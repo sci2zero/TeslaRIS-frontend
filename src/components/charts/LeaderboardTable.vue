@@ -117,7 +117,7 @@ const getEntityName = (index: PersonIndex | OrganisationUnitIndex | DocumentPubl
     } else if ("nameSr" in index) {
         return i18n.locale.value === "sr" ? index.nameSr : index.nameOther;
     } else {
-        return index.apa;
+        return i18n.locale.value === "sr" ? (index.titleSr || index.apa) : (index.titleOther || index.apa);
     }
 };
 

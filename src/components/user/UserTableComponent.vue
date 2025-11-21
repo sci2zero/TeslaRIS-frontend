@@ -117,8 +117,14 @@
                                     <user-email-change-modal
                                         :user-id="row.item.databaseId"
                                         :preset-email="row.item.email"
-                                        :read-only="row.item.active">
+                                        :read-only="row.item.active"
+                                        @update="notifyEmailChanged">
                                     </user-email-change-modal>
+                                    <v-list-item
+                                        v-if="!row.item.active"
+                                        @click="resendActivationEmail(row.item.databaseId)">
+                                        <v-list-item-title>{{ $t("resendActivationEmailLabel") }}</v-list-item-title>
+                                    </v-list-item>
                                 </v-list>
                             </v-menu>
                         </div>
@@ -309,13 +315,28 @@ export default defineComponent({
             snackbar.value = true;
         };
 
+        const notifyEmailChanged = (oldEmail: string, newEmail: string) => {
+            snackbarText.value = i18n.t("emailChangedMessage", [oldEmail, newEmail]);
+            snackbar.value = true;
+
+            refreshTable(tableOptions.value);
+        };
+
+        const resendActivationEmail = (userId: number) => {
+            UserService.resendActivationEmail(userId).then(() => {
+                snackbarText.value = i18n.t("emailSentMessage");
+                snackbar.value = true;
+            });
+        };
+
         return {
             headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, changeActivationStatus, takeRoleOfUser,
             displayFormNotification, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, setSortAndPageOption,
             accountsThatAllowedRoleTaking, UserRole, deleteUser,
-            generateNewPassword, notifyUserAboutMigration
+            generateNewPassword, notifyUserAboutMigration,
+            notifyEmailChanged, resendActivationEmail
         };
     }
 });

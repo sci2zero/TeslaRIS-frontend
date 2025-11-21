@@ -71,7 +71,7 @@
                         <multilingual-text-input
                             ref="scientificAreaRef"
                             v-model="scientificArea"
-                            :label="$t('scientificAreaLabel')">
+                            :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artAreaLabel' : 'scientificAreaLabel')">
                         </multilingual-text-input>
                     </v-col>
                 </v-row>
@@ -148,7 +148,7 @@
                             <multilingual-text-input
                                 ref="scientificSubAreaRef"
                                 v-model="scientificSubArea"
-                                :label="$t('scientificSubAreaLabel')">
+                                :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artSubAreaLabel' : 'scientificSubAreaLabel')">
                             </multilingual-text-input>
                         </v-col>
                     </v-row>
@@ -684,10 +684,10 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             typeOfTitle, scientificAreaRef, scientificSubAreaRef,
             placeOfKeepRef, typeOfTitleRef, presetContent,
-            toMultilingualTextInput, isResearcher, scopus,
+            toMultilingualTextInput, isResearcher, scopus, ThesisType,
             scopusIdValidationRules, languagesWithMoreWritingSystems,
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
-            topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules
+            topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules,
         };
     }
 });

@@ -1179,7 +1179,7 @@ const router = createRouter({
                     component: PromotionListView,
                     meta: {
                         authenticated: true,
-                        authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                        authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
                 },
                 {
@@ -1201,7 +1201,7 @@ const router = createRouter({
                             component: RegistryBookView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin, roles.promotionRegistryAdministrator],
+                                authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian, roles.headOfLibrary],
                             },
                         },
                         {

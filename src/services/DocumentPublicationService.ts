@@ -18,22 +18,22 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}`);
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}`);
   }
 
-  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}`);
+    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
@@ -76,13 +76,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/for-publisher/${publisherId}?${pageable}`);
   }
 
-  async findPublicationsForOrganisationUnit(organisationUnitId: number, allowedTypes: PublicationType[], pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async findPublicationsForOrganisationUnit(organisationUnitId: number, allowedTypes: PublicationType[], pageable: string, notArchivedOnly: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}${allowedTypesParam}`);
+    return super.sendRequest(axios.get, `document/for-organisation-unit/${organisationUnitId}?${pageable}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}`);
   }
 
   async createJournalPublication(body: JournalPublication, idempotencyKey: string | null = null): Promise<AxiosResponse<JournalPublication>> {

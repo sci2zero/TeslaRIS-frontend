@@ -50,6 +50,8 @@
             </v-card>
         </v-dialog>
     </div>
+
+    <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
@@ -57,10 +59,13 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import UserService from "@/services/UserService";
 import { useValidationUtils } from "@/utils/ValidationUtils";
+import Toast from "../core/Toast.vue";
+import { useI18n } from "vue-i18n";
 
 
 export default defineComponent({
     name: "UserEmailChangeModal",
+    components: { Toast },
     props: {
         userId: {
             type: Number,
@@ -80,6 +85,10 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
+        const snackbar = ref(false);
+        const message = ref("");
+        const i18n = useI18n();
+
         const email = ref(props.presetEmail);
         const { emailFieldRules } = useValidationUtils();
 
@@ -90,6 +99,11 @@ export default defineComponent({
             ).then(() => {
                 dialog.value = false;
                 emit("update", props.presetEmail, email.value);
+            }).catch(error => {
+                if (error.response.status === 409) {
+                    message.value = i18n.t(error.response.data.message as string);
+                    snackbar.value = true;
+                }
             });
         };
 
@@ -97,7 +111,8 @@ export default defineComponent({
             isFormValid,
             emailFieldRules,
             forceEmailChange,
-            dialog, email
+            dialog, email,
+            snackbar, message
         };
     }
 });

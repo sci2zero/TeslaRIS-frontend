@@ -6,6 +6,10 @@ import { type InstitutionDefaultSubmissionContent } from "@/models/OrganisationU
 
 export class InstitutionDefaultSubmissionContentService extends BaseService {
 
+    async canEdit(institutionId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `institution-default-submission-content/${institutionId}/can-edit`);
+    }
+
     async getContentForInstitution(institutionId: number): Promise<AxiosResponse<InstitutionDefaultSubmissionContent>> {
         return super.sendRequest(axios.get, `institution-default-submission-content/institution/${institutionId}`);
     }
