@@ -2,7 +2,7 @@
     <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="800px">
             <template #activator="scope">
-                <div v-if="!readOnly" class="edit-pen">
+                <div v-if="!readOnly" class="edit-pen!">
                     <v-btn
                         v-if="!edit"
                         icon variant="outlined"

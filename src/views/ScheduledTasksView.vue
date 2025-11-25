@@ -43,6 +43,7 @@
                     :items="entityTypes"
                     :label="$t('entityTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
+                    return-object
                     multiple>
                 </v-select>
             </v-col>
@@ -133,6 +134,24 @@
                     :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
             </v-col>
         </v-row>
+        <v-row
+            v-if="taskReindexing && reindexingDocuments"
+            class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
+            <v-col cols="2" md="2">
+                <h5>
+                    {{ $t("publicationTypeToIndexMessage") }}
+                </h5>
+            </v-col>
+            <v-col cols="4" md="2">
+                <v-select
+                    v-model="selectedPublicationType"
+                    :items="publicationTypes"
+                    :label="$t('typeOfPublicationLabel')"
+                    clearable
+                    return-object>
+                </v-select>
+            </v-col>
+        </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
             <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" sm="3" md="2">
                 <date-picker
@@ -208,6 +227,7 @@ import { useInterval } from "@/composables/useInterval";
 import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType";
 import { RecurrenceType } from "@/models/LoadModel";
 import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
+import { getPublicationTypesForGivenLocale } from "@/i18n/publicationType";
 
 
 export default defineComponent({
@@ -266,6 +286,10 @@ export default defineComponent({
 
         const entityTypes = ref<{ title: string; value: EntityType; }[]>(getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[]);
         const selectedEntityTypes = ref<{ title: string, value: EntityType }[]>([...entityTypes.value]);
+
+        const publicationTypes = ref<{ title: string; value: PublicationType; }[]>(getPublicationTypesForGivenLocale() as { title: string; value: PublicationType; }[]);
+        const selectedPublicationType = ref<{ title: string; value: PublicationType; }>();
+        const reindexingDocuments = computed(() => selectedEntityTypes.value.some(el => el.value === EntityType.PUBLICATION));
 
         const selectedJournals = ref<{title: string, value: number}[]>([]);
         const selectedEvents = ref<{title: string, value: number}[]>([]);
@@ -379,7 +403,8 @@ export default defineComponent({
                         TaskManagerService.scheduleDatabaseReindexing(
                             timestamp, selectedEntityTypes.value.map(entityType => entityType.value),
                             selectedRecurrenceType.value.value,
-                            reharvestCitationIndicators.value
+                            reharvestCitationIndicators.value,
+                            selectedPublicationType.value ? selectedPublicationType.value.value : null
                         )
                     );
                     break;
@@ -522,10 +547,11 @@ export default defineComponent({
             isTopLevelReport, isSummaryReport,
             selectedCommissions, recurrenceTypes,
             selectedRecurrenceType, thesisTypes,
-            reharvestCitationIndicators,
-            taskUnmanagedDocumentsDeletion,
+            reharvestCitationIndicators, reindexingDocuments,
+            taskUnmanagedDocumentsDeletion, publicationTypes,
             publicReviewEndCheck, selectedThesisTypes,
-            requiredNumericGreaterThanZeroFieldRules
+            requiredNumericGreaterThanZeroFieldRules,
+            selectedPublicationType
         };
     },
 });

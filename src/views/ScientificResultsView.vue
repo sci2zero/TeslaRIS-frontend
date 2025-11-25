@@ -35,9 +35,6 @@
             </v-tabs-window-item>
         </v-tabs-window>
 
-
-        
-
         <tab-content-loader
             v-if="loading"
             button-header
@@ -53,7 +50,7 @@
             :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
             :has-active-type-filters="selectedPublicationTypes.length > 0"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+            :endpoint-token-parameters="[`${returnOnlyNonArchived}`, searchParams.replaceAll('&tokens=', 'tokens=')]"
             :endpoint-body-parameters="
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
@@ -106,6 +103,13 @@
                                     v-if="isAdmin"
                                     v-model="returnOnlyUnmanagedPublications"
                                     :label="$t('showOnlyUnmanagedLabel')"
+                                    class=""
+                                ></v-checkbox>
+
+                                <v-checkbox
+                                    v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
+                                    v-model="returnOnlyNonArchived"
+                                    :label="$t('showNonArchivedLabel')"
                                     class=""
                                 ></v-checkbox>
                             </span>
@@ -210,6 +214,7 @@ export default defineComponent({
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
         const returnOnlyUnmanagedPublications = ref(false);
+        const returnOnlyNonArchived = ref(false);
 
         const {
             isCommission, isAdmin, isInstitutionalEditor,
@@ -243,7 +248,7 @@ export default defineComponent({
         watch([
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
-            returnOnlyUnmanagedPublications], () => {
+            returnOnlyUnmanagedPublications, returnOnlyNonArchived], () => {
             if (!initialLoad.value) {
                 search(searchParams.value);
             }
@@ -265,9 +270,9 @@ export default defineComponent({
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes);
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value);
 
             const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
                 ? (loggedInUser.value?.organisationUnitId as number)
@@ -346,7 +351,9 @@ export default defineComponent({
             ExportableEndpointType, searchParams, currentTab,
             resetFiltersAndSearch, loggedInUser, loading,
             performNavigation, returnOnlyUnmanagedPublications,
-            togglePublicationType, toggleAdvancedSearch
+            togglePublicationType, toggleAdvancedSearch,
+            isInstitutionalLibrarian, isHeadOfLibrary,
+            returnOnlyNonArchived
         };
     }
 });

@@ -147,7 +147,7 @@ export default defineComponent({
         });
 
         const startLoadProcess = () => {
-            if (props.personForLoading.scopusAuthorId || props.personForLoading.openAlexId || props.personForLoading.webOfScienceResearcherId) {
+            if (props.personForLoading.scopusAuthorId || props.personForLoading.openAlexId || props.personForLoading.webOfScienceResearcherId || props.personForLoading.orcid) {
                 PersonService.findResearcherByImportIdentifier(props.personForLoading.importId)
                 .then(response => {
                     if(response.data) {

@@ -116,7 +116,7 @@
                             class="d-flex flex-row justify-start ml-1 mt-5">
                             <h2>{{ $t("creatingExportLabel") }}</h2>
                             <v-progress-circular
-                                class="ml-2"
+                                class="ml-3 mt-5"
                                 color="primary"
                                 indeterminate
                             ></v-progress-circular>

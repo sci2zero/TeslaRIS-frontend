@@ -1,7 +1,7 @@
 <template>
     <v-btn
-        v-if="!disableBulkActions"
-        density="compact" class="bottom-spacer" :disabled="selectedEntries.length === 0"
+        v-if="!disableBulkActions && (isAdmin || isPromotionRegistryAdministrator)"
+        density="compact" class="bottom-spacer mt-3" :disabled="selectedEntries.length === 0"
         @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -14,7 +14,7 @@
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
-        :show-select="!disableBulkActions"
+        :show-select="!disableBulkActions && (isAdmin || isPromotionRegistryAdministrator)"
         return-object
         :no-data-text="$t('noDataInTableMessage')"
         :page="tableOptions.page"
@@ -22,7 +22,7 @@
     >
         <template #item="{ item }">
             <tr>
-                <td v-if="!disableBulkActions">
+                <td v-if="!disableBulkActions && (isAdmin || isPromotionRegistryAdministrator)">
                     <v-checkbox
                         v-model="selectedEntries"
                         :value="item"
@@ -53,7 +53,7 @@
                 <td v-if="promotedEntriesView">
                     {{ item.schoolYearOrdinalNumber }}
                 </td>
-                <td v-if="!disableActions">
+                <td v-if="!disableActions && (isAdmin || isPromotionRegistryAdministrator)">
                     <v-btn
                         v-if="item.inPromotion && !item.promoted"
                         density="compact"
@@ -95,6 +95,7 @@ import GenericCrudModal from '../core/GenericCrudModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { useUserRole } from '@/composables/useUserRole';
   
 
 export default defineComponent({
@@ -129,6 +130,8 @@ export default defineComponent({
         const selectedEntries = ref<RegistryBookEntry[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
+        const { isAdmin, isPromotionRegistryAdministrator } = useUserRole();
+
         const tableOptions = ref({
             initialCustomConfiguration: true,
             page: 1,
@@ -159,7 +162,7 @@ export default defineComponent({
                 headers.value.push({ title: i18n.t("schoolYearNumberLabel"), align: "start" });
             }
             
-            if (!props.disableActions) {
+            if (!props.disableActions && (isAdmin.value || isPromotionRegistryAdministrator.value)) {
                 headers.value.push({ title: i18n.t("actionLabel"), align: "start" });
             }
         });
@@ -231,7 +234,8 @@ export default defineComponent({
             addToPromotion, deleteSelection,
             returnCurrentLocaleContent,
             displayPersistentDialog,
-            startDeletionProcess
+            startDeletionProcess, isAdmin,
+            isPromotionRegistryAdministrator
         };
     },
 });

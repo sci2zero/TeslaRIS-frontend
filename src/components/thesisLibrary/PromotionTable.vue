@@ -1,5 +1,7 @@
 <template>
-    <v-row class="align-center">
+    <v-row
+        v-if="isPromotionRegistryAdministrator || isAdmin"
+        class="align-center">
         <v-col cols="auto">
             <v-btn
                 density="compact" class="bottom-spacer" :disabled="selectedPromotions.length === 0"
@@ -27,14 +29,14 @@
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
-        show-select
+        :show-select="isPromotionRegistryAdministrator || isAdmin"
         return-object
         :no-data-text="$t('noDataInTableMessage')"
         :page="tableOptions.page"
         @update:options="refreshTable">
         <template #item="row">
             <tr>
-                <td>
+                <td v-if="isPromotionRegistryAdministrator || isAdmin">
                     <v-checkbox
                         v-model="selectedPromotions"
                         :value="row.item"
@@ -49,7 +51,7 @@
                     <v-icon v-if="row.item.finished" icon="mdi-check"></v-icon>
                     <v-icon v-else icon="mdi-cancel"></v-icon>
                 </td>
-                <td>
+                <td v-if="isPromotionRegistryAdministrator || isAdmin">
                     <generic-crud-modal
                         class="mt-5"
                         :form-component="PromotionForm"
@@ -86,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
@@ -99,6 +101,7 @@ import type { Promotion } from '@/models/ThesisLibraryModel';
 import { localiseDate, localiseTime } from '@/utils/DateUtil';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
@@ -130,14 +133,28 @@ export default defineComponent({
         const actionLabel = computed(() => i18n.t("actionLabel"));
         const isFinishedLabel = computed(() => i18n.t("isFinishedLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "promotionDate", order: "asc"}]});
+        const { isPromotionRegistryAdministrator, isAdmin } = useUserRole();
 
-        const headers = ref<any>([
-          { title: dateTimeLabel, align: "start", sortable: true, key: "promotionDate"},
-          { title: placeLabel, align: "start", sortable: true, key: "placeOrVenue"},
-          { title: descriptionLabel, align: "start", sortable: false, key: "description.content"},
-          { title: isFinishedLabel, align: "start", sortable: true, key: "finished"},
-          { title: actionLabel},
+        const tableOptions = ref<any>(
+            {
+                initialCustomConfiguration: true,
+                page: 1,
+                itemsPerPage: 25,
+                sortBy:[{key: "promotionDate", order: "asc"}]
+            }
+        );
+
+        onMounted(() => {
+            if (isPromotionRegistryAdministrator.value || isAdmin.value) {
+                headers.value.push({ title: actionLabel });
+            }
+        });
+
+        const headers = ref<any[]>([
+          { title: dateTimeLabel, align: "start", sortable: true, key: "promotionDate" },
+          { title: placeLabel, align: "start", sortable: true, key: "placeOrVenue" },
+          { title: descriptionLabel, align: "start", sortable: false, key: "description.content" },
+          { title: isFinishedLabel, align: "start", sortable: true, key: "finished" }
         ]);
 
         const refreshTable = (event: any) => {
@@ -230,13 +247,15 @@ export default defineComponent({
             displayPersistentDialog.value = true;
         };
 
-        return {headers, snackbar, snackbarText, timeout, refreshTable,
+        return {
+            headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedPromotions, notifications, createNewPromotion,
             updatePromotion, setSortAndPageOption, PromotionForm,
             localiseDate, localiseTime, displayPersistentDialog,
-            startDeletionProcess
+            startDeletionProcess, isPromotionRegistryAdministrator,
+            isAdmin
         };
     }
 });

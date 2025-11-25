@@ -8,7 +8,7 @@
                 placeholder="DOI"
                 :rules="doiValidationRules">
             </v-text-field>
-            <p v-if="errorMessage" class="text-red">
+            <p v-if="errorMessage" class="text-red ml-1">
                 {{ errorMessage }} {{ harvestedDocumentType }}
             </p>
         </v-col>
@@ -90,6 +90,11 @@ export default defineComponent({
                     if (response.data.documentPublicationType && response.data.documentPublicationType !== props.documentType) {
                         harvestedDocumentType.value = getPublicationTypeTitleFromValueAutoLocale(response.data.documentPublicationType) as string;
                         errorMessage.value = mismatchedTypesMessage.value;
+                        return;
+                    }
+
+                    if (response.data.doi === null) {
+                        errorMessage.value = i18n.t("unableToFetchMetadataMessage");
                         return;
                     }
 
