@@ -104,7 +104,7 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[]});
         
         onMounted(() => {
             startLoadProcess();

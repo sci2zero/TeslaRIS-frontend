@@ -126,7 +126,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const totalEvents = ref(0);
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[]});
         
         const selectedPublicationSeries = ref<PublicationSeries>();
 

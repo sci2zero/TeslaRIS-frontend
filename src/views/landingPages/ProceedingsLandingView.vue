@@ -557,6 +557,8 @@ export default defineComponent({
                 if(reload) {
                     fetchProceedings(false);
                 }
+            }).finally(() => {
+                fetchPublications();
             });
         };
 

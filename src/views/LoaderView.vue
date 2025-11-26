@@ -390,6 +390,7 @@ export default defineComponent({
             const runId = crypto.randomUUID();
             currentSmartSkipRunId.value = runId;
             smartLoading.value = true;
+            let firstIter = true;
 
             let shouldStep = true;
             while (shouldStep) {
@@ -397,10 +398,11 @@ export default defineComponent({
                     break;
                 }
 
-                nextStep();
-                await new Promise(r => setTimeout(r, 1000));
-
-                if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
+                if (!firstIter || stepperValue.value === 0) {
+                    nextStep();
+                    await new Promise(r => setTimeout(r, 1000));
+                    if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
+                }
 
                 if (stepperValue.value <= currentLoadRecord.value!.contributions.length) {
                     await waitForImportAuthor(stepperValue.value - 1);
@@ -423,6 +425,8 @@ export default defineComponent({
                         finishLoad();
                     }
                 }
+
+                firstIter = false;
             }
         };
 

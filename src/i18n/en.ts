@@ -1203,5 +1203,11 @@ export default {
     emailSentMessage: "Email successfully sent.",
     resendActivationEmailLabel: "Resend activation email",
     contributorIdentifierLabel: "Contributor identifier",
-    institutionIdentifierLabel: "Institution identifier"
+    institutionIdentifierLabel: "Institution identifier",
+    scheduledMaintenanceMessage: "We are performing scheduled maintenance to improve your experience. System login will be temporarily unavailable from {0} to {1} .",
+    maintenanceModeMessage: "The application is in maintenance mode. System login is not possible. Also, some data may be temporarily missing.",
+    approximateEndMomentLabel: "Approximate end moment",
+    turnOnMaintenanceModeLabel: "Turn-on maintenance mode",
+    turnOffMaintenanceModeLabel: "Turn-off maintenance mode",
+    compareContributionsLabel: "Compare contributions"
 }

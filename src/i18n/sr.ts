@@ -1210,5 +1210,11 @@ export default {
     emailSentMessage: "Uspešno poslato.",
     resendActivationEmailLabel: "Pošalji aktivacioni link",
     contributorIdentifierLabel: "Identifikator kontributora",
-    institutionIdentifierLabel: "Identifikator institucije"
+    institutionIdentifierLabel: "Identifikator institucije",
+    scheduledMaintenanceMessage: "Obavljamo planirano održavanje kako bismo poboljšali vaše iskustvo. Prijava na sistem će biti privremeno nedostupna od {0} do {1} .",
+    maintenanceModeMessage: "Aplikacija je u modu održavanja. Prijava na sistem nije moguća. Takođe, neki podaci će možda privremeno nedostajati.",
+    approximateEndMomentLabel: "Procenjen momenat zavrsavanja",
+    turnOnMaintenanceModeLabel: "Uključi režim održavanja",
+    turnOffMaintenanceModeLabel: "Isključi režim održavanja",
+    compareContributionsLabel: "Uporedi kontribucije"
 }

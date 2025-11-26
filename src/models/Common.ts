@@ -130,7 +130,8 @@ export enum ScheduledTaskType {
     PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
     REPORT_GENERATION = "REPORT_GENERATION",
     UNMANAGED_DOCUMENTS_DELETION = "UNMANAGED_DOCUMENTS_DELETION",
-    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK"
+    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK",
+    MAINTENANCE = "MAINTENANCE"
 }
 
 export interface BrandingInformation {
@@ -367,4 +368,9 @@ export interface PersonFeaturedInformation {
 export interface YearRange {
     a: number;
     b: number;
+}
+
+export interface MaintenanceInformation {
+    startTime: string;
+    approximateEndMoment: string;
 }
