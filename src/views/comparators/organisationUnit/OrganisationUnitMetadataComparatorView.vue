@@ -16,7 +16,10 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="leftOrganisationUnit?.researchAreas" in-comparator></research-area-hierarchy>
+                        <research-area-hierarchy
+                            :research-areas="leftOrganisationUnit?.researchAreas"
+                            in-comparator>
+                        </research-area-hierarchy>
                     </v-card-text>
                 </v-card>
 
@@ -26,8 +29,12 @@
                     <v-card-text>
                         <div><b>{{ $t("relationsLabel") }}</b></div>
                         <organisation-unit-relation-update-form
-                            ref="leftRelationsRef" :relations="leftRelations" :source-o-u="leftOrganisationUnit" in-comparator
-                            @update="updateRightRelations"></organisation-unit-relation-update-form>
+                            ref="leftRelationsRef"
+                            :relations="leftRelations"
+                            :source-o-u="leftOrganisationUnit"
+                            in-comparator
+                            @update="updateLeftRelations">
+                        </organisation-unit-relation-update-form>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -57,7 +64,10 @@
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                        <research-area-hierarchy :research-areas="rightOrganisationUnit?.researchAreas" in-comparator></research-area-hierarchy>
+                        <research-area-hierarchy
+                            :research-areas="rightOrganisationUnit?.researchAreas"
+                            in-comparator>
+                        </research-area-hierarchy>
                     </v-card-text>
                 </v-card>
 
@@ -67,8 +77,12 @@
                     <v-card-text>
                         <div><b>{{ $t("relationsLabel") }}</b></div>
                         <organisation-unit-relation-update-form
-                            ref="rightRelationsRef" :relations="rightRelations" :source-o-u="rightOrganisationUnit" in-comparator
-                            @update="updateRightRelations"></organisation-unit-relation-update-form>
+                            ref="rightRelationsRef"
+                            :relations="rightRelations"
+                            :source-o-u="rightOrganisationUnit"
+                            in-comparator
+                            @update="updateRightRelations">
+                        </organisation-unit-relation-update-form>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -106,6 +120,7 @@ import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import OrganisationUnitRelationUpdateForm from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -195,39 +210,27 @@ export default defineComponent({
             mergeMultilingualContentField(organisationUnit1.keyword, organisationUnit2.keyword);
             organisationUnit2.keyword = [];
 
-            organisationUnit1.nameAbbreviation = organisationUnit2.nameAbbreviation;
-            organisationUnit2.nameAbbreviation = "";
-            organisationUnit1.scopusAfid = organisationUnit2.scopusAfid;
-            organisationUnit2.scopusAfid = "";
-            organisationUnit1.openAlexId = organisationUnit2.openAlexId;
-            organisationUnit2.openAlexId = "";
-            organisationUnit1.ror = organisationUnit2.ror;
-            organisationUnit2.ror = "";
-            organisationUnit1.allowedThesisTypes = organisationUnit2.allowedThesisTypes;
-            organisationUnit2.allowedThesisTypes = [];
-
-            organisationUnit1.clientInstitutionCris = organisationUnit2.clientInstitutionCris;
-            organisationUnit2.clientInstitutionCris = false;
-            organisationUnit1.validatingEmailDomainCris = organisationUnit2.validatingEmailDomainCris;
-            organisationUnit2.validatingEmailDomainCris = false;
-            organisationUnit1.allowingSubdomainsCris = organisationUnit2.allowingSubdomainsCris;
-            organisationUnit2.allowingSubdomainsCris = false;
-            organisationUnit1.institutionEmailDomainCris = organisationUnit2.institutionEmailDomainCris;
-            organisationUnit2.institutionEmailDomainCris = "";
-            organisationUnit1.clientInstitutionDl = organisationUnit2.clientInstitutionDl;
-            organisationUnit2.clientInstitutionDl = false;
-            organisationUnit1.validatingEmailDomainDl = organisationUnit2.validatingEmailDomainDl;
-            organisationUnit2.validatingEmailDomainDl = false;
-            organisationUnit1.allowingSubdomainsDl = organisationUnit2.allowingSubdomainsDl;
-            organisationUnit2.allowingSubdomainsDl = false;
-            organisationUnit1.institutionEmailDomainDl = organisationUnit2.institutionEmailDomainDl;
-            organisationUnit2.institutionEmailDomainDl = "";
-            organisationUnit1.legalEntity = organisationUnit2.legalEntity;
-
-            organisationUnit1.contact!.contactEmail = organisationUnit2.contact?.contactEmail as string;
-            organisationUnit1.contact!.phoneNumber = organisationUnit2.contact?.phoneNumber as string;
-            organisationUnit2.contact!.contactEmail = "";
-            organisationUnit2.contact!.phoneNumber = "";
+            bulkTransferFields(organisationUnit1, organisationUnit2, [
+                { fieldName: "nameAbbreviation", emptyValue: "" },
+                { fieldName: "scopusAfid", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "ror", emptyValue: "" },
+                { fieldName: "allowedThesisTypes", emptyValue: [] },
+                { fieldName: "clientInstitutionCris", emptyValue: false },
+                { fieldName: "validatingEmailDomainCris", emptyValue: false },
+                { fieldName: "allowingSubdomainsCris", emptyValue: false },
+                { fieldName: "institutionEmailDomainCris", emptyValue: "" },
+                { fieldName: "clientInstitutionDl", emptyValue: false },
+                { fieldName: "validatingEmailDomainDl", emptyValue: false },
+                { fieldName: "allowingSubdomainsDl", emptyValue: false },
+                { fieldName: "institutionEmailDomainDl", emptyValue: "" },
+                { fieldName: "legalEntity", emptyValue: false, setEmpty: false },
+                { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
+                { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
+                { fieldName: "location.latitude", emptyValue: null, nested: true, setEmpty: false },
+                { fieldName: "location.longitude", emptyValue: null, nested: true, setEmpty: false },
+                { fieldName: "location.address", emptyValue: null, nested: true, setEmpty: false }
+            ]);
 
             organisationUnit1.researchAreas = organisationUnit2.researchAreas;
 
@@ -237,10 +240,6 @@ export default defineComponent({
                 }
             });
             organisationUnit2.uris = [];
-
-            organisationUnit1.location!.latitude = organisationUnit2.location?.latitude as number;
-            organisationUnit1.location!.longitude = organisationUnit2.location?.longitude as number;
-            organisationUnit1.location!.address = organisationUnit2.location?.address;
 
             return [organisationUnit1, organisationUnit2];
         };

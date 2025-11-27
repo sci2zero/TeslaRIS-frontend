@@ -117,6 +117,7 @@ import { ComparisonSide } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -172,21 +173,17 @@ export default defineComponent({
 
             mergeDocumentAttachments(software1, software2);
 
-            software1.internalNumber = software2.internalNumber;
-            software2.internalNumber = "";
-            software1.doi = software2.doi;
-            software2.doi = "";
-            software1.openAlexId = software2.openAlexId;
-            software2.openAlexId = "";
-            software1.webOfScienceId = software2.webOfScienceId;
-            software2.webOfScienceId = "";
-            software1.scopusId = software2.scopusId;
-            software2.scopusId = "";
-            software1.documentDate = software2.documentDate;
-
-            software1.eventId = software2.eventId;
-            software1.publisherId = software2.publisherId;
-            software1.authorReprint = software2.authorReprint;
+            bulkTransferFields(software1, software2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "internalNumber", emptyValue: "" },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
             software2.uris!.forEach(uri => {
                 if (!software1.uris!.includes(uri)) {

@@ -550,7 +550,7 @@ export default {
     createNewResearchAreaLabel: "Create New Research Area",
     searchInSystemLabel: "Search in system",
     enterExternalOULabel: "Enter affiliation that is not in list",
-    enterExternalThesisOULabel: "Doctorate in external institution",
+    enterExternalThesisOULabel: "Thesis in external institution",
     externalOUNameLabel: "External institution name",
     boundToUserLabel: "(Bound to user)",
     forceDeleteLabel: "Force Delete",
@@ -1204,10 +1204,12 @@ export default {
     resendActivationEmailLabel: "Resend activation email",
     contributorIdentifierLabel: "Contributor identifier",
     institutionIdentifierLabel: "Institution identifier",
-    scheduledMaintenanceMessage: "We are performing scheduled maintenance to improve your experience. System login will be temporarily unavailable from {0} to {1} .",
+    scheduledMaintenanceMessage: "We are performing scheduled maintenance to improve your experience. System login will be temporarily unavailable from {0} - {1} .",
     maintenanceModeMessage: "The application is in maintenance mode. System login is not possible. Also, some data may be temporarily missing.",
     approximateEndMomentLabel: "Approximate end moment",
     turnOnMaintenanceModeLabel: "Turn-on maintenance mode",
     turnOffMaintenanceModeLabel: "Turn-off maintenance mode",
-    compareContributionsLabel: "Compare contributions"
+    compareContributionsLabel: "Compare contributions",
+    onlyWithImportIdentifiersLabel: "Only with identifiers",
+    harvestStartedMessage: "Started scanning external sources, you will get a notification once this process is completed."
 }

@@ -90,7 +90,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import BookSeriesService from '@/services/BookSeriesService';
 import type { BookSeries } from '@/models/BookSeriesModel';
 import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';
@@ -101,6 +101,7 @@ import { ComparisonSide } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -137,50 +138,17 @@ export default defineComponent({
         };
 
         const mergeBookSeriesMetadata = (bookSeries1: BookSeries, bookSeries2: BookSeries) => {
-            bookSeries2.title.forEach(title => {
-                let merged = false;
-                bookSeries1.title.forEach(currentTitle => {
-                    if (currentTitle.languageTag === title.languageTag) {
-                        currentTitle.content += " | " + title.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    bookSeries1.title.push(title);
-                }
-            });
+            mergeMultilingualContentField(bookSeries1.title, bookSeries2.title);
+            mergeMultilingualContentField(bookSeries1.subtitle, bookSeries2.subtitle);
 
-            bookSeries2.subtitle?.forEach(subtitle => {
-                let merged = false;
-                bookSeries1.subtitle?.forEach(currentTitle => {
-                    if (currentTitle.languageTag === subtitle.languageTag) {
-                        currentTitle.content += " | " + subtitle.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    bookSeries1.title.push(subtitle);
-                }
-            });
-
-            bookSeries2.nameAbbreviation.forEach(nameAbbreviation => {
-                let merged = false;
-                bookSeries1.nameAbbreviation.forEach(currentNameAbbreviation => {
-                    if (currentNameAbbreviation.languageTag === nameAbbreviation.languageTag) {
-                        currentNameAbbreviation.content += " | " + nameAbbreviation.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    bookSeries1.nameAbbreviation.push(nameAbbreviation);
-                }
-            });
+            mergeMultilingualContentField(bookSeries1.nameAbbreviation, bookSeries2.nameAbbreviation);
             bookSeries2.nameAbbreviation = [];
 
-            bookSeries1.eissn = bookSeries2.eissn;
-            bookSeries2.eissn = "";
-            bookSeries1.printISSN = bookSeries2.printISSN;
-            bookSeries2.printISSN = "";
+            bulkTransferFields(bookSeries1, bookSeries2, [
+                { fieldName: "eissn", emptyValue: "" },
+                { fieldName: "printISSN", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" }
+            ]);
 
             bookSeries2.languageTagIds.forEach(languageTagId => {
                 if (!bookSeries1.languageTagIds.includes(languageTagId)) {
@@ -228,6 +196,7 @@ export default defineComponent({
             leftBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             leftBookSeries.value!.uris = updatedBookSeries.uris;
             leftBookSeries.value!.subtitle = updatedBookSeries.subtitle;
+            leftBookSeries.value!.openAlexId = updatedBookSeries.openAlexId;
             leftUpdateComplete.value = true;
             
             if (update.value) {
@@ -243,6 +212,7 @@ export default defineComponent({
             rightBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
             rightBookSeries.value!.uris = updatedBookSeries.uris;
             rightBookSeries.value!.subtitle = updatedBookSeries.subtitle;
+            rightBookSeries.value!.openAlexId = updatedBookSeries.openAlexId;
             rightUpdateComplete.value = true;
             
             if (update.value) {

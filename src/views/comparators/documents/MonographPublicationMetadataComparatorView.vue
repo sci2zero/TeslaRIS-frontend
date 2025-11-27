@@ -115,6 +115,7 @@ import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -169,26 +170,21 @@ export default defineComponent({
             monographPublication2.description = [];
 
             mergeDocumentAttachments(monographPublication1, monographPublication2);
-            
-            monographPublication1.monographPublicationType = monographPublication2.monographPublicationType;
-            monographPublication1.numberOfPages = monographPublication2.numberOfPages;
-            monographPublication2.numberOfPages = 0;
-            monographPublication1.doi = monographPublication2.doi;
-            monographPublication2.doi = "";
-            monographPublication1.scopusId = monographPublication2.scopusId;
-            monographPublication2.scopusId = "";
-            monographPublication1.openAlexId = monographPublication2.openAlexId;
-            monographPublication2.openAlexId = "";
-            monographPublication1.documentDate = monographPublication2.documentDate;
-            monographPublication1.startPage = monographPublication2.startPage;
-            monographPublication2.startPage = "";
-            monographPublication1.endPage = monographPublication2.endPage;
-            monographPublication2.endPage = "";
-            monographPublication1.articleNumber = monographPublication2.articleNumber;
-            monographPublication2.articleNumber = "";
 
-            monographPublication1.eventId = monographPublication2.eventId;
-            monographPublication1.monographId = monographPublication2.monographId;
+            bulkTransferFields(monographPublication1, monographPublication2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "numberOfPages", emptyValue: 0 },
+                { fieldName: "articleNumber", emptyValue: "" },
+                { fieldName: "startPage", emptyValue: "" },
+                { fieldName: "endPage", emptyValue: "" },
+                { fieldName: "monographPublicationType", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "monographId", emptyValue: null, setEmpty: false }
+            ]);
 
             monographPublication2.uris!.forEach(uri => {
                 if (!monographPublication1.uris!.includes(uri)) {

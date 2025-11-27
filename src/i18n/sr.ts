@@ -549,7 +549,7 @@ export default {
     createNewResearchAreaLabel: "Kreiraj novu oblast istraživanja",
     searchInSystemLabel: "Pretraži u sistemu",
     enterExternalOULabel: "Unesi afilijaciju koja nije u listi",
-    enterExternalThesisOULabel: "Doktorat u spoljnoj instituciji",
+    enterExternalThesisOULabel: "Završni rad u spoljnoj instituciji",
     externalOUNameLabel: "Naziv spoljne institucije",
     boundToUserLabel: "(Vezan za korisnika)",
     forceDeleteLabel: "Forsirano brisanje",
@@ -1211,10 +1211,12 @@ export default {
     resendActivationEmailLabel: "Pošalji aktivacioni link",
     contributorIdentifierLabel: "Identifikator kontributora",
     institutionIdentifierLabel: "Identifikator institucije",
-    scheduledMaintenanceMessage: "Obavljamo planirano održavanje kako bismo poboljšali vaše iskustvo. Prijava na sistem će biti privremeno nedostupna od {0} do {1} .",
+    scheduledMaintenanceMessage: "Obavljamo planirano održavanje kako bismo poboljšali vaše iskustvo. Prijava na sistem će biti privremeno nedostupna od {0} - {1} .",
     maintenanceModeMessage: "Aplikacija je u modu održavanja. Prijava na sistem nije moguća. Takođe, neki podaci će možda privremeno nedostajati.",
-    approximateEndMomentLabel: "Procenjen momenat zavrsavanja",
+    approximateEndMomentLabel: "Procenjen momenat završavanja",
     turnOnMaintenanceModeLabel: "Uključi režim održavanja",
     turnOffMaintenanceModeLabel: "Isključi režim održavanja",
-    compareContributionsLabel: "Uporedi kontribucije"
+    compareContributionsLabel: "Uporedi kontribucije",
+    onlyWithImportIdentifiersLabel: "Samo sa identifikatorima",
+    harvestStartedMessage: "Skeniranje izvora započeto, dobićete obaveštenje kada bude završeno."
 }

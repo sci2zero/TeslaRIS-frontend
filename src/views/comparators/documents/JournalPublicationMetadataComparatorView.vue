@@ -116,6 +116,7 @@ import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -170,32 +171,23 @@ export default defineComponent({
             journalPublication2.description = [];
 
             mergeDocumentAttachments(journalPublication1, journalPublication2);
-            
-            journalPublication1.journalPublicationType = journalPublication2.journalPublicationType;
-            journalPublication1.numberOfPages = journalPublication2.numberOfPages;
-            journalPublication2.numberOfPages = 0;
-            journalPublication1.doi = journalPublication2.doi;
-            journalPublication2.doi = "";
-            journalPublication1.scopusId = journalPublication2.scopusId;
-            journalPublication2.scopusId = "";
-            journalPublication1.documentDate = journalPublication2.documentDate;
-            journalPublication1.startPage = journalPublication2.startPage;
-            journalPublication2.startPage = "";
-            journalPublication1.endPage = journalPublication2.endPage;
-            journalPublication2.endPage = "";
-            journalPublication1.articleNumber = journalPublication2.articleNumber;
-            journalPublication2.articleNumber = "";
-            journalPublication1.volume = journalPublication2.volume;
-            journalPublication2.volume = "";
-            journalPublication1.issue = journalPublication2.issue;
-            journalPublication2.issue = "";
-            journalPublication1.openAlexId = journalPublication2.openAlexId;
-            journalPublication2.openAlexId = "";
-            journalPublication1.webOfScienceId = journalPublication2.webOfScienceId;
-            journalPublication2.webOfScienceId = "";
 
-            journalPublication1.eventId = journalPublication2.eventId;
-            journalPublication1.journalId = journalPublication2.journalId;
+            bulkTransferFields(journalPublication1, journalPublication2, [
+                { fieldName: "numberOfPages", emptyValue: 0 },
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "volume", emptyValue: "" },
+                { fieldName: "issue", emptyValue: "" },
+                { fieldName: "startPage", emptyValue: "" },
+                { fieldName: "endPage", emptyValue: "" },
+                { fieldName: "articleNumber", emptyValue: "" },
+                { fieldName: "journalPublicationType", emptyValue: null, setEmpty: false },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "journalId", emptyValue: null, setEmpty: false }
+            ]);
 
             journalPublication2.uris!.forEach(uri => {
                 if (!journalPublication1.uris!.includes(uri)) {

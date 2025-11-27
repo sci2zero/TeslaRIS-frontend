@@ -119,6 +119,7 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -175,32 +176,24 @@ export default defineComponent({
 
             mergeDocumentAttachments(monograph1, monograph2);
 
-            monograph1.monographType = monograph2.monographType;
-            monograph1.eisbn = monograph2.eisbn;
-            monograph2.eisbn = "";
-            monograph1.printISBN = monograph2.printISBN;
-            monograph2.printISBN = "";
-            monograph1.numberOfPages = monograph2.numberOfPages;
-            monograph2.numberOfPages = 0;
-            monograph1.doi = monograph2.doi;
-            monograph2.doi = "";
-            monograph1.scopusId = monograph2.scopusId;
-            monograph2.scopusId = "";
-            monograph1.openAlexId = monograph2.openAlexId;
-            monograph2.openAlexId = "";
-            monograph1.webOfScienceId = monograph2.webOfScienceId;
-            monograph2.webOfScienceId = "";
-            monograph1.documentDate = monograph2.documentDate;
-            monograph1.volume = monograph2.volume;
-            monograph2.volume = "";
-            monograph1.number = monograph2.number;
-            monograph2.number = "";
-
-            monograph1.eventId = monograph2.eventId;
-            monograph1.publicationSeriesId = monograph2.publicationSeriesId;
-            monograph1.researchAreaId = monograph2.researchAreaId;
-            monograph1.publisherId = monograph2.publisherId;
-            monograph1.authorReprint = monograph2.authorReprint;
+            bulkTransferFields(monograph1, monograph2, [
+                { fieldName: "eisbn", emptyValue: "" },
+                { fieldName: "printISBN", emptyValue: "" },
+                { fieldName: "numberOfPages", emptyValue: 0 },
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "volume", emptyValue: "" },
+                { fieldName: "number", emptyValue: "" },
+                { fieldName: "monographType", emptyValue: null, setEmpty: false },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publicationSeriesId", emptyValue: null, setEmpty: false },
+                { fieldName: "researchAreaId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
             monograph2.languageTagIds!.forEach(languageTagId => {
                 if (!monograph1.languageTagIds!.includes(languageTagId)) {

@@ -146,6 +146,7 @@ import { ComparisonSide } from '@/models/MergeModel';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -259,28 +260,21 @@ export default defineComponent({
             mergeMultilingualContentField(person1.postalAddress!.streetAndNumber, person2.postalAddress!.streetAndNumber);
             person2.postalAddress!.streetAndNumber = [];
 
-            person1.placeOfBirth = person2.placeOfBirth;
-            person2.placeOfBirth = "";
-            person1.localBirthDate = person2.localBirthDate;
-            person2.localBirthDate = "";
-            person1.orcid = person2.orcid;
-            person2.orcid = "";
-            person1.eCrisId = person2.eCrisId;
-            person2.eCrisId = "";
-            person1.eNaukaId = person2.eNaukaId;
-            person2.eNaukaId = "";
-            person1.apvnt = person2.apvnt;
-            person2.apvnt = "";
-            person1.scopusAuthorId = person2.scopusAuthorId;
-            person2.scopusAuthorId = "";
-            person1.openAlexId = person2.openAlexId;
-            person2.openAlexId = "";
-            person1.webOfScienceResearcherId = person2.webOfScienceResearcherId;
-            person2.webOfScienceResearcherId = "";
-            person1.contact.contactEmail = person2.contact.contactEmail;
-            person2.contact.contactEmail = "";
-            person1.contact.phoneNumber = person2.contact.phoneNumber;
-            person2.contact.phoneNumber = "";
+            bulkTransferFields(person1, person2, [
+                { fieldName: "placeOfBirth", emptyValue: "" },
+                { fieldName: "localBirthDate", emptyValue: "" },
+                { fieldName: "orcid", emptyValue: "" },
+                { fieldName: "eCrisId", emptyValue: "" },
+                { fieldName: "eNaukaId", emptyValue: "" },
+                { fieldName: "apvnt", emptyValue: "" },
+                { fieldName: "scopusAuthorId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceResearcherId", emptyValue: "" },
+                { fieldName: "eNaukaId", emptyValue: "" },
+                { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
+                { fieldName: "contact.phoneNumber", emptyValue: "", nested: true }
+            ]);
+
             person2.uris!.forEach(uri => {
                 if (!person1.uris!.includes(uri)) {
                     person1.uris!.push(uri);

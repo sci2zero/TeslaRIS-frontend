@@ -50,7 +50,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
@@ -95,31 +95,9 @@ export default defineComponent({
         };
 
         const mergePublisherMetadata = (publisher1: Publisher, publisher2: Publisher) => {
-            publisher2.name.forEach(name => {
-                let merged = false;
-                publisher1.name.forEach(currentName => {
-                    if (currentName.languageTag === name.languageTag) {
-                        currentName.content += " | " + name.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    publisher1.name.push(name);
-                }
-            });
+            mergeMultilingualContentField(publisher1.name, publisher2.name);
 
-            publisher2.place.forEach(place => {
-                let merged = false;
-                publisher1.place.forEach(currentPlace => {
-                    if (currentPlace.languageTag === place.languageTag) {
-                        currentPlace.content += " | " + place.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    publisher1.place.push(place);
-                }
-            });
+            mergeMultilingualContentField(publisher1.place, publisher2.place);
             publisher2.place = [];
 
             publisher1.countryId = publisher2.countryId;

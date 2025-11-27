@@ -90,7 +90,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
 import PersonPublicationSeriesContributionList from '@/components/core/PersonPublicationSeriesContributionList.vue';
@@ -101,6 +101,7 @@ import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -139,50 +140,17 @@ export default defineComponent({
         };
 
         const mergeJournalMetadata = (journal1: Journal, journal2: Journal) => {
-            journal2.title.forEach(title => {
-                let merged = false;
-                journal1.title.forEach(currentTitle => {
-                    if (currentTitle.languageTag === title.languageTag) {
-                        currentTitle.content += " | " + title.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    journal1.title.push(title);
-                }
-            });
+            mergeMultilingualContentField(journal1.title, journal2.title);
+            mergeMultilingualContentField(journal1.subtitle, journal2.subtitle);
 
-            journal2.subtitle?.forEach(subtitle => {
-                let merged = false;
-                journal1.subtitle?.forEach(currentTitle => {
-                    if (currentTitle.languageTag === subtitle.languageTag) {
-                        currentTitle.content += " | " + subtitle.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    journal1.title.push(subtitle);
-                }
-            });
-
-            journal2.nameAbbreviation.forEach(nameAbbreviation => {
-                let merged = false;
-                journal1.nameAbbreviation.forEach(currentNameAbbreviation => {
-                    if (currentNameAbbreviation.languageTag === nameAbbreviation.languageTag) {
-                        currentNameAbbreviation.content += " | " + nameAbbreviation.content;
-                        merged = true;
-                    }
-                });
-                if (!merged) {
-                    journal1.nameAbbreviation.push(nameAbbreviation);
-                }
-            });
+            mergeMultilingualContentField(journal1.nameAbbreviation, journal2.nameAbbreviation);
             journal2.nameAbbreviation = [];
 
-            journal1.eissn = journal2.eissn;
-            journal2.eissn = "";
-            journal1.printISSN = journal2.printISSN;
-            journal2.printISSN = "";
+            bulkTransferFields(journal1, journal2, [
+                { fieldName: "eissn", emptyValue: "" },
+                { fieldName: "printISSN", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" }
+            ]);
 
             journal2.languageTagIds.forEach(languageTagId => {
                 if (!journal1.languageTagIds.includes(languageTagId)) {
@@ -230,6 +198,7 @@ export default defineComponent({
             leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
             leftJournal.value!.uris = updatedJournal.uris;
             leftJournal.value!.subtitle = updatedJournal.subtitle;
+            leftJournal.value!.openAlexId = updatedJournal.openAlexId;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -245,6 +214,7 @@ export default defineComponent({
             rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
             rightJournal.value!.uris = updatedJournal.uris;
             rightJournal.value!.subtitle = updatedJournal.subtitle;
+            rightJournal.value!.openAlexId = updatedJournal.openAlexId;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

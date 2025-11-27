@@ -20,7 +20,7 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.get, "import-common/can-perform");
     }
   
-    async startHarvest(dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<number>> {
+    async startHarvest(dateFrom: string, dateTo: string, institutionId: number = 0): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.get, `import-common/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}`);
     }
 
@@ -28,7 +28,7 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.post, `import-common/schedule/documents-by-author-or-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&institutionId=${institutionId}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`);
     }
 
-    async startAuthorCentricInstitutionHarvest(dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<number>> {
+    async startAuthorCentricInstitutionHarvest(dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.post, `import-common/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}`, request);
     }
 
