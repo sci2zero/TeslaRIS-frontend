@@ -118,7 +118,9 @@
                                 color="primary"
                             ></date-picker>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col
+                            v-if="!isOrganisationUnitDLClient || isAdmin || isHeadOfLibrary"
+                            cols="6">
                             <date-picker
                                 v-model="thesisDefenceDate"
                                 :label="$t('defenceDateLabel')"
@@ -334,7 +336,7 @@
 import { computed, defineComponent, nextTick, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
@@ -358,6 +360,7 @@ import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDe
 import type { InstitutionDefaultSubmissionContent } from '@/models/OrganisationUnitModel';
 import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
 
 
 export default defineComponent({
@@ -395,13 +398,17 @@ export default defineComponent({
         const languages = ref<LanguageResponse[]>();
 
         const presetContent = ref<InstitutionDefaultSubmissionContent>();
+        const isOrganisationUnitDLClient = ref(true);
+        const route = useRoute();
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
                 languagesWithMoreWritingSystems.value.splice(0);
                 response.data.forEach((language: LanguageResponse) => {
-                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
                     if (i18n.locale.value.toUpperCase() === language.languageCode) {
                         selectedLanguage.value = language.id;
                     }
@@ -413,8 +420,9 @@ export default defineComponent({
 
             fetchDefaultContent();
 
-            if (isResearcher.value) {
-                populateSinglePossibleAuthor();
+            const researcherId = route.query.researcherId;
+            if (isResearcher.value || researcherId) {
+                populateSinglePossibleAuthor(researcherId ? (researcherId as string) : null);
             }
         });
 
@@ -519,6 +527,14 @@ export default defineComponent({
             scopusIdValidationRules,
             optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
+
+        watch(selectedOrganisationUnit, () => {
+            if (selectedOrganisationUnit.value.value > 0) {
+                OrganisationUnitService.readOU(selectedOrganisationUnit.value.value).then((response) => {
+                    isOrganisationUnitDLClient.value = response.data.clientInstitutionDl;
+                });
+            }
+        });
 
         const submitThesis = (stayOnPage: boolean) => {
             const newThesis: Thesis = {
@@ -637,10 +653,17 @@ export default defineComponent({
             }
         };
 
-        const populateSinglePossibleAuthor = async () => {
-            const userResponse = await UserService.getLoggedInUser();
+        const populateSinglePossibleAuthor = async (researcherId: string | null) => {
+            let personId: number;
+            
+            if (researcherId) {
+                personId = parseInt(researcherId);
+            } else {
+                const userResponse = await UserService.getLoggedInUser();
+                personId = userResponse.data.personId;
+            }
 
-            const personResponse = await PersonService.getPersonWithUser(userResponse.data.personId);
+            const personResponse = await PersonService.getPersonWithUser(personId);
 
             contributions.value = [
                 {
@@ -648,7 +671,7 @@ export default defineComponent({
                     isMainContributor: true,
                     isCorrespondingContributor: true,
                     isBoardPresident: false,
-                    personId: userResponse.data.personId as number,
+                    personId: personId,
                     contributionDescription: [],
                     orderNumber: 1,
                     displayAffiliationStatement: [],
@@ -688,6 +711,7 @@ export default defineComponent({
             scopusIdValidationRules, languagesWithMoreWritingSystems,
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
             topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules,
+            isOrganisationUnitDLClient, isAdmin
         };
     }
 });

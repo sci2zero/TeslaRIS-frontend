@@ -671,6 +671,9 @@ export default defineComponent({
                 if (thesis.value.organisationUnitId) {
                     OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
                         organisationUnit.value = response.data;
+
+                        canBePutOnPublicReview.value = organisationUnit.value?.clientInstitutionDl === true &&
+                            (thesis.value?.thesisType === ThesisType.PHD || thesis.value?.thesisType === ThesisType.PHD_ART_PROJECT);
                     });
                 }
 
@@ -685,8 +688,6 @@ export default defineComponent({
                         event.value = response.data;
                     });
                 }
-
-                canBePutOnPublicReview.value = thesis.value.thesisType === ThesisType.PHD || thesis.value.thesisType === ThesisType.PHD_ART_PROJECT;
     
                 populateData();
             }).catch(() => {

@@ -73,7 +73,7 @@
                     color="primary"
                 ></date-picker>
             </v-col>
-            <v-col v-show="presetThesis?.publicReviewCompleted" cols="6">
+            <v-col v-show="!isOrganisationUnitDLClient || presetThesis?.publicReviewCompleted || isAdmin || isHeadOfLibrary" cols="6">
                 <date-picker
                     v-model="thesisDefenceDate"
                     :label="$t('defenceDateLabel')"
@@ -334,7 +334,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
-        const { isAdmin, isInstitutionalLibrarian } = useUserRole();
+        const { isAdmin, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
         const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
         const { languageTags } = useLanguageTags();
@@ -343,6 +343,7 @@ export default defineComponent({
         const selectedLanguage = ref<number>(props.presetThesis?.languageId as number);
         const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
+        const isOrganisationUnitDLClient = ref(false);
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
@@ -361,11 +362,15 @@ export default defineComponent({
             if(props.presetThesis) {
                 if (props.presetThesis.organisationUnitId) {
                     OrganisationUnitService.readOU(props.presetThesis.organisationUnitId).then((response) => {
-                        selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number}
+                        selectedOrganisationUnit.value = {
+                            title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number
+                        };
+                        isOrganisationUnitDLClient.value = response.data.clientInstitutionDl;
                     });
                 } else {
                     externalOUName.value = props.presetThesis?.externalOrganisationUnitName as MultilingualContent[];
                     enterExternalOU.value = true;
+                    isOrganisationUnitDLClient.value = false;
                 }
 
                 if (props.presetThesis?.publisherId) {
@@ -574,7 +579,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle, urisRef,
-            publicationYear, doi, message, snackbar,
+            publicationYear, doi, message, snackbar, isAdmin,
             numberOfPages, selectedPublisher, languageTagsList,
             uris, requiredFieldRules, requiredSelectionRules,
             submit, toMultilingualTextInput, selectedWritingLanguage,
@@ -590,7 +595,8 @@ export default defineComponent({
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
-            scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules
+            scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules,
+            isOrganisationUnitDLClient, isHeadOfLibrary
         };
     }
 });
