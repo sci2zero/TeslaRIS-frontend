@@ -89,6 +89,14 @@ export class RegistryBookService extends BaseService {
     async allowSingleUpdate(entryId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book/allow-single-update/${entryId}`);
     }
+
+    async getDraft(thesisId: number): Promise<AxiosResponse<RegistryBookEntry>> {
+        return super.sendRequest(axios.get, `registry-book-draft/${thesisId}`);
+    }
+
+    async saveDraft(body: RegistryBookEntry, thesisId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book-draft/${thesisId}`, body, RegistryBookService.idempotencyKey);
+    }
 }
 
 export default new RegistryBookService();

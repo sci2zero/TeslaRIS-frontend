@@ -20,6 +20,22 @@
                         </multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <publication-deduplication-table
+                                ref="deduplicationTableRef"
+                                :title="title"
+                                :doi="doi"
+                                :scopus-id="scopus"
+                                :web-of-science-id="webOfScienceId"
+                                :open-alex-id="openAlexId"
+                            ></publication-deduplication-table>
+                        </v-col>
+                    </v-row>
+                </v-row>
+
                 <v-row>
                     <v-col cols="10">
                         <v-text-field
@@ -268,11 +284,12 @@ import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch},
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch, PublicationDeduplicationTable },
     props: {
         inModal: {
             type: Boolean,
@@ -368,6 +385,7 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
+        const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
 
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
         const bookSeriesAutocompleteRef = ref<typeof BookSeriesAutocompleteSearch>();
@@ -390,7 +408,7 @@ export default defineComponent({
         const subtitle = ref([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const uris = ref<string[]>([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const description = ref([]);
         const eIsbn = ref("");
         const printIsbn = ref("");
@@ -495,6 +513,7 @@ export default defineComponent({
                     publicationYear.value = "";
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
+                    deduplicationTableRef.value?.resetTable();
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -534,6 +553,14 @@ export default defineComponent({
 
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+            }
         };
 
         return {
@@ -556,7 +583,8 @@ export default defineComponent({
             workOpenAlexIdValidationRules, popuateMetadata,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             publisherAutocompleteRef, selectedPublisher,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            deduplicationTableRef
         };
     }
 });

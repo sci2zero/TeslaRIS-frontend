@@ -1211,5 +1211,7 @@ export default {
     turnOffMaintenanceModeLabel: "Turn-off maintenance mode",
     compareContributionsLabel: "Compare contributions",
     onlyWithImportIdentifiersLabel: "Only with identifiers",
-    harvestStartedMessage: "Started scanning external sources, you will get a notification once this process is completed."
+    harvestStartedMessage: "Started scanning external sources, you will get a notification once this process is completed.",
+    notYetAddedLabel: "Not yet sent",
+    createThesisLabel: "Add new thesis"
 }

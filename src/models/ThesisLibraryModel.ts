@@ -10,6 +10,13 @@ export interface ThesisReportRequest {
     thesisType: ThesisType;
 }
 
+export interface NotAddedToPromotionThesesRequest {
+    fromDate: string,
+    toDate: string;
+    topLevelInstitutionIds: number[];
+    thesisTypes: ThesisType[];
+}
+
 export interface ThesisReportCounts {
     institutionId: number;
     institutionName: MultilingualContent[];

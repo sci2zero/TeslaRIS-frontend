@@ -1218,5 +1218,7 @@ export default {
     turnOffMaintenanceModeLabel: "Isključi režim održavanja",
     compareContributionsLabel: "Uporedi kontribucije",
     onlyWithImportIdentifiersLabel: "Samo sa identifikatorima",
-    harvestStartedMessage: "Skeniranje izvora započeto, dobićete obaveštenje kada bude završeno."
+    harvestStartedMessage: "Skeniranje izvora započeto, dobićete obaveštenje kada bude završeno.",
+    notYetAddedLabel: "Nije poslato",
+    createThesisLabel: "Dodaj završni rad"
 }

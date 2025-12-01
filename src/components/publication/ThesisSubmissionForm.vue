@@ -51,11 +51,29 @@
                 <v-row>
                     <v-col>
                         <multilingual-text-input
-                            ref="titleRef" v-model="title"
-                            :rules="requiredFieldRules" :label="$t('titleLabel') + '*'">
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
                         </multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <publication-deduplication-table
+                                ref="deduplicationTableRef"
+                                :title="title"
+                                :doi="doi"
+                                :scopus-id="scopus"
+                                :web-of-science-id="webOfScienceId"
+                                :open-alex-id="openAlexId"
+                            ></publication-deduplication-table>
+                        </v-col>
+                    </v-row>
+                </v-row>
+
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
@@ -361,11 +379,12 @@ import type { InstitutionDefaultSubmissionContent } from '@/models/OrganisationU
 import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator},
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable },
     setup() {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
@@ -479,6 +498,7 @@ export default defineComponent({
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
+        const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -488,7 +508,7 @@ export default defineComponent({
         const externalOUName = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
@@ -612,6 +632,7 @@ export default defineComponent({
                     udc.value = "";
                     scopus.value = "";
                     typeOfTitleRef.value?.clearInput();
+                    deduplicationTableRef.value?.resetTable();
 
                     error.value = false;
                     snackbar.value = true;
@@ -650,6 +671,14 @@ export default defineComponent({
                 await nextTick();
 
                 contributionsRef.value?.fillInputs(contributions.value, true);
+            }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
             }
         };
 
@@ -711,7 +740,7 @@ export default defineComponent({
             scopusIdValidationRules, languagesWithMoreWritingSystems,
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
             topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules,
-            isOrganisationUnitDLClient, isAdmin
+            isOrganisationUnitDLClient, isAdmin, deduplicationTableRef
         };
     }
 });

@@ -261,6 +261,7 @@ export interface PrepopulatedMetadata {
     endPage: string;
     url: string;
     doi: string;
+    keywords: MultilingualContent[];
 }
 
 export interface ContactFormData {

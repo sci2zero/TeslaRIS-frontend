@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { ThesisPublicReviewResponse, ThesisReportCounts, ThesisReportRequest } from "@/models/ThesisLibraryModel";
+import type { NotAddedToPromotionThesesRequest, ThesisPublicReviewResponse, ThesisReportCounts, ThesisReportRequest } from "@/models/ThesisLibraryModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { useDownloadStore } from "@/stores/downloadStore";
 
@@ -53,6 +53,10 @@ export class ThesisLibraryReportingService extends BaseService {
 
     async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
         return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${forMyInstitution ? ("&forMyInstitution=" + forMyInstitution) : ""}${pageable}`);
+    }
+
+    async getEntriesNotAddedToRegBook(body: NotAddedToPromotionThesesRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.post, `thesis-library/report/not-added-to-registry-book?${pageable}`, body);
     }
 }
 

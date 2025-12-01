@@ -153,7 +153,7 @@ export default defineComponent({
                 filterFromInputChoices(input.language);
             });
             sendContentToParent();
-        }
+        };
 
         watch(() => props.initialValue, () => {
             if(!initialValueSet.value && props.initialValue && props.initialValue.length > 0 && props.initialValue[0].supportedLanguages.length > 0) {

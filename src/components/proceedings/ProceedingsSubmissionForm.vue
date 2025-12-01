@@ -304,7 +304,7 @@ export default defineComponent({
         const subtitle = ref([]);
         const acronym = ref([]);
         const uris = ref<string[]>([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const description = ref([]);
         const eIsbn = ref("");
         const printIsbn = ref("");
@@ -434,6 +434,14 @@ export default defineComponent({
 
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
                 selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
+            }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
             }
         };
 
