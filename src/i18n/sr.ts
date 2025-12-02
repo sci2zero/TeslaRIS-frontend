@@ -1135,8 +1135,8 @@ export default {
     publicReviewLengthLabel: "Trajanje javnog uvida (u danima)",
     noFilesForDownloadLabel: "Nema fajlova za preuzimanje.",
     eventDescriptionLabel: "Opis događaja",
-    enterOneOfTwoLabel: "Unesite bar jedno od ova dva podatka",
-    enterOneOfThreeLabel: "Unesite bar jedno od ova tri podatka",
+    enterOneOfTwoLabel: "Unesite bar jedan od ova dva podatka",
+    enterOneOfThreeLabel: "Unesite bar jedan od ova tri podatka",
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
     spanWholeRowLabel: "Raspon na celi red",
     positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0.",
@@ -1220,5 +1220,7 @@ export default {
     onlyWithImportIdentifiersLabel: "Samo sa identifikatorima",
     harvestStartedMessage: "Skeniranje izvora započeto, dobićete obaveštenje kada bude završeno.",
     notYetAddedLabel: "Nije poslato",
-    createThesisLabel: "Dodaj završni rad"
+    createThesisLabel: "Dodaj završni rad",
+    saveDraftLabel: "Sačuvaj nacrt",
+    validateEveryStepLabel: "Validiraj svaki korak"
 }

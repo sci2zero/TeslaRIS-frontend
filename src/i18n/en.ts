@@ -1213,5 +1213,7 @@ export default {
     onlyWithImportIdentifiersLabel: "Only with identifiers",
     harvestStartedMessage: "Started scanning external sources, you will get a notification once this process is completed.",
     notYetAddedLabel: "Not yet sent",
-    createThesisLabel: "Add new thesis"
+    createThesisLabel: "Add new thesis",
+    saveDraftLabel: "Save draft",
+    validateEveryStepLabel: "Validate every step"
 }
