@@ -561,7 +561,7 @@ export default defineComponent({
                 title: title.value,
                 thesisType: selectedThesisType.value.value as ThesisType,
                 languageId: selectedLanguage.value as number,
-                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
+                writingLanguageTagId: languagesWithMoreWritingSystems.value.includes(selectedLanguage.value as number) ? selectedWritingLanguage.value?.value as number : undefined,
                 numberOfPages: numberOfPages.value as number,
                 numberOfChapters: numberOfChapters.value as number,
                 numberOfReferences: numberOfReferences.value as number,

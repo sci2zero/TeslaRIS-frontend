@@ -588,6 +588,9 @@ export default defineComponent({
             RegistryBookService.previewPromoteAll(selectedPromotion.value.value).then(response => {
                 promotionPreview.value = response.data;
                 promotionPreviewRef.value?.toggle();
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
             });
         };
 

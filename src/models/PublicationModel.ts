@@ -223,7 +223,7 @@ export interface Dataset extends Document {
 }
 
 export interface DeduplicationSuggestion {
-    id: number;
+    id: string;
     leftEntityId: number;
     rightEntityId: number;
     leftTitleSr: string;

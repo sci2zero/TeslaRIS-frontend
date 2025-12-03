@@ -103,6 +103,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             supports-force-delete
+            aggregated-entities-comparison-page="eventProceedingsComparator"
+            :left-id="(leftConference?.id as number)"
+            :right-id="(rightConference?.id as number)"
+            :entity-type="EntityType.EVENT"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -373,7 +377,7 @@ export default defineComponent({
             snackbar, snackbarMessage,
             leftConference, rightConference,
             moveAll, updateAll, updateLeft,
-            updateLeftRef, updateRightRef,
+            updateLeftRef, updateRightRef, EntityType,
             updateRight, showStopDialog, deleteSide,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,

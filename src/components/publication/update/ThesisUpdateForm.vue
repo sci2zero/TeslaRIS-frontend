@@ -220,7 +220,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)">
                 <v-select
                     v-model="selectedWritingLanguage"
                     :label="$t('writingLanguageLabel')"
@@ -345,13 +345,20 @@ export default defineComponent({
         const languages = ref<LanguageResponse[]>();
         const isOrganisationUnitDLClient = ref(false);
 
+        const languagesWithMoreWritingSystems = ref<number[]>([]);
+
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
+                languagesWithMoreWritingSystems.value.splice(0);
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push(
                         {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
                     );
+
+                    if (language.languageCode === "SR") {
+                        languagesWithMoreWritingSystems.value.push(language.id);
+                    }
                 });
             });
             
@@ -505,7 +512,7 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 languageId: selectedLanguage.value,
-                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
+                writingLanguageTagId: languagesWithMoreWritingSystems.value.includes(selectedLanguage.value) ? selectedWritingLanguage.value?.value as number : undefined,
                 fileItems: [],
                 proofs: [],
                 topicAcceptanceDate: topicAcceptanceDate.value,
@@ -596,7 +603,7 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
             scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules,
-            isOrganisationUnitDLClient, isHeadOfLibrary
+            isOrganisationUnitDLClient, isHeadOfLibrary, languagesWithMoreWritingSystems
         };
     }
 });

@@ -1222,5 +1222,6 @@ export default {
     notYetAddedLabel: "Nije poslato",
     createThesisLabel: "Dodaj završni rad",
     saveDraftLabel: "Sačuvaj nacrt",
-    validateEveryStepLabel: "Validiraj svaki korak"
+    validateEveryStepLabel: "Validiraj svaki korak",
+    compareAggregatedEntitiesLabel: "Uporedi spojene entitete"
 }

@@ -37,6 +37,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             supports-force-delete
+            aggregated-entities-comparison-page="publisherPublicationsComparator"
+            :left-id="(leftPublisher?.id as number)"
+            :right-id="(rightPublisher?.id as number)"
+            :entity-type="EntityType.PUBLISHER"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -202,7 +206,7 @@ export default defineComponent({
             leftPublisher, rightPublisher,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef,
-            updateRight, deleteSide
+            updateRight, deleteSide, EntityType
         };
 }})
 

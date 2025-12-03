@@ -115,6 +115,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             :supports-force-delete="isAdmin"
+            aggregated-entities-comparison-page="personPublicationsComparator"
+            :left-id="(leftPerson?.id as number)"
+            :right-id="(rightPerson?.id as number)"
+            :entity-type="EntityType.PERSON"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -142,7 +146,7 @@ import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import type { MultilingualContent } from '@/models/Common';
 import MergeService from '@/services/MergeService';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -478,7 +482,7 @@ export default defineComponent({
             rightEmployments, rightEducation, rightMemberships,
             updateLeftBiography, updateRightBiography,
             updateLeftKeywords, updateRightKeywords,
-            updateRightBioRef, updateLeftBioRef,
+            updateRightBioRef, updateLeftBioRef, EntityType,
             updateRightKeywordsRef, updateLeftKeywordsRef,
             isLeftBoundToUser, isRightBoundToUser
         };

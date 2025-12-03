@@ -86,6 +86,10 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/can-edit/${entryId}`);
     }
 
+    async canAllowSingleEdit(entryId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `registry-book/can-allow-single-edit/${entryId}`);
+    }
+
     async allowSingleUpdate(entryId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book/allow-single-update/${entryId}`);
     }

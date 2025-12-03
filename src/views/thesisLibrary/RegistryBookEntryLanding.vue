@@ -266,7 +266,7 @@
         </v-row>
 
         <div
-            v-if="isAdmin && !canEdit"
+            v-if="(isAdmin || canAllowEdit) && !canEdit"
             class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("adminActionsLabel") }}
@@ -311,6 +311,7 @@ export default defineComponent({
 
         const currentRoute = useRoute();
         const canEdit = ref(false);
+        const canAllowEdit = ref(false);
 
         const registryBookEntry = ref<RegistryBookEntry>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -323,7 +324,9 @@ export default defineComponent({
 
         onMounted(() => {
             fetchRegistryBookEntry();
+            
             checkCanEdit();
+            checkCanAllowEdit();
         });
 
         const checkCanEdit = () => {
@@ -331,6 +334,14 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then(response => {
                 canEdit.value = response.data;
+            });
+        };
+
+        const checkCanAllowEdit = () => {
+            RegistryBookService.canAllowSingleEdit(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                canAllowEdit.value = response.data;
             });
         };
 
@@ -371,7 +382,7 @@ export default defineComponent({
             registryBookEntry, icon, returnCurrentLocaleContent,
             languageTagMap, localiseDate, snackbar, snackbarMessage,
             RegistryBookEntryForm, updateBasicInfo, canEdit,
-            allowSingleEdit, isAdmin
+            allowSingleEdit, isAdmin, canAllowEdit
         };
 }})
 

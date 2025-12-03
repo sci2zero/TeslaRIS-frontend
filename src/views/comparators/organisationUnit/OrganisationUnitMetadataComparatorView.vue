@@ -93,6 +93,10 @@
             :supports-force-delete="isAdmin"
             :left-warning-message="leftWarningMessage"
             :right-warning-message="rightWarningMessage"
+            aggregated-entities-comparison-page="organisationUnitEmploymentsComparator"
+            :left-id="(leftOrganisationUnit?.id as number)"
+            :right-id="(rightOrganisationUnit?.id as number)"
+            :entity-type="EntityType.ORGANISATION_UNIT"
             @update="updateAll"
             @delete="deleteSide"
         />
@@ -111,7 +115,7 @@ import OrganisationUnitUpdateForm from '@/components/organisationUnit/update/Org
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import type { MultilingualContent } from '@/models/Common';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import type { OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import MergeService from '@/services/MergeService';
@@ -456,7 +460,8 @@ export default defineComponent({
             leftRelations, rightRelations, snackbar,
             leftRelationsRef, rightRelationsRef, isAdmin,
             updateLeftRelations, updateRightRelations,
-            leftWarningMessage, rightWarningMessage
+            leftWarningMessage, rightWarningMessage,
+            EntityType
         };
 }})
 

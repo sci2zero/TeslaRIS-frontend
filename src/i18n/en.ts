@@ -1215,5 +1215,6 @@ export default {
     notYetAddedLabel: "Not yet sent",
     createThesisLabel: "Add new thesis",
     saveDraftLabel: "Save draft",
-    validateEveryStepLabel: "Validate every step"
+    validateEveryStepLabel: "Validate every step",
+    compareAggregatedEntitiesLabel: "Compare connected entities"
 }

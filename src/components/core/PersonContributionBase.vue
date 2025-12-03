@@ -73,7 +73,7 @@
         </v-col>
     </v-row>
     <v-btn
-        v-if="allowExternalAssociate && selectExternalAssociate"
+        v-if="selectExternalAssociate"
         color="primary"
         class="text-body-2 mb-2"
         @click="toggleExternalSelection">

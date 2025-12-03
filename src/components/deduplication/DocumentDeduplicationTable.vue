@@ -78,7 +78,7 @@ import { EntityType } from "@/models/MergeModel";
 
 
 export default defineComponent({
-    name: "DocumentDeduplicationTableComponent",
+    name: "DocumentDeduplicationTable",
     components: { LocalizedLink },
     props: {
         suggestions: {

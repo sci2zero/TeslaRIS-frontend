@@ -77,6 +77,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             supports-force-delete
+            aggregated-entities-comparison-page="bookSeriesPublicationsComparator"
+            :left-id="(leftBookSeries?.id as number)"
+            :right-id="(rightBookSeries?.id as number)"
+            :entity-type="EntityType.BOOK_SERIES"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -97,7 +101,7 @@ import PersonPublicationSeriesContributionList from '@/components/core/PersonPub
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -277,7 +281,7 @@ export default defineComponent({
             leftBookSeries, rightBookSeries,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef,
-            updateRight, deleteSide
+            updateRight, deleteSide, EntityType
         };
 }})
 
