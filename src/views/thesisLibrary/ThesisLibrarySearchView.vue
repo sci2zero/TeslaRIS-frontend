@@ -19,7 +19,11 @@
 
     <v-tabs-window v-model="currentTab">
         <v-tabs-window-item value="simpleSearch">
-            <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+            <div class="flex flex-row justify-center mt-4">
+                <search-bar-component
+                    @search="clearSortAndPerformSearch($event)">
+                </search-bar-component>
+            </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="advancedSearch">
             <query-input-component
@@ -30,8 +34,8 @@
         </v-tabs-window-item>
     </v-tabs-window>
 
-    <v-row class="d-flex flex-row justify-center">
-        <v-col cols="12" sm="10" class="justify-start">
+    <v-row class="d-flex flex-row justify-center align-center mt-10!">
+        <v-col cols="12" sm="9" class="d-flex align-center">
             <filter-bar-component
                 ref="filtersRef"
                 :filter-component="ThesisFilters"
@@ -39,6 +43,8 @@
                 @apply-filters="search(searchParams)"
                 @reset="search(searchParams)">
             </filter-bar-component>
+        </v-col>
+        <v-col cols="12" sm="1" class="d-flex align-center justify-end">
             <v-select 
                 v-model="showWordcloud"
                 class="bottom-spacer ml-4 result-representation"
@@ -177,6 +183,7 @@ export default defineComponent({
                 };
             }
 
+            console.log(searchRequest)
             lastSearchRequest.value = searchRequest;
 
             const isSimpleSearch = currentTab.value === "simpleSearch";
@@ -230,9 +237,9 @@ export default defineComponent({
         };
 
         const resetFiltersAndSearch = () => {
-            filtersRef.value?.resetFilters();
+            filtersRef.value?.resetFilters(false);
             filtersRef.value!.isExpanded = false;
-            search([]);
+            search(["*"]);
         };
 
         return {

@@ -111,12 +111,12 @@
                                         {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
-                                <div v-if="monograph?.languageTagIds && monograph?.languageTagIds.length > 0">
+                                <div v-if="monograph?.languageIds && monograph?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
-                                    <v-chip v-for="(languageTagId, index) in monograph?.languageTagIds" :key="index" outlined>
-                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                    <v-chip v-for="(languageId, index) in monograph?.languageIds" :key="index" outlined>
+                                        {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
                                     </v-chip>
                                 </div>
                             </v-col>
@@ -340,7 +340,7 @@
 </template>
 
 <script lang="ts">
-import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -411,7 +411,7 @@ export default defineComponent({
         const router = useRouter();
 
         const monograph = ref<Monograph>();
-        const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const publisher = ref<Publisher>();
 
         const { isResearcher } = useUserRole();
@@ -503,9 +503,9 @@ export default defineComponent({
         };
 
         const populateData = () => {
-            LanguageService.getAllLanguageTags().then(response => {
-                response.data.forEach(languageTag => {
-                    languageTagMap.value.set(languageTag.id, languageTag);
+            LanguageService.getAllLanguages().then(response => {
+                response.data.forEach(language => {
+                    languageMap.value.set(language.id, language);
                 })
             });
 
@@ -601,7 +601,7 @@ export default defineComponent({
             monograph.value!.number = basicInfo.number;
             monograph.value!.volume = basicInfo.volume;
             monograph.value!.researchAreaId = basicInfo.researchAreaId;
-            monograph.value!.languageTagIds = basicInfo.languageTagIds;
+            monograph.value!.languageIds = basicInfo.languageIds;
             monograph.value!.publicationSeriesId = basicInfo.publicationSeriesId;
             monograph.value!.numberOfPages = basicInfo.numberOfPages;
             monograph.value!.eisbn = basicInfo.eisbn;
@@ -656,7 +656,7 @@ export default defineComponent({
         return {
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
-            languageTagMap, updateBasicInfo,
+            languageMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
             addAttachment, updateAttachment,
             updateKeywords, updateDescription,

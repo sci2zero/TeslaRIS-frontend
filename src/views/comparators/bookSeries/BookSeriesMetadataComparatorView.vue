@@ -154,12 +154,12 @@ export default defineComponent({
                 { fieldName: "openAlexId", emptyValue: "" }
             ]);
 
-            bookSeries2.languageTagIds.forEach(languageTagId => {
-                if (!bookSeries1.languageTagIds.includes(languageTagId)) {
-                    bookSeries1.languageTagIds.push(languageTagId);
+            bookSeries2.languageIds.forEach(languageId => {
+                if (!bookSeries1.languageIds.includes(languageId)) {
+                    bookSeries1.languageIds.push(languageId);
                 }
             });
-            bookSeries2.languageTagIds = [];
+            bookSeries2.languageIds = [];
 
             bookSeries2.uris.forEach(uri => {
                 if (!bookSeries1.uris.includes(uri)) {
@@ -197,7 +197,7 @@ export default defineComponent({
             leftBookSeries.value!.nameAbbreviation = updatedBookSeries.nameAbbreviation;
             leftBookSeries.value!.eissn = updatedBookSeries.eissn;
             leftBookSeries.value!.printISSN = updatedBookSeries.printISSN;
-            leftBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            leftBookSeries.value!.languageIds = updatedBookSeries.languageIds;
             leftBookSeries.value!.uris = updatedBookSeries.uris;
             leftBookSeries.value!.subtitle = updatedBookSeries.subtitle;
             leftBookSeries.value!.openAlexId = updatedBookSeries.openAlexId;
@@ -213,7 +213,7 @@ export default defineComponent({
             rightBookSeries.value!.nameAbbreviation = updatedBookSeries.nameAbbreviation;
             rightBookSeries.value!.eissn = updatedBookSeries.eissn;
             rightBookSeries.value!.printISSN = updatedBookSeries.printISSN;
-            rightBookSeries.value!.languageTagIds = updatedBookSeries.languageTagIds;
+            rightBookSeries.value!.languageIds = updatedBookSeries.languageIds;
             rightBookSeries.value!.uris = updatedBookSeries.uris;
             rightBookSeries.value!.subtitle = updatedBookSeries.subtitle;
             rightBookSeries.value!.openAlexId = updatedBookSeries.openAlexId;

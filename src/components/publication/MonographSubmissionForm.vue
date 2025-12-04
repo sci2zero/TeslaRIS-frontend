@@ -321,16 +321,22 @@ export default defineComponent({
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageTags.value.push(languageTag);
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
-                        selectedLanguages.value.push(languageTag.id);
-                    }
-                })
+                languageTags.value = response.data;
 
                 presetName();
             });
+
+            LanguageService.getAllLanguages().then(response => {
+                response.data.forEach(language => {
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
+
+                    if (i18n.locale.value.toUpperCase().startsWith(language.languageCode)) {
+                        selectedLanguages.value.push(language.id);
+                    }
+                });
+            })
 
             ResearchAreaService.listAllResearchAreas().then(response => {
                 allResearchAreas.value = response.data;
@@ -472,7 +478,7 @@ export default defineComponent({
                 doi: doi.value,
                 eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
                 publicationSeriesId: publicationSeriesId as number,

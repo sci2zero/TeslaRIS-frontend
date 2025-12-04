@@ -64,12 +64,12 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageResponse, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { PublicationSeries } from '@/models/PublicationSeriesModel';
 import { watch } from 'vue';
 import UriInput from '@/components/core/UriInput.vue';
@@ -110,17 +110,21 @@ export default defineComponent({
         const urisRef = ref<typeof UriInput>();
 
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>(props.presetPublicationSeries?.languageTagIds as number[]);
+        const selectedLanguages = ref<number[]>(props.presetPublicationSeries?.languageIds as number[]);
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
+                });
+            });
+
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
-                
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                });
             });
         });
 
@@ -173,7 +177,7 @@ export default defineComponent({
                 title: title.value,
                 eissn: eIssn.value as string,
                 printISSN: printIssn.value,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
                 openAlexId: openAlexId.value,
@@ -195,7 +199,7 @@ export default defineComponent({
             nameAbbreviations.value = props.presetPublicationSeries?.nameAbbreviation as MultilingualContent[];
 
             uris.value = props.presetPublicationSeries?.uris as string[];
-            selectedLanguages.value = props.presetPublicationSeries?.languageTagIds as number[];
+            selectedLanguages.value = props.presetPublicationSeries?.languageIds as number[];
             eIssn.value = props.presetPublicationSeries?.eissn;
             printIssn.value = props.presetPublicationSeries?.printISSN;
             openAlexId.value = props.presetPublicationSeries?.openAlexId;

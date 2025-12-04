@@ -206,12 +206,12 @@ export default defineComponent({
             proceedings1.publisherId = proceedings2.publisherId;
             proceedings1.authorReprint = proceedings2.authorReprint;
 
-            proceedings2.languageTagIds!.forEach(languageTagId => {
-                if (!proceedings1.languageTagIds!.includes(languageTagId)) {
-                    proceedings1.languageTagIds!.push(languageTagId);
+            proceedings2.languageIds!.forEach(languageId => {
+                if (!proceedings1.languageIds!.includes(languageId)) {
+                    proceedings1.languageIds!.push(languageId);
                 }
             });
-            proceedings2.languageTagIds = [];
+            proceedings2.languageIds = [];
 
             proceedings2.uris!.forEach(uri => {
                 if (!proceedings1.uris!.includes(uri)) {
@@ -262,7 +262,7 @@ export default defineComponent({
             leftProceedings.value!.doi = updatedInfo.doi;
             leftProceedings.value!.eISBN = updatedInfo.eISBN;
             leftProceedings.value!.eventId = updatedInfo.eventId;
-            leftProceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            leftProceedings.value!.languageIds = updatedInfo.languageIds;
             leftProceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             leftProceedings.value!.printISBN = updatedInfo.printISBN;
             leftProceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -291,7 +291,7 @@ export default defineComponent({
             rightProceedings.value!.doi = updatedInfo.doi;
             rightProceedings.value!.eISBN = updatedInfo.eISBN;
             rightProceedings.value!.eventId = updatedInfo.eventId;
-            rightProceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            rightProceedings.value!.languageIds = updatedInfo.languageIds;
             rightProceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             rightProceedings.value!.printISBN = updatedInfo.printISBN;
             rightProceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;

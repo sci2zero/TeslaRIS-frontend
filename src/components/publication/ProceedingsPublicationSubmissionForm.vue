@@ -44,7 +44,10 @@
                     <v-col>
                         <generic-crud-modal
                             :form-component="ProceedingsSubmissionForm"
-                            :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
+                            :form-props="{
+                                conference: selectedEvent ? selectedEvent : searchPlaceholder,
+                                presetName: `Proceedings of: ${selectedEvent.title.split('|')[0].trim()}`
+                            }"
                             entity-name="Proceedings"
                             is-submission
                             :read-only="!selectedEvent || selectedEvent.value === -1"

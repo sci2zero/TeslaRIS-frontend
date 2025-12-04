@@ -199,12 +199,12 @@ export default defineComponent({
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
             ]);
 
-            monograph2.languageTagIds!.forEach(languageTagId => {
-                if (!monograph1.languageTagIds!.includes(languageTagId)) {
-                    monograph1.languageTagIds!.push(languageTagId);
+            monograph2.languageIds!.forEach(languageId => {
+                if (!monograph1.languageIds!.includes(languageId)) {
+                    monograph1.languageIds!.push(languageId);
                 }
             });
-            monograph2.languageTagIds = [];
+            monograph2.languageIds = [];
 
             monograph2.uris!.forEach(uri => {
                 if (!monograph1.uris!.includes(uri)) {
@@ -255,7 +255,7 @@ export default defineComponent({
             leftMonograph.value!.doi = updatedInfo.doi;
             leftMonograph.value!.eisbn = updatedInfo.eisbn;
             leftMonograph.value!.eventId = updatedInfo.eventId;
-            leftMonograph.value!.languageTagIds = updatedInfo.languageTagIds;
+            leftMonograph.value!.languageIds = updatedInfo.languageIds;
             leftMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             leftMonograph.value!.printISBN = updatedInfo.printISBN;
             leftMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -284,7 +284,7 @@ export default defineComponent({
             rightMonograph.value!.doi = updatedInfo.doi;
             rightMonograph.value!.eisbn = updatedInfo.eisbn;
             rightMonograph.value!.eventId = updatedInfo.eventId;
-            rightMonograph.value!.languageTagIds = updatedInfo.languageTagIds;
+            rightMonograph.value!.languageIds = updatedInfo.languageIds;
             rightMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             rightMonograph.value!.printISBN = updatedInfo.printISBN;
             rightMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;

@@ -156,12 +156,12 @@ export default defineComponent({
                 { fieldName: "openAlexId", emptyValue: "" }
             ]);
 
-            journal2.languageTagIds.forEach(languageTagId => {
-                if (!journal1.languageTagIds.includes(languageTagId)) {
-                    journal1.languageTagIds.push(languageTagId);
+            journal2.languageIds.forEach(languageId => {
+                if (!journal1.languageIds.includes(languageId)) {
+                    journal1.languageIds.push(languageId);
                 }
             });
-            journal2.languageTagIds = [];
+            journal2.languageIds = [];
 
             journal2.uris.forEach(uri => {
                 if (!journal1.uris.includes(uri)) {
@@ -199,7 +199,7 @@ export default defineComponent({
             leftJournal.value!.nameAbbreviation = updatedJournal.nameAbbreviation;
             leftJournal.value!.eissn = updatedJournal.eissn;
             leftJournal.value!.printISSN = updatedJournal.printISSN;
-            leftJournal.value!.languageTagIds = updatedJournal.languageTagIds;
+            leftJournal.value!.languageIds = updatedJournal.languageIds;
             leftJournal.value!.uris = updatedJournal.uris;
             leftJournal.value!.subtitle = updatedJournal.subtitle;
             leftJournal.value!.openAlexId = updatedJournal.openAlexId;
@@ -215,7 +215,7 @@ export default defineComponent({
             rightJournal.value!.nameAbbreviation = updatedJournal.nameAbbreviation;
             rightJournal.value!.eissn = updatedJournal.eissn;
             rightJournal.value!.printISSN = updatedJournal.printISSN;
-            rightJournal.value!.languageTagIds = updatedJournal.languageTagIds;
+            rightJournal.value!.languageIds = updatedJournal.languageIds;
             rightJournal.value!.uris = updatedJournal.uris;
             rightJournal.value!.subtitle = updatedJournal.subtitle;
             rightJournal.value!.openAlexId = updatedJournal.openAlexId;

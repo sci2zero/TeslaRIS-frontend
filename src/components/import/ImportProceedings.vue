@@ -307,7 +307,7 @@ export default defineComponent({
                 subTitle: [],
                 uris: [],
                 contributions: [],
-                languageTagIds: [],
+                languageIds: [],
                 eISBN: props.publicationForLoading.isbn
             }).then((response) => {
                 selectedProceedings.value = {} as ProceedingsResponse;

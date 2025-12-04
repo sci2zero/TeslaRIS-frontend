@@ -180,7 +180,7 @@ export interface Monograph extends Document {
     volume?: string;
     number?: string;
     publicationSeriesId?: number;
-    languageTagIds?: number[];
+    languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
     authorReprint?: boolean;

@@ -213,13 +213,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import type { LanguageTagResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -236,9 +236,11 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { PropType } from 'vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { PublicationType } from '@/models/PublicationModel';
+import { useUserRole } from '@/composables/useUserRole';
+import EventService from '@/services/EventService';
 
 
 export default defineComponent({
@@ -252,6 +254,10 @@ export default defineComponent({
         conference: {
             type: Object as PropType<{title: string, value: number}>,
             default: () => ({ title: "", value: -1 })
+        },
+        presetName: {
+            type: String,
+            default: ""
         }
     },
     emits: ["create"],
@@ -270,17 +276,60 @@ export default defineComponent({
         const selectedLanguages = ref<number[]>([]);
         const defaultLanguage = ref(-1);
 
+        const { loggedInUser } = useUserRole();
+        const { languageTags } = useLanguageTags();
+
+        watch(() => languageTags.value, () => {
+            presetName();
+        });
+
+        const presetName = async () => {
+            if (props.presetName) {
+                const tag = languageTags.value.find(
+                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                );
+                if (tag) {
+                    const mc: MultilingualContent[] = [
+                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                    ];
+                    title.value = mc;
+                    titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
+                }
+            }
+        };
+
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
-                        selectedLanguages.value.push(languageTag.id);
-                        defaultLanguage.value = languageTag.id;
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
+
+                    if (i18n.locale.value.toUpperCase().startsWith(language.languageCode)) {
+                        selectedLanguages.value.push(language.id);
+                        defaultLanguage.value = language.id;
                     }
                 })
             });
+
+            fetchAdditionalInfo();
         });
+
+        watch(() => props.conference, () => {
+            fetchAdditionalInfo();
+        });
+
+        const fetchAdditionalInfo = () => {
+            if (props.conference.value <= 0) {
+                return;
+            }
+
+            EventService.readConference(props.conference.value).then(response => {
+                if (response.data.dateFrom) {
+                    publicationYear.value = response.data.dateFrom.substring(0, 4);
+                }
+            });
+        };
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
@@ -368,7 +417,7 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
                 publicationSeriesId: publicationSeriesId,
@@ -416,7 +465,6 @@ export default defineComponent({
             });
         };
 
-        const { languageTags } = useLanguageTags();
         const popuateMetadata = async (metadata: PrepopulatedMetadata) => {
             if (title.value.length === 0) {
                 title.value = metadata.title;

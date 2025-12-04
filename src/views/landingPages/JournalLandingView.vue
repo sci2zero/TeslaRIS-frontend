@@ -66,12 +66,12 @@
                                 <div v-if="journal?.openAlexId" class="response">
                                     <identifier-link :identifier="journal.openAlexId" type="open_alex"></identifier-link>
                                 </div>
-                                <div v-if="journal?.languageTagIds && journal?.languageTagIds.length > 0">
+                                <div v-if="journal?.languageIds && journal?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
-                                    <v-chip v-for="(languageTagId, index) in journal?.languageTagIds" :key="index" outlined>
-                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                    <v-chip v-for="(languageId, index) in journal?.languageIds" :key="index" outlined>
+                                        {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
                                     </v-chip>
                                 </div>
                                 <div v-if="journal?.uris && journal?.uris.length > 0">
@@ -162,7 +162,7 @@
 
 <script lang="ts">
 
-import { ApplicableEntityType, type LanguageTagResponse } from '@/models/Common';
+import { ApplicableEntityType, type LanguageResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -206,7 +206,7 @@ export default defineComponent({
         const currentRoute = useRoute();
 
         const journal = ref<Journal>();
-        const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -284,9 +284,9 @@ export default defineComponent({
         };
 
         const populateData = () => {
-            LanguageService.getAllLanguageTags().then(response => {
-                response.data.forEach(languageTag => {
-                    languageTagMap.value.set(languageTag.id, languageTag);
+            LanguageService.getAllLanguages().then(response => {
+                response.data.forEach(language => {
+                    languageMap.value.set(language.id, language);
                 })
             });
         };
@@ -311,7 +311,7 @@ export default defineComponent({
             journal.value!.nameAbbreviation = updatedJournal.nameAbbreviation;
             journal.value!.eissn = updatedJournal.eissn;
             journal.value!.printISSN = updatedJournal.printISSN;
-            journal.value!.languageTagIds = updatedJournal.languageTagIds;
+            journal.value!.languageIds = updatedJournal.languageIds;
             journal.value!.openAlexId = updatedJournal.openAlexId;
             journal.value!.uris = updatedJournal.uris;
             journal.value!.subtitle = updatedJournal.subtitle;
@@ -359,7 +359,7 @@ export default defineComponent({
         return {
             journal, icon, publications, totalPublications,
             switchPage, canEdit, returnCurrentLocaleContent,
-            languageTagMap, updateBasicInfo, canClassify,
+            languageMap, updateBasicInfo, canClassify,
             snackbar, snackbarMessage, journalIndicators,
             updateContributions, ApplicableEntityType,
             currentTab, PublicationSeriesUpdateForm,
