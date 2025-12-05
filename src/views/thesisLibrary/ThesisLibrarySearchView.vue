@@ -35,7 +35,7 @@
     </v-tabs-window>
 
     <v-row class="d-flex flex-row justify-center align-center mt-10!">
-        <v-col cols="12" sm="9" class="d-flex align-center">
+        <v-col cols="12" sm="10" class="d-flex align-center items-end">
             <filter-bar-component
                 ref="filtersRef"
                 :filter-component="ThesisFilters"
@@ -43,16 +43,17 @@
                 @apply-filters="search(searchParams)"
                 @reset="search(searchParams)">
             </filter-bar-component>
-        </v-col>
-        <v-col cols="12" sm="1" class="d-flex align-center justify-end">
-            <v-select 
-                v-model="showWordcloud"
-                class="bottom-spacer ml-4 result-representation"
-                :items="[{title: $t('tableLabel'), value: false}, {title: $t('wordcloudLabel'), value: true}]"
-                item-value="value"
-                :label="$t('resultRepresentationLabel')" 
-                dense
-            />
+            <div class="w-52">
+                <v-select 
+                    v-model="showWordcloud"
+                    class="bottom-spacer result-representation"
+                    :items="[{title: $t('tableLabel'), value: false}, {title: $t('wordcloudLabel'), value: true}]"
+                    item-value="value"
+                    :label="$t('resultRepresentationLabel')" 
+                    dense
+                    hide-details
+                />
+            </div>
         </v-col>
     </v-row>
 
@@ -267,7 +268,8 @@ export default defineComponent({
 <style scoped>
 
 .result-representation {
-    max-width: 200px;
+    max-width: 300px;
+    width: 100%;
 }
 
 </style>
