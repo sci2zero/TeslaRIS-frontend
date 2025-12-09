@@ -199,13 +199,13 @@
                                     {{ returnCurrentLocaleContent(thesis.placeOfKeep) }}
                                 </div>
                                 <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0">
-                                    {{ $t("scientificAreaLabel") }}:
+                                    {{ $t((thesis.thesisType == ThesisType.PHD_ART_PROJECT) ? "artAreaLabel" : "scientificAreaLabel") }}:
                                 </div>
                                 <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.scientificArea) }}
                                 </div>
                                 <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0">
-                                    {{ $t("scientificSubAreaLabel") }}:
+                                    {{ $t((thesis.thesisType == ThesisType.PHD_ART_PROJECT) ? "artSubAreaLabel" : "scientificSubAreaLabel") }}:
                                 </div>
                                 <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.scientificSubArea) }}
@@ -955,7 +955,7 @@ export default defineComponent({
             updateBasicInfo, organisationUnit, ThesisUpdateForm, updateRemark,
             event, getThesisTitleFromValueAutoLocale, updateExtendedAbstract,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
-            currentRoute, actionsRef, ApplicableEntityType, canClassify,
+            currentRoute, actionsRef, ApplicableEntityType, canClassify, ThesisType,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,

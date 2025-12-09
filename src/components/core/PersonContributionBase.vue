@@ -101,7 +101,7 @@
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
     </v-row>
-    <v-row v-if="personOtherNames.length > 0 && !selectExternalAssociate">
+    <v-row v-if="personOtherNames.length > 0 && personAffiliations.length > 0 && !selectExternalAssociate">
         <v-col>
             <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU; sendContentToParent();">
                 {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
@@ -557,6 +557,10 @@ export default defineComponent({
                     }
 
                     sendContentToParent();
+                }
+
+                if (personAffiliations.value.length === 0) {
+                    enterExternalOU.value = true;
                 }
             });
         });
