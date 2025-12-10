@@ -1,12 +1,11 @@
 <template>
     <v-card min-width="150">
         <v-list v-if="notifications.length > 0">
-            <v-list-subheader class="w-100">
-                <div class="d-flex flex-row justify-space-between w-100">
+            <v-list-subheader>
+                <div class="flex flex-row justify-between w-150">
                     <strong>{{ $t("recentNotificationsLabel") }}</strong>
-                    <v-spacer></v-spacer>
                     <v-btn
-                        class="ml-3 mb-1"
+                        class="ml-3! mb-1!"
                         density="compact"
                         color="primary"
                         @click="dismissAllNotifications">
@@ -22,11 +21,11 @@
                 color="secondary"
                 @click="navigateToNotificationPage"
             >
-                <v-row>
-                    <v-col cols="10">
+                <div class="flex items-center justify-between">
+                    <div>
                         <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
-                    </v-col>
-                    <v-col cols="1">
+                    </div>
+                    <div class="flex justify-center ml-3 mr-1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
                             <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
@@ -46,15 +45,13 @@
                                 </v-icon>
                             </v-btn>
                         </v-list-item-action>
-                    </v-col>
-                    <v-col cols="1">
                         <v-list-item-action>
                             <v-btn icon @click.stop="rejectNotification(notification.id)">
-                                <v-icon>mdi-delete</v-icon>
+                                <v-icon>mdi-close</v-icon>
                             </v-btn>
                         </v-list-item-action>
-                    </v-col>    
-                </v-row>
+                    </div>  
+                </div>
             </v-list-item>
         </v-list>
 
