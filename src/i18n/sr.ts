@@ -530,6 +530,7 @@ export default {
     issueDateLabel: "Datum izdavanja",
     createNewAccount: "Kreiraj novi istraživački nalog: ",
     successfulRegistrationMessage: "Zahtev za registraciju poslat. Molimo vas, proverite email.",
+    successfulRegistrationAdminMessage: "Zahtev za registraciju poslat.",
     deactivateAccountLabel: "Deaktiviraj nalog",
     activateAccountLabel: "Aktiviraj nalog",
     takeRoleLabel: "Preuzmi ulogu",
@@ -1223,5 +1224,7 @@ export default {
     createThesisLabel: "Dodaj završni rad",
     saveDraftLabel: "Sačuvaj nacrt",
     validateEveryStepLabel: "Validiraj svaki korak",
-    compareAggregatedEntitiesLabel: "Uporedi spojene entitete"
+    compareAggregatedEntitiesLabel: "Uporedi spojene entitete",
+    addResearcherLabel: "Dodaj istraživača",
+    researcherBoundMessage: "Istraživač je registrovan sa email-om: {0}"
 }

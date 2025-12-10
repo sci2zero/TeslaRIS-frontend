@@ -12,14 +12,17 @@
                     @click="toggleSidebar"
                 >
                 </v-btn>
-                <breadcrumbs v-else />
+                <breadcrumbs v-else v-model="navigationDepth" />
             </div>
 
             <v-spacer></v-spacer>
 
             <div
                 v-if="maintenanceModeOn || nextScheduledMaintenance"
-                class="bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm">
+                :class="[
+                    'bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm',
+                    (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'max-w-[400px]' : ''
+                ]">
                 <div class="flex items-start gap-3">
                     <div class="flex-shrink-0">
                         <svg
@@ -33,8 +36,12 @@
                             />
                         </svg>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-amber-800 text-sm leading-6 font-medium">
+                    <div :class="['flex-1', (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'min-w-0' : '']">
+                        <p
+                            :class="[
+                                'text-amber-800 text-sm leading-6 font-medium',
+                                (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'truncate' : ''
+                            ]">
                             {{ maintenanceModeOn ? $t("maintenanceModeMessage") : $t("scheduledMaintenanceMessage", [nextScheduledMaintenance?.startTime, nextScheduledMaintenance?.approximateEndMoment]) }}
                         </p>
                     </div>
@@ -189,6 +196,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const appTitle = ref("");
+const navigationDepth = ref(0);
 
 const { userRole } = useUserRole();
 

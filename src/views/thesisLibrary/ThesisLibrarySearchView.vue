@@ -184,7 +184,6 @@ export default defineComponent({
                 };
             }
 
-            console.log(searchRequest)
             lastSearchRequest.value = searchRequest;
 
             const isSimpleSearch = currentTab.value === "simpleSearch";

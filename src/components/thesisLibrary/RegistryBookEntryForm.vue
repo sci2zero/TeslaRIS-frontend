@@ -48,7 +48,7 @@
                     </v-btn>
                     <v-btn
                         class="ml-2"
-                        :disabled="(validateEveryStep || step === validSteps.length) && !validSteps[step - 1]"
+                        :disabled="((validateEveryStep || step === validSteps.length) && !validSteps[step - 1]) || (step === validSteps.length && !canSave)"
                         @click="step === steps.length ? submit() : nextStep()">
                         {{ step === steps.length ? getSaveButtonLabel() : $t("nextLabel") }}
                     </v-btn>
@@ -103,6 +103,10 @@ export default defineComponent({
         presetRegistryBookEntry: {
             type: Object as PropType<RegistryBookEntry>,
             default: undefined
+        },
+        canSave: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create"],

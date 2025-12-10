@@ -329,7 +329,7 @@
                     v-if="canCreateRegistryBookEntry"
                     class="ml-2"
                     :form-component="RegistryBookEntryForm"
-                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
+                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string), canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) }"
                     entity-name="RegistryBookEntry"
                     :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
                     primary-color compact

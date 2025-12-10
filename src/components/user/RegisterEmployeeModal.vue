@@ -2,7 +2,7 @@
     <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="600px">
             <template #activator="scope">
-                <v-list-item dark v-bind="scope.props" class="inline-action" v-on="scope.isActive">
+                <v-list-item dark v-bind="scope.props" class="inline-action w-80" v-on="scope.isActive">
                     <v-list-item-title>
                         {{ getTitleLabel() }}
                     </v-list-item-title>

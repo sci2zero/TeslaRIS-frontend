@@ -531,6 +531,7 @@ export default {
     issueDateLabel: "Issue Date",
     createNewAccount: "Create new researcher account: ",
     successfulRegistrationMessage: "Registration request sent. Please check you email.",
+    successfulRegistrationAdminMessage: "Registration request sent.",
     deactivateAccountLabel: "Deactivate Account",
     activateAccountLabel: "Activate Account",
     takeRoleLabel: "Take Role",
@@ -1216,5 +1217,7 @@ export default {
     createThesisLabel: "Add new thesis",
     saveDraftLabel: "Save draft",
     validateEveryStepLabel: "Validate every step",
-    compareAggregatedEntitiesLabel: "Compare connected entities"
+    compareAggregatedEntitiesLabel: "Compare connected entities",
+    addResearcherLabel: "Add researcher",
+    researcherBoundMessage: "Researcher is registered with email: {0}"
 }
