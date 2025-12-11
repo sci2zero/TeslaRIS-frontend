@@ -25,7 +25,7 @@
                     <div>
                         <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
                     </div>
-                    <div class="flex justify-center ml-3 mr-1">
+                    <div class="flex justify-center ml-3 mr-1 mb-1 mt-1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
                             <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
                                 <v-icon v-if="notificationAction.toString() === 'APPROVE'">
@@ -45,7 +45,7 @@
                                 </v-icon>
                             </v-btn>
                         </v-list-item-action>
-                        <v-list-item-action>
+                        <v-list-item-action class="ml-2">
                             <v-btn icon @click.stop="rejectNotification(notification.id)">
                                 <v-icon>mdi-close</v-icon>
                             </v-btn>
@@ -63,10 +63,17 @@
             </v-list-item>
         </v-list>
 
-        <h3 v-else class="ml-4 pr-4">
+        <h4 v-else class="ml-4 pr-4">
             {{ $t("noNewNotificationsMessage") }}
-        </h3>
+        </h4>
     </v-card>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="dialogMessage"
+        @continue="continueToAction"
+    />
 </template>
   
 <script lang="ts">
@@ -76,16 +83,26 @@ import NotificationService from '@/services/NotificationService';
 import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { defineComponent, onMounted, ref } from 'vue';  
 import { useRouter } from 'vue-router';
+import PersistentQuestionDialog from './comparators/PersistentQuestionDialog.vue';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "NotificationList",
+    components: { PersistentQuestionDialog },
     setup() {
         const notifications = ref<Notification[]>([]);
         const notificationCountStore = useNotificationCountStore();
 
         const router = useRouter();
         const loading = ref(false);
+
+        const i18n = useI18n();
+
+        const displayPersistentDialog = ref(false);
+        const dialogMessage = ref("");
+        const selectedNotificationId = ref<number>(0);
+        const selectedNotificationAction = ref<NotificationAction | undefined>();
 
         onMounted(() => {
             loading.value = true;
@@ -104,14 +121,6 @@ export default defineComponent({
         };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
-            NotificationService.performAction(notificationId, action).then((response) => {
-                removeHandledNotification(notificationId);
-                notificationCountStore.decrementCounter();
-                if (response.data.value) {
-                    router.push('/' + response.data.value);
-                }
-            });
-
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
                 decrementCounterAndNavigateToPage("deduplication");
             } else if (action === NotificationAction.BROWSE_CLAIMABLE_DOCUMENTS) {
@@ -129,7 +138,41 @@ export default defineComponent({
             } else if (action === NotificationAction.GO_TO_UNBINDED_PUBLICATIONS_PAGE) {
                 notificationCountStore.decrementCounter();
                 router.push({name: "scientificResults", query: {unmanaged: "true"}});
+            } else {
+                const message = getMessageBasedOnAction(notificationId, action);
+                if (!message) {
+                    return;
+                }
+
+                dialogMessage.value = message;
+                selectedNotificationId.value = notificationId;
+                selectedNotificationAction.value = action;
+
+                displayPersistentDialog.value = true;
             }
+        };
+
+        const continueToAction = () => {
+            if (!selectedNotificationAction.value) {
+                return;
+            }
+
+            NotificationService.performAction(
+                selectedNotificationId.value, 
+                selectedNotificationAction.value
+            ).then((response) => {
+                dialogMessage.value = "";
+                
+                removeHandledNotification(selectedNotificationId.value);
+                notificationCountStore.decrementCounter();
+
+                selectedNotificationId.value = 0;
+                selectedNotificationAction.value = undefined;
+
+                if (response.data.value) {
+                    router.push('/' + response.data.value);
+                }
+            });
         };
 
         const decrementCounterAndNavigateToPage = (pageName: string) => {
@@ -159,13 +202,35 @@ export default defineComponent({
             router.push({ name: "notifications" });
         };
 
+        const getMessageBasedOnAction = (notificationId: number, action: NotificationAction) => {
+            const notification = notifications.value.find(n => n.id === notificationId);
+
+            if (!notification) {
+                return null;
+            }
+
+            if (action === NotificationAction.APPROVE) {
+                return i18n.t("addNewOtherNameActionMessage", [notification.displayValue]);   
+            } else if (action === NotificationAction.REMOVE_FROM_PUBLICATION) {
+                return i18n.t("removeFromPublicationActionMessage", [notification.displayValue]);   
+            } else if (action === NotificationAction.REMOVE_EMPLOYEES_FROM_PUBLICATION) {
+                return i18n.t("unbindEmployeesActionMessage", [notification.displayValue]); 
+            } else if (action === NotificationAction.RETURN_TO_PUBLICATION) {
+                return i18n.t("returnToPublicationActionMessage", [notification.displayValue]); 
+            }
+
+            return null;
+        };
+
         return {
             performAction,
             notifications,
             rejectNotification,
             notificationCountStore,
             navigateToNotificationPage,
-            loading, dismissAllNotifications
+            loading, dismissAllNotifications,
+            displayPersistentDialog,
+            continueToAction, dialogMessage
         };
 }});
 </script>

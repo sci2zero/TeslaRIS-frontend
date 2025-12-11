@@ -80,6 +80,7 @@ export enum NotificationAction {
 export interface Notification {
     id: number;
     notificationText: string;
+    displayValue: string;
     possibleActions: NotificationAction[];
 }
 

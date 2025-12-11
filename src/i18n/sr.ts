@@ -1226,5 +1226,9 @@ export default {
     validateEveryStepLabel: "Validiraj svaki korak",
     compareAggregatedEntitiesLabel: "Uporedi spojene entitete",
     addResearcherLabel: "Dodaj istraživača",
-    researcherBoundMessage: "Istraživač je registrovan sa email-om: {0}"
+    researcherBoundMessage: "Istraživač je registrovan sa email-om: {0}",
+    addNewOtherNameActionMessage: "Dodaj '{0}' u listu oblika imena?",
+    removeFromPublicationActionMessage: "Ukloni me sa publikacije '{0}'?",
+    unbindEmployeesActionMessage: "Ukloni sve zaposlene sa moje institucije sa publikacije '{0}'?",
+    returnToPublicationActionMessage: "Vrati me kao autora na publikaciju '{0}'"
 }
