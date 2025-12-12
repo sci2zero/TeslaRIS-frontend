@@ -12,8 +12,11 @@
                 <v-row>
                     <v-col>
                         <multilingual-text-input
-                            ref="descriptionRef" v-model="description" :initial-value="toMultilingualTextInput(presetDocumentFile?.description, languageTags)" is-area
-                            :label="$t('descriptionLabel')"></multilingual-text-input>
+                            ref="descriptionRef" v-model="description"
+                            :initial-value="toMultilingualTextInput(presetDocumentFile?.description, languageTags)"
+                            is-area
+                            :label="$t('descriptionLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row v-if="!isProof && !disableResourceTypeSelection">
@@ -38,10 +41,13 @@
                         </v-select>
                     </v-col>
                 </v-row>
-                <v-row v-else>
-                    <v-checkbox v-model="isOpenAccess" :label="$t('isOpenAccessLabel')"></v-checkbox>
+                <v-row v-else-if="!alwaysOpenAccess">
+                    <v-checkbox
+                        v-model="isOpenAccess"
+                        :label="$t('isOpenAccessLabel')"
+                    />
                 </v-row>
-                <v-row v-if="isOpenAccess">
+                <v-row v-if="isOpenAccess && !alwaysOpenAccess">
                     <v-col>
                         <v-select
                             v-model="selectedCCLicense"
@@ -103,6 +109,10 @@ export default defineComponent({
         disableResourceTypeSelection: {
             type: Boolean,
             default: false
+        },
+        alwaysOpenAccess: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "update"],
@@ -119,16 +129,22 @@ export default defineComponent({
             });
             
             if(props.edit && props.presetDocumentFile) {
-                    file.value = new File([], props.presetDocumentFile.fileName);
-                    selectedAccessRight.value = { title: accessRights.find(accessRights => getNameFromOrdinal(License, accessRights.value) === props.presetDocumentFile?.accessRights.toString())?.title as string, value: props.presetDocumentFile.accessRights };
+                file.value = new File([], props.presetDocumentFile.fileName);
+                selectedAccessRight.value = { title: accessRights.find(accessRights => getNameFromOrdinal(License, accessRights.value) === props.presetDocumentFile?.accessRights.toString())?.title as string, value: props.presetDocumentFile.accessRights };
 
-                    if (props.presetDocumentFile.accessRights.toString() === "OPEN_ACCESS") {
-                        isOpenAccess.value = true;
-                        selectedCCLicense.value = { title: cclicenseTypes?.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
-                    }
+                if (props.presetDocumentFile.accessRights.toString() === "OPEN_ACCESS") {
+                    isOpenAccess.value = true;
+                    selectedCCLicense.value = { title: cclicenseTypes?.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
+                }
 
-                    selectedResourceType.value = { title: resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
-            } 
+                selectedResourceType.value = { title: resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
+            }
+
+            if (props.alwaysOpenAccess) {
+                isOpenAccess.value = true;
+                selectedAccessRight.value = { title: "Open Access", value: AccessRights.OPEN_ACCESS };
+                selectedCCLicense.value = { title: getLicenseTitleFromValueAutoLocale(License.BY_NC_ND) as string, value: License.BY_NC_ND };
+            }
         });
 
         const file = ref<File>();

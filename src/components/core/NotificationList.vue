@@ -24,6 +24,10 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
+                        <p class="text-gray-500 text-sm mt-1">
+                            {{ localiseDate(notification.creationTimestamp.split("T")[0]) }} 
+                            ({{ localiseTime(notification.creationTimestamp.split("T")[1].substring(0, 5)) }})
+                        </p>
                     </div>
                     <div class="flex justify-center ml-3 mr-1 mb-1 mt-1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
@@ -85,6 +89,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import PersistentQuestionDialog from './comparators/PersistentQuestionDialog.vue';
 import { useI18n } from 'vue-i18n';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -111,7 +116,9 @@ export default defineComponent({
 
         const fetchNotificationsAndCounts = () => {
             NotificationService.getAllNotifications().then(response => {
-                notifications.value = response.data;
+                notifications.value = response.data.sort((a, b) => 
+                    new Date(b.creationTimestamp).getTime() - new Date(a.creationTimestamp).getTime()
+                );
                 loading.value = false;
             });
             
@@ -223,14 +230,14 @@ export default defineComponent({
         };
 
         return {
-            performAction,
-            notifications,
-            rejectNotification,
+            performAction, notifications,
+            rejectNotification, localiseTime,
             notificationCountStore,
             navigateToNotificationPage,
             loading, dismissAllNotifications,
-            displayPersistentDialog,
-            continueToAction, dialogMessage
+            displayPersistentDialog, localiseDate,
+            continueToAction, dialogMessage,
+
         };
 }});
 </script>

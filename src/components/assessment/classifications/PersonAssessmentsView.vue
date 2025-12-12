@@ -60,7 +60,7 @@
                             <ul>
                                 <li v-for="(publication, index) in publications" :key="index">
                                     <localized-link :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
-                                        {{ publication.a }} <b v-if="loginStore.userLoggedIn">→ {{ publication.b }}</b>
+                                        {{ publication.a }} <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
                                     </localized-link>
                                 </li>
                             </ul>
@@ -69,7 +69,7 @@
                             {{ publications.length }}
                         </td>
                         <td v-if="loginStore.userLoggedIn">
-                            {{ calculatePointSum(assessment.commissionId, category) }}
+                            {{ formatNumber(calculatePointSum(assessment.commissionId, category)) }}
                         </td>
                     </tr>
                 </tbody>
@@ -129,8 +129,13 @@ export default defineComponent({
             return 0;
         };
 
+        const formatNumber = (num: number) => {
+            const fixed = num.toFixed(2);
+            return fixed.endsWith('.00') ? fixed.slice(0, -3) : fixed;
+        };
+
         return {
-            calculatePointSum, loginStore,
+            calculatePointSum, loginStore, formatNumber,
             returnCurrentLocaleContent, startDate, endDate,
             getDocumentLandingPageBasePathBasedOnAssessment
         };

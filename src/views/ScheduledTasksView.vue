@@ -252,8 +252,12 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
 
-        const scheduleDate = ref();
-        const scheduledTime = ref();
+        const now = new Date();
+        const fiveMinutesLater = new Date(
+            now.getTime() + 5 * 60000 - (now.getTimezoneOffset() * 60000)
+        );
+        const scheduleDate = ref(fiveMinutesLater.toISOString().split('T')[0]);
+        const scheduledTime = ref(fiveMinutesLater.toISOString().split('T')[1].slice(0, 5));
 
         const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
 

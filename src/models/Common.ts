@@ -82,6 +82,7 @@ export interface Notification {
     notificationText: string;
     displayValue: string;
     possibleActions: NotificationAction[];
+    creationTimestamp: string;
 }
 
 export interface ResearchAreaResponse {

@@ -5,6 +5,7 @@
                 v-if="canEdit"
                 :is-proof="isProof"
                 :allow-licence-selection="allowLicenceSelection"
+                :always-open-access="alwaysOpenAccess"
                 :disable-resource-type-selection="disableResourceTypeSelection"
                 @create="sendDataToParent">
             </document-file-submission-modal>
@@ -130,6 +131,10 @@ export default defineComponent({
             default: false
         },
         canMakeOfficial: {
+            type: Boolean,
+            default: false
+        },
+        alwaysOpenAccess: {
             type: Boolean,
             default: false
         }
