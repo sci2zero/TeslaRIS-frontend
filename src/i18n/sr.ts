@@ -1230,5 +1230,10 @@ export default {
     addNewOtherNameActionMessage: "Dodaj '{0}' u listu oblika imena?",
     removeFromPublicationActionMessage: "Ukloni me sa publikacije '{0}'?",
     unbindEmployeesActionMessage: "Ukloni sve zaposlene sa moje institucije sa publikacije '{0}'?",
-    returnToPublicationActionMessage: "Vrati me kao autora na publikaciju '{0}'"
+    returnToPublicationActionMessage: "Vrati me kao autora na publikaciju '{0}'",
+    deleteNotificationLabel: "Obriši notifikaciju",
+    addNameVariantLabel: "Dodaj oblik imena",
+    returnToPublicationLabel: "Vrati me na publikaciju",
+    viewDetailsLabel: "Vidi detalje",
+    performDeduplicationLabel: "Izvrsi deduplikaciju"
 }

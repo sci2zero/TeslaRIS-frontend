@@ -1223,5 +1223,10 @@ export default {
     addNewOtherNameActionMessage: "Add '{0}' to name variants list?",
     removeFromPublicationActionMessage: "Remove me from publication '{0}'?",
     unbindEmployeesActionMessage: "Remove all employees, from my institution, from publication '{0}'?",
-    returnToPublicationActionMessage: "Return me as an author of publication '{0}'"
+    returnToPublicationActionMessage: "Return me as an author of publication '{0}'",
+    deleteNotificationLabel: "Delete notification",
+    addNameVariantLabel: "Add name variant",
+    returnToPublicationLabel: "Return me to publication",
+    viewDetailsLabel: "View details",
+    performDeduplicationLabel: "Perform deduplication"
 }

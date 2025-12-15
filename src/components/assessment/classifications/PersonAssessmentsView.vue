@@ -60,7 +60,8 @@
                             <ul>
                                 <li v-for="(publication, index) in publications" :key="index">
                                     <localized-link :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
-                                        {{ publication.a }} <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                        {{ publication.a }} 
+                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
                                     </localized-link>
                                 </li>
                             </ul>
@@ -72,6 +73,15 @@
                             {{ formatNumber(calculatePointSum(assessment.commissionId, category)) }}
                         </td>
                     </tr>
+                
+                    <tr v-if="loginStore.userLoggedIn" class="totals-row">
+                        <td class="narrow">
+                            <strong>{{ $t("totalLabel") }}</strong>
+                        </td>
+                        <td></td>
+                        <td><strong>{{ totalPublicationsCount }}</strong></td>
+                        <td><strong>{{ formatNumber(totalPoints) }}</strong></td>
+                    </tr>
                 </tbody>
             </v-table>
             <p v-else class="ml-5">
@@ -82,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import type { ResearcherAssessmentResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useLoginStore } from '@/stores/loginStore';
@@ -97,7 +107,7 @@ export default defineComponent({
     props: {
         assessments: {
             type: Array<ResearcherAssessmentResponse>,
-            required: true
+            default: []
         },
         isLoading: {
             type: Boolean,
@@ -110,6 +120,38 @@ export default defineComponent({
 
         const startDate = ref<string>("1970-01-01");
         const endDate = ref<string>(((new Date()).toISOString()).split("T")[0]);
+
+        const totalPublicationsCount = computed(() => {
+            if (!props.assessments) {
+                return 0;
+            }
+            
+            return props.assessments.reduce((assessmentSum, assessment) => {
+                const assessmentCount = Object.values(assessment.publicationsPerCategory || {})
+                    .reduce((categorySum, publicationsArray) => {
+                        return categorySum + publicationsArray.length;
+                    }, 0);
+                
+                return assessmentSum + assessmentCount;
+            }, 0);
+        });
+
+        const totalPoints = computed(() => {
+            if (!props.assessments) {
+                return 0;
+            }
+            
+            return props.assessments.reduce((assessmentSum, assessment) => {
+                const assessmentPoints = Object.values(assessment.publicationsPerCategory || {})
+                    .reduce((categorySum, publicationsArray) => {
+                        return categorySum + publicationsArray.reduce((pubSum, publication) => {
+                            return pubSum + publication.b; 
+                        }, 0);
+                    }, 0);
+                
+                return assessmentSum + assessmentPoints;
+            }, 0);
+        });
 
         watch([startDate, endDate], () => {
             emit("fetch", startDate.value.split("T")[0], endDate.value.split("T")[0]);
@@ -133,11 +175,12 @@ export default defineComponent({
             const fixed = num.toFixed(2);
             return fixed.endsWith('.00') ? fixed.slice(0, -3) : fixed;
         };
-
+        
         return {
             calculatePointSum, loginStore, formatNumber,
             returnCurrentLocaleContent, startDate, endDate,
-            getDocumentLandingPageBasePathBasedOnAssessment
+            getDocumentLandingPageBasePathBasedOnAssessment,
+            totalPublicationsCount, totalPoints
         };
     }
 });

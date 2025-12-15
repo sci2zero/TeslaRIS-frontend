@@ -32,26 +32,26 @@
                     <div class="flex justify-center ml-3 mr-1 mb-1 mt-1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
                             <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
-                                <v-icon v-if="notificationAction.toString() === 'APPROVE'">
-                                    mdi-check
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION' || notificationAction.toString() === 'REMOVE_EMPLOYEES_FROM_PUBLICATION'">
-                                    mdi-file-remove-outline
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
-                                    mdi-content-duplicate
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'RETURN_TO_PUBLICATION'">
-                                    mdi-restart
-                                </v-icon>
-                                <v-icon v-else>
-                                    mdi-eye-outline
-                                </v-icon>
+                                <v-tooltip location="bottom">
+                                    <template #activator="{ props: tooltipProps }">
+                                        <v-icon v-bind="tooltipProps">
+                                            {{ getActionIcon(notificationAction) }}
+                                        </v-icon>
+                                    </template>
+                                    <span>{{ getActionTooltip(notificationAction) }}</span>
+                                </v-tooltip>
                             </v-btn>
                         </v-list-item-action>
                         <v-list-item-action class="ml-2">
                             <v-btn icon @click.stop="rejectNotification(notification.id)">
-                                <v-icon>mdi-close</v-icon>
+                                <v-tooltip location="bottom">
+                                    <template #activator="{ props: tooltipProps }">
+                                        <v-icon v-bind="tooltipProps">
+                                            mdi-close
+                                        </v-icon>
+                                    </template>
+                                    <span>{{ $t("deleteNotificationLabel") }}</span>
+                                </v-tooltip>
                             </v-btn>
                         </v-list-item-action>
                     </div>  
@@ -229,15 +229,39 @@ export default defineComponent({
             return null;
         };
 
+        const getActionIcon = (action: NotificationAction) => {
+            switch(action) {
+                case 'APPROVE': return 'mdi-check';
+                case 'REMOVE_FROM_PUBLICATION':
+                case 'REMOVE_EMPLOYEES_FROM_PUBLICATION': 
+                    return 'mdi-file-remove-outline';
+                case 'PERFORM_DEDUPLICATION': return 'mdi-content-duplicate';
+                case 'RETURN_TO_PUBLICATION': return 'mdi-restart';
+                default: return 'mdi-eye-outline';
+            }
+        };
+
+        const getActionTooltip = (action: NotificationAction) => {    
+            switch(action) {
+                case "APPROVE": return i18n.t("addNameVariantLabel");
+                case "REMOVE_FROM_PUBLICATION":
+                case "REMOVE_EMPLOYEES_FROM_PUBLICATION": 
+                    return i18n.t("removeLabel");
+                case "PERFORM_DEDUPLICATION": return i18n.t("performDeduplicationLabel");
+                case "RETURN_TO_PUBLICATION": return i18n.t("returnToPublicationLabel");
+                default: return i18n.t("viewDetailsLabel");
+            }
+        };
+
         return {
             performAction, notifications,
             rejectNotification, localiseTime,
-            notificationCountStore,
+            notificationCountStore, getActionIcon,
             navigateToNotificationPage,
             loading, dismissAllNotifications,
             displayPersistentDialog, localiseDate,
             continueToAction, dialogMessage,
-
+            getActionTooltip
         };
 }});
 </script>
