@@ -99,6 +99,7 @@ import { useLoginStore } from '@/stores/loginStore';
 import DatePicker from '@/components/core/DatePicker.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { getDocumentLandingPageBasePathBasedOnAssessment } from '@/utils/PathResolutionUtil';
+import { formatNumber } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -169,11 +170,6 @@ export default defineComponent({
             }
             
             return 0;
-        };
-
-        const formatNumber = (num: number) => {
-            const fixed = num.toFixed(2);
-            return fixed.endsWith('.00') ? fixed.slice(0, -3) : fixed;
         };
         
         return {

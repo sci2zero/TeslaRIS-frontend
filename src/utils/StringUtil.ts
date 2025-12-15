@@ -19,3 +19,8 @@ export const transliterateContentToCyrillic = <T extends { title: string }>(data
 export const transliterateValueToCyrillic = (value: string): string => {
     return toCyrillic(value) ?? value;
 };
+
+export const formatNumber = (num: number) => {
+    const fixed = num.toFixed(1);
+    return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
+};

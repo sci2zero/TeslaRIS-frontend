@@ -116,6 +116,12 @@ export default defineComponent({
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10});
 
         const refreshTable = (event: any) => {
+            if (tableOptions.value.initialCustomConfiguration) {
+                tableOptions.value.initialCustomConfiguration = false;
+                event = tableOptions.value;
+            }
+
+            tableOptions.value = event;
             if (props.suggestions.length > 0) {
                 emit("switchPage", event.page - 1, event.itemsPerPage, props.suggestions[0].entityType);
             }
