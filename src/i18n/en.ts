@@ -663,13 +663,13 @@ export default {
     authorCountLabel: "Author count",
     mServiceLabel: "M-service",
     noAssessmentForSelectionMessage: "It is not possible to perform an assessment for given selection.",
-    impactFactorTableLabel: "Impact factor table",
+    impactFactorTableLabel: "Impact factor and JCI table",
     experimentalPublicationLabel: "Experimental paper",
     theoreticalPublicationLabel: "Theoretical paper",
     simulationPublicationLabel: "Simulation",
     noClassificationsLabel: "No classifications for this entity",
     typeLabel: "Type",
-    ifValuesLabel: "Impact Factors",
+    ifValuesLabel: "Impact Factors and Journal Citation Indexes",
     if2ValueLabel: "IF2 value",
     if5ValueLabel: "IF5 value",
     updateBrandingInformationLabel: "Update branding information",
@@ -1228,5 +1228,7 @@ export default {
     addNameVariantLabel: "Add name variant",
     returnToPublicationLabel: "Return me to publication",
     viewDetailsLabel: "View details",
-    performDeduplicationLabel: "Perform deduplication"
+    performDeduplicationLabel: "Perform deduplication",
+    jciValueLabel: "JCI value",
+    jciPercentileLabel: "JCI percentile"
 }

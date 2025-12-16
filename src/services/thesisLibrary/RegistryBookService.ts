@@ -18,8 +18,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}`);
     }
 
-    async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
-        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&authorName=${authorName}&authorTitle=${authorTitle}&${pageable}`);
+    async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, promotionId: number | undefined, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
+        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&authorName=${authorName}&authorTitle=${authorTitle}${promotionId ? "&promotionId=" + promotionId : ""}&${pageable}`);
     }
 
     async getPromotedCounts(from: string, to: string): Promise<AxiosResponse<InstitutionPromotionCountsReport[]>> {

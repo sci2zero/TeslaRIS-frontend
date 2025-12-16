@@ -147,6 +147,17 @@
                             color="primary"
                         ></date-picker-split>
                     </v-col>
+                    <v-col cols="6" md="4" lg="3">
+                        <v-select
+                            v-model="selectedPromotionFilter"
+                            class="promotion-select mt-3"
+                            :items="finishedPromotions"
+                            :label="$t('promotionLabel')"
+                            return-object
+                            :no-data-text="$t('noDataInTableMessage')"
+                            clearable
+                        />
+                    </v-col>
                 </v-row>
                 <v-row class="justify-start mb-5">
                     <v-col cols="12" sm="6" md="5" lg="3">
@@ -214,7 +225,7 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row class="mb-1">
+                <v-row class="mb-1!">
                     <registry-book-entry-table
                         class="mt-15"
                         :entries="(tableStates.promoted.entries as RegistryBookEntry[])"
@@ -237,7 +248,7 @@
             <v-window-item value="reports">
                 <v-row class="justify-start mt-3">
                     <v-col cols="6">
-                        <registry-book-reports-list></registry-book-reports-list>
+                        <registry-book-reports-list />
                     </v-col>
                 </v-row>
             </v-window-item>
@@ -284,7 +295,7 @@ import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
 import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
 import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
-import type { InstitutionPromotionCountsReport, NotAddedToPromotionThesesRequest, RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import type { InstitutionPromotionCountsReport, NotAddedToPromotionThesesRequest, Promotion, RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import { computeRelativeDate, localiseDate } from '@/utils/DateUtil';
 import Toast from '@/components/core/Toast.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
@@ -311,6 +322,7 @@ import { ThesisType, type DocumentPublicationIndex } from '@/models/PublicationM
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import ThesisLibraryReportingService from '@/services/thesisLibrary/ThesisLibraryReportingService';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { useRoute, useRouter } from 'vue-router';
   
 
 type TabKey = "notYetAdded" | "nonPromoted" | "forPromotion" | "promoted";
@@ -333,6 +345,8 @@ export default defineComponent({
         const snackbar = ref(false);
 
         const currentTab = ref("nonPromoted");
+        const route = useRoute();
+        const router = useRouter();
 
         const reportLoading = ref(false);
 
@@ -344,10 +358,12 @@ export default defineComponent({
         const { loggedInUser, isPromotionRegistryAdministrator, isAdmin } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
+        const finishedPromotions = ref<{ title: string; value: Promotion }[]>([]);
         const selectedPromotion = ref<{ title: string; value: number }>({
             title: "",
             value: -1
         });
+        const selectedPromotionFilter = ref<{ title: string; value: Promotion }>();
 
         const fromDate = ref(new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]);
         const toDate = ref((new Date()).toISOString().split("T")[0]);
@@ -359,7 +375,9 @@ export default defineComponent({
             value: -1
         });
         const thesisTypes =
-            computed(() => getThesisTypesForGivenLocale()?.filter(el => el.value === ThesisType.PHD || el.value === ThesisType.PHD_ART_PROJECT));
+            computed(() => 
+            getThesisTypesForGivenLocale()?.filter(el => el.value === ThesisType.PHD || el.value === ThesisType.PHD_ART_PROJECT)
+        );
         const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
         
         const authorFullName = ref("");
@@ -368,7 +386,10 @@ export default defineComponent({
 
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
         const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
-            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+            {
+                title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string,
+                value: RecurrenceType.ONCE
+            }
         );
 
         watch(
@@ -381,6 +402,7 @@ export default defineComponent({
                 authorAcquiredTitle,
                 selectedPromotion,
                 selectedThesisTypes,
+                selectedPromotionFilter,
                 currentTab
             ], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
@@ -489,6 +511,7 @@ export default defineComponent({
                         dateFrom ? dateFrom.split("T")[0] : "",
                         dateTo ? dateTo.split("T")[0] : "",
                         authorFullName.value, authorAcquiredTitle.value,
+                        selectedPromotionFilter.value?.value.id,
                         query
                     );
                     tableStates.promoted.entries = response.data.content;
@@ -525,23 +548,42 @@ export default defineComponent({
             state.fetchFn();
         };
     
-        const fetchPromotions = () => {
-            PromotionService.getNonFinishedPromotions().then(response => {
-                promotions.value.splice(0);
-                response.data.forEach(promotion => {
-                    promotions.value.push({
+        const fetchPromotions = async () => {
+            const nonFinished = await PromotionService.getNonFinishedPromotions();
+            promotions.value.splice(0);
+            nonFinished.data.forEach(promotion => {
+                promotions.value.push({
                     title: localiseDate(promotion.promotionDate) as string,
                     value: promotion.id as number
-                    });
                 });
-        
-                if (promotions.value.length > 0) {
-                    selectedPromotion.value = promotions.value[0];
-                }
-        
-                fetchAllTables();
             });
+    
+            if (promotions.value.length > 0) {
+                selectedPromotion.value = promotions.value[0];
+            }
+
+            const finished = await PromotionService.getFinishedPromotions();
+            finishedPromotions.value.splice(0);
+            finished.data.forEach(promotion => {
+                finishedPromotions.value.push({
+                    title: localiseDate(promotion.promotionDate) as string,
+                    value: promotion
+                });
+            });
+    
+            fetchAllTables();
         };
+
+        watch(selectedPromotionFilter, () => {
+            if (selectedPromotionFilter.value) {
+                selectedInstitution.value = { 
+                    title: returnCurrentLocaleContent(selectedPromotionFilter.value.value.institutionName) as string, 
+                    value: selectedPromotionFilter.value.value.institutionId 
+                };
+                fromDate.value = selectedPromotionFilter.value.value.promotionDate.split("T")[0];
+                toDate.value = selectedPromotionFilter.value.value.promotionDate.split("T")[0];
+            }
+        });
     
         watch(i18n.locale, () => {
             fetchAllTables();
@@ -558,12 +600,29 @@ export default defineComponent({
             }
         });
     
-        onMounted(() => {
+        onMounted(async () => {
+            await router.isReady();
+
             document.title = i18n.t("registryBookLabel");
-            fetchPromotions();
+            await fetchPromotions();
 
             if (isAdmin.value || isPromotionRegistryAdministrator.value) {
                 fetchScheduledTasks();
+            }
+
+            if (route.query.promotionId) {
+                currentTab.value = "promoted";
+                const presetPromotion = 
+                    finishedPromotions.value.find(
+                        promotion => promotion.value.id === parseInt(route.query.promotionId as string)
+                    );
+                
+                if (presetPromotion) {
+                    selectedPromotionFilter.value = {
+                        title: localiseDate(presetPromotion.value.promotionDate) as string,
+                        value: presetPromotion.value
+                    };
+                }
             }
         });
 
@@ -672,7 +731,8 @@ export default defineComponent({
             selectedRecurrenceType, deleteScheduledTask,
             scheduledTasks, RecurrenceType, reportLoading,
             isPromotionRegistryAdministrator, fromDateSimple,
-            toDateSimple, selectedThesisTypes, thesisTypes
+            toDateSimple, selectedThesisTypes, thesisTypes,
+            selectedPromotionFilter, finishedPromotions
         };
     }
 });

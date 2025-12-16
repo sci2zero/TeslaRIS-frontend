@@ -268,6 +268,8 @@ export interface IFCategoryData {
 export interface IFTableResponse {
     if2Values: IFValue[];
     if5Values: IFValue[];
+    jciValues: IFValue[];
+    jciPercentiles: IFValue[];
     ifTableContent: IFCategoryData[];
 }
 

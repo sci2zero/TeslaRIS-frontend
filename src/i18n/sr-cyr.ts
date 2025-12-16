@@ -89,5 +89,8 @@ export default {
     metadataStandardisationMessage: "Стандардизација метаподатака према међународним CRIS стандардима.",
     emailChangedMessage: "Адреса електронске поште успешно променјена са {0} на {1}.",
     userWithEmailExistsMessage: "Ова адреса електронске поште је већ у употреби.",
-    researcherBoundMessage: "Истраживач је регистрован са адресом ел. поште: {0}"
+    researcherBoundMessage: "Истраживач је регистрован са адресом ел. поште: {0}",
+    impactFactorTableLabel: "Табела импакт фактора и JCI-а",
+    jciValueLabel: "JCI број",
+    jciPercentileLabel: "JCI перцентил"
 };

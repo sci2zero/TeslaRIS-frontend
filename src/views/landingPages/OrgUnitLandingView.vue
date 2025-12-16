@@ -66,6 +66,14 @@
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
                                     {{ $t("legalEntityLabel") }}
                                 </div>
+                                <div v-if="organisationUnit?.superInstitutionId">
+                                    {{ $t("superOULabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.superInstitutionId" class="response">
+                                    <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId">
+                                        {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
+                                    </localized-link>
+                                </div>
                                 <div>
                                     {{ $t("addressLabel") }}:
                                 </div>
@@ -524,11 +532,12 @@ import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
 import DLDisplayConfigurationForm from '@/components/organisationUnit/DLDisplayConfigurationForm.vue';
 import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink },
     setup() {
         const currentTab = ref("relations");
 

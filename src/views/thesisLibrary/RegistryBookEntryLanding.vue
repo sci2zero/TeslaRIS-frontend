@@ -26,7 +26,7 @@
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
                             :form-component="RegistryBookEntryForm"
-                            :form-props="{ presetRegistryBookEntry: registryBookEntry }"
+                            :form-props="{ presetRegistryBookEntry: registryBookEntry, canSave: canEdit }"
                             is-section-update
                             entity-name="RegistryBookEntry"
                             :read-only="!canEdit"
@@ -37,6 +37,16 @@
                         <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
+                        </div>
+                        <div
+                            v-if="registryBookEntry?.promotionId"
+                            class="mb-5">
+                            {{ $t("promotionLabel") }}:
+                            <div class="response">
+                                <localized-link :to="'registry-book?promotionId=' + registryBookEntry?.promotionId">
+                                    {{ `${localiseDate(registryBookEntry.promotionDate)} ${$t("inLabel")} ${localiseTime(registryBookEntry.promotionTime)}` }}
+                                </localized-link>
+                            </div>
                         </div>
                         <v-row>
                             <v-col cols="6">
@@ -294,7 +304,7 @@ import { useRoute } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -382,7 +392,7 @@ export default defineComponent({
             registryBookEntry, icon, returnCurrentLocaleContent,
             languageTagMap, localiseDate, snackbar, snackbarMessage,
             RegistryBookEntryForm, updateBasicInfo, canEdit,
-            allowSingleEdit, isAdmin, canAllowEdit
+            allowSingleEdit, isAdmin, canAllowEdit, localiseTime
         };
 }})
 

@@ -58,6 +58,7 @@ export interface Promotion {
     description: MultilingualContent[];
     institutionId: number;
     finished?: boolean;
+    institutionName?: MultilingualContent[];
 }
 
 export enum AcademicTitle {
@@ -126,6 +127,9 @@ export interface RegistryBookEntry {
     registryBookNumber?: number;
     schoolYearOrdinalNumber?: number;
     thesisId?: number;
+    promotionId?: number;
+    promotionDate?: string;
+    promotionTime?: string;
 }
 
 export interface PhdThesisPrePopulatedData {

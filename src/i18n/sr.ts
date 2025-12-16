@@ -662,13 +662,13 @@ export default {
     authorCountLabel: "Broj autora",
     mServiceLabel: "M-servis",
     noAssessmentForSelectionMessage: "Nije moguće izvršiti vrednovanje za datu selekciju.",
-    impactFactorTableLabel: "Tabela Impakt Faktora",
+    impactFactorTableLabel: "Tabela Impakt Faktora i JCI-a",
     experimentalPublicationLabel: "Eksperimentalan rad",
     theoreticalPublicationLabel: "Teoretski rad",
     simulationPublicationLabel: "Simulacija",
     noClassificationsLabel: "Nema klasifikacija za ovaj entitet.",
     typeLabel: "Tip",
-    ifValuesLabel: "Impakt Faktori",
+    ifValuesLabel: "Impakt Faktori i Indikatori Citiranosti Časopisa",
     if2ValueLabel: "IF2 broj",
     if5ValueLabel: "IF5 broj",
     updateBrandingInformationLabel: "Ažuriraj informacije o brendiranju",
@@ -1235,5 +1235,7 @@ export default {
     addNameVariantLabel: "Dodaj oblik imena",
     returnToPublicationLabel: "Vrati me na publikaciju",
     viewDetailsLabel: "Vidi detalje",
-    performDeduplicationLabel: "Izvrsi deduplikaciju"
+    performDeduplicationLabel: "Izvrsi deduplikaciju",
+    jciValueLabel: "JCI broj",
+    jciPercentileLabel: "JCI percentil"
 }
