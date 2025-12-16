@@ -31,7 +31,13 @@
                 <!-- Affiliation -->
                 <div class="mb-6 lg:mb-8">
                     <p class="text-lg sm:text-xl serif font-semibold text-slate-600 font-sans">
-                        {{ primaryEmployment?.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        <localized-link
+                            v-if="primaryEmployment?.organisationUnitId"
+                            :to="'organisation-units/' + primaryEmployment?.organisationUnitId"
+                            class="font-medium text-gray-900 underline"
+                        >
+                            {{ primaryEmployment?.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        </localized-link>
                     </p>
                     <p class="text-sm text-slate-500 font-sans">
                         {{ primaryEmployment?.employmentPosition ? getEmploymentPositionTitleFromValueAutoLocale(primaryEmployment.employmentPosition) : "" }}
