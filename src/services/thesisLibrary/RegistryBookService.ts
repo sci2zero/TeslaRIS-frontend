@@ -101,6 +101,14 @@ export class RegistryBookService extends BaseService {
     async saveDraft(body: RegistryBookEntry, thesisId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book-draft/${thesisId}`, body, RegistryBookService.idempotencyKey);
     }
+
+    async removeFromFinishedPromotion(entryId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/remove-from-finished-promotion/${entryId}`, {});
+    }
+
+    async removeAllFromFinishedPromotion(promotionId: number, deletePromotion: boolean): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/remove-all-from-finished-promotion/${promotionId}?deletePromotion=${deletePromotion}`, {});
+    }
 }
 
 export default new RegistryBookService();

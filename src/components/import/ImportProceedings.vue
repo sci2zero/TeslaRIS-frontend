@@ -43,10 +43,14 @@
             <template #item="row">
                 <tr>
                     <td v-if="$i18n.locale.startsWith('sr')">
-                        {{ row.item.nameSr }}
+                        <localized-link :to="'events/conference/' + row.item.databaseId">
+                            {{ row.item.nameSr }}
+                        </localized-link>
                     </td>
                     <td v-else>
-                        {{ row.item.nameOther }}
+                        <localized-link :to="'events/conference/' + row.item.databaseId">
+                            {{ row.item.nameOther }}
+                        </localized-link>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(row.item.dateFromTo) }}
@@ -93,10 +97,12 @@ import ProceedingsService from "@/services/ProceedingsService";
 import JournalService from "@/services/JournalService";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import BookSeriesService from "@/services/BookSeriesService";
+import LocalizedLink from "../localization/LocalizedLink.vue";
 
 
 export default defineComponent({
     name: "ImportProceedingsComponent",
+    components: { LocalizedLink },
     props: {
         publicationForLoading: {
             type: Object as PropType<ProceedingsPublicationLoad>,

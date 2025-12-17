@@ -29,10 +29,18 @@
             <template #item="row">
                 <tr>
                     <td v-if="$i18n.locale.startsWith('sr')">
-                        {{ row.item.titleSr }}
+                        <localized-link
+                            :to="'journals/' + row.item.databaseId"
+                            open-in-new-tab>
+                            {{ row.item.titleSr }}
+                        </localized-link>
                     </td>
                     <td v-else>
-                        {{ row.item.titleOther }}
+                        <localized-link
+                            :to="'journals/' + row.item.databaseId"
+                            open-in-new-tab>
+                            {{ row.item.titleOther }}
+                        </localized-link>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(row.item.eissn) }}
@@ -71,10 +79,12 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import type { JournalIndex } from "@/models/JournalModel";
 import JournalService from "@/services/JournalService";
 import ImportService from "@/services/importer/ImportService";
+import LocalizedLink from "../localization/LocalizedLink.vue";
 
 
 export default defineComponent({
     name: "ImportJournalComponent",
+    components: { LocalizedLink },
     props: {
         publicationForLoading: {
             type: Object as PropType<JournalPublicationLoad>,

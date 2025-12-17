@@ -11,6 +11,19 @@
                 :title="title"
                 class="multiline-text"
             >
+                <v-card-text v-if="showRadioOptions">
+                    <div class="text-subtitle-1 mb-2">
+                        {{ $t("selectOptionLabel") }}
+                    </div>
+                    <v-radio-group v-model="selectedOption" density="compact">
+                        <v-radio
+                            v-for="option in radioOptions"
+                            :key="option.value"
+                            :label="option.title"
+                            :value="option.value"
+                        ></v-radio>
+                    </v-radio-group>
+                </v-card-text>
                 <template #actions>
                     <v-spacer></v-spacer>
   
@@ -28,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, onMounted, type PropType, ref, watch } from 'vue';
 
 export default defineComponent({
     name: "PersistentQuestionDialog",
@@ -48,11 +61,35 @@ export default defineComponent({
         entityNames: {
             type: Array<string>,
             default: []
+        },
+        showRadioOptions: {
+            type: Boolean,
+            default: false
+        },
+        radioOptions: {
+            type: Object as PropType<{title: string, value: number}[]>,
+            default: () => [] as {title: string, value: number}[]
         }
     },
     emits: ["continue", "update:modelValue"],
     setup(props, { emit }) {
         const dialog = ref(props.modelValue);
+
+        const selectedOption = ref();
+
+        onMounted(() => {
+            setInitialRadioOption();
+        });
+
+        watch(() => props.radioOptions, () => {
+            setInitialRadioOption();
+        });
+
+        const setInitialRadioOption = () => {
+            if (props.radioOptions) {
+                selectedOption.value = props.radioOptions[0].value;
+            }
+        };
 
         watch(() => props.modelValue, (newValue) => {
             dialog.value = newValue;
@@ -72,13 +109,19 @@ export default defineComponent({
 
         const continueOperation = () => {
             dialog.value = false;
-            emit("continue");
+
+            if (selectedOption.value) {
+                emit("continue", selectedOption.value);
+            } else {
+                emit("continue");
+            }
         };
 
         return {
             dialog, toggle,
             cancelOperation,
-            continueOperation
+            continueOperation,
+            selectedOption
         };
     },
 });

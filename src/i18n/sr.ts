@@ -67,7 +67,7 @@ export default {
         submitProceedingsPublication: "Dodavanje rada u zborniku",
         advancedSearch: "Napredna pretraga",
         activateAccount: "Aktivacija naloga",
-        importer: "Uvoznik",
+        importer: "Uvoz rezultata",
         loader: "Učitavanje",
         resetPassword: "Resetovanje lozinke",
         notifications: "Obaveštenja",
@@ -1237,5 +1237,12 @@ export default {
     viewDetailsLabel: "Vidi detalje",
     performDeduplicationLabel: "Izvrsi deduplikaciju",
     jciValueLabel: "JCI broj",
-    jciPercentileLabel: "JCI percentil"
+    jciPercentileLabel: "JCI percentil",
+    removeFromPromotionLabel: "Ukloni iz promocije",
+    removeOneFromPromotionMessage: "Ova akcija će ukloniti kandidata iz promocije u kojoj se nalazi nakon čega ćete ga moći pronaći u listi nepromovisanih kandidata. Redni broj u matičnoj knjizi će biti takođe uklonjen. Ukoliko u promociji iz koje ste ga uklonili ne ostane nijedan kandidat, promocija će biti automatski obrisana. Da li želite da nastavite?",
+    removeAllFromPromotionLabel: "Ukloni sve iz promocije",
+    removeAllFromPromotionMessage: "Ova akcija će ukloniti sve kandidate iz promocije u kojoj se nalaze nakon čega ćete ih moći pronaći u listi za promociju ili u listi nepromovisanih u zavisnosti od toga da li želite da obrišete promociju ili ne.",
+    selectOptionLabel: "Izaberite opciju:",
+    deletePromotionLabel: "Obriši promociju",
+    doNotDeletePromotionLabel: "Nemoj brisati promociju"
 }

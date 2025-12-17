@@ -148,15 +148,25 @@
                         ></date-picker-split>
                     </v-col>
                     <v-col cols="6" md="4" lg="3">
-                        <v-select
-                            v-model="selectedPromotionFilter"
-                            class="promotion-select mt-3"
-                            :items="finishedPromotions"
-                            :label="$t('promotionLabel')"
-                            return-object
-                            :no-data-text="$t('noDataInTableMessage')"
-                            clearable
-                        />
+                        <div class="flex justify-start">
+                            <v-select
+                                v-model="selectedPromotionFilter"
+                                class="promotion-select mt-3"
+                                :items="finishedPromotions"
+                                :label="$t('promotionLabel')"
+                                return-object
+                                :no-data-text="$t('noDataInTableMessage')"
+                                clearable
+                            />
+                            <v-btn
+                                v-if="isAdmin && selectedPromotionFilter"
+                                class="ml-3 mt-6"
+                                density="compact"
+                                color="error"
+                                @click="initiateRemoveAllFromPromotion">
+                                {{ $t('removeAllFromPromotionLabel') }}
+                            </v-btn>
+                        </div>
                     </v-col>
                 </v-row>
                 <v-row class="justify-start mb-5">
@@ -285,6 +295,15 @@
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="message" />
+
+        <persistent-question-dialog
+            v-model="displayPersistentDialog"
+            :title="$t('areYouSureLabel')"
+            :message="$t('removeAllFromPromotionMessage')"
+            show-radio-options
+            :radio-options="[{title: $t('deletePromotionLabel'), value: 1}, {title: $t('doNotDeletePromotionLabel'), value: 2}]"
+            @continue="removeAllFromPromotion">
+        </persistent-question-dialog>
     </v-container>
 </template>
   
@@ -323,6 +342,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import ThesisLibraryReportingService from '@/services/thesisLibrary/ThesisLibraryReportingService';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { useRoute, useRouter } from 'vue-router';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
   
 
 type TabKey = "notYetAdded" | "nonPromoted" | "forPromotion" | "promoted";
@@ -339,10 +359,11 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList, DatePickerSplit, RelativeDatePreview, PublicationTableComponent },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList, DatePickerSplit, RelativeDatePreview, PublicationTableComponent, PersistentQuestionDialog },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
+        const displayPersistentDialog = ref(false);
 
         const currentTab = ref("nonPromoted");
         const route = useRoute();
@@ -611,16 +632,23 @@ export default defineComponent({
             }
 
             if (route.query.promotionId) {
-                currentTab.value = "promoted";
+                const forPromotion = !!route.query.forPromotion && route.query.forPromotion as string === "true";
+                currentTab.value = forPromotion ? "forPromotion" : "promoted";
+                
                 const presetPromotion = 
                     finishedPromotions.value.find(
                         promotion => promotion.value.id === parseInt(route.query.promotionId as string)
                     );
                 
-                if (presetPromotion) {
+                if (presetPromotion && !forPromotion) {
                     selectedPromotionFilter.value = {
                         title: localiseDate(presetPromotion.value.promotionDate) as string,
                         value: presetPromotion.value
+                    };
+                } else if (presetPromotion && forPromotion) {
+                    selectedPromotion.value = {
+                        title: localiseDate(presetPromotion.value.promotionDate) as string,
+                        value: presetPromotion.value.id as number
                     };
                 }
             }
@@ -715,6 +743,33 @@ export default defineComponent({
                 snackbar.value = true;
             });
         };
+
+        const initiateRemoveAllFromPromotion = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        const removeAllFromPromotion = (selectedOption: number) => {
+            if (!selectedPromotionFilter.value || !selectedPromotionFilter.value.value) {
+                return;
+            }
+
+            RegistryBookService.removeAllFromFinishedPromotion(
+                selectedPromotionFilter.value.value?.id as number, selectedOption === 1
+            ).then(() => {
+                if (selectedOption === 1) {
+                    currentTab.value = "nonPromoted";
+                    tableStates.notYetAdded.fetchFn();
+                } else {
+                    currentTab.value = "forPromotion";
+                    selectedPromotion.value = {
+                        title: selectedPromotionFilter.value?.title as string,
+                        value: selectedPromotionFilter.value?.value?.id as number
+                    };
+                }
+
+                selectedPromotionFilter.value = undefined;
+            });
+        };
     
         return {
             currentTab, fromDate, toDate,
@@ -732,7 +787,9 @@ export default defineComponent({
             scheduledTasks, RecurrenceType, reportLoading,
             isPromotionRegistryAdministrator, fromDateSimple,
             toDateSimple, selectedThesisTypes, thesisTypes,
-            selectedPromotionFilter, finishedPromotions
+            selectedPromotionFilter, finishedPromotions,
+            initiateRemoveAllFromPromotion,
+            displayPersistentDialog, removeAllFromPromotion
         };
     }
 });

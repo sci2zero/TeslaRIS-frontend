@@ -1230,5 +1230,12 @@ export default {
     viewDetailsLabel: "View details",
     performDeduplicationLabel: "Perform deduplication",
     jciValueLabel: "JCI value",
-    jciPercentileLabel: "JCI percentile"
+    jciPercentileLabel: "JCI percentile",
+    removeFromPromotionLabel: "Remove from promotion",
+    removeOneFromPromotionMessage: "This action will remove the candidate from the promotion they are currently in, after which you will be able to find them in the list of unpromoted candidates. The serial number in the registry book will also be removed. If no candidates remain in the promotion you removed them from, the promotion will be automatically deleted. Do you wish to continue?",
+    removeAllFromPromotionLabel: "Remove all from promotion",
+    removeAllFromPromotionMessage: "This action will remove all candidates from the promotion they are currently in, after which you will be able to find them either in the promotion list or in the list of unpromoted candidates, depending on whether you want to delete the promotion or not.",
+    selectOptionLabel: "Select an option:",
+    deletePromotionLabel: "Delete promotion",
+    doNotDeletePromotionLabel: "Do not delete promotion"
 }

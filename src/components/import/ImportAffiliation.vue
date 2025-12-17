@@ -29,10 +29,18 @@
             <template #item="row">
                 <tr>
                     <td v-if="$i18n.locale.startsWith('sr')">
-                        {{ displayTextOrPlaceholder(row.item.nameSr) }}
+                        <localized-link
+                            :to="'organisation-units/' + row.item.databaseId"
+                            open-in-new-tab>
+                            {{ displayTextOrPlaceholder(row.item.nameSr) }}
+                        </localized-link>
                     </td>
                     <td v-else>
-                        {{ displayTextOrPlaceholder(row.item.nameOther) }}
+                        <localized-link
+                            :to="'organisation-units/' + row.item.databaseId"
+                            open-in-new-tab>
+                            {{ displayTextOrPlaceholder(row.item.nameOther) }}
+                        </localized-link>
                     </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
@@ -83,10 +91,12 @@ import type { OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import ImportService from "@/services/importer/ImportService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import LocalizedLink from "../localization/LocalizedLink.vue";
 
 
 export default defineComponent({
     name: "ImportAffiliationComponent",
+    components: { LocalizedLink },
     props: {
         ouForLoading: {
             type: Object as PropType<OrganisationUnitLoad>,
@@ -276,6 +286,8 @@ export default defineComponent({
                     superOUNameOther: "",
                     superOUNameOtherSortable: "",
                     id: "",
+                    allowedThesisTypes: [],
+                    employeeCount: 0,
                     superOUId: -1
                 };
 
