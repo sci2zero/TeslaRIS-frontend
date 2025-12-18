@@ -80,7 +80,7 @@ export default {
         branding: "Brendiranje",
         massInstitutionAssignment: "Masovno dodeljivanje institucija",
         apiKeyManagement: "Upravljanje API ključevima",
-        indicators: "Pokazatelji",
+        indicators: "Indikatori",
         classifications: "Klasifikacije",
         assessmentRulebooks: "Pravilnici vrednovanja",
         assessmentRulebookLandingPage: "Detalji pravilnika vrednovanja",
