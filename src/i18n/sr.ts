@@ -693,7 +693,8 @@ export default {
     missingAttachmentsMessage: "Broj preliminarnih dokumenata, dodataka i izveštaja sa konferencije nije jednak.",
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
     noAttachmentsMessage: "Nisu unešeni neophodni podaci i dokumenti za postavljanje na javni uvid. Neophodni podaci su: Naslov, Autor, Naucna ili umetnicka oblast, i Organizaciona jedinica. Neophodni (preliminarni) dokumenti su: disertacija i izveštaj komisije.",
-    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida.",
+    putOnPublicReviewWarningMessage: "Kada se završni rad stavi na javni uvid, sve izmene biće onemogućene do isteka perioda javnog uvida. Započni javni uvid?",
+    putOnShortenedPublicReviewWarningMessage: "Po zaključku nadležnog stručnog veća iz stava 8 člana 26 Pravila doktorskih studija Univerziteta u Novom Sadu izmenjen ili dopunjen izveštaj o oceni doktorske disertacije, odnosno doktorskog umetničkog projekta ponovo se stavlja na uvid javnosti u trajanju od 10 dana. Započni skraćeni javni uvid?",
     removeFromPublicReviewWarningMessage: "Sklanjanjem rada sa javnog uvida biće omogućene izmene nakon čega ćete moći da započnete novi ili nastavite trenutni uvid. Ovo je operacija koju ne bi trebalo koristiti osim u vanrednim situacijama.",
     classifiedByMeLabel: "Klasifikovano od strane mene",
     institutionProfileLabel: "Profil institucije",
@@ -704,7 +705,7 @@ export default {
     addHeadOfLibraryLabel: "Dodaj Administratora Biblioteke",
     continuePublicReviewLabel: "Nastavi uvid javnosti",
     restartPublicReviewLabel: "Restartuj uvid javnosti",
-    restartLastReviewWarningMessage: "Restartovanjem javnog uvida poništavate čitav period proveden na trenutnom javnom uvidu.",
+    restartLastReviewWarningMessage: "Restartovanjem javnog uvida poništavate čitav period proveden na trenutnom javnom uvidu. Da li želite da započnete novi javni uvid?",
     continueLastReviewWarningMessage: "Ovom operacijom nastavljate trenutni uvid javnosti.",
     documentLabel: "Dokument",
     researchOutputLabel: "Objavljeni rezultati",
@@ -1244,5 +1245,7 @@ export default {
     removeAllFromPromotionMessage: "Ova akcija će ukloniti sve kandidate iz promocije u kojoj se nalaze nakon čega ćete ih moći pronaći u listi za promociju ili u listi nepromovisanih u zavisnosti od toga da li želite da obrišete promociju ili ne.",
     selectOptionLabel: "Izaberite opciju:",
     deletePromotionLabel: "Obriši promociju",
-    doNotDeletePromotionLabel: "Nemoj brisati promociju"
+    doNotDeletePromotionLabel: "Nemoj brisati promociju",
+    regularLabel: "Regularan",
+    shortenedLabel: "Skraćen"
 }

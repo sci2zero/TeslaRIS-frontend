@@ -287,7 +287,7 @@ export default defineComponent({
         const taskReindexing = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REINDEXING);
         const taskUnmanagedDocumentsDeletion = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION);
         const taskIndicatorLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.INDICATOR_LOAD);
-        const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_COMPUTATION);
+        const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_JCI_COMPUTATION);
         const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
@@ -403,9 +403,9 @@ export default defineComponent({
                     );
                     break;
 
-                case ScheduledTaskType.IF5_COMPUTATION:
+                case ScheduledTaskType.IF5_JCI_COMPUTATION:
                     scheduleTask(() => 
-                        TaskManagerService.scheduleIF5RankComputationTask(
+                        TaskManagerService.scheduleIF5AndJCIRankComputationTask(
                             timestamp, selectedYears.value
                         )
                     );

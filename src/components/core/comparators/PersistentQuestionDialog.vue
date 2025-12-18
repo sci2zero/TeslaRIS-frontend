@@ -86,7 +86,8 @@ export default defineComponent({
         });
 
         const setInitialRadioOption = () => {
-            if (props.radioOptions) {
+            selectedOption.value = null;
+            if (props.radioOptions && props.radioOptions.length > 0) {
                 selectedOption.value = props.radioOptions[0].value;
             }
         };

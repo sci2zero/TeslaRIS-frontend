@@ -269,6 +269,7 @@ export interface Thesis extends Document {
     extendedAbstract?: MultilingualContent[];
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
+    isShortenedReview?: boolean;
 }
 
 export interface CitationResponse {
