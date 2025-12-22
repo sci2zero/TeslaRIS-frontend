@@ -21,12 +21,20 @@ export class ThesisLibraryReportingService extends BaseService {
         return super.sendRequest(axios.post, `thesis-library/report/accepted?${pageable}`, body);
     }
 
+    async getNotDefendedThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.post, `thesis-library/report/not-defended?${pageable}`, body);
+    }
+
     async getPublicReviewThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
         return super.sendRequest(axios.post, `thesis-library/report/public-review?${pageable}`, body);
     }
 
     async getPubliclyAvailableThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
         return super.sendRequest(axios.post, `thesis-library/report/public-access?${pageable}`, body);
+    }
+
+    async getClosedAccessThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.post, `thesis-library/report/closed-access?${pageable}`, body);
     }
 
     async downloadReport(body: ThesisReportRequest, lang: string): Promise<void> {

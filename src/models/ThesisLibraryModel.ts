@@ -7,7 +7,7 @@ export interface ThesisReportRequest {
     fromDate: string,
     toDate: string;
     topLevelInstitutionIds: number[];
-    thesisType: ThesisType;
+    thesisTypes: ThesisType[];
 }
 
 export interface NotAddedToPromotionThesesRequest {
@@ -21,16 +21,16 @@ export interface ThesisReportCounts {
     institutionId: number;
     institutionName: MultilingualContent[];
     defendedCount: number;
-    putOnPublicReviewCount: number;
-    topicsAcceptedCount: number;
+    notDefendedCount: number;
     publiclyAvailableCount: number;
+    closedAccessCount: number;
 }
 
 export enum ThesisReportType {
     DEFENDED = "DEFENDED",
-    ACCEPTED = "ACCEPTED",
-    PUBLIC_REVIEW = "PUBLIC_REVIEW",
-    PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE"
+    NOT_DEFENDED = "NOT_DEFENDED",
+    PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE",
+    CLOSED_ACCESS = "CLOSED_ACCESS"
 }
 
 export interface ThesisSearchRequest {

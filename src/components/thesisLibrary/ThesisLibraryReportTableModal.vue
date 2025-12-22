@@ -1,6 +1,6 @@
 <template>
     <div justify="start">
-        <v-dialog v-model="dialog" persistent class="wide">
+        <v-dialog v-model="dialog" class="wide">
             <template #activator="scope">
                 <v-btn
                     color="primary" :disabled="displayCount === 0"
@@ -15,13 +15,25 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <publication-table-component
-                            :publications="publications"
-                            :total-publications="totalPublications"
-                            shows-research-outputs
-                            allow-selection
-                            @switch-page="switchPage">
-                        </publication-table-component>
+                        <div
+                            v-if="isLoading"
+                            class="flex justify-center">
+                            <v-progress-circular
+                                color="primary"
+                                :size="40"
+                                :width="3"
+                                indeterminate
+                            ></v-progress-circular>
+                        </div>
+                        <div v-show="!isLoading">
+                            <publication-table-component
+                                :publications="publications"
+                                :total-publications="totalPublications"
+                                shows-research-outputs
+                                allow-selection
+                                @switch-page="switchPage">
+                            </publication-table-component>
+                        </div>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -70,6 +82,8 @@ export default defineComponent({
         const dialog = ref(false);
         const i18n = useI18n();
 
+        const isLoading = ref(false);
+
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
         const page = ref(0);
@@ -82,20 +96,20 @@ export default defineComponent({
                 [ThesisReportType.DEFENDED]:
                     (body: ThesisReportRequest, pageable: string) =>
                         ThesisLibraryReportingService.getDefendedThesesForPeriod(body, pageable),
-                [ThesisReportType.ACCEPTED]:
+                [ThesisReportType.NOT_DEFENDED]:
                     (body: ThesisReportRequest, pageable: string) =>
-                        ThesisLibraryReportingService.getAcceptedThesesForPeriod(body, pageable),
-                [ThesisReportType.PUBLIC_REVIEW]:
-                    (body: ThesisReportRequest, pageable: string) =>
-                        ThesisLibraryReportingService.getPublicReviewThesesForPeriod(body, pageable),
+                        ThesisLibraryReportingService.getNotDefendedThesesForPeriod(body, pageable),
                 [ThesisReportType.PUBLICLY_AVAILABLE]:
                     (body: ThesisReportRequest, pageable: string) =>
                         ThesisLibraryReportingService.getPubliclyAvailableThesesForPeriod(body, pageable),
+                [ThesisReportType.CLOSED_ACCESS]:
+                    (body: ThesisReportRequest, pageable: string) =>
+                        ThesisLibraryReportingService.getClosedAccessThesesForPeriod(body, pageable)
             };
 
             const fetchMethod = reportMethods[props.reportType];
 
-            let reportRequest = Object.assign(
+            const reportRequest = Object.assign(
                 {},
                 props.reportRequest,
                 { 
@@ -104,10 +118,12 @@ export default defineComponent({
             );
             
             if (fetchMethod) {
+                isLoading.value = true;
                 fetchMethod(reportRequest, `page=${page.value}&size=${size.value}&sort=${sort.value}`)
                     .then(({ data }) => {
                         publications.value = data.content;
                         totalPublications.value = data.totalElements;
+                        isLoading.value = false;
                     });
             }
         };
@@ -116,12 +132,12 @@ export default defineComponent({
             switch (props.reportType) {
                 case ThesisReportType.DEFENDED:
                     return i18n.t("defendedThesesLabel");
-                case ThesisReportType.ACCEPTED:
-                    return i18n.t("acceptedThesesLabel");
-                case ThesisReportType.PUBLIC_REVIEW:
-                    return i18n.t("publicReviewThesesLabel");
+                case ThesisReportType.NOT_DEFENDED:
+                    return i18n.t("notDefendedThesesLabel");
                 case ThesisReportType.PUBLICLY_AVAILABLE:
                     return i18n.t("publiclyAvailableThesesLabel");
+                case ThesisReportType.CLOSED_ACCESS:
+                    return i18n.t("closedAccessThesesLabel");
             }
         };
 
@@ -134,7 +150,7 @@ export default defineComponent({
         };
 
         return { 
-            dialog, publications,
+            dialog, publications, isLoading,
             totalPublications, switchPage,
             fetchTheses, getReportName
         };
