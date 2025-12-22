@@ -60,6 +60,10 @@ export default defineComponent({
         reportType: {
             type: Object as PropType<ThesisReportType>,
             required: true
+        },
+        institutionId: {
+            type: Number,
+            required: true
         }
     },
     setup(props) {
@@ -90,9 +94,17 @@ export default defineComponent({
             };
 
             const fetchMethod = reportMethods[props.reportType];
+
+            let reportRequest = Object.assign(
+                {},
+                props.reportRequest,
+                { 
+                    topLevelInstitutionIds: [props.institutionId]
+                }
+            );
             
             if (fetchMethod) {
-                fetchMethod(props.reportRequest, `page=${page.value}&size=${size.value}&sort=${sort.value}`)
+                fetchMethod(reportRequest, `page=${page.value}&size=${size.value}&sort=${sort.value}`)
                     .then(({ data }) => {
                         publications.value = data.content;
                         totalPublications.value = data.totalElements;

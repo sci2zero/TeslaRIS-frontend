@@ -24,6 +24,7 @@
         v-if="reportCounts.length > 0"
         :headers="headers"
         :items="reportCounts"
+        :items-per-page="reportCounts.length"
         density="comfortable"
         hide-default-footer
         class="mb-5"
@@ -49,7 +50,8 @@
                         class="mt-3"
                         :display-count="props.item.defendedCount"
                         :report-request="(reportRequest as ThesisReportRequest)"
-                        :report-type="ThesisReportType.DEFENDED">
+                        :report-type="ThesisReportType.DEFENDED"
+                        :institution-id="props.item.institutionId">
                     </thesis-library-report-table-modal>
                 </td>
                 <td>
@@ -57,7 +59,8 @@
                         class="mt-3"
                         :display-count="props.item.topicsAcceptedCount"
                         :report-request="(reportRequest as ThesisReportRequest)"
-                        :report-type="ThesisReportType.ACCEPTED">
+                        :report-type="ThesisReportType.ACCEPTED"
+                        :institution-id="props.item.institutionId">
                     </thesis-library-report-table-modal>
                 </td>
                 <td>
@@ -65,7 +68,8 @@
                         class="mt-3"
                         :display-count="props.item.putOnPublicReviewCount"
                         :report-request="(reportRequest as ThesisReportRequest)"
-                        :report-type="ThesisReportType.PUBLIC_REVIEW">
+                        :report-type="ThesisReportType.PUBLIC_REVIEW"
+                        :institution-id="props.item.institutionId">
                     </thesis-library-report-table-modal>
                 </td>
                 <td>
@@ -73,7 +77,8 @@
                         class="mt-3"
                         :display-count="props.item.publiclyAvailableCount"
                         :report-request="(reportRequest as ThesisReportRequest)"
-                        :report-type="ThesisReportType.PUBLICLY_AVAILABLE">
+                        :report-type="ThesisReportType.PUBLICLY_AVAILABLE"
+                        :institution-id="props.item.institutionId">
                     </thesis-library-report-table-modal>
                 </td>
             </tr>
