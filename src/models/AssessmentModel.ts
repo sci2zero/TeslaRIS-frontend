@@ -1,5 +1,6 @@
 import type { AccessLevel, ApplicableEntityType, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { type ResearchArea } from "./OrganisationUnitModel";
 
 
 export interface IndicatorResponse {
@@ -208,6 +209,7 @@ export interface PublicationAssessmentRequest {
 export interface AssessmentResearchArea {
     name: MultilingualContent[],
     code: string
+    researchSubAreas: ResearchArea[];
 }
 
 export interface ResearcherAssessmentResponse {

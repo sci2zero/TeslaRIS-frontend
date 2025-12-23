@@ -1248,5 +1248,10 @@ export default {
     deletePromotionLabel: "Obriši promociju",
     doNotDeletePromotionLabel: "Nemoj brisati promociju",
     regularLabel: "Regularan",
-    shortenedLabel: "Skraćen"
+    shortenedLabel: "Skraćen",
+    downloadRoCrateLabel: "Preuzmi kao Ro-Crate",
+    downloadRoCrateBibliographyLabel: "Preuzmi bibliografiju (Ro-Crate)",
+    updateResearchAreasLabel: "Ažuriraj oblasti istraživanja",
+    updateResearchSubAreasLabel: "Ažuriraj pod-oblasti istraživanja",
+    selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:"
 }

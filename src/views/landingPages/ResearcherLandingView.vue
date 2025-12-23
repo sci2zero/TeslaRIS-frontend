@@ -21,13 +21,20 @@
                         <generic-crud-modal
                             class="ml-2" 
                             :form-component="AssessmentResearchAreaForm"
-                            :form-props="{ personId: person?.id, presetResearchArea: researchArea }"
+                            :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
                             entity-name="ResearchArea"
                             is-update compact
                             primary-color outlined
                             :read-only="!canEdit"
                             @update="fetchAssessmentResearchArea"
                         />
+                        <v-btn
+                            v-if="canEdit"
+                            class="mb-5 ml-2" color="primary" density="compact"
+                            variant="outlined"
+                            @click="downloadRoCrateBibliography">
+                            {{ $t("downloadRoCrateBibliographyLabel") }}
+                        </v-btn>
                         <v-btn
                             v-if="isResearcher && canEdit"
                             class="mb-5 ml-2" color="primary" density="compact"
@@ -331,6 +338,8 @@ import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
 import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
 import ExternalIndicatorConfigurationService from '@/services/assessment/ExternalIndicatorConfigurationService';
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
+import RoCrateService from '@/services/export/RoCrateService';
+import { type ResearchArea } from '@/models/OrganisationUnitModel';
 
 
 export default defineComponent({
@@ -385,6 +394,7 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const researchArea = ref<AssessmentResearchArea>();
+        const researchSubAreas = ref<ResearchArea[]>([]);
 
         const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
 
@@ -495,6 +505,7 @@ export default defineComponent({
         const fetchAssessmentResearchArea = () => {
             AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
                 researchArea.value = response.data;
+                researchSubAreas.value = response.data.researchSubAreas;
             });
         };
 
@@ -706,9 +717,13 @@ export default defineComponent({
             snackbar.value = true;
         };
 
+        const downloadRoCrateBibliography = () => {
+            RoCrateService.downloadRoCrateBibliography(person.value?.id as number);
+        };
+
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
-            biography, publications,  totalPublications, switchPage, searchKeyword,
+            biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
@@ -719,7 +734,7 @@ export default defineComponent({
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
-            isInstitutionalEditor, performIndicatorHarvest, personId
+            isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography
         };
 }});
 </script>

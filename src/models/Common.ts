@@ -316,6 +316,7 @@ export interface DownloadState {
     progress: number
     fileName: string
     isDownloading: boolean
+    message?: string;
 }
 
 export interface LeaderboardEntry {

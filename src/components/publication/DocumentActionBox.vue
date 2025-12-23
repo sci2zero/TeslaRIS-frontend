@@ -12,6 +12,13 @@
                         ref="citationRef"
                         :document-id="documentId">
                     </citation-selector>
+                    <v-btn
+                        class="mb-5 ml-2" color="primary" 
+                        density="compact"
+                        :disabled="!isUserLoggedIn"
+                        @click="downloadRoCrate">
+                        {{ $t("downloadRoCrateLabel") }}
+                    </v-btn>
                     <publication-unbind-button
                         v-if="canEdit && isResearcher"
                         :document-id="documentId"
@@ -70,8 +77,9 @@ import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUn
 import type { Document } from '@/models/PublicationModel';
 import { commitArchiveStateChange } from '@/utils/DocumentUtil';
 import Toast from '../core/Toast.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import RoCrateService from '@/services/export/RoCrateService';
 
 
 export default defineComponent({
@@ -132,13 +140,15 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
+        const currentRoute = useRoute();
         const router = useRouter();
 
         const citationRef = ref<typeof CitationSelector>();
 
         const {
             isAdmin, isInstitutionalEditor,
-            isInstitutionalLibrarian, isResearcher
+            isInstitutionalLibrarian, isResearcher,
+            isUserLoggedIn
         } = useUserRole();
 
         const canValidate = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)
@@ -170,13 +180,20 @@ export default defineComponent({
 
             commitArchiveStateChange(archive, props.document, snackbar, snackbarMessage, router);
         };
+
+        const downloadRoCrate = () => {
+            RoCrateService.downloadRoCrateForSingleDocument(
+                parseInt(currentRoute.params.id as string)
+            );
+        };
         
         return {
             fetchCitations, canValidate,
             validateMetadata, validateUploadedFiles,
             isAdmin, isInstitutionalEditor,
             changeArchiveState, snackbar,
-            snackbarMessage, isResearcher
+            snackbarMessage, isResearcher,
+            isUserLoggedIn, downloadRoCrate
         };
 }})
 

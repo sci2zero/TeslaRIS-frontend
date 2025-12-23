@@ -1240,5 +1240,10 @@ export default {
     removeAllFromPromotionMessage: "This action will remove all candidates from the promotion they are currently in, after which you will be able to find them either in the promotion list or in the list of unpromoted candidates, depending on whether you want to delete the promotion or not.",
     selectOptionLabel: "Select an option:",
     deletePromotionLabel: "Delete promotion",
-    doNotDeletePromotionLabel: "Do not delete promotion"
+    doNotDeletePromotionLabel: "Do not delete promotion",
+    downloadRoCrateLabel: "Download as Ro-Crate",
+    downloadRoCrateBibliographyLabel: "Download bibliography (Ro-Crate)",
+    updateResearchAreasLabel: "Update research areas",
+    updateResearchSubAreasLabel: "Update research sub-areas",
+    selectSubAreasLabel: "Choose research sub-areas:"
 }

@@ -424,12 +424,18 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <research-areas-update-modal :research-areas-hierarchy="organisationUnit?.researchAreas" :read-only="!canEdit" @update="updateResearchAreas"></research-areas-update-modal>
+                                <research-areas-update-modal 
+                                    :research-areas-hierarchy="organisationUnit?.researchAreas"
+                                    :read-only="!canEdit"
+                                    @update="updateResearchAreas">
+                                </research-areas-update-modal>
 
                                 <h3 class="mb-1">
                                     {{ $t("researchAreasLabel") }}
                                 </h3>
-                                <research-area-hierarchy :research-areas="organisationUnit?.researchAreas"></research-area-hierarchy>
+                                <research-area-hierarchy
+                                    :research-areas="organisationUnit?.researchAreas" 
+                                />
                             </v-card-text>
                         </v-card>
                     </v-col>
