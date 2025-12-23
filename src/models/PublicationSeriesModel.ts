@@ -8,7 +8,7 @@ export interface PublicationSeries {
     printISSN?: string;
     openAlexId?: string;
     contributions?: PersonPublicationSeriesContribution[];
-    languageTagIds: number[];
+    languageIds: number[];
     nameAbbreviation: MultilingualContent[];
     uris: string[],
     subtitle?: MultilingualContent[];

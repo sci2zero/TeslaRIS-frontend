@@ -199,13 +199,13 @@
                                     {{ returnCurrentLocaleContent(thesis.placeOfKeep) }}
                                 </div>
                                 <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0">
-                                    {{ $t("scientificAreaLabel") }}:
+                                    {{ $t((thesis.thesisType == ThesisType.PHD_ART_PROJECT) ? "artAreaLabel" : "scientificAreaLabel") }}:
                                 </div>
                                 <div v-if="thesis?.scientificArea && thesis?.scientificArea.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.scientificArea) }}
                                 </div>
                                 <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0">
-                                    {{ $t("scientificSubAreaLabel") }}:
+                                    {{ $t((thesis.thesisType == ThesisType.PHD_ART_PROJECT) ? "artSubAreaLabel" : "scientificSubAreaLabel") }}:
                                 </div>
                                 <div v-if="thesis?.scientificSubArea && thesis?.scientificSubArea.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.scientificSubArea) }}
@@ -284,6 +284,13 @@
                     {{ $t("putOnPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
+                    v-if="!thesis?.isOnPublicReview && canBePutOnPublicReview && userCanPutOnPublicReview && !thesis?.isArchived && !thesis?.isOnPublicReviewPause && thesis?.publicReviewCompleted"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="changePublicReviewState(true, false, true)">
+                    {{ $t("putOnPublicReviewShortenedLabel") }}
+                </v-btn>
+                <v-btn
                     v-if="(isAdmin || isHeadOfLibrary) && thesis?.isOnPublicReview && !thesis?.isArchived"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
@@ -329,7 +336,7 @@
                     v-if="canCreateRegistryBookEntry"
                     class="ml-2"
                     :form-component="RegistryBookEntryForm"
-                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string) }"
+                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string), canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) }"
                     entity-name="RegistryBookEntry"
                     :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
                     primary-color compact
@@ -489,6 +496,8 @@
             ref="publicDialogRef"
             :title="$t('areYouSureLabel')"
             :message="dialogMessage"
+            :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewCompleted && !continueLastReview"
+            :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewCompleted && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
             @continue="commitThesisStatusChange">
         </persistent-question-dialog>
 
@@ -671,6 +680,9 @@ export default defineComponent({
                 if (thesis.value.organisationUnitId) {
                     OrganisationUnitService.readOU(thesis.value.organisationUnitId).then((response) => {
                         organisationUnit.value = response.data;
+
+                        canBePutOnPublicReview.value = organisationUnit.value?.clientInstitutionDl === true &&
+                            (thesis.value?.thesisType === ThesisType.PHD || thesis.value?.thesisType === ThesisType.PHD_ART_PROJECT);
                     });
                 }
 
@@ -685,8 +697,6 @@ export default defineComponent({
                         event.value = response.data;
                     });
                 }
-
-                canBePutOnPublicReview.value = thesis.value.thesisType === ThesisType.PHD || thesis.value.thesisType === ThesisType.PHD_ART_PROJECT;
     
                 populateData();
             }).catch(() => {
@@ -831,8 +841,11 @@ export default defineComponent({
         };
 
         const continueLastReview = ref(false);
-        const changePublicReviewState = (putOnPublic: boolean, continueLast: boolean) => {
+        const shortenedReview = ref(false);
+        const changePublicReviewState = (putOnPublic: boolean, continueLast: boolean, shortened: boolean = false) => {
             if (putOnPublic) {
+                shortenedReview.value = shortened;
+
                 if (thesis.value?.isOnPublicReviewPause) {
                     continueLastReview.value = continueLast;
 
@@ -843,7 +856,7 @@ export default defineComponent({
                     }
 
                 } else {
-                    dialogMessage.value = i18n.t("putOnPublicReviewWarningMessage");
+                    dialogMessage.value = i18n.t(shortened ? "putOnShortenedPublicReviewWarningMessage" : "putOnPublicReviewWarningMessage");
                 }
             } else {
                 dialogMessage.value = i18n.t("removeFromPublicReviewWarningMessage");
@@ -868,8 +881,8 @@ export default defineComponent({
         const putOnPublicReview = (continueLast: boolean) => {
             DocumentPublicationService.putThesisOnPublicReview(
                 parseInt(currentRoute.params.id as string),
-                continueLast)
-            .then(() => {
+                continueLast, continueLast ? (thesis.value?.isShortenedReview as boolean) : shortenedReview.value
+            ).then(() => {
                 fetchThesis();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
@@ -885,7 +898,11 @@ export default defineComponent({
             });
         };
 
-        const commitThesisStatusChange = () => {
+        const commitThesisStatusChange = (option: number) => {
+            if (option) {
+                shortenedReview.value = option === 2;
+            }
+
             if (changingArchiveState.value) {
                 changingArchiveState.value = false;
                 commitArchiveStateChange();
@@ -954,13 +971,14 @@ export default defineComponent({
             updateBasicInfo, organisationUnit, ThesisUpdateForm, updateRemark,
             event, getThesisTitleFromValueAutoLocale, updateExtendedAbstract,
             handleResearcherUnbind, isAdmin, StatisticsType, documentIndicators,
-            currentRoute, actionsRef, ApplicableEntityType, canClassify,
+            currentRoute, actionsRef, ApplicableEntityType, canClassify, ThesisType,
             createClassification, fetchClassifications, documentClassifications,
             removeFromPublicReview, dialogMessage, publicDialogRef, isResearcher,
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
-            fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration
+            fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
+            continueLastReview, shortenedReview
         };
 }})
 

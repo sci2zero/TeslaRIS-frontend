@@ -285,7 +285,7 @@ const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'promotions', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'public-dissertations', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document' },
-    { key: 'theses', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => (isInstitutionalLibrarian.value)) },
+    { key: 'theses', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => isInstitutionalLibrarian.value) },
     { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) }
 ]);
 
@@ -307,6 +307,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'theses-list', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+    { key: 'add-thesis', label: computed(() => i18n.t('createThesisLabel')), to: '/scientific-results/thesis/submit-thesis', icon: 'mdi-file-document-edit', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'public-review', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'scientific-results-validation', label: computed(() => i18n.t('routeLabel.publicationsValidation')), to: '/scientific-results/validation', icon: 'mdi-check-circle', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
     { key: 'advanced-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/advanced-search', icon: 'mdi-magnify', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
@@ -329,6 +330,14 @@ const menuItems = ref<MenuItem[]>([
         condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
     },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isInstitutionalEditor.value)) },
+    { 
+        key: 'thesis-library', 
+        label: computed(() => i18n.t('thesisLibraryLabel')), 
+        to: '/thesis-library', 
+        icon: 'mdi-book-open-variant',
+        subItems: thesisLibraryMenu.value,
+        condition: computed(() => !loginStore.userLoggedIn)
+    },
     { 
         key: 'thesis-library', 
         label: computed(() => i18n.t('thesisLibraryLabel')), 
@@ -371,9 +380,9 @@ const filteredMenuItems = computed(() => {
     });
 });
 
-function isActive(path: string): boolean {
+const isActive = (path: string): boolean => {
     return route.path === path || route.path.startsWith(path + '/');
-}
+};
 
 </script>
 

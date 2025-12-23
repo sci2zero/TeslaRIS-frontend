@@ -17,6 +17,10 @@ export class PromotionService extends BaseService {
         return super.sendRequest(axios.get, `promotion/non-finished`);
     }
 
+    async getFinishedPromotions(): Promise<AxiosResponse<Promotion[]>> {
+        return super.sendRequest(axios.get, `promotion/finished`);
+    }
+
     async createPromotion(body: Promotion): Promise<AxiosResponse<Promotion>> {
         return super.sendRequest(axios.post, "promotion", body, PromotionService.idempotencyKey);
     }

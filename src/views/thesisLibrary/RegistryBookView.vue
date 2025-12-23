@@ -8,6 +8,9 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="!isPromotionRegistryAdministrator" value="notYetAdded">
+                {{ $t("notYetAddedLabel") }}
+            </v-tab>
             <v-tab value="nonPromoted">
                 {{ $t("nonPromotedLabel") }}
             </v-tab>
@@ -29,9 +32,59 @@
         </v-tabs>
   
         <v-tabs-window v-model="currentTab">
+            <v-window-item value="notYetAdded">
+                <v-row class="justify-start mt-3!">
+                    <v-col cols="6" md="4" lg="3">
+                        <date-picker
+                            v-model="fromDateSimple"
+                            class="input-component"
+                            :label="$t('fromLabel')"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                    <v-col cols="6" md="4" lg="3">
+                        <date-picker
+                            v-model="toDateSimple"
+                            :label="$t('toLabel')"
+                            color="primary"
+                        ></date-picker>
+                    </v-col>
+                </v-row>
+                <v-row class="justify-start mb-5">
+                    <v-col
+                        v-if="isAdmin"
+                        cols="12" sm="6" md="5" lg="3">
+                        <organisation-unit-autocomplete-search
+                            v-model:model-value="selectedInstitution"
+                            :top-level-institution-id="loggedInUser && loggedInUser.organisationUnitId > 0 ? loggedInUser.organisationUnitId : undefined"
+                            disable-submission
+                            registry-book-relevant
+                            required
+                        ></organisation-unit-autocomplete-search>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="5" lg="3">
+                        <v-select
+                            v-model="selectedThesisTypes"
+                            class="no-empty-outline publication-type-select"
+                            :items="thesisTypes"
+                            :label="$t('thesisTypeLabel')"
+                            return-object
+                            multiple
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <publication-table-component
+                    class="mt-15"
+                    :publications="(tableStates.notYetAdded.entries as DocumentPublicationIndex[])"
+                    :total-publications="tableStates.notYetAdded.totalEntries"
+                    rich-results-view
+                    sort-by-date-default
+                    @switch-page="(...args) => switchPage('notYetAdded', ...(args as [number, number, string, string]))">
+                </publication-table-component>
+            </v-window-item>
             <v-window-item value="nonPromoted">
                 <registry-book-entry-table
-                    :entries="tableStates.nonPromoted.entries"
+                    :entries="(tableStates.nonPromoted.entries as RegistryBookEntry[])"
                     :total-entries="tableStates.nonPromoted.totalEntries"
                     @switch-page="(args: any[]) => switchPage('nonPromoted', ...(args as [number, number, string, string]))"
                     @entry-added-to-promotion="fetchAllTables"
@@ -48,7 +101,7 @@
                 />
                 <registry-book-entry-table
                     class="mt-5"
-                    :entries="tableStates.forPromotion.entries"
+                    :entries="(tableStates.forPromotion.entries as RegistryBookEntry[])"
                     :total-entries="tableStates.forPromotion.totalEntries"
                     disable-bulk-actions
                     @switch-page="(args: any[]) => switchPage('forPromotion', ...(args as [number, number, string, string]))"
@@ -93,6 +146,27 @@
                             :label="$t('toLabel')"
                             color="primary"
                         ></date-picker-split>
+                    </v-col>
+                    <v-col cols="6" md="4" lg="3">
+                        <div class="flex justify-start">
+                            <v-select
+                                v-model="selectedPromotionFilter"
+                                class="promotion-select mt-3"
+                                :items="finishedPromotions"
+                                :label="$t('promotionLabel')"
+                                return-object
+                                :no-data-text="$t('noDataInTableMessage')"
+                                clearable
+                            />
+                            <v-btn
+                                v-if="isAdmin && selectedPromotionFilter"
+                                class="ml-3 mt-6"
+                                density="compact"
+                                color="error"
+                                @click="initiateRemoveAllFromPromotion">
+                                {{ $t('removeAllFromPromotionLabel') }}
+                            </v-btn>
+                        </div>
                     </v-col>
                 </v-row>
                 <v-row class="justify-start mb-5">
@@ -161,10 +235,10 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row class="mb-1">
+                <v-row class="mb-1!">
                     <registry-book-entry-table
                         class="mt-15"
-                        :entries="tableStates.promoted.entries"
+                        :entries="(tableStates.promoted.entries as RegistryBookEntry[])"
                         :total-entries="tableStates.promoted.totalEntries"
                         disable-actions
                         promoted-entries-view
@@ -184,7 +258,7 @@
             <v-window-item value="reports">
                 <v-row class="justify-start mt-3">
                     <v-col cols="6">
-                        <registry-book-reports-list></registry-book-reports-list>
+                        <registry-book-reports-list />
                     </v-col>
                 </v-row>
             </v-window-item>
@@ -221,6 +295,15 @@
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="message" />
+
+        <persistent-question-dialog
+            v-model="displayPersistentDialog"
+            :title="$t('areYouSureLabel')"
+            :message="$t('removeAllFromPromotionMessage')"
+            show-radio-options
+            :radio-options="[{title: $t('deletePromotionLabel'), value: 1}, {title: $t('doNotDeletePromotionLabel'), value: 2}]"
+            @continue="removeAllFromPromotion">
+        </persistent-question-dialog>
     </v-container>
 </template>
   
@@ -231,7 +314,7 @@ import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
 import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
 import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
-import type { InstitutionPromotionCountsReport, RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import type { InstitutionPromotionCountsReport, NotAddedToPromotionThesesRequest, Promotion, RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import { computeRelativeDate, localiseDate } from '@/utils/DateUtil';
 import Toast from '@/components/core/Toast.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
@@ -254,12 +337,18 @@ import DatePickerSplit from '@/components/core/DatePickerSplit.vue';
 import RelativeDatePreview from '@/components/core/RelativeDatePreview.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { ThesisType, type DocumentPublicationIndex } from '@/models/PublicationModel';
+import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import ThesisLibraryReportingService from '@/services/thesisLibrary/ThesisLibraryReportingService';
+import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
+import { useRoute, useRouter } from 'vue-router';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
   
 
-type TabKey = "nonPromoted" | "forPromotion" | "promoted";
+type TabKey = "notYetAdded" | "nonPromoted" | "forPromotion" | "promoted";
 
 interface EntryTableState {
-    entries: RegistryBookEntry[];
+    entries: RegistryBookEntry[] | DocumentPublicationIndex[];
     totalEntries: number;
     page: number;
     size: number;
@@ -270,12 +359,15 @@ interface EntryTableState {
   
 export default defineComponent({
     name: "RegistryBookListView",
-    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList, DatePickerSplit, RelativeDatePreview },
+    components: { RegistryBookEntryTable, PromotionPrintedLists, Toast, OrganisationUnitAutocompleteSearch, DatePicker, PromotionCountReport, RegistryBookReportsList, PersistentTableDialog, ScheduledTasksList, DatePickerSplit, RelativeDatePreview, PublicationTableComponent, PersistentQuestionDialog },
     setup() {
         const message = ref("");
         const snackbar = ref(false);
+        const displayPersistentDialog = ref(false);
 
         const currentTab = ref("nonPromoted");
+        const route = useRoute();
+        const router = useRouter();
 
         const reportLoading = ref(false);
 
@@ -287,33 +379,51 @@ export default defineComponent({
         const { loggedInUser, isPromotionRegistryAdministrator, isAdmin } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
+        const finishedPromotions = ref<{ title: string; value: Promotion }[]>([]);
         const selectedPromotion = ref<{ title: string; value: number }>({
             title: "",
             value: -1
         });
+        const selectedPromotionFilter = ref<{ title: string; value: Promotion }>();
 
         const fromDate = ref(new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]);
         const toDate = ref((new Date()).toISOString().split("T")[0]);
+        const fromDateSimple = ref(new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]);
+        
+        const toDateSimple = ref((new Date()).toISOString().split("T")[0]);
         const selectedInstitution = ref<{ title: string; value: number }>({
             title: "",
             value: -1
         });
+        const thesisTypes =
+            computed(() => 
+            getThesisTypesForGivenLocale()?.filter(el => el.value === ThesisType.PHD || el.value === ThesisType.PHD_ART_PROJECT)
+        );
+        const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
+        
         const authorFullName = ref("");
         const authorAcquiredTitle = ref("");
         const reportCounts = ref<InstitutionPromotionCountsReport[]>([]);
 
         const recurrenceTypes = computed(() => getRecurrenceTypesForGivenLocale());
         const selectedRecurrenceType = ref<{title: string, value: RecurrenceType}>(
-            {title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string, value: RecurrenceType.ONCE}
+            {
+                title: getRecurrenceTypeTitleFromValueAutoLocale(RecurrenceType.ONCE) as string,
+                value: RecurrenceType.ONCE
+            }
         );
 
         watch(
             [
                 fromDate, toDate,
+                fromDateSimple,
+                toDateSimple,
                 selectedInstitution,
                 authorFullName,
                 authorAcquiredTitle,
                 selectedPromotion,
+                selectedThesisTypes,
+                selectedPromotionFilter,
                 currentTab
             ], () => {
             if (currentTab.value === "promoted" && selectedInstitution.value.value > 0) {
@@ -331,10 +441,40 @@ export default defineComponent({
                 });
             } else if (currentTab.value === "forPromotion" && selectedPromotion.value.value > 0) {
                 tableStates.forPromotion.fetchFn();
+            } else if(currentTab.value === "notYetAdded") {
+                tableStates.notYetAdded.fetchFn();
             }
         });
     
         const tableStates = reactive<Record<TabKey, EntryTableState>>({
+            notYetAdded: {
+                entries: [],
+                totalEntries: 0,
+                page: 0,
+                size: 10,
+                sort: "",
+                direction: "",
+                fetchFn: async () => {
+                    if (isPromotionRegistryAdministrator.value ||
+                        (isAdmin.value && (!selectedInstitution.value || selectedInstitution.value.value <= 0))
+                    ) {
+                        return;
+                    }
+
+                    const pageable = 
+                        `page=${tableStates.notYetAdded.page}&size=${tableStates.notYetAdded.size}${tableStates.notYetAdded.sort ? `&sort=${tableStates.notYetAdded.sort},${tableStates.notYetAdded.direction}` : ""}`;
+                    const reportRequest: NotAddedToPromotionThesesRequest = {
+                        topLevelInstitutionIds: selectedInstitution.value.value > 0 ? [selectedInstitution.value.value] : [],
+                        thesisTypes: selectedThesisTypes.value.map(selection => selection.value),
+                        fromDate: fromDate.value.split("T")[0],
+                        toDate: toDate.value.split("T")[0]
+                    };
+
+                    const response = await ThesisLibraryReportingService.getEntriesNotAddedToRegBook(reportRequest, pageable);
+                    tableStates.notYetAdded.entries = response.data.content;
+                    tableStates.notYetAdded.totalEntries = response.data.totalElements;
+                }
+            },
             nonPromoted: {
                 entries: [],
                 totalEntries: 0,
@@ -392,6 +532,7 @@ export default defineComponent({
                         dateFrom ? dateFrom.split("T")[0] : "",
                         dateTo ? dateTo.split("T")[0] : "",
                         authorFullName.value, authorAcquiredTitle.value,
+                        selectedPromotionFilter.value?.value.id,
                         query
                     );
                     tableStates.promoted.entries = response.data.content;
@@ -417,6 +558,10 @@ export default defineComponent({
             sortDir: string
         ) => {
             const state = tableStates[tab];
+            if (!state) {
+                return;
+            }
+
             state.page = nextPage;
             state.size = pageSize;
             state.sort = sortField;
@@ -424,23 +569,42 @@ export default defineComponent({
             state.fetchFn();
         };
     
-        const fetchPromotions = () => {
-            PromotionService.getNonFinishedPromotions().then(response => {
-                promotions.value.splice(0);
-                response.data.forEach(promotion => {
-                    promotions.value.push({
+        const fetchPromotions = async () => {
+            const nonFinished = await PromotionService.getNonFinishedPromotions();
+            promotions.value.splice(0);
+            nonFinished.data.forEach(promotion => {
+                promotions.value.push({
                     title: localiseDate(promotion.promotionDate) as string,
                     value: promotion.id as number
-                    });
                 });
-        
-                if (promotions.value.length > 0) {
-                    selectedPromotion.value = promotions.value[0];
-                }
-        
-                fetchAllTables();
             });
+    
+            if (promotions.value.length > 0) {
+                selectedPromotion.value = promotions.value[0];
+            }
+
+            const finished = await PromotionService.getFinishedPromotions();
+            finishedPromotions.value.splice(0);
+            finished.data.forEach(promotion => {
+                finishedPromotions.value.push({
+                    title: localiseDate(promotion.promotionDate) as string,
+                    value: promotion
+                });
+            });
+    
+            fetchAllTables();
         };
+
+        watch(selectedPromotionFilter, () => {
+            if (selectedPromotionFilter.value) {
+                selectedInstitution.value = { 
+                    title: returnCurrentLocaleContent(selectedPromotionFilter.value.value.institutionName) as string, 
+                    value: selectedPromotionFilter.value.value.institutionId 
+                };
+                fromDate.value = selectedPromotionFilter.value.value.promotionDate.split("T")[0];
+                toDate.value = selectedPromotionFilter.value.value.promotionDate.split("T")[0];
+            }
+        });
     
         watch(i18n.locale, () => {
             fetchAllTables();
@@ -457,12 +621,36 @@ export default defineComponent({
             }
         });
     
-        onMounted(() => {
+        onMounted(async () => {
+            await router.isReady();
+
             document.title = i18n.t("registryBookLabel");
-            fetchPromotions();
+            await fetchPromotions();
 
             if (isAdmin.value || isPromotionRegistryAdministrator.value) {
                 fetchScheduledTasks();
+            }
+
+            if (route.query.promotionId) {
+                const forPromotion = !!route.query.forPromotion && route.query.forPromotion as string === "true";
+                currentTab.value = forPromotion ? "forPromotion" : "promoted";
+                
+                const presetPromotion = 
+                    finishedPromotions.value.find(
+                        promotion => promotion.value.id === parseInt(route.query.promotionId as string)
+                    );
+                
+                if (presetPromotion && !forPromotion) {
+                    selectedPromotionFilter.value = {
+                        title: localiseDate(presetPromotion.value.promotionDate) as string,
+                        value: presetPromotion.value
+                    };
+                } else if (presetPromotion && forPromotion) {
+                    selectedPromotion.value = {
+                        title: localiseDate(presetPromotion.value.promotionDate) as string,
+                        value: presetPromotion.value.id as number
+                    };
+                }
             }
         });
 
@@ -487,6 +675,9 @@ export default defineComponent({
             RegistryBookService.previewPromoteAll(selectedPromotion.value.value).then(response => {
                 promotionPreview.value = response.data;
                 promotionPreviewRef.value?.toggle();
+            }).catch((error) => {
+                message.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
             });
         };
 
@@ -552,6 +743,33 @@ export default defineComponent({
                 snackbar.value = true;
             });
         };
+
+        const initiateRemoveAllFromPromotion = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        const removeAllFromPromotion = (selectedOption: number) => {
+            if (!selectedPromotionFilter.value || !selectedPromotionFilter.value.value) {
+                return;
+            }
+
+            RegistryBookService.removeAllFromFinishedPromotion(
+                selectedPromotionFilter.value.value?.id as number, selectedOption === 1
+            ).then(() => {
+                if (selectedOption === 1) {
+                    currentTab.value = "nonPromoted";
+                    tableStates.notYetAdded.fetchFn();
+                } else {
+                    currentTab.value = "forPromotion";
+                    selectedPromotion.value = {
+                        title: selectedPromotionFilter.value?.title as string,
+                        value: selectedPromotionFilter.value?.value?.id as number
+                    };
+                }
+
+                selectedPromotionFilter.value = undefined;
+            });
+        };
     
         return {
             currentTab, fromDate, toDate,
@@ -567,7 +785,11 @@ export default defineComponent({
             authorAcquiredTitle, recurrenceTypes,
             selectedRecurrenceType, deleteScheduledTask,
             scheduledTasks, RecurrenceType, reportLoading,
-            isPromotionRegistryAdministrator
+            isPromotionRegistryAdministrator, fromDateSimple,
+            toDateSimple, selectedThesisTypes, thesisTypes,
+            selectedPromotionFilter, finishedPromotions,
+            initiateRemoveAllFromPromotion,
+            displayPersistentDialog, removeAllFromPromotion
         };
     }
 });

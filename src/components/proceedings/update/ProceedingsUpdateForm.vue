@@ -138,7 +138,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { ExternalValidation, LanguageResponse, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -163,7 +163,7 @@ import Toast from '@/components/core/Toast.vue';
 
 export default defineComponent({
     name: "ProceedingsUpdateForm",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast },
     props: {
         presetProceedings: {
             type: Object as PropType<Proceedings | undefined>,
@@ -189,15 +189,19 @@ export default defineComponent({
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
 
         const languageList = ref<{title: string, value: number}[]>([]);
-        const selectedLanguages = ref<number[]>(props.presetProceedings?.languageTagIds as number[]);
+        const selectedLanguages = ref<number[]>(props.presetProceedings?.languageIds as number[]);
         const languageTags = ref<LanguageTagResponse[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
-                
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
+            });
+
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((language: LanguageResponse) => {
+                    languageList.value.push(
+                        {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
+                    );
                 })
             });
             
@@ -328,7 +332,7 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 eISBN: eIsbn.value,
                 eventId: selectedEvent.value?.value,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
                 publicationSeriesId: publicationSeriesId,
@@ -354,7 +358,7 @@ export default defineComponent({
             acronymRef.value?.clearInput();
             acronym.value = props.presetProceedings?.acronym as MultilingualContent[];
 
-            selectedLanguages.value = props.presetProceedings?.languageTagIds as number[];
+            selectedLanguages.value = props.presetProceedings?.languageIds as number[];
             uris.value = props.presetProceedings?.uris as string[];
             eIsbn.value = props.presetProceedings?.eISBN;
             printIsbn.value = props.presetProceedings?.printISBN;

@@ -51,8 +51,7 @@
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="formValue.municipalityOfBrith"
-                    :label="$t('municipalityOfBirthLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    :label="$t('municipalityOfBirthLabel')"
                 />
             </v-col>
         </v-row>
@@ -148,11 +147,15 @@ export default defineComponent({
         const guardianNameRef = ref<typeof VTextField>();
         watch(
         () => [
-            formValue.value.fatherName,
-            formValue.value.motherName,
-            formValue.value.guardianNameAndSurname,
+            formValue.value?.fatherName,
+            formValue.value?.motherName,
+            formValue.value?.guardianNameAndSurname,
         ],
         () => {
+            if (!formValue.value) {
+                return;
+            }
+            
             fatherNameRef.value?.validate?.();
             motherNameRef.value?.validate?.();
             guardianNameRef.value?.validate?.();

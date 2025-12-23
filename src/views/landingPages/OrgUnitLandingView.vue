@@ -66,6 +66,14 @@
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
                                     {{ $t("legalEntityLabel") }}
                                 </div>
+                                <div v-if="organisationUnit?.superInstitutionId">
+                                    {{ $t("superOULabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.superInstitutionId" class="response">
+                                    <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId">
+                                        {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
+                                    </localized-link>
+                                </div>
                                 <div>
                                     {{ $t("addressLabel") }}:
                                 </div>
@@ -290,32 +298,34 @@
                     class="mt-5"
                     @search="clearSortAndPerformPublicationSearch($event)"
                 />
-                <div
-                    v-if="canEdit"
-                    class="mb-5 mt-5">
-                    <add-publication-menu compact />
-                    <v-btn
-                        v-if="isInstitutionalEditor && canEdit"
-                        class="ml-2" color="primary" density="compact"
-                        @click="performNavigation('importer')">
-                        {{ $t("importerLabel") }}
-                    </v-btn>
-                </div>
-                <span class="flex justify-start">
-                    <v-select
-                        v-model="selectedPublicationTypes"
-                        :items="publicationTypes"
-                        :label="$t('typeOfPublicationLabel')"
-                        return-object
-                        class="publication-type-select mt-3"
-                        multiple
-                    ></v-select>
-                    <v-checkbox
-                        v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
-                        v-model="returnOnlyNonArchived"
-                        :label="$t('showNonArchivedLabel')"
-                        class="mt-2"
-                    ></v-checkbox>
+                <span class="flex justify-between items-center">
+                    <div class="flex items-center gap-4 mt-5">
+                        <v-select
+                            v-model="selectedPublicationTypes"
+                            :items="publicationTypes"
+                            :label="$t('typeOfPublicationLabel')"
+                            return-object
+                            class="publication-type-select"
+                            multiple
+                        ></v-select>
+                        <v-checkbox
+                            v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
+                            v-model="returnOnlyNonArchived"
+                            :label="$t('showNonArchivedLabel')"
+                            class="mt-2"
+                        ></v-checkbox>
+                    </div>
+                    <div
+                        v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
+                        class="flex items-center gap-2 mt-5">
+                        <add-publication-menu compact />
+                        <v-btn
+                            v-if="isInstitutionalEditor && canEdit"
+                            color="primary" density="compact"
+                            @click="performNavigation('importer')">
+                            {{ $t("importerLabel") }}
+                        </v-btn>
+                    </div>
                 </span>
                 <publication-table-component
                     ref="publicationsRef"
@@ -522,11 +532,12 @@ import { useOUChartDisplay } from '@/composables/useOUChartDisplay';
 import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
 import DLDisplayConfigurationForm from '@/components/organisationUnit/DLDisplayConfigurationForm.vue';
 import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink },
     setup() {
         const currentTab = ref("relations");
 
@@ -588,7 +599,8 @@ export default defineComponent({
         const {
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
-            loggedInUser
+            loggedInUser, userInstitutionid,
+            isLibrarianUser
         } = useUserRole();
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
@@ -959,7 +971,7 @@ export default defineComponent({
 
         return {
             organisationUnit, currentTab, isHeadOfLibrary,
-            publications, totalPublications,
+            publications, totalPublications, userInstitutionid,
             employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,
             switchEmployeesPage, isAdmin, performNavigation,
@@ -975,7 +987,7 @@ export default defineComponent({
             ExternalIndicatorsConfigurationForm,
             ApplicableEntityType, fetchIndicators,
             clearSortAndPerformPersonSearch, alumni,
-            clearSortAndPerformPublicationSearch,
+            clearSortAndPerformPublicationSearch, isLibrarianUser,
             employeesRef, alumniRef, personSearchParams,
             publicationSearchParams, isInstitutionalEditor,
             PublicReviewContentForm, publicReviewPageContent,
@@ -1025,6 +1037,7 @@ export default defineComponent({
     }
 
     .publication-type-select {
+        min-width: 500px;
         max-width: 500px;
     }
 

@@ -3,7 +3,7 @@ import { BaseService } from "../BaseService";
 import axios from "axios";
 import type { DocumentIndicator, EntityIndicatorResponse, EventIndicator, IFTableResponse } from "@/models/AssessmentModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
-import { type DocumentFileResponse, License, ResourceType } from "@/models/DocumentFileModel";
+import { AccessRights, type DocumentFileResponse, License, ResourceType } from "@/models/DocumentFileModel";
 
 
 export class EntityIndicatorService extends BaseService {
@@ -85,7 +85,8 @@ export class EntityIndicatorService extends BaseService {
                     file: fileItem,
                     description: [],
                     resourceType: ResourceType.SUPPLEMENT,
-                    license: License.OPEN_ACCESS,
+                    accessRights: AccessRights.OPEN_ACCESS,
+                    license: License.BY_NC_ND
                 },
                 responseDataId,
                 this.getDisposableIdempotencyKey()

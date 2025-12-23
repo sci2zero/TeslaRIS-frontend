@@ -98,7 +98,7 @@
         <div class="flex items-center gap-2">
             <add-sub-unit-modal 
                 v-if="topLevelInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
-                class="mb-4"
+                class="mr-3!"
                 :institution-id="topLevelInstitutionId"
                 @update="notifyUserAndRefreshTable">
             </add-sub-unit-modal>

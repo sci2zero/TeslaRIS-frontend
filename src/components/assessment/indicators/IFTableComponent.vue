@@ -120,6 +120,8 @@ export default defineComponent({
         const typeLabel = computed(() => i18n.t("typeLabel"));
         const if2ValueLabel = computed(() => i18n.t("if2ValueLabel"));
         const if5ValueLabel = computed(() => i18n.t("if5ValueLabel"));
+        const jciValueLabel = computed(() => i18n.t("jciValueLabel"));
+        const jciPercentileLabel = computed(() => i18n.t("jciPercentileLabel"));
 
         watch([() => props.presetFromYear, () => props.presetToYear], () => {
             fromYear.value = props.presetFromYear;
@@ -168,6 +170,22 @@ export default defineComponent({
                     ...years.value.reduce<Record<number, string | null>>((acc, year) => {
                         acc[year] =
                             props.jsonData.if5Values.find(v => v.a === year)?.b || null;
+                        return acc;
+                    }, {})
+                },
+                {
+                    type: jciValueLabel,
+                    ...years.value.reduce<Record<number, string | null>>((acc, year) => {
+                        acc[year] =
+                            props.jsonData.jciValues.find(v => v.a === year)?.b || null;
+                        return acc;
+                    }, {})
+                },
+                {
+                    type: jciPercentileLabel,
+                    ...years.value.reduce<Record<number, string | null>>((acc, year) => {
+                        acc[year] =
+                            props.jsonData.jciPercentiles.find(v => v.a === year)?.b || null;
                         return acc;
                     }, {})
                 }

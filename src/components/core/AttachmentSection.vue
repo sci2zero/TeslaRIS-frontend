@@ -8,12 +8,12 @@
                 :attachments="preliminaryFiles"
                 :can-edit="canEditThesisAttachments"
                 :in-comparator="inComparator"
-                disable-updates
+                :disable-updates="!isAdmin"
                 :can-make-official="isThesisSection && fileItems && !fileItems.some(f => f.resourceType === ResourceType.OFFICIAL_PUBLICATION || String(f.resourceType) === 'OFFICIAL_PUBLICATION')"
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
-                @update="notifyAboutSectionChange()"
+                @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>
@@ -26,12 +26,12 @@
                 :attachments="preliminarySupplements"
                 :can-edit="canEditThesisAttachments"
                 :in-comparator="inComparator"
-                disable-updates
+                :disable-updates="!isAdmin"
                 :can-make-official="isThesisSection"
                 disable-resource-type-selection
                 @create="addThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.SUPPLEMENT, document as Thesis)"
-                @update="notifyAboutSectionChange()"
+                @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>
@@ -42,10 +42,12 @@
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
                 :attachments="commissionReports" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
-                disable-updates
+                :disable-updates="!isAdmin"
                 disable-resource-type-selection
+                :always-open-access="!isAdmin"
                 @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
+                @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"
             />
         </v-col>
     </v-row>
@@ -172,7 +174,7 @@ export default defineComponent({
         canEditThesisAttachments, addThesisAttachment,
         deleteThesisAttachment, ThesisAttachmentType,
         notifyAboutSectionChange, ResourceType,
-        canSeeThesisSectionsWhenArchived
+        canSeeThesisSectionsWhenArchived, isAdmin
     };
   },
 });

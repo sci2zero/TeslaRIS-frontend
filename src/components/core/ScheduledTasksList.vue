@@ -13,7 +13,7 @@
                         <td>{{ `${localiseDate(serverTimeToLocal(row.item.executionTime).split("T")[0])} ${$t("inLabel")} ${serverTimeToLocal(row.item.executionTime).split("T")[1]}` }}</td>
                         <td>{{ getRecurrenceTypeTitleFromValueAutoLocale(row.item.recurrenceType) }}</td>
                         <td>
-                            <v-btn v-if="!isDateTimeInPast(row.item.executionTime)" @click="deleteScheduledLoadTask(row.item.taskId)">
+                            <v-btn v-if="!isDateTimeInPast(serverTimeToLocal(row.item.executionTime))" @click="deleteScheduledLoadTask(row.item.taskId)">
                                 {{ $t("cancelLabel") }}
                             </v-btn>
                             <p v-else>

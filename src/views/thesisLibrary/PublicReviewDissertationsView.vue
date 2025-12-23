@@ -2,22 +2,22 @@
     <v-container>
         <h1
             v-if="organisationUnit && !selectedYear"
-            class="d-flex flex-row justify-center mb-15">
+            class="d-flex flex-row justify-center mb-15!">
             {{ $t("institutionPublicReviewDissertationsLabel", [returnCurrentLocaleContent(organisationUnit.name)]) }}
         </h1>
         <h1
             v-else-if="organisationUnit && selectedYear"
-            class="d-flex flex-row justify-center mb-15">
+            class="d-flex flex-row justify-center mb-15!">
             {{ $t("institutionPublicReviewDissertationsArchiveLabel", [returnCurrentLocaleContent(organisationUnit.name)]) }}
         </h1>
         <h1
             v-else-if="selectedYear"
-            class="d-flex flex-row justify-center mb-15">
+            class="d-flex flex-row justify-center mb-15!">
             {{ $t("publicReviewDissertationsArchiveLabel") }}
         </h1>
         <h1
             v-else
-            class="d-flex flex-row justify-center mb-15">
+            class="d-flex flex-row justify-center mb-15!">
             {{ $t("allPublicReviewDissertationsLabel") }}
         </h1>
         <v-row class="d-flex justify-start">

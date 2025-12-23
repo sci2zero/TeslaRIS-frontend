@@ -10,7 +10,9 @@
                         @update="sendToParent">
                     </publication-series-contribution-update-modal>
 
-                    <div v-if="contributionList?.length === 0">
+                    <div
+                        v-if="contributionList?.length === 0"
+                        class="mt-5">
                         <b>{{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>

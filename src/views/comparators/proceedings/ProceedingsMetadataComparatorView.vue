@@ -89,6 +89,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             :supports-force-delete="isAdmin"
+            aggregated-entities-comparison-page="proceedingsPublicationsComparator"
+            :left-id="(leftProceedings?.id as number)"
+            :right-id="(rightProceedings?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide"
         />
@@ -114,7 +118,7 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -202,12 +206,12 @@ export default defineComponent({
             proceedings1.publisherId = proceedings2.publisherId;
             proceedings1.authorReprint = proceedings2.authorReprint;
 
-            proceedings2.languageTagIds!.forEach(languageTagId => {
-                if (!proceedings1.languageTagIds!.includes(languageTagId)) {
-                    proceedings1.languageTagIds!.push(languageTagId);
+            proceedings2.languageIds!.forEach(languageId => {
+                if (!proceedings1.languageIds!.includes(languageId)) {
+                    proceedings1.languageIds!.push(languageId);
                 }
             });
-            proceedings2.languageTagIds = [];
+            proceedings2.languageIds = [];
 
             proceedings2.uris!.forEach(uri => {
                 if (!proceedings1.uris!.includes(uri)) {
@@ -258,7 +262,7 @@ export default defineComponent({
             leftProceedings.value!.doi = updatedInfo.doi;
             leftProceedings.value!.eISBN = updatedInfo.eISBN;
             leftProceedings.value!.eventId = updatedInfo.eventId;
-            leftProceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            leftProceedings.value!.languageIds = updatedInfo.languageIds;
             leftProceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             leftProceedings.value!.printISBN = updatedInfo.printISBN;
             leftProceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -287,7 +291,7 @@ export default defineComponent({
             rightProceedings.value!.doi = updatedInfo.doi;
             rightProceedings.value!.eISBN = updatedInfo.eISBN;
             rightProceedings.value!.eventId = updatedInfo.eventId;
-            rightProceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            rightProceedings.value!.languageIds = updatedInfo.languageIds;
             rightProceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             rightProceedings.value!.printISBN = updatedInfo.printISBN;
             rightProceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -390,7 +394,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

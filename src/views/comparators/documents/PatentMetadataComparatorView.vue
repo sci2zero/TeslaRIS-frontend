@@ -88,6 +88,9 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :left-id="(leftPatent?.id as number)"
+            :right-id="(rightPatent?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)">
         </comparison-actions>
@@ -113,10 +116,11 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -172,21 +176,17 @@ export default defineComponent({
             mergeMultilingualContentField(patent1.description, patent2.description);
             patent2.description = [];
 
-            patent1.number = patent2.number;
-            patent2.number = "";
-            patent1.doi = patent2.doi;
-            patent2.doi = "";
-            patent1.scopusId = patent2.scopusId;
-            patent2.scopusId = "";
-            patent1.openAlexId = patent2.openAlexId;
-            patent2.openAlexId = "";
-            patent1.webOfScienceId = patent2.webOfScienceId;
-            patent2.webOfScienceId = "";
-            patent1.documentDate = patent2.documentDate;
-
-            patent1.eventId = patent2.eventId;
-            patent1.publisherId = patent2.publisherId;
-            patent1.authorReprint = patent2.authorReprint;
+            bulkTransferFields(patent1, patent2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "number", emptyValue: "" },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
             patent2.uris!.forEach(uri => {
                 if (!patent1.uris!.includes(uri)) {
@@ -352,7 +352,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

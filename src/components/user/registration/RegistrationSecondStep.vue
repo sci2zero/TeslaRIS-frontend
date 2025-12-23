@@ -31,13 +31,19 @@
                 :rules="emailFieldRules"
             ></v-text-field>
             <password-input-with-meter
+                v-if="!inModal"
                 :label="$t('newPasswordLabel') + '*'"
                 @password-change="setNewPassword($event)"
                 @show-repeated-password="true">
             </password-input-with-meter>
         </v-form>
 
-        <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">
+        <v-btn
+            v-if="!inModal"
+            block
+            color="blue darken-1 large"
+            :disabled="!isFormValid"
+            @click="register">
             {{ $t("registerLabel") }}
         </v-btn>
 
@@ -52,7 +58,7 @@ import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/Or
 import AuthenticationService from "@/services/AuthenticationService";
 import LanguageService from "@/services/LanguageService";
 import PasswordInputWithMeter from "@/components/core/PasswordInputWithMeter.vue";
-import type { AxiosResponse } from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
 import type { LanguageTagResponse } from "@/models/Common";
 import { useRegisterStore } from '@/stores/registerStore';
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -74,6 +80,10 @@ export default defineComponent({
         lastname: {
             type: String,
             default: ""
+        },
+        inModal: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
@@ -125,7 +135,7 @@ export default defineComponent({
             }
         };
 
-        const register = () => {
+        const register = async () => {
             const requestBody: ResearcherRegistrationRequest = {
                 firstName: firstName.value,
                 lastName: lastName.value,
@@ -136,17 +146,38 @@ export default defineComponent({
                 personId: registerStore.registerPersonData?.personId
             };
 
-            AuthenticationService.registerResearcher(requestBody).then(() => {
-                message.value = i18n.t("successfulRegistrationMessage");
-                snackbar.value = true;
+            try {
+                const service = props.inModal 
+                    ? (requestBody: ResearcherRegistrationRequest) => AuthenticationService.registerResearcherAdmin(requestBody)
+                    : (requestBody: ResearcherRegistrationRequest) => AuthenticationService.registerResearcher(requestBody);
 
-                setTimeout(() => {
-                    router.push({ name: "login" });
-                }, 5000);
-            }).catch((error) => {
-                message.value = getErrorMessageForErrorKey(error.response.data.message);
-                snackbar.value = true;
-            });
+                await service(requestBody);
+                
+                handleSuccess();
+                
+                if (!props.inModal) {
+                    setTimeout(() => router.push({ name: "login" }), 5000);
+                }
+                
+                return true;
+            } catch (error: any) {
+                handleError(error);
+                return false;
+            }
+        };
+
+        const handleError = (error: AxiosError<any>) => {
+            if (!error.response) {
+                return;
+            }
+
+            message.value = getErrorMessageForErrorKey(error.response.data.message);
+            snackbar.value = true;
+        };
+
+        const handleSuccess = () => {
+            message.value = i18n.t(!props.inModal ? "successfulRegistrationMessage" : "successfulRegistrationAdminMessage");
+            snackbar.value = true;
         };
 
         onMounted(() => {
@@ -166,11 +197,20 @@ export default defineComponent({
            return registerStore.registerPersonData != null
         };
 
+        const clearForm = () => {
+            email.value = "";
+            firstName.value = "";
+            lastName.value = "";
+            selectedOrganisationUnit.value = {title: "", value: -1};
+            password.value = "";
+        };
+
         return {
             email, emailFieldRules, requiredFieldMessage,
             register, selectedLanguage, languages, firstName, lastName, 
             selectedOrganisationUnit, setNewPassword, isPersonSelected,
-            requiredFieldRules, isFormValid, snackbar, message
+            requiredFieldRules, isFormValid, snackbar, message,
+            clearForm
         };
     }
 })

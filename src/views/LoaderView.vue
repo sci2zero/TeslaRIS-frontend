@@ -8,9 +8,15 @@
                 v-model:model-value="selectedOrganisationUnit"
                 required
                 disable-submission
-                only-harvestable-institutions
+                :only-harvestable-institutions="showOnlyHarvestableInstitutions"
                 :label="$t('institutionLabel')"
             ></organisation-unit-autocomplete-search>
+        </v-col>
+        <v-col v-if="!showAll" cols="2">
+            <v-checkbox
+                v-model="showOnlyHarvestableInstitutions"
+                :label="$t('onlyWithImportIdentifiersLabel')"
+            ></v-checkbox>
         </v-col>
         <v-col cols="1">
             <v-btn
@@ -20,7 +26,7 @@
             </v-btn>
         </v-col>
     </v-row>
-    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && (selectedOrganisationUnit.value > 0 || showAll))">
+    <v-container v-if="(!noRecordsRemaining && !isAdmin) || (!noRecordsRemaining && isAdmin && ((selectedOrganisationUnit && selectedOrganisationUnit.value > 0) || showAll))">
         <h1>{{ $t("currentlyLoadingLabel") }}: {{ returnCurrentLocaleContent(currentLoadRecord?.title) }}</h1>
         <h3>{{ $t("dateOfPublicationLabel") }}: {{ localiseDate(currentLoadRecord?.documentDate) }}</h3>
 
@@ -157,7 +163,7 @@
 
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
-    <v-container v-else-if="isAdmin && selectedOrganisationUnit.value <= 0 && !showAll">
+    <v-container v-else-if="isAdmin && selectedOrganisationUnit && selectedOrganisationUnit.value <= 0 && !showAll">
         <h1 class="d-flex flex-row justify-center">
             {{ $t("selectInstitutionMessage") }}
         </h1>
@@ -236,6 +242,8 @@ export default defineComponent({
         const automaticSubmission = ref(false);
         const deduplicatorRef = ref<typeof Deduplicator>();
 
+        const showOnlyHarvestableInstitutions = ref(true);
+
         const languageTags = ref<LanguageTagResponse[]>([]);
         
         const nextStep = () => {
@@ -261,7 +269,7 @@ export default defineComponent({
         });
 
         const startLoadingProcess = async () => {
-            if (isAdmin.value && selectedOrganisationUnit.value.value <= 0 && !showAll.value) {
+            if (isAdmin.value && (!selectedOrganisationUnit.value || selectedOrganisationUnit.value.value <= 0) && !showAll.value) {
                 return;
             }
 
@@ -390,6 +398,7 @@ export default defineComponent({
             const runId = crypto.randomUUID();
             currentSmartSkipRunId.value = runId;
             smartLoading.value = true;
+            let firstIter = true;
 
             let shouldStep = true;
             while (shouldStep) {
@@ -397,10 +406,11 @@ export default defineComponent({
                     break;
                 }
 
-                nextStep();
-                await new Promise(r => setTimeout(r, 1000));
-
-                if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
+                if (!firstIter || stepperValue.value === 0) {
+                    nextStep();
+                    await new Promise(r => setTimeout(r, 1000));
+                    if (!smartLoading.value || currentSmartSkipRunId.value !== runId) break;
+                }
 
                 if (stepperValue.value <= currentLoadRecord.value!.contributions.length) {
                     await waitForImportAuthor(stepperValue.value - 1);
@@ -423,6 +433,8 @@ export default defineComponent({
                         finishLoad();
                     }
                 }
+
+                firstIter = false;
             }
         };
 
@@ -734,7 +746,8 @@ export default defineComponent({
             selectedOrganisationUnit, unmanagedImport,
             automaticSubmission, toggleAutomaticSubmission,
             deducedContributions, authorshipSelectionRef,
-            submissionDTO, fetchNextAfterLoading
+            submissionDTO, fetchNextAfterLoading,
+            showOnlyHarvestableInstitutions
         };
     },
 });

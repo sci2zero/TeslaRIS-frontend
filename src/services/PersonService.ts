@@ -61,7 +61,7 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, `person/${personId}`);
   }
 
-  async getTopCollaborators(): Promise<AxiosResponse<Record<string, number>[]>> {
+  async getTopCollaborators(researcherId: number | null = null): Promise<AxiosResponse<Record<string, number>[]>> {
     const cachedData = cacheService.get<AxiosResponse<Record<string, number>[]>>(
       this.TOP_COLLABORATORS_CACHE_KEY
     );
@@ -70,7 +70,7 @@ export class PersonService extends BaseService {
       return cachedData;
     }
 
-    const response = await super.sendRequest(axios.get, `person/top-collaborators`);
+    const response = await super.sendRequest(axios.get, `person/top-collaborators${researcherId ? ("?researcherId=" + researcherId) : ""}`);
     
     cacheService.set(this.TOP_COLLABORATORS_CACHE_KEY, response, 10 * 60 * 1000);
     

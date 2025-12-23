@@ -80,7 +80,9 @@ export enum NotificationAction {
 export interface Notification {
     id: number;
     notificationText: string;
+    displayValue: string;
     possibleActions: NotificationAction[];
+    creationTimestamp: string;
 }
 
 export interface ResearchAreaResponse {
@@ -123,14 +125,15 @@ export interface ScheduledTaskResponse {
 export enum ScheduledTaskType {
     REINDEXING = "REINDEXING",
     INDICATOR_LOAD = "INDICATOR_LOAD",
-    IF5_COMPUTATION = "IF5_COMPUTATION",
+    IF5_JCI_COMPUTATION = "IF5_JCI_COMPUTATION",
     CLASSIFICATION_COMPUTATION = "CLASSIFICATION_COMPUTATION",
     CLASSIFICATION_LOAD = "CLASSIFICATION_LOAD",
     JOURNAL_PUBLICATIONS_ASSESSMENT = "JOURNAL_PUBLICATIONS_ASSESSMENT",
     PROCEEDINGS_PUBLICATIONS_ASSESSMENT = "PROCEEDINGS_PUBLICATIONS_ASSESSMENT",
     REPORT_GENERATION = "REPORT_GENERATION",
     UNMANAGED_DOCUMENTS_DELETION = "UNMANAGED_DOCUMENTS_DELETION",
-    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK"
+    PUBLIC_REVIEW_END_DATE_CHECK = "PUBLIC_REVIEW_END_DATE_CHECK",
+    MAINTENANCE = "MAINTENANCE"
 }
 
 export interface BrandingInformation {
@@ -260,6 +263,7 @@ export interface PrepopulatedMetadata {
     endPage: string;
     url: string;
     doi: string;
+    keywords: MultilingualContent[];
 }
 
 export interface ContactFormData {
@@ -367,4 +371,9 @@ export interface PersonFeaturedInformation {
 export interface YearRange {
     a: number;
     b: number;
+}
+
+export interface MaintenanceInformation {
+    startTime: string;
+    approximateEndMoment: string;
 }

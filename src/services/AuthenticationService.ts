@@ -19,6 +19,11 @@ class AuthenticationService extends BaseService {
     return super.sendRequest(axios.post, "user/register-researcher", registrationRequest, AuthenticationService.idempotencyKey);
   }
 
+  async registerResearcherAdmin(registrationRequest: ResearcherRegistrationRequest): Promise<AxiosResponse<UserResponse>> {
+    registrationRequest.password = "PASS_VALIDATION";
+    return super.sendRequest(axios.post, "user/register-researcher-admin", registrationRequest, AuthenticationService.idempotencyKey);
+  }
+
   async registerResearcherOAuth(registrationRequest: ResearcherRegistrationRequest, provider: string, identifier: string): Promise<AxiosResponse<UserResponse>> {
     return super.sendRequest(axios.post, `user/register-researcher-oauth?provider=${provider.toUpperCase()}&identifier=${identifier}`, registrationRequest, AuthenticationService.idempotencyKey);
   }

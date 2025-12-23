@@ -44,7 +44,10 @@
                     <v-col>
                         <generic-crud-modal
                             :form-component="ProceedingsSubmissionForm"
-                            :form-props="{conference: selectedEvent ? selectedEvent : searchPlaceholder}"
+                            :form-props="{
+                                conference: selectedEvent ? selectedEvent : searchPlaceholder,
+                                presetName: `Proceedings of: ${selectedEvent.title.split('|')[0].trim()}`
+                            }"
                             entity-name="Proceedings"
                             is-submission
                             :read-only="!selectedEvent || selectedEvent.value === -1"
@@ -54,9 +57,30 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <publication-deduplication-table
+                                ref="deduplicationTableRef"
+                                :title="title"
+                                :doi="doi"
+                                :scopus-id="scopus"
+                                :web-of-science-id="webOfScienceId"
+                                :open-alex-id="openAlexId"
+                            ></publication-deduplication-table>
+                        </v-col>
+                    </v-row>
+                </v-row>
+                
                 <v-row>
                     <v-col cols="5">
                         <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
@@ -184,11 +208,12 @@ import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.
 import { useUserRole } from '@/composables/useUserRole';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast, IDFMetadataPrepopulator},
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
     props: {
         inModal: {
             type: Boolean,
@@ -211,6 +236,7 @@ export default defineComponent({
         const placeRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
+        const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
 
         const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
 
@@ -222,7 +248,7 @@ export default defineComponent({
         const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const availableProceedings = ref<{title: string, value: number}[]>([]);
         const selectedProceedings = ref(searchPlaceholder);
@@ -322,6 +348,14 @@ export default defineComponent({
 
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+            }
         };
 
         const selectNewlyAddedProceedings = (proceedings: Proceedings) => {
@@ -385,6 +419,7 @@ export default defineComponent({
                     numberOfPages.value = null;
                     myPublications.value = [];
                     contributionsRef.value?.clearInput();
+                    deduplicationTableRef.value?.resetTable();
 
                     error.value = false;
                     snackbar.value = true;
@@ -416,7 +451,7 @@ export default defineComponent({
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
             popuateMetadata, documentWebOfScienceIdValidationRules, webOfScienceId,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef
         };
     }
 });

@@ -18,7 +18,7 @@
             <template #actions>
                 <v-btn
                     class="ms-auto"
-                    text="Ok"
+                    :text="$t('closeLabel')"
                     @click="dialog = false"
                 ></v-btn>
             </template>
@@ -73,9 +73,9 @@ export default defineComponent({
                 
                 response.data.content.forEach(publication => {
                     if (i18n.locale.value.startsWith("sr")) {
-                        text.value += publication.apa + "\n";
+                        text.value += publication.apa + "\n\n";
                     } else {
-                        text.value += publication.apa + "\n";
+                        text.value += publication.apa + "\n\n";
                     }
                 });
             });

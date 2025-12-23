@@ -64,9 +64,21 @@ export const updateAttachment = (attachment: DocumentFile, isProof: boolean, doc
         if(isProof) {
             document!.proofs = document?.proofs?.filter(proof => proof.id !== attachment.id);
             document?.proofs?.push(response.data);
-        } else {
+        } else if (document?.fileItems?.some(fileItem => fileItem.id === attachment.id)) {
             document!.fileItems = document?.fileItems?.filter(fileItem => fileItem.id !== attachment.id);
             document?.fileItems?.push(response.data);
+        } else {
+            const thesis = (document as Thesis);
+            if (thesis?.preliminaryFiles?.some(file => file.id === attachment.id)) {
+                thesis!.preliminaryFiles = thesis?.preliminaryFiles?.filter(file => file.id !== attachment.id);
+                thesis?.preliminaryFiles?.push(response.data);
+            } else if (thesis?.preliminarySupplements?.some(file => file.id === attachment.id)) {
+                thesis!.preliminarySupplements = thesis?.preliminarySupplements?.filter(file => file.id !== attachment.id);
+                thesis?.preliminarySupplements?.push(response.data);
+            } else if (thesis?.commissionReports?.some(file => file.id === attachment.id)) {
+                thesis!.commissionReports = thesis?.commissionReports?.filter(file => file.id !== attachment.id);
+                thesis?.commissionReports?.push(response.data);
+            }
         }
 
         if (attachment.file.size > 0) {

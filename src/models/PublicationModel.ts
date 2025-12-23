@@ -180,7 +180,7 @@ export interface Monograph extends Document {
     volume?: string;
     number?: string;
     publicationSeriesId?: number;
-    languageTagIds?: number[];
+    languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
     authorReprint?: boolean;
@@ -223,7 +223,7 @@ export interface Dataset extends Document {
 }
 
 export interface DeduplicationSuggestion {
-    id: number;
+    id: string;
     leftEntityId: number;
     rightEntityId: number;
     leftTitleSr: string;
@@ -269,6 +269,7 @@ export interface Thesis extends Document {
     extendedAbstract?: MultilingualContent[];
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
+    isShortenedReview?: boolean;
 }
 
 export interface CitationResponse {

@@ -114,7 +114,11 @@
                         ></v-select>
                     </div>
                     <div class="mb-5 mt-5">
-                        <add-publication-menu v-if="canEdit" compact />
+                        <add-publication-menu
+                            v-if="canEdit"
+                            :person-id="isResearcher ? undefined : personId"
+                            compact
+                        />
                         <v-btn
                             v-if="isResearcher && canEdit"
                             class="mt-2" color="primary" density="compact"
@@ -389,6 +393,8 @@ export default defineComponent({
         const shouldDisplayCollaborationNetworkFirst = ref(false);
 
         const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
+
+        const personId = computed(() => parseInt(currentRoute.params.id as string));
 
         onMounted(async () => {
             if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
@@ -713,7 +719,7 @@ export default defineComponent({
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
-            isInstitutionalEditor, performIndicatorHarvest
+            isInstitutionalEditor, performIndicatorHarvest, personId
         };
 }});
 </script>

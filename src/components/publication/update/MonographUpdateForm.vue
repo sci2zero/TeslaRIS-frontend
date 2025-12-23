@@ -147,7 +147,7 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { ExternalValidation, LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { ExternalValidation, LanguageResponse, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { MonographType, Monograph } from '@/models/PublicationModel';
@@ -199,16 +199,16 @@ export default defineComponent({
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
         const noDataMessage = computed(() => i18n.t("noDataMessage"));
 
-        const selectedLanguages = ref<number[]>([]);
+        const selectedLanguages = ref<number[]>(props.presetMonograph?.languageIds as number[]);
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
                 languageTags.value = response.data;
-                response.data.forEach(languageTag => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
-                        selectedLanguages.value.push(languageTag.id);
-                    }
+            });
+
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach(language => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id});
                 })
             });
 
@@ -363,7 +363,7 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 numberOfPages: numberOfPages.value,
                 printISBN: printIsbn.value,
                 publicationSeriesId: publicationSeriesId as number,
@@ -388,7 +388,7 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetMonograph?.subTitle as MultilingualContent[];
 
-            selectedLanguages.value = props.presetMonograph?.languageTagIds as number[];
+            selectedLanguages.value = props.presetMonograph?.languageIds as number[];
             uris.value = props.presetMonograph?.uris as string[];
             eIsbn.value = props.presetMonograph?.eisbn;
             printIsbn.value = props.presetMonograph?.printISBN;

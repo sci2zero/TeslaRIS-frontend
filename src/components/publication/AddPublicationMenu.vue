@@ -34,9 +34,13 @@ export default defineComponent({
         compact: {
             type: Boolean,
             default: false
+        },
+        personId: {
+            type: Number,
+            default: undefined
         }
     },
-    setup() {
+    setup(props) {
         const router = useRouter();
         const { isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
 
@@ -48,7 +52,7 @@ export default defineComponent({
         });
 
         const navigateToPage = (name: string) => {
-            router.push({name: name});
+            router.push({name: name, query: props.personId ? {researcherId: props.personId} : {}});
         };
 
         const i18n = useI18n();

@@ -88,6 +88,9 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :left-id="(leftDataset?.id as number)"
+            :right-id="(rightDataset?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)">
         </comparison-actions>
@@ -113,10 +116,11 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -172,21 +176,17 @@ export default defineComponent({
 
             mergeDocumentAttachments(dataset1, dataset2);
 
-            dataset1.internalNumber = dataset2.internalNumber;
-            dataset2.internalNumber = "";
-            dataset1.doi = dataset2.doi;
-            dataset2.doi = "";
-            dataset1.scopusId = dataset2.scopusId;
-            dataset2.scopusId = "";
-            dataset1.openAlexId = dataset2.openAlexId;
-            dataset2.openAlexId = "";
-            dataset1.webOfScienceId = dataset2.webOfScienceId;
-            dataset2.webOfScienceId = "";
-            dataset1.documentDate = dataset2.documentDate;
-
-            dataset1.eventId = dataset2.eventId;
-            dataset1.publisherId = dataset2.publisherId;
-            dataset1.authorReprint = dataset2.authorReprint;
+            bulkTransferFields(dataset1, dataset2, [
+                { fieldName: "internalNumber", emptyValue: "" },
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
             dataset2.uris!.forEach(uri => {
                 if (!dataset1.uris!.includes(uri)) {
@@ -352,7 +352,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

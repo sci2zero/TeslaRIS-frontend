@@ -7,14 +7,21 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, type PropType, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 
 export default defineComponent({
     name: "BreadcrumbsNavigation",
-    setup() {
+    props: {
+        modelValue: {
+            type: Object as PropType<number | undefined>,
+            required: true,
+            }
+    },
+    emits: ["update:modelValue"],
+    setup(_, { emit }) {
         const route = useRoute();
         const router = useRouter();
 
@@ -45,6 +52,14 @@ export default defineComponent({
             });
 
             if (breadcrumbs.length > 1) return breadcrumbs; else return [];
+        });
+
+        watch(breadcrumbItems, () => {
+            if (breadcrumbItems.value) {
+                emit("update:modelValue", breadcrumbItems.value.length);
+            } else {
+                emit("update:modelValue", 0);
+            }
         });
   
         return {

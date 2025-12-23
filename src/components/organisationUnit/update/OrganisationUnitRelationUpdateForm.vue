@@ -1,7 +1,9 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <draggable
-            :list="data" group="organisationUnitRelations" item-key="id" :disabled="!inComparator"
+            :list="data" group="organisationUnitRelations"
+            item-key="id" :disabled="!inComparator"
+            :move="checkIfMovable"
             @change="onDropCallback">
             <v-row v-for="(relation, index) in data" :key="relation.id">
                 <v-col cols="3">
@@ -120,7 +122,15 @@ export default defineComponent({
         const relationTypes = getTypesForGivenLocale();
 
         const addRelation = () => {
-            data.value.push({relationType: {title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO), value: OrganisationUnitsRelationType.BELONGS_TO}, targetOrganisationUnit: {title: "", value: -1}});
+            data.value.push(
+                {
+                    relationType: {
+                        title: getTitleFromValueAutoLocale(OrganisationUnitsRelationType.BELONGS_TO),
+                        value: OrganisationUnitsRelationType.BELONGS_TO
+                    },
+                    targetOrganisationUnit: {title: "", value: -1}
+                }
+            );
         };
 
         const removeRelation = (index: number, relationId: number) => {
@@ -137,13 +147,32 @@ export default defineComponent({
             emit("dragged", event);
         };
 
+        const checkIfMovable = (event: any) => {
+            const draggedElement = event.draggedContext?.element;
+            
+            if (draggedElement?.targetOrganisationUnit?.title === "" || draggedElement?.targetOrganisationUnit?.value === -1) {
+                return false;
+            }
+            
+            const currentData = [...data.value];
+            const draggedIndex = event.draggedContext?.index;
+            
+            if (draggedIndex !== undefined && currentData.length === 1) {
+                addRelation();
+            }
+            
+            return true;
+        };
+
         return {
             isFormValid,
-            requiredFieldRules, data,
+            requiredFieldRules,
             toMultilingualTextInput,
-            addRelation, removeRelation, relationTypes,
-            updateOURelations, autocompleteSearchRef,
-            onDropCallback
+            addRelation, removeRelation,
+            relationTypes, data,
+            updateOURelations,
+            autocompleteSearchRef,
+            onDropCallback, checkIfMovable
         };
     }
 });

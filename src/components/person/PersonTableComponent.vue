@@ -67,7 +67,7 @@
                                 </v-icon>
                             </template>
                             <v-list-item-title class="text-body-2">
-                                {{ $t("comparePublicationsLabel") }}
+                                {{ $t("compareContributionsLabel") }}
                                 <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
                             </v-list-item-title>
                         </v-list-item>

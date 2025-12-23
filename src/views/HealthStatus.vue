@@ -9,6 +9,16 @@
                 <p><strong>Frontend Version:</strong> {{ healthData.frontendVersion }}</p>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-btn
+                    color="primary"
+                    density="compact" class="bottom-spacer"
+                    @click="toggleMaintenanceMode">
+                    {{ maintenanceModeOn ? $t("turnOffMaintenanceModeLabel") : $t("turnOnMaintenanceModeLabel") }}
+                </v-btn>
+            </v-col>
+        </v-row>
   
         <v-row v-if="!loading">
             <v-col
@@ -38,7 +48,7 @@
             </v-col>
         </v-row>
     </v-container>
-    <div v-if="loading" class="d-flex flex-row justify-center loader mt-10">
+    <div v-if="loading" class="d-flex flex-row justify-center loader mt-10 mb-10">
         <v-progress-circular
             color="primary"
             indeterminate
@@ -51,6 +61,7 @@
 import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
 import HealthCheckService from "@/services/HealthCheckService";
 import type { AxiosResponse } from "axios";
+import ApplicationConfigurationService from "@/services/ApplicationConfigurationService";
 
 
 export default defineComponent({
@@ -79,18 +90,43 @@ setup() {
     onMounted(() => {
         loading.value = true;
         fetchHealthStatus();
+        fetchMaintenanceInfo();
 
         intervalId = setInterval(() => fetchHealthStatus(), 10000);
     });
+
+    const maintenanceModeOn = ref(false);
 
     onUnmounted(() => {
         clearInterval(intervalId);
     });
 
+    const fetchMaintenanceInfo = () => {
+        ApplicationConfigurationService.getIsApplicationInMaintenanceMode().then(response => {
+            maintenanceModeOn.value = response.data;
+        });
+    };
+
+    const toggleMaintenanceMode = () => {
+        if (maintenanceModeOn.value) {
+            ApplicationConfigurationService.turnOffMaintenanceMode().then(() => {
+                fetchMaintenanceInfo();
+                window.location.reload();
+            });
+        } else {
+            ApplicationConfigurationService.turnOnMaintenanceMode().then(() => {
+                fetchMaintenanceInfo();
+                window.location.reload();
+            });
+        }
+    };
+
     return {
         healthData,
         serviceStatus,
-        loading
+        loading,
+        maintenanceModeOn,
+        toggleMaintenanceMode
     };
 },
 });

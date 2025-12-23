@@ -6,7 +6,7 @@
         </v-btn>
   
         <v-expand-transition>
-            <v-card v-show="isExpanded" class="mt-3 pa-4">
+            <v-card v-show="isExpanded" class="mt-3! p-4!">
                 <component
                     :is="filterComponent"
                     ref="filtersRef"
@@ -69,9 +69,12 @@ export default defineComponent({
         isExpanded.value = false;
     };
 
-    const resetFilters = () => {
+    const resetFilters = (shouldEmit: boolean = true) => {
         filtersRef.value.resetFilters();
-        emit("reset");
+
+        if (shouldEmit) {
+            emit("reset");
+        }
     };
 
     return {

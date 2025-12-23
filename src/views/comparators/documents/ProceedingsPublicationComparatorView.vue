@@ -88,6 +88,9 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :left-id="(leftProceedingsPublication?.id as number)"
+            :right-id="(rightProceedingsPublication?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)">
         </comparison-actions>
@@ -111,11 +114,12 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -171,27 +175,20 @@ export default defineComponent({
 
             mergeDocumentAttachments(proceedingsPublication1, proceedingsPublication2);
             
-            proceedingsPublication1.proceedingsPublicationType = proceedingsPublication2.proceedingsPublicationType;
-            proceedingsPublication1.numberOfPages = proceedingsPublication2.numberOfPages;
-            proceedingsPublication2.numberOfPages = 0;
-            proceedingsPublication1.doi = proceedingsPublication2.doi;
-            proceedingsPublication2.doi = "";
-            proceedingsPublication1.scopusId = proceedingsPublication2.scopusId;
-            proceedingsPublication2.scopusId = "";
-            proceedingsPublication1.openAlexId = proceedingsPublication2.openAlexId;
-            proceedingsPublication2.openAlexId = "";
-            proceedingsPublication1.webOfScienceId = proceedingsPublication2.webOfScienceId;
-            proceedingsPublication2.webOfScienceId = "";
-            proceedingsPublication1.documentDate = proceedingsPublication2.documentDate;
-            proceedingsPublication1.startPage = proceedingsPublication2.startPage;
-            proceedingsPublication2.startPage = "";
-            proceedingsPublication1.endPage = proceedingsPublication2.endPage;
-            proceedingsPublication2.endPage = "";
-            proceedingsPublication1.articleNumber = proceedingsPublication2.articleNumber;
-            proceedingsPublication2.articleNumber = "";
-
-            proceedingsPublication1.eventId = proceedingsPublication2.eventId;
-            proceedingsPublication1.proceedingsId = proceedingsPublication2.proceedingsId;
+            bulkTransferFields(proceedingsPublication1, proceedingsPublication2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "numberOfPages", emptyValue: 0 },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "startPage", emptyValue: "" },
+                { fieldName: "endPage", emptyValue: "" },
+                { fieldName: "articleNumber", emptyValue: "" },
+                { fieldName: "proceedingsPublicationType", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "proceedingsId", emptyValue: null, setEmpty: false }
+            ]);
 
             proceedingsPublication2.uris!.forEach(uri => {
                 if (!proceedingsPublication1.uris!.includes(uri)) {
@@ -362,7 +359,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

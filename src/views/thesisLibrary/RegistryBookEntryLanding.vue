@@ -26,7 +26,7 @@
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
                             :form-component="RegistryBookEntryForm"
-                            :form-props="{ presetRegistryBookEntry: registryBookEntry }"
+                            :form-props="{ presetRegistryBookEntry: registryBookEntry, canSave: canEdit }"
                             is-section-update
                             entity-name="RegistryBookEntry"
                             :read-only="!canEdit"
@@ -37,6 +37,16 @@
                         <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
+                        </div>
+                        <div
+                            v-if="registryBookEntry?.promotionId"
+                            class="mb-5">
+                            {{ $t("promotionLabel") }}:
+                            <div class="response">
+                                <localized-link :to="'registry-book?promotionId=' + registryBookEntry?.promotionId + (!registryBookEntry.promoted ? '&forPromotion=true' : '')">
+                                    {{ `${localiseDate(registryBookEntry.promotionDate)} ${$t("inLabel")} ${localiseTime(registryBookEntry.promotionTime)}` }}
+                                </localized-link>
+                            </div>
                         </div>
                         <v-row>
                             <v-col cols="6">
@@ -265,23 +275,49 @@
             </v-col>
         </v-row>
 
+        <div class="flex justify-end">
+            <generic-crud-modal
+                v-if="!registryBookEntry?.inPromotion"
+                class="mt-5"
+                :form-component="PromotionSelectorForm"
+                :form-props="{}"
+                entity-name="Entry"
+                primary-color
+                @create="addToPromotion($event, (registryBookEntry?.id as number))"
+            />
+        </div>
         <div
-            v-if="isAdmin && !canEdit"
+            v-if="((isAdmin || canAllowEdit) && !canEdit) || (isAdmin && registryBookEntry?.promoted)"
             class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("adminActionsLabel") }}
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <v-btn
+                    v-if="(isAdmin || canAllowEdit) && !canEdit"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="allowSingleEdit()">
                     {{ $t("allowSingleEditLabel") }}
                 </v-btn>
+                <v-btn
+                    v-if="isAdmin && registryBookEntry?.promoted"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="initialteRemovalFromPromotion">
+                    {{ $t("removeFromPromotionLabel") }}
+                </v-btn>
             </div>
         </div>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <persistent-question-dialog
+            v-model="displayPersistentDialog"
+            :title="$t('areYouSureLabel')"
+            :message="$t('removeOneFromPromotionMessage')"
+            @continue="removeFromPromotion">
+        </persistent-question-dialog>
     </v-container>
 </template>
 
@@ -290,27 +326,32 @@ import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import Toast from '@/components/core/Toast.vue';
 import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import { useUserRole } from '@/composables/useUserRole';
+import PromotionSelectorForm from '@/components/thesisLibrary/PromotionSelectorForm.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "RegistryBookEntryLandingPage",
-    components: { LocalizedLink, GenericCrudModal, Toast },
+    components: { LocalizedLink, GenericCrudModal, Toast, PersistentQuestionDialog },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
+        const displayPersistentDialog = ref(false);
 
+        const router = useRouter();
         const currentRoute = useRoute();
         const canEdit = ref(false);
+        const canAllowEdit = ref(false);
 
         const registryBookEntry = ref<RegistryBookEntry>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
@@ -323,7 +364,9 @@ export default defineComponent({
 
         onMounted(() => {
             fetchRegistryBookEntry();
+            
             checkCanEdit();
+            checkCanAllowEdit();
         });
 
         const checkCanEdit = () => {
@@ -331,6 +374,14 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then(response => {
                 canEdit.value = response.data;
+            });
+        };
+
+        const checkCanAllowEdit = () => {
+            RegistryBookService.canAllowSingleEdit(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                canAllowEdit.value = response.data;
             });
         };
 
@@ -367,11 +418,36 @@ export default defineComponent({
             });
         };
 
+        const addToPromotion = (promotionId: number, entryId: number) => {
+            RegistryBookService.addToPromotion(entryId, promotionId)
+            .then(() => {
+                router.push(
+                    {
+                        name: "registryBookList",
+                        query: {promotionId: promotionId, forPromotion: "true"}
+                    }
+                );
+            });
+        };
+
+        const initialteRemovalFromPromotion = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        const removeFromPromotion = () => {
+            RegistryBookService.removeFromFinishedPromotion(registryBookEntry.value?.id as number)
+            .then(() => {
+                router.push({name: "registryBookList"});
+            });
+        };
+
         return {
             registryBookEntry, icon, returnCurrentLocaleContent,
             languageTagMap, localiseDate, snackbar, snackbarMessage,
             RegistryBookEntryForm, updateBasicInfo, canEdit,
-            allowSingleEdit, isAdmin
+            allowSingleEdit, isAdmin, canAllowEdit, localiseTime,
+            PromotionSelectorForm, addToPromotion, removeFromPromotion,
+            displayPersistentDialog, initialteRemovalFromPromotion
         };
 }})
 

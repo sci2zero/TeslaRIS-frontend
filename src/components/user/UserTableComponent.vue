@@ -1,5 +1,5 @@
 <template>
-    <v-row class="mb-5">
+    <v-row class="mb-5!">
         <v-menu open-on-hover open-on-click :open-delay="100">
             <template #activator="{ props }">
                 <v-btn
@@ -38,6 +38,10 @@
                 />
                 <register-employee-modal
                     :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR"
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
+                <register-researcher-modal
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
@@ -153,11 +157,12 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import UserMigrationSelectionModal from './UserMigrationSelectionModal.vue';
 import { isEqual } from 'lodash';
 import UserEmailChangeModal from './UserEmailChangeModal.vue';
+import RegisterResearcherModal from './RegisterResearcherModal.vue';
 
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal, UserEmailChangeModal },
+    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal, UserEmailChangeModal, RegisterResearcherModal },
     props: {
         users: {
             type: Array<UserAccountIndex>,

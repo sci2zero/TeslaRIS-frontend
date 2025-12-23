@@ -88,6 +88,9 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :left-id="(leftSoftware?.id as number)"
+            :right-id="(rightSoftware?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)">
         </comparison-actions>
@@ -113,10 +116,11 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -172,21 +176,17 @@ export default defineComponent({
 
             mergeDocumentAttachments(software1, software2);
 
-            software1.internalNumber = software2.internalNumber;
-            software2.internalNumber = "";
-            software1.doi = software2.doi;
-            software2.doi = "";
-            software1.openAlexId = software2.openAlexId;
-            software2.openAlexId = "";
-            software1.webOfScienceId = software2.webOfScienceId;
-            software2.webOfScienceId = "";
-            software1.scopusId = software2.scopusId;
-            software2.scopusId = "";
-            software1.documentDate = software2.documentDate;
-
-            software1.eventId = software2.eventId;
-            software1.publisherId = software2.publisherId;
-            software1.authorReprint = software2.authorReprint;
+            bulkTransferFields(software1, software2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "internalNumber", emptyValue: "" },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
             software2.uris!.forEach(uri => {
                 if (!software1.uris!.includes(uri)) {
@@ -352,7 +352,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

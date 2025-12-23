@@ -7,23 +7,30 @@ export interface ThesisReportRequest {
     fromDate: string,
     toDate: string;
     topLevelInstitutionIds: number[];
-    thesisType: ThesisType;
+    thesisTypes: ThesisType[];
+}
+
+export interface NotAddedToPromotionThesesRequest {
+    fromDate: string,
+    toDate: string;
+    topLevelInstitutionIds: number[];
+    thesisTypes: ThesisType[];
 }
 
 export interface ThesisReportCounts {
     institutionId: number;
     institutionName: MultilingualContent[];
     defendedCount: number;
-    putOnPublicReviewCount: number;
-    topicsAcceptedCount: number;
+    notDefendedCount: number;
     publiclyAvailableCount: number;
+    closedAccessCount: number;
 }
 
 export enum ThesisReportType {
     DEFENDED = "DEFENDED",
-    ACCEPTED = "ACCEPTED",
-    PUBLIC_REVIEW = "PUBLIC_REVIEW",
-    PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE"
+    NOT_DEFENDED = "NOT_DEFENDED",
+    PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE",
+    CLOSED_ACCESS = "CLOSED_ACCESS"
 }
 
 export interface ThesisSearchRequest {
@@ -51,6 +58,7 @@ export interface Promotion {
     description: MultilingualContent[];
     institutionId: number;
     finished?: boolean;
+    institutionName?: MultilingualContent[];
 }
 
 export enum AcademicTitle {
@@ -119,6 +127,9 @@ export interface RegistryBookEntry {
     registryBookNumber?: number;
     schoolYearOrdinalNumber?: number;
     thesisId?: number;
+    promotionId?: number;
+    promotionDate?: string;
+    promotionTime?: string;
 }
 
 export interface PhdThesisPrePopulatedData {

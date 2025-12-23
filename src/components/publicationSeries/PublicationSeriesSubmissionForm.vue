@@ -78,7 +78,7 @@ import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
+import type { LanguageResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -91,7 +91,7 @@ import UriInput from '@/components/core/UriInput.vue';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -127,10 +127,10 @@ export default defineComponent({
         const defaultLanguage = ref(-1);
 
         onMounted(() => {
-            LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
-                response.data.forEach((languageTag: LanguageTagResponse) => {
-                    languageList.value.push({title: `${languageTag.display} (${languageTag.languageCode})`, value: languageTag.id});
-                    if (i18n.locale.value.toUpperCase() === languageTag.languageCode) {
+            LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
+                response.data.forEach((languageTag: LanguageResponse) => {
+                    languageList.value.push({title: `${returnCurrentLocaleContent(languageTag.name)} (${languageTag.languageCode})`, value: languageTag.id});
+                    if (i18n.locale.value.toUpperCase().startsWith(languageTag.languageCode)) {
                         selectedLanguages.value.push(languageTag.id);
                         defaultLanguage.value = languageTag.id;
                     }
@@ -182,7 +182,7 @@ export default defineComponent({
                 title: title.value,
                 eissn: eIssn.value,
                 printISSN: printIssn.value,
-                languageTagIds: selectedLanguages.value,
+                languageIds: selectedLanguages.value,
                 nameAbbreviation: nameAbbreviations.value,
                 contributions: [],
                 openAlexId: openAlexId.value,

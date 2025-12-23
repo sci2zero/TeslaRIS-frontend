@@ -12,9 +12,30 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <publication-deduplication-table
+                                ref="deduplicationTableRef"
+                                :title="title"
+                                :doi="doi"
+                                :scopus-id="scopus"
+                                :web-of-science-id="webOfScienceId"
+                                :open-alex-id="openAlexId"
+                            ></publication-deduplication-table>
+                        </v-col>
+                    </v-row>
+                </v-row>
+
                 <v-row>
                     <v-col cols="10">
                         <v-text-field
@@ -153,11 +174,12 @@ import Toast from '../core/Toast.vue';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 
 
 export default defineComponent({
     name: "SubmitPatent",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator},
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
     props: {
         inModal: {
             type: Boolean,
@@ -184,6 +206,7 @@ export default defineComponent({
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
+        const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -191,7 +214,7 @@ export default defineComponent({
         const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const place = ref([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
@@ -245,6 +268,7 @@ export default defineComponent({
                     patentNumber.value = "";
                     scopus.value = "";
                     contributionsRef.value?.clearInput();
+                    deduplicationTableRef.value?.resetTable();
 
                     error.value = false;
                     snackbar.value = true;
@@ -286,6 +310,14 @@ export default defineComponent({
 
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+            }
         };
 
         return {
@@ -307,7 +339,8 @@ export default defineComponent({
             PublicationType, popuateMetadata,
             documentWebOfScienceIdValidationRules,
             webOfScienceId, scopus,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            deduplicationTableRef
         };
     }
 });

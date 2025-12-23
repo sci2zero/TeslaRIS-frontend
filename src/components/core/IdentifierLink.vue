@@ -2,8 +2,9 @@
     <v-btn
         v-if="identifier"
         variant="plain"
-        class="no-uppercase m-0 p-0 h-auto semi-transparent"
-        :style="{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: '-15px' }"
+        :density="compact ? 'compact' : 'default'"
+        :class="compact ? 'text-slate-700 text-sm font-mono' : 'no-uppercase m-0 p-0 h-auto semi-transparent'"
+        :style="{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: (compact && type !== 'researcher_id') ? '-12px' : '-17px' }"
         :href="`${computeBaseURL()}${identifier}`"
         target="_blank">
         {{ identifier }}
@@ -24,6 +25,10 @@ export default defineComponent({
         type: {
             type: String,
             default: "doi"
+        },
+        compact: {
+            type: Boolean,
+            default: false
         }
     },
     setup (props) {

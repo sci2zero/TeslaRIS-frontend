@@ -13,7 +13,11 @@ export class DeduplicationService extends BaseService {
     return super.sendRequest(axios.get, `deduplication/${type}?page=${page}&size=${size}`);
   }
 
-  async flagAsNotDuplicate(suggestionId: number): Promise<AxiosResponse<void>> {
+  async getSuggestionId(leftId: number, rightId: number, entityType: EntityType): Promise<AxiosResponse<string | null>> {
+    return super.sendRequest(axios.patch, `deduplication/suggestion/${leftId}/${rightId}/${entityType}`);
+  }
+
+  async flagAsNotDuplicate(suggestionId: string): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.patch, `deduplication/suggestion/${suggestionId}`);
   }
 

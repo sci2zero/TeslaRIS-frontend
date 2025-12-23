@@ -60,7 +60,7 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
     return "";
 };
 
-export const getDocumentLandingPageName = (type: PublicationType): string => {
+export const getDocumentLandingPageName = (type: PublicationType | string): string => {
     switch (type) {
         case "JOURNAL_PUBLICATION":
             return "journalPublicationLandingPage";

@@ -110,14 +110,24 @@ export default defineComponent({
 
         onMounted(() => {
             if (props.modelValue) {
-                const initDate = new Date(props.modelValue);
-                if (!isNaN(initDate.getTime())) {
-                    day.value = String(initDate.getDate()).padStart(2, "0");
-                    month.value = String(initDate.getMonth() + 1).padStart(2, "0");
-                    year.value = String(initDate.getFullYear());
-                }
+                setInitialValue();
             }
         });
+
+        const setInitialValue = () => {
+            const initDate = new Date(props.modelValue);
+            if (!isNaN(initDate.getTime())) {
+                const parsedDay = String(initDate.getDate()).padStart(2, "0");
+                const parsedMonth = String(initDate.getMonth() + 1).padStart(2, "0");
+                const parsedYear = String(initDate.getFullYear());
+
+                if (day.value !== parsedDay && month.value !== parsedMonth && year.value !== parsedYear) {
+                    day.value = parsedDay;
+                    month.value = parsedMonth;
+                    year.value = parsedYear;
+                }
+            }
+        };
 
         const { requiredNumericFieldRules } = useValidationUtils();
 
@@ -154,6 +164,10 @@ export default defineComponent({
 
                 emit("update:modelValue", toIsoString(newDate));
             }
+        });
+
+        watch(() => props.modelValue, () => {
+            setInitialValue();
         });
 
         watch([day, month, year], ([d, m, y]) => {

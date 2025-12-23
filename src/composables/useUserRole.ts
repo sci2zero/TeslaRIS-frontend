@@ -18,8 +18,17 @@ export function useUserRole() {
     const isHeadOfLibrary = computed(() => Boolean(userRole.value && userRole.value === "HEAD_OF_LIBRARY"));
     const isPromotionRegistryAdministrator = computed(() => Boolean(userRole.value && userRole.value === "PROMOTION_REGISTRY_ADMINISTRATOR"));
 
-    const canUserAddPersons = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian);
+    const canUserAddPersons = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value);
     const canAddSerialEvents = computed(() => isAdmin.value || isInstitutionalEditor.value);
+
+    const isLibrarianUser = computed(() => isHeadOfLibrary.value || isInstitutionalLibrarian.value);
+    const userInstitutionid = computed(() => {
+        if (isUserLoggedIn.value) {
+            return loggedInUser.value?.organisationUnitId;
+        }
+
+        return undefined;
+    });
 
     const canUserAddPublications = computed(() => userRole.value && userRole.value !== 'COMMISSION' && userRole.value !== 'VICE_DEAN_FOR_SCIENCE');
     const returnOnlyInstitutionRelatedEntities = ref(isUserBoundToOU.value);
@@ -61,6 +70,7 @@ export function useUserRole() {
         isInstitutionalLibrarian, isHeadOfLibrary,
         isPromotionRegistryAdministrator,
         canUserAddPersons, canAddSerialEvents,
-        isUserLoggedIn, loggedResearcherId
+        isUserLoggedIn, loggedResearcherId,
+        isLibrarianUser, userInstitutionid
     };
 }

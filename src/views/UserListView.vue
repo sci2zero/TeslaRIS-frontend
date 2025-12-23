@@ -3,7 +3,9 @@
         <h1>{{ $t("userListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
+        <div class="flex flex-row justify-center">
+            <search-bar-component @search="clearSortAndPerformSearch" />
+        </div>
         <br />
         <br />
         <br />

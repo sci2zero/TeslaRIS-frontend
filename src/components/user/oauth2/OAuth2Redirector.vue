@@ -19,14 +19,19 @@
                 />
             </div>
         </div>
-        <div v-else>
+        <div v-else-if="!error">
             <h1>
                 {{ $t("redirectingLabel") }}
             </h1>
         </div>
 
-        <div v-if="error">
-            <h1>
+        <div
+            v-if="error"
+            class="mb-15">
+            <h1 v-if="maintenance">
+                {{ $t("maintenanceModeMessage") }}
+            </h1>
+            <h1 v-else>
                 {{ $t("genericErrorMessage") }}
             </h1>
         </div>
@@ -54,6 +59,7 @@ import { useRoute, useRouter } from 'vue-router';
         const name = ref<string>("");
         const loading = ref<boolean>(false);
         const error = ref<boolean>(false);
+        const maintenance = ref<boolean>(false);
 
         const registrationId = ref<string>("");
 
@@ -98,15 +104,22 @@ import { useRoute, useRouter } from 'vue-router';
                 loading.value = false;
 
                 router.push({ name: "home", params: { locale: preferredUILanguage } });
-            }).catch(() => {
+            }).catch((errorResponse) => {
                 error.value = true;
                 loading.value = false;
+                
+                maintenance.value = errorResponse.response.status === 503;
+
+                setTimeout(() => {
+                    router.push({ name: "home" });
+                }, 5000);
             });
         };
     
         return {
             name, loading,
-            error, registrationId
+            error, registrationId,
+            maintenance
         };
     }
   });

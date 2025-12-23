@@ -101,12 +101,12 @@
                                 <div v-if="proceedings?.publicationSeriesIssue" class="response">
                                     {{ proceedings.publicationSeriesIssue }}
                                 </div>
-                                <div v-if="proceedings?.languageTagIds && proceedings?.languageTagIds.length > 0">
+                                <div v-if="proceedings?.languageIds && proceedings?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
                                 </div>
                                 <div>
-                                    <v-chip v-for="(languageTagId, index) in proceedings?.languageTagIds" :key="index" outlined>
-                                        {{ languageTagMap.get(languageTagId)?.display }}
+                                    <v-chip v-for="(languageId, index) in proceedings?.languageIds" :key="index" outlined>
+                                        {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
                                     </v-chip>
                                 </div>
                             </v-col>
@@ -298,7 +298,7 @@
 </template>
 
 <script lang="ts">
-import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -364,7 +364,7 @@ export default defineComponent({
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
-        const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
+        const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         
         const event = ref<Conference>();
         const publisher = ref<Publisher>();
@@ -442,9 +442,9 @@ export default defineComponent({
         };
 
         const populateData = () => {
-            LanguageService.getAllLanguageTags().then(response => {
+            LanguageService.getAllLanguages().then(response => {
                 response.data.forEach(languageTag => {
-                    languageTagMap.value.set(languageTag.id, languageTag);
+                    languageMap.value.set(languageTag.id, languageTag);
                 })
             });
         };
@@ -509,7 +509,7 @@ export default defineComponent({
             proceedings.value!.doi = updatedInfo.doi;
             proceedings.value!.eISBN = updatedInfo.eISBN;
             proceedings.value!.eventId = updatedInfo.eventId;
-            proceedings.value!.languageTagIds = updatedInfo.languageTagIds;
+            proceedings.value!.languageIds = updatedInfo.languageIds;
             proceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             proceedings.value!.printISBN = updatedInfo.printISBN;
             proceedings.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -557,6 +557,8 @@ export default defineComponent({
                 if(reload) {
                     fetchProceedings(false);
                 }
+            }).finally(() => {
+                fetchPublications();
             });
         };
 
@@ -592,7 +594,7 @@ export default defineComponent({
             publications, event, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseDate,
-            languageTagMap, publicationSeriesType, displayConfiguration,
+            languageMap, publicationSeriesType, displayConfiguration,
             searchKeyword, goToURL, canEdit, publisher,
             addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

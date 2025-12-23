@@ -34,9 +34,30 @@
 
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <publication-deduplication-table
+                                ref="deduplicationTableRef"
+                                :title="title"
+                                :doi="doi"
+                                :scopus-id="scopus"
+                                :web-of-science-id="webOfScienceId"
+                                :open-alex-id="openAlexId"
+                            ></publication-deduplication-table>
+                        </v-col>
+                    </v-row>
+                </v-row>
+
                 <v-row>
                     <v-col cols="5">
                         <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
@@ -188,11 +209,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
     props: {
         inModal: {
             type: Boolean,
@@ -214,6 +236,7 @@ export default defineComponent({
         const keywordsRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
+        const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
 
         const journalAutocompleteRef = ref<typeof JournalAutocompleteSearch>();
 
@@ -227,7 +250,7 @@ export default defineComponent({
         const title = ref<any[]>([]);
         const subtitle = ref([]);
         const description = ref([]);
-        const keywords = ref([]);
+        const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const volume = ref("");
         const issue = ref("");
@@ -302,6 +325,14 @@ export default defineComponent({
 
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
+
+            if (keywords.value.length === 0) {
+                additionalFields.value = true;
+                await nextTick();
+                
+                keywords.value = metadata.keywords;
+                keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+            }
         };
 
         const submitJournalPublication = (stayOnPage: boolean) => {
@@ -350,6 +381,7 @@ export default defineComponent({
                     articleNumber.value = "";
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
+                    deduplicationTableRef.value?.resetTable();
 
                     error.value = false;
                     snackbar.value = true;
@@ -379,7 +411,8 @@ export default defineComponent({
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage,
             popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
-            webOfScienceId, optionalNumericZeroOrGreaterFieldRules, disableYearInput
+            webOfScienceId, optionalNumericZeroOrGreaterFieldRules, disableYearInput,
+            deduplicationTableRef
         };
     }
 });

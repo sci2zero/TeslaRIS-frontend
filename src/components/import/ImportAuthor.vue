@@ -29,7 +29,11 @@
             <template #item="row">
                 <tr>
                     <td>
-                        {{ row.item.name }}
+                        <localized-link
+                            :to="'persons/' + row.item.databaseId"
+                            open-in-new-tab>
+                            {{ row.item.name }}
+                        </localized-link>
                     </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
                         {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
@@ -38,7 +42,17 @@
                         {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                     </td>
                     <td>{{ displayTextOrPlaceholder(localiseDate(row.item.birthdate)) }}</td>
-                    <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
+                    <td>
+                        <identifier-link
+                            v-if="row.item.orcid"
+                            :identifier="row.item.orcid"
+                            type="orcid"
+                            compact
+                        />
+                        <p v-else>
+                            {{ displayTextOrPlaceholder(row.item.orcid) }}
+                        </p>
+                    </td>
                     <td>
                         <publications-dialog
                             :button-text="$t('viewPublicationsLabel')"
@@ -46,7 +60,10 @@
                             icon="mdi-note"
                             :title="$t('publicationsLabel')">
                         </publications-dialog>
-                        <v-btn size="small" color="primary" @click="selectManually(row.item)">
+                        <v-btn
+                            class="ml-2"
+                            size="small" color="primary"
+                            @click="selectManually(row.item)">
                             {{ $t("selectLabel") }}
                         </v-btn>
                     </td>
@@ -90,11 +107,13 @@ import ImportAffiliation from "./ImportAffiliation.vue";
 import ImportService from "@/services/importer/ImportService";
 import { useUserRole } from "@/composables/useUserRole";
 import { localiseDate } from "@/utils/DateUtil";
+import LocalizedLink from "../localization/LocalizedLink.vue";
+import IdentifierLink from "../core/IdentifierLink.vue";
 
 
 export default defineComponent({
     name: "ImportAuthorComponent",
-    components: {PublicationsDialog, ImportAffiliation},
+    components: { PublicationsDialog, ImportAffiliation, LocalizedLink, IdentifierLink },
     props: {
         personForLoading: {
             type: Object as PropType<PersonLoad>,
@@ -135,7 +154,7 @@ export default defineComponent({
         const size = ref(5);
         const sort = ref("");
         const direction = ref("");
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: "name",  order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[]});
         
         onMounted(() => {
             startLoadProcess();
@@ -177,8 +196,8 @@ export default defineComponent({
             PersonService.searchResearchers(
                 `tokens=${props.personForLoading.firstName}&tokens=${props.personForLoading.lastName}&tokens=${props.personForLoading.middleName}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 false,
-                null)
-            .then(response => {
+                null
+            ).then(response => {
                 potentialMatches.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
                 if (page.value === 0 && !automaticProcessCompleted.value) {

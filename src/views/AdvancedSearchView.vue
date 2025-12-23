@@ -19,13 +19,15 @@
 
         <v-tabs-window v-model="searchTab">
             <v-tabs-window-item value="simpleSearch">
-                <search-bar-component
-                    ref="simpleSearchRef"
-                    class="mt-5"
-                    :preset-search-input="simpleSearchPresetInput"
-                    focus-automatically
-                    @search="clearSortAndPerformSearch"
-                />
+                <div class="flex flex-row justify-center mt-4">
+                    <search-bar-component
+                        ref="simpleSearchRef"
+                        class="mt-5"
+                        :preset-search-input="simpleSearchPresetInput"
+                        focus-automatically
+                        @search="clearSortAndPerformSearch"
+                    />
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="advancedSearch">
                 <query-input-component

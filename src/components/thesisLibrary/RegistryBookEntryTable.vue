@@ -53,6 +53,9 @@
                 <td v-if="promotedEntriesView">
                     {{ item.schoolYearOrdinalNumber }}
                 </td>
+                <td v-if="promotedEntriesView">
+                    {{ localiseDate(item.promotionDate) }}
+                </td>
                 <td v-if="!disableActions && (isAdmin || isPromotionRegistryAdministrator)">
                     <v-btn
                         v-if="item.inPromotion && !item.promoted"
@@ -160,6 +163,7 @@ export default defineComponent({
                 headers.value.push({ title: i18n.t("schoolYearLabel"), sortable: true, align: "start", key: "promotionSchoolYear" });
                 headers.value.push({ title: i18n.t("registryBookNumberLabel"), align: "start" });
                 headers.value.push({ title: i18n.t("schoolYearNumberLabel"), align: "start" });
+                headers.value.push({ title: i18n.t("promotionLabel"), align: "start" });
             }
             
             if (!props.disableActions && (isAdmin.value || isPromotionRegistryAdministrator.value)) {

@@ -234,8 +234,8 @@
                                     <div class="flex items-baseline gap-2">
                                         <div class="text-gray-800! hover:text-blue-900! font-semibold text-base flex">
                                             <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                                <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="item.titleSr"></rich-title-renderer>
-                                                <rich-title-renderer v-else :title="item.titleOther"></rich-title-renderer>
+                                                <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="item.titleSr" />
+                                                <rich-title-renderer v-else :title="item.titleOther" />
                                             </localized-link>
                                             <span v-if="item.year && item.year > 0">, </span>
                                         </div>
@@ -488,6 +488,10 @@ export default defineComponent({
         hasActiveTypeFilters: {
             type: Boolean,
             default: false
+        },
+        sortByDateDefault: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -518,7 +522,7 @@ export default defineComponent({
                 headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
             }
 
-            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value || props.sortByDateDefault) {
                 tableOptions.value.sortBy = [{key: "year", order: "desc"}];
             }
         })

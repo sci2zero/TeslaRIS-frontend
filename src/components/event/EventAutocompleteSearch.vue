@@ -160,6 +160,10 @@ export default defineComponent({
         watch(() => props.modelValue, () => {
             if (props.modelValue) {
                 selectedEvent.value = props.modelValue;
+                
+                if (!lastSearchInput.value) {
+                    lastSearchInput.value = (selectedEvent.value as { title: string, value: number }).title
+                }
             }
         });
 

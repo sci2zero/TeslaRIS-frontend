@@ -18,8 +18,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}`);
     }
 
-    async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
-        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&authorName=${authorName}&authorTitle=${authorTitle}&${pageable}`);
+    async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, promotionId: number | undefined, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
+        return super.sendRequest(axios.get, `registry-book/promoted/${institutionId}?from=${from}&to=${to}&authorName=${authorName}&authorTitle=${authorTitle}${promotionId ? "&promotionId=" + promotionId : ""}&${pageable}`);
     }
 
     async getPromotedCounts(from: string, to: string): Promise<AxiosResponse<InstitutionPromotionCountsReport[]>> {
@@ -86,8 +86,28 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/can-edit/${entryId}`);
     }
 
+    async canAllowSingleEdit(entryId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `registry-book/can-allow-single-edit/${entryId}`);
+    }
+
     async allowSingleUpdate(entryId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `registry-book/allow-single-update/${entryId}`);
+    }
+
+    async getDraft(thesisId: number): Promise<AxiosResponse<RegistryBookEntry>> {
+        return super.sendRequest(axios.get, `registry-book-draft/${thesisId}`);
+    }
+
+    async saveDraft(body: RegistryBookEntry, thesisId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book-draft/${thesisId}`, body, RegistryBookService.idempotencyKey);
+    }
+
+    async removeFromFinishedPromotion(entryId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/remove-from-finished-promotion/${entryId}`, {});
+    }
+
+    async removeAllFromFinishedPromotion(promotionId: number, deletePromotion: boolean): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `registry-book/remove-all-from-finished-promotion/${promotionId}?deletePromotion=${deletePromotion}`, {});
     }
 }
 

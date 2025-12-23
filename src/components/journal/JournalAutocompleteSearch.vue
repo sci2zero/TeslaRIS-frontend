@@ -133,6 +133,10 @@ export default defineComponent({
         watch(() => props.modelValue, () => {
             if(props.modelValue) {
                 selectedJournal.value = props.modelValue;
+
+                if (!lastSearchInput.value) {
+                    lastSearchInput.value = (selectedJournal.value as { title: string, value: number }).title
+                }
             }
         });
 
