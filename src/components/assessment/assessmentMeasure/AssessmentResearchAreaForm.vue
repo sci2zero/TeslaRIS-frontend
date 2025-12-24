@@ -29,6 +29,8 @@
                 <research-areas-selection
                     ref="researchAreasSelectionRef"
                     :research-areas-hierarchy="researchAreasHierarchy"
+                    submit-on-click
+                    @update="saveSubAreas"
                 />
             </v-col>
         </v-row>
@@ -77,6 +79,7 @@ export default defineComponent({
         const assessmentResearchAreas = ref<AssessmentResearchArea[]>([]);
         const researchAreas = ref<{title: string, value: string}[]>([]);
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
+        const selectedResearchAreaIds = ref<number[]>([]);
 
         onMounted(() => {
             AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
@@ -96,24 +99,30 @@ export default defineComponent({
 
         const submit = () => {
             AssessmentResearchAreaService.setPersonAssessmentResearchArea(
-                props.personId, selectedResearchArea.value.value
+                props.personId, selectedResearchArea.value.value,
+                selectedResearchAreaIds.value
             ).then(() => {
                 emit("create");
             });
         };
 
         const removeResearchArea = () => {
-            AssessmentResearchAreaService.deletePersonAssessmentResearchArea(props.personId).then(() => {
+            AssessmentResearchAreaService.deletePersonAssessmentResearchArea(
+                props.personId
+            ).then(() => {
                 emit("create");
             });
         };
 
+        const saveSubAreas = (researchAreaIds: number[]) => {
+            selectedResearchAreaIds.value = researchAreaIds;
+        };
+
         return {
-            isFormValid,
-            researchAreas, submit,
+            isFormValid, researchAreas,
             requiredStringSelectionRules,
-            selectedResearchArea,
-            removeResearchArea
+            selectedResearchArea, submit,
+            removeResearchArea, saveSubAreas
         };
     }
 });

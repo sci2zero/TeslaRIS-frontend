@@ -690,6 +690,7 @@ export default {
     commissionReportsLabel: "CommissionReports",
     onPublicReviewLabel: "Thesis is on public review until {0}",
     putOnPublicReviewLabel: "Put on public review",
+    putOnPublicReviewShortenedLabel: "Put on shortened public review",
     removeFromPublicReviewLabel: "Remove from public review",
     missingAttachmentsMessage: "Number of preliminary documents, supplements and commission reports.",
     datesOfPublicReviewLabel: "Dates when put on public review:",

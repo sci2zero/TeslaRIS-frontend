@@ -35,15 +35,16 @@
             const li = document.createElement('li');
             li.style.marginLeft = '10px';
             // Color box
-            const link = document.createElement("a")
-            link.href = "https://sdgs.un.org/goals/goal" + prediction.sdg.code
+            const link = document.createElement("a");
+            link.className = 'sdg-a';
+            link.href = "https://sdgs.un.org/goals/goal" + prediction.sdg.code;
             const boxSpan = document.createElement('img');
             boxSpan.style.height = '25px';
             boxSpan.style.marginRight = '10px';
             boxSpan.style.width = '25px';
             boxSpan.style.verticalAlign = 'middle';
             boxSpan.style.margin = '2px';
-            boxSpan.src = '/assets/img/sdg_icon_' + prediction.sdg.code + '.png'
+            boxSpan.src = 'https://aurora-sdg.labs.vu.nl/assets/img/sdg_icon_' + prediction.sdg.code + '.png'
             link.appendChild(boxSpan)
             // Text
             const textContainer = document.createElement('p');
@@ -52,6 +53,7 @@
             textContainer.style.display = 'inline-block';
             textContainer.style.verticalAlign = 'middle';
             textContainer.style.marginLeft = '5px'
+            textContainer.style.marginBottom = '20px'
             textContainer.innerHTML = 'SDG' + prediction.sdg.code +': ' + prediction.sdg.name + " (" +  (prediction.prediction * 100).toFixed(0) + "%)"
             li.appendChild(link);
             li.appendChild(textContainer);
@@ -66,45 +68,66 @@
     let listContainer = legendContainer.querySelector('ul');
     if (!listContainer) {
       let title = document.createElement('h3');
-      title.textContent = 'Top 3 SDG classifications'
-      legendContainer.appendChild(title)
+      title.textContent = 'Top 3 SDG classifications';
+      legendContainer.appendChild(title);
       listContainer = document.createElement('ul');
       listContainer.style.margin = 0;
       listContainer.style.padding = 0;
       listContainer.style.listStyleType = 'none';
       legendContainer.appendChild(listContainer);
     }
-    let footer = document.createElement("div")
-    footer.style.textAlign = 'center'
-    let auroraLink = document.createElement("a")
-    auroraLink.href = 'https://aurora-universities.eu/'
-    auroraLink.target = '_blank'
-    let auroraLogo = document.createElement("img")
-    auroraLogo.src = 'assets/img/aurora_logo.png'
-    auroraLogo.style.width='100px'
+    let footer = document.createElement("div");
+    footer.style.textAlign = 'center';
+    footer.style.display = 'flex';
+    footer.style.alignItems = 'center';
+    footer.style.justifyContent = 'center';
+    footer.style.gap = '10px';
+
+    let auroraLink = document.createElement("a");
+    auroraLink.className = 'sdg-a';
+    auroraLink.href = 'https://aurora-universities.eu/';
+    auroraLink.target = '_blank';
+    auroraLink.style.display = 'inline-flex';
+    auroraLink.style.alignItems = 'center';
+
+    let auroraLogo = document.createElement("img");
+    auroraLogo.src = 'https://aurora-sdg.labs.vu.nl/assets/img/aurora_logo.png';
+    auroraLogo.style.height = '30px';
+    auroraLogo.style.width = 'auto';
+    auroraLogo.style.objectFit = 'contain';
     auroraLogo.style.verticalAlign = 'middle';
-    auroraLink.appendChild(auroraLogo)
-    const projectLink = document.createElement("a")
-    projectLink.href = "https://aurora-sdg.labs.vu.nl?model=" + chart.options.plugins.htmlLegend.predictionResponse.model + "&text=" + encodeURI(chart.options.plugins.htmlLegend.predictionResponse.text)
-    projectLink.text = '[Learn more]';
-    projectLink.target = '_blank'
-    projectLink.style.color = 'lightgreen'
-    projectLink.style.textAlign = 'center';
-    projectLink.style.marginLeft = '10px'
-    projectLink.style.marginRight = '10px'
-    projectLink.style.verticalAlign = 'middle';
-    let euLink = document.createElement("a")
-    euLink.href = 'https://www.erasmusplus.de/'
-    euLink.target = '_blank'
-    let euLogo = document.createElement("img")
-    euLogo.src = 'https://aurora-sdg.labs.vu.nl/resources/EU-co-funded.jpg'
-    euLogo.style.width='100px'
+    auroraLink.appendChild(auroraLogo);
+
+    const projectLink = document.createElement("a");
+    projectLink.className = 'sdg-a';
+    projectLink.href = "https://aurora-sdg.labs.vu.nl?model=" + chart.options.plugins.htmlLegend.predictionResponse.model + "&text=" + encodeURI(chart.options.plugins.htmlLegend.predictionResponse.text);
+    projectLink.textContent = '[Learn more]';
+    projectLink.target = '_blank';
+    projectLink.style.color = 'lightgreen';
+    projectLink.style.textDecoration = 'none';
+    projectLink.style.display = 'inline-flex';
+    projectLink.style.alignItems = 'center';
+    projectLink.style.height = '30px';
+
+    let euLink = document.createElement("a");
+    euLink.className = 'sdg-a';
+    euLink.href = 'https://www.erasmusplus.de/';
+    euLink.target = '_blank';
+    euLink.style.display = 'inline-flex';
+    euLink.style.alignItems = 'center';
+
+    let euLogo = document.createElement("img");
+    euLogo.src = 'https://aurora-sdg.labs.vu.nl/resources/EU-co-funded.jpg';
+    euLogo.style.height = '30px';
+    euLogo.style.width = 'auto';
+    euLogo.style.objectFit = 'contain';
     euLogo.style.verticalAlign = 'middle';
-    euLink.appendChild(euLogo)
-    footer.appendChild(projectLink)
-    footer.appendChild(auroraLink)
-    footer.appendChild(euLink)
-    legendContainer.appendChild(footer)
+    euLink.appendChild(euLogo);
+
+    footer.appendChild(projectLink);
+    footer.appendChild(auroraLink);
+    footer.appendChild(euLink);
+    legendContainer.appendChild(footer);
     return listContainer;
   };
 
@@ -113,7 +136,7 @@
       var css_link = $("<link>", {
         type: "text/css",
         rel: "stylesheet",
-        href: "assets/css/widget.css"
+        href: "/widgets/SdgWheel.css"
       });
       css_link.appendTo('head');
       $('.sdg-wheel').each(function (i, div) {
@@ -228,13 +251,13 @@
   }
 
   /* Load jQuery */
-  loadScript("https://aurora-sdg.labs.vu.nl/resources/jquery.min.js", function () {
-    /* load Chart.js */
-    loadScript("https://aurora-sdg.labs.vu.nl/resources/chart.min.js", function () {
-      $ = jQuery = window.jQuery.noConflict(true);
-      main(); /* Execute the main logic of our widget once jQuery is loaded */
-    });
-  });
+  // loadScript("https://aurora-sdg.labs.vu.nl/resources/jquery.min.js", function () {
+  //   /* load Chart.js */
+  //   loadScript("https://aurora-sdg.labs.vu.nl/resources/chart.min.js", function () {
+  //     $ = jQuery = window.jQuery.noConflict(true);
+  //     main(); /* Execute the main logic of our widget once jQuery is loaded */
+  //   });
+  // });
 
   // Our addition, globally expose the setup function
   window._init_sdg_badge = function () {

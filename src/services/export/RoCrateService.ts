@@ -25,6 +25,12 @@ export class RoCrateService extends BaseService {
     ) {
         const exportId = crypto.randomUUID();
 
+        const accessTokenResponse = 
+            await super.sendRequest(axios.get, `sse/access-token?exportId=${exportId}`);
+        if (!accessTokenResponse.data) {
+            return;
+        }
+
         const downloadStore = useDownloadStore();
         if (downloadStore.isDownloading) {
             return;
@@ -32,7 +38,10 @@ export class RoCrateService extends BaseService {
 
         downloadStore.downloadProgressRef?.startDownload(filename);
 
-        const sse = new EventSource(this.basePath + `sse/progress/${exportId}`);
+        const sse = new EventSource(this.basePath + 
+            `sse/progress/${exportId}?accessToken=${accessTokenResponse.data}`
+        );
+        
         sse.addEventListener("progress", e => {
             const progress = JSON.parse(e.data);
             downloadStore.downloadProgressRef?.setMessage(progress.stage);

@@ -32,6 +32,10 @@ export default defineComponent({
         researchAreasHierarchy: {
             type: Object as PropType<ResearchArea[] | undefined>,
             required: true
+        },
+        submitOnClick: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -156,6 +160,10 @@ export default defineComponent({
                 if (node) {
                     selectParentHierarchy(node);
                 }
+            }
+
+            if (props.submitOnClick) {
+                submitSelection();
             }
         };
 

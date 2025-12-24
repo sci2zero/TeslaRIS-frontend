@@ -689,6 +689,7 @@ export default {
     commissionReportsLabel: "Izveštaji komisije",
     onPublicReviewLabel: "Završni rad je na javnom uvidu do {0}",
     putOnPublicReviewLabel: "Postavi na uvid javnosti",
+    putOnPublicReviewShortenedLabel: "Postavi na skraćeni uvid javnosti",
     removeFromPublicReviewLabel: "Skloni sa javnog uvida",
     missingAttachmentsMessage: "Broj preliminarnih dokumenata, dodataka i izveštaja sa konferencije nije jednak.",
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",

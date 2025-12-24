@@ -204,7 +204,7 @@ export default defineComponent({
 
         watch(() => props.description, async () => {
             if (props.description) {
-                await loadScript("/src/utils/SdgWheel.js");
+                await loadScript("/widgets/SdgWheel.js");
                 if ((typeof window) !== "undefined" && (window as any)._init_sdg_badge) {
                     (window as any)._init_sdg_badge();
                 }
