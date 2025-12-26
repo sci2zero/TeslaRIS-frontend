@@ -94,5 +94,7 @@ export default {
     jciValueLabel: "JCI број",
     jciPercentileLabel: "JCI перцентил",
     downloadRoCrateLabel: "Преузми као Ro-Crate",
-    downloadRoCrateBibliographyLabel: "Преузми библиографију (Ro-Crate)"
+    downloadRoCrateBibliographyLabel: "Преузми библиографију (Ro-Crate)",
+    calculateIf5RankLabel: "Израчунај IF5 ранк",
+    calculateJciRankLabel: "Израчунај JCI ранк"
 };

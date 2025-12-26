@@ -1246,5 +1246,7 @@ export default {
     downloadRoCrateBibliographyLabel: "Download bibliography (Ro-Crate)",
     updateResearchAreasLabel: "Update research areas",
     updateResearchSubAreasLabel: "Update research sub-areas",
-    selectSubAreasLabel: "Choose research sub-areas:"
+    selectSubAreasLabel: "Choose research sub-areas:",
+    calculateIf5RankLabel: "Calculate IF5 rank",
+    calculateJciRankLabel: "Calculate JCI rank"
 }

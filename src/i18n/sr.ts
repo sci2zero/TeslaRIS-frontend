@@ -1254,5 +1254,7 @@ export default {
     downloadRoCrateBibliographyLabel: "Preuzmi bibliografiju (Ro-Crate)",
     updateResearchAreasLabel: "Ažuriraj oblasti istraživanja",
     updateResearchSubAreasLabel: "Ažuriraj pod-oblasti istraživanja",
-    selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:"
+    selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:",
+    calculateIf5RankLabel: "Izračunaj IF5 rank",
+    calculateJciRankLabel: "Izračunaj JCI rank"
 }
