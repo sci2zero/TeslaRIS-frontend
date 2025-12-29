@@ -1256,5 +1256,10 @@ export default {
     updateResearchSubAreasLabel: "Ažuriraj pod-oblasti istraživanja",
     selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:",
     calculateIf5RankLabel: "Izračunaj IF5 rank",
-    calculateJciRankLabel: "Izračunaj JCI rank"
+    calculateJciRankLabel: "Izračunaj JCI rank",
+    showOnlyWithoutProceedingsLabel: "Prikaži samo one bez zbornika",
+    showProceedingsOnlyLabel: "Prikaži samo zbornike",
+    emptyProceedingsOnlyLabel: "Prikaži samo prazne zbornike",
+    createNewTypeTransferProceedingsLabel: "Prebaci u zbornik",
+    createNewTypeTransferJournalLabel: "Prebaci u časopis"
 }

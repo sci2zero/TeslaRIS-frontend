@@ -85,10 +85,10 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="personIndicators?.length > 0" value="indicators">
+            <v-tab v-show="personIndicators?.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="personAssessments?.length > 0" value="assessments">
+            <v-tab value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab value="visualizations">
@@ -443,7 +443,12 @@ export default defineComponent({
 
         const fetchAssessment = (startDate: string, endDate: string) => {
             assessmentsLoading.value = true;
-            EntityClassificationService.fetchPersonAssessment(parseInt(currentRoute.params.id as string), startDate, endDate).then(response => {
+            personAssessments.value.splice(0);
+
+            EntityClassificationService.fetchPersonAssessment(
+                parseInt(currentRoute.params.id as string), 
+                startDate, endDate
+            ).then(response => {
                 personAssessments.value = response.data;
                 assessmentsLoading.value = false;
             });

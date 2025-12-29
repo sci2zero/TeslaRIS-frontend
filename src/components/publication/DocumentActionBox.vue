@@ -52,6 +52,17 @@
                         @click="changeArchiveState(false)">
                         {{ $t("unarchiveLabel") }}
                     </v-btn>
+                    <generic-crud-modal
+                        v-if="isAdmin && transferTo"
+                        class="ml-2"
+                        :form-component="PublicationTypeTransferForm"
+                        :form-props="{ documentId: documentId, transferTo: transferTo }"
+                        :entity-name="'TypeTransfer' + typeTransferSuffix"
+                        :read-only="false"
+                        outlined
+                        primary-color
+                        compact
+                    />
                 </div>
             </v-col>
             <v-col cols="12" sm="6" class="action-section">
@@ -74,17 +85,19 @@ import CitationSelector from '@/components/publication/CitationSelector.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
-import type { Document } from '@/models/PublicationModel';
+import type { Document, PublicationType } from '@/models/PublicationModel';
 import { commitArchiveStateChange } from '@/utils/DocumentUtil';
 import Toast from '../core/Toast.vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
 import RoCrateService from '@/services/export/RoCrateService';
+import PublicationTypeTransferForm from './PublicationTypeTransferForm.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "DocumentActionBox",
-    components: { CitationSelector, PublicationBadgeSection, Toast, PublicationUnbindButton },
+    components: { CitationSelector, PublicationBadgeSection, Toast, PublicationUnbindButton, GenericCrudModal },
     props: {
         documentId: {
             type: Number,
@@ -133,6 +146,14 @@ export default defineComponent({
         handleResearcherUnbind: {
             type: Function as PropType<((...args: any[]) => any)>,
             default: () => {}
+        },
+        transferTo: {
+            type: Object as PropType<PublicationType | undefined>,
+            default: undefined
+        },
+        typeTransferSuffix: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update"],
@@ -193,7 +214,8 @@ export default defineComponent({
             isAdmin, isInstitutionalEditor,
             changeArchiveState, snackbar,
             snackbarMessage, isResearcher,
-            isUserLoggedIn, downloadRoCrate
+            isUserLoggedIn, downloadRoCrate,
+            PublicationTypeTransferForm
         };
 }})
 

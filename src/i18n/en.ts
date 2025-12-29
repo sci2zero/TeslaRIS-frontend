@@ -1248,5 +1248,10 @@ export default {
     updateResearchSubAreasLabel: "Update research sub-areas",
     selectSubAreasLabel: "Choose research sub-areas:",
     calculateIf5RankLabel: "Calculate IF5 rank",
-    calculateJciRankLabel: "Calculate JCI rank"
+    calculateJciRankLabel: "Calculate JCI rank",
+    showOnlyWithoutProceedingsLabel: "Show only those without proceedings",
+    showProceedingsOnlyLabel: "Show only proceedings",
+    emptyProceedingsOnlyLabel: "Show only empty proceedings",
+    createNewTypeTransferProceedingsLabel: "Transfer to proceedings",
+    createNewTypeTransferJournalLabel: "Transfer to journal"
 }
