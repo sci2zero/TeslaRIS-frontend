@@ -789,6 +789,8 @@ export default defineComponent({
                     return 'mdi-book-open';
                 case 'THESIS':
                     return 'mdi-school';
+                case 'MATERIAL_PRODUCT':
+                    return 'mdi-hammer-wrench';
                 default:
                     return 'mdi-file-document';
             }

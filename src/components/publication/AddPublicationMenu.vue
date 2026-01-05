@@ -64,6 +64,7 @@ export default defineComponent({
         const createNewMonographLabel = computed(() => i18n.t("createNewMonographLabel"));
         const addMonographPublicationLabel = computed(() => i18n.t("addMonographPublicationLabel"));
         const addThesisLabel = computed(() => i18n.t("addThesisLabel"));
+        const addMaterialProductLabel = computed(() => i18n.t("addMaterialProductLabel"));
 
         const submissionMenuItems = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
@@ -74,6 +75,7 @@ export default defineComponent({
             { title: addPatentLabel, value: "submitPatent" },
             { title: addSoftwareLabel, value: "submitSoftware" },
             { title: addDatasetLabel, value: "submitDataset" },
+            { title: addMaterialProductLabel, value: "submitMaterialProduct" }
         ]);
 
         return {

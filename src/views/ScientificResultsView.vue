@@ -61,7 +61,12 @@
             @switch-page="switchPage">
             <template #top-left>
                 <div class="flex items-center gap-1">
-                    <search-bar-component v-if="currentTab === 'simpleSearch'" :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                    <search-bar-component
+                        v-if="currentTab === 'simpleSearch'"
+                        :transparent="false"
+                        size="small"
+                        @search="clearSortAndPerformSearch($event)"
+                    />
                     <v-btn
                         v-if="currentTab === 'simpleSearch'"
                         variant="text"
@@ -175,7 +180,7 @@
                                 class="w-full"
                                 color="primary"
                                 @update:model-value="togglePublicationType(type, !!$event)"
-                            ></v-checkbox>
+                            />
                         </div>
                     </div>
                 </div>

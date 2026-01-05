@@ -21,6 +21,8 @@ export const getMetadataComparisonPageName = (type: PublicationType): string => 
             return "monographPublicationMetadataComparator"
         case "THESIS":
             return "thesisMetadataComparator"
+        case "MATERIAL_PRODUCT":
+            return "materialProductMetadataComparator"
     }
     return "";
 };
@@ -56,6 +58,8 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
             return "scientific-results/monograph-publication/";
         case "THESIS":
             return "scientific-results/thesis/";
+        case "MATERIAL_PRODUCT":
+            return "scientific-results/material-product/";
     }
     return "";
 };
@@ -80,6 +84,8 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "monographPublicationLandingPage";
         case "THESIS":
             return "thesisLandingPage";
+        case "MATERIAL_PRODUCT":
+            return "materialProductLandingPage";
     }
     return "";
 };

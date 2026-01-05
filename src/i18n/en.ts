@@ -1253,5 +1253,10 @@ export default {
     showProceedingsOnlyLabel: "Show only proceedings",
     emptyProceedingsOnlyLabel: "Show only empty proceedings",
     createNewTypeTransferProceedingsLabel: "Transfer to proceedings",
-    createNewTypeTransferJournalLabel: "Transfer to journal"
+    createNewTypeTransferJournalLabel: "Transfer to journal",
+    addMaterialProductLabel: "Material product",
+    materialProductTypeLabel: "Material product type",
+    numberProducedLabel: "Number of units produced",
+    productUsersLabel: "Product users",
+    materialProductLabel: "Material product"
 }

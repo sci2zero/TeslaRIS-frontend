@@ -108,6 +108,8 @@ import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDis
 import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
+import SubmitMaterialProductView from "@/views/SubmitMaterialProductView.vue";
+import MaterialProductLandingView from "@/views/landingPages/MaterialProductLandingView.vue";
 
 
 const roles = {
@@ -669,6 +671,38 @@ const router = createRouter({
                                         authorities: [roles.admin, roles.institutionalEditor],
                                     },
                                 },
+                            ]
+                        },
+                        {
+                            path: "material-product",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "materialProductLandingPage",
+                                    component: MaterialProductLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-material-product",
+                                    name: "submitMaterialProduct",
+                                    component: SubmitMaterialProductView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                // {
+                                //     path: 'metadata-comparator/:leftId/:rightId',
+                                //     name: "materialProductMetadataComparator",
+                                //     component: MaterialProductMetadataComparatorView,
+                                //     meta: {
+                                //         authenticated: true,
+                                //         authorities: [roles.admin, roles.institutionalEditor],
+                                //     },
+                                // },
                             ]
                         },
                         {

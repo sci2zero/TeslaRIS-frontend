@@ -2,6 +2,7 @@ import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
+import { type ResearchArea } from "./OrganisationUnitModel";
 import type { PersonContribution } from "./PersonModel";
 
 export interface DocumentPublicationIndex {
@@ -52,7 +53,8 @@ export enum PublicationType {
     SOFTWARE = "SOFTWARE",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
-    THESIS = "THESIS"
+    THESIS = "THESIS",
+    MATERIAL_PRODUCT = "MATERIAL_PRODUCT"
 }
 
 export enum ThesisType {
@@ -216,6 +218,17 @@ export interface Software extends Document {
     authorReprint?: boolean;
 }
 
+export interface MaterialProduct extends Document {
+    internalNumber: string;
+    publisherId?: number;
+    authorReprint?: boolean;
+    numberProduced: number;
+    materialProductType: MaterialProductType;
+    productUsers: MultilingualContent[];
+    researchAreasId: number[];
+    researchAreas?: ResearchArea[];
+}
+
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
@@ -288,6 +301,14 @@ export interface DocumentAffiliationRequest {
 export enum MServiceApplicableTypes {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
+}
+
+export enum MaterialProductType {
+    PROTOTYPE = "PROTOTYPE",
+    INDUSTRIAL_PRODUCT = "INDUSTRIAL_PRODUCT",
+    INFRASTRUCTURE_OBJECT = "INFRASTRUCTURE_OBJECT",
+    DERIVATIVE_WORKS = "DERIVATIVE_WORKS",
+    OTHER = "OTHER"
 }
 
 export interface ThesisLibraryFormatsResponse {

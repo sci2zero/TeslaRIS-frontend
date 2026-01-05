@@ -11,7 +11,8 @@ const publicationTypeEn = [
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Software", value: PublicationType.SOFTWARE },
     { title: "Dataset", value: PublicationType.DATASET },
-    { title: "Proceedings", value: PublicationType.PROCEEDINGS }
+    { title: "Proceedings", value: PublicationType.PROCEEDINGS },
+    { title: "Materijalni proizvod", value: PublicationType.MATERIAL_PRODUCT }
 ];
 
 const publicationTypeSr = [
@@ -23,7 +24,8 @@ const publicationTypeSr = [
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Softver", value: PublicationType.SOFTWARE },
     { title: "Skup podataka", value: PublicationType.DATASET },
-    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS }
+    { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
+    { title: "Material product", value: PublicationType.MATERIAL_PRODUCT }
 ];
 
 export const getTitleFromValue = (value: PublicationType, publicationTypeArray: {title: string, value: PublicationType}[]) => {

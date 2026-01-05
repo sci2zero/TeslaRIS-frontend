@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, DocumentContributionType, type DocumentPublicationIndex, type JournalPublication, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type Software, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { DocumentContributionType, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type Software, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -46,6 +46,10 @@ export class DocumentPublicationService extends BaseService {
 
   async readSoftware(softwareId: number): Promise<AxiosResponse<Software>> {
     return super.sendRequest(axios.get, `software/${softwareId}`);
+  }
+
+  async readMaterialProduct(materialProductId: number): Promise<AxiosResponse<MaterialProduct>> {
+    return super.sendRequest(axios.get, `material-product/${materialProductId}`);
   }
 
   async readDataset(datasetId: number): Promise<AxiosResponse<Dataset>> {
@@ -101,6 +105,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "software", body, DocumentPublicationService.idempotencyKey);
   }
 
+  async createMaterialProduct(body: MaterialProduct): Promise<AxiosResponse<MaterialProduct>> {
+    return super.sendRequest(axios.post, "material-product", body, DocumentPublicationService.idempotencyKey);
+  }
+
   async createDataset(body: Dataset): Promise<AxiosResponse<Dataset>> {
     return super.sendRequest(axios.post, "dataset", body, DocumentPublicationService.idempotencyKey);
   }
@@ -144,6 +152,10 @@ export class DocumentPublicationService extends BaseService {
 
   async updateSoftware(softwareId: number, updatedSoftware: Software): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `software/${softwareId}`, updatedSoftware);
+  }
+
+  async updateMaterialProduct(materialProductId: number, updatedMaterialProduct: MaterialProduct): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `material-product/${materialProductId}`, updatedMaterialProduct);
   }
 
   async updateDataset(datasetId: number, updatedDataset: Dataset): Promise<AxiosResponse<void>> {

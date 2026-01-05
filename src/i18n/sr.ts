@@ -1261,5 +1261,10 @@ export default {
     showProceedingsOnlyLabel: "Prikaži samo zbornike",
     emptyProceedingsOnlyLabel: "Prikaži samo prazne zbornike",
     createNewTypeTransferProceedingsLabel: "Prebaci u zbornik",
-    createNewTypeTransferJournalLabel: "Prebaci u časopis"
+    createNewTypeTransferJournalLabel: "Prebaci u časopis",
+    addMaterialProductLabel: "Materijalni proizvod",
+    materialProductTypeLabel: "Tip materijalnog proizvoda",
+    numberProducedLabel: "Broj proizvedenih jedinica",
+    productUsersLabel: "Korisnici proizvoda",
+    materialProductLabel: "Materijalni proizvod"
 }
