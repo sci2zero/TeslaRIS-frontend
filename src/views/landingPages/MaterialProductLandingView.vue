@@ -39,7 +39,7 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
-                        <!-- <generic-crud-modal
+                        <generic-crud-modal
                             :form-component="MaterialProductUpdateForm"
                             :form-props="{ presetMaterialProduct: materialProduct }"
                             entity-name="MaterialProduct"
@@ -47,7 +47,7 @@
                             is-section-update
                             :read-only="!canEdit || materialProduct?.isArchived"
                             @update="updateBasicInfo"
-                        /> -->
+                        />
 
                         <!-- Basic Info -->
                         <div class="mb-5">
@@ -313,11 +313,13 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
+import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal },
     setup() {
         const currentTab = ref("contributions");
 
@@ -515,7 +517,7 @@ export default defineComponent({
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, isResearcher,
+            updateBasicInfo, isResearcher, MaterialProductUpdateForm,
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,

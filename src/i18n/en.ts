@@ -104,7 +104,9 @@ export default {
         publicDissertationsReport: "Disertations on public review",
         publicationsValidation: "Validation of publications",
         oauth2: "External authorization",
-        authorReprints: "Author reprints"
+        authorReprints: "Author reprints",
+        materialProductMetadataComparator: "Comparing material product metadata",
+        materialProductLandingPage: "Material product"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1258,5 +1260,7 @@ export default {
     materialProductTypeLabel: "Material product type",
     numberProducedLabel: "Number of units produced",
     productUsersLabel: "Product users",
-    materialProductLabel: "Material product"
+    materialProductLabel: "Material product",
+    updateMaterialProductLabel: "Update material product",
+    materialProductMetadataComparatorLabel: "Material product metadata comparison"
 }

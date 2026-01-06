@@ -104,7 +104,9 @@ export default {
         publicDissertationsReport: "Disertacije na javnom uvidu",
         publicationsValidation: "Validacija publikacija",
         oauth2: "Eksterna autorizacija",
-        authorReprints: "Autorski reprinti"
+        authorReprints: "Autorski reprinti",
+        materialProductMetadataComparator: "Poređenje materijalnih proizvoda",
+        materialProductLandingPage: "Materijalni proizvod"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1266,5 +1268,7 @@ export default {
     materialProductTypeLabel: "Tip materijalnog proizvoda",
     numberProducedLabel: "Broj proizvedenih jedinica",
     productUsersLabel: "Korisnici proizvoda",
-    materialProductLabel: "Materijalni proizvod"
+    materialProductLabel: "Materijalni proizvod",
+    updateMaterialProductLabel: "Ažuriraj materijalni proizvod",
+    materialProductMetadataComparatorLabel: "Poređenje materijalnih proizvoda"
 }

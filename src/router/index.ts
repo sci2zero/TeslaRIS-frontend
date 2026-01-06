@@ -110,6 +110,7 @@ import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
 import SubmitMaterialProductView from "@/views/SubmitMaterialProductView.vue";
 import MaterialProductLandingView from "@/views/landingPages/MaterialProductLandingView.vue";
+import MaterialProductMetadataComparatorView from "@/views/comparators/documents/MaterialProductMetadataComparatorView.vue";
 
 
 const roles = {
@@ -694,15 +695,15 @@ const router = createRouter({
                                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                                     },
                                 },
-                                // {
-                                //     path: 'metadata-comparator/:leftId/:rightId',
-                                //     name: "materialProductMetadataComparator",
-                                //     component: MaterialProductMetadataComparatorView,
-                                //     meta: {
-                                //         authenticated: true,
-                                //         authorities: [roles.admin, roles.institutionalEditor],
-                                //     },
-                                // },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "materialProductMetadataComparator",
+                                    component: MaterialProductMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor],
+                                    },
+                                },
                             ]
                         },
                         {
