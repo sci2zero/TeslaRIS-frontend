@@ -361,7 +361,7 @@ export default defineComponent({
                 middleName.value = props.presetContributionValue.selectedOtherName[1];
                 lastName.value = props.presetContributionValue.selectedOtherName[2];
 
-                if(props.presetContributionValue.personId) {
+                if(props.presetContributionValue.personId && !isNaN(props.presetContributionValue.personId)) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
                         personPrimaryName.value = personResponse.data.personName;
                         
@@ -419,7 +419,7 @@ export default defineComponent({
                 return;
             }
 
-            if (selection.value === 0) {
+            if (selection.value === 0 || isNaN(selection.value)) {
                 selectExternalAssociate.value = true;
                 customNameInput.value = true;
                 constructExternalCollaboratorFromInput(selection.title);

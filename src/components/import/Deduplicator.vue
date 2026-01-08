@@ -69,7 +69,7 @@ export default defineComponent({
             if (props.publicationForLoading) {
                 parameters.value = "";
                 props.publicationForLoading.title.forEach(title => {
-                    parameters.value += `titles=${title.content}&`;
+                    parameters.value += `titles=${encodeURIComponent(title.content.replaceAll(",", "%2c").trim())}&`;
                 });
 
                 parameters.value += 

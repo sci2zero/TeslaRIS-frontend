@@ -125,9 +125,13 @@ export default defineComponent({
         });
 
         const searchPotentialMatches = lodash.debounce(() => {
+            if (!props.title || props.title.length === 0) {
+                return;
+            }
+
             let parameters = "";
             props.title.forEach(title => {
-                parameters += `titles=${title.content.trim()}&`;
+                parameters += `titles=${encodeURIComponent(title.content.replaceAll(",", "%2c").trim())}&`;
             });
 
             parameters += 

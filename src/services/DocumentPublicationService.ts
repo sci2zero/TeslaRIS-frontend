@@ -203,6 +203,10 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async readThesis(thesisId: number): Promise<AxiosResponse<Thesis>> {
+    if (isNaN(thesisId) || thesisId <= 0) {
+        throw new Error(`Invalid thesis ID: ${thesisId}. Must be a positive integer.`);
+    }
+
     return super.sendRequest(axios.get, `thesis/${thesisId}`);
   }
 
