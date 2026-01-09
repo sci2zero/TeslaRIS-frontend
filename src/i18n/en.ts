@@ -106,7 +106,9 @@ export default {
         oauth2: "External authorization",
         authorReprints: "Author reprints",
         materialProductMetadataComparator: "Comparing material product metadata",
-        materialProductLandingPage: "Material product"
+        materialProductLandingPage: "Material product details",
+        geneticMaterialLandingPage: "Genetec material details",
+        submitGeneticMaterial: "Dodavanje genetskog materijala"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1263,5 +1265,9 @@ export default {
     materialProductLabel: "Material product",
     updateMaterialProductLabel: "Update material product",
     materialProductMetadataComparatorLabel: "Material product metadata comparison",
-    resourceDeletedMessage: "Requested resource is deleted."
+    resourceDeletedMessage: "Requested resource is deleted.",
+    geneticMaterialLabel: "Genetic material",
+    geneticMaterialTypeLabel: "Genetic material type",
+    addGeneticMaterialLabel: "Add genetic material",
+    updateGeneticMaterialLabel: "Update genetic material"
 }

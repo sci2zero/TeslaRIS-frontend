@@ -110,7 +110,6 @@ export default {
         materialProductLandingPage: "Detalji materijalnog proizvoda",
         geneticMaterialLandingPage: "Detalji genetskog materijala",
         submitGeneticMaterial: "Dodavanje genetskog materijala"
-
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1278,5 +1277,6 @@ export default {
     resourceDeletedMessage: "Traženi resurs je obrisan.",
     geneticMaterialLabel: "Genetski materijal",
     geneticMaterialTypeLabel: "Tip genetskog materijala",
-    addGeneticMaterialLabel: "Dodaj genetski materijal"
+    addGeneticMaterialLabel: "Dodaj genetski materijal",
+    updateGeneticMaterialLabel: "Ažuriraj genetski materijal"
 }
