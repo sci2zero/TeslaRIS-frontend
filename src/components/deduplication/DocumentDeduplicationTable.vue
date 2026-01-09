@@ -38,7 +38,7 @@
                             <span v-if="row.item.leftYear && row.item.leftYear > 0" class="text-xs text-gray-600">{{ row.item.leftYear + (row.item.publicationType ? ", " : "") }}</span>
                             <span v-if="row.item.publicationType" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.leftConcreteType) }}</span>
                         </div>
-                        <div v-if="row.item.leftAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
+                        <div v-if="row.item.leftAuthors && row.item.leftAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
                             <div v-for="(author, index) in row.item.leftAuthors.split(';')" :key="index">
                                 <localized-link
                                     v-if="row.item.leftAuthorIds[index] !== -1"
@@ -69,7 +69,7 @@
                             <span v-if="row.item.rightYear && row.item.rightYear > 0" class="text-xs text-gray-600">{{ row.item.rightYear + (row.item.publicationType ? ", " : "") }}</span>
                             <span v-if="row.item.publicationType" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.rightConcreteType) }}</span>
                         </div>
-                        <div v-if="row.item.rightAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
+                        <div v-if="row.item.rightAuthors && row.item.rightAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
                             <div v-for="(author, index) in row.item.rightAuthors.split(';')" :key="index">
                                 <localized-link
                                     v-if="row.item.rightAuthorIds[index] !== -1"
