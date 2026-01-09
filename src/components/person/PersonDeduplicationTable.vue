@@ -25,7 +25,12 @@
                 <td>{{ displayTextOrPlaceholder(row.item.birthdate.length === 4 ? row.item.birthdate.slice(0, 4) : localiseDate(row.item.birthdate)) }}</td>
                 <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                 <td>
-                    <publications-dialog :button-text="$t('viewPublicationsLabel')" :id-for-fetching="row.item.databaseId" icon="mdi-note" :title="$t('publicationsLabel')"></publications-dialog>
+                    <publications-dialog
+                        :button-text="$t('viewPublicationsLabel')"
+                        :id-for-fetching="row.item.databaseId"
+                        icon="mdi-note"
+                        :title="$t('publicationsLabel')">
+                    </publications-dialog>
                     <v-btn size="small" color="primary" @click="returnSelected ? returnToParent(row.item) : navigateToLandingPage(row.item.databaseId)">
                         {{ $t("selectLabel") }}
                     </v-btn>
@@ -44,10 +49,12 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import lodash from "lodash";
 import { localiseDate } from '@/utils/DateUtil';
+import PublicationsDialog from '../core/PublicationsDialog.vue';
 
 
 export default defineComponent({
     name: "PersonDeduplicationTable",
+    components: { PublicationsDialog },
     props: {
         personFirstName: {
             type: String,
@@ -113,7 +120,7 @@ export default defineComponent({
           { title: organisationUnitLabel, align: "start", sortable: true, key: employmentColumn},
           { title: birthdateLabel, align: "start", sortable: true, key: "birthdate"},
           { title: "ORCID", align: "start", sortable: true, key: "orcid"},
-          { title: actionLabel, align: "start", sortable: false, key: "actions"},
+          { title: actionLabel, align: "start", sortable: false, key: "actions"}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([

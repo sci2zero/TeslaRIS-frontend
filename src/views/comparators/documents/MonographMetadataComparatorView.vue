@@ -89,6 +89,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             :supports-force-delete="(isAdmin as boolean)"
+            aggregated-entities-comparison-page="monographPublicationsComparator"
+            :left-id="(leftMonograph?.id as number)"
+            :right-id="(rightMonograph?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -113,12 +117,13 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -175,39 +180,31 @@ export default defineComponent({
 
             mergeDocumentAttachments(monograph1, monograph2);
 
-            monograph1.monographType = monograph2.monographType;
-            monograph1.eisbn = monograph2.eisbn;
-            monograph2.eisbn = "";
-            monograph1.printISBN = monograph2.printISBN;
-            monograph2.printISBN = "";
-            monograph1.numberOfPages = monograph2.numberOfPages;
-            monograph2.numberOfPages = 0;
-            monograph1.doi = monograph2.doi;
-            monograph2.doi = "";
-            monograph1.scopusId = monograph2.scopusId;
-            monograph2.scopusId = "";
-            monograph1.openAlexId = monograph2.openAlexId;
-            monograph2.openAlexId = "";
-            monograph1.webOfScienceId = monograph2.webOfScienceId;
-            monograph2.webOfScienceId = "";
-            monograph1.documentDate = monograph2.documentDate;
-            monograph1.volume = monograph2.volume;
-            monograph2.volume = "";
-            monograph1.number = monograph2.number;
-            monograph2.number = "";
+            bulkTransferFields(monograph1, monograph2, [
+                { fieldName: "eisbn", emptyValue: "" },
+                { fieldName: "printISBN", emptyValue: "" },
+                { fieldName: "numberOfPages", emptyValue: 0 },
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "volume", emptyValue: "" },
+                { fieldName: "number", emptyValue: "" },
+                { fieldName: "monographType", emptyValue: null, setEmpty: false },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publicationSeriesId", emptyValue: null, setEmpty: false },
+                { fieldName: "researchAreaId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+            ]);
 
-            monograph1.eventId = monograph2.eventId;
-            monograph1.publicationSeriesId = monograph2.publicationSeriesId;
-            monograph1.researchAreaId = monograph2.researchAreaId;
-            monograph1.publisherId = monograph2.publisherId;
-            monograph1.authorReprint = monograph2.authorReprint;
-
-            monograph2.languageTagIds!.forEach(languageTagId => {
-                if (!monograph1.languageTagIds!.includes(languageTagId)) {
-                    monograph1.languageTagIds!.push(languageTagId);
+            monograph2.languageIds!.forEach(languageId => {
+                if (!monograph1.languageIds!.includes(languageId)) {
+                    monograph1.languageIds!.push(languageId);
                 }
             });
-            monograph2.languageTagIds = [];
+            monograph2.languageIds = [];
 
             monograph2.uris!.forEach(uri => {
                 if (!monograph1.uris!.includes(uri)) {
@@ -258,7 +255,7 @@ export default defineComponent({
             leftMonograph.value!.doi = updatedInfo.doi;
             leftMonograph.value!.eisbn = updatedInfo.eisbn;
             leftMonograph.value!.eventId = updatedInfo.eventId;
-            leftMonograph.value!.languageTagIds = updatedInfo.languageTagIds;
+            leftMonograph.value!.languageIds = updatedInfo.languageIds;
             leftMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             leftMonograph.value!.printISBN = updatedInfo.printISBN;
             leftMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -287,7 +284,7 @@ export default defineComponent({
             rightMonograph.value!.doi = updatedInfo.doi;
             rightMonograph.value!.eisbn = updatedInfo.eisbn;
             rightMonograph.value!.eventId = updatedInfo.eventId;
-            rightMonograph.value!.languageTagIds = updatedInfo.languageTagIds;
+            rightMonograph.value!.languageIds = updatedInfo.languageIds;
             rightMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             rightMonograph.value!.printISBN = updatedInfo.printISBN;
             rightMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
@@ -391,7 +388,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

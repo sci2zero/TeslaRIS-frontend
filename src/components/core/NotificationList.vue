@@ -1,12 +1,11 @@
 <template>
     <v-card min-width="150">
         <v-list v-if="notifications.length > 0">
-            <v-list-subheader class="w-100">
-                <div class="d-flex flex-row justify-space-between w-100">
+            <v-list-subheader>
+                <div class="flex flex-row justify-between w-150">
                     <strong>{{ $t("recentNotificationsLabel") }}</strong>
-                    <v-spacer></v-spacer>
                     <v-btn
-                        class="ml-3 mb-1"
+                        class="ml-3! mb-1!"
                         density="compact"
                         color="primary"
                         @click="dismissAllNotifications">
@@ -22,39 +21,41 @@
                 color="secondary"
                 @click="navigateToNotificationPage"
             >
-                <v-row>
-                    <v-col cols="10">
+                <div class="flex items-center justify-between">
+                    <div>
                         <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
-                    </v-col>
-                    <v-col cols="1">
+                        <p class="text-gray-500 text-sm mt-1">
+                            {{ localiseDate(notification.creationTimestamp.split("T")[0]) }} 
+                            ({{ localiseTime(notification.creationTimestamp.split("T")[1].substring(0, 5)) }})
+                        </p>
+                    </div>
+                    <div class="flex justify-center ml-3 mr-1 mb-1 mt-1">
                         <v-list-item-action v-for="(notificationAction, index) in notification.possibleActions" :key="index">
                             <v-btn icon @click.stop="performAction(notification.id, notificationAction)">
-                                <v-icon v-if="notificationAction.toString() === 'APPROVE'">
-                                    mdi-check
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'REMOVE_FROM_PUBLICATION' || notificationAction.toString() === 'REMOVE_EMPLOYEES_FROM_PUBLICATION'">
-                                    mdi-file-remove-outline
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'PERFORM_DEDUPLICATION'">
-                                    mdi-content-duplicate
-                                </v-icon>
-                                <v-icon v-else-if="notificationAction.toString() === 'RETURN_TO_PUBLICATION'">
-                                    mdi-restart
-                                </v-icon>
-                                <v-icon v-else>
-                                    mdi-eye-outline
-                                </v-icon>
+                                <v-tooltip location="bottom">
+                                    <template #activator="{ props: tooltipProps }">
+                                        <v-icon v-bind="tooltipProps">
+                                            {{ getActionIcon(notificationAction) }}
+                                        </v-icon>
+                                    </template>
+                                    <span>{{ getActionTooltip(notificationAction) }}</span>
+                                </v-tooltip>
                             </v-btn>
                         </v-list-item-action>
-                    </v-col>
-                    <v-col cols="1">
-                        <v-list-item-action>
+                        <v-list-item-action class="ml-2">
                             <v-btn icon @click.stop="rejectNotification(notification.id)">
-                                <v-icon>mdi-delete</v-icon>
+                                <v-tooltip location="bottom">
+                                    <template #activator="{ props: tooltipProps }">
+                                        <v-icon v-bind="tooltipProps">
+                                            mdi-close
+                                        </v-icon>
+                                    </template>
+                                    <span>{{ $t("deleteNotificationLabel") }}</span>
+                                </v-tooltip>
                             </v-btn>
                         </v-list-item-action>
-                    </v-col>    
-                </v-row>
+                    </div>  
+                </div>
             </v-list-item>
         </v-list>
 
@@ -66,10 +67,17 @@
             </v-list-item>
         </v-list>
 
-        <h3 v-else class="ml-4 pr-4">
+        <h4 v-else class="ml-4 pr-4">
             {{ $t("noNewNotificationsMessage") }}
-        </h3>
+        </h4>
     </v-card>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="dialogMessage"
+        @continue="continueToAction"
+    />
 </template>
   
 <script lang="ts">
@@ -79,16 +87,27 @@ import NotificationService from '@/services/NotificationService';
 import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { defineComponent, onMounted, ref } from 'vue';  
 import { useRouter } from 'vue-router';
+import PersistentQuestionDialog from './comparators/PersistentQuestionDialog.vue';
+import { useI18n } from 'vue-i18n';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "NotificationList",
+    components: { PersistentQuestionDialog },
     setup() {
         const notifications = ref<Notification[]>([]);
         const notificationCountStore = useNotificationCountStore();
 
         const router = useRouter();
         const loading = ref(false);
+
+        const i18n = useI18n();
+
+        const displayPersistentDialog = ref(false);
+        const dialogMessage = ref("");
+        const selectedNotificationId = ref<number>(0);
+        const selectedNotificationAction = ref<NotificationAction | undefined>();
 
         onMounted(() => {
             loading.value = true;
@@ -97,7 +116,9 @@ export default defineComponent({
 
         const fetchNotificationsAndCounts = () => {
             NotificationService.getAllNotifications().then(response => {
-                notifications.value = response.data;
+                notifications.value = response.data.sort((a, b) => 
+                    new Date(b.creationTimestamp).getTime() - new Date(a.creationTimestamp).getTime()
+                );
                 loading.value = false;
             });
             
@@ -107,14 +128,6 @@ export default defineComponent({
         };
     
         const performAction = (notificationId: number, action: NotificationAction) => {
-            NotificationService.performAction(notificationId, action).then((response) => {
-                removeHandledNotification(notificationId);
-                notificationCountStore.decrementCounter();
-                if (response.data.value) {
-                    router.push('/' + response.data.value);
-                }
-            });
-
             if (action === NotificationAction.PERFORM_DEDUPLICATION) {
                 decrementCounterAndNavigateToPage("deduplication");
             } else if (action === NotificationAction.BROWSE_CLAIMABLE_DOCUMENTS) {
@@ -132,7 +145,41 @@ export default defineComponent({
             } else if (action === NotificationAction.GO_TO_UNBINDED_PUBLICATIONS_PAGE) {
                 notificationCountStore.decrementCounter();
                 router.push({name: "scientificResults", query: {unmanaged: "true"}});
+            } else {
+                const message = getMessageBasedOnAction(notificationId, action);
+                if (!message) {
+                    return;
+                }
+
+                dialogMessage.value = message;
+                selectedNotificationId.value = notificationId;
+                selectedNotificationAction.value = action;
+
+                displayPersistentDialog.value = true;
             }
+        };
+
+        const continueToAction = () => {
+            if (!selectedNotificationAction.value) {
+                return;
+            }
+
+            NotificationService.performAction(
+                selectedNotificationId.value, 
+                selectedNotificationAction.value
+            ).then((response) => {
+                dialogMessage.value = "";
+                
+                removeHandledNotification(selectedNotificationId.value);
+                notificationCountStore.decrementCounter();
+
+                selectedNotificationId.value = 0;
+                selectedNotificationAction.value = undefined;
+
+                if (response.data.value) {
+                    router.push('/' + response.data.value);
+                }
+            });
         };
 
         const decrementCounterAndNavigateToPage = (pageName: string) => {
@@ -162,13 +209,59 @@ export default defineComponent({
             router.push({ name: "notifications" });
         };
 
+        const getMessageBasedOnAction = (notificationId: number, action: NotificationAction) => {
+            const notification = notifications.value.find(n => n.id === notificationId);
+
+            if (!notification) {
+                return null;
+            }
+
+            if (action === NotificationAction.APPROVE) {
+                return i18n.t("addNewOtherNameActionMessage", [notification.displayValue]);   
+            } else if (action === NotificationAction.REMOVE_FROM_PUBLICATION) {
+                return i18n.t("removeFromPublicationActionMessage", [notification.displayValue]);   
+            } else if (action === NotificationAction.REMOVE_EMPLOYEES_FROM_PUBLICATION) {
+                return i18n.t("unbindEmployeesActionMessage", [notification.displayValue]); 
+            } else if (action === NotificationAction.RETURN_TO_PUBLICATION) {
+                return i18n.t("returnToPublicationActionMessage", [notification.displayValue]); 
+            }
+
+            return null;
+        };
+
+        const getActionIcon = (action: NotificationAction) => {
+            switch(action) {
+                case 'APPROVE': return 'mdi-check';
+                case 'REMOVE_FROM_PUBLICATION':
+                case 'REMOVE_EMPLOYEES_FROM_PUBLICATION': 
+                    return 'mdi-file-remove-outline';
+                case 'PERFORM_DEDUPLICATION': return 'mdi-content-duplicate';
+                case 'RETURN_TO_PUBLICATION': return 'mdi-restart';
+                default: return 'mdi-eye-outline';
+            }
+        };
+
+        const getActionTooltip = (action: NotificationAction) => {    
+            switch(action) {
+                case "APPROVE": return i18n.t("addNameVariantLabel");
+                case "REMOVE_FROM_PUBLICATION":
+                case "REMOVE_EMPLOYEES_FROM_PUBLICATION": 
+                    return i18n.t("removeLabel");
+                case "PERFORM_DEDUPLICATION": return i18n.t("performDeduplicationLabel");
+                case "RETURN_TO_PUBLICATION": return i18n.t("returnToPublicationLabel");
+                default: return i18n.t("viewDetailsLabel");
+            }
+        };
+
         return {
-            performAction,
-            notifications,
-            rejectNotification,
-            notificationCountStore,
+            performAction, notifications,
+            rejectNotification, localiseTime,
+            notificationCountStore, getActionIcon,
             navigateToNotificationPage,
-            loading, dismissAllNotifications
+            loading, dismissAllNotifications,
+            displayPersistentDialog, localiseDate,
+            continueToAction, dialogMessage,
+            getActionTooltip
         };
 }});
 </script>

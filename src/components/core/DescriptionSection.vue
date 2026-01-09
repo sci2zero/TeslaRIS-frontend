@@ -5,7 +5,7 @@
                 <v-card-text class="edit-pen-container">
                     <generic-crud-modal
                         :form-component="DescriptionOrBiographyUpdateForm"
-                        :form-props="{ presetDescriptionOrBiography: description ? description : [] }"
+                        :form-props="{ presetDescriptionOrBiography: description ? description : [], placeholderLabel: getSectionTitle() }"
                         :entity-name="getEntityName()"
                         is-update
                         is-section-update
@@ -96,7 +96,7 @@ export default defineComponent({
             } else if (props.isExtendedAbstract) {
                 return i18n.t("extendedAbstractLabel");
             } else if (props.isRemark) {
-                return i18n.t("remarkLabel")
+                return i18n.t("remarkLabel");
             }
 
             return i18n.t("abstractLabel")

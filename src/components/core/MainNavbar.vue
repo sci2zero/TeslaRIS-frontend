@@ -12,7 +12,40 @@
                     @click="toggleSidebar"
                 >
                 </v-btn>
-                <breadcrumbs v-else />
+                <breadcrumbs v-else v-model="navigationDepth" />
+            </div>
+
+            <v-spacer></v-spacer>
+
+            <div
+                v-if="maintenanceModeOn || nextScheduledMaintenance"
+                :class="[
+                    'bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm',
+                    (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'max-w-[400px]' : ''
+                ]">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <svg
+                            class="w-5 h-5 text-amber-600 mt-0.5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                                fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" 
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </div>
+                    <div :class="['flex-1', (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'min-w-0' : '']">
+                        <p
+                            :class="[
+                                'text-amber-800 text-sm leading-6 font-medium',
+                                (showBreadcrumbs && !sidebarStore.isMobile && navigationDepth > 2) ? 'truncate' : ''
+                            ]">
+                            {{ maintenanceModeOn ? $t("maintenanceModeMessage") : $t("scheduledMaintenanceMessage", [nextScheduledMaintenance?.startTime, nextScheduledMaintenance?.approximateEndMoment]) }}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <v-spacer></v-spacer>
@@ -133,6 +166,9 @@ import { useUserRole } from '@/composables/useUserRole';
 import { useBrandingStore } from '@/stores/brandingStore';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import ApplicationConfigurationService from '@/services/ApplicationConfigurationService';
+import { type MaintenanceInformation } from '@/models/Common';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
 
 interface MenuItem {
     title?: ComputedRef<string> | string | undefined;
@@ -160,6 +196,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const appTitle = ref("");
+const navigationDepth = ref(0);
 
 const { userRole } = useUserRole();
 
@@ -189,6 +226,9 @@ const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
 const userName = ref("");
 const router = useRouter();
+
+const maintenanceModeOn = ref(false);
+const nextScheduledMaintenance = ref<MaintenanceInformation | null>(null);
 
 const populateUserData = () => {
     UserService.getLoggedInUser().then((response) => {
@@ -247,6 +287,20 @@ onMounted(() => {
     if (AuthenticationService.userLoggedIn()) {
         populateUserData();
     }
+
+    ApplicationConfigurationService.getIsApplicationInMaintenanceMode().then(response => {
+        maintenanceModeOn.value = response.data;
+
+        if (!maintenanceModeOn.value) {
+            ApplicationConfigurationService.getNextScheduledMaintenance().then(maintenanceInfo => {
+                nextScheduledMaintenance.value = maintenanceInfo.data;
+                if (nextScheduledMaintenance.value) {
+                    const startTimeParts = nextScheduledMaintenance.value.startTime.split("T");
+                    nextScheduledMaintenance.value.startTime = `${localiseDate(startTimeParts[0])} ${localiseTime(startTimeParts[1])}`
+                }
+            });
+        }
+    });
 });
 
 const menuItems = ref<MenuItem[]>([

@@ -5,7 +5,7 @@ export interface Proceedings extends Document {
     eISBN?: string;
     printISBN?: string;
     numberOfPages?: number;
-    languageTagIds?: number[];
+    languageIds?: number[];
     publisherId?: number;
     authorReprint?: boolean;
     publicationSeriesId?: number;

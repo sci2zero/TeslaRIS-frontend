@@ -10,7 +10,9 @@
                         @update="sendToParent">
                     </event-contribution-update-modal>
 
-                    <div v-if="contributionList?.length === 0">
+                    <div
+                        v-if="contributionList?.length === 0"
+                        class="mt-5">
                         <b>{{ $t("participationsLabel") }}</b>
                     </div>
                     <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>

@@ -275,6 +275,7 @@ export default defineComponent({
                     value: ""
                 }
             );
+
             emit("reset");
         };
 

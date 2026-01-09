@@ -103,6 +103,10 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             supports-force-delete
+            aggregated-entities-comparison-page="eventProceedingsComparator"
+            :left-id="(leftConference?.id as number)"
+            :right-id="(rightConference?.id as number)"
+            :entity-type="EntityType.EVENT"
             @update="updateAll"
             @delete="deleteSide">
         </comparison-actions>
@@ -132,6 +136,7 @@ import ComparisonActions from '@/components/core/comparators/ComparisonActions.v
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -203,16 +208,14 @@ export default defineComponent({
             mergeMultilingualContentField(conference1.description, conference2.description);
             conference2.description = [];
 
-            conference1.dateFrom = conference2.dateFrom;
-            conference1.dateTo = conference2.dateTo;
-            conference1.fee = conference2.fee;
-            conference2.fee = "";
-            conference1.number = conference2.number;
-            conference2.number = "";
-            conference1.confId = conference2.confId;
-            conference2.confId = "";
-            conference1.openAlexId = conference2.openAlexId;
-            conference2.openAlexId = "";
+            bulkTransferFields(conference1, conference2, [
+                { fieldName: "dateFrom", emptyValue: null, setEmpty: false },
+                { fieldName: "dateTo", emptyValue: null, setEmpty: false },
+                { fieldName: "fee", emptyValue: "" },
+                { fieldName: "number", emptyValue: "" },
+                { fieldName: "confId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" }
+            ]);
 
             conference2.uris.forEach(uri => {
                 if (!conference1.uris.includes(uri)) {
@@ -374,7 +377,7 @@ export default defineComponent({
             snackbar, snackbarMessage,
             leftConference, rightConference,
             moveAll, updateAll, updateLeft,
-            updateLeftRef, updateRightRef,
+            updateLeftRef, updateRightRef, EntityType,
             updateRight, showStopDialog, deleteSide,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,

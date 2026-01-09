@@ -71,6 +71,8 @@ export interface OrganisationUnitResponse {
     validatingEmailDomainDl: boolean;
     allowingSubdomainsDl: boolean;
     legalEntity: boolean;
+    superInstitutionId: number;
+    superInstitutionName: MultilingualContent[];
 }
 
 export enum OrganisationUnitsRelationType {

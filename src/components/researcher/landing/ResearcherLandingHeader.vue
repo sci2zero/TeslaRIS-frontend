@@ -31,7 +31,13 @@
                 <!-- Affiliation -->
                 <div class="mb-6 lg:mb-8">
                     <p class="text-lg sm:text-xl serif font-semibold text-slate-600 font-sans">
-                        {{ primaryEmployment?.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        <localized-link
+                            v-if="primaryEmployment?.organisationUnitId"
+                            :to="'organisation-units/' + primaryEmployment?.organisationUnitId"
+                            class="font-medium text-gray-900 underline"
+                        >
+                            {{ primaryEmployment?.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        </localized-link>
                     </p>
                     <p class="text-sm text-slate-500 font-sans">
                         {{ primaryEmployment?.employmentPosition ? getEmploymentPositionTitleFromValueAutoLocale(primaryEmployment.employmentPosition) : "" }}
@@ -41,17 +47,6 @@
                 <!-- Academic Identifiers -->
                 <div class="mb-6 flex justify-center lg:justify-start">
                     <div class="space-y-3">
-                        <!-- WOS Number -->
-                        <div v-if="props.person?.personalInfo.webOfScienceResearcherId" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                                <span class="text-white text-sm font-bold">WoS</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Researcher ID (Web of Science)</span>
-                                <span class="text-slate-700 text-sm font-mono">{{ props.person.personalInfo.webOfScienceResearcherId }}</span>
-                            </div>
-                        </div>
-
                         <!-- ORCID -->
                         <div v-if="props.person?.personalInfo.orcid" class="flex items-center justify-start space-x-3">
                             <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
@@ -59,7 +54,13 @@
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">ORCID</span>
-                                <span class="text-slate-700 text-sm font-mono">{{ props.person.personalInfo.orcid }}</span>
+                                <span>
+                                    <identifier-link
+                                        :identifier="props.person.personalInfo.orcid"
+                                        type="orcid"
+                                        compact
+                                    />
+                                </span>
                             </div>
                         </div>
 
@@ -70,7 +71,47 @@
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Scopus Author ID</span>
-                                <span class="text-slate-700 text-sm font-mono">{{ props.person.personalInfo.scopusAuthorId }}</span>
+                                <span>
+                                    <identifier-link
+                                        :identifier="props.person.personalInfo.scopusAuthorId"
+                                        type="scopus_author"
+                                        compact
+                                    />
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- OpenAlex Number -->
+                        <div v-if="props.person?.personalInfo.openAlexId" class="flex items-center justify-start space-x-3">
+                            <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center shadow-md">
+                                <span class="text-black text-sm font-bold">OA</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">OpenAlex ID</span>
+                                <span>
+                                    <identifier-link
+                                        :identifier="props.person.personalInfo.openAlexId"
+                                        type="open_alex"
+                                        compact
+                                    />
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- WOS Number -->
+                        <div v-if="props.person?.personalInfo.webOfScienceResearcherId" class="flex items-center justify-start space-x-3">
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                                <span class="text-white text-sm font-bold">WoS</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Researcher ID (Web of Science)</span>
+                                <span>
+                                    <identifier-link
+                                        :identifier="props.person.personalInfo.webOfScienceResearcherId"
+                                        type="researcher_id"
+                                        compact
+                                    />
+                                </span>
                             </div>
                         </div>
 
@@ -81,7 +122,12 @@
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Email</span>
-                                <identifier-link v-if="person?.personalInfo.contact?.contactEmail" :identifier="person?.personalInfo.contact.contactEmail" type="email"></identifier-link>
+                                <identifier-link
+                                    v-if="person?.personalInfo.contact?.contactEmail"
+                                    :identifier="person?.personalInfo.contact.contactEmail"
+                                    type="email"
+                                    compact
+                                />
                                 <span v-else>-</span>
                             </div>
                         </div>
@@ -423,9 +469,16 @@ const tabs = computed(() => [
     { id: 'personal', name: t('allDetailsLabel') },
 ]);
 
-const primaryEmployment = computed(() => {
-    return props.employments.length > 0 ? props.employments[0] : null;
-});
+const primaryEmployment = computed(() => 
+    props.employments.length > 0 
+        ? props.employments.reduce((a, b) => 
+            (!b.dateFrom ? b : !a.dateFrom ? a : 
+             (!b.dateTo && a.dateTo) ? b : 
+             (b.dateTo && !a.dateTo) ? a :
+             new Date(b.dateFrom || 0) > new Date(a.dateFrom || 0) ? b : a)
+        ) 
+        : null
+);
 
 const activeEmployments = computed(() => {
     return props.employments.filter(employment => !employment.dateTo);

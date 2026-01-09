@@ -130,7 +130,7 @@
                         </v-row>
                         <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">
                             <v-col cols="auto">
-                                <v-btn color="primary" :disabled="!isFormValid" @click="startHarvest">
+                                <v-btn color="primary" :disabled="!isFormValid || harvestStarted" @click="startHarvest">
                                     {{ $t("scanSourcesLabel") }}
                                 </v-btn>
                             </v-col>
@@ -312,6 +312,7 @@ export default defineComponent({
         const harvestComplete = ref(false);
         const numberOfHarvestedDocuments = ref(0);
         const newDocumentsHarvested = ref(0);
+        const harvestStarted = ref(false);
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const selectedPersons = ref<{title: string, value: number}[]>([]);
@@ -429,8 +430,11 @@ export default defineComponent({
             ImportService.startHarvest(
                 startDate.value, endDate.value,
                 selectedOrganisationUnit.value.value
-            ).then(response => {
-                finishLoading(response.data);
+            ).then(() => {
+                loading.value = false;
+                errorMessage.value = i18n.t("harvestStartedMessage");
+                snackbar.value = true;
+                harvestStarted.value = true;
             }).catch((error) => {
                 handleError(error.response.status);
             });
@@ -445,8 +449,11 @@ export default defineComponent({
 
             ImportService.startAuthorCentricInstitutionHarvest(
                 startDate.value, endDate.value, request
-            ).then(response => {
-                finishLoading(response.data);
+            ).then(() => {
+                loading.value = false;
+                errorMessage.value = i18n.t("harvestStartedMessage");
+                harvestStarted.value = true;
+                snackbar.value = true;
             }).catch((error) => {
                 handleError(error.response.status);
             });
@@ -604,7 +611,7 @@ export default defineComponent({
             selectedPersons, researcherSelection, ScheduleHarvestForm,
             scheduleHarvest, scheduledTasks, deleteScheduledHarvestTask,
             oaiSources, skgifSources, scheduleOaiHarvest,
-            scheduleSkgifHarvest
+            scheduleSkgifHarvest, harvestStarted
         };
     },
 });

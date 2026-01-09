@@ -24,9 +24,16 @@
                 <v-card-text>
                     <v-container>
                         <document-file-submission-form
-                            ref="submissionFormRef" :edit="edit" :preset-document-file="presetDocumentFile" :is-proof="isProof"
-                            :allow-licence-selection="allowLicenceSelection" :disable-resource-type-selection="disableResourceTypeSelection"
-                            @create="emitCreateToParent" @update="emitUpdateToParent"></document-file-submission-form>
+                            ref="submissionFormRef"
+                            :edit="edit"
+                            :preset-document-file="presetDocumentFile"
+                            :is-proof="isProof"
+                            :always-open-access="alwaysOpenAccess"
+                            :allow-licence-selection="allowLicenceSelection"
+                            :disable-resource-type-selection="disableResourceTypeSelection"
+                            @create="emitCreateToParent"
+                            @update="emitUpdateToParent"
+                        />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -76,6 +83,10 @@ export default defineComponent({
             default: false
         },
         disableResourceTypeSelection: {
+            type: Boolean,
+            default: false
+        },
+        alwaysOpenAccess: {
             type: Boolean,
             default: false
         }

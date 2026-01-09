@@ -88,6 +88,9 @@
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
+            :left-id="(leftThesis?.id as number)"
+            :right-id="(rightThesis?.id as number)"
+            :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)">
         </comparison-actions>
@@ -113,10 +116,11 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
-import { ComparisonSide } from '@/models/MergeModel';
+import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
+import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 
 export default defineComponent({
@@ -184,42 +188,32 @@ export default defineComponent({
 
             mergeDocumentAttachments(thesis1, thesis2);
 
-            thesis1.organisationUnitId = thesis2.organisationUnitId;
-            thesis1.thesisType = thesis2.thesisType;
-            thesis1.printISBN = thesis2.printISBN;
-            thesis2.printISBN = "";
-            thesis1.eisbn = thesis2.eisbn;
-            thesis2.eisbn = "";
-            thesis1.udc = thesis2.udc;
-            thesis2.udc = "";
-
-            thesis1.numberOfPages = thesis2.numberOfPages;
-            thesis2.numberOfPages = 0;
-            thesis1.numberOfChapters = thesis2.numberOfChapters;
-            thesis2.numberOfChapters = 0;
-            thesis1.numberOfReferences = thesis2.numberOfReferences;
-            thesis2.numberOfReferences = 0;
-            thesis1.numberOfGraphs = thesis2.numberOfGraphs;
-            thesis2.numberOfGraphs = 0;
-            thesis1.numberOfIllustrations = thesis2.numberOfIllustrations;
-            thesis2.numberOfIllustrations = 0;
-            thesis1.numberOfTables = thesis2.numberOfTables;
-            thesis2.numberOfTables = 0;
-            thesis1.numberOfAppendices = thesis2.numberOfAppendices;
-            thesis2.numberOfAppendices = 0;
-            thesis1.doi = thesis2.doi;
-            thesis2.doi = "";
-            thesis1.openAlexId = thesis2.openAlexId;
-            thesis2.openAlexId = "";
-            thesis1.webOfScienceId = thesis2.webOfScienceId;
-            thesis2.webOfScienceId = "";
-            thesis1.scopusId = thesis2.scopusId;
-            thesis2.scopusId = "";
-            thesis1.documentDate = thesis2.documentDate;
-
-            thesis1.eventId = thesis2.eventId;
-            thesis1.publisherId = thesis2.publisherId;
-            thesis1.authorReprint = thesis2.authorReprint;
+            bulkTransferFields(thesis1, thesis2, [
+                { fieldName: "doi", emptyValue: "" },
+                { fieldName: "scopusId", emptyValue: "" },
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "webOfScienceId", emptyValue: "" },
+                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
+                { fieldName: "topicAcceptanceDate", emptyValue: null, setEmpty: false },
+                { fieldName: "thesisDefenceDate", emptyValue: null, setEmpty: false },
+                { fieldName: "organisationUnitId", emptyValue: null, setEmpty: false },
+                { fieldName: "thesisType", emptyValue: null, setEmpty: false },
+                { fieldName: "printISBN", emptyValue: "" },
+                { fieldName: "eisbn", emptyValue: "" },
+                { fieldName: "udc", emptyValue: "" },
+                { fieldName: "numberOfPages", emptyValue: "" },
+                { fieldName: "numberOfChapters", emptyValue: "" },
+                { fieldName: "numberOfReferences", emptyValue: "" },
+                { fieldName: "numberOfGraphs", emptyValue: "" },
+                { fieldName: "numberOfIllustrations", emptyValue: "" },
+                { fieldName: "numberOfTables", emptyValue: "" },
+                { fieldName: "numberOfAppendices", emptyValue: "" },
+                { fieldName: "eventId", emptyValue: null, setEmpty: false },
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
+                { fieldName: "languageId", emptyValue: undefined },
+                { fieldName: "writingLanguageTagId", emptyValue: undefined }
+            ]);
 
             thesis2.uris!.forEach(uri => {
                 if (!thesis1.uris!.includes(uri)) {
@@ -227,12 +221,6 @@ export default defineComponent({
                 }
             });
             thesis2.uris = [];
-
-            thesis1.languageId = thesis2.languageId;
-            thesis2.languageId = undefined;
-
-            thesis1.writingLanguageTagId = thesis2.writingLanguageTagId;
-            thesis2.writingLanguageTagId = undefined;
 
             thesis1.contributions = thesis1.contributions?.concat(thesis2.contributions as PersonDocumentContribution[]);
             thesis2.contributions = [];
@@ -425,7 +413,7 @@ export default defineComponent({
             updateRightKeywordsRef, updateLeftKeywordsRef,
             updateLeftDescription, updateRightDescription,
             updateLeftKeywords, updateRightKeywords,
-            deleteSide
+            deleteSide, EntityType
         };
 }})
 

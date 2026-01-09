@@ -65,12 +65,11 @@ import { type PersonIndex } from '@/models/PersonModel';
 import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { getDocumentLandingPageName } from '@/utils/PathResolutionUtil';
 import { type PropType } from 'vue';
-import { defineProps } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 
-const props = defineProps({
+defineProps({
     leaderboardData: {
         type: Array as PropType<LeaderboardEntry[]>,
         required: true
@@ -106,9 +105,18 @@ const getCardClass = (position: number) => {
     }
 };
 
-const formatValue = (value: number) => {
-    const formatted = new Intl.NumberFormat().format(value)
-    return props.valueSuffix ? `${formatted} ${props.valueSuffix}` : formatted
+const formatValue = (num: number, suffix?: string) => {
+    const rounded = Math.round(num * 10) / 10;
+    
+    const isWholeNumber = rounded % 1 === 0;
+    
+    const options = isWholeNumber 
+        ? { maximumFractionDigits: 0, minimumFractionDigits: 0 }
+        : { maximumFractionDigits: 1, minimumFractionDigits: 1 };
+    
+    const formatted = new Intl.NumberFormat(undefined, options).format(rounded);
+    
+    return suffix ? `${formatted} ${suffix}` : formatted;
 };
 
 const getEntityName = (index: PersonIndex | OrganisationUnitIndex | DocumentPublicationIndex) => {

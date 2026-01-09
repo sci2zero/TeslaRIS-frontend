@@ -72,6 +72,7 @@ export default defineComponent({
         watch(doi, async () => {
             if (doi.value.startsWith("https://doi.org/")) {
                 doi.value = doi.value.replace("https://doi.org/", "");
+                return;
             }
 
             errorMessage.value = "";

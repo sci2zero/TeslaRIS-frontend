@@ -77,7 +77,11 @@ export const mergeMultilingualContentField = (content1: MultilingualContent[] | 
         let merged = false;
         content1.forEach(currentContent => {
             if (currentContent.languageTag === content.languageTag) {
-                currentContent.content += " | " + content.content;
+                if (!content.content.includes("|") && 
+                    !currentContent.content.split("|").map(content => content.trim()).includes(content.content)) {
+                    currentContent.content += " | " + content.content;
+                }
+
                 merged = true;
             }
         });

@@ -23,12 +23,21 @@
             </v-row>
             <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION" justify="center" class="mt-5">
                 <v-col cols="12" md="6">
-                    <journal-autocomplete-search v-model="selectedJournal" required disable-submission></journal-autocomplete-search>
+                    <journal-autocomplete-search
+                        v-model="selectedJournal"
+                        required
+                        disable-submission>
+                    </journal-autocomplete-search>
                 </v-col>
             </v-row>
             <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION" justify="center" class="mt-5">
                 <v-col cols="12" md="6">
-                    <event-autocomplete-search v-model="selectedEvent" required disable-submission return-only-non-serial-events></event-autocomplete-search>
+                    <event-autocomplete-search
+                        v-model="selectedEvent"
+                        required
+                        disable-submission
+                        return-only-non-serial-events>
+                    </event-autocomplete-search>
                 </v-col>
             </v-row>
   
@@ -163,7 +172,7 @@
                             <strong>{{ $t("assessmentReasonLabel") }}:</strong>
                         </v-col>
                         <v-col cols="12" md="8">
-                            {{ returnCurrentLocaleContent(assessmentResponse?.assessmentReason) }}
+                            {{ returnCurrentLocaleContent(assessmentResponse?.assessmentReason)?.replace("§", " ") }}
                         </v-col>
                     </v-row>
 
@@ -391,7 +400,9 @@ export default defineComponent({
 
         const fetchIFTableData = (fromYear: number, toYear: number) => {
             if (loginStore.userLoggedIn) {
-                EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(selectedJournal.value.value, fromYear, toYear).then(response => {
+                EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(
+                    selectedJournal.value.value, fromYear, toYear
+                ).then(response => {
                     ifTableData.value = response.data;
                 });       
             }

@@ -73,7 +73,7 @@
         </v-col>
     </v-row>
     <v-btn
-        v-if="allowExternalAssociate && selectExternalAssociate"
+        v-if="selectExternalAssociate"
         color="primary"
         class="text-body-2 mb-2"
         @click="toggleExternalSelection">
@@ -101,7 +101,7 @@
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
     </v-row>
-    <v-row v-if="personOtherNames.length > 0 && !selectExternalAssociate">
+    <v-row v-if="personOtherNames.length > 0 && personAffiliations.length > 0 && !selectExternalAssociate">
         <v-col>
             <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU; sendContentToParent();">
                 {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
@@ -142,6 +142,9 @@ import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
 import { useUserRole } from "@/composables/useUserRole";
 import UserService from "@/services/UserService";
+import { useRoute } from "vue-router";
+import { type PersonUserResponse } from "@/models/PersonUserModel";
+import { type AxiosResponse } from "axios";
 
 
 export default defineComponent({
@@ -188,7 +191,7 @@ export default defineComponent({
     },
     emits: ["setInput"],
     setup(props, {emit}) {
-        const { canUserAddPersons, isResearcher } = useUserRole();
+        const { canUserAddPersons, isResearcher, isAdmin, isInstitutionalEditor } = useUserRole();
 
         const contributionDescription = ref([]);
         const affiliationStatement = ref([]);
@@ -243,8 +246,11 @@ export default defineComponent({
             displayTopCollaboratorPicks();
         });
 
+        const route = useRoute();
+
         const displayTopCollaboratorPicks = async () => {
-            if (isResearcher.value && props.showTopSuggestions) {
+            const researcherId = route.query.researcherId;
+            if ((isResearcher.value || researcherId) && props.showTopSuggestions) {
                 topContributors.value.splice(0);
 
                 const loggedInUser = await UserService.getLoggedInUser();
@@ -255,15 +261,31 @@ export default defineComponent({
                             b: loggedInUser?.data.personId as number
                         }
                     );
-                }
 
-                PersonService.getTopCollaborators().then(response => {
-                    response.data.forEach(collaborator => {
-                        if (props.suggestionDisplayCheck(collaborator.b)) {
-                            topContributors.value.push(collaborator)
-                        }
+                    PersonService.getTopCollaborators().then(response => {
+                        response.data.forEach(collaborator => {
+                            if (props.suggestionDisplayCheck(collaborator.b)) {
+                                topContributors.value.push(collaborator);
+                            }
+                        });
                     });
-                });
+                } else if ((isAdmin.value || isInstitutionalEditor.value) && researcherId) {
+                    const personId = parseInt(researcherId as string);
+                    PersonService.getPersonWithUser(personId).then((response: AxiosResponse<PersonUserResponse>) => {
+                        topContributors.value.push(
+                            {
+                                a: `${response.data.personName.firstname as string} ${response.data.personName.lastname as string}`,
+                                b: personId
+                            }
+                        );
+
+                        PersonService.getTopCollaborators(personId).then(response => {
+                            response.data.forEach(collaborator => {
+                                topContributors.value.push(collaborator);
+                            });
+                        });
+                    });
+                }
             }
         };
 
@@ -345,7 +367,7 @@ export default defineComponent({
                         
                         selectedPerson.value = {title: `${constructDisplayName(personResponse.data.personName)}`, value: personResponse.data.id as number};
 
-                        personOtherNames.value = [{title: selectedPerson.value.title, value: -1}];
+                        personOtherNames.value = [{title: selectedPerson.value.title, value: personResponse.data.personName}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
                             if (otherName.dateFrom) {
                                 personOtherNames.value.push({title: `${constructDisplayName(otherName)} | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}`, value: otherName as PersonName});
@@ -355,7 +377,7 @@ export default defineComponent({
                         });
 
                         const foundName = personOtherNames.value.find(otherName => {
-                            return otherName.title === selectedPersonName;
+                            return otherName.title.replaceAll("(", "").replaceAll(")", "") === selectedPersonName;
                         });
 
                         if(foundName) {
@@ -408,19 +430,21 @@ export default defineComponent({
             PersonService.readPerson(selection.value).then((response) => {
                 personPrimaryName.value = response.data.personName;
                 personOtherNames.value = [
-                    {title: constructDisplayName(response.data.personName), value: -1}
+                    {title: constructDisplayName(response.data.personName), value: response.data.personName}
                 ];
+
                 selectedOtherName.value = personOtherNames.value[0];
                 response.data.personOtherNames.forEach((otherName) => {
                     personOtherNames.value.push({title: `${constructDisplayName(otherName)}` + (otherName.dateFrom ? ` | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}` : ""), value: otherName as PersonName})
                 });
+
+                sendContentToParent();
             });
-            sendContentToParent();
         };
 
         const constructDisplayName = (name: PersonName): string => {
             if (name.otherName && name.otherName.trim() !== "") {
-                return `${name.firstname} ${name.otherName} ${name.lastname}`;
+                return `${name.firstname} (${name.otherName}) ${name.lastname}`;
             }
 
             return `${name.firstname} ${name.lastname}`;
@@ -533,6 +557,10 @@ export default defineComponent({
                     }
 
                     sendContentToParent();
+                }
+
+                if (personAffiliations.value.length === 0) {
+                    enterExternalOU.value = true;
                 }
             });
         });

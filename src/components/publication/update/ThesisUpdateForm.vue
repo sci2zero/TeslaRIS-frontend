@@ -73,7 +73,7 @@
                     color="primary"
                 ></date-picker>
             </v-col>
-            <v-col v-show="presetThesis?.publicReviewCompleted" cols="6">
+            <v-col v-show="!isOrganisationUnitDLClient || presetThesis?.publicReviewCompleted || isAdmin || isHeadOfLibrary" cols="6">
                 <date-picker
                     v-model="thesisDefenceDate"
                     :label="$t('defenceDateLabel')"
@@ -220,7 +220,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)">
                 <v-select
                     v-model="selectedWritingLanguage"
                     :label="$t('writingLanguageLabel')"
@@ -334,7 +334,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
-        const { isAdmin, isInstitutionalLibrarian } = useUserRole();
+        const { isAdmin, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
         const canAddAsNonReference = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
 
         const { languageTags } = useLanguageTags();
@@ -343,14 +343,22 @@ export default defineComponent({
         const selectedLanguage = ref<number>(props.presetThesis?.languageId as number);
         const selectedWritingLanguage = ref<{title: string, value: number}>();
         const languages = ref<LanguageResponse[]>();
+        const isOrganisationUnitDLClient = ref(false);
+
+        const languagesWithMoreWritingSystems = ref<number[]>([]);
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
                 languages.value = response.data;
+                languagesWithMoreWritingSystems.value.splice(0);
                 response.data.forEach((language: LanguageResponse) => {
                     languageList.value.push(
                         {title: `${returnCurrentLocaleContent(language.name)} (${language.languageCode})`, value: language.id}
                     );
+
+                    if (language.languageCode === "SR") {
+                        languagesWithMoreWritingSystems.value.push(language.id);
+                    }
                 });
             });
             
@@ -361,11 +369,15 @@ export default defineComponent({
             if(props.presetThesis) {
                 if (props.presetThesis.organisationUnitId) {
                     OrganisationUnitService.readOU(props.presetThesis.organisationUnitId).then((response) => {
-                        selectedOrganisationUnit.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number}
+                        selectedOrganisationUnit.value = {
+                            title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number
+                        };
+                        isOrganisationUnitDLClient.value = response.data.clientInstitutionDl;
                     });
                 } else {
                     externalOUName.value = props.presetThesis?.externalOrganisationUnitName as MultilingualContent[];
                     enterExternalOU.value = true;
+                    isOrganisationUnitDLClient.value = false;
                 }
 
                 if (props.presetThesis?.publisherId) {
@@ -500,7 +512,7 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 languageId: selectedLanguage.value,
-                writingLanguageTagId: selectedWritingLanguage.value?.value as number,
+                writingLanguageTagId: languagesWithMoreWritingSystems.value.includes(selectedLanguage.value) ? selectedWritingLanguage.value?.value as number : undefined,
                 fileItems: [],
                 proofs: [],
                 topicAcceptanceDate: topicAcceptanceDate.value,
@@ -574,7 +586,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle, urisRef,
-            publicationYear, doi, message, snackbar,
+            publicationYear, doi, message, snackbar, isAdmin,
             numberOfPages, selectedPublisher, languageTagsList,
             uris, requiredFieldRules, requiredSelectionRules,
             submit, toMultilingualTextInput, selectedWritingLanguage,
@@ -590,7 +602,8 @@ export default defineComponent({
             numberOfIllustrations, numberOfGraphs, numberOfAppendices,
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
-            scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules
+            scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules,
+            isOrganisationUnitDLClient, isHeadOfLibrary, languagesWithMoreWritingSystems
         };
     }
 });

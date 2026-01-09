@@ -124,7 +124,7 @@ export default defineComponent({
             let displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
 
             if (entityClassification.assessmentReason.length > 0) {
-                displayValue += " " + returnCurrentLocaleContent(entityClassification.assessmentReason);
+                displayValue += " " + returnCurrentLocaleContent(entityClassification.assessmentReason)?.split("§")[1];
             }
 
             const title = buildDisplayTitle(entityClassification);

@@ -4,7 +4,7 @@
         :group="dragGroup" 
         :disabled="!inComparator"
     >
-        <div v-for="(involvement, index) in involvements" :key="index" class="py-5">
+        <div v-for="(involvement, index) in sortedInvolvements" :key="index" class="py-5">
             <!-- <v-menu
                 v-if="canEdit"
                 v-model="menus[index]"
@@ -95,7 +95,7 @@ import type { Education, Employment, Membership } from '@/models/InvolvementMode
 import { EmploymentPosition, type PersonResponse } from '@/models/PersonModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import PersonInvolvementModal from './PersonInvolvementModal.vue';
 import AttachmentList from '@/components/core/AttachmentList.vue';
 import InvolvementService from '@/services/InvolvementService';
@@ -194,11 +194,25 @@ export default defineComponent({
             }
         };
 
-        return { returnCurrentLocaleContent, addInvolvementProof, menus,
+        const sortedInvolvements = computed(() => {
+            if (!props.involvements) return [];
+            
+            return [...props.involvements].sort((a, b) => {
+                if (a.dateFrom === null && b.dateFrom === null) return 0;
+                if (a.dateFrom === null) return -1;
+                if (b.dateFrom === null) return 1;
+                
+                return b.dateFrom.localeCompare(a.dateFrom);
+            });
+        });
+
+        return { 
+            returnCurrentLocaleContent, addInvolvementProof, menus,
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
             localiseDate, getEmploymentPositionTitleFromValueAutoLocale,
-            EmploymentPosition };
+            EmploymentPosition, sortedInvolvements
+        };
     }
 });
 </script>

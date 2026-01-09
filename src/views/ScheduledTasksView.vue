@@ -15,7 +15,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -133,6 +133,15 @@
                     v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
                     :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
             </v-col>
+            <v-col v-if="maintenance" cols="12" md="4">
+                <v-text-field
+                    v-model="approximateEndMoment"
+                    :label="$t('approximateEndMomentLabel') + '*'"
+                    :placeholder="$t('approximateEndMomentLabel')"
+                    outlined
+                    :rules="requiredFieldRules">
+                </v-text-field>
+            </v-col>
         </v-row>
         <v-row
             v-if="taskReindexing && reindexingDocuments"
@@ -192,7 +201,11 @@
         </v-row>
     </v-form>
 
-    <scheduled-tasks-list :scheduled-tasks="scheduledTasks" @delete="deleteScheduledLoadTask"></scheduled-tasks-list>
+    <scheduled-tasks-list
+        class="mt-10! mb-5!"
+        :scheduled-tasks="scheduledTasks"
+        @delete="deleteScheduledLoadTask">
+    </scheduled-tasks-list>
 
     <toast v-model="snackbar" :message="message" />
 </template>
@@ -228,6 +241,7 @@ import { getRecurrenceTypesForGivenLocale, getRecurrenceTypeTitleFromValueAutoLo
 import { RecurrenceType } from "@/models/LoadModel";
 import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
 import { getPublicationTypesForGivenLocale } from "@/i18n/publicationType";
+import ApplicationConfigurationService from "@/services/ApplicationConfigurationService";
 
 
 export default defineComponent({
@@ -238,8 +252,12 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
 
-        const scheduleDate = ref();
-        const scheduledTime = ref();
+        const now = new Date();
+        const fiveMinutesLater = new Date(
+            now.getTime() + 5 * 60000 - (now.getTimezoneOffset() * 60000)
+        );
+        const scheduleDate = ref(fiveMinutesLater.toISOString().split('T')[0]);
+        const scheduledTime = ref(fiveMinutesLater.toISOString().split('T')[1].slice(0, 5));
 
         const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
 
@@ -254,7 +272,8 @@ export default defineComponent({
 
         const {
             requiredSelectionRules, requiredMultiSelectionRules,
-            requiredNumericGreaterThanZeroFieldRules
+            requiredNumericGreaterThanZeroFieldRules,
+            requiredFieldRules
         } = useValidationUtils();
 
         const i18n = useI18n();
@@ -268,13 +287,16 @@ export default defineComponent({
         const taskReindexing = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REINDEXING);
         const taskUnmanagedDocumentsDeletion = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION);
         const taskIndicatorLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.INDICATOR_LOAD);
-        const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_COMPUTATION);
+        const taskIF5Computation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.IF5_JCI_COMPUTATION);
         const taskClassificationComputation = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_COMPUTATION);
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
         const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
         const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
+        const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
+
+        const approximateEndMoment = ref<string>("");
 
         const years = ref<number[]>([]);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
@@ -381,9 +403,9 @@ export default defineComponent({
                     );
                     break;
 
-                case ScheduledTaskType.IF5_COMPUTATION:
+                case ScheduledTaskType.IF5_JCI_COMPUTATION:
                     scheduleTask(() => 
-                        TaskManagerService.scheduleIF5RankComputationTask(
+                        TaskManagerService.scheduleIF5AndJCIRankComputationTask(
                             timestamp, selectedYears.value
                         )
                     );
@@ -476,6 +498,14 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.MAINTENANCE:
+                    scheduleTask(() => 
+                        ApplicationConfigurationService.scheduleMaintenence(
+                            timestamp, approximateEndMoment.value
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -551,7 +581,8 @@ export default defineComponent({
             taskUnmanagedDocumentsDeletion, publicationTypes,
             publicReviewEndCheck, selectedThesisTypes,
             requiredNumericGreaterThanZeroFieldRules,
-            selectedPublicationType
+            selectedPublicationType, maintenance,
+            approximateEndMoment, requiredFieldRules
         };
     },
 });

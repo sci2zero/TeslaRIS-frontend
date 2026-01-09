@@ -19,7 +19,11 @@
 
     <v-tabs-window v-model="currentTab">
         <v-tabs-window-item value="simpleSearch">
-            <search-bar-component class="mt-4" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+            <div class="flex flex-row justify-center mt-4">
+                <search-bar-component
+                    @search="clearSortAndPerformSearch($event)">
+                </search-bar-component>
+            </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="advancedSearch">
             <query-input-component
@@ -30,8 +34,8 @@
         </v-tabs-window-item>
     </v-tabs-window>
 
-    <v-row class="d-flex flex-row justify-center">
-        <v-col cols="12" sm="10" class="justify-start">
+    <v-row class="d-flex flex-row justify-center align-center mt-10!">
+        <v-col cols="12" sm="10" class="d-flex align-center items-end">
             <filter-bar-component
                 ref="filtersRef"
                 :filter-component="ThesisFilters"
@@ -39,14 +43,17 @@
                 @apply-filters="search(searchParams)"
                 @reset="search(searchParams)">
             </filter-bar-component>
-            <v-select 
-                v-model="showWordcloud"
-                class="bottom-spacer ml-4 result-representation"
-                :items="[{title: $t('tableLabel'), value: false}, {title: $t('wordcloudLabel'), value: true}]"
-                item-value="value"
-                :label="$t('resultRepresentationLabel')" 
-                dense
-            />
+            <div class="w-52">
+                <v-select 
+                    v-model="showWordcloud"
+                    class="bottom-spacer result-representation"
+                    :items="[{title: $t('tableLabel'), value: false}, {title: $t('wordcloudLabel'), value: true}]"
+                    item-value="value"
+                    :label="$t('resultRepresentationLabel')" 
+                    dense
+                    hide-details
+                />
+            </div>
         </v-col>
     </v-row>
 
@@ -230,9 +237,9 @@ export default defineComponent({
         };
 
         const resetFiltersAndSearch = () => {
-            filtersRef.value?.resetFilters();
+            filtersRef.value?.resetFilters(false);
             filtersRef.value!.isExpanded = false;
-            search([]);
+            search(["*"]);
         };
 
         return {
@@ -260,7 +267,8 @@ export default defineComponent({
 <style scoped>
 
 .result-representation {
-    max-width: 200px;
+    max-width: 300px;
+    width: 100%;
 }
 
 </style>
