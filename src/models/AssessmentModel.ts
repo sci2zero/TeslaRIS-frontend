@@ -49,6 +49,7 @@ export interface EntityClassificationResponse {
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
     categoryIdentifier: string;
+    edition?: string;
 }
 
 export enum StatisticsType {

@@ -1,38 +1,38 @@
 <template>
-    <v-container id="materialProduct">
+    <v-container id="geneticMaterial">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
                         <v-skeleton-loader
-                            :loading="!materialProduct"
+                            :loading="!geneticMaterial"
                             type="heading"
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(materialProduct?.title)" />
+                            <rich-title-renderer :title="returnCurrentLocaleContent(geneticMaterial?.title)"></rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(materialProduct?.subTitle) }}
+                        {{ returnCurrentLocaleContent(geneticMaterial?.subTitle) }}
                         <br />
-                        {{ $t("materialProductLabel") }}
+                        {{ $t("geneticMaterialLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- MaterialProduct Info -->
+        <!-- GeneticMaterial Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon v-if="!materialProduct" size="x-large" class="large-materialProduct-icon">
+                <v-icon v-if="!geneticMaterial" size="x-large" class="large-geneticMaterial-icon">
                     {{ icon }}
                 </v-icon>
                 <wordcloud
                     v-else
-                    :for-document-id="materialProduct?.id"
-                    :document-type="PublicationType.MATERIAL_PRODUCT"
+                    :for-document-id="geneticMaterial?.id"
+                    :document-type="PublicationType.GENETIC_MATERIAL"
                     compact-icon
                 />
             </v-col>
@@ -40,12 +40,12 @@
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
-                            :form-component="MaterialProductUpdateForm"
-                            :form-props="{ presetMaterialProduct: materialProduct }"
-                            entity-name="MaterialProduct"
+                            :form-component="GeneticMaterialUpdateForm"
+                            :form-props="{ presetGeneticMaterial: geneticMaterial }"
+                            entity-name="GeneticMaterial"
                             is-update
                             is-section-update
-                            :read-only="!canEdit || materialProduct?.isArchived"
+                            :read-only="!canEdit || geneticMaterial?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -53,71 +53,71 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <basic-info-loader v-if="!materialProduct" />
+                        <basic-info-loader v-if="!geneticMaterial" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <div v-if="materialProduct?.materialProductType">
-                                    {{ $t("materialProductTypeLabel") }}:
+                                <div v-if="geneticMaterial?.geneticMaterialType">
+                                    {{ $t("geneticMaterialTypeLabel") }}:
                                 </div>
-                                <div v-if="materialProduct?.materialProductType" class="response">
-                                    {{ getMaterialProductTypeTitleFromValueAutoLocale(materialProduct.materialProductType) }}
+                                <div v-if="geneticMaterial?.geneticMaterialType" class="response">
+                                    {{ getGeneticMaterialTypeTitleFromValueAutoLocale(geneticMaterial.geneticMaterialType) }}
                                 </div>
-                                <div v-if="materialProduct?.internalNumber">
+                                <div v-if="geneticMaterial?.internalNumber">
                                     {{ $t("internalNumberLabel") }}:
                                 </div>
-                                <div v-if="materialProduct?.internalNumber" class="response">
-                                    {{ materialProduct.internalNumber }}
+                                <div v-if="geneticMaterial?.internalNumber" class="response">
+                                    {{ geneticMaterial.internalNumber }}
                                 </div>
-                                <div v-if="materialProduct?.documentDate">
+                                <div v-if="geneticMaterial?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
-                                <div v-if="materialProduct?.documentDate" class="response">
-                                    {{ materialProduct.documentDate }}
+                                <div v-if="geneticMaterial?.documentDate" class="response">
+                                    {{ geneticMaterial.documentDate }}
                                 </div>
-                                <div v-if="materialProduct?.publisherId || materialProduct?.authorReprint">
+                                <div v-if="geneticMaterial?.publisherId || geneticMaterial?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="materialProduct?.publisherId" class="response">
-                                    <localized-link :to="'publishers/' + materialProduct?.publisherId">
+                                <div v-if="geneticMaterial?.publisherId" class="response">
+                                    <localized-link :to="'publishers/' + geneticMaterial?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-else-if="materialProduct?.authorReprint" class="response">
+                                <div v-else-if="geneticMaterial?.authorReprint" class="response">
                                     <localized-link to="scientific-results/author-reprints">
                                         {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <div v-if="materialProduct?.scopusId">
+                                <div v-if="geneticMaterial?.scopusId">
                                     Scopus ID:
                                 </div>
-                                <div v-if="materialProduct?.scopusId" class="response">
-                                    <identifier-link :identifier="materialProduct.scopusId" type="scopus" />
+                                <div v-if="geneticMaterial?.scopusId" class="response">
+                                    <identifier-link :identifier="geneticMaterial.scopusId" type="scopus" />
                                 </div>
-                                <div v-if="materialProduct?.doi">
+                                <div v-if="geneticMaterial?.doi">
                                     DOI:
                                 </div>
-                                <div v-if="materialProduct?.doi" class="response">
-                                    <identifier-link :identifier="materialProduct.doi"></identifier-link>
+                                <div v-if="geneticMaterial?.doi" class="response">
+                                    <identifier-link :identifier="geneticMaterial.doi"></identifier-link>
                                 </div>
-                                <div v-if="materialProduct?.openAlexId">
+                                <div v-if="geneticMaterial?.openAlexId">
                                     Open Alex ID:
                                 </div>
-                                <div v-if="materialProduct?.openAlexId" class="response">
-                                    <identifier-link :identifier="materialProduct.openAlexId" type="open_alex"></identifier-link>
+                                <div v-if="geneticMaterial?.openAlexId" class="response">
+                                    <identifier-link :identifier="geneticMaterial.openAlexId" type="open_alex"></identifier-link>
                                 </div>
-                                <div v-if="materialProduct?.webOfScienceId">
+                                <div v-if="geneticMaterial?.webOfScienceId">
                                     Web of Science ID:
                                 </div>
-                                <div v-if="materialProduct?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="materialProduct.webOfScienceId" type="web_of_science"></identifier-link>
+                                <div v-if="geneticMaterial?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="geneticMaterial.webOfScienceId" type="web_of_science"></identifier-link>
                                 </div>
-                                <div v-if="materialProduct?.uris && materialProduct?.uris.length > 0">
+                                <div v-if="geneticMaterial?.uris && geneticMaterial?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="materialProduct?.uris"></uri-list>
+                                    <uri-list :uris="geneticMaterial?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -128,21 +128,21 @@
 
         <document-action-box
             ref="actionsRef"
-            :doi="materialProduct?.doi"
-            :can-edit="canEdit && !materialProduct?.isArchived"
+            :doi="geneticMaterial?.doi"
+            :can-edit="canEdit && !geneticMaterial?.isArchived"
             :could-archive="canEdit"
-            :metadata-valid="materialProduct?.isMetadataValid"
-            :files-valid="materialProduct?.areFilesValid"
+            :metadata-valid="geneticMaterial?.isMetadataValid"
+            :files-valid="geneticMaterial?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(materialProduct?.description)"
-            :document="materialProduct"
+            :description="returnCurrentLocaleContent(geneticMaterial?.description)"
+            :document="geneticMaterial"
             :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(materialProduct?.id as number, materialProduct as _Document)"
+            @update="fetchValidationStatus(geneticMaterial?.id as number, geneticMaterial as _Document)"
         />
 
-        <tab-content-loader v-if="!materialProduct" layout="sections" />
+        <tab-content-loader v-if="!geneticMaterial" layout="sections" />
         <v-tabs
-            v-show="materialProduct"
+            v-show="geneticMaterial"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -168,65 +168,43 @@
         </v-tabs>
 
         <v-tabs-window
-            v-show="materialProduct"
+            v-show="geneticMaterial"
             v-model="currentTab">
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
-                    :document-id="materialProduct?.id"
-                    :contribution-list="materialProduct?.contributions ? materialProduct?.contributions : []"
-                    :read-only="!canEdit || materialProduct?.isArchived"
+                    :document-id="geneticMaterial?.id"
+                    :contribution-list="geneticMaterial?.contributions ? geneticMaterial?.contributions : []"
+                    :read-only="!canEdit || geneticMaterial?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section
-                    :document="materialProduct"
-                    :can-edit="canEdit && !materialProduct?.isArchived"
-                    :proofs="materialProduct?.proofs"
-                    :file-items="materialProduct?.fileItems">
+                    :document="geneticMaterial"
+                    :can-edit="canEdit && !geneticMaterial?.isArchived"
+                    :proofs="geneticMaterial?.proofs"
+                    :file-items="geneticMaterial?.fileItems">
                 </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
-                    :keywords="materialProduct?.keywords ? materialProduct.keywords : []"
-                    :can-edit="canEdit && !materialProduct?.isArchived"
+                    :keywords="geneticMaterial?.keywords ? geneticMaterial.keywords : []"
+                    :can-edit="canEdit && !geneticMaterial?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
 
-                <!-- Research Area -->
-                <v-row>
-                    <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <research-areas-update-modal 
-                                    :research-areas-hierarchy="materialProduct?.researchAreas"
-                                    :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
-
-                                <h4 class="mt-5 mb-7">
-                                    <strong>{{ $t("researchAreasLabel") }}</strong>
-                                </h4>
-                                <research-area-hierarchy
-                                    :research-areas="materialProduct?.researchAreas" 
-                                />
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
-
                 <!-- Description -->
                 <description-section
-                    :description="materialProduct?.description"
-                    :can-edit="canEdit && !materialProduct?.isArchived"
+                    :description="geneticMaterial?.description"
+                    :can-edit="canEdit && !geneticMaterial?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <description-section
-                    :description="materialProduct?.remark"
-                    :can-edit="canEdit && !materialProduct?.isArchived"
+                    :description="geneticMaterial?.remark"
+                    :can-edit="canEdit && !geneticMaterial?.isArchived"
                     is-remark
                     @update="updateRemark"
                 />
@@ -235,11 +213,11 @@
                 <indicators-section 
                     :indicators="documentIndicators" 
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
-                    :entity-id="materialProduct?.id" 
+                    :entity-id="geneticMaterial?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit"
                     show-statistics
-                    :has-attached-files="materialProduct?.fileItems && materialProduct?.fileItems.length > 0"
+                    :has-attached-files="geneticMaterial?.fileItems && geneticMaterial?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -247,8 +225,8 @@
             <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
-                    :entity-id="materialProduct?.id"
-                    :can-edit="canClassify && materialProduct?.documentDate !== ''"
+                    :entity-id="geneticMaterial?.id"
+                    :can-edit="canClassify && geneticMaterial?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.DOCUMENT]"
                     @create="createClassification"
@@ -257,7 +235,7 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <document-visualizations
-                    :document-id="(materialProduct?.id as number)"
+                    :document-id="(geneticMaterial?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
@@ -265,10 +243,10 @@
         </v-tabs-window>
 
         <share-buttons
-            v-if="materialProduct && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(materialProduct.title) as string)"
-            :document-id="(materialProduct.id as number)"
-            :document-type="PublicationType.MATERIAL_PRODUCT"
+            v-if="geneticMaterial && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(geneticMaterial.title) as string)"
+            :document-id="(geneticMaterial.id as number)"
+            :document-type="PublicationType.SOFTWARE"
         />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -285,7 +263,7 @@ import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Document as _Document, MaterialProduct } from '@/models/PublicationModel';
+import type { Document as _Document, GeneticMaterial } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -296,6 +274,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -317,16 +296,13 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
-import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
-import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
-import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
+import { getGeneticMaterialTypeTitleFromValueAutoLocale } from '@/i18n/geneticMaterialType';
+import GeneticMaterialUpdateForm from '@/components/publication/update/GeneticMaterialUpdateForm.vue';
 
 
 export default defineComponent({
-    name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal },
+    name: "GeneticMaterialLandingPage",
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
     setup() {
         const currentTab = ref("contributions");
 
@@ -336,7 +312,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const materialProduct = ref<MaterialProduct>();
+        const geneticMaterial = ref<GeneticMaterial>();
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
@@ -380,7 +356,7 @@ export default defineComponent({
                 fetchClassifications();
             }
 
-            fetchMaterialProduct();
+            fetchGeneticMaterial();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -389,20 +365,20 @@ export default defineComponent({
             populateData();
         });
 
-        const fetchMaterialProduct = () => {
-            DocumentPublicationService.readMaterialProduct(
+        const fetchGeneticMaterial = () => {
+            DocumentPublicationService.readGeneticMaterial(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                materialProduct.value = response.data;
+                geneticMaterial.value = response.data;
 
                 injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-                document.title = returnCurrentLocaleContent(materialProduct.value.title) as string;
+                document.title = returnCurrentLocaleContent(geneticMaterial.value.title) as string;
 
-                materialProduct.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                geneticMaterial.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                if(materialProduct.value.publisherId) {
-                    PublisherService.readPublisher(materialProduct.value.publisherId).then((publisherResponse) => {
+                if(geneticMaterial.value.publisherId) {
+                    PublisherService.readPublisher(geneticMaterial.value.publisherId).then((publisherResponse) => {
                         publisher.value = publisherResponse.data;
                     })
                 }
@@ -443,55 +419,49 @@ export default defineComponent({
         }
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
-            materialProduct.value!.keywords = keywords;
+            geneticMaterial.value!.keywords = keywords;
             performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
-            materialProduct.value!.description = description;
+            geneticMaterial.value!.description = description;
             performUpdate(false);
         };
 
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
-            materialProduct.value!.contributions = contributions;
+            geneticMaterial.value!.contributions = contributions;
             performUpdate(true);
         };
 
-        const updateBasicInfo = (basicInfo: MaterialProduct) => {
-            materialProduct.value!.title = basicInfo.title;
-            materialProduct.value!.subTitle = basicInfo.subTitle;
-            materialProduct.value!.documentDate = basicInfo.documentDate;
-            materialProduct.value!.doi = basicInfo.doi;
-            materialProduct.value!.scopusId = basicInfo.scopusId;
-            materialProduct.value!.uris = basicInfo.uris;
-            materialProduct.value!.publisherId = basicInfo.publisherId;
-            materialProduct.value!.internalNumber = basicInfo.internalNumber;
-            materialProduct.value!.openAlexId = basicInfo.openAlexId;
-            materialProduct.value!.webOfScienceId = basicInfo.webOfScienceId;
-            materialProduct.value!.authorReprint = basicInfo.authorReprint;
-            materialProduct.value!.researchAreasId = basicInfo.researchAreasId;
-            materialProduct.value!.productUsers = basicInfo.productUsers;
-            materialProduct.value!.numberProduced = basicInfo.numberProduced;
-            materialProduct.value!.materialProductType = basicInfo.materialProductType;
+        const updateBasicInfo = (basicInfo: GeneticMaterial) => {
+            geneticMaterial.value!.title = basicInfo.title;
+            geneticMaterial.value!.subTitle = basicInfo.subTitle;
+            geneticMaterial.value!.documentDate = basicInfo.documentDate;
+            geneticMaterial.value!.doi = basicInfo.doi;
+            geneticMaterial.value!.scopusId = basicInfo.scopusId;
+            geneticMaterial.value!.uris = basicInfo.uris;
+            geneticMaterial.value!.publisherId = basicInfo.publisherId;
+            geneticMaterial.value!.internalNumber = basicInfo.internalNumber;
+            geneticMaterial.value!.openAlexId = basicInfo.openAlexId;
+            geneticMaterial.value!.webOfScienceId = basicInfo.webOfScienceId;
+            geneticMaterial.value!.authorReprint = basicInfo.authorReprint;
+            geneticMaterial.value!.geneticMaterialType = basicInfo.geneticMaterialType;
 
             performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updateMaterialProduct(
-                materialProduct.value?.id as number,
-                materialProduct.value as MaterialProduct
-            ).then(() => {
+            DocumentPublicationService.updateGeneticMaterial(geneticMaterial.value?.id as number, geneticMaterial.value as GeneticMaterial).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchMaterialProduct();
+                    fetchGeneticMaterial();
                 }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchMaterialProduct();
+                    fetchGeneticMaterial();
                 }
             });
         };
@@ -509,40 +479,35 @@ export default defineComponent({
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
         const updateRemark = (remark: MultilingualContent[]) => {
-            materialProduct.value!.remark = remark;
-            performUpdate(true);
-        };
-
-        const updateResearchAreas = (researchAreaIds: number[]) => {
-            materialProduct.value!.researchAreasId = researchAreaIds;
+            geneticMaterial.value!.remark = remark;
             performUpdate(true);
         };
 
         return {
-            materialProduct, icon, publisher, ApplicableEntityType,
+            geneticMaterial, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, isResearcher, MaterialProductUpdateForm,
+            updateBasicInfo, isResearcher, displayConfiguration,
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
-            fetchMaterialProduct, fetchValidationStatus, updateRemark,
-            displayConfiguration, updateResearchAreas,
-            getMaterialProductTypeTitleFromValueAutoLocale
+            fetchGeneticMaterial, fetchValidationStatus, updateRemark,
+            getGeneticMaterialTypeTitleFromValueAutoLocale,
+            GeneticMaterialUpdateForm
         };
 }})
 
 </script>
 
 <style scoped>
-    #materialProduct .large-materialProduct-icon {
+    #geneticMaterial .large-geneticMaterial-icon {
         font-size: 10em;
     }
 
-    #materialProduct .response {
+    #geneticMaterial .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

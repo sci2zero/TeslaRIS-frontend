@@ -54,7 +54,8 @@ export enum PublicationType {
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
     THESIS = "THESIS",
-    MATERIAL_PRODUCT = "MATERIAL_PRODUCT"
+    MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
+    GENETIC_MATERIAL = "GENETIC_MATERIAL"
 }
 
 export enum ThesisType {
@@ -229,6 +230,13 @@ export interface MaterialProduct extends Document {
     researchAreas?: ResearchArea[];
 }
 
+export interface GeneticMaterial extends Document {
+    internalNumber: string;
+    publisherId?: number;
+    authorReprint?: boolean;
+    geneticMaterialType: GeneticMaterialType
+}
+
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
@@ -245,6 +253,15 @@ export interface DeduplicationSuggestion {
     rightTitleOther: string;
     documentPublicationType: PublicationType;
     entityType: EntityType;
+    leftYear: number;
+    rightYear: number;
+    leftAuthors: string;
+    rightAuthors: string;
+    leftAuthorIds: number[];
+    rightAuthorIds: number[];
+    leftConcreteType: string;
+    rightConcreteType: string;
+    publicationType: string;
 }
 
 export interface Thesis extends Document {
@@ -308,6 +325,14 @@ export enum MaterialProductType {
     INDUSTRIAL_PRODUCT = "INDUSTRIAL_PRODUCT",
     INFRASTRUCTURE_OBJECT = "INFRASTRUCTURE_OBJECT",
     DERIVATIVE_WORKS = "DERIVATIVE_WORKS",
+    OTHER = "OTHER"
+}
+
+export enum GeneticMaterialType {
+    GENOTYPE = "GENOTYPE",
+    RACE = "RACE",
+    VARIETY = "VARIETY",
+    STRAIN = "STRAIN",
     OTHER = "OTHER"
 }
 

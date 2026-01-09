@@ -23,6 +23,8 @@ export const getMetadataComparisonPageName = (type: PublicationType): string => 
             return "thesisMetadataComparator"
         case "MATERIAL_PRODUCT":
             return "materialProductMetadataComparator"
+        case "GENETIC_MATERIAL":
+            return "geneticMaterialMetadataComparator"
     }
     return "";
 };
@@ -60,6 +62,8 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
             return "scientific-results/thesis/";
         case "MATERIAL_PRODUCT":
             return "scientific-results/material-product/";
+        case "GENETIC_MATERIAL":
+            return "scientific-results/genetic-material/";
     }
     return "";
 };
@@ -86,6 +90,8 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "thesisLandingPage";
         case "MATERIAL_PRODUCT":
             return "materialProductLandingPage";
+        case "GENETIC_MATERIAL":
+            return "geneticMaterialLandingPage";
     }
     return "";
 };
@@ -106,9 +112,11 @@ export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: 
     } else if (assessmentCode.startsWith("M7")) {
         return "scientific-results/thesis/";
     } else if (assessmentCode.startsWith("M8")) {
-        return "scientific-results/software/";
-    } else if (assessmentCode.startsWith("M9")) {
+        return "scientific-results/material-product/";
+    } else if (["M91A", "M91", "M92", "M93", "M94"].includes(assessmentCode)) {
         return "scientific-results/patent/";
+    } else if (["M95", "M96", "M97", "M98"].includes(assessmentCode)) {
+        return "scientific-results/genetic-material/";
     }
     return "";
 };

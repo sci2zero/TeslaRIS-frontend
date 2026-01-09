@@ -80,6 +80,7 @@
                     <v-menu>
                         <template #activator="{ props }">
                             <v-btn
+                                v-if="isUserBoundToOU || isAdmin || isInstitutionalEditor || isCommission || isInstitutionalLibrarian || isHeadOfLibrary"
                                 v-bind="props"
                                 color="white"
                                 prepend-icon="mdi-dots-vertical"

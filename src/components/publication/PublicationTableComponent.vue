@@ -791,6 +791,8 @@ export default defineComponent({
                     return 'mdi-school';
                 case 'MATERIAL_PRODUCT':
                     return 'mdi-hammer-wrench';
+                case 'GENETIC_MATERIAL':
+                    return 'mdi-sprout';
                 default:
                     return 'mdi-file-document';
             }

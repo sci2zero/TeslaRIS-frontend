@@ -111,6 +111,9 @@ import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView
 import SubmitMaterialProductView from "@/views/SubmitMaterialProductView.vue";
 import MaterialProductLandingView from "@/views/landingPages/MaterialProductLandingView.vue";
 import MaterialProductMetadataComparatorView from "@/views/comparators/documents/MaterialProductMetadataComparatorView.vue";
+import SubmitGeneticMaterialView from "@/views/SubmitGeneticMaterialView.vue";
+import GeneticMaterialLandingView from "@/views/landingPages/GeneticMaterialLandingView.vue";
+import GeneticMaterialMetadataComparatorView from "@/views/comparators/documents/GeneticMaterialMetadataComparatorView.vue";
 
 
 const roles = {
@@ -699,6 +702,38 @@ const router = createRouter({
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "materialProductMetadataComparator",
                                     component: MaterialProductMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "genetic-material",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "geneticMaterialLandingPage",
+                                    component: GeneticMaterialLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-genetic-material",
+                                    name: "submitGeneticMaterial",
+                                    component: SubmitGeneticMaterialView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "geneticMaterialMetadataComparator",
+                                    component: GeneticMaterialMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor],

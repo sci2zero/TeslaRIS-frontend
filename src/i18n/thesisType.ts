@@ -22,7 +22,7 @@ export const thesisTypeEn = [
     { title: "Undergraduate thesis", value: ThesisType.UNDERGRADUATE_THESIS }
 ];
 
-export const getThesisTitleFromValueAutoLocale = (value: ThesisType) => {
+export const getThesisTitleFromValueAutoLocale = (value: ThesisType | string) => {
     const locale = i18n.vueI18n.global.locale;
 
     let thesisTypeArray = thesisTypeEn;

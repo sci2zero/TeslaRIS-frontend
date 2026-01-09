@@ -45,7 +45,9 @@
             :key="index" :title="keyValue[0]">
             <v-expansion-panel-text>
                 <v-row v-for="(line, lineIndex) in keyValue[1]" :key="lineIndex" class="mt-4 mb-1">
-                    <p>{{ line.value }}</p>
+                    <p :class="lineIndex === 0 ? 'mt-2 mb-5' : ''">
+                        {{ line.value }}
+                    </p>
                 </v-row>
             </v-expansion-panel-text>
         </v-expansion-panel>
@@ -167,6 +169,7 @@ export default defineComponent({
             if (!contentMap.value.has(key)) {
                 contentMap.value.set(key, [{value: returnCurrentLocaleContent(entityIndicator.indicatorResponse.description) as string, fromDate: ""}]);
             }
+
             contentMap.value.get(key)?.push({value: `${buildDisplayDate(entityIndicator)} - ${buildDisplayValue(entityIndicator)}`, fromDate: entityIndicator.fromDate as string});
         };
 
@@ -191,6 +194,10 @@ export default defineComponent({
 
             title += ` - ${getIndicatorSourceTitleFromValueAutoLocale(entityIndicator.source)}`;
 
+            if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                title += (entityIndicator as PublicationSeriesIndicatorResponse).edition ? (" (" + (entityIndicator as PublicationSeriesIndicatorResponse).edition + ")") : "";
+            }
+
             return title;
         };
 
@@ -204,7 +211,7 @@ export default defineComponent({
         };
 
         const buildDisplayValue = (entityIndicator: EntityIndicatorResponse) => {
-            let displayValue = "";
+            let displayValue = "\n";
             if (entityIndicator.textualValue || entityIndicator.indicatorResponse.contentType === IndicatorContentType.TEXT) {
                 displayValue += (entityIndicator.textualValue ? entityIndicator.textualValue : "N/A");
             } else if ((entityIndicator.numericValue !== null && entityIndicator.numericValue !== undefined) || entityIndicator.indicatorResponse.contentType === IndicatorContentType.NUMBER) {

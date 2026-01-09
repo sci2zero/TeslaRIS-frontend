@@ -5,7 +5,7 @@
                 <v-row>
                     <v-col cols="11">
                         <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.MATERIAL_PRODUCT"
+                            :document-type="PublicationType.GENETIC_MATERIAL"
                             @metadata-fetched="popuateMetadata"
                         />
                     </v-col>
@@ -50,11 +50,10 @@
                 <v-row>
                     <v-col cols="10">
                         <v-select
-                            v-model="selectedMaterialProductType"
-                            :label="$t('materialProductTypeLabel') + '*'"
-                            :items="materialProductTypes"
+                            v-model="selectedGeneticMaterialType"
+                            :label="$t('geneticMaterialTypeLabel') + '*'"
+                            :items="geneticMaterialTypes"
                             :rules="requiredSelectionRules"
-                            :disabled="inModal"
                             return-object
                         ></v-select>
                     </v-col>
@@ -62,7 +61,7 @@
                 <v-row>
                     <v-col cols="10">
                         <v-text-field
-                            v-model="materialProductNumber"
+                            v-model="geneticMaterialNumber"
                             :label="$t('internalNumberLabel')"
                             :placeholder="$t('internalNumberLabel')">
                         </v-text-field>
@@ -72,7 +71,11 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event" />
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
 
@@ -111,7 +114,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
+                            <uri-input ref="urisRef" v-model="uris"></uri-input>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -149,38 +152,6 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="numberProduced"
-                                type="number"
-                                :label="$t('numberProducedLabel')"
-                                :placeholder="$t('numberProducedLabel')"
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <multilingual-text-input
-                                ref="usersRef"
-                                v-model="productUsers"
-                                :label="$t('productUsersLabel')">
-                            </multilingual-text-input>
-                        </v-col>
-                    </v-row>
-                    <h2 class="mt-5!">
-                        {{ $t("researchAreasLabel") }}
-                    </h2>
-                    <v-row>
-                        <v-col cols="10">
-                            <research-areas-selection
-                                ref="researchAreasSelectionRef"
-                                :research-areas-hierarchy="[]"
-                                submit-on-click
-                                @update="saveResearchAreas"
-                            />
-                        </v-col>
-                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -203,7 +174,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { PublicationType, type PersonDocumentContribution, type MaterialProduct, MaterialProductType } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type GeneticMaterial, type GeneticMaterialType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -213,13 +184,12 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
-import { getMaterialProductTypesForGivenLocale } from '@/i18n/materialProductType';
-import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
+import { getGeneticMaterialTypesForGivenLocale } from '@/i18n/geneticMaterialType';
 
 
 export default defineComponent({
-    name: "SubmitMaterialProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection },
+    name: "SubmitGeneticMaterial",
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
     props: {
         inModal: {
             type: Boolean,
@@ -246,8 +216,6 @@ export default defineComponent({
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
-        const usersRef = ref<typeof MultilingualTextInput>();
-        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -256,20 +224,17 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref<any[]>([]);
-        const productUsers = ref<any>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
         const scopus = ref("");
         const webOfScienceId = ref("");
-        const materialProductNumber = ref("");
+        const geneticMaterialNumber = ref("");
         const uris = ref<string[]>([]);
-        const numberProduced = ref();
-        const researchAreaIds = ref<number[]>([]);
 
-        const materialProductTypes = getMaterialProductTypesForGivenLocale();
-        const selectedMaterialProductType = ref<{title: string, value: MaterialProductType | null}>({ title: "", value: null });
+        const geneticMaterialTypes = getGeneticMaterialTypesForGivenLocale();
+        const selectedGeneticMaterialType = ref<{title: string, value: GeneticMaterialType | null}>({ title: "", value: null });
 
         const {
             requiredFieldRules, doiValidationRules,
@@ -279,15 +244,12 @@ export default defineComponent({
             requiredSelectionRules
         } = useValidationUtils();
 
-        const submitMaterialProduct = (stayOnPage: boolean) => {
-            const newMaterialProduct: MaterialProduct = {
+        const submitGeneticMaterial = (stayOnPage: boolean) => {
+            const newGeneticMaterial: GeneticMaterial = {
                 title: title.value,
-                internalNumber: materialProductNumber.value,
-                numberProduced: numberProduced.value,
+                internalNumber: geneticMaterialNumber.value,
                 description: description.value,
                 keywords: keywords.value,
-                productUsers: productUsers.value,
-                materialProductType: selectedMaterialProductType.value.value as MaterialProductType,
                 subTitle: subtitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
@@ -296,14 +258,14 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
                 webOfScienceId: webOfScienceId.value,
+                geneticMaterialType: selectedGeneticMaterialType.value.value as GeneticMaterialType,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
-                proofs: [],
-                researchAreasId: researchAreaIds.value
+                proofs: []
             };
 
-            DocumentPublicationService.createMaterialProduct(newMaterialProduct).then((response) => {
+            DocumentPublicationService.createGeneticMaterial(newGeneticMaterial).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -315,19 +277,16 @@ export default defineComponent({
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
-                    materialProductNumber.value = "";
+                    geneticMaterialNumber.value = "";
                     scopus.value = ""
-                    numberProduced.value = 0;
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
-                    usersRef.value?.clearInput();
-                    researchAreasSelectionRef.value?.resetForm();
-                    selectedMaterialProductType.value = { title: "", value: null };
+                    selectedGeneticMaterialType.value = { title: "", value: null };
 
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "materialProductLandingPage", params: {id: response.data.id} });
+                    router.push({ name: "geneticMaterialLandingPage", params: {id: response.data.id} });
                 }
             }).catch((axiosError: AxiosError<ErrorResponse>) => {
                 const message = i18n.t(axiosError.response?.data.message as string);
@@ -348,7 +307,7 @@ export default defineComponent({
                 titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             }
 
-            materialProductNumber.value = materialProductNumber.value ? materialProductNumber.value : metadata.issue;
+            geneticMaterialNumber.value = geneticMaterialNumber.value ? geneticMaterialNumber.value : metadata.issue;
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
 
@@ -374,27 +333,21 @@ export default defineComponent({
             }
         };
 
-        const saveResearchAreas = (newResearchAreaIds: number[]) => {
-            researchAreaIds.value = newResearchAreaIds;
-        };
-
         return {
             isFormValid, scopusIdValidationRules,
             additionalFields, snackbar, error,
             title, titleRef, subtitle, subtitleRef,
             publicationYear, doi, PublicationType,
             publisherAutocompleteRef, popuateMetadata,
-            selectedPublisher, materialProductNumber, openAlexId,
+            selectedPublisher, geneticMaterialNumber, openAlexId,
             description, descriptionRef, doiValidationRules,
-            keywords, keywordsRef, uris, urisRef, productUsers,
+            keywords, keywordsRef, uris, urisRef,
             contributions, contributionsRef, errorMessage,
-            requiredFieldRules, submitMaterialProduct, scopus,
+            requiredFieldRules, submitGeneticMaterial, scopus,
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules,
-            deduplicationTableRef, numberProduced,
-            materialProductTypes, selectedMaterialProductType,
-            requiredSelectionRules, usersRef,
-            researchAreasSelectionRef, saveResearchAreas
+            deduplicationTableRef, selectedGeneticMaterialType,
+            geneticMaterialTypes, requiredSelectionRules
         };
     }
 });

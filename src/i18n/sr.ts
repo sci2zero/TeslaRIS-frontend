@@ -105,8 +105,12 @@ export default {
         publicationsValidation: "Validacija publikacija",
         oauth2: "Eksterna autorizacija",
         authorReprints: "Autorski reprinti",
+        submitMaterialProduct: "Dodavanje materijalnog proizvoda",
         materialProductMetadataComparator: "Poređenje materijalnih proizvoda",
-        materialProductLandingPage: "Materijalni proizvod"
+        materialProductLandingPage: "Detalji materijalnog proizvoda",
+        geneticMaterialLandingPage: "Detalji genetskog materijala",
+        submitGeneticMaterial: "Dodavanje genetskog materijala"
+
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1270,5 +1274,9 @@ export default {
     productUsersLabel: "Korisnici proizvoda",
     materialProductLabel: "Materijalni proizvod",
     updateMaterialProductLabel: "Ažuriraj materijalni proizvod",
-    materialProductMetadataComparatorLabel: "Poređenje materijalnih proizvoda"
+    materialProductMetadataComparatorLabel: "Poređenje materijalnih proizvoda",
+    resourceDeletedMessage: "Traženi resurs je obrisan.",
+    geneticMaterialLabel: "Genetski materijal",
+    geneticMaterialTypeLabel: "Tip genetskog materijala",
+    addGeneticMaterialLabel: "Dodaj genetski materijal"
 }

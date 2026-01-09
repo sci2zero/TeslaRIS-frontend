@@ -3,8 +3,11 @@
         class="d-flex align-center flex-column mt-12"
         height="200"
     >
-        <v-row class="d-flex flex-row justify-center">
+        <v-row v-if="!deleted" class="d-flex flex-row justify-center">
             <h2>{{ redirectionFinished ? $t("redirectionFinishedMessage") : $t("redirectingToResourceMessage") }}</h2>
+        </v-row>
+        <v-row v-else>
+            <h2>{{ $t("resourceDeletedMessage") }}</h2>
         </v-row>
         <v-row
             v-if="!redirectionFinished"
@@ -36,6 +39,7 @@ export default defineComponent({
         const route = useRoute();
         const router = useRouter();
         const redirectionFinished = ref(false);
+        const deleted = ref(false);
 
         onMounted(() => {
             const { query, params } = route;
@@ -54,7 +58,10 @@ export default defineComponent({
                 const legacyId = query.fileName as string;
                 LegacyRedirectService.getDocumentFileNavigationDetails(legacyId, source, language)
                 .then(response => {
-                    if (response.data.serverFilename !== "NOT_FOUND") {
+                    if (response.data.serverFilename === "DELETED") {
+                        redirectionFinished.value = true;
+                        deleted.value = true;
+                    } else if (response.data.serverFilename !== "NOT_FOUND") {
                         DocumentFileService.downloadDocumentFile(response.data.serverFilename, params.fileName as string, "", true)
                         .then(() => redirectionFinished.value = true);
                     } else {
@@ -94,13 +101,18 @@ export default defineComponent({
                     return "patentLandingPage";
                 case "DATASET":
                     return "datasetLandingPage";
+                case "MATERIAL_PRODUCT":
+                    return "datasetLandingPage";
+                case "GENETIC_MATERIAL":
+                    return "datasetLandingPage";
                 default:
                     return "notFound";
             }
         };
 
         return {
-            redirectionFinished
+            redirectionFinished,
+            deleted
         };
     },
 });

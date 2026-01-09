@@ -1262,5 +1262,6 @@ export default {
     productUsersLabel: "Product users",
     materialProductLabel: "Material product",
     updateMaterialProductLabel: "Update material product",
-    materialProductMetadataComparatorLabel: "Material product metadata comparison"
+    materialProductMetadataComparatorLabel: "Material product metadata comparison",
+    resourceDeletedMessage: "Requested resource is deleted."
 }
