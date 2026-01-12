@@ -158,9 +158,22 @@
         legendDiv.id =  'sdg-wheel-legend-' + i
         div.id = 'sdg-wheel-div-' + i
         legendDiv.style.opacity = '0'
+        legendDiv.style.pointerEvents = "none";
         div.appendChild(legendDiv)
-        div.onmouseenter = function () {$(this).children("div")[0].style.opacity = 1}
-        div.onmouseleave = function () {$(this).children("div")[0].style.opacity = 0}
+        // div.onmouseenter = function () {$(this).children("div")[0].style.opacity = 1}
+        // div.onmouseleave = function () {$(this).children("div")[0].style.opacity = 0}
+        div.onmouseenter = function () {
+          const child = $(this).children("div")[0];
+          child.style.opacity = 1;
+          child.style.pointerEvents = "unset";
+        };
+
+        div.onmouseleave = function () {
+          const child = $(this).children("div")[0];
+          child.style.opacity = 0;
+          child.style.pointerEvents = "none";
+        };
+
         let url = 'https://aurora-sdg.labs.vu.nl/classifier/classify/' + model;
         fetch(url, {
           method: 'POST',
