@@ -28,6 +28,14 @@
                         @click="handleSelect(potentialMatch.databaseId as number, true)">
                         {{ $t("overwriteOldPublicationLabel") }}
                     </v-btn>
+                    <v-btn
+                        class="inline-action"
+                        color="primary"
+                        density="compact"
+                        :href="getDocumentLandingPageBasePath(potentialMatch.type) + potentialMatch.databaseId"
+                        target="_blank">
+                        {{ $t("viewDetailsLabel") }}
+                    </v-btn>
                 </template>
             </v-list-item>
         </v-list>
@@ -44,6 +52,7 @@ import { watch } from "vue";
 import { ref } from "vue";
 import ImportService from "@/services/importer/ImportService";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
+import { getDocumentLandingPageBasePath } from "@/utils/PathResolutionUtil";
 
 
 export default defineComponent({
@@ -96,7 +105,7 @@ export default defineComponent({
         return { 
             returnCurrentLocaleContent, handleSelect,
             potentialMatches, displayTextOrPlaceholder,
-            foundDuplicates
+            foundDuplicates, getDocumentLandingPageBasePath
         };
     },
 });

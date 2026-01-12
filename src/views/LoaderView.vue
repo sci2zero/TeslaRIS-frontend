@@ -439,6 +439,7 @@ export default defineComponent({
         };
 
         const updateRecord = (updatedRecord: JournalPublicationLoad | ProceedingsPublicationLoad) => {
+            currentLoadRecord.value!.title = updatedRecord.title;
             currentLoadRecord.value!.subTitle = updatedRecord.subTitle;
             currentLoadRecord.value!.description = updatedRecord.description;
             currentLoadRecord.value!.startPage = updatedRecord.startPage;

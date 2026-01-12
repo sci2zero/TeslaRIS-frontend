@@ -2,7 +2,23 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetMetadata?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    ref="titleRef"
+                    v-model="title"
+                    :label="$t('titleLabel')"
+                    :initial-value="toMultilingualTextInput(presetMetadata?.title, languageTags)">
+                </multilingual-text-input>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetMetadata?.subTitle, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
 
@@ -16,7 +32,11 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                <v-text-field
+                    v-model="publicationYear"
+                    :label="$t('yearOfPublicationLabel')"
+                    :placeholder="$t('yearOfPublicationLabel')">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -39,7 +59,11 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                <v-text-field
+                    v-model="articleNumber"
+                    :label="$t('articleNumberLabel')"
+                    :placeholder="$t('articleNumberLabel')">
+                </v-text-field>
             </v-col>
             <v-col cols="5">
                 <v-text-field
@@ -51,15 +75,23 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"
-                    :initial-value="toMultilingualTextInput(presetMetadata?.description, languageTags)"></multilingual-text-input>
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('abstractLabel')"
+                    :initial-value="toMultilingualTextInput(presetMetadata?.description, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="keywordsRef" v-model="keywords" is-area :label="$t('keywordsLabel')"
-                    :initial-value="toMultilingualTextInput(presetMetadata?.keywords, languageTags)"></multilingual-text-input>
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    is-area
+                    :label="$t('keywordsLabel')"
+                    :initial-value="toMultilingualTextInput(presetMetadata?.keywords, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -99,6 +131,7 @@ export default defineComponent({
 
         const { languageTags } = useLanguageTags();
 
+        const title = ref([]);
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref([]);
@@ -116,7 +149,7 @@ export default defineComponent({
 
         const updateProceedingsPublication = () => {
             const updatedProceeedingsPublication: ProceedingsPublication = {
-                title: [],
+                title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
                 endPage: endPage.value as string,
                 numberOfPages: numberOfPages.value as number,
@@ -145,7 +178,7 @@ export default defineComponent({
         } = useValidationUtils();
 
         return {
-            isFormValid, subtitle,
+            isFormValid, subtitle, title,
             publicationYear, doi, scopus,
             articleNumber, uris, numberOfPages,
             updateProceedingsPublication,

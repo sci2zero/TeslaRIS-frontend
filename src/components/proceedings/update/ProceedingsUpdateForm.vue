@@ -5,18 +5,32 @@
                 <v-row>
                     <v-col>
                         <multilingual-text-input
-                            ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetProceedings?.title, languageTags)"></multilingual-text-input>
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetProceedings?.title, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required :read-only="inComparator"></event-autocomplete-search>
+                        <event-autocomplete-search
+                            ref="eventAutocompleteRef"
+                            v-model="selectedEvent"
+                            required
+                            :read-only="inComparator"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="publicationYear"
+                            :rules="requiredFieldRules"
+                            :label="$t('yearOfPublicationLabel') + '*'"
+                            :placeholder="$t('yearOfPublicationLabel')">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -24,18 +38,28 @@
                         <publisher-autocomplete-search
                             ref="publisherAutocompleteRef"
                             v-model="selectedPublisher"
-                            allow-author-reprint>
-                        </publisher-autocomplete-search>
+                            allow-author-reprint
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetProceedings?.subTitle, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="subtitleRef"
+                            v-model="subtitle"
+                            :label="$t('subtitleLabel')"
+                            :initial-value="toMultilingualTextInput(presetProceedings?.subTitle, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="acronymRef" v-model="acronym" :label="$t('nameAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetProceedings?.acronym, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="acronymRef"
+                            v-model="acronym"
+                            :label="$t('nameAbbreviationLabel')"
+                            :initial-value="toMultilingualTextInput(presetProceedings?.acronym, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -65,11 +89,30 @@
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
-                        <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+                    <v-col cols="5">
+                        <v-text-field
+                            v-model="eIsbn"
+                            label="E-ISBN"
+                            placeholder="E-ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+                    <v-col cols="2" class="text-center">
+                        <v-btn 
+                            icon 
+                            class="mx-2"
+                            @click="[printIsbn, eIsbn] = [eIsbn, printIsbn]"
+                        >
+                            <v-icon>mdi-swap-horizontal</v-icon>
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="5">
+                        <v-text-field
+                            v-model="printIsbn"
+                            label="Print ISBN"
+                            placeholder="Print ISBN"
+                            :rules="isbnValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -79,20 +122,38 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
+                        <journal-autocomplete-search
+                            ref="journalAutocompleteRef"
+                            v-model="selectedJournal"
+                            allow-manual-clearing
+                            :external-validation="publicationSeriesExternalValidation"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <book-series-autocomplete-search ref="bookSeriesAutocompleteRef" v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
+                        <book-series-autocomplete-search
+                            ref="bookSeriesAutocompleteRef"
+                            v-model="selectedBookSeries"
+                            allow-manual-clearing
+                            :external-validation="publicationSeriesExternalValidation"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" :placeholder="$t('publicationSeriesVolumeLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="publicationSeriesVolume"
+                            :label="$t('publicationSeriesVolumeLabel')"
+                            :placeholder="$t('publicationSeriesVolumeLabel')">
+                        </v-text-field>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" :placeholder="$t('publicationSeriesIssueLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="publicationSeriesIssue"
+                            :label="$t('publicationSeriesIssueLabel')"
+                            :placeholder="$t('publicationSeriesIssueLabel')">
+                        </v-text-field>
                     </v-col>
                 </v-row>
             </v-col>
