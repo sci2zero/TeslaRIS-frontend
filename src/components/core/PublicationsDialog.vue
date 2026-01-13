@@ -13,7 +13,7 @@
             :title="title"
         >
             <v-card-text>
-                <pre class="publications-as-text">{{ text }}</pre>
+                <pre class="publications-as-text mt-5">{{ text }}</pre>
             </v-card-text>
             <template #actions>
                 <v-btn
@@ -34,7 +34,7 @@ import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
-    name: "TextDialog",
+    name: "PublicationsDialog",
     props: {
         buttonText: {
             type: String,
@@ -70,7 +70,7 @@ export default defineComponent({
 
         const getContent = (researcherId: number) => {
             DocumentPublicationService.findResearcherPublications(
-                researcherId, [], "page=0&size=10"
+                researcherId, [], "page=0&size=10&sort=year,DESC"
             ).then(response => {
                 if (response.data.totalElements === 0) {
                     text.value = i18n.t("noPublicationsForResearcherMessage");

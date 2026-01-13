@@ -13,7 +13,19 @@
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
                 @blur="onAutocompleteBlur"
-            />
+            >
+                <template #item="{ item, props }">
+                    <v-list-item
+                        v-bind="{ ...props, title: undefined }"
+                    >
+                        <person-publications-tooltip
+                            :person-id="item.raw.value"
+                        >
+                            {{ item.raw.title }}
+                        </person-publications-tooltip>
+                    </v-list-item>
+                </template>
+            </v-autocomplete>
         </v-col>
         <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal
@@ -145,11 +157,12 @@ import UserService from "@/services/UserService";
 import { useRoute } from "vue-router";
 import { type PersonUserResponse } from "@/models/PersonUserModel";
 import { type AxiosResponse } from "axios";
+import PersonPublicationsTooltip from "../person/PersonPublicationsTooltip.vue";
 
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, GenericCrudModal },
+    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip },
     props: {
         basic: {
             type: Boolean,

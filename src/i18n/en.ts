@@ -1269,5 +1269,7 @@ export default {
     geneticMaterialLabel: "Genetic material",
     geneticMaterialTypeLabel: "Genetic material type",
     addGeneticMaterialLabel: "Add genetic material",
-    updateGeneticMaterialLabel: "Update genetic material"
+    updateGeneticMaterialLabel: "Update genetic material",
+    personBoundToUserMessage: "It is not possible to delete this researcher because it is bound to an user account.",
+    latestPublicationsLabel: "Latest publications from this researcher:"
 }

@@ -1278,5 +1278,7 @@ export default {
     geneticMaterialLabel: "Genetski materijal",
     geneticMaterialTypeLabel: "Tip genetskog materijala",
     addGeneticMaterialLabel: "Dodaj genetski materijal",
-    updateGeneticMaterialLabel: "Ažuriraj genetski materijal"
+    updateGeneticMaterialLabel: "Ažuriraj genetski materijal",
+    personBoundToUserMessage: "Nije moguće obrisati ovog istraživača jer je vazan za korisnika.",
+    latestPublicationsLabel: "Poslednje publikacije od ovog istraživača:"
 }

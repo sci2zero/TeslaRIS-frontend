@@ -467,7 +467,7 @@ export default defineComponent({
                 router.push({ name: "researcherLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value =
-                    isForceDelete ? i18n.t("personBoundToResearcherNotification", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
+                    isForceDelete ? i18n.t("personBoundToUserMessage", { name: name }) : i18n.t("deleteFailedNotification", { name: name });
                 snackbar.value = true;
             }
         };
