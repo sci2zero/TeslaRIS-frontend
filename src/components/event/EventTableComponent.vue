@@ -146,7 +146,19 @@ export default defineComponent({
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+        const tableOptions = ref<any>(
+            {
+                initialCustomConfiguration: true,
+                page: 1,
+                itemsPerPage: 10,
+                sortBy:[
+                    {
+                        key: (isCommission.value ? "dateFromTo" : nameColumn),
+                        order: (isCommission.value ? "desc" : "asc")
+                    }
+                ]
+            }
+        );
 
         const headers = ref<any[]>([
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
@@ -162,6 +174,7 @@ export default defineComponent({
 
             if (isCommission.value) {
                 headers.value.push({ title: classifiedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
+                tableOptions.value.sortBy = [{key: "dateFromTo", order: "desc"}];
             }
         });
 
@@ -266,7 +279,12 @@ export default defineComponent({
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             if (
                 (
-                    isEqual([{key: nameColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+                    isEqual([
+                        {
+                            key: (isCommission.value ? "dateFromTo" : nameColumn),
+                            order: (isCommission.value ? "desc" : "asc")
+                        }
+                    ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
                 ) &&
                 page == tableOptions.value.page

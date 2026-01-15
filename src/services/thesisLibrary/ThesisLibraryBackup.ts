@@ -23,7 +23,7 @@ export class ThesisLibraryBackupService extends BaseService {
 
         downloadStore.downloadProgressRef?.startDownload(backupFileName);
         const response = await super.sendRequest(axios.get, `thesis-library/backup/download/${backupFileName}`, {
-            responseType: 'blob',
+            responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
                 if (progressEvent.total) {
                     const percent = Math.round(

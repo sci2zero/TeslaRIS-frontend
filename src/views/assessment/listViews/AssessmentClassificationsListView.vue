@@ -4,13 +4,19 @@
         <br />
         <br />
         <br />
+
         <tab-content-loader
             v-if="loading"
             button-header
             :tab-number="1"
             layout="table"
         />
-        <AssessmentCLassificationTableComponent :classifications="classifications" :total-classifications="totalClassifications" @switch-page="switchPage"></AssessmentCLassificationTableComponent>
+
+        <assessment-cLassification-table-component
+            :classifications="classifications"
+            :total-classifications="totalClassifications"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -52,8 +58,9 @@ export default defineComponent({
         });
 
         const search = () => {
-            AssessmentClassificationService.fetchAllAssessmentClassifications(`page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
-            .then((response: AxiosResponse<Page<AssessmentClassification>>) => {
+            AssessmentClassificationService.fetchAllAssessmentClassifications(
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+            ).then((response: AxiosResponse<Page<AssessmentClassification>>) => {
                 classifications.value = response.data.content;
                 totalClassifications.value = response.data.totalElements;
             })

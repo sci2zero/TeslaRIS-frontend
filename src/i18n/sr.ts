@@ -672,6 +672,7 @@ export default {
     theoreticalPublicationLabel: "Teoretski rad",
     simulationPublicationLabel: "Simulacija",
     noClassificationsLabel: "Nema klasifikacija za ovaj entitet.",
+    noAssessmentsLabel: "Nema vrednovanja za ovaj entitet.",
     typeLabel: "Tip",
     ifValuesLabel: "Impakt Faktori i Indikatori Citiranosti Časopisa",
     if2ValueLabel: "IF2 broj",
@@ -1280,5 +1281,6 @@ export default {
     addGeneticMaterialLabel: "Dodaj genetski materijal",
     updateGeneticMaterialLabel: "Ažuriraj genetski materijal",
     personBoundToUserMessage: "Nije moguće obrisati ovog istraživača jer je vazan za korisnika.",
-    latestPublicationsLabel: "Poslednje publikacije od ovog istraživača:"
+    latestPublicationsLabel: "Poslednje publikacije od ovog istraživača:",
+    showAllCategoriesLabel: "Prikaži sve kategorije"
 }

@@ -256,7 +256,25 @@ export default defineComponent({
 
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string,
+                        value: PublicationType.THESIS
+                    }
+                );
+            }
+
+            if (isCommission.value) {
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH) as string,
+                        value: PublicationType.MONOGRAPH
+                    },
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH_PUBLICATION) as string,
+                        value: PublicationType.MONOGRAPH_PUBLICATION
+                    }
+                );
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {

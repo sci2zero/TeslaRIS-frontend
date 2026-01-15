@@ -52,7 +52,7 @@ export class RoCrateService extends BaseService {
                 axios.get,
                 `${exportUrl}?exportId=${exportId}`,
                 {
-                    responseType: 'blob',
+                    responseType: "blob",
                     onDownloadProgress: (progressEvent: any) => {
                         if (progressEvent.total) {
                             const percent = Math.round(

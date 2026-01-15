@@ -314,7 +314,7 @@
                     :entity-id="monograph?.id"
                     :can-edit="((canClassify && monograph?.documentDate) as boolean)"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.MONOGRAPH]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

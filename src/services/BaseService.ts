@@ -36,7 +36,7 @@ export class BaseService {
   async fetchImageForDisplay(personId: number, fullSize: boolean): Promise<[string | null, string | null]> {
     try {
       const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/image/${personId}?fullSize=${fullSize}`, {
-        responseType: 'blob',
+        responseType: "blob",
       });
 
       if (response.status === 204) {
@@ -59,7 +59,7 @@ export class BaseService {
   async fetchLogoForDisplay(organisationUnitId: number, fullSize: boolean): Promise<[string | null, string | null]> {
     try {
       const response: AxiosResponse<Blob> = await axios.get(this.basePath + `file/logo/${organisationUnitId}?fullSize=${fullSize}`, {
-        responseType: 'blob',
+        responseType: "blob",
       });
 
       if (response.status === 204) {

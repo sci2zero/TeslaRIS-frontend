@@ -671,7 +671,8 @@ export default {
     experimentalPublicationLabel: "Experimental paper",
     theoreticalPublicationLabel: "Theoretical paper",
     simulationPublicationLabel: "Simulation",
-    noClassificationsLabel: "No classifications for this entity",
+    noClassificationsLabel: "No classifications for this entity.",
+    noAssessmentsLabel: "No assessments for this entity.",
     typeLabel: "Type",
     ifValuesLabel: "Impact Factors and Journal Citation Indexes",
     if2ValueLabel: "IF2 value",
@@ -1271,5 +1272,6 @@ export default {
     addGeneticMaterialLabel: "Add genetic material",
     updateGeneticMaterialLabel: "Update genetic material",
     personBoundToUserMessage: "It is not possible to delete this researcher because it is bound to an user account.",
-    latestPublicationsLabel: "Latest publications from this researcher:"
+    latestPublicationsLabel: "Latest publications from this researcher:",
+    showAllCategoriesLabel: "Show all categories"
 }

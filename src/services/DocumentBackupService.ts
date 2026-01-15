@@ -23,7 +23,7 @@ export class DocumentBackupService extends BaseService {
 
         downloadStore.downloadProgressRef?.startDownload(backupFileName);
         const response = await super.sendRequest(axios.get, `document/backup/download/${backupFileName}`, {
-            responseType: 'blob',
+            responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
                 if (progressEvent.total) {
                     const percent = Math.round(

@@ -1,9 +1,12 @@
 import { ApplicableEntityType } from "@/models/Common";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
+import { PublicationType } from "@/models/PublicationModel";
+
 
 export const applicableEntityTypeSr = [
     { title: "Monografija", value: ApplicableEntityType.MONOGRAPH },
+    { title: "Rad u monografiji", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
     { title: "Događaj", value: ApplicableEntityType.EVENT },
     { title: "Dokument", value: ApplicableEntityType.DOCUMENT },
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
@@ -14,6 +17,7 @@ export const applicableEntityTypeSr = [
 
 export const applicableEntityTypeEn = [
     { title: "Monograph", value: ApplicableEntityType.MONOGRAPH },
+    { title: "Monograph publication", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
     { title: "Event", value: ApplicableEntityType.EVENT },
     { title: "Document", value: ApplicableEntityType.DOCUMENT },
     { title: "Researcher", value: ApplicableEntityType.PERSON },
@@ -43,5 +47,16 @@ export const getApplicableEntityTypesForGivenLocale = () => {
             return transliterateContentToCyrillic(applicableEntityTypeSr);
         case "en":
             return applicableEntityTypeEn;
+    }
+};
+
+export const getApplicableEntityTypeForDocumentType = (documentType: PublicationType) => {
+    switch(documentType) {
+        case PublicationType.MONOGRAPH:
+            return ApplicableEntityType.MONOGRAPH;
+        case PublicationType.MONOGRAPH_PUBLICATION:
+            return ApplicableEntityType.MONOGRAPH_PUBLICATION;
+        default:
+            return ApplicableEntityType.DOCUMENT;
     }
 };

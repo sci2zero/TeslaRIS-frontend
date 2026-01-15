@@ -108,6 +108,7 @@ export enum AccessLevel {
 
 export enum ApplicableEntityType {
     MONOGRAPH = "MONOGRAPH",
+    MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
     EVENT = "EVENT",
     DOCUMENT = "DOCUMENT",
     PERSON = "PERSON",

@@ -5,22 +5,38 @@
                 <v-select
                     v-model="selectedAssessmentClassification"
                     :items="assessmentClassifications"
-                    :label="$t('classificationLabel') + '*'"
+                    :label="$t(entityType === ApplicableEntityType.DOCUMENT ? 'assessmentLabel' : 'classificationLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object>
                 </v-select>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-checkbox
+                    v-model="showAllForEntityType"
+                    :label="$t('showAllCategoriesLabel')"
+                ></v-checkbox>
+            </v-col>
+        </v-row>
         <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT'">
             <v-col>
                 <v-text-field
-                    v-model="classificationYear" type="number" :label="$t('classificationYearLabel') + '*'" :placeholder="$t('classificationYearLabel') + '*'"
-                    :rules="requiredNumericFieldRules"></v-text-field>
+                    v-model="classificationYear"
+                    type="number"
+                    :label="$t('classificationYearLabel') + '*'"
+                    :placeholder="$t('classificationYearLabel') + '*'"
+                    :rules="requiredNumericFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row v-if="!isCommission && !isViceDeanForScience">
             <v-col>
-                <commission-autocomplete-search v-model="selectedCommission" :read-only="presetClassification !== undefined" required></commission-autocomplete-search>
+                <commission-autocomplete-search
+                    v-model="selectedCommission"
+                    :read-only="presetClassification !== undefined"
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -69,6 +85,7 @@ export default defineComponent({
     emits: ["create"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
+        const showAllForEntityType = ref(false);
 
         const { isCommission, isViceDeanForScience } = useUserRole();
 
@@ -77,8 +94,18 @@ export default defineComponent({
             populateFields();
         });
 
+        watch(showAllForEntityType, () => {
+            fetchDetails();
+        });
+
         const fetchDetails = () => {
-            AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(props.applicableTypes).then((response) => {
+            const applicableTypes = [...props.applicableTypes];
+
+            if (showAllForEntityType.value) {
+                applicableTypes.push(props.entityType);
+            }
+
+            AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(applicableTypes).then((response) => {
                 assessmentClassifications.value.splice(0);
                 response.data.forEach((classification) => {
                     assessmentClassifications.value.push({title: returnCurrentLocaleContent(classification.title) as string, value: classification.id as number});
@@ -134,7 +161,9 @@ export default defineComponent({
             selectedAssessmentClassification,
             requiredNumericFieldRules,
             classificationYear, isCommission,
-            isViceDeanForScience
+            isViceDeanForScience,
+            ApplicableEntityType,
+            showAllForEntityType
         };
     }
 });

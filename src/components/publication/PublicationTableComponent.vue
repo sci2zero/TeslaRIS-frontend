@@ -330,7 +330,7 @@
                             <entity-classification-modal-content
                                 v-if="(isAdmin || isCommission) && !richResultsView && !validationView"
                                 :entity-id="(item.databaseId as number)"
-                                :entity-type="ApplicableEntityType.DOCUMENT"
+                                :entity-type="getApplicableEntityTypeForDocumentType(item.type)"
                                 :disabled="!item.year || item.year < 0"
                                 @classified="documentClassified(item)"
                                 @update="refreshTable(tableOptions)">
@@ -411,6 +411,7 @@ import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from 
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import IdentifierMenu from '../core/IdentifierMenu.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { getApplicableEntityTypeForDocumentType } from '@/i18n/applicableEntityType';
 
 
 export default defineComponent({
@@ -522,7 +523,7 @@ export default defineComponent({
                 headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
             }
 
-            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value || props.sortByDateDefault) {
+            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || props.sortByDateDefault) {
                 tableOptions.value.sortBy = [{key: "year", order: "desc"}];
             }
         })
@@ -566,8 +567,8 @@ export default defineComponent({
                 itemsPerPage: 10,
                 sortBy:[
                     {
-                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn),
-                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
+                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "year" : titleColumn),
+                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "desc" : "asc")
                     }
                 ]
             }
@@ -716,8 +717,8 @@ export default defineComponent({
                     isEqual(
                         [
                             {
-                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "year" : titleColumn.value),
-                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value) ? "desc" : "asc")
+                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "year" : titleColumn.value),
+                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "desc" : "asc")
                             }
                         ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
@@ -904,7 +905,7 @@ export default defineComponent({
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
             toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
             getPublicationTypeIcon, titleColumn, yearHeader, displayPersistentDialog,
-            startDeletionProcess
+            startDeletionProcess, getApplicableEntityTypeForDocumentType
         };
     }
 });
