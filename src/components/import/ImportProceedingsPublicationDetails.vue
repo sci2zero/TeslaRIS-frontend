@@ -48,6 +48,24 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="workOpenAlexIdValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="webOfScienceId"
+                    label="Web of Science ID"
+                    placeholder="Web of Science ID"
+                    :rules="documentWebOfScienceIdValidationRules">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col cols="10">
                 <v-select
                     v-model="selectedpublicationType"
@@ -140,6 +158,8 @@ export default defineComponent({
         const publicationYear = ref(props.presetMetadata?.documentDate);
         const doi = ref(props.presetMetadata?.doi);
         const scopus = ref(props.presetMetadata?.scopusId);
+        const openAlexId = ref(props.presetMetadata?.openAlexId);
+        const webOfScienceId = ref(props.presetMetadata?.webOfScienceId);
         const articleNumber = ref(props.presetMetadata?.articleNumber);
         const numberOfPages = ref(props.presetMetadata?.numberOfPages);
         const uris = ref<string[]>(props.presetMetadata?.uris as string[]);
@@ -174,7 +194,9 @@ export default defineComponent({
 
         const {
             doiValidationRules, scopusIdValidationRules,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         } = useValidationUtils();
 
         return {
@@ -186,7 +208,10 @@ export default defineComponent({
             publicationTypes, selectedpublicationType,
             description, keywords, doiValidationRules,
             scopusIdValidationRules, toMultilingualTextInput,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            openAlexId, webOfScienceId,
+            workOpenAlexIdValidationRules,
+            documentWebOfScienceIdValidationRules
         };
     }
 });

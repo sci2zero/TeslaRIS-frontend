@@ -256,7 +256,7 @@ export default defineComponent({
 
         const currentLoadRecord = ref<JournalPublicationLoad|ProceedingsPublicationLoad>();
 
-        const documentIdToDelete = ref<number | null>(null);
+        const documentIdToUpdate = ref<number | null>(null);
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -451,6 +451,8 @@ export default defineComponent({
             currentLoadRecord.value!.documentDate = updatedRecord.documentDate;
             currentLoadRecord.value!.scopusId = updatedRecord.scopusId;
             currentLoadRecord.value!.doi = updatedRecord.doi;
+            currentLoadRecord.value!.webOfScienceId = updatedRecord.webOfScienceId;
+            currentLoadRecord.value!.openAlexId = updatedRecord.openAlexId;
             
             if (loadingJournalPublication.value) {
                 (currentLoadRecord.value as JournalPublicationLoad)!.volume = (updatedRecord as JournalPublicationLoad).volume;
@@ -585,6 +587,8 @@ export default defineComponent({
                 });
             });
 
+            const performUpdate = documentIdToUpdate.value !== null;
+
             if (loadingJournalPublication.value) {
                 const newJournalPublication: JournalPublication = {
                     title: currentLoadRecord.value!.title,
@@ -611,11 +615,8 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createJournalPublication(
-                    newJournalPublication,
-                    self.crypto.randomUUID()
-                ).then((response) => {
-                    fetchNextAfterLoading(response.data.id as number);
+                saveJournalPublication(performUpdate, newJournalPublication).then((response) => {
+                    fetchNextAfterLoading((performUpdate ? documentIdToUpdate.value : response.data?.id) as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -655,10 +656,8 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createProceedingsPublication(
-                    newProceedingsPublication, self.crypto.randomUUID()
-                ).then((response) => {
-                    fetchNextAfterLoading(response.data.id as number);
+                saveProceedingsPublication(performUpdate, newProceedingsPublication).then((response) => {
+                    fetchNextAfterLoading((performUpdate ? documentIdToUpdate.value : response.data?.id) as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -677,33 +676,60 @@ export default defineComponent({
             }
         };
 
-        const fetchNextAfterLoading = (newDocumentId: number) => {
-            markAsLoadedAndFetchNext(newDocumentId, documentIdToDelete.value, documentIdToDelete.value !== null);
-            loading.value = false;
-            documentIdToDelete.value = null;
+        const saveJournalPublication = (performUpdate: boolean, newJournalPublication: JournalPublication) => {
+            if (performUpdate) {
+                return DocumentPublicationService.updateJournalPublication(
+                    documentIdToUpdate.value as number,
+                    newJournalPublication
+                );
+            }
+
+            return DocumentPublicationService.createJournalPublication(
+                newJournalPublication,
+                self.crypto.randomUUID()
+            );
         };
 
-        const deduplicate = (oldDocumentId: number, deleteOldDocument: boolean) => {
-            if (deleteOldDocument) {
-                documentIdToDelete.value = oldDocumentId;
+        const saveProceedingsPublication = (performUpdate: boolean, newProceedingsPublication: ProceedingsPublication) => {
+            if (performUpdate) {
+                return DocumentPublicationService.updateProceedingsPublication(
+                    documentIdToUpdate.value as number,
+                    newProceedingsPublication
+                );
+            }
+
+            return DocumentPublicationService.createProceedingsPublication(
+                newProceedingsPublication,
+                self.crypto.randomUUID()
+            );
+        };
+
+        const fetchNextAfterLoading = (newDocumentId: number) => {
+            markAsLoadedAndFetchNext(newDocumentId, (newDocumentId != documentIdToUpdate.value) ? documentIdToUpdate.value : null);
+            loading.value = false;
+            documentIdToUpdate.value = null;
+        };
+
+        const deduplicate = (oldDocumentId: number, updateOldDocument: boolean) => {
+            if (updateOldDocument) {
+                documentIdToUpdate.value = oldDocumentId;
                 ImportService.prepareOldDocumentForOverwriting(
-                    documentIdToDelete.value,
+                    documentIdToUpdate.value,
                     selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
                 ).then(() => {
                     finishLoad();
                 });
             } else {
-                markAsLoadedAndFetchNext(null, oldDocumentId, deleteOldDocument);
+                markAsLoadedAndFetchNext(null, oldDocumentId);
             }
         };
 
-        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
+        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null) => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
                 oldDocumentId,
-                deleteOldDocument,
                 newDocumentId
             ).then(() => {
                 stepperValue.value = smartLoading.value ? 0 : 1;

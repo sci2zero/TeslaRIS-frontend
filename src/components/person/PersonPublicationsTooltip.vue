@@ -2,7 +2,7 @@
     <v-tooltip
         location="end"
         max-width="600"
-        :open-on-hover="true"
+        :open-on-hover="show"
     >
         <template #activator="{ props: tooltipProps }">
             <div
@@ -41,20 +41,24 @@ import DocumentPublicationService from '@/services/DocumentPublicationService'
 
 
 export default defineComponent({
-    name: 'PersonPublicationsTooltip',
+    name: "PersonPublicationsTooltip",
     props: {
         personId: {
             type: Number,
             required: true
+        },
+        show: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
-        const text = ref('');
+        const text = ref("");
         const loading = ref(false);
         const loaded = ref(false);
 
         const loadPublications = async () => {
-            if (loaded.value || loading.value) {
+            if (loaded.value || loading.value || !props.show) {
                 return;
             }
 

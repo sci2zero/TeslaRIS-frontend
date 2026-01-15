@@ -20,6 +20,7 @@
                     >
                         <person-publications-tooltip
                             :person-id="item.raw.value"
+                            :show="showLatestPublications"
                         >
                             {{ item.raw.title }}
                         </person-publications-tooltip>
@@ -113,6 +114,13 @@
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
     </v-row>
+    <v-row v-show="((personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate) && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
+        <v-chip
+            v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" class="ml-2" outlined
+            @click="affiliationStatementRef?.setNewInputValue(toMultilingualTextInput(suggestion, languageTags))">
+            {{ returnCurrentLocaleContent(suggestion) }}
+        </v-chip>
+    </v-row>
     <v-row v-if="personOtherNames.length > 0 && personAffiliations.length > 0 && !selectExternalAssociate">
         <v-col>
             <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU; sendContentToParent();">
@@ -197,6 +205,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        showLatestPublications: {
+            type: Boolean,
+            default: true
+        },
         suggestionDisplayCheck: {
             type: Function as PropType<((personId: number) => boolean)>,
             default: () => { return true; }
@@ -207,7 +219,7 @@ export default defineComponent({
         const { canUserAddPersons, isResearcher, isAdmin, isInstitutionalEditor } = useUserRole();
 
         const contributionDescription = ref([]);
-        const affiliationStatement = ref([]);
+        const affiliationStatement = ref<any>([]);
 
         const enterExternalOU = ref(true);
 
@@ -538,6 +550,8 @@ export default defineComponent({
                 return;
             }
 
+            enterExternalOU.value = false;
+
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
                 personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
@@ -574,6 +588,8 @@ export default defineComponent({
 
                 if (personAffiliations.value.length === 0) {
                     enterExternalOU.value = true;
+                } else {
+                    enterExternalOU.value = false;
                 }
             });
         });
@@ -691,19 +707,36 @@ export default defineComponent({
             onPersonSelect(selectedPerson.value);
         };
 
+        const externalInstitutionSuggestions = ref<MultilingualContent[][]>([]);
+        watch(enterExternalOU, (newValue, oldvalue) => {
+            console.log(oldvalue, newValue, personOtherNames.value.length, affiliationStatement.value.length)
+            if(
+                oldvalue === false && newValue === true &&
+                affiliationStatement.value.length === 0
+            ) {
+                externalInstitutionSuggestions.value.splice(0);
+                InvolvementService.getExternalInstitutionSuggestions(
+                    selectedPerson.value.value
+                ).then(response => {
+                    externalInstitutionSuggestions.value = response.data;
+                });
+            }
+        });
+
         return {
-                firstName, middleName, lastName, selectedPerson, customNameInput,
-                searchPersons, filterPersons, persons, requiredFieldRules,
-                requiredSelectionRules, contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
-                descriptionRef, affiliationStatementRef, toggleExternalSelection,
-                personOtherNames, selectedOtherName, selectExternalAssociate,
-                selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
-                languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm, enterExternalOU, canUserAddPersons,
-                constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
-            };
+            firstName, middleName, lastName, selectedPerson, customNameInput,
+            searchPersons, filterPersons, persons, requiredFieldRules,
+            requiredSelectionRules, contributionDescription, affiliationStatement,
+            sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
+            descriptionRef, affiliationStatementRef, toggleExternalSelection,
+            personOtherNames, selectedOtherName, selectExternalAssociate,
+            selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
+            languageTags, valueSet, selectedAffiliations, personAffiliations,
+            PersonSubmissionForm, enterExternalOU, canUserAddPersons,
+            constructExternalCollaboratorFromInput, onAutocompleteBlur,
+            presetPersonNameForCreation, setContributor, selectExistingSelectedPerson,
+            externalInstitutionSuggestions, returnCurrentLocaleContent
+        };
     }
 });
 </script>

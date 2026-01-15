@@ -145,6 +145,18 @@ export default defineComponent({
             }
         };
 
+        const setNewInputValue = (value: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]) => {
+            if(value && value.length > 0 && value[0].text !== "") {
+                inputs.value = [];
+                value.forEach(input => {
+                    input.supportedLanguages.push(input.language);
+                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
+                    filterFromInputChoices(input.language);
+                });
+                sendContentToParent();
+            }
+        };
+
         const forceRefreshModelValue = (modelValue: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]) => {
             inputs.value = [];
             modelValue.forEach(input => {
@@ -236,15 +248,15 @@ export default defineComponent({
 
         return {
             supportedLanguages,
-            inputs,
-            addInput,
+            inputs, addInput,
             removeInput,
             sendContentToParent,
             clearInput,
             updatedLanguage,
             forceRefreshModelValue,
             richEditorRef,
-            setInitialModelValue
+            setInitialModelValue,
+            setNewInputValue
         };
     }
 });

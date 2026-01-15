@@ -21,6 +21,7 @@
                     >
                         <person-publications-tooltip
                             :person-id="item.raw.value"
+                            :show="showLatestPublications"
                         >
                             {{ item.raw.title }}
                         </person-publications-tooltip>
@@ -107,6 +108,10 @@ export default defineComponent({
         noOrcid: {
             type: Boolean,
             default: false
+        },
+        showLatestPublications: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update:modelValue"],

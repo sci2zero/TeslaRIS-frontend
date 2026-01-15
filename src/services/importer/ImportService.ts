@@ -71,7 +71,6 @@ export class ImportService extends BaseService {
     async markCurrentAsLoaded(
         institutionId: number | null = null,
         oldDocumentId: number | null = null,
-        deleteOldDocument: boolean | null = null,
         newDocumentId: number | null = null
     ): Promise<AxiosResponse<void>> {
         const queryParams: string[] = [];
@@ -82,10 +81,6 @@ export class ImportService extends BaseService {
 
         if (oldDocumentId !== null) {
             queryParams.push(`oldDocumentId=${oldDocumentId}`);
-        }
-
-        if (deleteOldDocument !== null) {
-            queryParams.push(`deleteOldDocument=${deleteOldDocument}`);
         }
 
         if (newDocumentId !== null) {
