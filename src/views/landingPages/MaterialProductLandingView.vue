@@ -250,7 +250,7 @@
                     :entity-id="materialProduct?.id"
                     :can-edit="canClassify && materialProduct?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

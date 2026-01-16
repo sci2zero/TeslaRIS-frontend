@@ -222,7 +222,7 @@
                     :entity-id="software?.id"
                     :can-edit="canClassify && software?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

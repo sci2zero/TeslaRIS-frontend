@@ -228,7 +228,7 @@
                     :entity-id="geneticMaterial?.id"
                     :can-edit="canClassify && geneticMaterial?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.GENETIC_MATERIAL]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

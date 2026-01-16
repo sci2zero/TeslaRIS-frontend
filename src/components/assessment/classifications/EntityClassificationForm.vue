@@ -11,7 +11,8 @@
                 </v-select>
             </v-col>
         </v-row>
-        <v-row v-if="entityType === ApplicableEntityType.MONOGRAPH || entityType === ApplicableEntityType.MONOGRAPH_PUBLICATION">
+        <v-row
+            v-if="isDocumentEntity">
             <v-col>
                 <v-checkbox
                     v-model="showAllForEntityType"
@@ -86,6 +87,18 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
         const showAllForEntityType = ref(false);
+
+        const isDocumentEntity = ref(
+            props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH) || 
+            props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.JOURNAL_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.PROCEEDINGS_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.PATENT) || 
+            props.applicableTypes.includes(ApplicableEntityType.MATERIAL_PRODUCT) || 
+            props.applicableTypes.includes(ApplicableEntityType.GENETIC_MATERIAL) || 
+            props.applicableTypes.includes(ApplicableEntityType.DATASET) || 
+            props.applicableTypes.includes(ApplicableEntityType.THESIS)
+        );
 
         const { isCommission, isViceDeanForScience } = useUserRole();
 
@@ -163,7 +176,8 @@ export default defineComponent({
             classificationYear, isCommission,
             isViceDeanForScience,
             ApplicableEntityType,
-            showAllForEntityType
+            showAllForEntityType,
+            isDocumentEntity
         };
     }
 });

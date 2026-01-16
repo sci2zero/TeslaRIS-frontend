@@ -223,7 +223,7 @@
                     :entity-id="patent?.id"
                     :can-edit="canClassify && patent?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.PATENT]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

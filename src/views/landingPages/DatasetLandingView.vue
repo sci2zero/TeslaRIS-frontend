@@ -224,7 +224,7 @@
                     :entity-id="dataset?.id"
                     :can-edit="canClassify && dataset?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.DATASET]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

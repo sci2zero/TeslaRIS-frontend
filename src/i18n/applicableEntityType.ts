@@ -7,6 +7,13 @@ import { PublicationType } from "@/models/PublicationModel";
 export const applicableEntityTypeSr = [
     { title: "Monografija", value: ApplicableEntityType.MONOGRAPH },
     { title: "Rad u monografiji", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
+    { title: "Rad u časopisu", value: ApplicableEntityType.JOURNAL_PUBLICATION },
+    { title: "Rad sa konferencije", value: ApplicableEntityType.PROCEEDINGS_PUBLICATION },
+    { title: "Patent", value: ApplicableEntityType.PATENT },
+    { title: "Materijalni proizvod", value: ApplicableEntityType.MATERIAL_PRODUCT },
+    { title: "Genetski materijal", value: ApplicableEntityType.GENETIC_MATERIAL },
+    { title: "Skup podataka", value: ApplicableEntityType.DATASET },
+    { title: "Završni rad", value: ApplicableEntityType.THESIS },
     { title: "Događaj", value: ApplicableEntityType.EVENT },
     { title: "Dokument", value: ApplicableEntityType.DOCUMENT },
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
@@ -18,6 +25,13 @@ export const applicableEntityTypeSr = [
 export const applicableEntityTypeEn = [
     { title: "Monograph", value: ApplicableEntityType.MONOGRAPH },
     { title: "Monograph publication", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
+    { title: "Journal publication", value: ApplicableEntityType.JOURNAL_PUBLICATION },
+    { title: "Proceedings publication", value: ApplicableEntityType.PROCEEDINGS_PUBLICATION },
+    { title: "Patent", value: ApplicableEntityType.PATENT },
+    { title: "Material product", value: ApplicableEntityType.MATERIAL_PRODUCT },
+    { title: "Genetic material", value: ApplicableEntityType.GENETIC_MATERIAL },
+    { title: "Dataset", value: ApplicableEntityType.DATASET },
+    { title: "Thesis", value: ApplicableEntityType.THESIS },
     { title: "Event", value: ApplicableEntityType.EVENT },
     { title: "Document", value: ApplicableEntityType.DOCUMENT },
     { title: "Researcher", value: ApplicableEntityType.PERSON },
@@ -56,6 +70,21 @@ export const getApplicableEntityTypeForDocumentType = (documentType: Publication
             return ApplicableEntityType.MONOGRAPH;
         case PublicationType.MONOGRAPH_PUBLICATION:
             return ApplicableEntityType.MONOGRAPH_PUBLICATION;
+        case PublicationType.JOURNAL_PUBLICATION:
+            return ApplicableEntityType.JOURNAL_PUBLICATION;
+        case PublicationType.PROCEEDINGS_PUBLICATION:
+            return ApplicableEntityType.PROCEEDINGS_PUBLICATION;
+        case PublicationType.PATENT:
+            return ApplicableEntityType.PATENT;
+        case PublicationType.MATERIAL_PRODUCT:
+        case PublicationType.SOFTWARE:
+            return ApplicableEntityType.MATERIAL_PRODUCT;
+        case PublicationType.GENETIC_MATERIAL:
+            return ApplicableEntityType.GENETIC_MATERIAL;
+        case PublicationType.DATASET:
+            return ApplicableEntityType.DATASET;
+        case PublicationType.THESIS:
+            return ApplicableEntityType.THESIS;
         default:
             return ApplicableEntityType.DOCUMENT;
     }

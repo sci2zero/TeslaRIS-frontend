@@ -270,7 +270,7 @@
                     :entity-id="journalPublication?.id"
                     :can-edit="canClassify && journalPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.JOURNAL_PUBLICATION]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

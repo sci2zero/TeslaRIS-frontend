@@ -478,7 +478,7 @@
                     :entity-id="thesis?.id"
                     :can-edit="canClassify && !thesis?.isOnPublicReview && thesis?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.THESIS]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

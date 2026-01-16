@@ -254,7 +254,7 @@
                     :entity-id="proceedingsPublication?.id"
                     :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.PROCEEDINGS_PUBLICATION]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
