@@ -11,7 +11,7 @@
                 </v-select>
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="entityType === ApplicableEntityType.MONOGRAPH || entityType === ApplicableEntityType.MONOGRAPH_PUBLICATION">
             <v-col>
                 <v-checkbox
                     v-model="showAllForEntityType"

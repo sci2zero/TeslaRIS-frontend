@@ -330,7 +330,8 @@
                             <entity-classification-modal-content
                                 v-if="(isAdmin || isCommission) && !richResultsView && !validationView"
                                 :entity-id="(item.databaseId as number)"
-                                :entity-type="getApplicableEntityTypeForDocumentType(item.type)"
+                                :entity-type="ApplicableEntityType.DOCUMENT"
+                                :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
                                 :disabled="!item.year || item.year < 0"
                                 @classified="documentClassified(item)"
                                 @update="refreshTable(tableOptions)">

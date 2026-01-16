@@ -21,7 +21,7 @@
                             :entity-id="entityId"
                             can-edit
                             :containing-entity-type="entityType"
-                            :applicable-types="[entityType]"
+                            :applicable-types="[applicableType]"
                             @create="createClassification"
                             @update="fetchClassifications"
                         />
@@ -56,6 +56,10 @@ export default defineComponent({
             required: true
         },
         entityType: {
+            type: Object as PropType<ApplicableEntityType>,
+            required: true
+        },
+        applicableType: {
             type: Object as PropType<ApplicableEntityType>,
             required: true
         },
