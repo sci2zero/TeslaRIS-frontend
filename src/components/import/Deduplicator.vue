@@ -67,7 +67,7 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ["deduplicate"],
+    emits: ["deduplicate", "foundMatches"],
     setup(props, { emit }) {
         const parameters = ref("");
         const potentialMatches = ref<DocumentPublicationIndex[]>([]);
@@ -95,6 +95,7 @@ export default defineComponent({
         const fetchPotentialMatches = () => {
             ImportService.searchForDuplicates(parameters.value).then(response => {
                 potentialMatches.value = response.data.content;
+                emit("foundMatches", potentialMatches.value.map(document => document.databaseId));
             });
         };
 

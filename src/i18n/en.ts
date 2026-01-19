@@ -1273,5 +1273,9 @@ export default {
     updateGeneticMaterialLabel: "Update genetic material",
     personBoundToUserMessage: "It is not possible to delete this researcher because it is bound to an user account.",
     latestPublicationsLabel: "Latest publications from this researcher:",
-    showAllCategoriesLabel: "Show all categories"
+    showAllCategoriesLabel: "Show all categories",
+    monographListLabel: "Monographs",
+    if2RankLabel: "IF2 rank",
+    if5RankLabel: "IF5 rank",
+    jciRankLabel: "JCI rank"
 }

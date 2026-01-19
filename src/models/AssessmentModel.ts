@@ -266,6 +266,7 @@ export interface IFCategoryData {
     category: string;
     if2Ranks: IFValue[];
     if5Ranks: IFValue[];
+    jciRanks: IFValue[];
 }
 
 export interface IFTableResponse {

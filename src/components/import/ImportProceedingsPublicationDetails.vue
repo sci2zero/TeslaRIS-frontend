@@ -125,7 +125,7 @@ import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
-import type { ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
+import type { Document, ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/proceedingsPublicationType';
@@ -141,6 +141,10 @@ export default defineComponent({
         presetMetadata: {
             type: Object as PropType<ProceedingsPublicationLoad>,
             required: true
+        },
+        metadataEnrichment: {
+            type: Array<Document>,
+            default: []
         }
     },
     emits: ["update"],

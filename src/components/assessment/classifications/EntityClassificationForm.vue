@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
@@ -88,7 +88,7 @@ export default defineComponent({
         const isFormValid = ref(false);
         const showAllForEntityType = ref(false);
 
-        const isDocumentEntity = ref(
+        const isDocumentEntity = computed(() =>
             props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH) || 
             props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH_PUBLICATION) || 
             props.applicableTypes.includes(ApplicableEntityType.JOURNAL_PUBLICATION) || 
@@ -112,10 +112,12 @@ export default defineComponent({
         });
 
         const fetchDetails = () => {
-            const applicableTypes = [...props.applicableTypes];
+            let applicableTypes = [...props.applicableTypes];
 
             if (showAllForEntityType.value) {
                 applicableTypes.push(props.entityType);
+            } else if (applicableTypes.includes(ApplicableEntityType.DOCUMENT)) {
+                applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.DOCUMENT);
             }
 
             AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(applicableTypes).then((response) => {

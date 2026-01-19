@@ -1282,5 +1282,9 @@ export default {
     updateGeneticMaterialLabel: "Ažuriraj genetski materijal",
     personBoundToUserMessage: "Nije moguće obrisati ovog istraživača jer je vazan za korisnika.",
     latestPublicationsLabel: "Poslednje publikacije od ovog istraživača:",
-    showAllCategoriesLabel: "Prikaži sve kategorije"
+    showAllCategoriesLabel: "Prikaži sve kategorije",
+    monographListLabel: "Monografije",
+    if2RankLabel: "IF2 rank",
+    if5RankLabel: "IF5 rank",
+    jciRankLabel: "JCI rank"
 }

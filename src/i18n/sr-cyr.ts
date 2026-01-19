@@ -97,5 +97,8 @@ export default {
     downloadRoCrateBibliographyLabel: "Преузми библиографију (Ro-Crate)",
     calculateIf5RankLabel: "Израчунај IF5 ранк",
     calculateJciRankLabel: "Израчунај JCI ранк",
-    clientInstitutionCrisLabel: "Клијентска институција (CRIS)"
+    clientInstitutionCrisLabel: "Клијентска институција (CRIS)",
+    if2RankLabel: "IF2 ранк",
+    if5RankLabel: "IF5 ранк",
+    jciRankLabel: "JCI ранк"
 };

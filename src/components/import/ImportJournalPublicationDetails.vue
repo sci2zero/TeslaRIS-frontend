@@ -133,7 +133,7 @@ import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
-import type { JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
+import type { Document, JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
@@ -149,6 +149,10 @@ export default defineComponent({
         presetMetadata: {
             type: Object as PropType<JournalPublicationLoad>,
             required: true
+        },
+        metadataEnrichment: {
+            type: Array<Document>,
+            default: []
         }
     },
     emits: ["update"],

@@ -15,7 +15,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -92,7 +92,7 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
@@ -132,13 +132,20 @@
                     disable-submission
                 />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment" cols="12" md="3">
+            <v-col v-if="monographPublicationsAssessment" cols="12" md="3">
+                <monograph-autocomplete-search
+                    v-model="selectedMonographs"
+                    multiple
+                    disable-submission
+                />
+            </v-col>
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment" cols="12" md="3">
                 <person-autocomplete-search
                     v-model="selectedPersons"
                     multiple disable-submission
                 />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || isTopLevelReport()" cols="12" md="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || isTopLevelReport()" cols="12" md="3">
                 <organisation-unit-autocomplete-search
                     v-model="selectedOUs" :multiple="!isTopLevelReport()"
                     disable-submission :required="isTopLevelReport()"
@@ -193,7 +200,9 @@
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment" cols="12" sm="3" md="2">
+            <v-col
+                v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment"
+                cols="12" sm="3" md="2">
                 <date-picker
                     v-model="startDate"
                     :label="$t('startDateLabel') + '*'"
@@ -273,11 +282,12 @@ import { RecurrenceType } from "@/models/LoadModel";
 import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
 import { getPublicationTypesForGivenLocale } from "@/i18n/publicationType";
 import ApplicationConfigurationService from "@/services/ApplicationConfigurationService";
+import MonographAutocompleteSearch from "@/components/publication/MonographAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "IndicatorsLoadView",
-    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch, EventAutocompleteSearch },
+    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch, EventAutocompleteSearch, MonographAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -324,6 +334,7 @@ export default defineComponent({
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
         const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
         const thesesAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.THESES_ASSESSMENT);
+        const monographPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MONOGRAPH_PUBLICATIONS_ASSESSMENT);
         const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
         const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
@@ -347,6 +358,7 @@ export default defineComponent({
 
         const selectedJournals = ref<{title: string, value: number}[]>([]);
         const selectedEvents = ref<{title: string, value: number}[]>([]);
+        const selectedMonographs = ref<{title: string, value: number}[]>([]);
         const selectedPersons = ref<{title: string, value: number}[]>([]);
         const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
         const selectedCommissions = ref<{title: string, value: number}[]>([]);
@@ -556,6 +568,20 @@ export default defineComponent({
                         )
                     );
                     break;
+                case ScheduledTaskType.MONOGRAPH_PUBLICATIONS_ASSESSMENT:
+                    scheduleTask(() => 
+                        TaskManagerService.schedulePublicationAssessment(
+                            timestamp, (startDate.value as string).split("T")[0],
+                            {
+                                commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
+                                authorIds: selectedPersons.value.map(person => person.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
+                                publishedInIds: selectedMonographs.value.map(monograph => monograph.value)
+                            },
+                            PublicationType.MONOGRAPH_PUBLICATION
+                        )
+                    );
+                    break;
 
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
@@ -634,7 +660,8 @@ export default defineComponent({
             requiredNumericGreaterThanZeroFieldRules,
             selectedPublicationType, maintenance,
             approximateEndMoment, requiredFieldRules,
-            calculateIF5Rank, calculateJCIRank, thesesAssessment
+            calculateIF5Rank, calculateJCIRank, thesesAssessment,
+            monographPublicationsAssessment, selectedMonographs
         };
     },
 });
