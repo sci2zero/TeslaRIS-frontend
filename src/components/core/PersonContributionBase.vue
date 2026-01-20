@@ -68,8 +68,21 @@
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field
-                v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"
-                @update:model-value="sendContentToParent"></v-text-field>
+                v-model="firstName"
+                :label="$t('firstNameLabel') + '*'"
+                :placeholder="$t('firstNameLabel')"
+                :rules="requiredFieldRules"
+                @update:model-value="sendContentToParent">
+                <template #append-inner>
+                    <v-btn 
+                        icon
+                        variant="text"
+                        class="ml-2"
+                        @click="[firstName, lastName] = [lastName, firstName]">
+                        <v-icon>mdi-swap-horizontal</v-icon>
+                    </v-btn>
+                </template>
+            </v-text-field>
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>

@@ -35,8 +35,9 @@
             :publication-for-loading="currentLoadRecord"
             :can-perform-overwrite="stepperValue === steps.length"
             @deduplicate="deduplicate"
-            @found-matches="fetchMetadataForEnrichment">
-        </deduplicator>
+            @found-matches="fetchMetadataForEnrichment"
+            @match-selected="displayMatchMetadata"
+        />
 
         <br />
         
@@ -114,7 +115,8 @@
                         v-if="loadingJournalPublication"
                         ref="journalPublicationDetailsRef"
                         :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
-                        :metadata-enrichment="enrichmentMetadata"
+                        :metadata-enrichment="(enrichmentMetadata as JournalPublication[])"
+                        :display-enrichment-set-index="displayEnrichmentSetIndex"
                         @update="updateRecord">
                     </import-journal-publication-details>
                     
@@ -122,7 +124,8 @@
                         v-if="loadingProceedingsPublication"
                         ref="proceedingsPublicationDetailsRef"
                         :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
-                        :metadata-enrichment="enrichmentMetadata"
+                        :metadata-enrichment="(enrichmentMetadata as ProceedingsPublication[])"
+                        :display-enrichment-set-index="displayEnrichmentSetIndex"
                         @update="updateRecord">
                     </import-proceedings-publication-details>
 
@@ -191,7 +194,7 @@ import ImportAuthor from "@/components/import/ImportAuthor.vue";
 import ImportJournal from "@/components/import/ImportJournal.vue";
 import ImportJournalPublicationDetails from "@/components/import/ImportJournalPublicationDetails.vue";
 import ImportProceedingsPublicationDetails from "@/components/import/ImportProceedingsPublicationDetails.vue";
-import type { Document, JournalPublication, PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
+import type { JournalPublication, PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import Deduplicator from "@/components/import/Deduplicator.vue";
 import ImportProceedings from "@/components/import/ImportProceedings.vue";
@@ -261,7 +264,8 @@ export default defineComponent({
 
         const documentIdToUpdate = ref<number | null>(null);
 
-        const enrichmentMetadata = ref<Document[]>([]);
+        const enrichmentMetadata = ref<(JournalPublication | ProceedingsPublication)[]>([]);
+        const displayEnrichmentSetIndex = ref(0);
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -767,9 +771,13 @@ export default defineComponent({
             enrichmentMetadata.value.splice(0);
 
             for (const documentId of potentialMatchIds) {
-                const metadataResponse = await DocumentPublicationService.readDocumentPublication(documentId);
+                const metadataResponse = await ImportService.readEnrichmentMetadata(documentId);
                 enrichmentMetadata.value.push(metadataResponse.data);
             }
+        };
+
+        const displayMatchMetadata = (index: number) => {
+            displayEnrichmentSetIndex.value = index;
         };
 
         return {
@@ -791,7 +799,8 @@ export default defineComponent({
             deducedContributions, authorshipSelectionRef,
             submissionDTO, fetchNextAfterLoading,
             showOnlyHarvestableInstitutions,
-            fetchMetadataForEnrichment, enrichmentMetadata
+            fetchMetadataForEnrichment, enrichmentMetadata,
+            displayEnrichmentSetIndex, displayMatchMetadata
         };
     },
 });

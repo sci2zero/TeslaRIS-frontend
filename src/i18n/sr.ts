@@ -1286,5 +1286,6 @@ export default {
     monographListLabel: "Monografije",
     if2RankLabel: "IF2 rank",
     if5RankLabel: "IF5 rank",
-    jciRankLabel: "JCI rank"
+    jciRankLabel: "JCI rank",
+    showMetadataLabel: "Prikaži metapodatke"
 }
