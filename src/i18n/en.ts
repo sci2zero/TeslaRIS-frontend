@@ -1278,5 +1278,7 @@ export default {
     if2RankLabel: "IF2 rank",
     if5RankLabel: "IF5 rank",
     jciRankLabel: "JCI rank",
-    showMetadataLabel: "Show metadata"
+    showMetadataLabel: "Show metadata",
+    editionLabel: "Edition",
+    editionsLabel: "Editions"
 }

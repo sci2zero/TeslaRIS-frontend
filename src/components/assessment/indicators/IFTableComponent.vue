@@ -3,6 +3,12 @@
         <v-card>
             <v-card-title class="text-h5 d-flex align-center justify-space-between">
                 <span>{{ $t("impactFactorTableLabel") }}</span>
+                <span class="ml-2 mr-1">(</span>
+                <span class="mr-1">{{ $t(jsonData.editions.length > 1 ? "editionsLabel" : "editionLabel") }}:</span>
+                <span v-for="(edition, index) in jsonData.editions" :key="edition">
+                    {{ edition }}{{ (index < jsonData.editions.length - 1) ? "," : "" }}
+                </span>
+                <span class="ml-1">)</span>
                 <v-spacer></v-spacer>
 
                 <v-row no-gutters class="align-center" style="max-width: 250px;">

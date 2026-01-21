@@ -275,6 +275,7 @@ export interface IFTableResponse {
     jciValues: IFValue[];
     jciPercentiles: IFValue[];
     ifTableContent: IFCategoryData[];
+    editions: string[];
 }
 
 export interface ExternalIndicatorConfiguration {

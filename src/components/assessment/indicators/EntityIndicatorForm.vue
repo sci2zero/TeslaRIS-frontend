@@ -58,16 +58,29 @@
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.NUMBER">
                 <v-text-field
-                    v-model="numericValue" type="number" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredNumericFieldRules"></v-text-field>
+                    v-model="numericValue" type="number"
+                    :label="$t('valueLabel') + '*'"
+                    :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredNumericFieldRules">
+                </v-text-field>
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.TEXT">
-                <v-text-field v-model="textualValue" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="textualValue"
+                    :label="$t('valueLabel') + '*'"
+                    :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row v-if="!presetDocumentIndicator">
             <v-col>
-                <v-file-upload v-model="files" :title="$t('dragDropFilesLabel')" density="compact" multiple></v-file-upload>
+                <v-file-upload
+                    v-model="files"
+                    :title="$t('dragDropFilesLabel')"
+                    density="compact"
+                    multiple>
+                </v-file-upload>
             </v-col>
         </v-row>
 
@@ -140,7 +153,11 @@ export default defineComponent({
                 });
 
                 if(props.presetDocumentIndicator) {
-                    selectedIndicator.value = {title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string, value: props.presetDocumentIndicator.indicatorResponse.id};
+                    selectedIndicator.value = 
+                        {
+                            title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string,
+                            value: props.presetDocumentIndicator.indicatorResponse.id
+                        };
                 }
             });
         };
