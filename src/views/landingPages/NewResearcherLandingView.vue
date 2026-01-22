@@ -284,7 +284,7 @@ const publicationTypeSr = [
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
     { title: "Skup podataka", value: PublicationType.DATASET },
-    { title: "Softver", value: PublicationType.SOFTWARE },
+    { title: "Nematerijalni proizvod", value: PublicationType.INTANGIBLE_PRODUCT },
     { title: "Monografija", value: PublicationType.MONOGRAPH },
     { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },
     { title: "Završni rad", value: PublicationType.THESIS }

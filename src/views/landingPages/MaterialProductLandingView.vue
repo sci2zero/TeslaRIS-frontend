@@ -87,6 +87,12 @@
                                         {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
+                                <div v-if="materialProduct?.productUsers && materialProduct?.productUsers.length > 0">
+                                    {{ $t("productUsersLabel") }}:
+                                </div>
+                                <div v-if="materialProduct?.productUsers && materialProduct?.productUsers.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(materialProduct.productUsers) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
                                 <div v-if="materialProduct?.scopusId">

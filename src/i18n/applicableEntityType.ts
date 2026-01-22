@@ -77,8 +77,8 @@ export const getApplicableEntityTypeForDocumentType = (documentType: Publication
         case PublicationType.PATENT:
             return ApplicableEntityType.PATENT;
         case PublicationType.MATERIAL_PRODUCT:
-        case PublicationType.SOFTWARE:
-            return ApplicableEntityType.MATERIAL_PRODUCT;
+        case PublicationType.INTANGIBLE_PRODUCT:
+            return ApplicableEntityType.INTANGIBLE_PRODUCT;
         case PublicationType.GENETIC_MATERIAL:
             return ApplicableEntityType.GENETIC_MATERIAL;
         case PublicationType.DATASET:

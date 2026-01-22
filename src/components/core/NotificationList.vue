@@ -2,7 +2,7 @@
     <v-card min-width="150">
         <v-list v-if="notifications.length > 0">
             <v-list-subheader>
-                <div class="flex flex-row justify-between w-150">
+                <div class="flex flex-row justify-between w-full">
                     <strong>{{ $t("recentNotificationsLabel") }}</strong>
                     <v-btn
                         class="ml-3! mb-1!"
@@ -272,7 +272,7 @@ export default defineComponent({
     min-width: 400px;
 }
 
-.w-100 > div.v-list-subheader > div {
+.w-full > div.v-list-subheader > div {
     width: 100%;
 }
 

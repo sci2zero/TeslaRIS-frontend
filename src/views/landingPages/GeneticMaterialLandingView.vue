@@ -246,7 +246,7 @@
             v-if="geneticMaterial && isResearcher && canEdit"
             :title="(returnCurrentLocaleContent(geneticMaterial.title) as string)"
             :document-id="(geneticMaterial.id as number)"
-            :document-type="PublicationType.SOFTWARE"
+            :document-type="PublicationType.GENETIC_MATERIAL"
         />
 
         <toast v-model="snackbar" :message="snackbarMessage" />

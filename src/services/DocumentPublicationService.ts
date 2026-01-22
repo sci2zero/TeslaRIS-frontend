@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { DocumentContributionType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type Software, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { DocumentContributionType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -44,8 +44,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `proceedings-publication/${proceedingsPublicationId}`);
   }
 
-  async readSoftware(softwareId: number): Promise<AxiosResponse<Software>> {
-    return super.sendRequest(axios.get, `software/${softwareId}`);
+  async readIntangibleProduct(intangibleProductId: number): Promise<AxiosResponse<IntangibleProduct>> {
+    return super.sendRequest(axios.get, `intangible-product/${intangibleProductId}`);
   }
 
   async readMaterialProduct(materialProductId: number): Promise<AxiosResponse<MaterialProduct>> {
@@ -105,8 +105,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "patent", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createSoftware(body: Software): Promise<AxiosResponse<Software>> {
-    return super.sendRequest(axios.post, "software", body, DocumentPublicationService.idempotencyKey);
+  async createIntangibleProduct(body: IntangibleProduct): Promise<AxiosResponse<IntangibleProduct>> {
+    return super.sendRequest(axios.post, "intangible-product", body, DocumentPublicationService.idempotencyKey);
   }
 
   async createMaterialProduct(body: MaterialProduct): Promise<AxiosResponse<MaterialProduct>> {
@@ -158,8 +158,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/${publicationId}/can-edit`);
   }
 
-  async updateSoftware(softwareId: number, updatedSoftware: Software): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.put, `software/${softwareId}`, updatedSoftware);
+  async updateIntangibleProduct(intangibleProductId: number, updatedIntangibleProduct: IntangibleProduct): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `intangible-product/${intangibleProductId}`, updatedIntangibleProduct);
   }
 
   async updateMaterialProduct(materialProductId: number, updatedMaterialProduct: MaterialProduct): Promise<AxiosResponse<void>> {

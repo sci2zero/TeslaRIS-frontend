@@ -95,8 +95,8 @@ export default defineComponent({
                     return "monographLandingPage";
                 case "THESIS":
                     return "thesisLandingPage";
-                case "SOFTWARE":
-                    return "softwareLandingPage";
+                case "INTANGIBLE_PRODUCT":
+                    return "intangibleProductLandingPage";
                 case "PATENT":
                     return "patentLandingPage";
                 case "DATASET":

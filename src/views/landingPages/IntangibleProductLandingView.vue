@@ -1,38 +1,38 @@
 <template>
-    <v-container id="software">
+    <v-container id="intangibleProduct">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
                         <v-skeleton-loader
-                            :loading="!software"
+                            :loading="!intangibleProduct"
                             type="heading"
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(software?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(intangibleProduct?.title)"></rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(software?.subTitle) }}
+                        {{ returnCurrentLocaleContent(intangibleProduct?.subTitle) }}
                         <br />
-                        {{ $t("softwareLabel") }}
+                        {{ $t("intangibleProductLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Software Info -->
+        <!-- IntangibleProduct Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon v-if="!software" size="x-large" class="large-software-icon">
+                <v-icon v-if="!intangibleProduct" size="x-large" class="large-intangible-product-icon">
                     {{ icon }}
                 </v-icon>
                 <wordcloud
                     v-else
-                    :for-document-id="software?.id"
-                    :document-type="PublicationType.SOFTWARE"
+                    :for-document-id="intangibleProduct?.id"
+                    :document-type="PublicationType.INTANGIBLE_PRODUCT"
                     compact-icon
                 />
             </v-col>
@@ -40,12 +40,12 @@
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
-                            :form-component="SoftwareUpdateForm"
-                            :form-props="{ presetSoftware: software }"
-                            entity-name="Software"
+                            :form-component="IntangibleProductUpdateForm"
+                            :form-props="{ presetIntangibleProduct: intangibleProduct }"
+                            entity-name="IntangibleProduct"
                             is-update
                             is-section-update
-                            :read-only="!canEdit || software?.isArchived"
+                            :read-only="!canEdit || intangibleProduct?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -53,65 +53,77 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <basic-info-loader v-if="!software" />
+                        <basic-info-loader v-if="!intangibleProduct" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <div v-if="software?.internalNumber">
+                                <div v-if="intangibleProduct?.intangibleProductType">
+                                    {{ $t("intangibleProductTypeLabel") }}:
+                                </div>
+                                <div v-if="intangibleProduct?.intangibleProductType" class="response">
+                                    {{ getIntangibleProductTypeTitleFromValueAutoLocale(intangibleProduct.intangibleProductType) }}
+                                </div>
+                                <div v-if="intangibleProduct?.internalNumber">
                                     {{ $t("internalNumberLabel") }}:
                                 </div>
-                                <div v-if="software?.internalNumber" class="response">
-                                    {{ software.internalNumber }}
+                                <div v-if="intangibleProduct?.internalNumber" class="response">
+                                    {{ intangibleProduct.internalNumber }}
                                 </div>
-                                <div v-if="software?.documentDate">
+                                <div v-if="intangibleProduct?.documentDate">
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
-                                <div v-if="software?.documentDate" class="response">
-                                    {{ software.documentDate }}
+                                <div v-if="intangibleProduct?.documentDate" class="response">
+                                    {{ intangibleProduct.documentDate }}
                                 </div>
-                                <div v-if="software?.publisherId || software?.authorReprint">
+                                <div v-if="intangibleProduct?.publisherId || intangibleProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="software?.publisherId" class="response">
-                                    <localized-link :to="'publishers/' + software?.publisherId">
+                                <div v-if="intangibleProduct?.publisherId" class="response">
+                                    <localized-link :to="'publishers/' + intangibleProduct?.publisherId">
                                         {{ returnCurrentLocaleContent(publisher?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-else-if="software?.authorReprint" class="response">
+                                <div v-else-if="intangibleProduct?.authorReprint" class="response">
                                     <localized-link to="scientific-results/author-reprints">
                                         {{ $t("authorReprintLabel") }}
                                     </localized-link>
                                 </div>
+                                <div v-if="intangibleProduct?.productUsers && intangibleProduct?.productUsers.length > 0">
+                                    {{ $t("productUsersLabel") }}:
+                                </div>
+                                <div v-if="intangibleProduct?.productUsers && intangibleProduct?.productUsers.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(intangibleProduct.productUsers) }}
+                                </div>
                             </v-col>
                             <v-col cols="6">
-                                <div v-if="software?.scopusId">
+                                <div v-if="intangibleProduct?.scopusId">
                                     Scopus ID:
                                 </div>
-                                <div v-if="software?.scopusId" class="response">
-                                    <identifier-link :identifier="software.scopusId" type="scopus" />
+                                <div v-if="intangibleProduct?.scopusId" class="response">
+                                    <identifier-link :identifier="intangibleProduct.scopusId" type="scopus" />
                                 </div>
-                                <div v-if="software?.doi">
+                                <div v-if="intangibleProduct?.doi">
                                     DOI:
                                 </div>
-                                <div v-if="software?.doi" class="response">
-                                    <identifier-link :identifier="software.doi"></identifier-link>
+                                <div v-if="intangibleProduct?.doi" class="response">
+                                    <identifier-link :identifier="intangibleProduct.doi"></identifier-link>
                                 </div>
-                                <div v-if="software?.openAlexId">
+                                <div v-if="intangibleProduct?.openAlexId">
                                     Open Alex ID:
                                 </div>
-                                <div v-if="software?.openAlexId" class="response">
-                                    <identifier-link :identifier="software.openAlexId" type="open_alex"></identifier-link>
+                                <div v-if="intangibleProduct?.openAlexId" class="response">
+                                    <identifier-link :identifier="intangibleProduct.openAlexId" type="open_alex"></identifier-link>
                                 </div>
-                                <div v-if="software?.webOfScienceId">
+                                <div v-if="intangibleProduct?.webOfScienceId">
                                     Web of Science ID:
                                 </div>
-                                <div v-if="software?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="software.webOfScienceId" type="web_of_science"></identifier-link>
+                                <div v-if="intangibleProduct?.webOfScienceId" class="response">
+                                    <identifier-link :identifier="intangibleProduct.webOfScienceId" type="web_of_science"></identifier-link>
                                 </div>
-                                <div v-if="software?.uris && software?.uris.length > 0">
+                                <div v-if="intangibleProduct?.uris && intangibleProduct?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="software?.uris"></uri-list>
+                                    <uri-list :uris="intangibleProduct?.uris"></uri-list>
                                 </div>
                             </v-col>
                         </v-row>
@@ -122,21 +134,21 @@
 
         <document-action-box
             ref="actionsRef"
-            :doi="software?.doi"
-            :can-edit="canEdit && !software?.isArchived"
+            :doi="intangibleProduct?.doi"
+            :can-edit="canEdit && !intangibleProduct?.isArchived"
             :could-archive="canEdit"
-            :metadata-valid="software?.isMetadataValid"
-            :files-valid="software?.areFilesValid"
+            :metadata-valid="intangibleProduct?.isMetadataValid"
+            :files-valid="intangibleProduct?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(software?.description)"
-            :document="software"
+            :description="returnCurrentLocaleContent(intangibleProduct?.description)"
+            :document="intangibleProduct"
             :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(software?.id as number, software as _Document)"
+            @update="fetchValidationStatus(intangibleProduct?.id as number, intangibleProduct as _Document)"
         />
 
-        <tab-content-loader v-if="!software" layout="sections" />
+        <tab-content-loader v-if="!intangibleProduct" layout="sections" />
         <v-tabs
-            v-show="software"
+            v-show="intangibleProduct"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -162,43 +174,65 @@
         </v-tabs>
 
         <v-tabs-window
-            v-show="software"
+            v-show="intangibleProduct"
             v-model="currentTab">
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
-                    :document-id="software?.id"
-                    :contribution-list="software?.contributions ? software?.contributions : []"
-                    :read-only="!canEdit || software?.isArchived"
+                    :document-id="intangibleProduct?.id"
+                    :contribution-list="intangibleProduct?.contributions ? intangibleProduct?.contributions : []"
+                    :read-only="!canEdit || intangibleProduct?.isArchived"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section
-                    :document="software"
-                    :can-edit="canEdit && !software?.isArchived"
-                    :proofs="software?.proofs"
-                    :file-items="software?.fileItems">
+                    :document="intangibleProduct"
+                    :can-edit="canEdit && !intangibleProduct?.isArchived"
+                    :proofs="intangibleProduct?.proofs"
+                    :file-items="intangibleProduct?.fileItems">
                 </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
-                    :keywords="software?.keywords ? software.keywords : []"
-                    :can-edit="canEdit && !software?.isArchived"
+                    :keywords="intangibleProduct?.keywords ? intangibleProduct.keywords : []"
+                    :can-edit="canEdit && !intangibleProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
 
+                <!-- Research Area -->
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                            <v-card-text class="edit-pen-container">
+                                <research-areas-update-modal 
+                                    :research-areas-hierarchy="intangibleProduct?.researchAreas"
+                                    :read-only="!canEdit"
+                                    @update="updateResearchAreas">
+                                </research-areas-update-modal>
+
+                                <h4 class="mt-5 mb-7">
+                                    <strong>{{ $t("researchAreasLabel") }}</strong>
+                                </h4>
+                                <research-area-hierarchy
+                                    :research-areas="intangibleProduct?.researchAreas" 
+                                />
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+
                 <!-- Description -->
                 <description-section
-                    :description="software?.description"
-                    :can-edit="canEdit && !software?.isArchived"
+                    :description="intangibleProduct?.description"
+                    :can-edit="canEdit && !intangibleProduct?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <description-section
-                    :description="software?.remark"
-                    :can-edit="canEdit && !software?.isArchived"
+                    :description="intangibleProduct?.remark"
+                    :can-edit="canEdit && !intangibleProduct?.isArchived"
                     is-remark
                     @update="updateRemark"
                 />
@@ -207,11 +241,11 @@
                 <indicators-section 
                     :indicators="documentIndicators" 
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
-                    :entity-id="software?.id" 
+                    :entity-id="intangibleProduct?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit"
                     show-statistics
-                    :has-attached-files="software?.fileItems && software?.fileItems.length > 0"
+                    :has-attached-files="intangibleProduct?.fileItems && intangibleProduct?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -219,8 +253,8 @@
             <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
-                    :entity-id="software?.id"
-                    :can-edit="canClassify && software?.documentDate !== ''"
+                    :entity-id="intangibleProduct?.id"
+                    :can-edit="canClassify && intangibleProduct?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -229,7 +263,7 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <document-visualizations
-                    :document-id="(software?.id as number)"
+                    :document-id="(intangibleProduct?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
@@ -237,10 +271,10 @@
         </v-tabs-window>
 
         <share-buttons
-            v-if="software && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(software.title) as string)"
-            :document-id="(software.id as number)"
-            :document-type="PublicationType.SOFTWARE"
+            v-if="intangibleProduct && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(intangibleProduct.title) as string)"
+            :document-id="(intangibleProduct.id as number)"
+            :document-type="PublicationType.INTANGIBLE_PRODUCT"
         />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -257,7 +291,7 @@ import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Document as _Document, Software } from '@/models/PublicationModel';
+import type { Document as _Document, IntangibleProduct } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -268,7 +302,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import UriList from '@/components/core/UriList.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
-import SoftwareUpdateForm from '@/components/publication/update/SoftwareUpdateForm.vue';
+import IntangibleProductUpdateForm from '@/components/publication/update/IntangibleProductUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -291,11 +325,14 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
+import { getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
 
 
 export default defineComponent({
-    name: "SoftwareLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    name: "IntangibleProductLandingPage",
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy },
     setup() {
         const currentTab = ref("contributions");
 
@@ -305,7 +342,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const software = ref<Software>();
+        const intangibleProduct = ref<IntangibleProduct>();
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
@@ -349,7 +386,7 @@ export default defineComponent({
                 fetchClassifications();
             }
 
-            fetchSoftware();
+            fetchIntangibleProduct();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -358,20 +395,20 @@ export default defineComponent({
             populateData();
         });
 
-        const fetchSoftware = () => {
-            DocumentPublicationService.readSoftware(
+        const fetchIntangibleProduct = () => {
+            DocumentPublicationService.readIntangibleProduct(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                software.value = response.data;
+                intangibleProduct.value = response.data;
 
                 injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-                document.title = returnCurrentLocaleContent(software.value.title) as string;
+                document.title = returnCurrentLocaleContent(intangibleProduct.value.title) as string;
 
-                software.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                intangibleProduct.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
 
-                if(software.value.publisherId) {
-                    PublisherService.readPublisher(software.value.publisherId).then((publisherResponse) => {
+                if(intangibleProduct.value.publisherId) {
+                    PublisherService.readPublisher(intangibleProduct.value.publisherId).then((publisherResponse) => {
                         publisher.value = publisherResponse.data;
                     })
                 }
@@ -412,48 +449,53 @@ export default defineComponent({
         }
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
-            software.value!.keywords = keywords;
+            intangibleProduct.value!.keywords = keywords;
             performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
-            software.value!.description = description;
+            intangibleProduct.value!.description = description;
             performUpdate(false);
         };
 
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
-            software.value!.contributions = contributions;
+            intangibleProduct.value!.contributions = contributions;
             performUpdate(true);
         };
 
-        const updateBasicInfo = (basicInfo: Software) => {
-            software.value!.title = basicInfo.title;
-            software.value!.subTitle = basicInfo.subTitle;
-            software.value!.documentDate = basicInfo.documentDate;
-            software.value!.doi = basicInfo.doi;
-            software.value!.scopusId = basicInfo.scopusId;
-            software.value!.uris = basicInfo.uris;
-            software.value!.publisherId = basicInfo.publisherId;
-            software.value!.internalNumber = basicInfo.internalNumber;
-            software.value!.openAlexId = basicInfo.openAlexId;
-            software.value!.webOfScienceId = basicInfo.webOfScienceId;
-            software.value!.authorReprint = basicInfo.authorReprint;
+        const updateBasicInfo = (basicInfo: IntangibleProduct) => {
+            intangibleProduct.value!.title = basicInfo.title;
+            intangibleProduct.value!.subTitle = basicInfo.subTitle;
+            intangibleProduct.value!.documentDate = basicInfo.documentDate;
+            intangibleProduct.value!.doi = basicInfo.doi;
+            intangibleProduct.value!.scopusId = basicInfo.scopusId;
+            intangibleProduct.value!.uris = basicInfo.uris;
+            intangibleProduct.value!.publisherId = basicInfo.publisherId;
+            intangibleProduct.value!.internalNumber = basicInfo.internalNumber;
+            intangibleProduct.value!.openAlexId = basicInfo.openAlexId;
+            intangibleProduct.value!.webOfScienceId = basicInfo.webOfScienceId;
+            intangibleProduct.value!.authorReprint = basicInfo.authorReprint;
+            intangibleProduct.value!.researchAreasId = basicInfo.researchAreasId;
+            intangibleProduct.value!.productUsers = basicInfo.productUsers;
+            intangibleProduct.value!.intangibleProductType = basicInfo.intangibleProductType;
 
             performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updateSoftware(software.value?.id as number, software.value as Software).then(() => {
+            DocumentPublicationService.updateIntangibleProduct(
+                intangibleProduct.value?.id as number, intangibleProduct.value as IntangibleProduct
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchSoftware();
+                    fetchIntangibleProduct();
                 }
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchSoftware();
+                    fetchIntangibleProduct();
                 }
             });
         };
@@ -471,34 +513,40 @@ export default defineComponent({
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
         const updateRemark = (remark: MultilingualContent[]) => {
-            software.value!.remark = remark;
+            intangibleProduct.value!.remark = remark;
+            performUpdate(true);
+        };
+
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            intangibleProduct.value!.researchAreasId = researchAreaIds;
             performUpdate(true);
         };
 
         return {
-            software, icon, publisher, ApplicableEntityType,
+            intangibleProduct, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
-            updateBasicInfo, SoftwareUpdateForm, isResearcher,
+            updateBasicInfo, IntangibleProductUpdateForm, isResearcher,
             handleResearcherUnbind, documentIndicators,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
-            fetchSoftware, fetchValidationStatus, updateRemark,
-            displayConfiguration
+            fetchIntangibleProduct, fetchValidationStatus, updateRemark,
+            displayConfiguration, updateResearchAreas,
+            getIntangibleProductTypeTitleFromValueAutoLocale
         };
 }})
 
 </script>
 
 <style scoped>
-    #software .large-software-icon {
+    #intangibleProduct .large-intangible-product-icon {
         font-size: 10em;
     }
 
-    #software .response {
+    #intangibleProduct .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

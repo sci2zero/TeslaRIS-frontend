@@ -783,7 +783,7 @@ export default defineComponent({
                     return 'mdi-shield-check';
                 case 'DATASET':
                     return 'mdi-database';
-                case 'SOFTWARE':
+                case 'INTANGIBLE_PRODUCT':
                     return 'mdi-code-tags';
                 case 'MONOGRAPH':
                     return 'mdi-book';

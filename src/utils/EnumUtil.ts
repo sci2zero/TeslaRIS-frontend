@@ -31,8 +31,8 @@ export const getDocumentTypeDisplayValue = (documentType: string, publicationTyp
             return i18n.t("proceedingsLabel");
         case "DATASET":
             return i18n.t("datasetLabel");
-        case "SOFTWARE":
-            return i18n.t("softwareLabel");
+        case "INTANGIBLE_PRODUCT":
+            return i18n.t("intangibleProductLabel");
         case "MONOGRAPH":
             return getMonographTypeTitleFromValueAutoLocale(publicationType);
         case "MONOGRAPH_PUBLICATION":

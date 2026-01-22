@@ -1,18 +1,18 @@
 <template>
     <v-container>
         <v-sheet class="text-center">
-            <h1>{{ $t("addSoftwareLabel") }}</h1>
+            <h1>{{ $t("addIntangibleProductLabel") }}</h1>
         </v-sheet>
         <br />
         <br />
-        <software-submission-form ref="submissionFormRef" />
+        <intangible-product-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn
                     color="blue darken-1"
                     :disabled="!submissionFormRef?.isFormValid"
                     class="submission-action"
-                    @click="submissionFormRef?.submitSoftware(false)">
+                    @click="submissionFormRef?.submitIntangibleProduct(false)">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-col>
@@ -21,7 +21,7 @@
                     color="blue darken-1"
                     :disabled="!submissionFormRef?.isFormValid"
                     class="submission-action"
-                    @click="submissionFormRef?.submitSoftware(true)">
+                    @click="submissionFormRef?.submitIntangibleProduct(true)">
                     {{ $t("saveAndAddAnotherLabel") }}
                 </v-btn>
             </v-col>
@@ -31,22 +31,22 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import SoftwareSubmissionForm from "@/components/publication/SoftwareSubmissionForm.vue";
+import IntangibleProductSubmissionForm from "@/components/publication/IntangibleProductSubmissionForm.vue";
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 
 
 export default defineComponent({
-    name: "SubmitSoftwareView",
-    components: {SoftwareSubmissionForm},
+    name: "SubmitIntangibleProductView",
+    components: {IntangibleProductSubmissionForm},
     setup() {
-        const submissionFormRef = ref<typeof SoftwareSubmissionForm>();
+        const submissionFormRef = ref<typeof IntangibleProductSubmissionForm>();
 
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("addSoftwareLabel");
+            document.title = i18n.t("addIntangibleProductLabel");
         });
 
         return {

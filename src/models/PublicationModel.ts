@@ -50,7 +50,7 @@ export enum PublicationType {
     PATENT = "PATENT",
     PROCEEDINGS = "PROCEEDINGS",
     DATASET = "DATASET",
-    SOFTWARE = "SOFTWARE",
+    INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
     THESIS = "THESIS",
@@ -213,10 +213,14 @@ export interface Patent extends Document {
     authorReprint?: boolean;
 }
 
-export interface Software extends Document {
+export interface IntangibleProduct extends Document {
     internalNumber: string;
     publisherId?: number;
     authorReprint?: boolean;
+    intangibleProductType: IntangibleProductType;
+    productUsers: MultilingualContent[];
+    researchAreasId: number[];
+    researchAreas?: ResearchArea[];
 }
 
 export interface MaterialProduct extends Document {
@@ -325,6 +329,17 @@ export enum MaterialProductType {
     INDUSTRIAL_PRODUCT = "INDUSTRIAL_PRODUCT",
     INFRASTRUCTURE_OBJECT = "INFRASTRUCTURE_OBJECT",
     DERIVATIVE_WORKS = "DERIVATIVE_WORKS",
+    OTHER = "OTHER"
+}
+
+export enum IntangibleProductType {
+    SOFTWARE = "SOFTWARE",
+    MODEL = "MODEL",
+    PROCESS = "PROCESS",
+    METHOD = "METHOD",
+    STRATEGY = "STRATEGY",
+    POLICY = "POLICY",
+    FRAMEWORK = "FRAMEWORK",
     OTHER = "OTHER"
 }
 
