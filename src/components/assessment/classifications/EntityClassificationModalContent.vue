@@ -116,7 +116,9 @@ export default defineComponent({
 
         watch(dialog, () => {
             if (dialog.value) {
+                currentTab.value = "assessments";
                 fetchClassifications();
+                fetchIndicators();
             }
         });
 
@@ -147,6 +149,7 @@ export default defineComponent({
         };
 
         const fetchIndicators = () => {
+            console.log(props.entityType)
             switch (props.entityType) {
                 case ApplicableEntityType.EVENT:
                     EntityIndicatorService.fetchEventIndicators(props.entityId)

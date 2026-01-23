@@ -1281,5 +1281,6 @@ export default {
     showMetadataLabel: "Show metadata",
     editionLabel: "Edition",
     editionsLabel: "Editions",
-    intangibleProductTypeLabel: "Intangible product type"
+    intangibleProductTypeLabel: "Intangible product type",
+    noIndicatorsLabel: "No indicators for this entity."
 }

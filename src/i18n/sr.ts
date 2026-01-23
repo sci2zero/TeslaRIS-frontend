@@ -1290,5 +1290,6 @@ export default {
     showMetadataLabel: "Prikaži metapodatke",
     editionLabel: "Edicija",
     editionsLabel: "Edicije",
-    intangibleProductTypeLabel: "Tip nematerijalnog proizvoda"
+    intangibleProductTypeLabel: "Tip nematerijalnog proizvoda",
+    noIndicatorsLabel: "Nema indikatora za ovaj entitet."
 }

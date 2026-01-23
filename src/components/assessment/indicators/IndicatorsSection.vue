@@ -7,8 +7,8 @@
         :read-only="!canEdit"
         @create="createIndicator"
     />
-    <v-row>
-        <v-col v-if="showStatistics">
+    <v-row v-if="indicators.length > 0">
+        <v-col v-if="showStatistics && (!viewIndicatorsEmpty || !downloadIndicatorsEmpty)">
             <div
                 v-show="(viewsRef && viewsRef.statisticsEntityIndicators.length > 0) || (downloadsRef && downloadsRef.statisticsEntityIndicators.length > 0)"
                 class="statistics mt-3">
@@ -17,12 +17,14 @@
                     ref="viewsRef"
                     :entity-indicators="indicators"
                     :statistics-type="StatisticsType.VIEW"
+                    @no-indicators-present="viewIndicatorsEmpty = true"
                 />
                 <statistics-view
                     v-show="hasAttachedFiles"
                     ref="downloadsRef"
                     :entity-indicators="indicators"
                     :statistics-type="StatisticsType.DOWNLOAD"
+                    @no-indicators-present="downloadIndicatorsEmpty = true"
                 />
             </div>
         </v-col>
@@ -38,6 +40,9 @@
             </div>
         </v-col>
     </v-row>
+    <h3 v-else>
+        {{ $t("noIndicatorsLabel") }}
+    </h3>
 </template>
 
 <script lang="ts">
@@ -88,6 +93,9 @@ export default defineComponent({
         const viewsRef = ref<typeof StatisticsView>();
         const downloadsRef = ref<typeof StatisticsView>();
 
+        const viewIndicatorsEmpty = ref(false);
+        const downloadIndicatorsEmpty = ref(false);
+
         const createIndicator = (entityIndicator: any) => {
             emit("create", entityIndicator);
         };
@@ -96,11 +104,11 @@ export default defineComponent({
             emit("updated");
         };
 
-
         return {
             EntityIndicatorForm, ApplicableEntityType,
             createIndicator, refreshIndicators,
-            StatisticsType, viewsRef, downloadsRef
+            StatisticsType, viewsRef, downloadsRef,
+            viewIndicatorsEmpty, downloadIndicatorsEmpty
         };
     }
 });
