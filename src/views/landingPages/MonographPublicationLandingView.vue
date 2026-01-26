@@ -238,7 +238,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="monographPublication?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="monographPublication?.fileItems && monographPublication?.fileItems.length > 0"
                     @create="createIndicator"
@@ -340,7 +340,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -534,7 +534,7 @@ export default defineComponent({
             ApplicableEntityType, canClassify, documentClassifications,
             fetchClassifications, createClassification, fetchIndicators,
             createIndicator, actionsRef, fetchValidationStatus, PublicationType,
-            updateRemark, displayConfiguration
+            updateRemark, displayConfiguration, isAdmin, isCommission
         };
 }})
 

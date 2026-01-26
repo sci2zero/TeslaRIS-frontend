@@ -238,7 +238,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="proceedingsPublication?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="proceedingsPublication?.fileItems && proceedingsPublication?.fileItems.length > 0"
                     @create="createIndicator"
@@ -344,7 +344,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -547,7 +547,8 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus, PublicationType, updateRemark
+            fetchValidationStatus, PublicationType, updateRemark, isAdmin,
+            isCommission
         };
 }})
 

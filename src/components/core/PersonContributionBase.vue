@@ -722,7 +722,6 @@ export default defineComponent({
 
         const externalInstitutionSuggestions = ref<MultilingualContent[][]>([]);
         watch(enterExternalOU, (newValue, oldvalue) => {
-            console.log(oldvalue, newValue, personOtherNames.value.length, affiliationStatement.value.length)
             if(
                 oldvalue === false && newValue === true &&
                 affiliationStatement.value.length === 0

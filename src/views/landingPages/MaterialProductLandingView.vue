@@ -243,7 +243,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="materialProduct?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="materialProduct?.fileItems && materialProduct?.fileItems.length > 0"
                     @create="createIndicator"
@@ -346,7 +346,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -531,12 +531,12 @@ export default defineComponent({
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, isResearcher, MaterialProductUpdateForm,
-            handleResearcherUnbind, documentIndicators,
+            handleResearcherUnbind, documentIndicators, isCommission,
             actionsRef, currentRoute, createClassification,
             fetchClassifications, documentClassifications,
             fetchIndicators, createIndicator, PublicationType,
             fetchMaterialProduct, fetchValidationStatus, updateRemark,
-            displayConfiguration, updateResearchAreas,
+            displayConfiguration, updateResearchAreas, isAdmin,
             getMaterialProductTypeTitleFromValueAutoLocale
         };
 }})

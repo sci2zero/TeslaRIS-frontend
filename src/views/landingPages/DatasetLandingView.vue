@@ -211,7 +211,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="dataset?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="dataset?.fileItems && dataset?.fileItems.length > 0"
                     @create="createIndicator"
@@ -313,7 +313,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -502,7 +502,7 @@ export default defineComponent({
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
             createIndicator, fetchIndicators, fetchValidationStatus, updateRemark,
-            displayConfiguration
+            displayConfiguration, isAdmin, isCommission
         };
 }})
 

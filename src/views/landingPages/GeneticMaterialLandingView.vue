@@ -215,7 +215,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="geneticMaterial?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="geneticMaterial?.fileItems && geneticMaterial?.fileItems.length > 0"
                     @create="createIndicator"
@@ -316,7 +316,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -496,7 +496,7 @@ export default defineComponent({
             fetchIndicators, createIndicator, PublicationType,
             fetchGeneticMaterial, fetchValidationStatus, updateRemark,
             getGeneticMaterialTypeTitleFromValueAutoLocale,
-            GeneticMaterialUpdateForm
+            GeneticMaterialUpdateForm, isAdmin, isCommission
         };
 }})
 

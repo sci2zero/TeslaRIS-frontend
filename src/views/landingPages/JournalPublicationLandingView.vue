@@ -254,7 +254,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="journalPublication?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="journalPublication?.fileItems && journalPublication?.fileItems.length > 0"
                     @create="createIndicator"
@@ -360,7 +360,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -566,7 +566,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
-            createClassification, fetchClassifications, currentRoute,
+            createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
             fetchValidationStatus, PublicationType, updateRemark, displayConfiguration
         };
 }})

@@ -301,7 +301,7 @@
                     :applicable-types="[ApplicableEntityType.MONOGRAPH]" 
                     :entity-id="monograph?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="monograph?.fileItems && monograph?.fileItems.length > 0"
                     @create="createIndicator"
@@ -414,7 +414,7 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const publisher = ref<Publisher>();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -674,7 +674,8 @@ export default defineComponent({
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
-            publisher, updateRemark, displayConfiguration
+            publisher, updateRemark, displayConfiguration,
+            isAdmin, isCommission
         };
 }})
 
