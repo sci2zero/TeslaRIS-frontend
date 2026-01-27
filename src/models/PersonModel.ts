@@ -165,10 +165,27 @@ export interface PrizeResponse {
 }
 
 export interface Prize {
-    id?: number,
+    id?: number;
     title: MultilingualContent[];
     description: MultilingualContent[];
     date: string;
+}
+
+export interface PrizeIndex {
+    id: string;
+    titleSr: string;
+    titleOther: string;
+    titleSrSortable: string;
+    titleOtherSortable: string;
+    descriptionSr: string;
+    descriptionOther: string;
+    dateOfAcquisition: string;
+    personId: number;
+    personName: string;
+    databaseId: number;
+    relatedInstitutionsIdHierarchy: number[];
+    assessedBy: number[];
+    commissionAssessments: {a: number, b: string, c: boolean}[]
 }
 
 export interface PersonProfileImageRequest {

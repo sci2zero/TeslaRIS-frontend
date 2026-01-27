@@ -109,7 +109,8 @@ export default {
         materialProductMetadataComparator: "Poređenje materijalnih proizvoda",
         materialProductLandingPage: "Detalji materijalnog proizvoda",
         geneticMaterialLandingPage: "Detalji genetskog materijala",
-        submitGeneticMaterial: "Dodavanje genetskog materijala"
+        submitGeneticMaterial: "Dodavanje genetskog materijala",
+        prizes: "Nagrade"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1293,5 +1294,7 @@ export default {
     intangibleProductTypeLabel: "Tip nematerijalnog proizvoda",
     noIndicatorsLabel: "Nema indikatora za ovaj entitet.",
     yesLabel: "Da",
-    noLabel: "Ne"
+    noLabel: "Ne",
+    descriptionColumn: "descriptionSr",
+    prizeListLabel: "Lista nagrada"
 }

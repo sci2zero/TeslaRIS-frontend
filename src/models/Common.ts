@@ -114,6 +114,7 @@ export enum ApplicableEntityType {
     PATENT = "PATENT",
     MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
     GENETIC_MATERIAL = "GENETIC_MATERIAL",
+    PRIZE = "PRIZE",
     DATASET = "DATASET",
     THESIS = "THESIS",
     EVENT = "EVENT",

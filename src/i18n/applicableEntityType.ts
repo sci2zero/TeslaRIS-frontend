@@ -19,6 +19,7 @@ export const applicableEntityTypeSr = [
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
     { title: "Organizaciona jedinica", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Serija publikacija", value: ApplicableEntityType.PUBLICATION_SERIES },
+    { title: "Nagrada", value: ApplicableEntityType.PRIZE },
     { title: "Svi", value: ApplicableEntityType.ALL }
 ];
 
@@ -37,6 +38,7 @@ export const applicableEntityTypeEn = [
     { title: "Researcher", value: ApplicableEntityType.PERSON },
     { title: "Organisation unit", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Publication series", value: ApplicableEntityType.PUBLICATION_SERIES },
+    { title: "Prize", value: ApplicableEntityType.PRIZE },
     { title: "All", value: ApplicableEntityType.ALL }
 ];
 

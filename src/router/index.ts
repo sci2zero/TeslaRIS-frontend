@@ -114,6 +114,7 @@ import MaterialProductMetadataComparatorView from "@/views/comparators/documents
 import SubmitGeneticMaterialView from "@/views/SubmitGeneticMaterialView.vue";
 import GeneticMaterialLandingView from "@/views/landingPages/GeneticMaterialLandingView.vue";
 import GeneticMaterialMetadataComparatorView from "@/views/comparators/documents/GeneticMaterialMetadataComparatorView.vue";
+import PrizeListView from "@/views/PrizeListView.vue";
 
 
 const roles = {
@@ -456,6 +457,15 @@ const router = createRouter({
                             },
                         },
                     ]
+                },
+                {
+                    path: "prizes",
+                    name: "prizes",
+                    component: PrizeListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.commission],
+                    },
                 },
                 {
                     path: "persons",
