@@ -270,7 +270,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="proceedings?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="proceedings?.fileItems && proceedings?.fileItems.length > 0"
                     @create="createIndicator"
@@ -360,7 +360,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
@@ -600,7 +600,8 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
-            documentIndicators, StatisticsType, currentRoute, updateRemark
+            documentIndicators, StatisticsType, currentRoute, updateRemark,
+            isAdmin, isCommission
         };
 }})
 

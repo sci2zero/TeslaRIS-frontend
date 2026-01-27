@@ -14,7 +14,20 @@
                 :readonly="readOnly"
                 @update:search="searchPersons($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            >
+                <template #item="{ item, props }">
+                    <v-list-item
+                        v-bind="{ ...props, title: undefined }"
+                    >
+                        <person-publications-tooltip
+                            :person-id="item.raw.value"
+                            :show="showLatestPublications"
+                        >
+                            {{ item.raw.title }}
+                        </person-publications-tooltip>
+                    </v-list-item>
+                </template>
+            </v-autocomplete>
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
@@ -47,11 +60,12 @@ import { removeTrailingPipeRegex } from '@/utils/StringUtil';
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PersonSubmissionForm from './PersonSubmissionForm.vue';
+import PersonPublicationsTooltip from './PersonPublicationsTooltip.vue';
 
 
 export default defineComponent({
     name: "PersonAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, PersonPublicationsTooltip },
     props: {
         required: {
             type: Boolean,
@@ -94,6 +108,10 @@ export default defineComponent({
         noOrcid: {
             type: Boolean,
             default: false
+        },
+        showLatestPublications: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ["update:modelValue"],

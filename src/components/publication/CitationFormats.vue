@@ -1,5 +1,5 @@
 <template>
-    <v-list lines="two" class="w-100">
+    <v-list lines="two" class="w-full">
         <v-list-item v-for="(value, key) in citation" :key="key">
             <template #title>
                 <div class="citation-container">

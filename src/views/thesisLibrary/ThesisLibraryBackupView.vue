@@ -28,7 +28,8 @@
                             :items="thesisTypes"
                             multiple
                             :label="$t('thesisTypeLabel') + '*'"
-                            :rules="requiredSelectionRules">
+                            :rules="requiredSelectionRules"
+                            return-object>
                         </v-select>
                     </v-col>
                 </v-row>

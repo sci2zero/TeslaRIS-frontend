@@ -108,7 +108,12 @@ export default defineComponent({
         };
 
         const searchResearchers = lodash.debounce((input: string) => {
-            const tokens = input.split(" ").filter(t => t !== " " && t !== "");
+            if (!input || input.trim().length < 2) {
+                return;
+            }
+
+            const tokens = input.trim().split(" ").filter(t => t !== " " && t !== "");
+
             let searchTokens = "";
             tokens.forEach(token => {
                 searchTokens += `tokens=${token}&`;

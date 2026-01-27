@@ -158,6 +158,8 @@
             :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
             :document="proceedingsPublication"
             :handle-researcher-unbind="handleResearcherUnbind"
+            :transfer-to="PublicationType.JOURNAL_PUBLICATION"
+            type-transfer-suffix="Journal"
             @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 
@@ -236,7 +238,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="proceedingsPublication?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="proceedingsPublication?.fileItems && proceedingsPublication?.fileItems.length > 0"
                     @create="createIndicator"
@@ -252,7 +254,7 @@
                     :entity-id="proceedingsPublication?.id"
                     :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.PROCEEDINGS_PUBLICATION]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -342,7 +344,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -545,7 +547,8 @@ export default defineComponent({
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
-            fetchValidationStatus, PublicationType, updateRemark
+            fetchValidationStatus, PublicationType, updateRemark, isAdmin,
+            isCommission
         };
 }})
 

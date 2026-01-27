@@ -28,14 +28,66 @@
                         />
                     </td>
                     <td>
-                        <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.leftEntityId">
-                            {{ $i18n.locale.startsWith('sr') ? row.item.leftTitleSr : row.item.leftTitleOther }}
-                        </localized-link>
+                        <div class="flex items-baseline gap-2">
+                            <localized-link
+                                :to="`${getLandingPageBasePath(row.item)}` + row.item.leftEntityId"
+                                open-in-new-tab>
+                                {{ $i18n.locale.startsWith('sr') ? row.item.leftTitleSr : row.item.leftTitleOther }}
+                            </localized-link>
+                            <span v-if="row.item.leftYear && row.item.leftYear > 0">, </span>
+                            <span v-if="row.item.leftYear && row.item.leftYear > 0" class="text-xs text-gray-600">{{ row.item.leftYear + (row.item.publicationType ? ", " : "") }}</span>
+                            <span v-if="row.item.publicationType" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.leftConcreteType) }}</span>
+                        </div>
+                        <div v-if="row.item.leftAuthors && row.item.leftAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
+                            <div v-for="(author, index) in row.item.leftAuthors.split(';')" :key="index">
+                                <localized-link
+                                    v-if="row.item.leftAuthorIds[index] !== -1"
+                                    :to="'persons/' + row.item.leftAuthorIds[index]"
+                                    class="flex items-center gap-1"
+                                    open-in-new-tab
+                                >
+                                    <v-icon size="14" class="text-gray-500">
+                                        mdi-account
+                                    </v-icon>
+                                    {{ `${author.trim()}` }}
+                                </localized-link>
+                                <span v-else class="flex items-center gap-1">
+                                    <v-icon size="14" class="text-gray-500">mdi-account-outline</v-icon>
+                                    {{ `${author.trim()}` }}
+                                </span>
+                            </div>
+                        </div>
                     </td>
                     <td>
-                        <localized-link :to="`${getLandingPageBasePath(row.item)}` + row.item.rightEntityId">
-                            {{ $i18n.locale.startsWith('sr') ? row.item.rightTitleSr : row.item.rightTitleOther }}
-                        </localized-link>
+                        <div class="flex items-baseline gap-2">
+                            <localized-link
+                                :to="`${getLandingPageBasePath(row.item)}` + row.item.rightEntityId"
+                                open-in-new-tab>
+                                {{ $i18n.locale.startsWith('sr') ? row.item.rightTitleSr : row.item.rightTitleOther }}
+                            </localized-link>
+                            <span v-if="row.item.rightYear && row.item.rightYear > 0">, </span>
+                            <span v-if="row.item.rightYear && row.item.rightYear > 0" class="text-xs text-gray-600">{{ row.item.rightYear + (row.item.publicationType ? ", " : "") }}</span>
+                            <span v-if="row.item.publicationType" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.rightConcreteType) }}</span>
+                        </div>
+                        <div v-if="row.item.rightAuthors && row.item.rightAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
+                            <div v-for="(author, index) in row.item.rightAuthors.split(';')" :key="index">
+                                <localized-link
+                                    v-if="row.item.rightAuthorIds[index] !== -1"
+                                    :to="'persons/' + row.item.rightAuthorIds[index]"
+                                    class="flex items-center gap-1"
+                                    open-in-new-tab
+                                >
+                                    <v-icon size="14" class="text-gray-500">
+                                        mdi-account
+                                    </v-icon>
+                                    {{ `${author.trim()}` }}
+                                </localized-link>
+                                <span v-else class="flex items-center gap-1">
+                                    <v-icon size="14" class="text-gray-500">mdi-account-outline</v-icon>
+                                    {{ `${author.trim()}` }}
+                                </span>
+                            </div>
+                        </div>
                     </td>
                     <td>
                         <v-btn density="compact" class="mt-1 mb-1 ml-2" @click="compareMetadata(row.item)">
@@ -75,6 +127,7 @@ import LocalizedLink from "../localization/LocalizedLink.vue";
 import { useRouter } from "vue-router";
 import { getMetadataComparisonPageName, getPublicationComparisonPageName, getDocumentLandingPageBasePath } from "@/utils/PathResolutionUtil";
 import { EntityType } from "@/models/MergeModel";
+import { getDocumentTypeDisplayValue } from "@/utils/EnumUtil";
 
 
 export default defineComponent({
@@ -288,7 +341,7 @@ export default defineComponent({
             returnCurrentLocaleContent, getDocumentLandingPageBasePath,
             compareMetadata, comparePublications,
             canAggregateEntities, getLandingPageBasePath,
-            getAggregationComparisonLabel
+            getAggregationComparisonLabel, getDocumentTypeDisplayValue
         };   
     },
 });

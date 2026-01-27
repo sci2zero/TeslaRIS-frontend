@@ -211,7 +211,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="dataset?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="dataset?.fileItems && dataset?.fileItems.length > 0"
                     @create="createIndicator"
@@ -224,7 +224,7 @@
                     :entity-id="dataset?.id"
                     :can-edit="canClassify && dataset?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.DATASET]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -313,7 +313,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -381,13 +381,17 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
-            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityClassificationService.fetchDocumentClassifications(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentClassifications.value = response.data;
             });
         };
 
         const fetchIndicators = () => {
-            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityIndicatorService.fetchDocumentIndicators(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentIndicators.value = response.data;
             });
         };
@@ -402,7 +406,12 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});        
+            router.push(
+                {
+                    name:"advancedSearch", 
+                    query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }
+                }
+            );        
         };
 
         const goToURL = (uri: string) => {
@@ -441,7 +450,10 @@ export default defineComponent({
         };
 
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updateDataset(dataset.value?.id as number, dataset.value as Dataset).then(() => {
+            DocumentPublicationService.updateDataset(
+                dataset.value?.id as number, 
+                dataset.value as Dataset
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
@@ -490,7 +502,7 @@ export default defineComponent({
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
             createIndicator, fetchIndicators, fetchValidationStatus, updateRemark,
-            displayConfiguration
+            displayConfiguration, isAdmin, isCommission
         };
 }})
 

@@ -4,12 +4,22 @@
             <v-col cols="12">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="title" :initial-value="toMultilingualTextInput(presetPrize?.title, languageTags)" :label="$t('titleLabel') + '*'" :rules="requiredFieldRules"></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="title"
+                            :initial-value="toMultilingualTextInput(presetPrize?.title, languageTags)"
+                            :label="$t('titleLabel') + '*'"
+                            :rules="requiredFieldRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input v-model="description" :initial-value="toMultilingualTextInput(presetPrize?.description, languageTags)" :label="$t('abstractLabel')" is-area></multilingual-text-input>
+                        <multilingual-text-input
+                            v-model="description"
+                            :initial-value="toMultilingualTextInput(presetPrize?.description, languageTags)"
+                            :label="$t('descriptionLabel')"
+                            is-area
+                        />
                     </v-col>
                 </v-row>
                 <v-row>

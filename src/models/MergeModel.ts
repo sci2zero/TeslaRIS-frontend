@@ -4,7 +4,7 @@ import type { Journal } from "./JournalModel";
 import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
-import type { Dataset, JournalPublication, Monograph, MonographPublication, Patent, ProceedingsPublication, Software, Thesis } from "./PublicationModel";
+import type { Dataset, GeneticMaterial, JournalPublication, MaterialProduct, Monograph, MonographPublication, Patent, ProceedingsPublication, IntangibleProduct, Thesis } from "./PublicationModel";
 import type { Publisher } from "./PublisherModel";
 
 
@@ -49,9 +49,19 @@ export interface MergedProceedings extends MergedDocuments {
     rightProceedings: Proceedings;
 }
 
-export interface MergedSoftware extends MergedDocuments {
-    leftSoftware: Software;
-    rightSoftware: Software;
+export interface MergedIntangibleProduct extends MergedDocuments {
+    leftIntangibleProduct: IntangibleProduct;
+    rightIntangibleProduct: IntangibleProduct;
+}
+
+export interface MergedMaterialProduct extends MergedDocuments {
+    leftMaterialProduct: MaterialProduct;
+    rightMaterialProduct: MaterialProduct;
+}
+
+export interface MergedGeneticMaterial extends MergedDocuments {
+    leftGeneticMaterial: GeneticMaterial;
+    rightGeneticMaterial: GeneticMaterial;
 }
 
 export interface MergedDatasets extends MergedDocuments {

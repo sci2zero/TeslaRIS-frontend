@@ -33,7 +33,8 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props) {
+    emits: ["noIndicatorsPresent"],
+    setup(props, {emit}) {
         const statisticsIndicators = ref<string[]>([]);
         const statisticsEntityIndicators = ref<EntityIndicatorResponse[]>([]);
 
@@ -67,6 +68,11 @@ export default defineComponent({
                             statisticsEntityIndicators.value.push(entityIndicator);
                         }
                     });
+
+                    if (statisticsEntityIndicators.value.length === 0) {
+                        emit("noIndicatorsPresent")
+                    }
+
                     buildDisplayData();
                 });
             }

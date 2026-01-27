@@ -1,5 +1,6 @@
 import type { AccessLevel, ApplicableEntityType, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { type ResearchArea } from "./OrganisationUnitModel";
 
 
 export interface IndicatorResponse {
@@ -48,6 +49,7 @@ export interface EntityClassificationResponse {
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
     categoryIdentifier: string;
+    edition?: string;
 }
 
 export enum StatisticsType {
@@ -208,6 +210,7 @@ export interface PublicationAssessmentRequest {
 export interface AssessmentResearchArea {
     name: MultilingualContent[],
     code: string
+    researchSubAreas: ResearchArea[];
 }
 
 export interface ResearcherAssessmentResponse {
@@ -263,6 +266,7 @@ export interface IFCategoryData {
     category: string;
     if2Ranks: IFValue[];
     if5Ranks: IFValue[];
+    jciRanks: IFValue[];
 }
 
 export interface IFTableResponse {
@@ -271,6 +275,7 @@ export interface IFTableResponse {
     jciValues: IFValue[];
     jciPercentiles: IFValue[];
     ifTableContent: IFCategoryData[];
+    editions: string[];
 }
 
 export interface ExternalIndicatorConfiguration {

@@ -4,7 +4,9 @@
         <draggable
             :list="researchAreas" group="researchAreaHierarchy" item-key="id" :disabled="!inComparator"
             @change="onDropCallback">
-            <tree-hierarchy-recursive :preset-research-area="researchAreaTree"></tree-hierarchy-recursive>
+            <tree-hierarchy-recursive
+                :preset-research-area="researchAreaTree"
+            />
         </draggable>
     </ul>
 </template>
@@ -19,7 +21,7 @@ import { VueDraggableNext } from 'vue-draggable-next';
 
 export default defineComponent({
     name: 'ResearchAreaHierarchy',
-    components: {TreeHierarchyRecursive, draggable: VueDraggableNext},
+    components: { TreeHierarchyRecursive, draggable: VueDraggableNext },
     props: {
         researchAreas: {
             type: Object as PropType<ResearchArea[] | undefined>,

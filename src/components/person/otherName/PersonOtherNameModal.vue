@@ -26,18 +26,37 @@
                             <v-row>
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="primaryName.firstname" :label="$t('firstNameLabel') + (readOnly ? '' : '*')" :placeholder="$t('firstNameLabel')" outlined
-                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                        v-model="primaryName.firstname"
+                                        :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
+                                        :placeholder="$t('firstNameLabel')" outlined
+                                        :rules="requiredFieldRules" :readonly="readOnly">
+                                        <template #append-inner>
+                                            <v-btn 
+                                                icon
+                                                variant="text"
+                                                class="ml-2"
+                                                @click="[primaryName.firstname, primaryName.lastname] = [primaryName.lastname, primaryName.firstname]">
+                                                <v-icon>mdi-swap-horizontal</v-icon>
+                                            </v-btn>
+                                        </template>
+                                    </v-text-field>
                                 </v-col>
                                 <v-col v-if="readOnly ? primaryName.otherName : true" :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="primaryName.otherName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" outlined
-                                        :readonly="readOnly"></v-text-field>
+                                        v-model="primaryName.otherName"
+                                        :label="$t('middleNameLabel')"
+                                        :placeholder="$t('middleNameLabel')" outlined
+                                        :readonly="readOnly">
+                                    </v-text-field>
                                 </v-col>
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="primaryName.lastname" :label="$t('surnameLabel') + (readOnly ? '' : '*')" :placeholder="$t('surnameLabel')" outlined
-                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                        v-model="primaryName.lastname"
+                                        :label="$t('surnameLabel') + (readOnly ? '' : '*')"
+                                        :placeholder="$t('surnameLabel')" outlined
+                                        :rules="requiredFieldRules" 
+                                        :readonly="readOnly">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
                             <h3 v-if="readOnly && presetPerson && presetPerson.personOtherNames.length === 0">
@@ -46,18 +65,37 @@
                             <v-row v-for="(element, index) in otherNames" v-else :key="index">
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="element.firstname" :label="$t('firstNameLabel') + (readOnly ? '' : '*')" :placeholder="$t('firstNameLabel')" outlined
-                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                        v-model="element.firstname"
+                                        :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
+                                        :placeholder="$t('firstNameLabel')" outlined
+                                        :rules="requiredFieldRules" :readonly="readOnly">
+                                        <template #append-inner>
+                                            <v-btn 
+                                                icon
+                                                variant="text"
+                                                class="ml-2"
+                                                @click="[element.firstname, element.lastname] = [element.lastname, element.firstname]">
+                                                <v-icon>mdi-swap-horizontal</v-icon>
+                                            </v-btn>
+                                        </template>
+                                    </v-text-field>
                                 </v-col>
                                 <v-col v-if="readOnly ? element.otherName : true" :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="element.otherName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" outlined
-                                        :readonly="readOnly"></v-text-field>
+                                        v-model="element.otherName"
+                                        :label="$t('middleNameLabel')"
+                                        :placeholder="$t('middleNameLabel')" outlined
+                                        :readonly="readOnly">
+                                    </v-text-field>
                                 </v-col>
                                 <v-col :cols="readOnly ? 4 : 3">
                                     <v-text-field
-                                        v-model="element.lastname" :label="$t('surnameLabel') + (readOnly ? '' : '*')" :placeholder="$t('surnameLabel')" outlined
-                                        :rules="requiredFieldRules" :readonly="readOnly"></v-text-field>
+                                        v-model="element.lastname"
+                                        :label="$t('surnameLabel') + (readOnly ? '' : '*')"
+                                        :placeholder="$t('surnameLabel')" outlined
+                                        :rules="requiredFieldRules"
+                                        :readonly="readOnly">
+                                    </v-text-field>
                                 </v-col>
                                 <v-col cols="3">
                                     <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))" icon @click="removeOtherName(index)">

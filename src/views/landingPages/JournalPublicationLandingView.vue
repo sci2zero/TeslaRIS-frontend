@@ -173,6 +173,8 @@
             :description="returnCurrentLocaleContent(journalPublication?.description)"
             :document="journalPublication"
             :handle-researcher-unbind="handleResearcherUnbind"
+            :transfer-to="PublicationType.PROCEEDINGS_PUBLICATION"
+            type-transfer-suffix="Proceedings"
             @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 
@@ -252,7 +254,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="journalPublication?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="journalPublication?.fileItems && journalPublication?.fileItems.length > 0"
                     @create="createIndicator"
@@ -268,7 +270,7 @@
                     :entity-id="journalPublication?.id"
                     :can-edit="canClassify && journalPublication?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.JOURNAL_PUBLICATION]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -358,7 +360,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -564,7 +566,7 @@ export default defineComponent({
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
-            createClassification, fetchClassifications, currentRoute,
+            createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
             fetchValidationStatus, PublicationType, updateRemark, displayConfiguration
         };
 }})

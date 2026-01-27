@@ -16,10 +16,10 @@
         </v-tab>
     </v-tabs>
 
-    <v-tabs-window v-model="currentTab">
+    <v-tabs-window v-model="currentTab" class="mb-10">
         <v-tabs-window-item value="scheduling">
             <v-form v-model="isFormValid" @submit.prevent>
-                <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
+                <v-row class="d-flex flex-row justify-center mt-5! bg-grey-lighten-5">
                     <v-col cols="12" sm="3" md="2">
                         <v-select
                             v-model="selectedReportType"
@@ -111,7 +111,7 @@
         </v-tabs-window-item>
         <v-tabs-window-item value="generated">
             <h2
-                v-if="generatedReports.length === 0"
+                v-if="allGeneratedReports.length === 0"
                 class="d-flex fler-row justify-center mt-10">
                 {{ $t("noDataInTableMessage") }}
             </h2>
@@ -119,7 +119,7 @@
             <v-list
                 :lines="false"
                 density="comfortable"
-                class="bigger-font"
+                class="bigger-font mt-5"
             >
                 <v-list-item
                     v-for="generatedReport in allGeneratedReports" :key="generatedReport.name"
@@ -223,12 +223,12 @@ export default defineComponent({
         const { startInterval: startTasksInterval } = useInterval(fetchScheduledTasks, 1000 * 60);
 
         const fetchAllGeneratedReports = () => {
-            allGeneratedReports.value.splice(0);
             ReportingService.fetchAllGeneratedReports().then(response => {
-                    response.data.forEach(report => {
-                        allGeneratedReports.value.push({name: report.reportFileName, value: report.commissionId});
-                    });
+                allGeneratedReports.value.splice(0);
+                response.data.forEach(report => {
+                    allGeneratedReports.value.push({name: report.reportFileName, value: report.commissionId});
                 });
+            });
         };
         const { startInterval: startReportsInterval } = useInterval(fetchAllGeneratedReports, 1000 * 60);
 
@@ -285,9 +285,8 @@ export default defineComponent({
 
         const scheduleReportGeneration = () => {
             const topLevelInstitutionId = (selectedOUs.value as {title: string, value: number}).value;
-            const timeToRun = new Date(Date.now() + 60 * 60 * 1000).toLocaleString('sv-SE').replace(' ', 'T').slice(0, 19);
             TaskManagerService.scheduleReportGeneration(
-                timeToRun, selectedReportType.value,
+                null, selectedReportType.value,
                 selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? (selectedCommissions.value as {title: string, value: number}[]).map(commission => commission.value) : [(selectedCommissions.value as {title: string, value: number}).value],
                 selectedYear.value, topLevelInstitutionId, "sr", selectedRecurrenceType.value.value
             )

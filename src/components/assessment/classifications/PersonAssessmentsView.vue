@@ -21,13 +21,7 @@
         v-for="assessment in assessments"
         :key="assessment.commissionId"
         class="d-flex justify-center align-center">
-        <v-col v-if="isLoading">
-            <v-progress-circular
-                color="primary"
-                indeterminate
-            ></v-progress-circular>
-        </v-col>
-        <v-col v-else>
+        <v-col>
             <h3 class="ml-4 mt-5">
                 {{ $t("commissionLabel") }}: {{ returnCurrentLocaleContent(assessment.commissionDescription) }}
             </h3>
@@ -87,6 +81,16 @@
             <p v-else class="ml-5">
                 {{ $t("noAssessedPublicationsMessage") }}
             </p>
+        </v-col>
+    </v-row>
+    <v-row v-if="assessments.length === 0">
+        <v-col v-if="isLoading">
+            <v-progress-circular
+                color="primary"
+                :size="40"
+                :width="3"
+                indeterminate
+            ></v-progress-circular>
         </v-col>
     </v-row>
 </template>

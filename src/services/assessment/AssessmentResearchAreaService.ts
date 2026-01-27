@@ -21,8 +21,16 @@ export class AssessmentResearchAreaService extends BaseService {
         return super.sendRequest(axios.get, `assessment/research-area/${code}/${commissionId}?${pageable}`);
     }
 
-    async setPersonAssessmentResearchArea(personId: number, researchAreaCode: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `assessment/research-area/${personId}/${researchAreaCode}`, {}, AssessmentResearchAreaService.idempotencyKey);
+    async setPersonAssessmentResearchArea(personId: number, researchAreaCode: string, researchSubAreaIds: number[]): Promise<AxiosResponse<void>> {
+        let researchAreaIdsParam = "";
+        researchSubAreaIds.forEach(researchAreaId => {
+            researchAreaIdsParam +=
+                researchAreaIdsParam === "" ? "?" : "&";
+
+            researchAreaIdsParam += `researchAreaIds=${researchAreaId}`;
+        });
+
+        return super.sendRequest(axios.patch, `assessment/research-area/${personId}/${researchAreaCode}${researchAreaIdsParam}`, {}, AssessmentResearchAreaService.idempotencyKey);
     }
 
     async setPersonAssessmentResearchAreaForCommission(personId: number, researchAreaCode: string, commissionId: number): Promise<AxiosResponse<void>> {

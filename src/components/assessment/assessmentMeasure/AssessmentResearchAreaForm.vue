@@ -21,6 +21,20 @@
             </v-col>
         </v-row>
 
+        <h2 v-show="selectedResearchArea.value">
+            {{ $t("selectSubAreasLabel") }}
+        </h2>
+        <v-row v-show="selectedResearchArea.value">
+            <v-col>
+                <research-areas-selection
+                    ref="researchAreasSelectionRef"
+                    :research-areas-hierarchy="researchAreasHierarchy"
+                    submit-on-click
+                    @update="saveSubAreas"
+                />
+            </v-col>
+        </v-row>
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -37,10 +51,13 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { AssessmentResearchArea } from '@/models/AssessmentModel';
 import AssessmentResearchAreaService from '@/services/assessment/AssessmentResearchAreaService';
+import { type ResearchArea } from '@/models/OrganisationUnitModel';
+import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 
 
 export default defineComponent({
     name: "AssessmentResearchAreaForm",
+    components: { ResearchAreasSelection },
     props: {
         personId: {
             type: Number,
@@ -49,6 +66,10 @@ export default defineComponent({
         presetResearchArea: {
             type: Object as PropType<AssessmentResearchArea | undefined>,
             default: undefined
+        },
+        researchAreasHierarchy: {
+            type: Object as PropType<ResearchArea[] | undefined>,
+            required: true
         }
     },
     emits: ["create"],
@@ -58,6 +79,7 @@ export default defineComponent({
         const assessmentResearchAreas = ref<AssessmentResearchArea[]>([]);
         const researchAreas = ref<{title: string, value: string}[]>([]);
         const selectedResearchArea = ref<{title: string, value: string}>({title: "", value: ""});
+        const selectedResearchAreaIds = ref<number[]>([]);
 
         onMounted(() => {
             AssessmentResearchAreaService.readAssessmentResearchAreas().then(response => {
@@ -76,23 +98,31 @@ export default defineComponent({
         const { requiredStringSelectionRules } = useValidationUtils();
 
         const submit = () => {
-            AssessmentResearchAreaService.setPersonAssessmentResearchArea(props.personId, selectedResearchArea.value.value).then(() => {
+            AssessmentResearchAreaService.setPersonAssessmentResearchArea(
+                props.personId, selectedResearchArea.value.value,
+                selectedResearchAreaIds.value
+            ).then(() => {
                 emit("create");
             });
         };
 
         const removeResearchArea = () => {
-            AssessmentResearchAreaService.deletePersonAssessmentResearchArea(props.personId).then(() => {
+            AssessmentResearchAreaService.deletePersonAssessmentResearchArea(
+                props.personId
+            ).then(() => {
                 emit("create");
             });
         };
 
+        const saveSubAreas = (researchAreaIds: number[]) => {
+            selectedResearchAreaIds.value = researchAreaIds;
+        };
+
         return {
-            isFormValid,
-            researchAreas, submit,
+            isFormValid, researchAreas,
             requiredStringSelectionRules,
-            selectedResearchArea,
-            removeResearchArea
+            selectedResearchArea, submit,
+            removeResearchArea, saveSubAreas
         };
     }
 });

@@ -12,6 +12,13 @@
                         ref="citationRef"
                         :document-id="documentId">
                     </citation-selector>
+                    <v-btn
+                        class="mb-5 ml-2" color="primary" 
+                        density="compact"
+                        :disabled="!isUserLoggedIn"
+                        @click="downloadRoCrate">
+                        {{ $t("downloadRoCrateLabel") }}
+                    </v-btn>
                     <publication-unbind-button
                         v-if="canEdit && isResearcher"
                         :document-id="documentId"
@@ -45,6 +52,17 @@
                         @click="changeArchiveState(false)">
                         {{ $t("unarchiveLabel") }}
                     </v-btn>
+                    <generic-crud-modal
+                        v-if="isAdmin && transferTo"
+                        class="ml-2"
+                        :form-component="PublicationTypeTransferForm"
+                        :form-props="{ documentId: documentId, transferTo: transferTo }"
+                        :entity-name="'TypeTransfer' + typeTransferSuffix"
+                        :read-only="false"
+                        outlined
+                        primary-color
+                        compact
+                    />
                 </div>
             </v-col>
             <v-col cols="12" sm="6" class="action-section">
@@ -67,16 +85,19 @@ import CitationSelector from '@/components/publication/CitationSelector.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
-import type { Document } from '@/models/PublicationModel';
+import type { Document, PublicationType } from '@/models/PublicationModel';
 import { commitArchiveStateChange } from '@/utils/DocumentUtil';
 import Toast from '../core/Toast.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
+import RoCrateService from '@/services/export/RoCrateService';
+import PublicationTypeTransferForm from './PublicationTypeTransferForm.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
 
 
 export default defineComponent({
     name: "DocumentActionBox",
-    components: { CitationSelector, PublicationBadgeSection, Toast, PublicationUnbindButton },
+    components: { CitationSelector, PublicationBadgeSection, Toast, PublicationUnbindButton, GenericCrudModal },
     props: {
         documentId: {
             type: Number,
@@ -125,6 +146,14 @@ export default defineComponent({
         handleResearcherUnbind: {
             type: Function as PropType<((...args: any[]) => any)>,
             default: () => {}
+        },
+        transferTo: {
+            type: Object as PropType<PublicationType | undefined>,
+            default: undefined
+        },
+        typeTransferSuffix: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update"],
@@ -132,13 +161,15 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
+        const currentRoute = useRoute();
         const router = useRouter();
 
         const citationRef = ref<typeof CitationSelector>();
 
         const {
             isAdmin, isInstitutionalEditor,
-            isInstitutionalLibrarian, isResearcher
+            isInstitutionalLibrarian, isResearcher,
+            isUserLoggedIn
         } = useUserRole();
 
         const canValidate = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value)
@@ -170,13 +201,21 @@ export default defineComponent({
 
             commitArchiveStateChange(archive, props.document, snackbar, snackbarMessage, router);
         };
+
+        const downloadRoCrate = () => {
+            RoCrateService.downloadRoCrateForSingleDocument(
+                parseInt(currentRoute.params.id as string)
+            );
+        };
         
         return {
             fetchCitations, canValidate,
             validateMetadata, validateUploadedFiles,
             isAdmin, isInstitutionalEditor,
             changeArchiveState, snackbar,
-            snackbarMessage, isResearcher
+            snackbarMessage, isResearcher,
+            isUserLoggedIn, downloadRoCrate,
+            PublicationTypeTransferForm
         };
 }})
 

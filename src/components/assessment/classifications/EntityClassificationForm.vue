@@ -5,22 +5,39 @@
                 <v-select
                     v-model="selectedAssessmentClassification"
                     :items="assessmentClassifications"
-                    :label="$t('classificationLabel') + '*'"
+                    :label="$t(entityType === ApplicableEntityType.DOCUMENT ? 'assessmentLabel' : 'classificationLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object>
                 </v-select>
             </v-col>
         </v-row>
+        <v-row
+            v-if="isDocumentEntity">
+            <v-col>
+                <v-checkbox
+                    v-model="showAllForEntityType"
+                    :label="$t('showAllCategoriesLabel')"
+                ></v-checkbox>
+            </v-col>
+        </v-row>
         <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT'">
             <v-col>
                 <v-text-field
-                    v-model="classificationYear" type="number" :label="$t('classificationYearLabel') + '*'" :placeholder="$t('classificationYearLabel') + '*'"
-                    :rules="requiredNumericFieldRules"></v-text-field>
+                    v-model="classificationYear"
+                    type="number"
+                    :label="$t('classificationYearLabel') + '*'"
+                    :placeholder="$t('classificationYearLabel') + '*'"
+                    :rules="requiredNumericFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row v-if="!isCommission && !isViceDeanForScience">
             <v-col>
-                <commission-autocomplete-search v-model="selectedCommission" :read-only="presetClassification !== undefined" required></commission-autocomplete-search>
+                <commission-autocomplete-search
+                    v-model="selectedCommission"
+                    :read-only="presetClassification !== undefined"
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -33,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
@@ -69,6 +86,19 @@ export default defineComponent({
     emits: ["create"],
     setup(props, { emit }) {
         const isFormValid = ref(false);
+        const showAllForEntityType = ref(false);
+
+        const isDocumentEntity = computed(() =>
+            props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH) || 
+            props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.JOURNAL_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.PROCEEDINGS_PUBLICATION) || 
+            props.applicableTypes.includes(ApplicableEntityType.PATENT) || 
+            props.applicableTypes.includes(ApplicableEntityType.MATERIAL_PRODUCT) || 
+            props.applicableTypes.includes(ApplicableEntityType.GENETIC_MATERIAL) || 
+            props.applicableTypes.includes(ApplicableEntityType.DATASET) || 
+            props.applicableTypes.includes(ApplicableEntityType.THESIS)
+        );
 
         const { isCommission, isViceDeanForScience } = useUserRole();
 
@@ -77,8 +107,20 @@ export default defineComponent({
             populateFields();
         });
 
+        watch(showAllForEntityType, () => {
+            fetchDetails();
+        });
+
         const fetchDetails = () => {
-            AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(props.applicableTypes).then((response) => {
+            let applicableTypes = [...props.applicableTypes];
+
+            if (showAllForEntityType.value) {
+                applicableTypes.push(props.entityType);
+            } else if (applicableTypes.includes(ApplicableEntityType.DOCUMENT)) {
+                applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.DOCUMENT);
+            }
+
+            AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(applicableTypes).then((response) => {
                 assessmentClassifications.value.splice(0);
                 response.data.forEach((classification) => {
                     assessmentClassifications.value.push({title: returnCurrentLocaleContent(classification.title) as string, value: classification.id as number});
@@ -134,7 +176,10 @@ export default defineComponent({
             selectedAssessmentClassification,
             requiredNumericFieldRules,
             classificationYear, isCommission,
-            isViceDeanForScience
+            isViceDeanForScience,
+            ApplicableEntityType,
+            showAllForEntityType,
+            isDocumentEntity
         };
     }
 });

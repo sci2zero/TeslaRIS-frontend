@@ -2,7 +2,7 @@
     <v-card min-width="150">
         <v-list v-if="notifications.length > 0">
             <v-list-subheader>
-                <div class="flex flex-row justify-between w-150">
+                <div class="flex flex-row justify-between w-full">
                     <strong>{{ $t("recentNotificationsLabel") }}</strong>
                     <v-btn
                         class="ml-3! mb-1!"
@@ -26,7 +26,7 @@
                         <v-list-item-media>{{ notification.notificationText }}</v-list-item-media>
                         <p class="text-gray-500 text-sm mt-1">
                             {{ localiseDate(notification.creationTimestamp.split("T")[0]) }} 
-                            ({{ localiseTime(notification.creationTimestamp.split("T")[1].substring(0, 5)) }})
+                            ({{ serverTimeToLocalTime(notification.creationTimestamp.split("T")[1].substring(0, 5)) }})
                         </p>
                     </div>
                     <div class="flex justify-center ml-3 mr-1 mb-1 mt-1">
@@ -89,7 +89,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import PersistentQuestionDialog from './comparators/PersistentQuestionDialog.vue';
 import { useI18n } from 'vue-i18n';
-import { localiseDate, localiseTime } from '@/utils/DateUtil';
+import { localiseDate, serverTimeToLocalTime } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -255,13 +255,13 @@ export default defineComponent({
 
         return {
             performAction, notifications,
-            rejectNotification, localiseTime,
             notificationCountStore, getActionIcon,
             navigateToNotificationPage,
             loading, dismissAllNotifications,
             displayPersistentDialog, localiseDate,
             continueToAction, dialogMessage,
-            getActionTooltip
+            getActionTooltip, serverTimeToLocalTime,
+            rejectNotification
         };
 }});
 </script>
@@ -272,7 +272,7 @@ export default defineComponent({
     min-width: 400px;
 }
 
-.w-100 > div.v-list-subheader > div {
+.w-full > div.v-list-subheader > div {
     width: 100%;
 }
 

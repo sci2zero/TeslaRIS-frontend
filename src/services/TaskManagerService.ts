@@ -39,8 +39,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-load?timestamp=${toUtcLocalDateTimeString(timestamp)}&source=${source}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleIF5AndJCIRankComputationTask(timestamp: string, years: number[]): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-jci-compute?timestamp=${toUtcLocalDateTimeString(timestamp)}${this.createNumericalParameter("classificationYears", years)}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleIF5AndJCIRankComputationTask(timestamp: string, years: number[], calculateIF5Rank: boolean, calculateJCIRank: boolean): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/publication-series-indicator/schedule-if5-jci-compute?timestamp=${toUtcLocalDateTimeString(timestamp)}${this.createNumericalParameter("classificationYears", years)}&calculateIF5Rank=${calculateIF5Rank}&calculateJciRank=${calculateJCIRank}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleClassificationComputationTask(timestamp: string, commissionId: number, years: number[], journalIds: number[]): Promise<AxiosResponse<void>> {
@@ -59,8 +59,8 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `assessment/document-assessment-classification/schedule-publication-assessment/${type}?timestamp=${toUtcLocalDateTimeString(timestamp)}&dateFrom=${dateFrom}`, body, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleReportGeneration(timestamp: string, reportType: ReportType, commissionIds: number[], year: number[] | number, topLevelInstitutionId: number | undefined, lang: string, recurrence: string): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}&timestamp=${toUtcLocalDateTimeString(timestamp)}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
+    async scheduleReportGeneration(timestamp: string | null, reportType: ReportType, commissionIds: number[], year: number[] | number, topLevelInstitutionId: number | undefined, lang: string, recurrence: string): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.post, `assessment/report/schedule-generation?type=${reportType}&year=${year}&lang=${lang}${timestamp ? "&timestamp=" + toUtcLocalDateTimeString(timestamp) : ""}${topLevelInstitutionId ? ("&topLevelInstitutionId=" + topLevelInstitutionId) : ""}${this.createNumericalParameter("commissionId", commissionIds)}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
     async scheduleUnmanagedDocumentsDeletion(timestamp: string, recurrence: string): Promise<AxiosResponse<void>> {

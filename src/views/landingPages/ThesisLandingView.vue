@@ -465,7 +465,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="thesis?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit && !thesis?.isOnPublicReview"
+                    :can-edit="canEdit && !thesis?.isOnPublicReview && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="(thesis?.fileItems && thesis?.fileItems.length > 0) || (thesis?.preliminaryFiles && thesis?.preliminaryFiles.length > 0)"
                     @create="createIndicator"
@@ -478,7 +478,7 @@
                     :entity-id="thesis?.id"
                     :can-edit="canClassify && !thesis?.isOnPublicReview && thesis?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.THESIS]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -596,7 +596,7 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission } = useUserRole();
         const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
         const canEdit = ref(false);
         const canClassify = ref(false);
@@ -978,7 +978,7 @@ export default defineComponent({
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
-            continueLastReview, shortenedReview
+            continueLastReview, shortenedReview, isCommission
         };
 }})
 

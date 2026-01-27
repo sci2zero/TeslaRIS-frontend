@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, DocumentContributionType, type DocumentPublicationIndex, type JournalPublication, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type Software, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { DocumentContributionType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -18,22 +18,22 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}`);
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}`);
   }
 
-  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}`);
+    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
@@ -44,8 +44,16 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `proceedings-publication/${proceedingsPublicationId}`);
   }
 
-  async readSoftware(softwareId: number): Promise<AxiosResponse<Software>> {
-    return super.sendRequest(axios.get, `software/${softwareId}`);
+  async readIntangibleProduct(intangibleProductId: number): Promise<AxiosResponse<IntangibleProduct>> {
+    return super.sendRequest(axios.get, `intangible-product/${intangibleProductId}`);
+  }
+
+  async readMaterialProduct(materialProductId: number): Promise<AxiosResponse<MaterialProduct>> {
+    return super.sendRequest(axios.get, `material-product/${materialProductId}`);
+  }
+
+  async readGeneticMaterial(geneticMaterialId: number): Promise<AxiosResponse<GeneticMaterial>> {
+    return super.sendRequest(axios.get, `genetic-material/${geneticMaterialId}`);
   }
 
   async readDataset(datasetId: number): Promise<AxiosResponse<Dataset>> {
@@ -97,8 +105,16 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "patent", body, DocumentPublicationService.idempotencyKey);
   }
 
-  async createSoftware(body: Software): Promise<AxiosResponse<Software>> {
-    return super.sendRequest(axios.post, "software", body, DocumentPublicationService.idempotencyKey);
+  async createIntangibleProduct(body: IntangibleProduct): Promise<AxiosResponse<IntangibleProduct>> {
+    return super.sendRequest(axios.post, "intangible-product", body, DocumentPublicationService.idempotencyKey);
+  }
+
+  async createMaterialProduct(body: MaterialProduct): Promise<AxiosResponse<MaterialProduct>> {
+    return super.sendRequest(axios.post, "material-product", body, DocumentPublicationService.idempotencyKey);
+  }
+
+  async createGeneticMaterial(body: GeneticMaterial): Promise<AxiosResponse<GeneticMaterial>> {
+    return super.sendRequest(axios.post, "genetic-material", body, DocumentPublicationService.idempotencyKey);
   }
 
   async createDataset(body: Dataset): Promise<AxiosResponse<Dataset>> {
@@ -142,8 +158,16 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `document/${publicationId}/can-edit`);
   }
 
-  async updateSoftware(softwareId: number, updatedSoftware: Software): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.put, `software/${softwareId}`, updatedSoftware);
+  async updateIntangibleProduct(intangibleProductId: number, updatedIntangibleProduct: IntangibleProduct): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `intangible-product/${intangibleProductId}`, updatedIntangibleProduct);
+  }
+
+  async updateMaterialProduct(materialProductId: number, updatedMaterialProduct: MaterialProduct): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `material-product/${materialProductId}`, updatedMaterialProduct);
+  }
+
+  async updateGeneticMaterial(geneticMaterialId: number, updatedGeneticMaterial: GeneticMaterial): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `genetic-material/${geneticMaterialId}`, updatedGeneticMaterial);
   }
 
   async updateDataset(datasetId: number, updatedDataset: Dataset): Promise<AxiosResponse<void>> {
@@ -191,6 +215,10 @@ export class DocumentPublicationService extends BaseService {
   }
 
   async readThesis(thesisId: number): Promise<AxiosResponse<Thesis>> {
+    if (isNaN(thesisId) || thesisId <= 0) {
+        throw new Error(`Invalid thesis ID: ${thesisId}. Must be a positive integer.`);
+    }
+
     return super.sendRequest(axios.get, `thesis/${thesisId}`);
   }
 

@@ -14,7 +14,11 @@
         <template #item="row">
             <tr>
                 <td>
-                    {{ row.item.name }}
+                    <localized-link
+                        :to="'persons/' + row.item.databaseId"
+                        open-in-new-tab>
+                        {{ row.item.name }}
+                    </localized-link>
                 </td>
                 <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.employmentsSr) }}
@@ -22,16 +26,20 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.employmentsOther) }}
                 </td>
-                <td>{{ displayTextOrPlaceholder(row.item.birthdate.length === 4 ? row.item.birthdate.slice(0, 4) : localiseDate(row.item.birthdate)) }}</td>
+                <td>{{ displayTextOrPlaceholder((row.item.birthdate && row.item.birthdate.length === 4) ? row.item.birthdate.slice(0, 4) : localiseDate(row.item.birthdate)) }}</td>
                 <td>{{ displayTextOrPlaceholder(row.item.orcid) }}</td>
                 <td>
                     <publications-dialog
                         :button-text="$t('viewPublicationsLabel')"
                         :id-for-fetching="row.item.databaseId"
                         icon="mdi-note"
-                        :title="$t('publicationsLabel')">
+                        :title="$t('latestPublicationsLabel')">
                     </publications-dialog>
-                    <v-btn size="small" color="primary" @click="returnSelected ? returnToParent(row.item) : navigateToLandingPage(row.item.databaseId)">
+                    <v-btn
+                        class="ml-2"
+                        size="small"
+                        color="primary" 
+                        @click="returnSelected ? returnToParent(row.item) : navigateToLandingPage(row.item.databaseId)">
                         {{ $t("selectLabel") }}
                     </v-btn>
                 </td>
@@ -50,11 +58,12 @@ import { useRouter } from 'vue-router';
 import lodash from "lodash";
 import { localiseDate } from '@/utils/DateUtil';
 import PublicationsDialog from '../core/PublicationsDialog.vue';
+import LocalizedLink from '../localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "PersonDeduplicationTable",
-    components: { PublicationsDialog },
+    components: { PublicationsDialog, LocalizedLink },
     props: {
         personFirstName: {
             type: String,

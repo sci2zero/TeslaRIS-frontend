@@ -92,5 +92,13 @@ export default {
     researcherBoundMessage: "Истраживач је регистрован са адресом ел. поште: {0}",
     impactFactorTableLabel: "Табела импакт фактора и JCI-а",
     jciValueLabel: "JCI број",
-    jciPercentileLabel: "JCI перцентил"
+    jciPercentileLabel: "JCI перцентил",
+    downloadRoCrateLabel: "Преузми као Ro-Crate",
+    downloadRoCrateBibliographyLabel: "Преузми библиографију (Ro-Crate)",
+    calculateIf5RankLabel: "Израчунај IF5 ранк",
+    calculateJciRankLabel: "Израчунај JCI ранк",
+    clientInstitutionCrisLabel: "Клијентска институција (CRIS)",
+    if2RankLabel: "IF2 ранк",
+    if5RankLabel: "IF5 ранк",
+    jciRankLabel: "JCI ранк"
 };

@@ -61,7 +61,12 @@
             @switch-page="switchPage">
             <template #top-left>
                 <div class="flex items-center gap-1">
-                    <search-bar-component v-if="currentTab === 'simpleSearch'" :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                    <search-bar-component
+                        v-if="currentTab === 'simpleSearch'"
+                        :transparent="false"
+                        size="small"
+                        @search="clearSortAndPerformSearch($event)"
+                    />
                     <v-btn
                         v-if="currentTab === 'simpleSearch'"
                         variant="text"
@@ -75,6 +80,7 @@
                     <v-menu>
                         <template #activator="{ props }">
                             <v-btn
+                                v-if="isUserBoundToOU || isAdmin || isInstitutionalEditor || isCommission || isInstitutionalLibrarian || isHeadOfLibrary"
                                 v-bind="props"
                                 color="white"
                                 prepend-icon="mdi-dots-vertical"
@@ -110,6 +116,22 @@
                                     v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
                                     v-model="returnOnlyNonArchived"
                                     :label="$t('showNonArchivedLabel')"
+                                    class=""
+                                ></v-checkbox>
+                            </span>
+
+                            <span class="flex align-center flex-row gap-2">
+                                <v-checkbox
+                                    v-if="isAdmin"
+                                    v-model="showProceedingsOnly"
+                                    :label="$t('showProceedingsOnlyLabel')"
+                                    class=""
+                                ></v-checkbox>
+
+                                <v-checkbox
+                                    v-if="isAdmin && showProceedingsOnly"
+                                    v-model="emptyProceedingsOnly"
+                                    :label="$t('emptyProceedingsOnlyLabel')"
                                     class=""
                                 ></v-checkbox>
                             </span>
@@ -159,7 +181,7 @@
                                 class="w-full"
                                 color="primary"
                                 @update:model-value="togglePublicationType(type, !!$event)"
-                            ></v-checkbox>
+                            />
                         </div>
                     </div>
                 </div>
@@ -216,6 +238,9 @@ export default defineComponent({
         const returnOnlyUnmanagedPublications = ref(false);
         const returnOnlyNonArchived = ref(false);
 
+        const showProceedingsOnly = ref(false);
+        const emptyProceedingsOnly = ref(false);
+
         const {
             isCommission, isAdmin, isInstitutionalEditor,
             canUserAddPublications, isUserBoundToOU,
@@ -231,7 +256,25 @@ export default defineComponent({
 
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string,
+                        value: PublicationType.THESIS
+                    }
+                );
+            }
+
+            if (isCommission.value) {
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH) as string,
+                        value: PublicationType.MONOGRAPH
+                    },
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH_PUBLICATION) as string,
+                        value: PublicationType.MONOGRAPH_PUBLICATION
+                    }
+                );
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {
@@ -248,7 +291,9 @@ export default defineComponent({
         watch([
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
-            returnOnlyUnmanagedPublications, returnOnlyNonArchived], () => {
+            returnOnlyUnmanagedPublications, returnOnlyNonArchived,
+            showProceedingsOnly, emptyProceedingsOnly
+        ], () => {
             if (!initialLoad.value) {
                 search(searchParams.value);
             }
@@ -270,9 +315,9 @@ export default defineComponent({
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value);
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value);
 
             const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
                 ? (loggedInUser.value?.organisationUnitId as number)
@@ -353,7 +398,8 @@ export default defineComponent({
             performNavigation, returnOnlyUnmanagedPublications,
             togglePublicationType, toggleAdvancedSearch,
             isInstitutionalLibrarian, isHeadOfLibrary,
-            returnOnlyNonArchived
+            returnOnlyNonArchived, showProceedingsOnly,
+            emptyProceedingsOnly
         };
     }
 });

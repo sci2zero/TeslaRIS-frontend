@@ -3,18 +3,32 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetClassification?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetClassification?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="code"
+                    :label="$t('codeLabel') + '*'"
+                    :placeholder="$t('codeLabel') + '*'"
+                    :rules="requiredFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="formalDescriptionOfRule" :label="$t('classificationRuleLabel') + '*'" :placeholder="$t('classificationRuleLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="formalDescriptionOfRule"
+                    :label="$t('classificationRuleLabel') + '*'"
+                    :placeholder="$t('classificationRuleLabel') + '*'"
+                    :rules="requiredFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -74,7 +88,12 @@ export default defineComponent({
             if(props.presetClassification) {
                 selectedApplicableTypes.value = [];
                 props.presetClassification.applicableTypes.forEach(applicableType => {
-                    selectedApplicableTypes.value.push({title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string, value: applicableType});
+                    selectedApplicableTypes.value.push(
+                        {
+                            title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string,
+                            value: applicableType
+                        }
+                    );
                 });
             }
         };
@@ -82,11 +101,19 @@ export default defineComponent({
         const titleRef = ref<typeof MultilingualTextInput>();
 
         const applicableTypes = getApplicableEntityTypesForGivenLocale();
-        const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([{title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string, value: ApplicableEntityType.ALL}]);
+        const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>(
+            [
+                {
+                    title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string,
+                    value: ApplicableEntityType.ALL
+                }
+            ]
+        );
 
         const title = ref<any>([]);
         const code = ref<string>(props.presetClassification ? props.presetClassification.code as string : "");
-        const formalDescriptionOfRule = ref<string>(props.presetClassification ? props.presetClassification.formalDescriptionOfRule as string : "");
+        const formalDescriptionOfRule = ref<string>(
+            props.presetClassification ? props.presetClassification.formalDescriptionOfRule as string : "");
 
         const { requiredFieldRules, requiredMultiSelectionRules } = useValidationUtils();
 

@@ -43,13 +43,25 @@
         </v-row>
         <v-row v-if="!basic">
             <v-col v-if="input.contributionType && input.contributionType.value === 'AUTHOR'">
-                <v-checkbox v-model="input.isCorrespondingContributor" :label="$t('correspondingContributorLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+                <v-checkbox
+                    v-model="input.isCorrespondingContributor"
+                    :label="$t('correspondingContributorLabel')"
+                    @update:model-value="sendContentToParent">
+                </v-checkbox>
             </v-col>
             <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)">
-                <v-checkbox v-model="input.isBoardPresident" :label="$t('boardPresidentLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+                <v-checkbox
+                    v-model="input.isBoardPresident"
+                    :label="$t('boardPresidentLabel')"
+                    @update:model-value="sendContentToParent">
+                </v-checkbox>
             </v-col>
             <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)">
-                <v-checkbox v-model="input.isAlsoABoardMember" :label="$t('isAlsoABoardMemberLabel')" @update:model-value="sendContentToParent"></v-checkbox>
+                <v-checkbox
+                    v-model="input.isAlsoABoardMember"
+                    :label="$t('isAlsoABoardMemberLabel')"
+                    @update:model-value="sendContentToParent">
+                </v-checkbox>
             </v-col>
             <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
                 <v-select

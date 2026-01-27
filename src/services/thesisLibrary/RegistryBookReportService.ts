@@ -26,7 +26,7 @@ export class RegistryBookReportService extends BaseService {
 
         const response = await axios.get(this.basePath + `registry-book/report/download/${reportFileName}`,
             {
-                responseType: 'blob',
+                responseType: "blob",
                 onDownloadProgress: (progressEvent: any) => {
                     if (progressEvent.total) {
                         const percent = Math.round(

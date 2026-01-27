@@ -13,14 +13,18 @@ export const getMetadataComparisonPageName = (type: PublicationType): string => 
             return "proceedingsMetadataComparator";
         case "DATASET":
             return "datasetMetadataComparator";
-        case "SOFTWARE":
-            return "softwareMetadataComparator";
+        case "INTANGIBLE_PRODUCT":
+            return "intangibleProductMetadataComparator";
         case "MONOGRAPH":
             return "monographMetadataComparator";
         case "MONOGRAPH_PUBLICATION":
             return "monographPublicationMetadataComparator"
         case "THESIS":
             return "thesisMetadataComparator"
+        case "MATERIAL_PRODUCT":
+            return "materialProductMetadataComparator"
+        case "GENETIC_MATERIAL":
+            return "geneticMaterialMetadataComparator"
     }
     return "";
 };
@@ -48,14 +52,18 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
             return "proceedings/";
         case "DATASET":
             return "scientific-results/dataset/";
-        case "SOFTWARE":
-            return "scientific-results/software/";
+        case "INTANGIBLE_PRODUCT":
+            return "scientific-results/intangible-product/";
         case "MONOGRAPH":
             return "scientific-results/monograph/";
         case "MONOGRAPH_PUBLICATION":
             return "scientific-results/monograph-publication/";
         case "THESIS":
             return "scientific-results/thesis/";
+        case "MATERIAL_PRODUCT":
+            return "scientific-results/material-product/";
+        case "GENETIC_MATERIAL":
+            return "scientific-results/genetic-material/";
     }
     return "";
 };
@@ -72,14 +80,18 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "proceedingsLandingPage";
         case "DATASET":
             return "datasetLandingPage";
-        case "SOFTWARE":
-            return "softwareLandingPage";
+        case "INTANGIBLE_PRODUCT":
+            return "intangibleProductLandingPage";
         case "MONOGRAPH":
             return "monographLandingPage";
         case "MONOGRAPH_PUBLICATION":
             return "monographPublicationLandingPage";
         case "THESIS":
             return "thesisLandingPage";
+        case "MATERIAL_PRODUCT":
+            return "materialProductLandingPage";
+        case "GENETIC_MATERIAL":
+            return "geneticMaterialLandingPage";
     }
     return "";
 };
@@ -100,9 +112,11 @@ export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: 
     } else if (assessmentCode.startsWith("M7")) {
         return "scientific-results/thesis/";
     } else if (assessmentCode.startsWith("M8")) {
-        return "scientific-results/software/";
-    } else if (assessmentCode.startsWith("M9")) {
+        return "scientific-results/material-product/";
+    } else if (["M91A", "M91", "M92", "M93", "M94"].includes(assessmentCode)) {
         return "scientific-results/patent/";
+    } else if (["M95", "M96", "M97", "M98"].includes(assessmentCode)) {
+        return "scientific-results/genetic-material/";
     }
     return "";
 };
