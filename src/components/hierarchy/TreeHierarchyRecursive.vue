@@ -8,7 +8,9 @@
         </li>
 
         <li>
-            <tree-hierarchy-recursive :preset-research-area="researchArea.children"></tree-hierarchy-recursive>
+            <tree-hierarchy-recursive
+                :preset-research-area="researchArea.children"
+            />
         </li>
     </ul>
 </template>
@@ -29,13 +31,16 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const researchAreas = ref<any[]>(props.presetResearchArea)
+        const researchAreas = ref<any[]>(props.presetResearchArea);
 
         watch(() => props.presetResearchArea, () => {
             researchAreas.value = props.presetResearchArea;
         });
 
-        return {researchAreas, returnCurrentLocaleContent}
+        return {
+            researchAreas,
+            returnCurrentLocaleContent
+        };
     },
 })
 </script>

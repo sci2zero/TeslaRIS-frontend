@@ -158,6 +158,8 @@
             :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
             :document="proceedingsPublication"
             :handle-researcher-unbind="handleResearcherUnbind"
+            :transfer-to="PublicationType.JOURNAL_PUBLICATION"
+            type-transfer-suffix="Journal"
             @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
         />
 

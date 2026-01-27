@@ -689,6 +689,7 @@ export default {
     commissionReportsLabel: "Izveštaji komisije",
     onPublicReviewLabel: "Završni rad je na javnom uvidu do {0}",
     putOnPublicReviewLabel: "Postavi na uvid javnosti",
+    putOnPublicReviewShortenedLabel: "Postavi na skraćeni uvid javnosti",
     removeFromPublicReviewLabel: "Skloni sa javnog uvida",
     missingAttachmentsMessage: "Broj preliminarnih dokumenata, dodataka i izveštaja sa konferencije nije jednak.",
     datesOfPublicReviewLabel: "Datumi stavljanja na javni uvid:",
@@ -1248,5 +1249,17 @@ export default {
     deletePromotionLabel: "Obriši promociju",
     doNotDeletePromotionLabel: "Nemoj brisati promociju",
     regularLabel: "Regularan",
-    shortenedLabel: "Skraćen"
+    shortenedLabel: "Skraćen",
+    downloadRoCrateLabel: "Preuzmi kao Ro-Crate",
+    downloadRoCrateBibliographyLabel: "Preuzmi bibliografiju (Ro-Crate)",
+    updateResearchAreasLabel: "Ažuriraj oblasti istraživanja",
+    updateResearchSubAreasLabel: "Ažuriraj pod-oblasti istraživanja",
+    selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:",
+    calculateIf5RankLabel: "Izračunaj IF5 rank",
+    calculateJciRankLabel: "Izračunaj JCI rank",
+    showOnlyWithoutProceedingsLabel: "Prikaži samo one bez zbornika",
+    showProceedingsOnlyLabel: "Prikaži samo zbornike",
+    emptyProceedingsOnlyLabel: "Prikaži samo prazne zbornike",
+    createNewTypeTransferProceedingsLabel: "Prebaci u zbornik",
+    createNewTypeTransferJournalLabel: "Prebaci u časopis"
 }

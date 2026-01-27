@@ -55,6 +55,7 @@
                     </td>
                     <td>
                         <publications-dialog
+                            :key="row.item.databaseId + '_publications'"
                             :button-text="$t('viewPublicationsLabel')"
                             :id-for-fetching="row.item.databaseId"
                             icon="mdi-note"

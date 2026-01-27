@@ -41,6 +41,12 @@
                 :label="$t('showSerialEventsLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="returnEventsWithoutProceedings"
+                :label="$t('showOnlyWithoutProceedingsLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
 
         <tab-content-loader
@@ -95,6 +101,7 @@ export default defineComponent({
 
         const returnSerialEvents = ref(true);
         const returnOnlyUnclassifiedEntities = ref(true);
+        const returnEventsWithoutProceedings = ref(false);
         const tableRef = ref<typeof EventTableComponent>();
 
         const commissions = ref<{title: string, value: number}[]>([]);
@@ -125,7 +132,8 @@ export default defineComponent({
             returnSerialEvents,
             returnOnlyInstitutionRelatedEntities,
             returnOnlyUnclassifiedEntities,
-            selectedCommission
+            selectedCommission,
+            returnEventsWithoutProceedings
         ], () => {
             search(searchParams.value);
             loading.value = true;
@@ -153,7 +161,8 @@ export default defineComponent({
                 false,
                 returnOnlyInstitutionRelatedEntities.value as boolean,
                 (isCommission.value || isAdmin && selectedCommission.value.value > 0) && returnOnlyUnclassifiedEntities.value,
-                selectedCommission.value.value > 0 ? selectedCommission.value.value : null
+                selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
+                returnEventsWithoutProceedings.value
             ).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
@@ -185,7 +194,8 @@ export default defineComponent({
             tableRef, clearSortAndPerformSearch, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities, isCommission,
             returnOnlyUnclassifiedEntities, loading, commissions,
-            selectedCommission, onClearCommission
+            selectedCommission, onClearCommission,
+            returnEventsWithoutProceedings
         };
     }
 });

@@ -381,13 +381,17 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
-            EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityClassificationService.fetchDocumentClassifications(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentClassifications.value = response.data;
             });
         };
 
         const fetchIndicators = () => {
-            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityIndicatorService.fetchDocumentIndicators(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentIndicators.value = response.data;
             });
         };
@@ -402,7 +406,12 @@ export default defineComponent({
         };
 
         const searchKeyword = (keyword: string) => {
-            router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});        
+            router.push(
+                {
+                    name:"advancedSearch", 
+                    query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }
+                }
+            );        
         };
 
         const goToURL = (uri: string) => {
@@ -441,7 +450,10 @@ export default defineComponent({
         };
 
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updateDataset(dataset.value?.id as number, dataset.value as Dataset).then(() => {
+            DocumentPublicationService.updateDataset(
+                dataset.value?.id as number, 
+                dataset.value as Dataset
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {

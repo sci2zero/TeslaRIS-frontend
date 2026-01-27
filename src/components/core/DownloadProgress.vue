@@ -33,7 +33,7 @@
                     {{ fileName }}
                 </div>
                 <div class="text-caption text-medium-emphasis">
-                    {{ statusMessage }}
+                    {{ downloadState.message ? downloadState.message : statusMessage }}
                 </div>
             </div>
         </div>
@@ -49,8 +49,9 @@ import { useI18n } from 'vue-i18n';
 
 const downloadState = ref<DownloadState>({
     progress: 0,
-    fileName: '',
-    isDownloading: false
+    fileName: "",
+    isDownloading: false,
+    message: ""
 });
 
 const isVisible = computed(() => downloadState.value.isDownloading);
@@ -82,6 +83,11 @@ const startDownload = (fileName: string) => {
     downloadStore.setDownloadState(downloadState.value);
 };
 
+const setMessage = (message: string) => {
+    downloadState.value.message = message;
+    downloadStore.setDownloadState(downloadState.value);
+};
+
 const cancelDownload = () => {
     downloadState.value = {
         progress: 0,
@@ -94,6 +100,8 @@ const cancelDownload = () => {
 
 const updateProgress = (newProgress: number) => {
     if (downloadState.value.isDownloading) {
+        downloadState.value.message = "";
+        
         downloadState.value.progress = Math.min(100, Math.max(0, newProgress))
         downloadStore.setDownloadState(downloadState.value);
 
@@ -114,7 +122,8 @@ const completeDownload = () => {
 defineExpose({
     startDownload,
     updateProgress,
-    cancelDownload
+    cancelDownload,
+    setMessage
 });
 </script>
 

@@ -690,6 +690,7 @@ export default {
     commissionReportsLabel: "CommissionReports",
     onPublicReviewLabel: "Thesis is on public review until {0}",
     putOnPublicReviewLabel: "Put on public review",
+    putOnPublicReviewShortenedLabel: "Put on shortened public review",
     removeFromPublicReviewLabel: "Remove from public review",
     missingAttachmentsMessage: "Number of preliminary documents, supplements and commission reports.",
     datesOfPublicReviewLabel: "Dates when put on public review:",
@@ -1240,5 +1241,17 @@ export default {
     removeAllFromPromotionMessage: "This action will remove all candidates from the promotion they are currently in, after which you will be able to find them either in the promotion list or in the list of unpromoted candidates, depending on whether you want to delete the promotion or not.",
     selectOptionLabel: "Select an option:",
     deletePromotionLabel: "Delete promotion",
-    doNotDeletePromotionLabel: "Do not delete promotion"
+    doNotDeletePromotionLabel: "Do not delete promotion",
+    downloadRoCrateLabel: "Download as Ro-Crate",
+    downloadRoCrateBibliographyLabel: "Download bibliography (Ro-Crate)",
+    updateResearchAreasLabel: "Update research areas",
+    updateResearchSubAreasLabel: "Update research sub-areas",
+    selectSubAreasLabel: "Choose research sub-areas:",
+    calculateIf5RankLabel: "Calculate IF5 rank",
+    calculateJciRankLabel: "Calculate JCI rank",
+    showOnlyWithoutProceedingsLabel: "Show only those without proceedings",
+    showProceedingsOnlyLabel: "Show only proceedings",
+    emptyProceedingsOnlyLabel: "Show only empty proceedings",
+    createNewTypeTransferProceedingsLabel: "Transfer to proceedings",
+    createNewTypeTransferJournalLabel: "Transfer to journal"
 }

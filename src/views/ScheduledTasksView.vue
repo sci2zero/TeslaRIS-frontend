@@ -15,7 +15,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -92,22 +92,22 @@
                     :readonly="false">
                 </v-select>
             </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
+            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommission" 
                     :only-load-commissions="taskClassificationLoad" 
                     :only-classification-commissions="taskClassificationComputation"
                     :comfortable="taskClassificationComputation || journalPublicationsAssessment || proceedingsPublicationsAssessment"
-                    :required="taskClassificationComputation || taskClassificationLoad || reportGeneration">
-                </commission-autocomplete-search>
+                    :required="taskClassificationComputation || taskClassificationLoad || reportGeneration"
+                />
             </v-col>
             <v-col v-if="reportGeneration && isSummaryReport()" cols="12" sm="3" md="2">
                 <commission-autocomplete-search 
                     v-model="selectedCommissions" 
                     only-load-commissions
                     required
-                    multiple>
-                </commission-autocomplete-search>
+                    multiple
+                />
             </v-col>
             <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="12" sm="3" md="2">
                 <v-select
@@ -120,18 +120,31 @@
                 </v-select>
             </v-col>
             <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
-                <journal-autocomplete-search v-model="selectedJournals" multiple disable-submission></journal-autocomplete-search>
+                <journal-autocomplete-search
+                    v-model="selectedJournals"
+                    multiple disable-submission
+                />
             </v-col>
             <v-col v-if="proceedingsPublicationsAssessment" cols="12" md="3">
-                <event-autocomplete-search v-model="selectedEvents" multiple disable-submission></event-autocomplete-search>
+                <event-autocomplete-search
+                    v-model="selectedEvents"
+                    multiple
+                    disable-submission
+                />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" md="3">
-                <person-autocomplete-search v-model="selectedPersons" multiple disable-submission></person-autocomplete-search>
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment" cols="12" md="3">
+                <person-autocomplete-search
+                    v-model="selectedPersons"
+                    multiple disable-submission
+                />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || isTopLevelReport()" cols="12" md="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || isTopLevelReport()" cols="12" md="3">
                 <organisation-unit-autocomplete-search
-                    v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
-                    :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
+                    v-model="selectedOUs" :multiple="!isTopLevelReport()"
+                    disable-submission :required="isTopLevelReport()"
+                    :comfortable="isSummaryReport()"
+                    :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"
+                />
             </v-col>
             <v-col v-if="maintenance" cols="12" md="4">
                 <v-text-field
@@ -141,6 +154,24 @@
                     outlined
                     :rules="requiredFieldRules">
                 </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row 
+            v-if="taskIF5Computation"
+            class="d-flex flex-row justify-center bg-grey-lighten-5">
+            <v-col cols="2" md="2">
+                <v-checkbox
+                    v-model="calculateIF5Rank"
+                    class="mt-2"
+                    :label="$t('calculateIf5RankLabel')"
+                ></v-checkbox>
+            </v-col>
+            <v-col cols="2" md="2">
+                <v-checkbox
+                    v-model="calculateJCIRank"
+                    class="mt-2"
+                    :label="$t('calculateJciRankLabel')"
+                ></v-checkbox>
             </v-col>
         </v-row>
         <v-row
@@ -162,7 +193,7 @@
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment" cols="12" sm="3" md="2">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment" cols="12" sm="3" md="2">
                 <date-picker
                     v-model="startDate"
                     :label="$t('startDateLabel') + '*'"
@@ -292,6 +323,7 @@ export default defineComponent({
         const taskClassificationLoad = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.CLASSIFICATION_LOAD);
         const journalPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT);
         const proceedingsPublicationsAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT);
+        const thesesAssessment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.THESES_ASSESSMENT);
         const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
         const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
@@ -329,6 +361,9 @@ export default defineComponent({
         );
 
         const reharvestCitationIndicators = ref(false);
+
+        const calculateIF5Rank = ref(true);
+        const calculateJCIRank = ref(false);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -406,7 +441,8 @@ export default defineComponent({
                 case ScheduledTaskType.IF5_JCI_COMPUTATION:
                     scheduleTask(() => 
                         TaskManagerService.scheduleIF5AndJCIRankComputationTask(
-                            timestamp, selectedYears.value
+                            timestamp, selectedYears.value, 
+                            calculateIF5Rank.value, calculateJCIRank.value
                         )
                     );
                     break;
@@ -506,6 +542,21 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.THESES_ASSESSMENT:
+                    scheduleTask(() => 
+                        TaskManagerService.schedulePublicationAssessment(
+                            timestamp, (startDate.value as string).split("T")[0],
+                            {
+                                commissionId: selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
+                                authorIds: selectedPersons.value.map(person => person.value),
+                                organisationUnitIds: (selectedOUs.value as {title: string, value: number}[]).map(ou => ou.value),
+                                publishedInIds: []
+                            },
+                            PublicationType.THESIS
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -582,7 +633,8 @@ export default defineComponent({
             publicReviewEndCheck, selectedThesisTypes,
             requiredNumericGreaterThanZeroFieldRules,
             selectedPublicationType, maintenance,
-            approximateEndMoment, requiredFieldRules
+            approximateEndMoment, requiredFieldRules,
+            calculateIF5Rank, calculateJCIRank, thesesAssessment
         };
     },
 });

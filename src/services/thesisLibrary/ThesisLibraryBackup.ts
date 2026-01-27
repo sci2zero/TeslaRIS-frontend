@@ -21,6 +21,7 @@ export class ThesisLibraryBackupService extends BaseService {
             return;
         }
 
+        downloadStore.downloadProgressRef?.startDownload(backupFileName);
         const response = await super.sendRequest(axios.get, `thesis-library/backup/download/${backupFileName}`, {
             responseType: 'blob',
             onDownloadProgress: (progressEvent: any) => {
@@ -32,6 +33,9 @@ export class ThesisLibraryBackupService extends BaseService {
                     downloadStore.downloadProgressRef?.updateProgress(percent);
                 }
             }
+        }).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
         });
 
         this.initialzeDownload(response, backupFileName, ".zip");

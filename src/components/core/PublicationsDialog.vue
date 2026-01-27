@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -60,6 +60,12 @@ export default defineComponent({
 
         onMounted(() => {
             getContent(props.idForFetching);
+        });
+
+        watch(() => props.idForFetching, () => {
+            if (props.idForFetching) {
+                getContent(props.idForFetching);
+            }
         });
 
         const getContent = (researcherId: number) => {

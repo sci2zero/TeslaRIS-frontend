@@ -114,6 +114,22 @@
                                 ></v-checkbox>
                             </span>
 
+                            <span class="flex align-center flex-row gap-2">
+                                <v-checkbox
+                                    v-if="isAdmin"
+                                    v-model="showProceedingsOnly"
+                                    :label="$t('showProceedingsOnlyLabel')"
+                                    class=""
+                                ></v-checkbox>
+
+                                <v-checkbox
+                                    v-if="isAdmin && showProceedingsOnly"
+                                    v-model="emptyProceedingsOnly"
+                                    :label="$t('emptyProceedingsOnlyLabel')"
+                                    class=""
+                                ></v-checkbox>
+                            </span>
+
                             <div class="flex items-center gap-2">
                                 <span v-if="isAdmin || isInstitutionalEditor">
                                     <v-btn
@@ -216,6 +232,9 @@ export default defineComponent({
         const returnOnlyUnmanagedPublications = ref(false);
         const returnOnlyNonArchived = ref(false);
 
+        const showProceedingsOnly = ref(false);
+        const emptyProceedingsOnly = ref(false);
+
         const {
             isCommission, isAdmin, isInstitutionalEditor,
             canUserAddPublications, isUserBoundToOU,
@@ -248,7 +267,9 @@ export default defineComponent({
         watch([
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
-            returnOnlyUnmanagedPublications, returnOnlyNonArchived], () => {
+            returnOnlyUnmanagedPublications, returnOnlyNonArchived,
+            showProceedingsOnly, emptyProceedingsOnly
+        ], () => {
             if (!initialLoad.value) {
                 search(searchParams.value);
             }
@@ -270,9 +291,9 @@ export default defineComponent({
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value);
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value);
 
             const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
                 ? (loggedInUser.value?.organisationUnitId as number)
@@ -353,7 +374,8 @@ export default defineComponent({
             performNavigation, returnOnlyUnmanagedPublications,
             togglePublicationType, toggleAdvancedSearch,
             isInstitutionalLibrarian, isHeadOfLibrary,
-            returnOnlyNonArchived
+            returnOnlyNonArchived, showProceedingsOnly,
+            emptyProceedingsOnly
         };
     }
 });

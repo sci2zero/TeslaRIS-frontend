@@ -8,8 +8,8 @@ export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null): Promise<AxiosResponse<Page<EventIndex>>> {
-    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}`);
+  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null, returnEventsWithoutProceedings: boolean | null = null): Promise<AxiosResponse<Page<EventIndex>>> {
+    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}${returnEventsWithoutProceedings ? `&emptyEventsOnly=${returnEventsWithoutProceedings}`: ""}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
