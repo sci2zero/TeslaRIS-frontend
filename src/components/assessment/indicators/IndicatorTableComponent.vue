@@ -1,6 +1,8 @@
 <template>
     <v-btn
-        density="compact" class="bottom-spacer" :disabled="selectedIndicators.length === 0"
+        density="compact" 
+        class="bottom-spacer"
+        :disabled="selectedIndicators.length === 0"
         @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>

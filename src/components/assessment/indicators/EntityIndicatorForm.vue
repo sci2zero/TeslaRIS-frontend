@@ -54,7 +54,20 @@
 
         <v-row v-if="selectedIndicator?.value > 0">
             <v-col v-if="inputType === IndicatorContentType.BOOL">
-                <v-checkbox v-model="booleanValue" :label="$t('valueLabel')" />
+                <v-radio-group
+                    v-model="booleanValue"
+                    inline
+                    class="justify-start">
+                    <v-radio
+                        :label="$t('yesLabel')"
+                        :value="true"
+                    />
+                    <v-radio
+                        class="ml-3"
+                        :label="$t('noLabel')"
+                        :value="false"
+                    />
+                </v-radio-group>
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.NUMBER">
                 <v-text-field
@@ -189,7 +202,7 @@ export default defineComponent({
         };
 
         const numericValue = ref<number>(props.presetDocumentIndicator?.numericValue as number);
-        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean);
+        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean || false);
         const textualValue = ref<string>(props.presetDocumentIndicator?.textualValue as string);
         const fromDate = ref<string | undefined>(props.presetDocumentIndicator?.fromDate ? props.presetDocumentIndicator.fromDate : undefined);
         const toDate = ref<string | undefined>(props.presetDocumentIndicator?.toDate ? props.presetDocumentIndicator.toDate : undefined);

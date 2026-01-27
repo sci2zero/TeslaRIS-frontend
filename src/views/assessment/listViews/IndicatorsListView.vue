@@ -10,7 +10,12 @@
             :tab-number="1"
             layout="table"
         />
-        <indicator-table-component :indicators="indicators" :total-indicators="totalIndicators" @switch-page="switchPage"></indicator-table-component>
+        <indicator-table-component
+            v-show="!loading"
+            :indicators="indicators"
+            :total-indicators="totalIndicators"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 

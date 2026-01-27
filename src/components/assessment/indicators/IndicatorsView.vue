@@ -7,7 +7,7 @@
             v-for="(indicator, index) in entityIndicatorsFiltered"
             :key="indicator.id" :title="titles[index]">
             <v-expansion-panel-text>
-                <v-row class="mt-4 mb-1">
+                <v-row class="mt-4! mb-4!">
                     <p>{{ contents[index] }}</p>
                 </v-row>
                 <v-row v-if="indicator.source === EntityIndicatorSource.MANUAL" class="align-left">
@@ -22,16 +22,28 @@
                         />
                     </div>
                     <div class="ml-5">
-                        <v-btn v-if="canEdit" density="compact" @click.prevent="deleteIndicator(indicator.id)">
+                        <v-btn
+                            v-if="canEdit"
+                            density="compact"
+                            @click.prevent="deleteIndicator(indicator.id)">
                             {{ $t("deleteLabel") }}
                         </v-btn>
                     </div>
                     <div class="ml-5 mt-2">
-                        <document-file-submission-modal v-if="canEdit" :is-proof="true" @create="addIndicatorProof($event, indicator.id)"></document-file-submission-modal>
+                        <document-file-submission-modal
+                            v-if="canEdit"
+                            :is-proof="true"
+                            @create="addIndicatorProof($event, indicator.id)"
+                        />
                     </div>
                 </v-row>
                 <v-row v-if="canViewProofs">
-                    <indicator-proofs-list :attachments="indicator.proofs" :can-edit="canEdit" @update="updateIndicatorProof($event, indicator.id)" @delete="deleteIndicatorProof($event, indicator.id)"></indicator-proofs-list>
+                    <indicator-proofs-list
+                        :attachments="indicator.proofs"
+                        :can-edit="canEdit"
+                        @update="updateIndicatorProof($event, indicator.id)"
+                        @delete="deleteIndicatorProof($event, indicator.id)"
+                    />
                 </v-row>
             </v-expansion-panel-text>
         </v-expansion-panel>

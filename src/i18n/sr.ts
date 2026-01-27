@@ -1291,5 +1291,7 @@ export default {
     editionLabel: "Edicija",
     editionsLabel: "Edicije",
     intangibleProductTypeLabel: "Tip nematerijalnog proizvoda",
-    noIndicatorsLabel: "Nema indikatora za ovaj entitet."
+    noIndicatorsLabel: "Nema indikatora za ovaj entitet.",
+    yesLabel: "Da",
+    noLabel: "Ne"
 }

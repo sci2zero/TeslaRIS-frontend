@@ -13,6 +13,7 @@
         />
 
         <assessment-cLassification-table-component
+            v-show="!loading"
             :classifications="classifications"
             :total-classifications="totalClassifications"
             @switch-page="switchPage"

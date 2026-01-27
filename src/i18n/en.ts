@@ -1282,5 +1282,7 @@ export default {
     editionLabel: "Edition",
     editionsLabel: "Editions",
     intangibleProductTypeLabel: "Intangible product type",
-    noIndicatorsLabel: "No indicators for this entity."
+    noIndicatorsLabel: "No indicators for this entity.",
+    yesLabel: "Yes",
+    noLabel: "No"
 }
