@@ -70,7 +70,7 @@ export default defineComponent({
             default: false
         },
         lockContributionType: {
-            type: Object as PropType<DocumentContributionType | undefined>,
+            type: Object as PropType<DocumentContributionType[] | undefined>,
             default: undefined
         },
         boardMemberIds: {

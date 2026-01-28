@@ -120,7 +120,7 @@ export default defineComponent({
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: "title.content"},
-          { title: descriptionLabel, align: "start", sortable: true, key: "description.content"},
+          { title: descriptionLabel, align: "start", sortable: false, key: "description.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: actionLabel},
         ];

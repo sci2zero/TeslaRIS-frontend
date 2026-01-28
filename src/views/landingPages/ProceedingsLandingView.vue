@@ -229,6 +229,8 @@
                     :contribution-list="proceedings?.contributions ? proceedings?.contributions : []"
                     :read-only="!canEdit"
                     shows-board-and-reviewers
+                    :board-members-allowed="false"
+                    for-proceedings
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>

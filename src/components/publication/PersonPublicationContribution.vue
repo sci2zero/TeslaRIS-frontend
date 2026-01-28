@@ -36,7 +36,6 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
-                    :readonly="lockContributionType !== undefined"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
@@ -133,7 +132,7 @@ export default defineComponent({
             default: false
         },
         lockContributionType: {
-            type: Object as PropType<DocumentContributionType | undefined>,
+            type: Object as PropType<DocumentContributionType[] | undefined>,
             default: undefined
         },
         boardMemberIds: {
@@ -153,8 +152,8 @@ export default defineComponent({
             [
                 {
                     contributionType: {
-                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR),
-                        value: props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR
+                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType[0] : DocumentContributionType.AUTHOR),
+                        value: props.lockContributionType ? props.lockContributionType[0] : DocumentContributionType.AUTHOR
                     },
                     isMainContributor: false, isCorrespondingContributor: false
                 }
@@ -234,6 +233,10 @@ export default defineComponent({
         const contributionTypes = computed(() => {
             const types = getTypesForGivenLocale();
 
+            if (types && props.lockContributionType) {
+                return types.filter(type => props.lockContributionType?.includes(type.value));
+            }
+
             if (types && !props.boardMembersAllowed) {
                 return types.filter(type => type.value !== "BOARD_MEMBER");
             }
@@ -251,7 +254,7 @@ export default defineComponent({
 
         const addInput = () => {
             const contributionType =
-                props.lockContributionType ? props.lockContributionType : DocumentContributionType.AUTHOR;
+                props.lockContributionType ? props.lockContributionType[0] : DocumentContributionType.AUTHOR;
                 
             inputs.value.push({
                 contributionType: {
