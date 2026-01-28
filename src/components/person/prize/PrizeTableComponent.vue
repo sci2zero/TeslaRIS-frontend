@@ -62,8 +62,8 @@
                 <td>
                     <entity-classification-modal-content
                         :entity-id="row.item.databaseId"
-                        :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
-                        :applicable-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        :entity-type="ApplicableEntityType.PRIZE"
+                        :applicable-type="ApplicableEntityType.PRIZE"
                         @classified="prizeClassified(row.item)"
                         @update="refreshTable(tableOptions)"
                     />

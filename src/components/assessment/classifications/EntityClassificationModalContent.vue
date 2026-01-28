@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import type { DocumentAssessmentClassification, DocumentIndicator, EntityAssessmentClassification, EntityClassificationResponse, EntityIndicator, EntityIndicatorResponse, EventAssessmentClassification, EventIndicator, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
+import type { DocumentAssessmentClassification, DocumentIndicator, EntityAssessmentClassification, EntityClassificationResponse, EntityIndicator, EntityIndicatorResponse, EventAssessmentClassification, EventIndicator, PrizeAssessmentClassification, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import { defineComponent, type PropType, ref, watch } from 'vue';
@@ -145,6 +145,13 @@ export default defineComponent({
                         emit("update", props.entityId);
                     });
                     break;
+                case ApplicableEntityType.PRIZE:
+                    EntityClassificationService.fetchPrizeClassifications(props.entityId)
+                    .then(response => {
+                        entityClassifications.value = response.data;
+                        emit("update", props.entityId);
+                    });
+                    break;
             }
         };
 
@@ -197,6 +204,13 @@ export default defineComponent({
                     break;
                 case ApplicableEntityType.PUBLICATION_SERIES:
                     EntityClassificationService.createPublicationSeriesClassification(entityClassification as PublicationSeriesAssessmentClassification)
+                    .then(() => {
+                        fetchClassifications();
+                        emit("classified", props.entityId);
+                    });
+                    break;
+                case ApplicableEntityType.PRIZE:
+                    EntityClassificationService.createPrizeClassification(entityClassification as PrizeAssessmentClassification)
                     .then(() => {
                         fetchClassifications();
                         emit("classified", props.entityId);

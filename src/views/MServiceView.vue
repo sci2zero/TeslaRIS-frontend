@@ -290,7 +290,7 @@ export default defineComponent({
         const assessmentSectionRef = ref<HTMLElement | null>(null);
 
         onMounted(async () => {
-            document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}`;
             fetchCommissions();
 
             if (isResearcher.value) {

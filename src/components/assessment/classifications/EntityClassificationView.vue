@@ -160,6 +160,8 @@ export default defineComponent({
                 await EntityClassificationService.updatePublicationSeriesClassification(entityClassification, entityClassificationId);
             } else if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
                 await EntityClassificationService.updateDocumentClassification(entityClassification, entityClassificationId);
+            } else if (props.containingEntityType === ApplicableEntityType.PRIZE) {
+                await EntityClassificationService.updatePrizeClassification(entityClassification, entityClassificationId);
             }
 
             emit("update");

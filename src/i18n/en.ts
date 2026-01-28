@@ -1287,5 +1287,6 @@ export default {
     yesLabel: "Yes",
     noLabel: "No",
     descriptionColumn: "descriptionOther",
-    prizeListLabel: "Prize list"
+    prizeListLabel: "Prize list",
+    prizeLabel: "Prize"
 }

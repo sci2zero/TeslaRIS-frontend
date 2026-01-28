@@ -5,7 +5,7 @@
                 <span>{{ $t("impactFactorTableLabel") }}</span>
                 <span class="ml-2 mr-1">(</span>
                 <span class="mr-1">{{ $t(jsonData.editions.length > 1 ? "editionsLabel" : "editionLabel") }}:</span>
-                <span v-for="(edition, index) in jsonData.editions" :key="edition">
+                <span v-for="(edition, index) in jsonData.editions.filter(ed => ed)" :key="edition">
                     {{ edition }}{{ (index < jsonData.editions.length - 1) ? "," : "" }}
                 </span>
                 <span class="ml-1">)</span>

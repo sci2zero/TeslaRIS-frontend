@@ -20,7 +20,7 @@
                 ></v-checkbox>
             </v-col>
         </v-row>
-        <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT'">
+        <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT' && entityType !== 'PRIZE'">
             <v-col>
                 <v-text-field
                     v-model="classificationYear"
@@ -56,7 +56,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification, PrizeAssessmentClassification } from '@/models/AssessmentModel';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import { useUserRole } from '@/composables/useUserRole';
@@ -163,6 +163,8 @@ export default defineComponent({
                 (entityClassification as PublicationSeriesAssessmentClassification).publicationSeriesId = props.entityId as number;
             } else if (props.entityType === ApplicableEntityType.DOCUMENT) {
                 (entityClassification as DocumentAssessmentClassification).documentId = props.entityId as number;
+            } else if (props.entityType === ApplicableEntityType.PRIZE) {
+                (entityClassification as PrizeAssessmentClassification).prizeId = props.entityId as number;
             }
 
             emit("create", entityClassification);

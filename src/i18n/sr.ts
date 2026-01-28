@@ -1296,5 +1296,6 @@ export default {
     yesLabel: "Da",
     noLabel: "Ne",
     descriptionColumn: "descriptionSr",
-    prizeListLabel: "Lista nagrada"
+    prizeListLabel: "Lista nagrada",
+    prizeLabel: "Nagrada"
 }
