@@ -124,7 +124,6 @@ export default defineComponent({
         };
 
         const search = debounce((tokenParams: string) => {
-            console.log(tokenParams)
             searchParams.value = tokenParams;
 
             if (returnOnlyInstitutionRelatedEntities.value && !loggedInUser.value?.organisationUnitId) {
