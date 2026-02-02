@@ -512,14 +512,12 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchJournalPublication();
-                    assessJournalPublication();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchJournalPublication();
-                    assessJournalPublication();
                 }
             });
         };
