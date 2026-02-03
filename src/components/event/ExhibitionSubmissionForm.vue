@@ -17,7 +17,7 @@
                         <multilingual-text-input
                             ref="abbreviationRef"
                             v-model="nameAbbreviation"
-                            :label="$t('conferenceAbbreviationLabel')"
+                            :label="$t('exhibitionAbbreviationLabel')"
                         />
                     </v-col>
                 </v-row>
@@ -104,31 +104,11 @@
                             />
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="confId"
-                                label="Conf ID"
-                                placeholder="Conf ID"
-                                :rules="confIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Conf ID"
-                                :rules="sourceOpenAlexIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
                     <v-row v-if="!serialEvent">
                         <v-col cols="10">
                             <v-text-field
-                                v-model="conferenceNumber"
-                                :label="$t('conferenceNumberLabel')"
+                                v-model="exhibitionNumber"
+                                :label="$t('exhibitionNumberLabel')"
                             ></v-text-field>
                         </v-col>
                         <!-- <v-col cols="5">
@@ -164,7 +144,7 @@ import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { useI18n } from 'vue-i18n';
 import EventService from "@/services/EventService";
 import type { Country, MultilingualContent } from '@/models/Common';
-import type { Conference } from '@/models/EventModel';
+import type { Exhibition } from '@/models/EventModel';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import type { AxiosResponse } from 'axios';
@@ -179,7 +159,7 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 
 
 export default defineComponent({
-    name: "ConferenceSubmissionForm",
+    name: "ExhibitionSubmissionForm",
     components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         inModal: {
@@ -254,9 +234,7 @@ export default defineComponent({
         const dateTo = ref();
         const eventYear = ref();
         const place = ref([]);
-        const confId = ref("");
-        const openAlexId = ref("");
-        const conferenceNumber = ref("");
+        const exhibitionNumber = ref("");
         const entryFee = ref("");
         const serialEvent = ref(false);
         const uris = ref<string[]>([]);
@@ -271,7 +249,7 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof MultilingualTextInput>();
 
-        const { requiredFieldRules, confIdValidationRules, sourceOpenAlexIdValidationRules } = useValidationUtils();
+        const { requiredFieldRules } = useValidationUtils();
 
         const dateRangeFormatError = computed(() => i18n.t("dateRangeFormatError"));
         const dateRangeError = ref(false);
@@ -307,7 +285,7 @@ export default defineComponent({
                 dateTo.value = new Date(eventYear.value, 11, 31);
             }
 
-            const newConference: Conference = {
+            const newExhibition: Exhibition = {
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
                 description: description.value,
@@ -318,14 +296,12 @@ export default defineComponent({
                 place: place.value,
                 serialEvent: serialEvent.value,
                 fee: entryFee.value,
-                number: conferenceNumber.value,
+                number: exhibitionNumber.value,
                 contributions: [],
-                confId: confId.value,
-                openAlexId: openAlexId.value,
                 uris: uris.value
             };
 
-            EventService.createConference(newConference).then((response) => {
+            EventService.createExhibition(newExhibition).then((response) => {
                 if (props.inModal) {
                     emit("create", response.data);
                     return;
@@ -339,9 +315,7 @@ export default defineComponent({
                     descriptionRef.value?.clearInput();
                     serialEvent.value = false;
                     entryFee.value = "";
-                    conferenceNumber.value = "";
-                    confId.value = "";
-                    openAlexId.value = "";
+                    exhibitionNumber.value = "";
                     dateFrom.value = null;
                     dateTo.value = null;
                     eventYear.value = null;
@@ -352,7 +326,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "conferenceLandingPage", params: {id: response.data.id} });
+                    router.push({ name: "exhibitionLandingPage", params: {id: response.data.id} });
                 }
             }).catch(() => {
                 error.value = true;
@@ -364,11 +338,11 @@ export default defineComponent({
             isFormValid, isFormInputValid, additionalFields, snackbar,
             name, nameAbbreviation, description, keywords,
             dateFrom, dateTo, eventYear, countries, selectedCountry,
-            place, conferenceNumber, entryFee, serialEvent, openAlexId,
+            place, exhibitionNumber, entryFee, serialEvent,
             requiredFieldRules, submit, timePeriodInput, dateRangeFormatError,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
-            confIdValidationRules, confId, uris, urisRef, canAddSerialEvents,
-            sourceOpenAlexIdValidationRules, dateRangeError, manualValidationsPassed
+            uris, urisRef, canAddSerialEvents, dateRangeError,
+            manualValidationsPassed
         };
     }
 });

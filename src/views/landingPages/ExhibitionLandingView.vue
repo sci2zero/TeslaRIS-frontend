@@ -1,32 +1,32 @@
 <template>
-    <v-container id="conference">
+    <v-container id="exhibition">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
                         <v-skeleton-loader
-                            :loading="!conference"
+                            :loading="!exhibition"
                             type="heading"
                             color="blue-lighten-3"
                             class="d-flex justify-center align-center"
                         >
                             <p class="text-h5">
-                                {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
+                                {{ returnCurrentLocaleContent(exhibition?.name) + (exhibition?.nameAbbreviation && exhibition.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(exhibition?.nameAbbreviation) + ")" : "") }}
                             </p>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ $t("conferenceLabel") }}
+                        {{ $t("exhibitionLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Conference Info -->
+        <!-- Exhibition Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-conference-icon">
+                <v-icon size="x-large" class="large-exhibition-icon">
                     {{ icon }}
                 </v-icon>
             </v-col>
@@ -34,9 +34,9 @@
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
-                            :form-component="EventUpdateForm"
-                            :form-props="{ presetEvent: conference }"
-                            entity-name="Conference"
+                            :form-component="ExhibitionUpdateForm"
+                            :form-props="{ presetEvent: exhibition }"
+                            entity-name="Exhibition"
                             is-update
                             is-section-update
                             :read-only="!canEdit"
@@ -47,62 +47,50 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <basic-info-loader v-if="!conference" :citation-button="false" />
+                        <basic-info-loader v-if="!exhibition" :citation-button="false" />
                         <v-row>
                             <v-col cols="6">
-                                <div v-if="!conference?.serialEvent">
+                                <div v-if="!exhibition?.serialEvent">
                                     {{ $t("eventDateLabel") }}:
                                 </div>
-                                <div v-if="!conference?.serialEvent" class="response">
-                                    {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
+                                <div v-if="!exhibition?.serialEvent" class="response">
+                                    {{ localiseDateRange(exhibition?.dateFrom as string, exhibition?.dateTo as string) }}
                                 </div>
-                                <div v-if="conference?.countryId">
+                                <div v-if="exhibition?.countryId">
                                     {{ $t("stateLabel") }}:
                                 </div>
-                                <div v-if="conference?.countryId" class="response">
+                                <div v-if="exhibition?.countryId" class="response">
                                     {{ returnCurrentLocaleContent(country?.name) }}
                                 </div>
-                                <div v-if="conference?.place && conference.place.length > 0">
+                                <div v-if="exhibition?.place && exhibition.place.length > 0">
                                     {{ $t("placeLabel") }}:
                                 </div>
-                                <div v-if="conference?.place && conference.place.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(conference?.place) }}
+                                <div v-if="exhibition?.place && exhibition.place.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(exhibition?.place) }}
                                 </div>
-                                <div v-if="conference?.confId">
-                                    Conf ID:
+                                <div v-if="exhibition?.number">
+                                    {{ $t("exhibitionNumberLabel") }}:
                                 </div>
-                                <div v-if="conference?.confId" class="response">
-                                    {{ conference.confId }}
+                                <div v-if="exhibition?.number" class="response">
+                                    {{ exhibition.number }}
                                 </div>
-                                <div v-if="conference?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="conference?.openAlexId" class="response">
-                                    <identifier-link :identifier="conference.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="conference?.number">
-                                    {{ $t("conferenceNumberLabel") }}:
-                                </div>
-                                <div v-if="conference?.number" class="response">
-                                    {{ conference.number }}
-                                </div>
-                                <div v-if="conference?.fee">
+                                <div v-if="exhibition?.fee">
                                     {{ $t("cotizationFeeLabel") }}:
                                 </div>
-                                <div v-if="conference?.fee" class="response">
-                                    {{ conference.fee }}
+                                <div v-if="exhibition?.fee" class="response">
+                                    {{ exhibition.fee }}
                                 </div>
                                 <div v-if="keywords && keywords.length > 0">
                                     {{ $t("keywordsLabel") }}:
                                 </div>
-                                <div v-if="conference?.uris && conference?.uris.length > 0">
+                                <div v-if="exhibition?.uris && exhibition?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="conference?.uris"></uri-list>
+                                    <uri-list :uris="exhibition?.uris"></uri-list>
                                 </div>
                                 <br />
-                                <div v-if="conference?.serialEvent">
+                                <div v-if="exhibition?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
                             </v-col>
@@ -112,16 +100,16 @@
             </v-col>
         </v-row>
 
-        <tab-content-loader v-if="!conference" layout="sections" />
+        <tab-content-loader v-if="!exhibition" layout="sections" />
         <v-tabs
-            v-show="conference"
+            v-show="exhibition"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
         >
-            <v-tab v-show="!conference?.serialEvent" value="publications">
+            <!-- <v-tab v-show="!exhibition?.serialEvent" value="publications">
                 {{ $t("scientificResultsListLabel") }}
-            </v-tab>
+            </v-tab> -->
             <v-tab value="contributions">
                 {{ $t("participationsLabel") }}
             </v-tab>    
@@ -137,12 +125,12 @@
         </v-tabs>
 
         <v-tabs-window
-            v-show="conference"
+            v-show="exhibition"
             v-model="currentTab">
-            <v-tabs-window-item value="publications">
+            <!-- <v-tabs-window-item value="publications">
                 <div class="mt-10">
                     <h2 class="mb-5">
-                        {{ $t("conferencePublicationsLabel") }}
+                        {{ $t("exhibitionPublicationsLabel") }}
                     </h2>
                     <publication-table-component
                         :publications="publications"
@@ -150,41 +138,33 @@
                         @switch-page="switchPublicationsPage">
                     </publication-table-component>
                 </div>
-            </v-tabs-window-item>
+            </v-tabs-window-item> -->
             <v-tabs-window-item value="contributions">
                 <person-event-contribution-tabs
-                    :event-id="conference?.id"
-                    :contribution-list="conference?.contributions ? conference.contributions : []"
+                    :event-id="exhibition?.id"
+                    :contribution-list="exhibition?.contributions ? exhibition.contributions : []"
                     :read-only="!canEdit"
                     @update="updateContributions">
                 </person-event-contribution-tabs>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list
-                    :keywords="conference?.keywords ? conference?.keywords : []"
+                    :keywords="exhibition?.keywords ? exhibition?.keywords : []"
                     :can-edit="canEdit"
                     @update="updateKeywords">
                 </keyword-list>
                 <description-section
-                    :description="conference?.description ? conference.description : []"
+                    :description="exhibition?.description ? exhibition.description : []"
                     :can-edit="canEdit"
                     is-general-description
                     @update="updateDescription">
                 </description-section>
-            
-                <!-- Proceedings List -->
-                <div v-if="!conference?.serialEvent">
-                    <br />
-                    <proceedings-list
-                        :preset-event="conference"
-                        :readonly="!canEdit"
-                    />
-                </div>
 
                 <div class="mt-10">
                     <events-relation-list
-                        :preset-event="conference"
+                        :preset-event="exhibition"
                         :readonly="!canEdit"
+                        :event-type="EventType.EXHIBITION"
                     />
                 </div>
             </v-tabs-window-item>
@@ -192,7 +172,7 @@
                 <indicators-section 
                     :indicators="eventIndicators" 
                     :applicable-types="[ApplicableEntityType.EVENT]" 
-                    :entity-id="conference?.id" 
+                    :entity-id="exhibition?.id" 
                     :entity-type="ApplicableEntityType.EVENT" 
                     :can-edit="canClassify"
                     show-statistics
@@ -203,7 +183,7 @@
             <v-tabs-window-item value="classifications">
                 <entity-classification-view
                     :entity-classifications="eventClassifications"
-                    :entity-id="conference?.id"
+                    :entity-id="exhibition?.id"
                     :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.EVENT"
                     :applicable-types="[ApplicableEntityType.EVENT]"
@@ -223,22 +203,18 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import KeywordList from '@/components/core/KeywordList.vue';
-import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import type { DocumentPublicationIndex } from '@/models/PublicationModel';
-import DocumentPublicationService from "@/services/DocumentPublicationService";
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Conference, PersonEventContribution } from "@/models/EventModel";
+import { EventType, type Exhibition, type PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/utils/DateUtil';
-import ProceedingsList from '@/components/proceedings/ProceedingsList.vue';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import CountryService from '@/services/CountryService';
-import EventUpdateForm from '@/components/event/update/EventUpdateForm.vue';
+import ExhibitionUpdateForm from '@/components/event/update/ExhibitionUpdateForm.vue';
 import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import type { EntityClassificationResponse, EntityIndicatorResponse, EventAssessmentClassification, EventIndicator } from '@/models/AssessmentModel';
@@ -250,12 +226,11 @@ import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
-    name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink },
+    name: "ExhibitionLandingPage",
+    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
     setup() {
         const currentTab = ref("contributions");
 
@@ -263,20 +238,13 @@ export default defineComponent({
         const snackbarMessage = ref("");
 
         const currentRoute = useRoute();
-        const conference = ref<Conference>();
+        const exhibition = ref<Exhibition>();
         const keywords = ref<string[]>([]);
-
-        const publications = ref<DocumentPublicationIndex[]>([]);
-        const totalPublications = ref<number>(0);
-        const page = ref(0);
-        const size = ref(1);
-        const sort = ref("");
-        const direction = ref("");
         
         const i18n = useI18n();
         const router = useRouter();
 
-        const icon = ref("mdi-presentation");
+        const icon = ref("mdi-panorama");
 
         const canEdit = ref(false);
         const canClassify = ref(false);
@@ -300,7 +268,7 @@ export default defineComponent({
                 StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
-            fetchConference();
+            fetchExhibition();
             fetchIndicators();
         });
 
@@ -316,96 +284,70 @@ export default defineComponent({
             });
         };
 
-        const fetchConference = () => {
-            EventService.readConference(
+        const fetchExhibition = () => {
+            EventService.readExhibition(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                conference.value = response.data;
+                exhibition.value = response.data;
                 
-                document.title = returnCurrentLocaleContent(conference.value.name) as string;
+                document.title = returnCurrentLocaleContent(exhibition.value.name) as string;
 
-                fetchPublications();
                 fetchDetails();
-
-                currentTab.value = !conference.value?.serialEvent ? "publications" : "contributions";
             }).catch(() => {
                 router.push({ name: "notFound" });
             });
         };
 
         const fetchDetails = () => {
-            if (conference.value?.countryId) {
-                CountryService.readCountry(conference.value.countryId as number).then((response) => {
+            if (exhibition.value?.countryId) {
+                CountryService.readCountry(exhibition.value.countryId as number).then((response) => {
                     country.value = response.data;
                 });
             }
         };
 
-        const switchPublicationsPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
-            page.value = nextPage;
-            size.value = pageSize;
-            sort.value = sortField;
-            direction.value = sortDir;
-            fetchPublications();
-        };
-
-        const fetchPublications = () => {
-            if (!conference.value?.id) {
-                return;
-            }
-
-            DocumentPublicationService.findPublicationsInEvent(
-                conference.value?.id as number,
-                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
-                publications.value = publicationResponse.data.content;
-                totalPublications.value = publicationResponse.data.totalElements
-            });
-        };
-
         const updateKeywords = (keywords: MultilingualContent[]) => {
-            conference.value!.keywords = keywords;
+            exhibition.value!.keywords = keywords;
             performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
-            conference.value!.description = description;
+            exhibition.value!.description = description;
             performUpdate(false);
         };
 
         const updateContributions = (contributions: PersonEventContribution[]) => {
-            conference.value!.contributions = contributions;
+            exhibition.value!.contributions = contributions;
             performUpdate(true);
         };
 
-        const updateBasicInfo = (basicInfo: Conference) => {
-            conference.value!.name = basicInfo.name;
-            conference.value!.nameAbbreviation = basicInfo.nameAbbreviation;
-            conference.value!.dateFrom = basicInfo.dateFrom;
-            conference.value!.dateTo = basicInfo.dateTo;
-            conference.value!.countryId = basicInfo.countryId;
-            conference.value!.place = basicInfo.place;
-            conference.value!.serialEvent = basicInfo.serialEvent;
-            conference.value!.fee = basicInfo.fee;
-            conference.value!.number = basicInfo.number;
-            conference.value!.confId = basicInfo.confId;
-            conference.value!.openAlexId = basicInfo.openAlexId;
-            conference.value!.uris = basicInfo.uris;
+        const updateBasicInfo = (basicInfo: Exhibition) => {
+            exhibition.value!.name = basicInfo.name;
+            exhibition.value!.nameAbbreviation = basicInfo.nameAbbreviation;
+            exhibition.value!.dateFrom = basicInfo.dateFrom;
+            exhibition.value!.dateTo = basicInfo.dateTo;
+            exhibition.value!.countryId = basicInfo.countryId;
+            exhibition.value!.place = basicInfo.place;
+            exhibition.value!.serialEvent = basicInfo.serialEvent;
+            exhibition.value!.fee = basicInfo.fee;
+            exhibition.value!.number = basicInfo.number;
+            exhibition.value!.uris = basicInfo.uris;
 
             performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
-            EventService.updateConference(conference.value?.id as number, conference.value as Conference).then(() => {
+            EventService.updateExhibition(exhibition.value?.id as number, exhibition.value as Exhibition).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchConference();
+                    fetchExhibition();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchConference();
+                    fetchExhibition();
                 }
             });
         };
@@ -425,27 +367,26 @@ export default defineComponent({
         };
 
         return {
-            conference, icon, publications,
-            totalPublications, switchPublicationsPage,
+            exhibition, icon,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
-            country, EventUpdateForm, ApplicableEntityType,
+            country, ExhibitionUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify
+            fetchClassifications, canClassify, EventType
         };
 }})
 
 </script>
 
 <style scoped>
-    #conference .large-conference-icon {
+    #exhibition .large-exhibition-icon {
         font-size: 10em;
     }
 
-    #conference .response {
+    #exhibition .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

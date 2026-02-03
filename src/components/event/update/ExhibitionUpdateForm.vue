@@ -18,7 +18,7 @@
                         <multilingual-text-input
                             ref="abbreviationRef"
                             v-model="nameAbbreviation"
-                            :label="$t('conferenceAbbreviationLabel')"
+                            :label="$t('exhibitionAbbreviationLabel')"
                             :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"
                         />
                     </v-col>
@@ -81,37 +81,17 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-text-field
-                            v-model="confId"
-                            label="Conf ID"
-                            placeholder="Conf ID"
-                            :rules="confIdValidationRules"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-text-field
-                            v-model="openAlexId"
-                            label="Open Alex ID"
-                            placeholder="Open Alex ID"
-                            :rules="sourceOpenAlexIdValidationRules"
-                        />
-                    </v-col>
-                </v-row>
                 <v-row v-if="!serialEvent">
                     <v-col cols="5">
                         <v-text-field
-                            v-model="conferenceNumber"
-                            :label="$t('conferenceNumberLabel')"
+                            v-model="exhibitionNumber"
+                            :label="$t('exhibitionNumberLabel')"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="5">
                         <v-text-field
                             v-model="entryFee"
-                            :label="$t('cotizationFeeLabel')"
+                            :label="$t('entryFeeLabel')"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -144,7 +124,7 @@ import type { Country, ExternalValidation, MultilingualContent } from '@/models/
 import { onMounted } from 'vue';
 import type { AxiosResponse } from 'axios';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Conference } from '@/models/EventModel';
+import type { Exhibition } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import DatePicker from '@/components/core/DatePicker.vue';
@@ -152,16 +132,15 @@ import CountryService from '@/services/CountryService';
 import UriInput from '@/components/core/UriInput.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
-import EventService from '@/services/EventService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 
 
 export default defineComponent({
-    name: "EventUpdateForm",
+    name: "ExhibitionUpdateForm",
     components: { MultilingualTextInput, DatePicker, UriInput, Toast },
     props: {
         presetEvent: {
-            type: Object as PropType<Conference | undefined>,
+            type: Object as PropType<Exhibition | undefined>,
             required: true
         },
         inComparator: {
@@ -180,7 +159,7 @@ export default defineComponent({
 
         const isFormValid = computed(() => isFormInputValid.value && manualValidationsPassed.value);
 
-        const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
+        const { message, snackbar } = useIdentifierCheck();
         const i18n = useI18n();
 
         const { languageTags } = useLanguageTags();
@@ -239,11 +218,9 @@ export default defineComponent({
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
 
         const place = ref<any>([]);
-        const conferenceNumber = ref(props.presetEvent?.number);
+        const exhibitionNumber = ref(props.presetEvent?.number);
         const entryFee = ref(props.presetEvent?.fee);
         const serialEvent = ref(props.presetEvent?.serialEvent);
-        const confId = ref(props.presetEvent?.confId);
-        const openAlexId = ref(props.presetEvent?.openAlexId);
         const uris = ref<string[]>(props.presetEvent?.uris as string[]);
 
         const {
@@ -285,24 +262,24 @@ export default defineComponent({
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
         
         const submit = async () => {
-            if (props.inModal) {
-                const { duplicateFound } = await checkIdentifiers(
-                    [{ value: confId.value as string, error: "confIdExistsError" }],
-                    props.presetEvent?.id as number,
-                    (id, docId) => EventService.checkIdentifierUsage(id, docId)
-                );
+            // if (props.inModal) {
+            //     const { duplicateFound } = await checkIdentifiers(
+            //         [{ value: confId.value as string, error: "confIdExistsError" }],
+            //         props.presetEvent?.id as number,
+            //         (id, docId) => EventService.checkIdentifierUsage(id, docId)
+            //     );
 
-                if (duplicateFound) {
-                    return;
-                }
-            }
+            //     if (duplicateFound) {
+            //         return;
+            //     }
+            // }
 
             if (!timePeriodInput.value) {
                 dateFrom.value = new Date(parseInt(eventYear.value as string), 1, 1).toISOString();
                 dateTo.value = new Date(parseInt(eventYear.value as string), 11, 31).toISOString();
             }
 
-            const updatedEvent: Conference = {
+            const updatedEvent: Exhibition = {
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
                 description: props.presetEvent?.description as MultilingualContent[],
@@ -313,10 +290,8 @@ export default defineComponent({
                 place: place.value,
                 serialEvent: serialEvent.value as boolean,
                 fee: entryFee.value,
-                number: conferenceNumber.value,
+                number: exhibitionNumber.value,
                 contributions: props.presetEvent?.contributions,
-                confId: confId.value,
-                openAlexId: openAlexId.value,
                 uris: uris.value
             }
 
@@ -340,10 +315,8 @@ export default defineComponent({
             dateTo.value = props.presetEvent?.dateTo;
             eventYear.value = props.presetEvent?.dateFrom.split("-")[0];
             serialEvent.value = props.presetEvent?.serialEvent;
-            conferenceNumber.value = props.presetEvent?.number;
+            exhibitionNumber.value = props.presetEvent?.number;
             entryFee.value = props.presetEvent?.fee;
-            confId.value = props.presetEvent?.confId;
-            openAlexId.value = props.presetEvent?.openAlexId;
             urisRef.value?.refreshModelValue(uris.value);
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
@@ -355,9 +328,9 @@ export default defineComponent({
             name, nameAbbreviation, urisRef, refreshForm, uris, message, snackbar,
             languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, submit,
-            dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
-            eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId,
-            openAlexId, sourceOpenAlexIdValidationRules, dateRangeFormatError
+            dateFrom, dateTo, countries, place, exhibitionNumber, entryFee, serialEvent,
+            eventYear, selectedCountry, timePeriodInput, confIdValidationRules,
+            sourceOpenAlexIdValidationRules, dateRangeFormatError
         };
     }
 });

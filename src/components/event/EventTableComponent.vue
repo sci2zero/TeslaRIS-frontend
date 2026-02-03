@@ -6,12 +6,18 @@
     </v-btn>
     <v-btn
         v-if="isAdmin"
-        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startProceedingsComparison">
+        density="compact"
+        class="compare-button"
+        :disabled="selectedEvents.length !== 2 || selectedEvents.some(e => e.eventType !== EventType.CONFERENCE)"
+        @click="startProceedingsComparison">
         {{ $t("compareProceedingsLabel") }}
     </v-btn>
     <v-btn
         v-if="isAdmin"
-        density="compact" class="compare-button" :disabled="selectedEvents.length !== 2" @click="startMetadataComparison">
+        density="compact"
+        class="compare-button"
+        :disabled="selectedEvents.length !== 2 || (selectedEvents[0].eventType !== selectedEvents[1].eventType)"
+        @click="startMetadataComparison">
         {{ $t("compareMetadataLabel") }}
     </v-btn>
     <v-data-table-server
@@ -28,6 +34,25 @@
         :no-data-text="$t('noDataInTableMessage')"
         :page="tableOptions.page"
         @update:options="refreshTable">
+        <template #[`header.type`]="{ isSorted, column, toggleSort, getSortIcon }">
+            <div class="group flex items-center gap-2" @click="toggleSort(column)">
+                <span>{{ column.title }}</span>
+                <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
+                    <template #activator="{ props }">
+                        <v-icon 
+                            v-bind="props" 
+                            :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                            :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                            icon="mdi-filter"
+                        ></v-icon>
+                    </template>
+                    <div class="p-3 bg-white rounded-lg shadow-lg">
+                        <slot name="type-filter-menu" :column="column"></slot>
+                    </div>
+                </v-menu>
+                <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+            </div>
+        </template>
         <template #item="row">
             <tr>
                 <td v-if="isAdmin">
@@ -39,17 +64,20 @@
                     />
                 </td>
                 <td v-if="$i18n.locale.startsWith('sr')">
-                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                    <localized-link :to="'events/' + getPathByEventType(row.item.eventType) + '/' + row.item.databaseId">
                         {{ row.item.nameSr }}
                     </localized-link>
                 </td>
                 <td v-else>
-                    <localized-link :to="'events/conference/' + row.item.databaseId">
+                    <localized-link :to="'events/' + getPathByEventType(row.item.eventType) + '/' + row.item.databaseId">
                         {{ row.item.nameOther }}
                     </localized-link>
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(row.item.dateFromTo) }}
+                </td>
+                <td>
+                    {{ getEventTypeTitleFromValueAutoLocale(row.item.eventType) }}
                 </td>
                 <td v-if="$i18n.locale.startsWith('sr')">
                     {{ displayTextOrPlaceholder(row.item.stateSr) }}
@@ -112,6 +140,7 @@ import { useUserRole } from '@/composables/useUserRole';
 import { ApplicableEntityType } from '@/models/Common';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { getEventTypeTitleFromValueAutoLocale } from '@/i18n/eventType';
 
 
 export default defineComponent({
@@ -122,10 +151,15 @@ export default defineComponent({
             type: Array<EventIndex>,
             required: true
         }, 
+        hasActiveTypeFilters: {
+            type: Boolean,
+            default: false
+        },
         totalEvents: {
             type: Number,
             required: true
-        }},
+        }
+    },
     emits: ["switchPage"],
     setup(_, {emit}) {
         const selectedEvents = ref<EventIndex[]>([]);
@@ -137,6 +171,7 @@ export default defineComponent({
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const eventDateLabel = computed(() => i18n.t("eventDateLabel"));
+        const eventTypeLabel = computed(() => i18n.t("eventTypeLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
         const serialEventLabel = computed(() => i18n.t("serialEventLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
@@ -164,6 +199,7 @@ export default defineComponent({
         const headers = ref<any[]>([
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: eventDateLabel, align: "start", sortable: true, key: "dateFromTo"},
+          { title: eventTypeLabel, align: "start", sortable: true, key: "type"},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
           { title: serialEventLabel, align: "start", sortable: false, key: "serialEvent"}
         ]);
@@ -184,7 +220,8 @@ export default defineComponent({
             ["nameOther", "name_other_sortable"],
             ["dateFromTo", "date_sortable"],
             ["stateSr", "state_sr_sortable"],
-            ["stateOther", "state_other_sortable"]
+            ["stateOther", "state_other_sortable"],
+            ["type", "event_type"]
         ]);
 
         const refreshTable = (event: any) => {
@@ -272,7 +309,17 @@ export default defineComponent({
                 return;
             }
 
-            router.push({name: "eventMetadataComparator", params: {
+            let metadataComparisonPageName = "";
+            switch (selectedEvents.value[0].eventType) {
+                case EventType.CONFERENCE:
+                    metadataComparisonPageName = "conferenceMetadataComparator";
+                    break;
+                case EventType.EXHIBITION:
+                    metadataComparisonPageName = "exhibitionMetadataComparator";
+                    break;
+            }
+
+            router.push({name: metadataComparisonPageName, params: {
                 leftId: selectedEvents.value[0].databaseId, rightId: selectedEvents.value[1].databaseId
             }});
         };
@@ -324,6 +371,17 @@ export default defineComponent({
             displayPersistentDialog.value = true;
         };
 
+        const getPathByEventType = (eventType: EventType) => {
+            switch (eventType) {
+                case EventType.CONFERENCE:
+                    return "conference";
+                case EventType.EXHIBITION:
+                    return "exhibition";
+                default:
+                    return "conference"; // should never happen
+            }
+        };
+
         return {
             selectedEvents, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
@@ -331,7 +389,9 @@ export default defineComponent({
             startProceedingsComparison, startMetadataComparison,
             setSortAndPageOption, loggedInUser, isCommission,
             eventClassified, ApplicableEntityType,
-            displayPersistentDialog, startDeletionProcess
+            displayPersistentDialog, startDeletionProcess,
+            getEventTypeTitleFromValueAutoLocale, EventType,
+            getPathByEventType
         };
     }
 });

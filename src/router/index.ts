@@ -115,6 +115,9 @@ import SubmitGeneticMaterialView from "@/views/SubmitGeneticMaterialView.vue";
 import GeneticMaterialLandingView from "@/views/landingPages/GeneticMaterialLandingView.vue";
 import GeneticMaterialMetadataComparatorView from "@/views/comparators/documents/GeneticMaterialMetadataComparatorView.vue";
 import PrizeListView from "@/views/PrizeListView.vue";
+import SubmitExhibitionView from "@/views/SubmitExhibitionView.vue";
+import ExhibitionLandingView from "@/views/landingPages/ExhibitionLandingView.vue";
+import ExhibitionMetadataComparatorView from "@/views/comparators/event/ExhibitionMetadataComparatorView.vue";
 
 
 const roles = {
@@ -259,6 +262,15 @@ const router = createRouter({
                             },
                         },
                         {
+                            path: "exhibition/:id",
+                            name: "exhibitionLandingPage",
+                            component: ExhibitionLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
                             path: 'proceedings-comparator/:leftId/:rightId',
                             name: "eventProceedingsComparator",
                             component: EventProceedingsComparatorView,
@@ -268,9 +280,18 @@ const router = createRouter({
                             },
                         },
                         {
-                            path: 'metadata-comparator/:leftId/:rightId',
-                            name: "eventMetadataComparator",
+                            path: 'conference/metadata-comparator/:leftId/:rightId',
+                            name: "conferenceMetadataComparator",
                             component: EventMetadataComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'exhibition/metadata-comparator/:leftId/:rightId',
+                            name: "exhibitionMetadataComparator",
+                            component: ExhibitionMetadataComparatorView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],
@@ -282,6 +303,15 @@ const router = createRouter({
                     path: "submit-conference",
                     name: "submitConference",
                     component: SubmitConferenceView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-exhibition",
+                    name: "submitExhibition",
+                    component: SubmitExhibitionView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],

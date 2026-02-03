@@ -1,11 +1,11 @@
 <template>
     <v-container>
         <v-sheet class="text-center">
-            <h1>{{ $t("createNewConferenceLabel") }}</h1>
+            <h1>{{ $t("createNewExhibitionLabel") }}</h1>
         </v-sheet>
         <br />
         <br />
-        <conference-submission-form ref="submissionFormRef" />
+        <exhibition-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn
@@ -33,21 +33,21 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import ConferenceSubmissionForm from "@/components/event/ConferenceSubmissionForm.vue";
+import ExhibitionSubmissionForm from "@/components/event/ExhibitionSubmissionForm.vue";
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
-    name: "SubmitConferenceView",
-    components: {ConferenceSubmissionForm},
+    name: "SubmitExhibitionView",
+    components: {ExhibitionSubmissionForm},
     setup() {
-        const submissionFormRef = ref<typeof ConferenceSubmissionForm>();
+        const submissionFormRef = ref<typeof ExhibitionSubmissionForm>();
 
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("createNewConferenceLabel");
+            document.title = i18n.t("createNewExhibitionLabel");
         });
 
         return {

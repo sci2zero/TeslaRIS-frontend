@@ -193,7 +193,7 @@
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="contributions">
-                {{ $t("boardAndReviewersLabel") }}
+                {{ $t("editorsAndReviewersLabel") }}
             </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}

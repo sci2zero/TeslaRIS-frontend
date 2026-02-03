@@ -1,5 +1,5 @@
 import type { BookSeries } from "./BookSeriesModel";
-import type { Conference } from "./EventModel";
+import type { Conference, Exhibition } from "./EventModel";
 import type { Journal } from "./JournalModel";
 import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
@@ -32,6 +32,11 @@ export interface MergedOrganisationUnits {
 export interface MergedConferences {
     leftConference: Conference;
     rightConference: Conference;
+}
+
+export interface MergedExhibitions {
+    leftExhibition: Exhibition;
+    rightExhibition: Exhibition;
 }
 
 export interface MergedJournals {
@@ -117,5 +122,7 @@ export enum EntityType {
     BOOK_SERIES = "BOOK_SERIES",
     ORGANISATION_UNIT = "ORGANISATION_UNIT",
     PUBLISHER = "PUBLISHER",
-    USER_ACCOUNT = "USER_ACCOUNT"
+    USER_ACCOUNT = "USER_ACCOUNT",
+    CONFERENCE = "CONFERENCE",
+    EXHIBITION = "EXHIBITION"
 }

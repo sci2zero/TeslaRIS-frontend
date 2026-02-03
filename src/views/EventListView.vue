@@ -8,10 +8,8 @@
             @search="clearSortAndPerformSearch">
         </search-bar-component>
         <br />
-        <span class="d-flex align-center">
-            <v-btn v-if="isAdmin" color="primary" @click="addConference">
-                {{ $t("createNewConferenceLabel") }}
-            </v-btn>
+        <span class="d-flex align-center mb-5 mt-5">
+            <add-event-menu compact />
         </span>
         <span class="d-flex align-center">
             <v-checkbox
@@ -53,15 +51,40 @@
             v-if="loading"
             button-header
             tab-number-by-role
-            layout="table"
-        />
+            layout="table" />
         <event-table-component
             v-else
             ref="tableRef"
             :events="events"
             :total-events="totalEvents"
             @switch-page="switchPage"
-        />
+        >
+            <template #type-filter-menu>
+                <div class="publication-type-filter">
+                    <div class="filter-header">
+                        <span class="filter-title">{{ $t('eventTypeLabel') }}</span>
+                    </div>
+                    <v-divider class="my-2"></v-divider>
+                    <div class="checkbox-grid">
+                        <div 
+                            v-for="type in eventTypes"
+                            :key="type.value"
+                            class="checkbox-item"
+                        >
+                            <v-checkbox
+                                :model-value="selectedEventTypes.some(t => t.value === type.value)"
+                                :label="type.title"
+                                density="compact"
+                                hide-details
+                                class="w-full"
+                                color="primary"
+                                @update:model-value="toggleEventType(type, !!$event)"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </event-table-component>
     </v-container>
 </template>
 
@@ -71,23 +94,26 @@ import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import EventService from '@/services/EventService';
 import EventTableComponent from '@/components/event/EventTableComponent.vue';
 import { ref } from 'vue';
-import type { EventIndex } from '@/models/EventModel';
-import { useRoute, useRouter } from 'vue-router';
+import { type EventIndex } from '@/models/EventModel';
+import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import { useUserRole } from '@/composables/useUserRole';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import CommissionService from '@/services/assessment/CommissionService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import AddEventMenu from '@/components/event/AddEventMenu.vue';
+import { computed } from 'vue';
+import { getEventTypesForGivenLocale } from '@/i18n/eventType';
+import { EventType } from '@/models/EventModel';
 
 
 export default defineComponent({
     name: "EventListView",
-    components: { SearchBarComponent, EventTableComponent, TabContentLoader },
+    components: { SearchBarComponent, EventTableComponent, TabContentLoader, AddEventMenu },
     setup() {
         const loading = ref(false);
         const i18n = useI18n();
-        const router = useRouter();
         const route = useRoute();
 
         const presetSearchParams = ref(route.query.searchQuery as string);
@@ -108,6 +134,9 @@ export default defineComponent({
         const selectedCommission = ref({ title: '', value: -1 });
 
         const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities } = useUserRole();
+
+        const eventTypes = computed(() => getEventTypesForGivenLocale());
+        const selectedEventTypes = ref<{ title: string, value: EventType }[]>([]);
 
         onMounted(() => {
             document.title = i18n.t("eventListLabel");
@@ -155,14 +184,14 @@ export default defineComponent({
                 return;
             }
 
-            EventService.searchConferences(
+            EventService.searchEvents(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 !returnSerialEvents.value,
                 false,
                 returnOnlyInstitutionRelatedEntities.value as boolean,
                 (isCommission.value || isAdmin && selectedCommission.value.value > 0) && returnOnlyUnclassifiedEntities.value,
                 selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
-                returnEventsWithoutProceedings.value
+                returnEventsWithoutProceedings.value, selectedEventTypes.value.map(t => t.value)
             ).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
@@ -180,22 +209,29 @@ export default defineComponent({
             search(searchParams.value);
         };
 
-        const addConference = () => {
-            router.push({name: "submitConference"});
-        };
-
         const onClearCommission = () => {
             selectedCommission.value = { title: '', value: -1 };
         };
 
+        const toggleEventType = (type: { title: string, value: EventType }, isSelected: boolean) => {
+            if (isSelected) {
+                selectedEventTypes.value.push(type);
+            } else {
+                const index = selectedEventTypes.value.findIndex(t => t.value === type.value);
+                if (index > -1) selectedEventTypes.value.splice(index, 1);
+            }
+
+            search(searchParams.value);
+        };
+
         return {
             search, events, totalEvents, switchPage, isAdmin,
-            addConference, presetSearchParams, returnSerialEvents,
+            presetSearchParams, returnSerialEvents, eventTypes,
             tableRef, clearSortAndPerformSearch, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities, isCommission,
             returnOnlyUnclassifiedEntities, loading, commissions,
-            selectedCommission, onClearCommission,
-            returnEventsWithoutProceedings
+            selectedCommission, onClearCommission, toggleEventType,
+            returnEventsWithoutProceedings, selectedEventTypes
         };
     }
 });

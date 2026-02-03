@@ -225,7 +225,7 @@ export default defineComponent({
                     }});
                     break;
                 case EntityType.EVENT:
-                    router.push({name: "eventMetadataComparator", params: {
+                    router.push({name: "conferenceMetadataComparator", params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;

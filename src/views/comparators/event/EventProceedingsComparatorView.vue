@@ -144,7 +144,7 @@ export default defineComponent({
         };
 
         const navigateToMetadataComparison = () => {
-            router.push({name: "eventMetadataComparator", params: {
+            router.push({name: "conferenceMetadataComparator", params: {
                 leftId: parseInt(currentRoute.params.leftId as string), rightId: parseInt(currentRoute.params.rightId as string)
             }});
         };
