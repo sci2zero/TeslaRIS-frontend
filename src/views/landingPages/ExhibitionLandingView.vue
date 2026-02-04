@@ -186,7 +186,7 @@
                     :entity-id="exhibition?.id"
                     :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.EVENT"
-                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    :applicable-types="[ApplicableEntityType.EXHIBITION]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

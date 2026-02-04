@@ -7,6 +7,7 @@ export default {
         users: "Users",
         events: "Events",
         conferenceLandingPage: "Conference",
+        exhibitionLandingPage: "Exhibition",
         eventProceedingsComparator: "Event Proceedings Comparator",
         eventMetadataComparator: "Event Metadata Comparator",
         conferenceMetadataComparator: "Conference Metadata Comparator",
@@ -647,7 +648,7 @@ export default {
     markLabel: "Mark",
     numberOfPublicationsLabel: "Number of publications",
     totalPointsLabel: "Total points",
-    publicationsWithPointsLabel: "Publications with points",
+    scientificResultsWithPointsLabel: "Scientific results with points",
     noAssessedPublicationsMessage: "There are no assessed publications in selected time frame.",
     defaultLabel: "Default",
     setDefaultLabel: "Set default",
@@ -1300,5 +1301,6 @@ export default {
     editorsAndReviewersLabel: "Editors and reviewers",
     updateConferenceLabel: "Update conference",
     updateExhibitionLabel: "Update exhibition",
-    entryFeeLabel: "Entry fee"
+    entryFeeLabel: "Entry fee",
+    participationLabel: "Participation"
 }

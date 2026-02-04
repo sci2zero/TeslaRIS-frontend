@@ -12,7 +12,7 @@
             </v-col>
         </v-row>
         <v-row
-            v-if="isDocumentEntity">
+            v-if="isDocumentEntity || isEventEntity">
             <v-col>
                 <v-checkbox
                     v-model="showAllForEntityType"
@@ -100,6 +100,11 @@ export default defineComponent({
             props.applicableTypes.includes(ApplicableEntityType.THESIS)
         );
 
+        const isEventEntity = computed(() =>
+            props.applicableTypes.includes(ApplicableEntityType.CONFERENCE) || 
+            props.applicableTypes.includes(ApplicableEntityType.EXHIBITION)
+        );
+
         const { isCommission, isViceDeanForScience } = useUserRole();
 
         onMounted(() => {
@@ -118,6 +123,8 @@ export default defineComponent({
                 applicableTypes.push(props.entityType);
             } else if (applicableTypes.includes(ApplicableEntityType.DOCUMENT)) {
                 applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.DOCUMENT);
+            } else if (applicableTypes.includes(ApplicableEntityType.EVENT)) {
+                applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.EVENT);
             }
 
             AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(applicableTypes).then((response) => {
@@ -181,7 +188,7 @@ export default defineComponent({
             isViceDeanForScience,
             ApplicableEntityType,
             showAllForEntityType,
-            isDocumentEntity
+            isDocumentEntity, isEventEntity
         };
     }
 });

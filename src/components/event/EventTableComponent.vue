@@ -93,7 +93,7 @@
                     <entity-classification-modal-content
                         :entity-id="row.item.databaseId"
                         :entity-type="ApplicableEntityType.EVENT"
-                        :applicable-type="ApplicableEntityType.EVENT"
+                        :applicable-type="row.item.eventType === EventType.CONFERENCE ? ApplicableEntityType.CONFERENCE : ApplicableEntityType.EXHIBITION"
                         @classified="eventClassified(row.item)"
                         @update="refreshTable(tableOptions)">
                     </entity-classification-modal-content>

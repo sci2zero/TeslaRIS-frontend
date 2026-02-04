@@ -206,7 +206,7 @@
                     :entity-id="conference?.id"
                     :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.EVENT"
-                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    :applicable-types="[ApplicableEntityType.CONFERENCE]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />

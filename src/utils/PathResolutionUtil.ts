@@ -1,7 +1,8 @@
+import { EventType } from "@/models/EventModel";
 import type { PublicationType } from "@/models/PublicationModel";
 
 
-export const getMetadataComparisonPageName = (type: PublicationType): string => {
+export const getMetadataComparisonPageName = (type: PublicationType | string): string => {
     switch (type) {
         case "JOURNAL_PUBLICATION":
             return "journalPublicationMetadataComparator";
@@ -29,8 +30,18 @@ export const getMetadataComparisonPageName = (type: PublicationType): string => 
     return "";
 };
 
+export const getEventMetadataComparisonPageName = (type: EventType | string): string => {
+    switch (type) {
+        case EventType.CONFERENCE:
+            return "conferenceMetadataComparator";
+        case EventType.EXHIBITION:
+            return "exhibitionMetadataComparator";
+    }
 
-export const getPublicationComparisonPageName = (type: PublicationType): string => {
+    return "";
+};
+
+export const getPublicationComparisonPageName = (type: PublicationType | string): string => {
     switch (type) {
         case "PROCEEDINGS":
             return "proceedingsPublicationsComparator";
@@ -40,7 +51,16 @@ export const getPublicationComparisonPageName = (type: PublicationType): string 
     return "";
 };
 
-export const getDocumentLandingPageBasePath = (type: PublicationType): string => {
+export const getEventPublicationComparisonPageName = (type: EventType | string): string => {
+    switch (type) {
+        case EventType.CONFERENCE:
+            return "eventProceedingsComparator";
+    }
+
+    return "";
+};
+
+export const getDocumentLandingPageBasePath = (type: PublicationType | string): string => {
     switch (type) {
         case "JOURNAL_PUBLICATION":
             return "scientific-results/journal-publication/";
@@ -65,6 +85,17 @@ export const getDocumentLandingPageBasePath = (type: PublicationType): string =>
         case "GENETIC_MATERIAL":
             return "scientific-results/genetic-material/";
     }
+    return "";
+};
+
+export const getEventLandingPageBasePath = (type: EventType | string): string => {
+    switch (type) {
+        case EventType.CONFERENCE:
+            return "events/conference/";
+        case EventType.EXHIBITION:
+            return "events/exhibition/";
+    }
+
     return "";
 };
 

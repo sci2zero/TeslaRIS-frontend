@@ -312,7 +312,7 @@
                     {{ $t("restartPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
-                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived"
+                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived && !thesis.isOnPublicReview"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changeArchiveState(true)">
@@ -597,7 +597,7 @@ export default defineComponent({
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission } = useUserRole();
-        const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
+        const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary);
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);

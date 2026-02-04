@@ -19,8 +19,8 @@
         :headers="headers"
         :items-length="totalClassifications"
         :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 25, 50]"
-        :items-per-page="25"
+        :items-per-page-options="[50, 100]"
+        :items-per-page="50"
         show-select
         return-object
         @update:options="refreshTable">
@@ -115,7 +115,7 @@ export default defineComponent({
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "code", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 50, sortBy:[{key: "code", order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: "title.content"},

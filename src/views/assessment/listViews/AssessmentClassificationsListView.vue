@@ -43,7 +43,7 @@ export default defineComponent({
         const classifications = ref<AssessmentClassification[]>([]);
         const totalClassifications = ref(0);
         const page = ref(0);
-        const size = ref(25);
+        const size = ref(50);
         const sort = ref("");
         const direction = ref("");
 

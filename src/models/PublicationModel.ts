@@ -255,7 +255,7 @@ export interface DeduplicationSuggestion {
     rightTitleSr: string;
     leftTitleOther: string;
     rightTitleOther: string;
-    documentPublicationType: PublicationType;
+    concreteEntityType: string;
     entityType: EntityType;
     leftYear: number;
     rightYear: number;

@@ -7,6 +7,7 @@ export default {
         users: "Korisnici",
         events: "Događaji",
         conferenceLandingPage: "Konferencija",
+        exhibitionLandingPage: "Izložba",
         eventProceedingsComparator: "Poređenje radova događaja",
         eventMetadataComparator: "Poređenje metapodataka događaja",
         conferenceMetadataComparator: "Poređenje metapodataka konferencija",
@@ -185,7 +186,7 @@ export default {
     researchAreasColumn: "researchAreasSr",
     addInstitutionEditorLabel: "Dodaj institucionalnog urednika",
     titleColumn: "titleSr",
-    scientificResultsListLabel: "Rezultati",
+    scientificResultsListLabel: "Naučni rezultati",
     titleLabel: "Naslov",
     subtitleLabel: "Podnaslov",
     yearOfPublicationLabel: "Godina izdanja",
@@ -647,7 +648,7 @@ export default {
     markLabel: "Oznaka",
     numberOfPublicationsLabel: "Broj publikacija",
     totalPointsLabel: "Ukupan broj bodova",
-    publicationsWithPointsLabel: "Publikacije sa brojem bodova",
+    scientificResultsWithPointsLabel: "Naučni rezultati sa brojem bodova",
     noAssessedPublicationsMessage: "Nema vrednovanih publikacija u selektovanom periodu.",
     defaultLabel: "Podrazumevan",
     setDefaultLabel: "Postavi podrazumevan",
@@ -1309,5 +1310,6 @@ export default {
     editorsAndReviewersLabel: "Urednici i recenzenti",
     updateConferenceLabel: "Ažuriraj konferenciju",
     updateExhibitionLabel: "Ažuriraj izložbu",
-    entryFeeLabel: "Cena ulaznice"
+    entryFeeLabel: "Cena ulaznice",
+    participationLabel: "Učešće"
 }

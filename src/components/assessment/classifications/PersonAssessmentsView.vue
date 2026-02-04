@@ -32,7 +32,7 @@
                             {{ $t("markLabel") }}
                         </th>
                         <th class="text-left">
-                            {{ loginStore.userLoggedIn ? $t("publicationsWithPointsLabel") : $t("publicationsLabel") }}
+                            {{ loginStore.userLoggedIn ? $t("scientificResultsWithPointsLabel") : $t("scientificResultsListLabel") }}
                         </th>
                         <th v-if="loginStore.userLoggedIn" class="text-left">
                             {{ $t("numberOfPublicationsLabel") }}
@@ -53,10 +53,14 @@
                         <td>
                             <ul>
                                 <li v-for="(publication, index) in publications" :key="index">
-                                    <localized-link v-if="!category.startsWith('M10')" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
+                                    <localized-link v-if="!category.startsWith('M10') && !category.startsWith('M11')" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
                                         {{ publication.a }} 
                                         <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
                                     </localized-link>
+                                    <span v-else-if="category === 'M105' || category === 'M112'">
+                                        <strong>{{ $t("participationLabel") }}: </strong>{{ publication.a }} 
+                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                    </span>
                                     <span v-else>
                                         <strong>{{ $t("prizeLabel") }}: </strong>{{ publication.a }} 
                                         <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
