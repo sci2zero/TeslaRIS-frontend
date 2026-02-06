@@ -1311,5 +1311,9 @@ export default {
     updateConferenceLabel: "Ažuriraj konferenciju",
     updateExhibitionLabel: "Ažuriraj izložbu",
     entryFeeLabel: "Cena ulaznice",
-    participationLabel: "Učešće"
+    participationLabel: "Učešće",
+    updateSubstitutionLabel: "Definiši zamenu",
+    removeSubstitutionLabel: "Ukloni zamenu",
+    substitutedByLabel: "Zamenjeno sa",
+    substituteForLabel: "Zamena za"
 }

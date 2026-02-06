@@ -494,6 +494,10 @@ export default defineComponent({
         sortByDateDefault: {
             type: Boolean,
             default: false
+        },
+        limitOneSelection: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -539,7 +543,11 @@ export default defineComponent({
             }
         });
 
-        watch(selectedPublications, () => {
+        watch(selectedPublications, val => {
+            if (props.limitOneSelection) {
+                selectedPublications.value = [val[val.length - 1]];
+            }
+
             emit("selectionUpdated", selectedPublications.value);
         });
 

@@ -317,6 +317,14 @@ export class DocumentPublicationService extends BaseService {
   async getWordcloudForSingleDocument(documentId: number, documentType: PublicationType): Promise<AxiosResponse<TermFrequency[]>> {
     return super.sendRequest(axios.get, `document/wordcloud/${documentId}?documentType=${documentType}&language=${i18n.vueI18n.global.locale.toString()}`);
   }
+
+  async substituteThesis(staleThesisId: number, substituteThesisId: number): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.patch, `thesis/add-substitute/${staleThesisId}/${substituteThesisId}`, {}, DocumentPublicationService.idempotencyKey);
+  }
+
+  async removeSubstitution(thesisId: number): Promise<AxiosResponse<Thesis>> {
+    return super.sendRequest(axios.patch, `thesis/remove-substitute/${thesisId}`, {}, DocumentPublicationService.idempotencyKey);
+  }
 }
 
 export default new DocumentPublicationService();

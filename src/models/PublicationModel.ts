@@ -304,6 +304,10 @@ export interface Thesis extends Document {
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
     isShortenedReview?: boolean;
+    substituteFor?: number;
+    substitutedTitle?: MultilingualContent[];
+    substitutedBy?: number;
+    substituteTitle?: MultilingualContent[];
 }
 
 export interface CitationResponse {

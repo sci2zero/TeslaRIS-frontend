@@ -1302,5 +1302,9 @@ export default {
     updateConferenceLabel: "Update conference",
     updateExhibitionLabel: "Update exhibition",
     entryFeeLabel: "Entry fee",
-    participationLabel: "Participation"
+    participationLabel: "Participation",
+    updateSubstitutionLabel: "Define substitution",
+    removeSubstitutionLabel: "Remove substitution",
+    substitutedByLabel: "Substituted by",
+    substituteForLabel: "Substitute for"
 }
