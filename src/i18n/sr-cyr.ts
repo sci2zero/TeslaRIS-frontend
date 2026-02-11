@@ -100,5 +100,6 @@ export default {
     clientInstitutionCrisLabel: "Клијентска институција (CRIS)",
     if2RankLabel: "IF2 ранк",
     if5RankLabel: "IF5 ранк",
-    jciRankLabel: "JCI ранк"
+    jciRankLabel: "JCI ранк",
+    contactEmailVisibleLabel: "Адреса електронске поште је видљива неулогованим корисницима",
 };

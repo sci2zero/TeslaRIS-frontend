@@ -1306,5 +1306,12 @@ export default {
     updateSubstitutionLabel: "Define substitution",
     removeSubstitutionLabel: "Remove substitution",
     substitutedByLabel: "Substituted by",
-    substituteForLabel: "Substitute for"
+    substituteForLabel: "Substitute for",
+    sendOnlyNewNotificationsLabel: "Send only new notifications",
+    updatePersonFieldVisibilityConfigurationLabel: "Personal information visibility",
+    phoneNumberVisibleLabel: "Phone number visible to unauthenticated users",
+    contactEmailVisibleLabel: "Email visible to unauthenticated users",
+    dateOfBirthVisibleLabel: "Date of birth visible to unauthenticated users",
+    birthplaceVisibleLabel: "Birthplace visible to unauthenticated users",
+    sexVisibleLabel: "Sex visible to unauthenticated users"
 }

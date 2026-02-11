@@ -195,3 +195,11 @@ export interface PersonProfileImageRequest {
     height: number;
     width: number;
 }
+
+export interface PersonFieldVisibility {
+    phoneNumberVisible: boolean,
+    contactEmailVisible: boolean,
+    dateOfBirthVisible: boolean,
+    sexVisible: boolean,
+    birthplaceVisible: boolean
+}

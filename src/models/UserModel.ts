@@ -13,6 +13,7 @@ export interface UserResponse {
     personId: number;
     organisationUnitName: MultilingualContent[];
     notificationPeriod: UserNotificationPeriod;
+    sendOnlyNewNotifications: boolean;
     commissionId: number;
 }
 
@@ -51,6 +52,7 @@ export interface UserUpdateRequest {
     preferredReferenceCataloguingLanguageTagId: number;
     organisationUnitId?: number;
     notificationPeriod: UserNotificationPeriod;
+    sendOnlyNewNotifications: boolean;
 }
 
 export enum UserRole {
@@ -67,5 +69,6 @@ export enum UserRole {
 export enum UserNotificationPeriod {
     DAILY = "DAILY",
     WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY",
     NEVER = "NEVER"
 }

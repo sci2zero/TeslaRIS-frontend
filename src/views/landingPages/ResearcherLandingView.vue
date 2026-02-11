@@ -63,6 +63,17 @@
                             @click="performIndicatorHarvest">
                             {{ $t("harvestExternalIndicatorsLabel") }}
                         </v-btn>
+                        <generic-crud-modal
+                            v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                            class="ml-2"
+                            :form-component="PersonFieldVisibilityConfigurationForm"
+                            :form-props="{ personId: person?.id }"
+                            entity-name="PersonFieldVisibilityConfiguration"
+                            is-update compact
+                            primary-color outlined
+                            :read-only="!canEdit"
+                            @update="updateSuccess()"
+                        />
                     </div>
                 </div>
             </template>
@@ -340,6 +351,7 @@ import ExternalIndicatorConfigurationService from '@/services/assessment/Externa
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 import RoCrateService from '@/services/export/RoCrateService';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
+import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFieldVisibilityConfigurationForm.vue';
 
 
 export default defineComponent({
@@ -597,8 +609,7 @@ export default defineComponent({
         const updateKeywords = (updatedKeywords: MultilingualContent[]) => {
             keywords.value = updatedKeywords;
             PersonService.updateKeywords(person.value?.id as number, updatedKeywords).then(() => {
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -608,8 +619,7 @@ export default defineComponent({
         const updateBiography = (updatedBiography: MultilingualContent[]) => {
             biography.value = updatedBiography;
             PersonService.updateBiography(person.value?.id as number, updatedBiography).then(() => {
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -619,8 +629,7 @@ export default defineComponent({
         const updatePersonalInfo = (updatedInfo: PersonalInfo) => {
             PersonService.updatePersonalInfo(person.value?.id as number, updatedInfo).then(() => {
                 fetchPerson();
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
@@ -631,8 +640,7 @@ export default defineComponent({
             if("title" in involvement) {
                 InvolvementService.addEducation(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
+                    updateSuccess();
                 }).catch(() => {
                     snackbarMessage.value = i18n.t("genericErrorMessage");
                     snackbar.value = true;
@@ -640,8 +648,7 @@ export default defineComponent({
             } else if("contributionDescription" in involvement) {
                 InvolvementService.addMembership(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
+                    updateSuccess();
                 }).catch(() => {
                     snackbarMessage.value = i18n.t("genericErrorMessage");
                     snackbar.value = true;
@@ -649,8 +656,7 @@ export default defineComponent({
             } else if("employmentPosition" in involvement) {
                 InvolvementService.addEmployment(involvement, person.value?.id as number).then(() => {
                     fetchPerson();
-                    snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                    snackbar.value = true;
+                    updateSuccess();
                 }).catch(() => {
                     snackbarMessage.value = i18n.t("genericErrorMessage");
                     snackbar.value = true;
@@ -664,8 +670,7 @@ export default defineComponent({
                 await PersonService.updateOtherNames(otherNames, person.value?.id as number);
 
                 fetchPerson();
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
             } catch (_error) {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -675,8 +680,7 @@ export default defineComponent({
         const selectPrimaryName = (personNameId: number) => {
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
                 fetchPerson();
-                snackbarMessage.value = i18n.t("updatedSuccessMessage");
-                snackbar.value = true;
+                updateSuccess();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -726,6 +730,11 @@ export default defineComponent({
             RoCrateService.downloadRoCrateBibliography(person.value?.id as number);
         };
 
+        const updateSuccess = () => {
+            snackbarMessage.value = i18n.t("updatedSuccessMessage");
+            snackbar.value = true;
+        };
+
         return {
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
@@ -739,7 +748,8 @@ export default defineComponent({
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
-            isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography
+            isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
+            PersonFieldVisibilityConfigurationForm, updateSuccess
         };
 }});
 </script>

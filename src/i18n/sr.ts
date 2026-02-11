@@ -1315,5 +1315,12 @@ export default {
     updateSubstitutionLabel: "Definiši zamenu",
     removeSubstitutionLabel: "Ukloni zamenu",
     substitutedByLabel: "Zamenjeno sa",
-    substituteForLabel: "Zamena za"
+    substituteForLabel: "Zamena za",
+    sendOnlyNewNotificationsLabel: "Šalji samo nove notifikacije",
+    updatePersonFieldVisibilityConfigurationLabel: "Vidljivost ličnih informacija",
+    phoneNumberVisibleLabel: "Broj telefona je vidljiv neulogovanim korisnicima",
+    contactEmailVisibleLabel: "Email je vidljiv neulogovanim korisnicima",
+    dateOfBirthVisibleLabel: "Datum rođenja je vidljiv neulogovanim korisnicima",
+    birthplaceVisibleLabel: "Mesto rođenja je vidljivo neulogovanim korisnicima",
+    sexVisibleLabel: "Pol je vidljiv neulogovanim korisnicima"
 }
