@@ -23,7 +23,7 @@
                             hide-details
                         />
                     </td>
-                    <td>{{ row.item.nameAndSurname.replaceAll("*", "") }}</td>
+                    <td>{{ row.item.nameAndSurname ? row.item.nameAndSurname.replaceAll("*", "") : "-" }}</td>
                     <td v-if="(institutionId === undefined || !allFromSameFaculty) && $i18n.locale.startsWith('sr')">
                         {{ row.item.organisationUnitNameSr }}
                     </td>
