@@ -64,7 +64,7 @@
                             {{ $t("harvestExternalIndicatorsLabel") }}
                         </v-btn>
                         <generic-crud-modal
-                            v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                            v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
                             class="ml-2"
                             :form-component="PersonFieldVisibilityConfigurationForm"
                             :form-props="{ personId: person?.id }"

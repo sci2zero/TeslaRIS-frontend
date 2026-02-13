@@ -17,6 +17,7 @@ export interface PersonIndex {
     scopusAuthorId: string;
     openAlexId: string;
     webOfScienceResearcherId: string;
+    displayBirthdate: boolean;
 }
 
 export interface BasicPerson {
@@ -124,6 +125,7 @@ export interface PersonResponse {
     expertisesOrSkills: ExpertiseOrSkillResponse[];
     prizes: PrizeResponse[];
     imageServerFilename?: string;
+    showFullBirthdate: boolean;
 }
 
 export interface PersonalInfo {
