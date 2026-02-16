@@ -1313,5 +1313,6 @@ export default {
     contactEmailVisibleLabel: "Email visible to unauthenticated users",
     dateOfBirthVisibleLabel: "Date of birth visible to unauthenticated users",
     birthplaceVisibleLabel: "Birthplace visible to unauthenticated users",
-    sexVisibleLabel: "Sex visible to unauthenticated users"
+    sexVisibleLabel: "Sex visible to unauthenticated users",
+    monographMetadataComparatorLabel: "Comparing monographs"
 }

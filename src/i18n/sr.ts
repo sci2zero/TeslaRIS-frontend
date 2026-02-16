@@ -1322,5 +1322,6 @@ export default {
     contactEmailVisibleLabel: "Email je vidljiv neulogovanim korisnicima",
     dateOfBirthVisibleLabel: "Datum rođenja je vidljiv neulogovanim korisnicima",
     birthplaceVisibleLabel: "Mesto rođenja je vidljivo neulogovanim korisnicima",
-    sexVisibleLabel: "Pol je vidljiv neulogovanim korisnicima"
+    sexVisibleLabel: "Pol je vidljiv neulogovanim korisnicima",
+    monographMetadataComparatorLabel: "Poređenje monografija"
 }

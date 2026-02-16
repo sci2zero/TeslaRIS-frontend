@@ -1,6 +1,6 @@
 <template>
     <v-row
-        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminaryFiles && preliminaryFiles.length > 0))"
+        v-if="showAllThesisSections || canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminaryFiles && preliminaryFiles.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminaryFilesLabel") }}</h2>
@@ -18,7 +18,7 @@
         </v-col>
     </v-row>
     <v-row
-        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminarySupplements && preliminarySupplements.length > 0))"
+        v-if="showAllThesisSections || canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (preliminarySupplements && preliminarySupplements.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("preliminarySupplementsLabel") }}</h2>
@@ -36,12 +36,14 @@
         </v-col>
     </v-row>
     <v-row
-        v-if="canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
+        v-if="showAllThesisSections || canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("commissionReportsLabel") }}</h2>
             <attachment-list
-                :attachments="commissionReports" :can-edit="canEditThesisAttachments" :in-comparator="inComparator" 
+                :attachments="commissionReports"
+                :can-edit="canEditThesisAttachments"
+                :in-comparator="inComparator" 
                 :disable-updates="!isAdmin"
                 disable-resource-type-selection
                 :always-open-access="!isAdmin"
@@ -143,6 +145,10 @@ export default defineComponent({
         default: false
     },
     hideRegularSections: {
+        type: Boolean,
+        default: false
+    },
+    showAllThesisSections: {
         type: Boolean,
         default: false
     }

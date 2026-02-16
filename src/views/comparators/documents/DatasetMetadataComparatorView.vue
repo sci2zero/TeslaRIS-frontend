@@ -35,7 +35,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="leftDataset" :proofs="leftDataset?.proofs" :file-items="leftDataset?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="leftDataset"
+                    :proofs="leftDataset?.proofs"
+                    :file-items="leftDataset?.fileItems"
+                    in-comparator
+                />
             </v-col>
 
             <v-col cols="1">
@@ -82,7 +87,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="rightDataset" :proofs="rightDataset?.proofs" :file-items="rightDataset?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="rightDataset"
+                    :proofs="rightDataset?.proofs"
+                    :file-items="rightDataset?.fileItems"
+                    in-comparator
+                />
             </v-col>
         </v-row>
 

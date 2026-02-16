@@ -35,7 +35,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="leftProceedingsPublication" :proofs="leftProceedingsPublication?.proofs" :file-items="leftProceedingsPublication?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="leftProceedingsPublication"
+                    :proofs="leftProceedingsPublication?.proofs"
+                    :file-items="leftProceedingsPublication?.fileItems"
+                    in-comparator
+                />
             </v-col>
 
             <v-col cols="1">
@@ -82,7 +87,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="rightProceedingsPublication" :proofs="rightProceedingsPublication?.proofs" :file-items="rightProceedingsPublication?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="rightProceedingsPublication"
+                    :proofs="rightProceedingsPublication?.proofs"
+                    :file-items="rightProceedingsPublication?.fileItems"
+                    in-comparator
+                />
             </v-col>
         </v-row>
 

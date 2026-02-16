@@ -64,6 +64,7 @@
                     :document="leftMaterialProduct"
                     :proofs="leftMaterialProduct?.proofs"
                     :file-items="leftMaterialProduct?.fileItems"
+                    in-comparator
                 />
             </v-col>
 
@@ -139,6 +140,7 @@
                     :document="rightMaterialProduct"
                     :proofs="rightMaterialProduct?.proofs"
                     :file-items="rightMaterialProduct?.fileItems"
+                    in-comparator
                 />
             </v-col>
         </v-row>

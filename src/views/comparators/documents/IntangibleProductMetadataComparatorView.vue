@@ -61,6 +61,7 @@
                     :document="leftIntangibleProduct"
                     :proofs="leftIntangibleProduct?.proofs"
                     :file-items="leftIntangibleProduct?.fileItems"
+                    in-comparator
                 />
             </v-col>
 
@@ -134,6 +135,7 @@
                     :document="rightIntangibleProduct"
                     :proofs="rightIntangibleProduct?.proofs"
                     :file-items="rightIntangibleProduct?.fileItems"
+                    in-comparator
                 />
             </v-col>
         </v-row>

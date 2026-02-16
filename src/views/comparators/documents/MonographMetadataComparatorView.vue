@@ -35,7 +35,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="leftMonograph" :proofs="leftMonograph?.proofs" :file-items="leftMonograph?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="leftMonograph"
+                    :proofs="leftMonograph?.proofs"
+                    :file-items="leftMonograph?.fileItems"
+                    in-comparator
+                />
             </v-col>
 
             <v-col cols="1">
@@ -82,7 +87,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="rightMonograph" :proofs="rightMonograph?.proofs" :file-items="rightMonograph?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="rightMonograph"
+                    :proofs="rightMonograph?.proofs"
+                    :file-items="rightMonograph?.fileItems"
+                    in-comparator
+                />
             </v-col>
         </v-row>
 
