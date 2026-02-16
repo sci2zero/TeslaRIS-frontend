@@ -435,7 +435,7 @@
                 <person-document-contribution-tabs
                     :document-id="thesis?.id"
                     :contribution-list="thesis?.contributions ? thesis?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || thesis?.isOnPublicReview"
                     board-members-allowed
                     limit-one-author
                     @update="updateContributions">
