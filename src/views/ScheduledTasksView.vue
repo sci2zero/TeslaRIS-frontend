@@ -390,7 +390,7 @@ export default defineComponent({
                 years.value.push(i);
             }
 
-            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}}`;
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}`;
 
             setTimeout(() => {
                 fetchScheduledTasks();

@@ -52,7 +52,7 @@
                         </td>
                         <td>
                             <ul>
-                                <li v-for="(publication, index) in publications" :key="index">
+                                <li v-for="(publication, index) in publications" :key="index" class="mb-1 mt-2 publication-list">
                                     <localized-link v-if="!category.startsWith('M10') && !category.startsWith('M11')" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
                                         {{ publication.a }} 
                                         <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
@@ -198,6 +198,11 @@ export default defineComponent({
 
 .narrow {
     width: 200px;
+}
+
+.publication-list {
+    list-style-type: disc;
+    list-style-position: outside;
 }
 
 </style>
