@@ -543,13 +543,20 @@ export default defineComponent({
             }
         });
 
-        watch(selectedPublications, val => {
-            if (props.limitOneSelection) {
-                selectedPublications.value = [val[val.length - 1]];
+        let isUpdatingSeelction = false;
+        watch(selectedPublications, (newVal) => {
+            if (isUpdatingSeelction) {
+                return;
+            }
+            
+            if (props.limitOneSelection && newVal.length > 1) {
+                isUpdatingSeelction = true;
+                selectedPublications.value = [newVal[newVal.length - 1]];
+                isUpdatingSeelction = false;
             }
 
             emit("selectionUpdated", selectedPublications.value);
-        });
+        }, { deep: false });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));
