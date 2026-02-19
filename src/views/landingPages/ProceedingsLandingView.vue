@@ -179,6 +179,7 @@
             :handle-researcher-unbind="handleResearcherUnbind"
             :display-citation="false"
             for-proceedings
+            enable-metadata-scanning
         />
 
         <br />

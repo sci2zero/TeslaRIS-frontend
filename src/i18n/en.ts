@@ -1314,5 +1314,7 @@ export default {
     dateOfBirthVisibleLabel: "Date of birth visible to unauthenticated users",
     birthplaceVisibleLabel: "Birthplace visible to unauthenticated users",
     sexVisibleLabel: "Sex visible to unauthenticated users",
-    monographMetadataComparatorLabel: "Comparing monographs"
+    monographMetadataComparatorLabel: "Comparing monographs",
+    scanningExternalSourcesMessage: "Scanning of external sources in progress...",
+    scanForMetadataEnrichmentsLabel: "Metadata enrichment"
 }

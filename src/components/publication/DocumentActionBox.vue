@@ -63,6 +63,13 @@
                         primary-color
                         compact
                     />
+                    <v-btn
+                        v-if="enableMetadataScanning && canEdit && (isAdmin || isInstitutionalEditor || isResearcher) && !document?.isArchived"
+                        class="mb-5 ml-2" color="primary" density="compact"
+                        variant="outlined"
+                        @click="scanForMetadataEnrichment()">
+                        {{ $t("scanForMetadataEnrichmentsLabel") }}
+                    </v-btn>
                 </div>
             </v-col>
             <v-col cols="12" sm="6" class="action-section">
@@ -93,6 +100,9 @@ import PublicationUnbindButton from '@/components/publication/PublicationUnbindB
 import RoCrateService from '@/services/export/RoCrateService';
 import PublicationTypeTransferForm from './PublicationTypeTransferForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
+import ImportService from '@/services/importer/ImportService';
+import { useGlobalLoading } from '@/composables/useGlobalLoading';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -154,6 +164,10 @@ export default defineComponent({
         typeTransferSuffix: {
             type: String,
             default: ""
+        },
+        enableMetadataScanning: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -207,6 +221,22 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             );
         };
+
+        const { showLoader, hideLoader } = useGlobalLoading();
+        const i18n = useI18n();
+
+        const scanForMetadataEnrichment = async () => {
+            try {
+                showLoader(i18n.t("scanningExternalSourcesMessage"));
+                const response = await ImportService.scanForMetadataEnrichment(props.documentId);
+
+                if (response.data) {
+                    router.push({name: "loader", query: {recordId: response.data, documentId: props.documentId}});
+                }
+            } finally {
+                hideLoader();
+            }
+        };
         
         return {
             fetchCitations, canValidate,
@@ -215,7 +245,8 @@ export default defineComponent({
             changeArchiveState, snackbar,
             snackbarMessage, isResearcher,
             isUserLoggedIn, downloadRoCrate,
-            PublicationTypeTransferForm
+            PublicationTypeTransferForm,
+            scanForMetadataEnrichment
         };
 }})
 

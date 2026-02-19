@@ -70,6 +70,7 @@
         </v-btn>
 
         <v-btn
+            v-if="!fetchingForSingleRecord"
             class="load-action mb-5 same-line"
             :disabled="stepperValue === steps.length"
             @click="toggleAutomaticSubmission">
@@ -129,7 +130,9 @@
                         @update="updateRecord">
                     </import-proceedings-publication-details>
 
-                    <div class="d-flex flex-row justify-center">
+                    <div
+                        v-if="!fetchingForSingleRecord"
+                        class="d-flex flex-row justify-center">
                         <v-btn
                             class="finish-load-action"
                             :disabled="stepperValue !== steps.length"
@@ -206,6 +209,7 @@ import LanguageService from "@/services/LanguageService";
 import { type LanguageTagResponse } from "@/models/Common";
 import AuthorshipSelectionModal from "@/components/import/AuthorshipSelectionModal.vue";
 import { getErrorMessageForErrorKey } from "@/i18n";
+import { useRoute, useRouter } from "vue-router";
 
 
 export default defineComponent({
@@ -267,8 +271,14 @@ export default defineComponent({
         const enrichmentMetadata = ref<(JournalPublication | ProceedingsPublication)[]>([]);
         const displayEnrichmentSetIndex = ref(0);
 
+        const router = useRouter();
+        const route = useRoute();
+        const fetchingForSingleRecord = ref<boolean>(false);
+
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
+
+            fetchingForSingleRecord.value = !!route.query.recordId;
 
             startLoadingProcess();
 
@@ -279,6 +289,10 @@ export default defineComponent({
 
         const startLoadingProcess = async () => {
             if (isAdmin.value && (!selectedOrganisationUnit.value || selectedOrganisationUnit.value.value <= 0) && !showAll.value) {
+                if (fetchingForSingleRecord.value) {
+                    showAll.value = true;
+                }
+
                 return;
             }
 
@@ -323,7 +337,8 @@ export default defineComponent({
             loadingProceedingsPublication.value = false;
 
             ImportService.getNextFromWizard(
-                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
+                selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
+                route.query.recordId ? route.query.recordId as string : null
             ).then(response => {
                 if(!response.data) {
                     noRecordsRemaining.value = true;
@@ -743,6 +758,18 @@ export default defineComponent({
                 oldDocumentId,
                 newDocumentId
             ).then(() => {
+                if (fetchingForSingleRecord.value && currentLoadRecord.value) {
+                    if ("journalPublicationType" in currentLoadRecord.value) {
+                        router.push(
+                            {name: "journalPublicationLandingPage", params: {id: parseInt(route.query.documentId as string)}}
+                        );
+                    } else if ("proceedingsPublicationType" in currentLoadRecord.value) {
+                        router.push(
+                            {name: "proceedingsPublicationLandingPage", params: {id: parseInt(route.query.documentId as string)}}
+                        );
+                    }
+                }
+
                 stepperValue.value = smartLoading.value ? 0 : 1;
                 fetchNextRecordForLoading();
                 errorMessage.value = i18n.t("loadSuccessMessage");
@@ -800,7 +827,8 @@ export default defineComponent({
             submissionDTO, fetchNextAfterLoading,
             showOnlyHarvestableInstitutions,
             fetchMetadataForEnrichment, enrichmentMetadata,
-            displayEnrichmentSetIndex, displayMatchMetadata
+            displayEnrichmentSetIndex, displayMatchMetadata,
+            fetchingForSingleRecord
         };
     },
 });

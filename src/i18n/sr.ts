@@ -1323,5 +1323,7 @@ export default {
     dateOfBirthVisibleLabel: "Datum rođenja je vidljiv neulogovanim korisnicima",
     birthplaceVisibleLabel: "Mesto rođenja je vidljivo neulogovanim korisnicima",
     sexVisibleLabel: "Pol je vidljiv neulogovanim korisnicima",
-    monographMetadataComparatorLabel: "Poređenje monografija"
+    monographMetadataComparatorLabel: "Poređenje monografija",
+    scanningExternalSourcesMessage: "Skeniranje eksternih izvora u toku...",
+    scanForMetadataEnrichmentsLabel: "Obogaćivanje metapodataka"
 }

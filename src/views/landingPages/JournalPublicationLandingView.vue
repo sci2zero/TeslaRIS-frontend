@@ -175,6 +175,7 @@
             :handle-researcher-unbind="handleResearcherUnbind"
             :transfer-to="PublicationType.PROCEEDINGS_PUBLICATION"
             type-transfer-suffix="Proceedings"
+            enable-metadata-scanning
             @update="fetchValidationStatus(journalPublication?.id as number, journalPublication as _Document)"
         />
 

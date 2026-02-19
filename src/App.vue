@@ -4,6 +4,25 @@
         <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
             <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
 
+            <v-overlay
+                :model-value="globalLoading"
+                persistent
+                scrim="rgba(0,0,0,0.6)"
+                class="fixed inset-0 flex items-center justify-center z-50">
+                <div class="flex items-center gap-4">
+                    <span class="text-white text-xl">
+                        {{ globalLoadingMessage }}
+                    </span>
+
+                    <v-progress-circular
+                        indeterminate
+                        size="120"
+                        width="12"
+                        color="white"
+                    />
+                </div>
+            </v-overlay>
+
             <router-view
                 :key="$route.path"
                 class="flex-1"
@@ -45,6 +64,7 @@ import Navbar from "@/components/core/MainNavbar.vue";
 import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";
 import { useSidebarStore } from "@/stores/sidebarStore";
+import { useGlobalLoading } from "./composables/useGlobalLoading";
 
 
 export default defineComponent({
@@ -52,6 +72,8 @@ export default defineComponent({
     components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar },
     setup() {
         const route = useRoute();
+
+        const { globalLoading, globalLoadingMessage } = useGlobalLoading()
 
         const downloadProgressRef = ref<typeof DownloadProgress>();
         const uploadProgressRef = ref<typeof UploadProgress>();
@@ -88,7 +110,9 @@ export default defineComponent({
             downloadProgressRef,
             uploadProgressRef,
             isHome,
-            sidebarStore
+            sidebarStore,
+            globalLoading,
+            globalLoadingMessage
         };
     },
     beforeMount() {

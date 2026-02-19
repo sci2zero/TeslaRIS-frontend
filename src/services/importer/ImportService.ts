@@ -56,8 +56,8 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.get, `load/load-wizard/count-remaining${institutionId ? "?institutionId=" + institutionId : ""}`);
     }
 
-    async getNextFromWizard(institutionId: number | null = null): Promise<AxiosResponse<JournalPublicationLoad | ProceedingsPublicationLoad>> {
-        return super.sendRequest(axios.get, `load/load-wizard${institutionId ? "?institutionId=" + institutionId : ""}`);
+    async getNextFromWizard(institutionId: number | null = null, recordId: string | null = null): Promise<AxiosResponse<JournalPublicationLoad | ProceedingsPublicationLoad>> {
+        return super.sendRequest(axios.get, `load/load-wizard?recordId=${recordId ? recordId : ""}${institutionId ? "&institutionId=" + institutionId : ""}`);
     }
 
     async skipWizard(institutionId: number | null = null, removeFromRecord: boolean = false): Promise<AxiosResponse<void>> {
@@ -150,6 +150,10 @@ export class ImportService extends BaseService {
 
     async readEnrichmentMetadata(documentId: number): Promise<AxiosResponse<JournalPublication | ProceedingsPublication>> {
         return super.sendRequest(axios.get, `load/enrichment-metadata/${documentId}`);
+    }
+
+    async scanForMetadataEnrichment(documentId: number): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.get, `import-common/metadata-scan/${documentId}`);
     }
 }
   
