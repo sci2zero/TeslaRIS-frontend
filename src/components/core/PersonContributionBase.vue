@@ -115,7 +115,9 @@
     <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
         <v-col>
             <multilingual-text-input
-                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                ref="affiliationStatementRef"
+                v-model="affiliationStatement"
+                :label="$t('affiliationStatementLabel')"
                 :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
@@ -726,6 +728,8 @@ export default defineComponent({
                     externalInstitutionSuggestions.value = response.data;
                 });
             }
+
+            sendContentToParent();
         });
 
         return {

@@ -1316,5 +1316,6 @@ export default {
     sexVisibleLabel: "Sex visible to unauthenticated users",
     monographMetadataComparatorLabel: "Comparing monographs",
     scanningExternalSourcesMessage: "Scanning of external sources in progress...",
-    scanForMetadataEnrichmentsLabel: "Metadata enrichment"
+    scanForMetadataEnrichmentsLabel: "Metadata enrichment",
+    noNewMetadataFoundMessage: "No new metadata was found."
 }

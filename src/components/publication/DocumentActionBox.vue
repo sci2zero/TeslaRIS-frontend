@@ -232,6 +232,8 @@ export default defineComponent({
 
                 if (response.data) {
                     router.push({name: "loader", query: {recordId: response.data, documentId: props.documentId}});
+                } else {
+                    snackbarMessage.value = i18n.t("noNewMetadataFoundMessage");
                 }
             } finally {
                 hideLoader();

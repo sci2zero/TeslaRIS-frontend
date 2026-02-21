@@ -1325,5 +1325,6 @@ export default {
     sexVisibleLabel: "Pol je vidljiv neulogovanim korisnicima",
     monographMetadataComparatorLabel: "Poređenje monografija",
     scanningExternalSourcesMessage: "Skeniranje eksternih izvora u toku...",
-    scanForMetadataEnrichmentsLabel: "Obogaćivanje metapodataka"
+    scanForMetadataEnrichmentsLabel: "Obogaćivanje metapodataka",
+    noNewMetadataFoundMessage: "Nisu pronađeni novi metapodaci."
 }
