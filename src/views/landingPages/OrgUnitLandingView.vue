@@ -255,6 +255,13 @@
                     @click="navigateToBackupPage">
                     {{ $t("backupLabel") }}
                 </v-btn>
+                <v-btn
+                    v-if="isAdmin || (isInstitutionalEditor && canEdit)"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="openMetadataEnrichmentDialog">
+                    {{ $t("enrichDocumentMetadata") }}
+                </v-btn>
             </div>
         </div>
         <br />
@@ -477,6 +484,15 @@
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
+
+        <persistent-question-dialog
+            v-model="displayPersistentDialog"
+            :title="$t('selectEnrichmentTypeLabel')"
+            :message="$t('selectEnrichmentTypeMessage')"
+            :radio-options="[{title: $t('uiBasedLabel'), value: 1}, {title: $t('automaticLabel'), value: 2}]"
+            show-radio-options
+            @continue="startMetadataEnrichment"
+        />
     </v-container>
 </template>
 
@@ -539,13 +555,16 @@ import { useDLChartDisplay } from '@/composables/useDLChartDisplay';
 import DLDisplayConfigurationForm from '@/components/organisationUnit/DLDisplayConfigurationForm.vue';
 import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDefaultSubmissionContentService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
+import ImportService from '@/services/importer/ImportService';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog },
     setup() {
         const currentTab = ref("relations");
+        const displayPersistentDialog = ref(false);
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -975,6 +994,21 @@ export default defineComponent({
             fetchPublications();
         });
 
+        const openMetadataEnrichmentDialog = () => {
+            displayPersistentDialog.value = true;
+        };
+
+        const startMetadataEnrichment = (option: number) => {
+            ImportService.scanInstitutionForMetadataEnrichment(organisationUnit.value?.id as number, option === 2)
+            .then(() => {
+                snackbarMessage.value = i18n.t("metadataEnrichmentStartedSuccessfully");
+            }).catch(() => {
+                snackbarMessage.value = i18n.t("metadataEnrichmentStartFailed");
+            }).finally(() => {
+                snackbar.value = true;
+            });
+        };
+
         return {
             organisationUnit, currentTab, isHeadOfLibrary,
             publications, totalPublications, userInstitutionid,
@@ -1005,7 +1039,9 @@ export default defineComponent({
             outputConfigurationUpdated, loggedInUser,
             navigateToBackupPage, ChartDisplayConfigurationForm,
             displaySettingsDL, DLDisplayConfigurationForm,
-            returnOnlyNonArchived, canEditDefaultSubmissionContent
+            returnOnlyNonArchived, canEditDefaultSubmissionContent,
+            openMetadataEnrichmentDialog, displayPersistentDialog,
+            startMetadataEnrichment
         };
 }})
 

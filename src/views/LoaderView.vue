@@ -34,6 +34,7 @@
             ref="deduplicatorRef"
             :publication-for-loading="currentLoadRecord"
             :can-perform-overwrite="stepperValue === steps.length"
+            :is-enrichment-mode="fetchingForSingleRecord || currentLoadRecord?.isEnrichment"
             @deduplicate="deduplicate"
             @found-matches="fetchMetadataForEnrichment"
             @match-selected="displayMatchMetadata"
@@ -70,7 +71,7 @@
         </v-btn>
 
         <v-btn
-            v-if="!fetchingForSingleRecord"
+            v-if="!fetchingForSingleRecord && !currentLoadRecord?.isEnrichment"
             class="load-action mb-5 same-line"
             :disabled="stepperValue === steps.length"
             @click="toggleAutomaticSubmission">
@@ -131,7 +132,7 @@
                     </import-proceedings-publication-details>
 
                     <div
-                        v-if="!fetchingForSingleRecord"
+                        v-if="!fetchingForSingleRecord && !currentLoadRecord?.isEnrichment"
                         class="d-flex flex-row justify-center">
                         <v-btn
                             class="finish-load-action"

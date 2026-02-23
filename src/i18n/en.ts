@@ -1317,5 +1317,13 @@ export default {
     monographMetadataComparatorLabel: "Comparing monographs",
     scanningExternalSourcesMessage: "Scanning of external sources in progress...",
     scanForMetadataEnrichmentsLabel: "Metadata enrichment",
-    noNewMetadataFoundMessage: "No new metadata was found."
+    noNewMetadataFoundMessage: "No new metadata was found.",
+    selectEnrichmentTypeLabel: "Select enrichment method",
+    selectEnrichmentTypeMessage: "UI-based approach will scan sources only for those types available during import, after which all researchers will be able to deduplicate them through the import form. Automatic approach will scan and populate missing metadata for all document types.",
+    uiBasedLabel: "UI-based approach",
+    automaticLabel: "Automatic approach",
+    enrichDocumentMetadata: "Metadata enrichment",
+    metadataEnrichmentStartedSuccessfully: "Metadata scanning started successfully.",
+    metadataEnrichmentStartFailed: "Unable to start metadata scanning, please try again later or contact the system administrator.",
+    enrichmentCandidateMessage: "Select publication that you want to enrich, in the list below:",
 }

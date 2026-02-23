@@ -228,7 +228,7 @@ export default defineComponent({
         const scanForMetadataEnrichment = async () => {
             try {
                 showLoader(i18n.t("scanningExternalSourcesMessage"));
-                const response = await ImportService.scanForMetadataEnrichment(props.documentId);
+                const response = await ImportService.scanDocumentForMetadataEnrichment(props.documentId);
 
                 if (response.data) {
                     router.push({name: "loader", query: {recordId: response.data, documentId: props.documentId}});

@@ -15,6 +15,7 @@ interface DocumentLoad {
     webOfScienceId: string;
     eventId: number | null;
     internalIdentifiers: string[];
+    isEnrichment: boolean;
 }
 
 export interface ProceedingsPublicationLoad extends DocumentLoad {

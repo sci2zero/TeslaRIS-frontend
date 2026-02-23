@@ -152,8 +152,12 @@ export class ImportService extends BaseService {
         return super.sendRequest(axios.get, `load/enrichment-metadata/${documentId}`);
     }
 
-    async scanForMetadataEnrichment(documentId: number): Promise<AxiosResponse<string>> {
-        return super.sendRequest(axios.get, `import-common/metadata-scan/${documentId}`);
+    async scanDocumentForMetadataEnrichment(documentId: number): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.post, `import-common/metadata-scan/${documentId}`);
+    }
+
+    async scanInstitutionForMetadataEnrichment(institutionId: number, autoload: boolean): Promise<AxiosResponse<string>> {
+        return super.sendRequest(axios.post, `import-common/institution-metadata-scan/${institutionId}?autoload=${autoload}`);
     }
 }
   

@@ -76,6 +76,15 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `thesis/schedule-public-review-end-check?timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&publicReviewLengthDays=${publicReviewLengthDays}${typesParam}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
+    async scheduleMetadataEnrichment(timestamp: string, institutionIds: number[], autoload: boolean, recurrence: string): Promise<AxiosResponse<void>> {
+        let institutionIdsParam = "";
+        institutionIds.forEach(institutionId => {
+            institutionIdsParam += `&institutionIds=${institutionId}`;
+        });
+        
+        return super.sendRequest(axios.post, `import-common/schedule/metadata-enrichment?timestamp=${toUtcLocalDateTimeString(timestamp)}${institutionIdsParam}&autoload=${autoload}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
+    }
+
     private createNumericalParameter(paramName: string, values: number[]): string {
         let params = "";
         values.forEach(value => {

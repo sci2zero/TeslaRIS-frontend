@@ -1326,5 +1326,13 @@ export default {
     monographMetadataComparatorLabel: "Poređenje monografija",
     scanningExternalSourcesMessage: "Skeniranje eksternih izvora u toku...",
     scanForMetadataEnrichmentsLabel: "Obogaćivanje metapodataka",
-    noNewMetadataFoundMessage: "Nisu pronađeni novi metapodaci."
+    noNewMetadataFoundMessage: "Nisu pronađeni novi metapodaci.",
+    selectEnrichmentTypeLabel: "Izaberite način obogaćivanja",
+    selectEnrichmentTypeMessage: "UI-bazirani pristup će skenirati izvore samo za one tipove koji su dostupni prilikom uvoza, nakon čega će svi istraživači moći da ih deduplikuju kroz formu za uvoz. Automatski pristup će skenirati i popuniti nedostajuće metapodatke za sve tipove dokumenata.",
+    uiBasedLabel: "UI-bazirani pristup",
+    automaticLabel: "Automatski pristup",
+    enrichDocumentMetadata: "Obogaćivanje metapodataka",
+    metadataEnrichmentStartedSuccessfully: "Započeto skeniranje metapodataka.",
+    metadataEnrichmentStartFailed: "Nije moguće započeti skeniranje metapodataka, molimo Vas da pokušate kasnije ili kontaktirate administartora sistema.",
+    enrichmentCandidateMessage: "Selektujte rad koji želite da obogatite, u listi ispod:",
 }
