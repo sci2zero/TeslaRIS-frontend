@@ -315,7 +315,7 @@ import PromotionService from '@/services/thesisLibrary/PromotionService';
 import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
 import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
 import type { InstitutionPromotionCountsReport, NotAddedToPromotionThesesRequest, Promotion, RegistryBookEntry } from '@/models/ThesisLibraryModel';
-import { computeRelativeDate, localiseDate } from '@/utils/DateUtil';
+import { computeRelativeDate, localiseDate, serverTimeToLocalTime } from '@/utils/DateUtil';
 import Toast from '@/components/core/Toast.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
@@ -710,7 +710,7 @@ export default defineComponent({
                 `from=${from}&to=${to}&institutionId=${selectedInstitution.value.value}&authorName=${authorFullName.value}&authorTitle=${authorAcquiredTitle.value}&lang=${selectedLang.value.value}`,
                 selectedRecurrenceType.value.value
             ).then((response) => {
-                message.value = i18n.t("reportGenerationScheduledMessage", [response.data]);
+                message.value = i18n.t("reportGenerationScheduledMessage", [serverTimeToLocalTime(response.data)]);
                 snackbar.value = true;
                 fetchScheduledTasks();
             }).catch((error) => {

@@ -1326,4 +1326,9 @@ export default {
     metadataEnrichmentStartedSuccessfully: "Metadata scanning started successfully.",
     metadataEnrichmentStartFailed: "Unable to start metadata scanning, please try again later or contact the system administrator.",
     enrichmentCandidateMessage: "Select publication that you want to enrich, in the list below:",
+    nameOrIssnMessage: "Type name or ISSN to search...",
+    acceptedLabel: "Accepted",
+    publicReviewLabel: "On public review",
+    submittedLabel: "Submitted in system",
+    archivedLabel: "Archived"
 }

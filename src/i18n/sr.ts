@@ -1335,4 +1335,9 @@ export default {
     metadataEnrichmentStartedSuccessfully: "Započeto skeniranje metapodataka.",
     metadataEnrichmentStartFailed: "Nije moguće započeti skeniranje metapodataka, molimo Vas da pokušate kasnije ili kontaktirate administartora sistema.",
     enrichmentCandidateMessage: "Selektujte rad koji želite da obogatite, u listi ispod:",
+    nameOrIssnMessage: "Kucajte naziv ili ISSN da biste pretražili...",
+    acceptedLabel: "Prihvaćeni",
+    publicReviewLabel: "Na javnom uvidu",
+    submittedLabel: "Uneti u sistem",
+    archivedLabel: "Arhivirani"
 }

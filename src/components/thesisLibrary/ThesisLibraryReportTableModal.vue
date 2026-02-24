@@ -1,5 +1,5 @@
 <template>
-    <div justify="start">
+    <div justify="center">
         <v-dialog v-model="dialog" class="wide">
             <template #activator="scope">
                 <v-btn
@@ -104,7 +104,19 @@ export default defineComponent({
                         ThesisLibraryReportingService.getPubliclyAvailableThesesForPeriod(body, pageable),
                 [ThesisReportType.CLOSED_ACCESS]:
                     (body: ThesisReportRequest, pageable: string) =>
-                        ThesisLibraryReportingService.getClosedAccessThesesForPeriod(body, pageable)
+                        ThesisLibraryReportingService.getClosedAccessThesesForPeriod(body, pageable),
+                [ThesisReportType.ACCEPTED]:
+                    (body: ThesisReportRequest, pageable: string) =>
+                        ThesisLibraryReportingService.getAcceptedThesesForPeriod(body, pageable),
+                [ThesisReportType.PUBLIC_REVIEW]:
+                    (body: ThesisReportRequest, pageable: string) =>
+                        ThesisLibraryReportingService.getPublicReviewThesesForPeriod(body, pageable),
+                [ThesisReportType.SUBMITTED]:
+                    (body: ThesisReportRequest, pageable: string) =>
+                        ThesisLibraryReportingService.getSubmittedThesesForPeriod(body, pageable),
+                [ThesisReportType.ARCHIVED]:
+                    (body: ThesisReportRequest, pageable: string) =>
+                        ThesisLibraryReportingService.getArchivedThesesForPeriod(body, pageable)
             };
 
             const fetchMethod = reportMethods[props.reportType];

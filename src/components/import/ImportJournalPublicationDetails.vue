@@ -3,7 +3,8 @@
         <v-row>
             <v-col>
                 <input-with-suggestions
-                    :suggestions="getSuggestions('title')"
+                    :suggestions="[...getSuggestions('title'), presetMetadata?.title]
+                        .filter((arr, index, self) => index === self.findIndex(a => a[0]?.content === arr[0]?.content))"
                     :apply-suggestion="s =>
                         titleRef?.setNewInputValue(
                             toMultilingualTextInput(s, languageTags)
@@ -24,7 +25,8 @@
         <v-row>
             <v-col>
                 <input-with-suggestions
-                    :suggestions="getSuggestions('subTitle')"
+                    :suggestions="[...getSuggestions('subTitle'), presetMetadata?.subTitle]
+                        .filter((arr, index, self) => index === self.findIndex(a => a[0]?.content === arr[0]?.content))"
                     :apply-suggestion="s =>
                         subtitleRef?.setNewInputValue(
                             toMultilingualTextInput(s, languageTags)
@@ -223,7 +225,8 @@
         <v-row>
             <v-col>
                 <input-with-suggestions
-                    :suggestions="getSuggestions('description')"
+                    :suggestions="[...getSuggestions('description'), presetMetadata?.description]
+                        .filter((arr, index, self) => index === self.findIndex(a => a[0]?.content === arr[0]?.content))"
                     :apply-suggestion="s =>
                         descriptionRef?.setNewInputValue(
                             toMultilingualTextInput(s, languageTags)
@@ -245,7 +248,8 @@
         <v-row>
             <v-col>
                 <input-with-suggestions
-                    :suggestions="getSuggestions('keywords')"
+                    :suggestions="[...getSuggestions('keywords'), presetMetadata?.keywords]
+                        .filter((arr, index, self) => index === self.findIndex(a => a[0]?.content === arr[0]?.content))"
                     :apply-suggestion="s =>
                         keywordsRef?.setNewInputValue(
                             toMultilingualTextInput(s, languageTags)
