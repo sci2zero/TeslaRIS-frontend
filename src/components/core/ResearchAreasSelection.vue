@@ -50,7 +50,13 @@ export default defineComponent({
 
             ResearchAreaService.fetchChildResearchAreas(0).then(response => {
                 response.data.forEach(researchAreaNode => {
-                    researchAreas.push({ id: researchAreaNode.id, title: returnCurrentLocaleContent(researchAreaNode.name) as string, children: []});
+                    researchAreas.push(
+                        {
+                            id: researchAreaNode.id,
+                            title: returnCurrentLocaleContent(researchAreaNode.name) as string, 
+                            children: []
+                        }
+                    );
                 });
 
                 props.researchAreasHierarchy?.forEach(researchArea => {
@@ -208,8 +214,12 @@ export default defineComponent({
             emitToParent(findDeepestNodes([...new Set(selectedResearchAreas.value)]));
         };
 
+        const resetForm = () => {
+            buildInitialSelection();
+        };
+
         return {
-            researchAreas, openNodes,
+            researchAreas, openNodes, resetForm,
             selectedResearchAreas, handleSelection,
             submitSelection, onNodeOpen, emitToParent
         };

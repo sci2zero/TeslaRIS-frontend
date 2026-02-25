@@ -342,6 +342,12 @@ export default defineComponent({
             }
         });
 
+        watch(selectedJournal, () => {
+            if (selectedJournal.value.value && yearOfPublication.value) {
+                fetchIFTableData(yearOfPublication.value - 2, yearOfPublication.value);
+            }
+        });
+
         const authorCount = ref(1);
         const yearOfPublication = ref<number | null>((new Date()).getFullYear());
 

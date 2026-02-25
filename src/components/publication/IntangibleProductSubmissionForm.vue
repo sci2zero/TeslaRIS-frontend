@@ -5,7 +5,7 @@
                 <v-row>
                     <v-col cols="11">
                         <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.SOFTWARE"
+                            :document-type="PublicationType.INTANGIBLE_PRODUCT"
                             @metadata-fetched="popuateMetadata"
                         />
                     </v-col>
@@ -49,8 +49,20 @@
                 </v-row>
                 <v-row>
                     <v-col cols="10">
+                        <v-select
+                            v-model="selectedIntangibleProductType"
+                            :label="$t('intangibleProductTypeLabel') + '*'"
+                            :items="intangibleProductTypes"
+                            :rules="requiredSelectionRules"
+                            :disabled="inModal"
+                            return-object
+                        ></v-select>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="10">
                         <v-text-field
-                            v-model="softwareNumber"
+                            v-model="intangibleProductNumber"
                             :label="$t('internalNumberLabel')"
                             :placeholder="$t('internalNumberLabel')">
                         </v-text-field>
@@ -137,6 +149,28 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <multilingual-text-input
+                                ref="usersRef"
+                                v-model="productUsers"
+                                :label="$t('productUsersLabel')">
+                            </multilingual-text-input>
+                        </v-col>
+                    </v-row>
+                    <h2 class="mt-5!">
+                        {{ $t("researchAreasLabel") }}
+                    </h2>
+                    <v-row>
+                        <v-col cols="10">
+                            <research-areas-selection
+                                ref="researchAreasSelectionRef"
+                                :research-areas-hierarchy="[]"
+                                submit-on-click
+                                @update="saveResearchAreas"
+                            />
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -159,7 +193,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { PublicationType, type PersonDocumentContribution, type Software } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type IntangibleProduct, IntangibleProductType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -169,11 +203,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import { getIntangibleProductTypesForGivenLocale } from '@/i18n/intangibleProductType';
+import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
 
 
 export default defineComponent({
-    name: "SubmitSoftware",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    name: "SubmitIntangibleProduct",
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection },
     props: {
         inModal: {
             type: Boolean,
@@ -200,6 +236,8 @@ export default defineComponent({
         const urisRef = ref<typeof UriInput>();
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
+        const usersRef = ref<typeof MultilingualTextInput>();
+        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -208,26 +246,32 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref<any[]>([]);
+        const productUsers = ref<any>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const publicationYear = ref("");
         const doi = ref("");
         const openAlexId = ref("");
         const scopus = ref("");
         const webOfScienceId = ref("");
-        const softwareNumber = ref("");
+        const intangibleProductNumber = ref("");
         const uris = ref<string[]>([]);
+        const researchAreaIds = ref<number[]>([]);
+
+        const intangibleProductTypes = getIntangibleProductTypesForGivenLocale();
+        const selectedIntangibleProductType = ref<{title: string, value: IntangibleProductType | null}>({ title: "", value: null });
 
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
-        const submitSoftware = (stayOnPage: boolean) => {
-            const newSoftware: Software = {
+        const submitIntangibleProduct = (stayOnPage: boolean) => {
+            const newIntangibleProduct: IntangibleProduct = {
                 title: title.value,
-                internalNumber: softwareNumber.value,
+                internalNumber: intangibleProductNumber.value,
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
@@ -241,10 +285,13 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                productUsers: productUsers.value,
+                intangibleProductType: selectedIntangibleProductType.value.value as IntangibleProductType,
+                researchAreasId: researchAreaIds.value
             };
 
-            DocumentPublicationService.createSoftware(newSoftware).then((response) => {
+            DocumentPublicationService.createIntangibleProduct(newIntangibleProduct).then((response) => {
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -256,15 +303,18 @@ export default defineComponent({
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
-                    softwareNumber.value = "";
+                    intangibleProductNumber.value = "";
                     scopus.value = ""
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    usersRef.value?.clearInput();
+                    researchAreasSelectionRef.value?.resetForm();
+                    selectedIntangibleProductType.value = { title: "", value: null };
 
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "softwareLandingPage", params: {id: response.data.id} });
+                    router.push({ name: "intangibleProductLandingPage", params: {id: response.data.id} });
                 }
             }).catch((axiosError: AxiosError<ErrorResponse>) => {
                 const message = i18n.t(axiosError.response?.data.message as string);
@@ -285,7 +335,7 @@ export default defineComponent({
                 titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             }
 
-            softwareNumber.value = softwareNumber.value ? softwareNumber.value : metadata.issue;
+            intangibleProductNumber.value = intangibleProductNumber.value ? intangibleProductNumber.value : metadata.issue;
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
 
@@ -311,20 +361,26 @@ export default defineComponent({
             }
         };
 
+        const saveResearchAreas = (newResearchAreaIds: number[]) => {
+            researchAreaIds.value = newResearchAreaIds;
+        };
+
         return {
             isFormValid, scopusIdValidationRules,
             additionalFields, snackbar, error,
             title, titleRef, subtitle, subtitleRef,
             publicationYear, doi, PublicationType,
             publisherAutocompleteRef, popuateMetadata,
-            selectedPublisher, softwareNumber, openAlexId,
+            selectedPublisher, intangibleProductNumber, openAlexId,
             description, descriptionRef, doiValidationRules,
-            keywords, keywordsRef, uris, urisRef,
+            keywords, keywordsRef, uris, urisRef, productUsers,
             contributions, contributionsRef, errorMessage,
-            requiredFieldRules, submitSoftware, scopus,
+            requiredFieldRules, submitIntangibleProduct, scopus,
             workOpenAlexIdValidationRules, webOfScienceId,
-            documentWebOfScienceIdValidationRules,
-            deduplicationTableRef
+            documentWebOfScienceIdValidationRules, usersRef,
+            deduplicationTableRef, requiredSelectionRules,
+            intangibleProductTypes, selectedIntangibleProductType,
+            researchAreasSelectionRef, saveResearchAreas
         };
     }
 });

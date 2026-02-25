@@ -2,6 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Education, Employment, EmploymentTitle, Membership } from "@/models/InvolvementModel";
+import { type MultilingualContent } from "@/models/Common";
 
 export class InvolvementService extends BaseService {
 
@@ -57,7 +58,11 @@ export class InvolvementService extends BaseService {
 
   async getEmploymentTitle(personId: boolean): Promise<AxiosResponse<EmploymentTitle>> {
     return super.sendRequest(axios.get, `involvement/employment-title/${personId}`);
-}
+  }
+
+  async getExternalInstitutionSuggestions(personId: number): Promise<AxiosResponse<MultilingualContent[][]>> {
+    return super.sendRequest(axios.get, `involvement/external-institution-suggestion/${personId}`);
+  }
 }
 
 export default new InvolvementService();

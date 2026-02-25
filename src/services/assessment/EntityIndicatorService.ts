@@ -55,8 +55,8 @@ export class EntityIndicatorService extends BaseService {
     }
 
     async addEntityIndicatorProof(proof: any, entityIndicatorId: number, idempotencyKey: string | undefined): Promise<AxiosResponse<DocumentFileResponse>> {
-        proof.license = getNameFromOrdinal(License, proof.license);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         return super.sendMultipartFormDataRequest(axios.patch, `assessment/entity-indicator/add-proof/${entityIndicatorId}`, proof, idempotencyKey ? idempotencyKey : EntityIndicatorService.idempotencyKey);
     }
 

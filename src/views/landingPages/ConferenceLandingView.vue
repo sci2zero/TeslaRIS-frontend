@@ -36,7 +36,7 @@
                         <generic-crud-modal
                             :form-component="EventUpdateForm"
                             :form-props="{ presetEvent: conference }"
-                            entity-name="Software"
+                            entity-name="IntangibleProduct"
                             is-update
                             is-section-update
                             :read-only="!canEdit"

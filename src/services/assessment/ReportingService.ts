@@ -22,7 +22,7 @@ export class ReportingService extends BaseService {
         }
 
         const response = await super.sendRequest(axios.get, `assessment/report/download/${reportFileName}/${commissionId}`, {
-            responseType: 'blob',
+            responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
                 if (progressEvent.total) {
                     const percent = Math.round(

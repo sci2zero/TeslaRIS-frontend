@@ -30,7 +30,7 @@
             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
             @switch-page="switchPage">
             <template #top-left>
-                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
             </template>
             <template #actions>
                 <v-btn v-if="isAdmin || isInstitutionalEditor" color="primary" prepend-icon="mdi-plus" @click="addPerson">

@@ -1,6 +1,8 @@
 <template>
     <v-btn
-        density="compact" class="bottom-spacer" :disabled="selectedIndicators.length === 0"
+        density="compact" 
+        class="bottom-spacer"
+        :disabled="selectedIndicators.length === 0"
         @click="startDeletionProcess">
         {{ $t("deleteLabel") }}
     </v-btn>
@@ -114,7 +116,7 @@ export default defineComponent({
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
-        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "title", order: "asc"}]});
+        const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "title.content", order: "asc"}]});
 
         const headers = [
           { title: titleLabel, align: "start", sortable: true, key: "title.content"},

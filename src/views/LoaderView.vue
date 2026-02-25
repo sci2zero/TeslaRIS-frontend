@@ -34,8 +34,10 @@
             ref="deduplicatorRef"
             :publication-for-loading="currentLoadRecord"
             :can-perform-overwrite="stepperValue === steps.length"
-            @deduplicate="deduplicate">
-        </deduplicator>
+            @deduplicate="deduplicate"
+            @found-matches="fetchMetadataForEnrichment"
+            @match-selected="displayMatchMetadata"
+        />
 
         <br />
         
@@ -113,6 +115,8 @@
                         v-if="loadingJournalPublication"
                         ref="journalPublicationDetailsRef"
                         :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
+                        :metadata-enrichment="(enrichmentMetadata as JournalPublication[])"
+                        :display-enrichment-set-index="displayEnrichmentSetIndex"
                         @update="updateRecord">
                     </import-journal-publication-details>
                     
@@ -120,6 +124,8 @@
                         v-if="loadingProceedingsPublication"
                         ref="proceedingsPublicationDetailsRef"
                         :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
+                        :metadata-enrichment="(enrichmentMetadata as ProceedingsPublication[])"
+                        :display-enrichment-set-index="displayEnrichmentSetIndex"
                         @update="updateRecord">
                     </import-proceedings-publication-details>
 
@@ -256,7 +262,10 @@ export default defineComponent({
 
         const currentLoadRecord = ref<JournalPublicationLoad|ProceedingsPublicationLoad>();
 
-        const documentIdToDelete = ref<number | null>(null);
+        const documentIdToUpdate = ref<number | null>(null);
+
+        const enrichmentMetadata = ref<(JournalPublication | ProceedingsPublication)[]>([]);
+        const displayEnrichmentSetIndex = ref(0);
 
         onMounted(() => {
             document.title = i18n.t("harvestDataLabel");
@@ -306,6 +315,8 @@ export default defineComponent({
         });
 
         const fetchNextRecordForLoading = () => {
+            enrichmentMetadata.value.splice(0);
+
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             loadingJournalPublication.value = false;
@@ -439,6 +450,7 @@ export default defineComponent({
         };
 
         const updateRecord = (updatedRecord: JournalPublicationLoad | ProceedingsPublicationLoad) => {
+            currentLoadRecord.value!.title = updatedRecord.title;
             currentLoadRecord.value!.subTitle = updatedRecord.subTitle;
             currentLoadRecord.value!.description = updatedRecord.description;
             currentLoadRecord.value!.startPage = updatedRecord.startPage;
@@ -450,6 +462,8 @@ export default defineComponent({
             currentLoadRecord.value!.documentDate = updatedRecord.documentDate;
             currentLoadRecord.value!.scopusId = updatedRecord.scopusId;
             currentLoadRecord.value!.doi = updatedRecord.doi;
+            currentLoadRecord.value!.webOfScienceId = updatedRecord.webOfScienceId;
+            currentLoadRecord.value!.openAlexId = updatedRecord.openAlexId;
             
             if (loadingJournalPublication.value) {
                 (currentLoadRecord.value as JournalPublicationLoad)!.volume = (updatedRecord as JournalPublicationLoad).volume;
@@ -584,6 +598,8 @@ export default defineComponent({
                 });
             });
 
+            const performUpdate = documentIdToUpdate.value !== null;
+
             if (loadingJournalPublication.value) {
                 const newJournalPublication: JournalPublication = {
                     title: currentLoadRecord.value!.title,
@@ -610,11 +626,8 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createJournalPublication(
-                    newJournalPublication,
-                    self.crypto.randomUUID()
-                ).then((response) => {
-                    fetchNextAfterLoading(response.data.id as number);
+                saveJournalPublication(performUpdate, newJournalPublication).then((response) => {
+                    fetchNextAfterLoading((performUpdate ? documentIdToUpdate.value : response.data?.id) as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -654,10 +667,8 @@ export default defineComponent({
                     proofs: []
                 };
 
-                DocumentPublicationService.createProceedingsPublication(
-                    newProceedingsPublication, self.crypto.randomUUID()
-                ).then((response) => {
-                    fetchNextAfterLoading(response.data.id as number);
+                saveProceedingsPublication(performUpdate, newProceedingsPublication).then((response) => {
+                    fetchNextAfterLoading((performUpdate ? documentIdToUpdate.value : response.data?.id) as number);
                 })
                 .catch((error) => {
                     if (error.response.data.message === "unauthorizedPublicationEditAttemptMessage") {
@@ -676,33 +687,60 @@ export default defineComponent({
             }
         };
 
-        const fetchNextAfterLoading = (newDocumentId: number) => {
-            markAsLoadedAndFetchNext(newDocumentId, documentIdToDelete.value, documentIdToDelete.value !== null);
-            loading.value = false;
-            documentIdToDelete.value = null;
+        const saveJournalPublication = (performUpdate: boolean, newJournalPublication: JournalPublication) => {
+            if (performUpdate) {
+                return DocumentPublicationService.updateJournalPublication(
+                    documentIdToUpdate.value as number,
+                    newJournalPublication
+                );
+            }
+
+            return DocumentPublicationService.createJournalPublication(
+                newJournalPublication,
+                self.crypto.randomUUID()
+            );
         };
 
-        const deduplicate = (oldDocumentId: number, deleteOldDocument: boolean) => {
-            if (deleteOldDocument) {
-                documentIdToDelete.value = oldDocumentId;
+        const saveProceedingsPublication = (performUpdate: boolean, newProceedingsPublication: ProceedingsPublication) => {
+            if (performUpdate) {
+                return DocumentPublicationService.updateProceedingsPublication(
+                    documentIdToUpdate.value as number,
+                    newProceedingsPublication
+                );
+            }
+
+            return DocumentPublicationService.createProceedingsPublication(
+                newProceedingsPublication,
+                self.crypto.randomUUID()
+            );
+        };
+
+        const fetchNextAfterLoading = (newDocumentId: number) => {
+            markAsLoadedAndFetchNext(newDocumentId, (newDocumentId != documentIdToUpdate.value) ? documentIdToUpdate.value : null);
+            loading.value = false;
+            documentIdToUpdate.value = null;
+        };
+
+        const deduplicate = (oldDocumentId: number, updateOldDocument: boolean) => {
+            if (updateOldDocument) {
+                documentIdToUpdate.value = oldDocumentId;
                 ImportService.prepareOldDocumentForOverwriting(
-                    documentIdToDelete.value,
+                    documentIdToUpdate.value,
                     selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null
                 ).then(() => {
                     finishLoad();
                 });
             } else {
-                markAsLoadedAndFetchNext(null, oldDocumentId, deleteOldDocument);
+                markAsLoadedAndFetchNext(null, oldDocumentId);
             }
         };
 
-        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null, deleteOldDocument: boolean | null = null) => {
+        const markAsLoadedAndFetchNext = (newDocumentId: number | null = null, oldDocumentId: number | null = null) => {
             importAuthorsRef.value = [];
             importAuthorsRef.value.length = 0;
             ImportService.markCurrentAsLoaded(
                 selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : null,
                 oldDocumentId,
-                deleteOldDocument,
                 newDocumentId
             ).then(() => {
                 stepperValue.value = smartLoading.value ? 0 : 1;
@@ -729,6 +767,19 @@ export default defineComponent({
             automaticSubmission.value = !automaticSubmission.value;
         };
 
+        const fetchMetadataForEnrichment = async (potentialMatchIds: number[]) => {
+            enrichmentMetadata.value.splice(0);
+
+            for (const documentId of potentialMatchIds) {
+                const metadataResponse = await ImportService.readEnrichmentMetadata(documentId);
+                enrichmentMetadata.value.push(metadataResponse.data);
+            }
+        };
+
+        const displayMatchMetadata = (index: number) => {
+            displayEnrichmentSetIndex.value = index;
+        };
+
         return {
             isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
@@ -747,7 +798,9 @@ export default defineComponent({
             automaticSubmission, toggleAutomaticSubmission,
             deducedContributions, authorshipSelectionRef,
             submissionDTO, fetchNextAfterLoading,
-            showOnlyHarvestableInstitutions
+            showOnlyHarvestableInstitutions,
+            fetchMetadataForEnrichment, enrichmentMetadata,
+            displayEnrichmentSetIndex, displayMatchMetadata
         };
     },
 });

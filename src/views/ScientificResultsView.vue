@@ -61,7 +61,12 @@
             @switch-page="switchPage">
             <template #top-left>
                 <div class="flex items-center gap-1">
-                    <search-bar-component v-if="currentTab === 'simpleSearch'" :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                    <search-bar-component
+                        v-if="currentTab === 'simpleSearch'"
+                        :transparent="false"
+                        size="small"
+                        @search="clearSortAndPerformSearch($event)"
+                    />
                     <v-btn
                         v-if="currentTab === 'simpleSearch'"
                         variant="text"
@@ -75,6 +80,7 @@
                     <v-menu>
                         <template #activator="{ props }">
                             <v-btn
+                                v-if="isUserBoundToOU || isAdmin || isInstitutionalEditor || isCommission || isInstitutionalLibrarian || isHeadOfLibrary"
                                 v-bind="props"
                                 color="white"
                                 prepend-icon="mdi-dots-vertical"
@@ -175,7 +181,7 @@
                                 class="w-full"
                                 color="primary"
                                 @update:model-value="togglePublicationType(type, !!$event)"
-                            ></v-checkbox>
+                            />
                         </div>
                     </div>
                 </div>
@@ -250,7 +256,25 @@ export default defineComponent({
 
             selectedPublicationTypes.value.splice(0);
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                selectedPublicationTypes.value.push({title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string, value: PublicationType.THESIS});
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.THESIS) as string,
+                        value: PublicationType.THESIS
+                    }
+                );
+            }
+
+            if (isCommission.value) {
+                selectedPublicationTypes.value.push(
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH) as string,
+                        value: PublicationType.MONOGRAPH
+                    },
+                    {
+                        title: getPublicationTypeTitleFromValueAutoLocale(PublicationType.MONOGRAPH_PUBLICATION) as string,
+                        value: PublicationType.MONOGRAPH_PUBLICATION
+                    }
+                );
             }
 
             DocumentPublicationService.getSearchFields(false).then(response => {

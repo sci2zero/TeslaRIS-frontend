@@ -1,14 +1,15 @@
 <template>
     <v-row>
-        <v-col cols="10">
+        <v-col :cols="!disableSubmission ? 10 : 12">
             <v-autocomplete
                 v-model="selectedMonograph"
                 :readonly="readOnly"
-                :label="$t('monographLabel') + (required ? '*' : '')"
+                :label="(multiple ? $t('monographListLabel') : $t('monographLabel')) + (required ? '*' : '')"
                 :items="readOnly ? [] : monographs"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
                 return-object
                 @update:search="searchMonographs($event)"
                 @update:model-value="sendContentToParent"
@@ -53,8 +54,16 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
         modelValue: {
-            type: Object as PropType<{ title: string, value: number } | undefined>,
+            type: [Object, Array] as PropType<
+                { title: string, value: number } |
+                { title: string, value: number }[] |
+                undefined
+            >,
             required: true,
         },
         returnOnlyNonSerialMonographs: {
@@ -73,18 +82,23 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, {emit}) {
         const i18n = useI18n();
-        const searchPlaceholder = {title: "", value: -1};
-
         const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
 
         const monographs = ref<{ title: string; value: number; date?: string }[]>([]);
-        const selectedMonograph = ref<{ title: string, value: number }>(searchPlaceholder);
+
+        const searchPlaceholder = { title: "", value: -1 };
+
+        const selectedMonograph = ref(
+            props.multiple
+                ? (props.modelValue as any[] || [])
+                : (props.modelValue || searchPlaceholder)
+        );
 
         const lastSearchInput = ref("");
 
         onMounted(() => {
-            if(props.modelValue && props.modelValue.value !== -1) {
-                selectedMonograph.value = props.modelValue;
+            if (props.modelValue) {
+                selectedMonograph.value = props.modelValue as any;
             }
             sendContentToParent();
         });
@@ -131,12 +145,13 @@ export default defineComponent({
 
         watch(selectedMonograph, () => {
             if (
+                !props.multiple &&
                 selectedMonograph.value &&
-                (selectedMonograph.value as { title: string; value: number; }).value === 0
+                (selectedMonograph.value as { title: string; value: number }).value === 0
             ) {
                 modalRef.value!.dialog = true;
-                (selectedMonograph.value as { title: string; value: number; }).title = "";
-                (selectedMonograph.value as { title: string; value: number; }).value = -1;
+                (selectedMonograph.value as any).title = "";
+                (selectedMonograph.value as any).value = -1;
             }
         });
 
@@ -145,8 +160,8 @@ export default defineComponent({
         };
 
         watch(() => props.modelValue, () => {
-            if(props.modelValue && props.modelValue.value !== -1) {
-                selectedMonograph.value = props.modelValue;
+            if (props.modelValue) {
+                selectedMonograph.value = props.modelValue as any;
             }
         });
 
@@ -158,19 +173,28 @@ export default defineComponent({
         const selectNewlyAddedMonograph = (monograph: Monograph) => {
             let title: string | undefined;
             monograph.title.forEach(multilingualContent => {
-                if(multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
+                if (multilingualContent.languageTag === i18n.locale.value.toUpperCase()) {
                     title = multilingualContent.content;
-                    return;
                 }
             });
 
             if (!title && monograph.title.length > 0) {
                 title = monograph.title[0].content;
             }
-            
-            const toSelect = {title: `${title} | ${monograph.documentDate}`, value: monograph.id as number};
+
+            const toSelect = {
+                title: `${title} | ${monograph.documentDate}`,
+                value: monograph.id as number
+            };
+
             monographs.value.push(toSelect);
-            selectedMonograph.value = toSelect;
+
+            if (props.multiple) {
+                (selectedMonograph.value as any[]).push(toSelect);
+            } else {
+                selectedMonograph.value = toSelect;
+            }
+
             sendContentToParent();
         };
 

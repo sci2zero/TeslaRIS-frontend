@@ -169,7 +169,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="5">
                 <v-text-field
                     v-model="eIsbn"
                     label="E-ISBN"
@@ -177,7 +177,16 @@
                     :rules="isbnValidationRules">
                 </v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="2" class="text-center">
+                <v-btn 
+                    icon 
+                    class="mx-2"
+                    @click="[printIsbn, eIsbn] = [eIsbn, printIsbn]"
+                >
+                    <v-icon>mdi-swap-horizontal</v-icon>
+                </v-btn>
+            </v-col>
+            <v-col cols="5">
                 <v-text-field
                     v-model="printIsbn"
                     label="Print ISBN"

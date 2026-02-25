@@ -11,17 +11,17 @@ export class TableExportService extends BaseService {
     }
 
     async exportDocumentTable(body: DocumentTableExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "table-export/documents", body, {responseType: 'blob'});
+        const response = await axios.post(this.basePath + "table-export/documents", body, {responseType: "blob"});
         this.downloadExportFile(response, body.exportFileType);
     }
 
     async exportPersonTable(body: TableExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "table-export/persons", body, {responseType: 'blob'});
+        const response = await axios.post(this.basePath + "table-export/persons", body, {responseType: "blob"});
         this.downloadExportFile(response, body.exportFileType);
     }
 
     async exportOrganisationUnitTable(body: TableExportRequest): Promise<void> {
-        const response = await axios.post(this.basePath + "table-export/organisation-units", body, {responseType: 'blob'});
+        const response = await axios.post(this.basePath + "table-export/organisation-units", body, {responseType: "blob"});
         this.downloadExportFile(response, body.exportFileType);
     }
 

@@ -5,31 +5,71 @@
                 <v-row>
                     <v-col>
                         <multilingual-text-input
-                            ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetPublicationSeries?.title, languageTags)"></multilingual-text-input>
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetPublicationSeries?.title, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationsRef" v-model="nameAbbreviations" :label="$t('nameAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetPublicationSeries?.nameAbbreviation, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input 
+                            ref="abbreviationsRef"
+                            v-model="nameAbbreviations"
+                            :label="$t('nameAbbreviationLabel')"
+                            :initial-value="toMultilingualTextInput(presetPublicationSeries?.nameAbbreviation, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetPublicationSeries?.subtitle, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="subtitleRef"
+                            v-model="subtitle"
+                            :label="$t('subtitleLabel')"
+                            :initial-value="toMultilingualTextInput(presetPublicationSeries?.subtitle, languageTags)">
+                        </multilingual-text-input>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="6">
-                        <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
+                    <v-col cols="5">
+                        <v-text-field 
+                            v-model="eIssn" 
+                            label="E-ISSN" 
+                            placeholder="E-ISSN" 
+                            :rules="eIssnValidationRules"
+                        ></v-text-field>
                     </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
+                    
+                    <v-col cols="2" class="text-center">
+                        <v-btn 
+                            icon 
+                            class="mx-2"
+                            @click="[printIssn, eIssn] = [eIssn, printIssn]"
+                        >
+                            <v-icon>mdi-swap-horizontal</v-icon>
+                        </v-btn>
+                    </v-col>
+                    
+                    <v-col cols="5">
+                        <v-text-field 
+                            v-model="printIssn" 
+                            label="Print ISSN" 
+                            placeholder="Print ISSN" 
+                            :rules="printIssnValidationRules"
+                        ></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="sourceOpenAlexIdValidationRules">
+                        </v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>

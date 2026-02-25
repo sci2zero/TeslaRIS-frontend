@@ -16,6 +16,10 @@ export class StatisticsService extends BaseService {
     }
 
     async registerDocumentView(documentId: number): Promise<AxiosResponse<void>> {
+      if (isNaN(documentId) || documentId <= 0) {
+        return Promise.resolve(undefined as unknown as AxiosResponse<void>);
+      }
+
       return super.sendRequest(axios.post, `statistics/document/${documentId}`, {}, StatisticsService.idempotencyKey);
     }
 

@@ -5,7 +5,7 @@ import type { AuthorCentricInstitutionHarvestRequest, FormatDescription, Journal
 import type { OrganisationUnitResponse } from "@/models/OrganisationUnitModel";
 import type { PublicationSeries } from "@/models/PublicationSeriesModel";
 import type { Page } from "@/models/Common";
-import type { DocumentPublicationIndex } from "@/models/PublicationModel";
+import type { DocumentPublicationIndex, JournalPublication, ProceedingsPublication } from "@/models/PublicationModel";
 import type { ProceedingsResponse } from "@/models/ProceedingsModel";
 import type { PersonResponse } from "@/models/PersonModel";
 import i18n from "@/i18n";
@@ -71,7 +71,6 @@ export class ImportService extends BaseService {
     async markCurrentAsLoaded(
         institutionId: number | null = null,
         oldDocumentId: number | null = null,
-        deleteOldDocument: boolean | null = null,
         newDocumentId: number | null = null
     ): Promise<AxiosResponse<void>> {
         const queryParams: string[] = [];
@@ -82,10 +81,6 @@ export class ImportService extends BaseService {
 
         if (oldDocumentId !== null) {
             queryParams.push(`oldDocumentId=${oldDocumentId}`);
-        }
-
-        if (deleteOldDocument !== null) {
-            queryParams.push(`deleteOldDocument=${deleteOldDocument}`);
         }
 
         if (newDocumentId !== null) {
@@ -151,6 +146,10 @@ export class ImportService extends BaseService {
 
     async scheduleSKGIFHarvest(sourceName: string, timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string, authorIdentifier: string, institutionIdentifier: string): Promise<AxiosResponse<string[]>> {
         return super.sendRequest(axios.get, `skg-if-harvest/schedule?sourceName=${sourceName}&from=${dateFrom}&until=${dateTo}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}&authorIdentifier=${authorIdentifier}&institutionIdentifier=${institutionIdentifier}`);
+    }
+
+    async readEnrichmentMetadata(documentId: number): Promise<AxiosResponse<JournalPublication | ProceedingsPublication>> {
+        return super.sendRequest(axios.get, `load/enrichment-metadata/${documentId}`);
     }
 }
   

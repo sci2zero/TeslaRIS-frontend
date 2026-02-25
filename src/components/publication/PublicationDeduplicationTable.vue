@@ -21,13 +21,16 @@
                     <td>
                         <div class="flex items-baseline gap-2">
                             <div class="text-gray-800! hover:text-blue-900! font-semibold text-base flex">
-                                <localized-link :to="getDocumentLandingPageBasePath(row.item.type) + row.item.databaseId">
+                                <localized-link
+                                    :to="getDocumentLandingPageBasePath(row.item.type) + row.item.databaseId"
+                                    open-in-new-tab>
                                     <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="row.item.titleSr" />
                                     <rich-title-renderer v-else :title="row.item.titleOther" />
                                 </localized-link>
                                 <span v-if="row.item.year && row.item.year > 0">, </span>
                             </div>
-                            <span v-if="row.item.year && row.item.year > 0" class="text-xs text-gray-600">{{ row.item.year }}</span>
+                            <span v-if="row.item.year && row.item.year > 0" class="text-xs text-gray-600">{{ row.item.year + (row.item.type ? "," : "") }}</span>
+                            <span v-if="row.item.type" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.type, row.item.publicationType) }}</span>
                         </div>
                         <div v-if="row.item.authorNames.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
                             <div v-for="(author, index) in row.item.authorNames.split(';')" :key="index">
@@ -35,6 +38,7 @@
                                     v-if="row.item.authorIds[index] !== -1"
                                     :to="'persons/' + row.item.authorIds[index]"
                                     class="flex items-center gap-1"
+                                    open-in-new-tab
                                 >
                                     <v-icon size="14" class="text-gray-500">
                                         mdi-account
@@ -75,6 +79,7 @@ import ImportService from '@/services/importer/ImportService';
 import { getDocumentLandingPageBasePath, getDocumentLandingPageName } from '@/utils/PathResolutionUtil';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import RichTitleRenderer from '../core/RichTitleRenderer.vue';
+import { getDocumentTypeDisplayValue } from '@/utils/EnumUtil';
 
 
 export default defineComponent({
@@ -125,9 +130,13 @@ export default defineComponent({
         });
 
         const searchPotentialMatches = lodash.debounce(() => {
+            if (!props.title || props.title.length === 0) {
+                return;
+            }
+
             let parameters = "";
             props.title.forEach(title => {
-                parameters += `titles=${title.content.trim()}&`;
+                parameters += `titles=${encodeURIComponent(title.content.replaceAll(",", "%2c").trim())}&`;
             });
 
             parameters += 
@@ -184,7 +193,8 @@ export default defineComponent({
             totalResults, potentialMatches,
             tableOptions, navigateToLandingPage,
             resetTable, returnToParent,
-            getDocumentLandingPageBasePath
+            getDocumentLandingPageBasePath,
+            getDocumentTypeDisplayValue
         };
     },
 });

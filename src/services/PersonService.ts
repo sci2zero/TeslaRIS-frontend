@@ -23,6 +23,14 @@ export class PersonService extends BaseService {
   }
 
   async searchResearchers(tokens: string, strict: boolean, institutionId: number | null): Promise<AxiosResponse<Page<PersonIndex>>> {
+    if (!tokens.includes("tokens=")) {
+        if(tokens.trim() === "") {
+          tokens = "tokens=*"
+        } else {
+          tokens += "&tokens=*"
+        }
+    }
+
     return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
   }
 
@@ -58,6 +66,10 @@ export class PersonService extends BaseService {
   }
 
   async readPerson(personId: number): Promise<AxiosResponse<PersonResponse>> {
+    if (isNaN(personId) || personId <= 0) {
+        throw new Error(`Invalid person ID: ${personId}. Must be a positive integer.`);
+    }
+
     return super.sendRequest(axios.get, `person/${personId}`);
   }
 

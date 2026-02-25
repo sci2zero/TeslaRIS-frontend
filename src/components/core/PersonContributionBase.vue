@@ -13,7 +13,20 @@
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
                 @blur="onAutocompleteBlur"
-            />
+            >
+                <template #item="{ item, props }">
+                    <v-list-item
+                        v-bind="{ ...props, title: undefined }"
+                    >
+                        <person-publications-tooltip
+                            :person-id="item.raw.value"
+                            :show="showLatestPublications"
+                        >
+                            {{ item.raw.title }}
+                        </person-publications-tooltip>
+                    </v-list-item>
+                </template>
+            </v-autocomplete>
         </v-col>
         <v-col v-if="canUserAddPersons" cols="1">
             <generic-crud-modal
@@ -55,8 +68,21 @@
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field
-                v-model="firstName" :label="$t('firstNameLabel') + '*'" :placeholder="$t('firstNameLabel')" :rules="requiredFieldRules"
-                @update:model-value="sendContentToParent"></v-text-field>
+                v-model="firstName"
+                :label="$t('firstNameLabel') + '*'"
+                :placeholder="$t('firstNameLabel')"
+                :rules="requiredFieldRules"
+                @update:model-value="sendContentToParent">
+                <template #append-inner>
+                    <v-btn 
+                        icon
+                        variant="text"
+                        class="ml-2"
+                        @click="[firstName, lastName] = [lastName, firstName]">
+                        <v-icon>mdi-swap-horizontal</v-icon>
+                    </v-btn>
+                </template>
+            </v-text-field>
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>
@@ -100,6 +126,13 @@
                 :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
+    </v-row>
+    <v-row v-show="((personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate) && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
+        <v-chip
+            v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" class="ml-2" outlined
+            @click="affiliationStatementRef?.setNewInputValue(toMultilingualTextInput(suggestion, languageTags))">
+            {{ returnCurrentLocaleContent(suggestion) }}
+        </v-chip>
     </v-row>
     <v-row v-if="personOtherNames.length > 0 && personAffiliations.length > 0 && !selectExternalAssociate">
         <v-col>
@@ -145,11 +178,12 @@ import UserService from "@/services/UserService";
 import { useRoute } from "vue-router";
 import { type PersonUserResponse } from "@/models/PersonUserModel";
 import { type AxiosResponse } from "axios";
+import PersonPublicationsTooltip from "../person/PersonPublicationsTooltip.vue";
 
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, GenericCrudModal },
+    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip },
     props: {
         basic: {
             type: Boolean,
@@ -184,6 +218,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        showLatestPublications: {
+            type: Boolean,
+            default: true
+        },
         suggestionDisplayCheck: {
             type: Function as PropType<((personId: number) => boolean)>,
             default: () => { return true; }
@@ -194,7 +232,7 @@ export default defineComponent({
         const { canUserAddPersons, isResearcher, isAdmin, isInstitutionalEditor } = useUserRole();
 
         const contributionDescription = ref([]);
-        const affiliationStatement = ref([]);
+        const affiliationStatement = ref<any>([]);
 
         const enterExternalOU = ref(true);
 
@@ -361,7 +399,7 @@ export default defineComponent({
                 middleName.value = props.presetContributionValue.selectedOtherName[1];
                 lastName.value = props.presetContributionValue.selectedOtherName[2];
 
-                if(props.presetContributionValue.personId) {
+                if(props.presetContributionValue.personId && !isNaN(props.presetContributionValue.personId)) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
                         personPrimaryName.value = personResponse.data.personName;
                         
@@ -419,7 +457,7 @@ export default defineComponent({
                 return;
             }
 
-            if (selection.value === 0) {
+            if (selection.value === 0 || isNaN(selection.value)) {
                 selectExternalAssociate.value = true;
                 customNameInput.value = true;
                 constructExternalCollaboratorFromInput(selection.title);
@@ -525,6 +563,8 @@ export default defineComponent({
                 return;
             }
 
+            enterExternalOU.value = false;
+
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
                 personAffiliations.value.splice(0);
                 response.data.forEach(employment => {
@@ -561,6 +601,8 @@ export default defineComponent({
 
                 if (personAffiliations.value.length === 0) {
                     enterExternalOU.value = true;
+                } else {
+                    enterExternalOU.value = false;
                 }
             });
         });
@@ -678,19 +720,35 @@ export default defineComponent({
             onPersonSelect(selectedPerson.value);
         };
 
+        const externalInstitutionSuggestions = ref<MultilingualContent[][]>([]);
+        watch(enterExternalOU, (newValue, oldvalue) => {
+            if(
+                oldvalue === false && newValue === true &&
+                affiliationStatement.value.length === 0
+            ) {
+                externalInstitutionSuggestions.value.splice(0);
+                InvolvementService.getExternalInstitutionSuggestions(
+                    selectedPerson.value.value
+                ).then(response => {
+                    externalInstitutionSuggestions.value = response.data;
+                });
+            }
+        });
+
         return {
-                firstName, middleName, lastName, selectedPerson, customNameInput,
-                searchPersons, filterPersons, persons, requiredFieldRules,
-                requiredSelectionRules, contributionDescription, affiliationStatement,
-                sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
-                descriptionRef, affiliationStatementRef, toggleExternalSelection,
-                personOtherNames, selectedOtherName, selectExternalAssociate,
-                selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
-                languageTags, valueSet, selectedAffiliations, personAffiliations,
-                PersonSubmissionForm, enterExternalOU, canUserAddPersons,
-                constructExternalCollaboratorFromInput, onAutocompleteBlur,
-                presetPersonNameForCreation, setContributor, selectExistingSelectedPerson
-            };
+            firstName, middleName, lastName, selectedPerson, customNameInput,
+            searchPersons, filterPersons, persons, requiredFieldRules,
+            requiredSelectionRules, contributionDescription, affiliationStatement,
+            sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
+            descriptionRef, affiliationStatementRef, toggleExternalSelection,
+            personOtherNames, selectedOtherName, selectExternalAssociate,
+            selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
+            languageTags, valueSet, selectedAffiliations, personAffiliations,
+            PersonSubmissionForm, enterExternalOU, canUserAddPersons,
+            constructExternalCollaboratorFromInput, onAutocompleteBlur,
+            presetPersonNameForCreation, setContributor, selectExistingSelectedPerson,
+            externalInstitutionSuggestions, returnCurrentLocaleContent
+        };
     }
 });
 </script>

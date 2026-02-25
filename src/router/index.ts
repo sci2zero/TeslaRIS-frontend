@@ -26,7 +26,7 @@ import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
 import SubmitProceedingsPublicationView from "@/views/SubmitProceedingsPublicationView.vue";
 import ResetPasswordView from "@/views/ResetPasswordView.vue";
 import SubmitPatentView from "@/views/SubmitPatentView.vue";
-import SubmitSoftwareView from "@/views/SubmitSoftwareView.vue";
+import SubmitIntangibleProductView from "@/views/SubmitIntangibleProductView.vue";
 import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
@@ -37,7 +37,7 @@ import ConferenceLandingView from "@/views/landingPages/ConferenceLandingView.vu
 import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vue";
 import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
 import JournalPublicationLandingView from "@/views/landingPages/JournalPublicationLandingView.vue";
-import SoftwareLandingView from "@/views/landingPages/SoftwareLandingView.vue";
+import IntangibleProductLandingView from "@/views/landingPages/IntangibleProductLandingView.vue";
 import DatasetLandingView from "@/views/landingPages/DatasetLandingView.vue";
 import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
 import ProceedingsPublicationsLandingView from "@/views/landingPages/ProceedingsPublicationsLandingView.vue";
@@ -61,7 +61,7 @@ import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
-import SoftwareMetadataComparatorView from "@/views/comparators/documents/SoftwareMetadataComparatorView.vue";
+import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
 import DatasetMetadataComparatorView from "@/views/comparators/documents/DatasetMetadataComparatorView.vue";
 import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
 import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
@@ -108,6 +108,12 @@ import PublicReviewDissertationsView from "@/views/thesisLibrary/PublicReviewDis
 import PublicationsValidationView from "@/views/PublicationsValidationView.vue";
 import OAuth2Redirector from "@/components/user/oauth2/OAuth2Redirector.vue";
 import AuthorReprintPublicationsView from "@/views/AuthorReprintPublicationsView.vue";
+import SubmitMaterialProductView from "@/views/SubmitMaterialProductView.vue";
+import MaterialProductLandingView from "@/views/landingPages/MaterialProductLandingView.vue";
+import MaterialProductMetadataComparatorView from "@/views/comparators/documents/MaterialProductMetadataComparatorView.vue";
+import SubmitGeneticMaterialView from "@/views/SubmitGeneticMaterialView.vue";
+import GeneticMaterialLandingView from "@/views/landingPages/GeneticMaterialLandingView.vue";
+import GeneticMaterialMetadataComparatorView from "@/views/comparators/documents/GeneticMaterialMetadataComparatorView.vue";
 
 
 const roles = {
@@ -640,21 +646,21 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: "software",
+                            path: "intangible-product",
                             children: [
                                 {
                                     path: ":id",
-                                    name: "softwareLandingPage",
-                                    component: SoftwareLandingView,
+                                    name: "intangibleProductLandingPage",
+                                    component: IntangibleProductLandingView,
                                     meta: {
                                         authenticated: false,
                                         authorities: [],
                                     },
                                 },
                                 {
-                                    path: "submit-software",
-                                    name: "submitSoftware",
-                                    component: SubmitSoftwareView,
+                                    path: "submit-intangible-product",
+                                    name: "submitIntangibleProduct",
+                                    component: SubmitIntangibleProductView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
@@ -662,8 +668,72 @@ const router = createRouter({
                                 },
                                 {
                                     path: 'metadata-comparator/:leftId/:rightId',
-                                    name: "softwareMetadataComparator",
-                                    component: SoftwareMetadataComparatorView,
+                                    name: "intangibleProductMetadataComparator",
+                                    component: IntangibleProductMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "material-product",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "materialProductLandingPage",
+                                    component: MaterialProductLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-material-product",
+                                    name: "submitMaterialProduct",
+                                    component: SubmitMaterialProductView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "materialProductMetadataComparator",
+                                    component: MaterialProductMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "genetic-material",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "geneticMaterialLandingPage",
+                                    component: GeneticMaterialLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-genetic-material",
+                                    name: "submitGeneticMaterial",
+                                    component: SubmitGeneticMaterialView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "geneticMaterialMetadataComparator",
+                                    component: GeneticMaterialMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor],

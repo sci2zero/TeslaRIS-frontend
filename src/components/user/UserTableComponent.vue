@@ -64,11 +64,16 @@
                 <tr>
                     <td>{{ row.item.fullName }}</td>
                     <td>{{ row.item.email }}</td>
-                    <td v-if="$i18n.locale.startsWith('sr')">
-                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameSr) }}
-                    </td>
-                    <td v-else>
-                        {{ displayTextOrPlaceholder(row.item.organisationUnitNameOther) }}
+                    <td>
+                        <localized-link
+                            :to="'organisation-units/' + row.item.organisationUnitId">
+                            <template v-if="$i18n.locale.startsWith('sr')">
+                                {{ row.item.organisationUnitNameSr }}
+                            </template>
+                            <template v-else>
+                                {{ row.item.organisationUnitNameOther }}
+                            </template>
+                        </localized-link>
                     </td>
                     <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
                     <td>
@@ -158,11 +163,12 @@ import UserMigrationSelectionModal from './UserMigrationSelectionModal.vue';
 import { isEqual } from 'lodash';
 import UserEmailChangeModal from './UserEmailChangeModal.vue';
 import RegisterResearcherModal from './RegisterResearcherModal.vue';
+import LocalizedLink from '../localization/LocalizedLink.vue';
 
 
 export default defineComponent({
     name: "UserTableComponent",
-    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal, UserEmailChangeModal, RegisterResearcherModal },
+    components: { RegisterEmployeeModal, Toast, UserMigrationSelectionModal, UserEmailChangeModal, RegisterResearcherModal, LocalizedLink },
     props: {
         users: {
             type: Array<UserAccountIndex>,

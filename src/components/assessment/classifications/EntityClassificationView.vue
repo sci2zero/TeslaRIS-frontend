@@ -18,8 +18,10 @@
                     v-for="(classification, index) in entityClassifications"
                     :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
                     <v-expansion-panel-text>
-                        <v-row class="mt-4 mb-1">
-                            <p>{{ contents[index] }}</p>
+                        <v-row>
+                            <p class="mt-3 mb-5 ml-3">
+                                {{ contents[index] }}
+                            </p>
                         </v-row>
                         <v-row v-if="classification.manual">
                             <div v-if="classification.commissionId === loggedInUser?.commissionId || isAdmin">
@@ -42,7 +44,7 @@
                 </v-expansion-panel>
             </v-expansion-panels>
             <h3 v-else>
-                {{ $t("noClassificationsLabel") }}
+                {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("noClassificationsLabel") : $t("noAssessmentsLabel") }}
             </h3>
         </v-col>
     </v-row>
@@ -124,7 +126,8 @@ export default defineComponent({
             let displayValue = returnCurrentLocaleContent(entityClassification.classificationTitle);
 
             if (entityClassification.assessmentReason.length > 0) {
-                displayValue += " " + returnCurrentLocaleContent(entityClassification.assessmentReason)?.split("§")[1];
+                const reason = returnCurrentLocaleContent(entityClassification.assessmentReason);
+                displayValue += " " + (reason?.includes("§")? reason.split("§")[1] : reason);
             }
 
             const title = buildDisplayTitle(entityClassification);

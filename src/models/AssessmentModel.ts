@@ -49,6 +49,7 @@ export interface EntityClassificationResponse {
 
 export interface PublicationSeriesIndicatorResponse extends EntityIndicatorResponse {
     categoryIdentifier: string;
+    edition?: string;
 }
 
 export enum StatisticsType {
@@ -265,6 +266,7 @@ export interface IFCategoryData {
     category: string;
     if2Ranks: IFValue[];
     if5Ranks: IFValue[];
+    jciRanks: IFValue[];
 }
 
 export interface IFTableResponse {
@@ -273,6 +275,7 @@ export interface IFTableResponse {
     jciValues: IFValue[];
     jciPercentiles: IFValue[];
     ifTableContent: IFCategoryData[];
+    editions: string[];
 }
 
 export interface ExternalIndicatorConfiguration {

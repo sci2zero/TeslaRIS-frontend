@@ -21,24 +21,24 @@ export class DocumentBackupService extends BaseService {
             return;
         }
 
-        downloadStore.downloadProgressRef?.startDownload(backupFileName);
-        const response = await super.sendRequest(axios.get, `document/backup/download/${backupFileName}`, {
-            responseType: 'blob',
-            onDownloadProgress: (progressEvent: any) => {
-                if (progressEvent.total) {
-                    const percent = Math.round(
-                        (progressEvent.loaded * 100) / progressEvent.total
-                    );
-                    
-                    downloadStore.downloadProgressRef?.updateProgress(percent);
-                }
-            }
-        }).catch(error => {
+        const accessTokenResponse = 
+            await super.sendRequest(axios.get, `document/backup/access-token`);
+        if (!accessTokenResponse.data) {
             downloadStore.downloadProgressRef?.cancelDownload();
-            throw error;
-        });
+            return;
+        }
+
+        downloadStore.downloadProgressRef?.updateProgress(100);
+
+        const downloadUrl = `${this.basePath}document/backup/download/${backupFileName}?accessToken=${accessTokenResponse.data}`;
         
-        this.initialzeDownload(response, backupFileName, ".zip");
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = backupFileName;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="container h-100">
+    <div class="container">
         <bubble-menu
             v-if="editor"
             :editor="editor"
@@ -28,7 +28,7 @@
             <!-- eslint-enable vue/no-v-html -->
             <editor-content
                 v-if="!isTruncated"
-                :style="`height: 100%; ${editable ? 'min-height: 300px; display: flex;' : ''}`"
+                :style="`height: 100%; ${editable ? 'height: 300px; overflow:auto; display: flex;' : ''}`"
                 :editor="editor"
             />
             

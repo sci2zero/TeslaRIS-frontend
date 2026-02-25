@@ -44,7 +44,7 @@ export class ThesisLibraryReportingService extends BaseService {
         }
 
         const response = await axios.post(this.basePath + `thesis-library/report/download/${lang}`, body, {
-            responseType: 'blob',
+            responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
                 if (progressEvent.total) {
                     const percent = Math.round(

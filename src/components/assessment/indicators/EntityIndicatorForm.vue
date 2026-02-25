@@ -54,20 +54,46 @@
 
         <v-row v-if="selectedIndicator?.value > 0">
             <v-col v-if="inputType === IndicatorContentType.BOOL">
-                <v-checkbox v-model="booleanValue" :label="$t('valueLabel')" />
+                <v-radio-group
+                    v-model="booleanValue"
+                    inline
+                    class="justify-start">
+                    <v-radio
+                        :label="$t('yesLabel')"
+                        :value="true"
+                    />
+                    <v-radio
+                        class="ml-3"
+                        :label="$t('noLabel')"
+                        :value="false"
+                    />
+                </v-radio-group>
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.NUMBER">
                 <v-text-field
-                    v-model="numericValue" type="number" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredNumericFieldRules"></v-text-field>
+                    v-model="numericValue" type="number"
+                    :label="$t('valueLabel') + '*'"
+                    :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredNumericFieldRules">
+                </v-text-field>
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.TEXT">
-                <v-text-field v-model="textualValue" :label="$t('valueLabel') + '*'" :placeholder="$t('valueLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="textualValue"
+                    :label="$t('valueLabel') + '*'"
+                    :placeholder="$t('valueLabel') + '*'"
+                    :rules="requiredFieldRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row v-if="!presetDocumentIndicator">
             <v-col>
-                <v-file-upload v-model="files" :title="$t('dragDropFilesLabel')" density="compact" multiple></v-file-upload>
+                <v-file-upload
+                    v-model="files"
+                    :title="$t('dragDropFilesLabel')"
+                    density="compact"
+                    multiple>
+                </v-file-upload>
             </v-col>
         </v-row>
 
@@ -140,7 +166,11 @@ export default defineComponent({
                 });
 
                 if(props.presetDocumentIndicator) {
-                    selectedIndicator.value = {title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string, value: props.presetDocumentIndicator.indicatorResponse.id};
+                    selectedIndicator.value = 
+                        {
+                            title: returnCurrentLocaleContent(props.presetDocumentIndicator.indicatorResponse.title) as string,
+                            value: props.presetDocumentIndicator.indicatorResponse.id
+                        };
                 }
             });
         };
@@ -172,7 +202,7 @@ export default defineComponent({
         };
 
         const numericValue = ref<number>(props.presetDocumentIndicator?.numericValue as number);
-        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean);
+        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean || false);
         const textualValue = ref<string>(props.presetDocumentIndicator?.textualValue as string);
         const fromDate = ref<string | undefined>(props.presetDocumentIndicator?.fromDate ? props.presetDocumentIndicator.fromDate : undefined);
         const toDate = ref<string | undefined>(props.presetDocumentIndicator?.toDate ? props.presetDocumentIndicator.toDate : undefined);

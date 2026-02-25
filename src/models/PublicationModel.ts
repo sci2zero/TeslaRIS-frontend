@@ -2,6 +2,7 @@ import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
+import { type ResearchArea } from "./OrganisationUnitModel";
 import type { PersonContribution } from "./PersonModel";
 
 export interface DocumentPublicationIndex {
@@ -49,10 +50,12 @@ export enum PublicationType {
     PATENT = "PATENT",
     PROCEEDINGS = "PROCEEDINGS",
     DATASET = "DATASET",
-    SOFTWARE = "SOFTWARE",
+    INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
-    THESIS = "THESIS"
+    THESIS = "THESIS",
+    MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
+    GENETIC_MATERIAL = "GENETIC_MATERIAL"
 }
 
 export enum ThesisType {
@@ -210,10 +213,32 @@ export interface Patent extends Document {
     authorReprint?: boolean;
 }
 
-export interface Software extends Document {
+export interface IntangibleProduct extends Document {
     internalNumber: string;
     publisherId?: number;
     authorReprint?: boolean;
+    intangibleProductType: IntangibleProductType;
+    productUsers: MultilingualContent[];
+    researchAreasId: number[];
+    researchAreas?: ResearchArea[];
+}
+
+export interface MaterialProduct extends Document {
+    internalNumber: string;
+    publisherId?: number;
+    authorReprint?: boolean;
+    numberProduced: number;
+    materialProductType: MaterialProductType;
+    productUsers: MultilingualContent[];
+    researchAreasId: number[];
+    researchAreas?: ResearchArea[];
+}
+
+export interface GeneticMaterial extends Document {
+    internalNumber: string;
+    publisherId?: number;
+    authorReprint?: boolean;
+    geneticMaterialType: GeneticMaterialType
 }
 
 export interface Dataset extends Document {
@@ -232,6 +257,15 @@ export interface DeduplicationSuggestion {
     rightTitleOther: string;
     documentPublicationType: PublicationType;
     entityType: EntityType;
+    leftYear: number;
+    rightYear: number;
+    leftAuthors: string;
+    rightAuthors: string;
+    leftAuthorIds: number[];
+    rightAuthorIds: number[];
+    leftConcreteType: string;
+    rightConcreteType: string;
+    publicationType: string;
 }
 
 export interface Thesis extends Document {
@@ -288,6 +322,33 @@ export interface DocumentAffiliationRequest {
 export enum MServiceApplicableTypes {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION"
+}
+
+export enum MaterialProductType {
+    PROTOTYPE = "PROTOTYPE",
+    INDUSTRIAL_PRODUCT = "INDUSTRIAL_PRODUCT",
+    INFRASTRUCTURE_OBJECT = "INFRASTRUCTURE_OBJECT",
+    DERIVATIVE_WORKS = "DERIVATIVE_WORKS",
+    OTHER = "OTHER"
+}
+
+export enum IntangibleProductType {
+    SOFTWARE = "SOFTWARE",
+    MODEL = "MODEL",
+    PROCESS = "PROCESS",
+    METHOD = "METHOD",
+    STRATEGY = "STRATEGY",
+    POLICY = "POLICY",
+    FRAMEWORK = "FRAMEWORK",
+    OTHER = "OTHER"
+}
+
+export enum GeneticMaterialType {
+    GENOTYPE = "GENOTYPE",
+    RACE = "RACE",
+    VARIETY = "VARIETY",
+    STRAIN = "STRAIN",
+    OTHER = "OTHER"
 }
 
 export interface ThesisLibraryFormatsResponse {

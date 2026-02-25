@@ -3,6 +3,12 @@
         <v-card>
             <v-card-title class="text-h5 d-flex align-center justify-space-between">
                 <span>{{ $t("impactFactorTableLabel") }}</span>
+                <span class="ml-2 mr-1">(</span>
+                <span class="mr-1">{{ $t(jsonData.editions.length > 1 ? "editionsLabel" : "editionLabel") }}:</span>
+                <span v-for="(edition, index) in jsonData.editions" :key="edition">
+                    {{ edition }}{{ (index < jsonData.editions.length - 1) ? "," : "" }}
+                </span>
+                <span class="ml-1">)</span>
                 <v-spacer></v-spacer>
 
                 <v-row no-gutters class="align-center" style="max-width: 250px;">
@@ -77,7 +83,7 @@
   
                     <template #item="props">
                         <tr>
-                            <td><strong>{{ props.item.type }}</strong></td>
+                            <td><strong>{{ props.item.type.value }}</strong></td>
                             <td v-for="year in years" :key="year">
                                 {{ (props as any).item[year] || '-' }}
                             </td>
@@ -122,6 +128,9 @@ export default defineComponent({
         const if5ValueLabel = computed(() => i18n.t("if5ValueLabel"));
         const jciValueLabel = computed(() => i18n.t("jciValueLabel"));
         const jciPercentileLabel = computed(() => i18n.t("jciPercentileLabel"));
+        const if2RankLabel = computed(() => i18n.t("if2RankLabel"));
+        const if5RankLabel = computed(() => i18n.t("if5RankLabel"));
+        const jciRankLabel = computed(() => i18n.t("jciRankLabel"));
 
         watch([() => props.presetFromYear, () => props.presetToYear], () => {
             fromYear.value = props.presetFromYear;
@@ -196,7 +205,7 @@ export default defineComponent({
             return props.jsonData.ifTableContent.map(category => {
                 const ifValues = [
                     {
-                        type: "IF2 rank",
+                        type: if2RankLabel,
                         ...years.value.reduce<Record<number, string | null>>((acc, year) => {
                             acc[year] =
                                 category.if2Ranks.find(v => v.a === year)?.b || null;
@@ -204,10 +213,18 @@ export default defineComponent({
                         }, {})
                     },
                     {
-                        type: "IF5 rank",
+                        type: if5RankLabel,
                         ...years.value.reduce<Record<number, string | null>>((acc, year) => {
                             acc[year] =
                                 category.if5Ranks.find(v => v.a === year)?.b || null;
+                            return acc;
+                        }, {})
+                    },
+                    {
+                        type: jciRankLabel,
+                        ...years.value.reduce<Record<number, string | null>>((acc, year) => {
+                            acc[year] =
+                                category.jciRanks.find(v => v.a === year)?.b || null;
                             return acc;
                         }, {})
                     }
@@ -217,7 +234,8 @@ export default defineComponent({
         });
 
         return {
-            years, headers, tableData, ifValuesTable,
+            years, headers,
+            tableData, ifValuesTable,
             fromYear, toYear
         };
     }

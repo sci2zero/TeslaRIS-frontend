@@ -58,6 +58,7 @@
                     <entity-classification-modal-content
                         :entity-id="row.item.databaseId"
                         :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        :applicable-type="ApplicableEntityType.PUBLICATION_SERIES"
                         @classified="journalClassified(row.item)"
                         @update="refreshTable(tableOptions)">
                     </entity-classification-modal-content>

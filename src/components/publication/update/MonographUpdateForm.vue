@@ -2,12 +2,22 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <multilingual-text-input v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'" :initial-value="toMultilingualTextInput(presetMonograph?.title, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetMonograph?.title, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field v-model="publicationYear" :rules="requiredFieldRules" :label="$t('yearOfPublicationLabel') + '*'" :placeholder="$t('yearOfPublicationLabel') + '*'"></v-text-field>
+                <v-text-field
+                    v-model="publicationYear"
+                    :rules="requiredFieldRules"
+                    :label="$t('yearOfPublicationLabel') + '*'"
+                    :placeholder="$t('yearOfPublicationLabel') + '*'">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -22,7 +32,11 @@
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetMonograph?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetMonograph?.subTitle, languageTags)">
+                </multilingual-text-input>
             </v-col>
         </v-row>
         <v-row>
@@ -62,11 +76,30 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
-                <v-text-field v-model="eIsbn" label="E-ISBN" placeholder="E-ISBN" :rules="isbnValidationRules"></v-text-field>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="eIsbn"
+                    label="E-ISBN"
+                    placeholder="E-ISBN"
+                    :rules="isbnValidationRules">
+                </v-text-field>
             </v-col>
-            <v-col cols="6">
-                <v-text-field v-model="printIsbn" label="Print ISBN" placeholder="Print ISBN" :rules="isbnValidationRules"></v-text-field>
+            <v-col cols="2" class="text-center">
+                <v-btn 
+                    icon 
+                    class="mx-2"
+                    @click="[printIsbn, eIsbn] = [eIsbn, printIsbn]"
+                >
+                    <v-icon>mdi-swap-horizontal</v-icon>
+                </v-btn>
+            </v-col>
+            <v-col cols="5">
+                <v-text-field
+                    v-model="printIsbn"
+                    label="Print ISBN"
+                    placeholder="Print ISBN"
+                    :rules="isbnValidationRules">
+                </v-text-field>
             </v-col>
         </v-row>
         <v-row>
@@ -76,12 +109,20 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <journal-autocomplete-search v-model="selectedJournal" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></journal-autocomplete-search>
+                <journal-autocomplete-search
+                    v-model="selectedJournal"
+                    allow-manual-clearing
+                    :external-validation="publicationSeriesExternalValidation"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <book-series-autocomplete-search v-model="selectedBookSeries" allow-manual-clearing :external-validation="publicationSeriesExternalValidation"></book-series-autocomplete-search>
+                <book-series-autocomplete-search
+                    v-model="selectedBookSeries"
+                    allow-manual-clearing
+                    :external-validation="publicationSeriesExternalValidation"
+                />
             </v-col>
         </v-row>
         <v-row>

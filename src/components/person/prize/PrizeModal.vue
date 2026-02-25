@@ -30,8 +30,12 @@
                 <v-card-text>
                     <v-container>
                         <prize-form
-                            ref="formRef" :edit="edit" :preset-prize="presetPrize" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></prize-form>
+                            ref="formRef"
+                            :edit="edit"
+                            :preset-prize="presetPrize"
+                            @create="emitCreateToParent"
+                            @update="emitUpdateToParent"
+                        />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>

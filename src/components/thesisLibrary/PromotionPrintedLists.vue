@@ -29,7 +29,7 @@
 
                     <v-tabs-window v-model="currentTab">
                         <v-tabs-window-item value="promotees">
-                            <v-list lines="two" class="w-100">
+                            <v-list lines="two" class="w-full">
                                 <v-list-item v-for="(value, key) in promotees" :key="key">
                                     <template #title>
                                         <div class="citation-container">
@@ -42,7 +42,7 @@
                             </v-list>
                         </v-tabs-window-item>
                         <v-tabs-window-item value="addresses">
-                            <v-list lines="two" class="w-100">
+                            <v-list lines="two" class="w-full">
                                 <v-list-item v-for="(value, key) in addresses" :key="key">
                                     <template #title>
                                         <div class="citation-container">

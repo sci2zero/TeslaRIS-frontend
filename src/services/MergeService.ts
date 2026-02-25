@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedJournalPublications, MergedJournals, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedSoftware, MergedTheses } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses } from "@/models/MergeModel";
 import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
@@ -135,8 +135,16 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/book-series/metadata/${leftBookSeriesId}/${rightBookSeriesId}`, body);
     }
 
-    async saveMergedSoftwareMetadata(leftSoftwareId: number, rightSoftwareId: number, body: MergedSoftware): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/software/metadata/${leftSoftwareId}/${rightSoftwareId}`, body);
+    async saveMergedIntangibleProductMetadata(leftIntangibleProductId: number, rightIntangibleProductId: number, body: MergedIntangibleProduct): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/intangible-product/metadata/${leftIntangibleProductId}/${rightIntangibleProductId}`, body);
+    }
+
+    async saveMergedMaterialProductMetadata(leftMaterialProductId: number, rightMaterialProductId: number, body: MergedMaterialProduct): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/material-product/metadata/${leftMaterialProductId}/${rightMaterialProductId}`, body);
+    }
+
+    async saveMergedGeneticMaterialMetadata(leftGeneticMaterialId: number, rightGeneticMaterialId: number, body: MergedGeneticMaterial): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/material-product/metadata/${leftGeneticMaterialId}/${rightGeneticMaterialId}`, body);
     }
 
     async saveMergedDatasetsMetadata(leftDatasetId: number, rightDatasetId: number, body: MergedDatasets): Promise<AxiosResponse<void>> {

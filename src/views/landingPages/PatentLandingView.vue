@@ -210,7 +210,7 @@
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
                     :entity-id="patent?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit"
+                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
                     :has-attached-files="patent?.fileItems && patent?.fileItems.length > 0"
                     @create="createIndicator"
@@ -223,7 +223,7 @@
                     :entity-id="patent?.id"
                     :can-edit="canClassify && patent?.documentDate !== ''"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                    :applicable-types="[ApplicableEntityType.PATENT]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -312,7 +312,7 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher } = useUserRole();
+        const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -487,7 +487,7 @@ export default defineComponent({
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators, fetchValidationStatus,
-            PublicationType, updateRemark, displayConfiguration
+            PublicationType, updateRemark, displayConfiguration, isAdmin, isCommission
         };
 }})
 

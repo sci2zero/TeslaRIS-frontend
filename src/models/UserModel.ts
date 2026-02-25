@@ -23,6 +23,7 @@ export interface UserAccountIndex {
     emailSortable: string;
     organisationUnitNameSr: string;
     organisationUnitNameOther: string;
+    organisationUnitId: number;
     userRole: string;
     databaseId: number;
     active: boolean;

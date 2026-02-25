@@ -94,10 +94,24 @@ export default defineComponent({
             populateUriList(uriList);
         };
 
+        const addUriToModel = (newUri: string) => {
+            if (uris.value.every(item => item.value === "")) {
+                uris.value.splice(0);
+            }
+
+            if (uris.value.every(item => item.value !== newUri)) {
+                uris.value.push({value: newUri});
+            }
+
+
+            sendContentToParent();
+        };
+
         return { 
             uris, addUri, removeUri, 
             sendContentToParent, clearInput,
-            uriValidationRules, refreshModelValue
+            uriValidationRules, refreshModelValue,
+            addUriToModel
         };
     },
 });
