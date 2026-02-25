@@ -12,16 +12,13 @@
                 :readonly="lockSearchField"
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
-                @blur="onAutocompleteBlur"
-            >
+                @blur="onAutocompleteBlur">
                 <template #item="{ item, props }">
                     <v-list-item
-                        v-bind="{ ...props, title: undefined }"
-                    >
+                        v-bind="{ ...props, title: undefined }">
                         <person-publications-tooltip
                             :person-id="item.raw.value"
-                            :show="showLatestPublications"
-                        >
+                            :show="showLatestPublications">
                             {{ item.raw.title }}
                         </person-publications-tooltip>
                     </v-list-item>
@@ -73,7 +70,7 @@
                 :placeholder="$t('firstNameLabel')"
                 :rules="requiredFieldRules"
                 append-inner-icon="mdi-swap-horizontal"
-                @click:append-inner="[firstName, lastName] = [lastName, firstName]"
+                @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
                 @update:model-value="sendContentToParent"
             />
         </v-col>
