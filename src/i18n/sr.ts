@@ -1339,5 +1339,6 @@ export default {
     acceptedLabel: "Prihvaćeni",
     publicReviewLabel: "Na javnom uvidu",
     submittedLabel: "Uneti u sistem",
-    archivedLabel: "Arhivirani"
+    archivedLabel: "Arhivirani",
+    showOnlyNonFinishedLabel: "Prikaži samo promocije koje nisu završene"
 }

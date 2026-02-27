@@ -3,6 +3,12 @@
         <h1>{{ $t("promotionListLabel") }}</h1>
         <br />
         <br />
+        <div>
+            <v-checkbox
+                v-model="onlyNonFinished"
+                :label="$t('showOnlyNonFinishedLabel')"
+            />
+        </div>
         <promotion-table
             ref="tableRef"
             :promotions="promotions"
@@ -32,6 +38,7 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
+        const onlyNonFinished = ref(true);
 
         const i18n = useI18n();
         const tableRef = ref<typeof PromotionTable>();
@@ -40,13 +47,14 @@ export default defineComponent({
             document.title = i18n.t("promotionListLabel");
         });
 
-        watch(i18n.locale, () => {
+        watch([i18n.locale, onlyNonFinished], () => {
             fetchPromotions();
         });
 
         const fetchPromotions = () => {
             PromotionService.getAllPromotions(
-                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+                onlyNonFinished.value
             ).then((response) => {
                 promotions.value = response.data.content;
                 totalPromotions.value = response.data.totalElements;
@@ -63,7 +71,7 @@ export default defineComponent({
 
         return {
             fetchPromotions, promotions,
-            totalPromotions,
+            totalPromotions, onlyNonFinished,
             switchPage, tableRef
         };
     }

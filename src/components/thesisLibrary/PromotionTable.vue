@@ -140,7 +140,7 @@ export default defineComponent({
                 initialCustomConfiguration: true,
                 page: 1,
                 itemsPerPage: 25,
-                sortBy:[{key: "promotionDate", order: "asc"}]
+                sortBy:[{key: "promotionDate", order: "desc"}]
             }
         );
 
@@ -224,7 +224,7 @@ export default defineComponent({
         const setSortAndPageOption = (sortBy: {key: string,  order: string}[], page: number) => {
             if (
                 (
-                    isEqual([{key: "promotionDate", order: "asc"}], tableOptions.value.sortBy) ||
+                    isEqual([{key: "promotionDate", order: "desc"}], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0
                 ) &&
                 page == tableOptions.value.page

@@ -1330,5 +1330,6 @@ export default {
     acceptedLabel: "Accepted",
     publicReviewLabel: "On public review",
     submittedLabel: "Submitted in system",
-    archivedLabel: "Archived"
+    archivedLabel: "Archived",
+    showOnlyNonFinishedLabel: "Show only non-finished promotions"
 }

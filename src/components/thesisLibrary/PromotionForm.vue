@@ -11,12 +11,21 @@
                 ></date-picker>
             </v-col>
             <v-col cols="6">
-                <time-picker v-model="promotionTime" :label="$t('timeLabel') + '*'" required></time-picker>
+                <time-picker
+                    v-model="promotionTime"
+                    :label="$t('timeLabel') + '*'" 
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="placeOrVenue" :label="$t('placeLabel') + '*'" :placeholder="$t('placeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="placeOrVenue"
+                    :label="$t('placeLabel') + '*'"
+                    :placeholder="$t('placeLabel') + '*'"
+                    :rules="requiredFieldRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -24,11 +33,10 @@
                 <multilingual-text-input
                     ref="descriptionRef"
                     v-model="description"
-                    :rules="requiredFieldRules"
-                    :label="$t('descriptionLabel') + '*'"
+                    :label="$t('descriptionLabel')"
                     :initial-value="toMultilingualTextInput(presetPromotion?.description, languageTags)"
-                    is-area>
-                </multilingual-text-input>
+                    is-area
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -37,8 +45,9 @@
                     ref="ouAutocompleteRef"
                     v-model:model-value="selectedOrganisationUnit"
                     :readonly="false"
-                    required>
-                </organisation-unit-autocomplete-search>
+                    required
+                    :top-level-institution-id="isAdmin ? undefined : (loggedInUser?.organisationUnitId as number)"
+                />
             </v-col>
         </v-row>
 
@@ -105,7 +114,7 @@ export default defineComponent({
                 promotionTime: promotionTime.value as string,
                 placeOrVenue: placeOrVenue.value,
                 description: description.value,
-                institutionId: isAdmin.value ? selectedOrganisationUnit.value?.value as number : loggedInUser.value?.organisationUnitId as number
+                institutionId: selectedOrganisationUnit.value?.value as number
             };
 
             emit("create", promotion);
@@ -117,7 +126,7 @@ export default defineComponent({
             toMultilingualTextInput, submit,
             languageTags, requiredFieldRules,
             placeOrVenue, promotionTime, isAdmin,
-            selectedOrganisationUnit
+            selectedOrganisationUnit, loggedInUser
         };
     }
 });
