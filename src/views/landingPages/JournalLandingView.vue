@@ -101,10 +101,10 @@
             <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
             </v-tab>
-            <v-tab v-if="canClassify || journalIndicators.length > 0" value="indicators">
+            <v-tab value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-if="canClassify || journalClassifications.length > 0" value="classifications">
+            <v-tab v-if="canClassify || (journalClassifications && journalClassifications.length > 0)" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -223,8 +223,8 @@ export default defineComponent({
         const canEdit = ref(false);
         const canClassify = ref(false);
 
-        const journalIndicators = ref<EntityIndicatorResponse[]>([]);
-        const journalClassifications = ref<EntityClassificationResponse[]>([]);
+        const journalIndicators = ref<EntityIndicatorResponse[]>();
+        const journalClassifications = ref<EntityClassificationResponse[]>();
 
         const loginStore = useLoginStore();
 

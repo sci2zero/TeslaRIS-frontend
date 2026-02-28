@@ -109,8 +109,8 @@ export default defineComponent({
         const hasAttachedFiles = ref(false);
 
         const dialog = ref(false);
-        const entityClassifications = ref<EntityClassificationResponse[]>([]);
-        const entityIndicators = ref<EntityIndicatorResponse[]>([]);
+        const entityClassifications = ref<EntityClassificationResponse[]>();
+        const entityIndicators = ref<EntityIndicatorResponse[]>();
 
         const i18n = useI18n();
 

@@ -116,10 +116,10 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="eventIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="(eventIndicators && eventIndicators.length > 0) || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="eventClassifications?.length > 0 || canClassify" value="classifications">
+            <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -250,8 +250,8 @@ export default defineComponent({
         const canClassify = ref(false);
         const country = ref<Country>();
 
-        const eventIndicators = ref<EntityIndicatorResponse[]>([]);
-        const eventClassifications = ref<EntityClassificationResponse[]>([]);
+        const eventIndicators = ref<EntityIndicatorResponse[]>();
+        const eventClassifications = ref<EntityClassificationResponse[]>();
 
         const loginStore = useLoginStore();
 

@@ -284,7 +284,7 @@
             <v-tab value="researchAreas">
                 {{ $t("researchAreasLabel") }}
             </v-tab>
-            <v-tab v-if="ouIndicators?.length > 0" value="indicators">
+            <v-tab v-if="ouIndicators && ouIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
             <v-tab v-show="displaySettings.shouldDisplayVisualisations()" value="visualizations">
@@ -617,7 +617,7 @@ export default defineComponent({
         const subUnits = ref<OrganisationUnitIndex[]>([]);
         const totalSubUnits = ref<number>(0);
 
-        const ouIndicators = ref<EntityIndicatorResponse[]>([]);
+        const ouIndicators = ref<EntityIndicatorResponse[]>();
 
         const loginStore = useLoginStore();
         

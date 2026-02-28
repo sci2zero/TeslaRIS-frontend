@@ -101,7 +101,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-if="bookSeriesIndicators.length > 0" value="indicators">
+            <v-tab v-if="bookSeriesIndicators && bookSeriesIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
         </v-tabs>
@@ -203,7 +203,7 @@ export default defineComponent({
         const loginStore = useLoginStore();
         const router = useRouter();
 
-        const bookSeriesIndicators = ref<EntityIndicatorResponse[]>([]);
+        const bookSeriesIndicators = ref<EntityIndicatorResponse[]>();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {

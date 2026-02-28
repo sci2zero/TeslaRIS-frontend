@@ -96,7 +96,7 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="personIndicators?.length > 0" value="indicators">
+            <v-tab v-show="personIndicators && personIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
             <v-tab value="assessments">
@@ -401,7 +401,7 @@ export default defineComponent({
 
         const canEdit = ref(false);
 
-        const personIndicators = ref<EntityIndicatorResponse[]>([]);
+        const personIndicators = ref<EntityIndicatorResponse[]>();
 
         const loginStore = useLoginStore();
 
