@@ -1331,5 +1331,6 @@ export default {
     publicReviewLabel: "On public review",
     submittedLabel: "Submitted in system",
     archivedLabel: "Archived",
-    showOnlyNonFinishedLabel: "Show only non-finished promotions"
+    showOnlyNonFinishedLabel: "Show only non-finished promotions",
+    noOUForConfigurationMessage: "Commission is not bound to organisation unit, you have to manually specify top-level institution."
 }

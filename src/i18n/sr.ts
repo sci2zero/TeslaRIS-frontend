@@ -1340,5 +1340,6 @@ export default {
     publicReviewLabel: "Na javnom uvidu",
     submittedLabel: "Uneti u sistem",
     archivedLabel: "Arhivirani",
-    showOnlyNonFinishedLabel: "Prikaži samo promocije koje nisu završene"
+    showOnlyNonFinishedLabel: "Prikaži samo promocije koje nisu završene",
+    noOUForConfigurationMessage: "Komisija nije vezana za organizacionu jedinicu, morate ručno specificirati krovnu instituciju."
 }
