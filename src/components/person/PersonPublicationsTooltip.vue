@@ -5,12 +5,13 @@
         :open-on-hover="false"
         :close-on-content-click="false"
         transition="fade-transition">
-        <template #activator="{ props: menuProps }">
+        <template #activator="{ props }">
             <div
-                v-bind="menuProps"
+                :ref="props.ref"
                 class="d-flex align-center"
                 @mouseenter="handleMouseEnter"
-                @mouseleave="handleMouseLeave">
+                @mouseleave="handleMouseLeave"
+            >
                 <slot></slot>
             </div>
         </template>

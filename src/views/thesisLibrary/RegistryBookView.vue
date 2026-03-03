@@ -315,7 +315,7 @@ import PromotionService from '@/services/thesisLibrary/PromotionService';
 import RegistryBookEntryTable from '@/components/thesisLibrary/RegistryBookEntryTable.vue';
 import PromotionPrintedLists from '@/components/thesisLibrary/PromotionPrintedLists.vue';
 import type { InstitutionPromotionCountsReport, NotAddedToPromotionThesesRequest, Promotion, RegistryBookEntry } from '@/models/ThesisLibraryModel';
-import { computeRelativeDate, localiseDate, serverTimeToLocalTime } from '@/utils/DateUtil';
+import { computeRelativeDate, localiseDate, localiseTime, serverTimeToLocalTime } from '@/utils/DateUtil';
 import Toast from '@/components/core/Toast.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
@@ -574,7 +574,7 @@ export default defineComponent({
             promotions.value.splice(0);
             nonFinished.data.forEach(promotion => {
                 promotions.value.push({
-                    title: localiseDate(promotion.promotionDate) as string,
+                    title: `${localiseDate(promotion.promotionDate) as string} ${i18n.t("inLabel")} ${localiseTime(promotion.promotionTime) as string}`,
                     value: promotion.id as number
                 });
             });
@@ -587,7 +587,7 @@ export default defineComponent({
             finishedPromotions.value.splice(0);
             finished.data.forEach(promotion => {
                 finishedPromotions.value.push({
-                    title: localiseDate(promotion.promotionDate) as string,
+                    title: `${localiseDate(promotion.promotionDate) as string} ${i18n.t("inLabel")} ${localiseTime(promotion.promotionTime) as string}`,
                     value: promotion
                 });
             });
@@ -798,7 +798,7 @@ export default defineComponent({
 <style scoped>
 
 .promotion-select {
-    max-width: 200px;
+    max-width: 230px;
     margin-top: 10px;
 }
 
