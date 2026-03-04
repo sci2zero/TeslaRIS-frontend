@@ -195,7 +195,7 @@ export default defineComponent({
             const secondsUntilNextMinute = 60 - now.getSeconds();
             const millisecondsUntilNextMinute = secondsUntilNextMinute * 1000;
 
-            document.title = `TeslaRIS - ${i18n.t("routeLabel.reporting")}}`;
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.reporting")}`;
 
             setTimeout(() => {
                 fetchScheduledTasks();

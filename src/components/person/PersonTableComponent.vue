@@ -215,7 +215,7 @@
                                                     </localized-link>
                                                     <span v-if="(index + 1 < getDisplayedNameVariants(item).length) || item.birthdate">, </span>
                                                 </span>
-                                                <span v-if="item.birthdate" class="person-year">{{ extractYear(item.birthdate) }}</span>
+                                                <span v-if="item.birthdate" class="person-year">{{ item.displayBirthdate ? localiseDate(item.birthdate) : extractYear(item.birthdate) }}</span>
                                             </div>
                                             <v-btn
                                                 v-if="shouldShowMoreButton(item)"

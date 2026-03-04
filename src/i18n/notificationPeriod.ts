@@ -5,12 +5,14 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 export const notificationPeriodSr = [
     { title: "Dnevno", value: UserNotificationPeriod.DAILY },
     { title: "Nedeljno", value: UserNotificationPeriod.WEEKLY },
+    { title: "Mesečno", value: UserNotificationPeriod.MONTHLY },
     { title: "Nikada", value: UserNotificationPeriod.NEVER }
 ];
 
 export const notificationPeriodEn = [
     { title: "Daily", value: UserNotificationPeriod.DAILY },
     { title: "Weekly", value: UserNotificationPeriod.WEEKLY },
+    { title: "Monthly", value: UserNotificationPeriod.MONTHLY },
     { title: "Never", value: UserNotificationPeriod.NEVER }
 ];
 

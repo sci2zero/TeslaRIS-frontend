@@ -207,10 +207,10 @@
             <v-tab value="researchArea">
                 {{ $t("researchAreaLabel") }}
             </v-tab>
-            <v-tab v-show="documentIndicators?.length > 0 || canEdit" value="indicators">
+            <v-tab v-show="(documentIndicators && documentIndicators.length > 0) || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="(documentClassifications && documentClassifications.length > 0) || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -435,8 +435,8 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
-        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
-        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+        const documentIndicators = ref<EntityIndicatorResponse[]>();
+        const documentClassifications = ref<EntityClassificationResponse[]>();
 
         const loginStore = useLoginStore();
 

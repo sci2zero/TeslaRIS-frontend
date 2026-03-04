@@ -4,12 +4,21 @@
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="nameRef"
+                            v-model="name"
+                            :rules="requiredFieldRules"
+                            :label="$t('nameLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('conferenceAbbreviationLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="abbreviationRef"
+                            v-model="nameAbbreviation"
+                            :label="$t('conferenceAbbreviationLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <div v-if="!serialEvent" class="mt-3">
@@ -68,27 +77,51 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="placeRef"
+                                v-model="place"
+                                :label="$t('placeLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" :is-area="true" :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="descriptionRef"
+                                v-model="description"
+                                :is-area="true"
+                                :label="$t('abstractLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="keywordsRef"
+                                v-model="keywords"
+                                :label="$t('keywordsLabel')"
+                                is-area
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
+                            <v-text-field
+                                v-model="confId"
+                                label="Conf ID"
+                                placeholder="Conf ID"
+                                :rules="confIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="10">
-                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Conf ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                            <v-text-field
+                                v-model="openAlexId"
+                                label="Open Alex ID"
+                                placeholder="Conf ID"
+                                :rules="sourceOpenAlexIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row v-if="!serialEvent">
@@ -101,7 +134,7 @@
                         <!-- <v-col cols="5">
                             <v-text-field
                                 v-model="entryFee"
-                                :label="$t('entryFeeLabel')"
+                                :label="$t('cotizationFeeLabel')"
                             ></v-text-field>
                         </v-col> -->
                     </v-row>

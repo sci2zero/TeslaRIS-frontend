@@ -28,7 +28,13 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="7">
-                                    <event-autocomplete-search v-model="selectedEvent" required :return-only-non-serial-events="false" :return-only-serial-events="relationType.value === EventsRelationType.BELONGS_TO_SERIES"></event-autocomplete-search>
+                                    <event-autocomplete-search
+                                        v-model="selectedEvent"
+                                        required
+                                        :return-only-non-serial-events="false"
+                                        :return-only-serial-events="relationType.value === EventsRelationType.BELONGS_TO_SERIES"
+                                        :event-type="eventType"
+                                    />
                                 </v-col>
                             </v-row>
                         </v-form>
@@ -57,12 +63,12 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import { getEventsRelationTypeForGivenLocale } from "@/i18n/eventsRelationType";
 import EventAutocompleteSearch from "../EventAutocompleteSearch.vue";
-import { type Conference, type EventsRelation, EventsRelationType } from "@/models/EventModel";
+import { type Conference, type EventsRelation, EventsRelationType, EventType } from "@/models/EventModel";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import EventService from "@/services/EventService";
 import { getErrorMessageForErrorKey } from "@/i18n";
@@ -81,6 +87,10 @@ export default defineComponent({
             type: Object as PropType<Conference | undefined>,
             required: true
         },
+        eventType: {
+            type: Object as PropType<EventType>,
+            default: EventType.CONFERENCE
+        }
     },
     emits: ["create"],
     setup(props, { emit }) {
@@ -118,10 +128,16 @@ export default defineComponent({
             });
         };
 
-        return {dialog, emitToParent, isFormValid, 
+        watch(relationType, () => {
+            selectedEvent.value = searchPlaceholder;
+        });
+
+        return {
+            dialog, emitToParent, isFormValid, 
             selectedEvent, relationTypes, relationType,
             requiredSelectionRules, createRelation,
-            message, snackbar, EventsRelationType};
+            message, snackbar, EventsRelationType
+        };
     }
 });
 </script>

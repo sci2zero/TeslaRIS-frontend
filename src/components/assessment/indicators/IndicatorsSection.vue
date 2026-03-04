@@ -1,48 +1,60 @@
 <template>
-    <generic-crud-modal
-        class="mt-5 ml-5"
-        :form-component="EntityIndicatorForm"
-        :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: entityType }"
-        entity-name="EntityIndicator"
-        :read-only="!canEdit"
-        @create="createIndicator"
-    />
-    <v-row v-if="indicators.length > 0">
-        <v-col v-if="showStatistics && (!viewIndicatorsEmpty || !downloadIndicatorsEmpty)">
-            <div
-                v-show="(viewsRef && viewsRef.statisticsEntityIndicators.length > 0) || (downloadsRef && downloadsRef.statisticsEntityIndicators.length > 0)"
-                class="statistics mt-3">
-                <h2>{{ $t("statisticsIndicatorsLabel") }}</h2>
-                <statistics-view
-                    ref="viewsRef"
-                    :entity-indicators="indicators"
-                    :statistics-type="StatisticsType.VIEW"
-                    @no-indicators-present="viewIndicatorsEmpty = true"
-                />
-                <statistics-view
-                    v-show="hasAttachedFiles"
-                    ref="downloadsRef"
-                    :entity-indicators="indicators"
-                    :statistics-type="StatisticsType.DOWNLOAD"
-                    @no-indicators-present="downloadIndicatorsEmpty = true"
-                />
-            </div>
-        </v-col>
-        <v-col>
-            <div class="statistics">
-                <indicators-view 
-                    :entity-indicators="indicators" 
-                    :exclude-prefixes="['view', 'download']" :can-edit="canEdit" 
-                    :entity-id="entityId" 
-                    :containing-entity-type="entityType"
-                    @updated="refreshIndicators"
-                />
-            </div>
-        </v-col>
-    </v-row>
-    <h3 v-else>
-        {{ $t("noIndicatorsLabel") }}
-    </h3>
+    <div
+        v-if="isLoading"
+        class="d-flex flex-row justify-center align-center mt-10 mb-5">
+        <v-progress-circular
+            indeterminate
+            size="64"
+            width="6"
+            color="primary"
+        />
+    </div>
+    <div v-else>
+        <generic-crud-modal
+            class="mt-5 ml-5"
+            :form-component="EntityIndicatorForm"
+            :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: entityType }"
+            entity-name="EntityIndicator"
+            :read-only="!canEdit"
+            @create="createIndicator"
+        />
+        <v-row v-if="indicators && indicators.length > 0">
+            <v-col v-if="showStatistics && (!viewIndicatorsEmpty || !downloadIndicatorsEmpty)">
+                <div
+                    v-show="(viewsRef && viewsRef.statisticsEntityIndicators.length > 0) || (downloadsRef && downloadsRef.statisticsEntityIndicators.length > 0)"
+                    class="statistics mt-3">
+                    <h2>{{ $t("statisticsIndicatorsLabel") }}</h2>
+                    <statistics-view
+                        ref="viewsRef"
+                        :entity-indicators="indicators"
+                        :statistics-type="StatisticsType.VIEW"
+                        @no-indicators-present="viewIndicatorsEmpty = true"
+                    />
+                    <statistics-view
+                        v-show="hasAttachedFiles"
+                        ref="downloadsRef"
+                        :entity-indicators="indicators"
+                        :statistics-type="StatisticsType.DOWNLOAD"
+                        @no-indicators-present="downloadIndicatorsEmpty = true"
+                    />
+                </div>
+            </v-col>
+            <v-col>
+                <div class="statistics">
+                    <indicators-view 
+                        :entity-indicators="indicators" 
+                        :exclude-prefixes="['view', 'download']" :can-edit="canEdit" 
+                        :entity-id="entityId" 
+                        :containing-entity-type="entityType"
+                        @updated="refreshIndicators"
+                    />
+                </div>
+            </v-col>
+        </v-row>
+        <h3 v-else>
+            {{ $t("noIndicatorsLabel") }}
+        </h3>
+    </div>
 </template>
 
 <script lang="ts">
@@ -52,7 +64,7 @@ import IndicatorsView from './IndicatorsView.vue';
 import { ApplicableEntityType } from '@/models/Common';
 import EntityIndicatorForm from './EntityIndicatorForm.vue';
 import { type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
-import { defineComponent, ref, type PropType } from 'vue';
+import { computed, defineComponent, ref, type PropType } from 'vue';
 
 
 export default defineComponent({
@@ -60,8 +72,9 @@ export default defineComponent({
     components: { StatisticsView, IndicatorsView, GenericCrudModal },
     props: {
         indicators: {
-            type: Array<EntityIndicatorResponse>,
-            required: true
+            type: Array as PropType<EntityIndicatorResponse[] | undefined>,
+            required: false,
+            default: undefined
         },
         applicableTypes: {
             type: Array<ApplicableEntityType>,
@@ -89,12 +102,14 @@ export default defineComponent({
         }
     },
     emits: ["create", "updated"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const viewsRef = ref<typeof StatisticsView>();
         const downloadsRef = ref<typeof StatisticsView>();
 
         const viewIndicatorsEmpty = ref(false);
         const downloadIndicatorsEmpty = ref(false);
+
+        const isLoading = computed(() => props.indicators === undefined);
 
         const createIndicator = (entityIndicator: any) => {
             emit("create", entityIndicator);
@@ -108,7 +123,8 @@ export default defineComponent({
             EntityIndicatorForm, ApplicableEntityType,
             createIndicator, refreshIndicators,
             StatisticsType, viewsRef, downloadsRef,
-            viewIndicatorsEmpty, downloadIndicatorsEmpty
+            viewIndicatorsEmpty, downloadIndicatorsEmpty,
+            isLoading
         };
     }
 });

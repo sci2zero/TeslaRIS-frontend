@@ -1,5 +1,10 @@
 <template>
-    <v-checkbox v-if="!isAdmin" v-model="allowAccountTakeover" :label="$t('allowTakeoverLabel')" @click="updateAccountTakeoverPermission"></v-checkbox>
+    <v-checkbox
+        v-if="!isAdmin"
+        v-model="allowAccountTakeover"
+        :label="$t('allowTakeoverLabel')"
+        @click="updateAccountTakeoverPermission"
+    />
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col :cols="isCommission ? 12 : 6">
@@ -61,13 +66,19 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col cols="12" md="6">
                 <v-select
                     v-model="selectedNotificationPeriod"
                     :items="notificationPeriods"
                     :label="$t('notificationPeriodLabel')"
                     return-object>
                 </v-select>
+            </v-col>
+            <v-col cols="12" md="6">
+                <v-checkbox
+                    v-model="onlyNewNotifications"
+                    :label="$t('sendOnlyNewNotificationsLabel')"
+                />
             </v-col>
         </v-row>
         <v-btn color="blue darken-1" @click="changePassword = !changePassword">
@@ -161,11 +172,17 @@ export default defineComponent({
         const selectedOrganisationUnit = ref<{ title: string, value: number }>(ouPlaceholder);
         const allowAccountTakeover = ref(false);
         const researcherId = ref(-1);
+        const onlyNewNotifications = ref(true);
 
         const oldPassword = ref("");
         const newPassword = ref("");
 
-        const {isResearcher, isAdmin, isCommission, isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary, isInstitutionalEditor, isPromotionRegistryAdministrator} = useUserRole();
+        const {
+            isResearcher, isAdmin, isCommission, 
+            isViceDeanForScience, isInstitutionalLibrarian, 
+            isHeadOfLibrary, isInstitutionalEditor, 
+            isPromotionRegistryAdministrator
+        } = useUserRole();
 
         const i18n = useI18n();
         const savedMessage = computed(() => i18n.t("savedMessage"));
@@ -186,7 +203,11 @@ export default defineComponent({
                 email.value = response.data.email;
                 
                 allowAccountTakeover.value = response.data.canTakeRole;
-                selectedNotificationPeriod.value = {title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, value: response.data.notificationPeriod};
+                selectedNotificationPeriod.value = {
+                    title: getTitleFromValueAutoLocale(response.data.notificationPeriod) as string, 
+                    value: response.data.notificationPeriod
+                };
+                onlyNewNotifications.value = response.data.sendOnlyNewNotifications;
                 
                 let ouNameSr = "";
                 let ouNameOther = "";
@@ -262,7 +283,8 @@ export default defineComponent({
                 organisationUnitId: organisationUnitId,
                 oldPassword: changePassword.value ? oldPassword.value : "",
                 newPassword: changePassword.value ? newPassword.value : "",
-                notificationPeriod: selectedNotificationPeriod.value.value
+                notificationPeriod: selectedNotificationPeriod.value.value,
+                sendOnlyNewNotifications: onlyNewNotifications.value
             };
 
             UserService.updateUser(userUpdateRequest).then((response) => {
@@ -314,7 +336,7 @@ export default defineComponent({
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
             isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,
-            isPromotionRegistryAdministrator, uiLanguages
+            isPromotionRegistryAdministrator, uiLanguages, onlyNewNotifications
         };
     }
 });

@@ -8,7 +8,7 @@
             v-if="suggestions.length"
             :class="'d-flex flex-wrap ' + (spaceOutSuggestions ? 'mt-5' : 'suggestions')">
             <span
-                v-for="(suggestion, index) in suggestions.filter(s => s)"
+                v-for="(suggestion, index) in [...new Set(suggestions.filter(s => s))]"
                 :key="index"
                 class="ml-2">
                 <v-chip

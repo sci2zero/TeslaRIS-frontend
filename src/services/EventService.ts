@@ -2,14 +2,19 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Conference, EventIndex, EventsRelation } from "@/models/EventModel";
+import type { Conference, EventIndex, EventsRelation, EventType, Exhibition } from "@/models/EventModel";
 
 export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchConferences(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null, returnEventsWithoutProceedings: boolean | null = null): Promise<AxiosResponse<Page<EventIndex>>> {
-    return super.sendRequest(axios.get, `conference/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}${returnEventsWithoutProceedings ? `&emptyEventsOnly=${returnEventsWithoutProceedings}`: ""}`);
+  async searchEvents(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null, returnEventsWithoutProceedings: boolean | null = null, eventTypes: EventType[] | []): Promise<AxiosResponse<Page<EventIndex>>> {
+    let allowedTypesParam= "";
+    eventTypes.forEach(allowedType => {
+      allowedTypesParam += `&eventTypes=${allowedType}`;
+    });
+
+    return super.sendRequest(axios.get, `event/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}${returnEventsWithoutProceedings ? `&emptyEventsOnly=${returnEventsWithoutProceedings}`: ""}${allowedTypesParam}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {
@@ -20,12 +25,24 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.get, `conference/${conferenceId}`);
   }
 
+  async readExhibition(exhibitionId: number): Promise<AxiosResponse<Conference>> {
+    return super.sendRequest(axios.get, `exhibition/${exhibitionId}`);
+  }
+
   async deleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `conference/${conferenceId}`);
   }
 
+  async deleteExhibition(exhibitionId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `exhibition/${exhibitionId}`);
+  }
+
   async forceDeleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `conference/force/${conferenceId}`);
+  }
+
+  async forceDeleteExhibition(exhibitionId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `exhibition/force/${exhibitionId}`);
   }
 
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {
@@ -34,6 +51,14 @@ export class EventService extends BaseService {
 
   async updateConference(conferenceId: number, updatedConference: Conference): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `conference/${conferenceId}`, updatedConference);
+  }
+
+  async createExhibition(body: Exhibition): Promise<AxiosResponse<Exhibition>> {
+    return super.sendRequest(axios.post, "exhibition", body, EventService.idempotencyKey);
+  }
+
+  async updateExhibition(exhibitionId: number, updatedExhibition: Exhibition): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `exhibition/${exhibitionId}`, updatedExhibition);
   }
 
   async canEdit(conferenceId: number): Promise<AxiosResponse<boolean>> {

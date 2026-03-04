@@ -100,5 +100,9 @@ export default {
     clientInstitutionCrisLabel: "Клијентска институција (CRIS)",
     if2RankLabel: "IF2 ранк",
     if5RankLabel: "IF5 ранк",
-    jciRankLabel: "JCI ранк"
+    jciRankLabel: "JCI ранк",
+    contactEmailVisibleLabel: "Адреса електронске поште је видљива неулогованим корисницима",
+    selectEnrichmentTypeMessage: "UI-базирани приступ ће скенирати изворе само за оне типове који су доступни приликом увоза, након чега ће сви истраживачи моћи да их дедупликују кроз форму за увоз. Аутоматски приступ ће скенирати и попунити недостајуће метаподатке за све типове докумената.",
+    uiBasedLabel: "UI-базирани приступ",
+    nameOrIssnMessage: "Куцајте назив или ISSN да бисте претражили..."
 };

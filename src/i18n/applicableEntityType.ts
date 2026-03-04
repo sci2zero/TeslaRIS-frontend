@@ -15,10 +15,13 @@ export const applicableEntityTypeSr = [
     { title: "Skup podataka", value: ApplicableEntityType.DATASET },
     { title: "Završni rad", value: ApplicableEntityType.THESIS },
     { title: "Događaj", value: ApplicableEntityType.EVENT },
+    { title: "Konferencija", value: ApplicableEntityType.CONFERENCE },
+    { title: "Izložba", value: ApplicableEntityType.EXHIBITION },
     { title: "Dokument", value: ApplicableEntityType.DOCUMENT },
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
     { title: "Organizaciona jedinica", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Serija publikacija", value: ApplicableEntityType.PUBLICATION_SERIES },
+    { title: "Nagrada", value: ApplicableEntityType.PRIZE },
     { title: "Svi", value: ApplicableEntityType.ALL }
 ];
 
@@ -33,10 +36,13 @@ export const applicableEntityTypeEn = [
     { title: "Dataset", value: ApplicableEntityType.DATASET },
     { title: "Thesis", value: ApplicableEntityType.THESIS },
     { title: "Event", value: ApplicableEntityType.EVENT },
+    { title: "Conference", value: ApplicableEntityType.CONFERENCE },
+    { title: "Exhibition", value: ApplicableEntityType.EXHIBITION },
     { title: "Document", value: ApplicableEntityType.DOCUMENT },
     { title: "Researcher", value: ApplicableEntityType.PERSON },
     { title: "Organisation unit", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Publication series", value: ApplicableEntityType.PUBLICATION_SERIES },
+    { title: "Prize", value: ApplicableEntityType.PRIZE },
     { title: "All", value: ApplicableEntityType.ALL }
 ];
 

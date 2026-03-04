@@ -1,7 +1,7 @@
 <template>
     <v-container v-if="foundDuplicates">
         <h2 class="alert">
-            {{ $t("potentialDuplicateMessage") }}
+            {{ isEnrichmentMode ? $t("enrichmentCandidateMessage") : $t("potentialDuplicateMessage") }}
         </h2>
         <v-list lines="two">
             <v-radio-group
@@ -74,6 +74,10 @@ export default defineComponent({
         canPerformOverwrite: {
             type: Boolean,
             required: true
+        },
+        isEnrichmentMode: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["deduplicate", "foundMatches", "matchSelected"],

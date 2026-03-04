@@ -17,6 +17,7 @@ export interface PersonIndex {
     scopusAuthorId: string;
     openAlexId: string;
     webOfScienceResearcherId: string;
+    displayBirthdate: boolean;
 }
 
 export interface BasicPerson {
@@ -124,6 +125,7 @@ export interface PersonResponse {
     expertisesOrSkills: ExpertiseOrSkillResponse[];
     prizes: PrizeResponse[];
     imageServerFilename?: string;
+    showFullBirthdate: boolean;
 }
 
 export interface PersonalInfo {
@@ -165,10 +167,27 @@ export interface PrizeResponse {
 }
 
 export interface Prize {
-    id?: number,
+    id?: number;
     title: MultilingualContent[];
     description: MultilingualContent[];
     date: string;
+}
+
+export interface PrizeIndex {
+    id: string;
+    titleSr: string;
+    titleOther: string;
+    titleSrSortable: string;
+    titleOtherSortable: string;
+    descriptionSr: string;
+    descriptionOther: string;
+    dateOfAcquisition: string;
+    personId: number;
+    personName: string;
+    databaseId: number;
+    relatedInstitutionsIdHierarchy: number[];
+    assessedBy: number[];
+    commissionAssessments: {a: number, b: string, c: boolean}[]
 }
 
 export interface PersonProfileImageRequest {
@@ -177,4 +196,12 @@ export interface PersonProfileImageRequest {
     left: number;
     height: number;
     width: number;
+}
+
+export interface PersonFieldVisibility {
+    phoneNumberVisible: boolean,
+    contactEmailVisible: boolean,
+    dateOfBirthVisible: boolean,
+    sexVisible: boolean,
+    birthplaceVisible: boolean
 }

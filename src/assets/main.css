@@ -251,3 +251,22 @@ h3 {
   margin-bottom: 0.5rem;
   margin-top: 1rem;
 }
+
+/* LINKS */
+
+.clickable-link {
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.clickable-link:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.clickable-link:active {
+  transform: translateY(1px);
+}

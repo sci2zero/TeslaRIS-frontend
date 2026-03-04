@@ -1,7 +1,9 @@
 <template>
     <v-container>
         <v-btn
-            density="compact" class="bottom-spacer" :disabled="selectedSuggestions.length === 0" @click="flagAsNotDuplicates">
+            density="compact" class="bottom-spacer"
+            :disabled="selectedSuggestions.length === 0"
+            @click="flagAsNotDuplicates">
             {{ $t("flagAsNotDuplicatesLabel") }}
         </v-btn>
 
@@ -35,8 +37,16 @@
                                 {{ $i18n.locale.startsWith('sr') ? row.item.leftTitleSr : row.item.leftTitleOther }}
                             </localized-link>
                             <span v-if="row.item.leftYear && row.item.leftYear > 0">, </span>
-                            <span v-if="row.item.leftYear && row.item.leftYear > 0" class="text-xs text-gray-600">{{ row.item.leftYear + (row.item.publicationType ? ", " : "") }}</span>
-                            <span v-if="row.item.publicationType" class="text-xs text-gray-600">{{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.leftConcreteType) }}</span>
+                            <span
+                                v-if="row.item.leftYear && row.item.leftYear > 0"
+                                class="text-xs text-gray-600">
+                                {{ row.item.leftYear + (row.item.publicationType ? ", " : "") }}
+                            </span>
+                            <span
+                                v-if="row.item.publicationType"
+                                class="text-xs text-gray-600">
+                                {{ getDocumentTypeDisplayValue(row.item.publicationType, row.item.leftConcreteType) }}
+                            </span>
                         </div>
                         <div v-if="row.item.leftAuthors && row.item.leftAuthors.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
                             <div v-for="(author, index) in row.item.leftAuthors.split(';')" :key="index">
@@ -125,7 +135,7 @@ import DeduplicationService from "@/services/DeduplicationService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import LocalizedLink from "../localization/LocalizedLink.vue";
 import { useRouter } from "vue-router";
-import { getMetadataComparisonPageName, getPublicationComparisonPageName, getDocumentLandingPageBasePath } from "@/utils/PathResolutionUtil";
+import { getMetadataComparisonPageName, getPublicationComparisonPageName, getDocumentLandingPageBasePath, getEventMetadataComparisonPageName, getEventPublicationComparisonPageName, getEventLandingPageBasePath } from "@/utils/PathResolutionUtil";
 import { EntityType } from "@/models/MergeModel";
 import { getDocumentTypeDisplayValue } from "@/utils/EnumUtil";
 
@@ -210,7 +220,7 @@ export default defineComponent({
         const compareMetadata = (suggestion: DeduplicationSuggestion) => {
             switch(suggestion.entityType) {
                 case EntityType.PUBLICATION:
-                    router.push({name: getMetadataComparisonPageName(suggestion.documentPublicationType), params: {
+                    router.push({name: getMetadataComparisonPageName(suggestion.concreteEntityType), params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -225,7 +235,7 @@ export default defineComponent({
                     }});
                     break;
                 case EntityType.EVENT:
-                    router.push({name: "eventMetadataComparator", params: {
+                    router.push({name: getEventMetadataComparisonPageName(suggestion.concreteEntityType), params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -250,7 +260,7 @@ export default defineComponent({
         const comparePublications = (suggestion: DeduplicationSuggestion) => {
             switch(suggestion.entityType) {
                 case EntityType.PUBLICATION:
-                    router.push({name: getPublicationComparisonPageName(suggestion.documentPublicationType), params: {
+                    router.push({name: getPublicationComparisonPageName(suggestion.concreteEntityType), params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -265,7 +275,7 @@ export default defineComponent({
                     }});
                     break;
                 case EntityType.EVENT:
-                    router.push({name: "eventProceedingsComparator", params: {
+                    router.push({name: getEventPublicationComparisonPageName(suggestion.concreteEntityType), params: {
                         leftId: suggestion.leftEntityId, rightId: suggestion.rightEntityId
                     }});
                     break;
@@ -290,10 +300,11 @@ export default defineComponent({
         const canAggregateEntities = (suggestion: DeduplicationSuggestion) => {
             switch(suggestion.entityType) {
                 case EntityType.PUBLICATION:
-                    return suggestion.documentPublicationType === 'PROCEEDINGS' || suggestion.documentPublicationType === 'MONOGRAPH';
+                    return suggestion.concreteEntityType === "PROCEEDINGS" || suggestion.concreteEntityType === "MONOGRAPH";
+                case EntityType.EVENT:
+                    return suggestion.concreteEntityType === "CONFERENCE";
                 case EntityType.JOURNAL:
                 case EntityType.BOOK_SERIES:
-                case EntityType.EVENT:
                 case EntityType.PERSON:
                 case EntityType.ORGANISATION_UNIT:
                 case EntityType.PUBLISHER:
@@ -304,13 +315,13 @@ export default defineComponent({
         const getLandingPageBasePath = (suggestion: DeduplicationSuggestion) => {
             switch(suggestion.entityType) {
                 case EntityType.PUBLICATION:
-                    return getDocumentLandingPageBasePath(suggestion.documentPublicationType);
+                    return getDocumentLandingPageBasePath(suggestion.concreteEntityType);
                 case EntityType.JOURNAL:
                     return "journals/";
                 case EntityType.BOOK_SERIES:
                     return "book-series/";
                 case EntityType.EVENT:
-                    return "events/conference/";
+                    return getEventLandingPageBasePath(suggestion.concreteEntityType);
                 case EntityType.PERSON:
                     return "persons/";
                 case EntityType.ORGANISATION_UNIT:

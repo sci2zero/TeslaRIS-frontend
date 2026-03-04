@@ -24,13 +24,21 @@ export interface ThesisReportCounts {
     notDefendedCount: number;
     publiclyAvailableCount: number;
     closedAccessCount: number;
+    acceptedCount: number;
+    publicReviewCount: number;
+    submittedCount: number;
+    archivedCount: number;
 }
 
 export enum ThesisReportType {
     DEFENDED = "DEFENDED",
     NOT_DEFENDED = "NOT_DEFENDED",
     PUBLICLY_AVAILABLE = "PUBLICLY_AVAILABLE",
-    CLOSED_ACCESS = "CLOSED_ACCESS"
+    CLOSED_ACCESS = "CLOSED_ACCESS",
+    ACCEPTED = "ACCEPTED",
+    PUBLIC_REVIEW = "PUBLIC_REVIEW",
+    SUBMITTED = "SUBMITTED",
+    ARCHIVED = "ARCHIVED"
 }
 
 export interface ThesisSearchRequest {

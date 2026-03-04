@@ -51,6 +51,7 @@
                     :document="leftGeneticMaterial"
                     :proofs="leftGeneticMaterial?.proofs"
                     :file-items="leftGeneticMaterial?.fileItems"
+                    in-comparator
                 />
             </v-col>
 
@@ -114,6 +115,7 @@
                     :document="rightGeneticMaterial"
                     :proofs="rightGeneticMaterial?.proofs"
                     :file-items="rightGeneticMaterial?.fileItems"
+                    in-comparator
                 />
             </v-col>
         </v-row>

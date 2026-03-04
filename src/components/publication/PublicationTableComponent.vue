@@ -494,6 +494,10 @@ export default defineComponent({
         sortByDateDefault: {
             type: Boolean,
             default: false
+        },
+        limitOneSelection: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
@@ -539,9 +543,20 @@ export default defineComponent({
             }
         });
 
-        watch(selectedPublications, () => {
+        let isUpdatingSeelction = false;
+        watch(selectedPublications, (newVal) => {
+            if (isUpdatingSeelction) {
+                return;
+            }
+            
+            if (props.limitOneSelection && newVal.length > 1) {
+                isUpdatingSeelction = true;
+                selectedPublications.value = [newVal[newVal.length - 1]];
+                isUpdatingSeelction = false;
+            }
+
             emit("selectionUpdated", selectedPublications.value);
-        });
+        }, { deep: false });
 
         const titleLabel = computed(() => i18n.t("titleLabel"));
         const yearOfPublicationLabel = computed(() => i18n.t("yearOfPublicationLabel"));

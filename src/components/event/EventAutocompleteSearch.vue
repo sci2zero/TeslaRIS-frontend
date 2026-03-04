@@ -39,7 +39,7 @@
 import { defineComponent, watch, computed, type PropType, ref, onMounted } from 'vue';
 import lodash from "lodash";
 import EventService from '@/services/EventService';
-import type { Conference, EventIndex } from '@/models/EventModel';
+import { type Conference, type EventIndex, EventType } from '@/models/EventModel';
 import { useI18n } from 'vue-i18n';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
@@ -82,6 +82,10 @@ export default defineComponent({
         disableSubmission: {
             type: Boolean,
             default: false
+        },
+        eventType: {
+            type: Object as PropType<EventType>,
+            default: EventType.CONFERENCE
         }
     },
     emits: ["update:modelValue"],
@@ -119,7 +123,12 @@ export default defineComponent({
                 }
 
                 const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
-                EventService.searchConferences(params, props.returnOnlyNonSerialEvents, props.returnOnlySerialEvents, false, false).then((response) => {
+                EventService.searchEvents(
+                    params, props.returnOnlyNonSerialEvents, 
+                    props.returnOnlySerialEvents, 
+                    false, false, null, null, 
+                    [props.eventType as EventType]
+                ).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
                         title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} ${conference.dateFromTo ? ("| " + conference.dateFromTo) : ""}`,
                         value: conference.databaseId,

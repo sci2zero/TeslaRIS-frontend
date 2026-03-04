@@ -12,16 +12,13 @@
                 :readonly="lockSearchField"
                 @update:search="searchPersons($event)"
                 @update:model-value="onPersonSelect($event)"
-                @blur="onAutocompleteBlur"
-            >
+                @blur="onAutocompleteBlur">
                 <template #item="{ item, props }">
                     <v-list-item
-                        v-bind="{ ...props, title: undefined }"
-                    >
+                        v-bind="{ ...props, title: undefined }">
                         <person-publications-tooltip
                             :person-id="item.raw.value"
-                            :show="showLatestPublications"
-                        >
+                            :show="showLatestPublications">
                             {{ item.raw.title }}
                         </person-publications-tooltip>
                     </v-list-item>
@@ -66,23 +63,16 @@
                 @update:model-value="sendContentToParent"
             ></v-select>
         </v-col>
-        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
+        <v-col v-if="customNameInput || selectExternalAssociate" cols="4">
             <v-text-field
                 v-model="firstName"
                 :label="$t('firstNameLabel') + '*'"
                 :placeholder="$t('firstNameLabel')"
                 :rules="requiredFieldRules"
-                @update:model-value="sendContentToParent">
-                <template #append-inner>
-                    <v-btn 
-                        icon
-                        variant="text"
-                        class="ml-2"
-                        @click="[firstName, lastName] = [lastName, firstName]">
-                        <v-icon>mdi-swap-horizontal</v-icon>
-                    </v-btn>
-                </template>
-            </v-text-field>
+                append-inner-icon="mdi-swap-horizontal"
+                @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
+                @update:model-value="sendContentToParent"
+            />
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>
@@ -122,7 +112,9 @@
     <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
         <v-col>
             <multilingual-text-input
-                ref="affiliationStatementRef" v-model="affiliationStatement" :label="$t('affiliationStatementLabel')"
+                ref="affiliationStatementRef"
+                v-model="affiliationStatement"
+                :label="$t('affiliationStatementLabel')"
                 :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
                 @update:model-value="sendContentToParent"></multilingual-text-input>
         </v-col>
@@ -733,6 +725,8 @@ export default defineComponent({
                     externalInstitutionSuggestions.value = response.data;
                 });
             }
+
+            sendContentToParent();
         });
 
         return {

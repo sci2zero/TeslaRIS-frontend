@@ -70,6 +70,22 @@
                         <basic-info-loader v-if="!thesis" />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div v-if="thesis?.substituteFor">
+                                    {{ $t("substituteForLabel") }}:
+                                </div>
+                                <div v-if="thesis?.substituteFor" class="response">
+                                    <localized-link :to="'scientific-results/thesis/' + thesis?.substituteFor">
+                                        {{ returnCurrentLocaleContent(thesis.substitutedTitle) }}
+                                    </localized-link>
+                                </div>
+                                <div v-if="thesis?.substitutedBy">
+                                    {{ $t("substitutedByLabel") }}:
+                                </div>
+                                <div v-if="thesis?.substitutedBy" class="response">
+                                    <localized-link :to="'scientific-results/thesis/' + thesis?.substitutedBy">
+                                        {{ returnCurrentLocaleContent(thesis.substituteTitle) }}
+                                    </localized-link>
+                                </div>
                                 <div v-if="thesis?.thesisType">
                                     {{ $t("typeOfPublicationLabel") }}:
                                 </div>
@@ -271,7 +287,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="isAdmin || isHeadOfLibrary || userCanPutOnPublicReview" class="actions-box pa-4">
+        <div v-if="userCanPutOnPublicReview" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -312,7 +328,7 @@
                     {{ $t("restartPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
-                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived"
+                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived && !thesis.isOnPublicReview"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changeArchiveState(true)">
@@ -344,6 +360,25 @@
                     outlined wide
                     @create="createRegistryBookEntry"
                 />
+                <generic-crud-modal
+                    v-if="!thesis?.substitutedBy && thesis?.contributions?.find(c => c.contributionType === DocumentContributionType.AUTHOR)"
+                    :form-component="ThesisSubstitutionForm"
+                    :form-props="{ thesisId: thesis?.id, researcherId: thesis?.contributions?.find(c => c.contributionType === DocumentContributionType.AUTHOR)?.personId, existingSubstitutionId: thesis.substitutedBy }"
+                    entity-name="Substitution"
+                    is-update
+                    primary-color
+                    compact
+                    outlined wide
+                    :read-only="!canEdit || !userCanPutOnPublicReview"
+                    @update="fetchThesis"
+                />
+                <v-btn
+                    v-if="thesis?.substitutedBy && canEdit && userCanPutOnPublicReview"
+                    class="mb-5 ml-2" color="primary" density="compact"
+                    variant="outlined"
+                    @click="removeSubstitution()">
+                    {{ $t("removeSubstitutionLabel") }}
+                </v-btn>
             </div>
         </div>
 
@@ -381,10 +416,10 @@
                 value="researchOutput">
                 {{ $t("researchOutputLabel") }}
             </v-tab>
-            <v-tab v-show="documentIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="(documentIndicators && documentIndicators.length > 0) || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="documentClassifications?.length > 0 || canClassify" value="assessments">
+            <v-tab v-show="(documentClassifications && documentClassifications.length > 0) || canClassify" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -400,7 +435,7 @@
                 <person-document-contribution-tabs
                     :document-id="thesis?.id"
                     :contribution-list="thesis?.contributions ? thesis?.contributions : []"
-                    :read-only="!canEdit"
+                    :read-only="!canEdit || thesis?.isOnPublicReview"
                     board-members-allowed
                     limit-one-author
                     @update="updateContributions">
@@ -519,7 +554,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import { PublicationType, ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
+import { DocumentContributionType, PublicationType, ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, Thesis } from '@/models/PublicationModel';
@@ -570,6 +605,7 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import ThesisSubstitutionForm from '@/components/publication/ThesisSubstitutionForm.vue';
 
 
 export default defineComponent({
@@ -597,18 +633,18 @@ export default defineComponent({
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission } = useUserRole();
-        const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value);
+        const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
         const canEdit = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
 
-        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+        const documentClassifications = ref<EntityClassificationResponse[]>();
 
         const icon = ref("mdi-certificate-outline");
 
-        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentIndicators = ref<EntityIndicatorResponse[]>();
 
         const loginStore = useLoginStore();
 
@@ -666,6 +702,11 @@ export default defineComponent({
             DocumentPublicationService.readThesis(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
+                if (parseInt(currentRoute.params.id as string) !== response.data.id) {
+                    router.push({ name: "thesisLandingPage", params: {id: response.data.id} });
+                    return;
+                }
+
                 thesis.value = response.data;
                 if (loginStore.userLoggedIn) {
                     checkIfUserCanEdit();
@@ -961,6 +1002,14 @@ export default defineComponent({
 
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
+        const removeSubstitution = () => {
+            DocumentPublicationService.removeSubstitution(
+                thesis.value?.id as number
+            ).then(() => {
+                fetchThesis();
+            })
+        };
+
         return {
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
@@ -978,7 +1027,8 @@ export default defineComponent({
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
-            continueLastReview, shortenedReview, isCommission
+            continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
+            DocumentContributionType, removeSubstitution
         };
 }})
 

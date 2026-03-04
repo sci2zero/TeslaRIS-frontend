@@ -179,6 +179,7 @@
             :handle-researcher-unbind="handleResearcherUnbind"
             :display-citation="false"
             for-proceedings
+            enable-metadata-scanning
         />
 
         <br />
@@ -193,7 +194,7 @@
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
             <v-tab value="contributions">
-                {{ $t("boardAndReviewersLabel") }}
+                {{ $t("editorsAndReviewersLabel") }}
             </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
@@ -201,7 +202,7 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-if="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-if="documentIndicators && documentIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -229,6 +230,8 @@
                     :contribution-list="proceedings?.contributions ? proceedings?.contributions : []"
                     :read-only="!canEdit"
                     shows-board-and-reviewers
+                    :board-members-allowed="false"
+                    for-proceedings
                     @update="updateContributions">
                 </person-document-contribution-tabs>
             </v-tabs-window-item>
@@ -383,7 +386,7 @@ export default defineComponent({
 
         const icon = ref("mdi-newspaper-variant-multiple");
 
-        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
+        const documentIndicators = ref<EntityIndicatorResponse[]>();
 
         const loginStore= useLoginStore();
 

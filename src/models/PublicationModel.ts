@@ -255,7 +255,7 @@ export interface DeduplicationSuggestion {
     rightTitleSr: string;
     leftTitleOther: string;
     rightTitleOther: string;
-    documentPublicationType: PublicationType;
+    concreteEntityType: string;
     entityType: EntityType;
     leftYear: number;
     rightYear: number;
@@ -304,6 +304,10 @@ export interface Thesis extends Document {
     alternateTitle?: MultilingualContent[];
     publicReviewCompleted?: boolean;
     isShortenedReview?: boolean;
+    substituteFor?: number;
+    substitutedTitle?: MultilingualContent[];
+    substitutedBy?: number;
+    substituteTitle?: MultilingualContent[];
 }
 
 export interface CitationResponse {

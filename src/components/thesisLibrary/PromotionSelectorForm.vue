@@ -26,7 +26,8 @@ import { defineComponent, onMounted } from 'vue';
 import { ref } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import PromotionService from '@/services/thesisLibrary/PromotionService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseTime } from '@/utils/DateUtil';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -39,6 +40,7 @@ export default defineComponent({
         const selectedPromotion = ref<{title: string, value: number}>({title: "", value: -1});
 
         const { requiredSelectionRules } = useValidationUtils();
+        const i18n = useI18n();
 
         onMounted(() => {
             PromotionService.getNonFinishedPromotions()
@@ -47,7 +49,7 @@ export default defineComponent({
                 response.data.forEach(promotion => {
                     promotions.value.push(
                         {
-                            title: localiseDate(promotion.promotionDate) as string,
+                            title: `${localiseDate(promotion.promotionDate) as string} ${i18n.t("inLabel")} ${localiseTime(promotion.promotionTime) as string}`,
                             value: promotion.id as number
                         }
                     );

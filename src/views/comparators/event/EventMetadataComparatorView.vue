@@ -358,7 +358,7 @@ export default defineComponent({
 
                 await deleteAction;
 
-                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.EVENT);
+                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.CONFERENCE);
                 await MergeService.switchAllIndicatorsToOtherConference(id as number, transferTargetId as number);
                 await MergeService.switchAllClassificationsToOtherConference(id as number, transferTargetId as number);
 

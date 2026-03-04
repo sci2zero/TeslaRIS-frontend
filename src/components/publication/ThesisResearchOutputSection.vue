@@ -24,8 +24,8 @@
                 allow-selection
                 :can-remove-research-outputs="canEdit"
                 @remove-research-outputs="removeSelectedOutputs"
-                @switch-page="switchPage">
-            </publication-table-component>
+                @switch-page="switchPage"
+            />
         </v-col>
     </v-row>
 </template>

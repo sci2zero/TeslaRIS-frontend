@@ -5,7 +5,7 @@
         </v-sheet>
         <br />
         <br />
-        <conference-submission-form ref="submissionFormRef"></conference-submission-form>
+        <conference-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn

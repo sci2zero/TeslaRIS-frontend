@@ -9,8 +9,8 @@ export class PromotionService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async getAllPromotions(pageable: string): Promise<AxiosResponse<Page<Promotion>>> {
-        return super.sendRequest(axios.get, `promotion?${pageable}`);
+    async getAllPromotions(pageable: string, nonFinishedOnly: boolean): Promise<AxiosResponse<Page<Promotion>>> {
+        return super.sendRequest(axios.get, `promotion?${pageable}&nonFinishedOnly=${nonFinishedOnly}`);
     }
 
     async getNonFinishedPromotions(): Promise<AxiosResponse<Promotion[]>> {

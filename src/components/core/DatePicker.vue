@@ -75,7 +75,7 @@ export default defineComponent({
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const isMenuOpen = ref(false);
-        const selectedDate = ref(props.modelValue ? new Date(props.modelValue) : undefined);
+        const selectedDate = ref(props.modelValue ? new Date(props.modelValue.toLowerCase().replaceAll("|", "-").replaceAll("%7c", "-")) : undefined);
 
         const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
 
@@ -105,7 +105,7 @@ export default defineComponent({
 
         watch(() => props.modelValue, (newDate) => {
             if(newDate) {
-                selectedDate.value = new Date(newDate);
+                selectedDate.value = new Date(newDate.toLowerCase().replaceAll("|", "-").replaceAll("%7c", "-"));
             }
         });
 

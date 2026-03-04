@@ -15,7 +15,8 @@ export const scheduledTaskTypeSr = [
     { title: "Generisanje izveštaja", value: ScheduledTaskType.REPORT_GENERATION },
     { title: "Brisanje neuvezanih publikacija", value: ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION },
     { title: "Sklanjanje sa javnog uvida", value: ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK },
-    { title: "Održavanje", value: ScheduledTaskType.MAINTENANCE }
+    { title: "Održavanje", value: ScheduledTaskType.MAINTENANCE },
+    { title: "Obogaćivanje metapodataka", value: ScheduledTaskType.METADATA_ENRICHMENT }
 ];
 
 export const scheduledTaskTypeEn = [
@@ -31,7 +32,8 @@ export const scheduledTaskTypeEn = [
     { title: "Report generation", value: ScheduledTaskType.REPORT_GENERATION },
     { title: "Non-managed publications deletion", value: ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION },
     { title: "Public review removal", value: ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK },
-    { title: "Maintenance", value: ScheduledTaskType.MAINTENANCE }
+    { title: "Maintenance", value: ScheduledTaskType.MAINTENANCE },
+    { title: "Metadata enrichment", value: ScheduledTaskType.METADATA_ENRICHMENT }
 ];
 
 export const getScheduledTaskTypeTitleFromValueAutoLocale = (value: ScheduledTaskType) => {

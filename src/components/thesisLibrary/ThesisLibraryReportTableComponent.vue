@@ -94,6 +94,42 @@
                             :institution-id="props.item.institutionId">
                         </thesis-library-report-table-modal>
                     </td>
+                    <td>
+                        <thesis-library-report-table-modal
+                            class="mt-3"
+                            :display-count="props.item.acceptedCount"
+                            :report-request="(reportRequest as ThesisReportRequest)"
+                            :report-type="ThesisReportType.ACCEPTED"
+                            :institution-id="props.item.institutionId">
+                        </thesis-library-report-table-modal>
+                    </td>
+                    <td>
+                        <thesis-library-report-table-modal
+                            class="mt-3"
+                            :display-count="props.item.publicReviewCount"
+                            :report-request="(reportRequest as ThesisReportRequest)"
+                            :report-type="ThesisReportType.PUBLIC_REVIEW"
+                            :institution-id="props.item.institutionId">
+                        </thesis-library-report-table-modal>
+                    </td>
+                    <td>
+                        <thesis-library-report-table-modal
+                            class="mt-3"
+                            :display-count="props.item.submittedCount"
+                            :report-request="(reportRequest as ThesisReportRequest)"
+                            :report-type="ThesisReportType.SUBMITTED"
+                            :institution-id="props.item.institutionId">
+                        </thesis-library-report-table-modal>
+                    </td>
+                    <td>
+                        <thesis-library-report-table-modal
+                            class="mt-3"
+                            :display-count="props.item.archivedCount"
+                            :report-request="(reportRequest as ThesisReportRequest)"
+                            :report-type="ThesisReportType.ARCHIVED"
+                            :institution-id="props.item.institutionId">
+                        </thesis-library-report-table-modal>
+                    </td>
                 </tr>
             </template>
         </v-data-table>
@@ -142,13 +178,21 @@ export default defineComponent({
         const notDefendedLabel = computed(() => i18n.t("notDefendedLabel"));
         const closedAccessLabel = computed(() => i18n.t("closedAccessLabel"));
         const publiclyAvailableLabel = computed(() => i18n.t("publiclyAvailableLabel"));
+        const acceptedLabel = computed(() => i18n.t("acceptedLabel"));
+        const publicReviewLabel = computed(() => i18n.t("publicReviewLabel"));
+        const archivedLabel = computed(() => i18n.t("archivedLabel"));
+        const submittedLabel = computed(() => i18n.t("submittedLabel"));
 
         const headers = ref<any>([
-            { title: nameLabel, align: "start", sortable: false, key: "name"},
-            { title: defendedLabel, align: "start", sortable: false, key: "defended"},
-            { title: notDefendedLabel, align: "start", sortable: false, key: "notDefended"},
-            { title: publiclyAvailableLabel, align: "start", sortable: false, key: "publicAccess"},
-            { title: closedAccessLabel, align: "start", sortable: false, key: "closedAccess"}
+            { title: nameLabel, align: "center", sortable: false, key: "name"},
+            { title: defendedLabel, align: "center", sortable: false, key: "defended"},
+            { title: notDefendedLabel, align: "center", sortable: false, key: "notDefended"},
+            { title: publiclyAvailableLabel, align: "center", sortable: false, key: "publicAccess"},
+            { title: closedAccessLabel, align: "center", sortable: false, key: "closedAccess"},
+            { title: acceptedLabel, align: "center", sortable: false, key: "accepted"},
+            { title: publicReviewLabel, align: "center", sortable: false, key: "publicReview"},
+            { title: submittedLabel, align: "center", sortable: false, key: "submitted"},
+            { title: archivedLabel, align: "center", sortable: false, key: "archived"}
         ]);
 
         watch(() => props.reportRequest, () => {

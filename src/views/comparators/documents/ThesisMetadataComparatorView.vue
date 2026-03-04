@@ -8,14 +8,26 @@
                 <br />
 
                 <thesis-update-form
-                    ref="updateLeftRef" :preset-thesis="leftThesis" in-comparator :in-modal="false"
-                    @update="updateLeft"></thesis-update-form>
+                    ref="updateLeftRef"
+                    :preset-thesis="leftThesis"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftThesis?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftThesis?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftThesis?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftThesis?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,12 +42,21 @@
                             :contribution-list="leftThesis?.contributions ? leftThesis.contributions : []"
                             :document-id="leftThesis?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="leftThesis" :proofs="leftThesis?.proofs" :file-items="leftThesis?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="leftThesis"
+                    :proofs="leftThesis?.proofs"
+                    :file-items="leftThesis?.fileItems"
+                    :preliminary-files="leftThesis?.preliminaryFiles"
+                    :preliminary-supplements="leftThesis?.preliminarySupplements"
+                    :commission-reports="leftThesis?.commissionReports"
+                    in-comparator
+                    show-all-thesis-sections
+                />
             </v-col>
 
             <v-col cols="1">
@@ -55,14 +76,26 @@
                 <br />
 
                 <thesis-update-form
-                    ref="updateRightRef" :preset-thesis="rightThesis" in-comparator :in-modal="false"
-                    @update="updateRight"></thesis-update-form>
+                    ref="updateRightRef"
+                    :preset-thesis="rightThesis"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightThesis?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightThesis?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightThesis?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightThesis?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -77,12 +110,21 @@
                             :contribution-list="rightThesis?.contributions ? rightThesis.contributions : []"
                             :document-id="rightThesis?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="rightThesis" :proofs="rightThesis?.proofs" :file-items="rightThesis?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="rightThesis"
+                    :proofs="rightThesis?.proofs"
+                    :file-items="rightThesis?.fileItems"
+                    :preliminary-files="rightThesis?.preliminaryFiles"
+                    :preliminary-supplements="rightThesis?.preliminarySupplements"
+                    :commission-reports="rightThesis?.commissionReports"
+                    in-comparator
+                    show-all-thesis-sections
+                />
             </v-col>
         </v-row>
 
@@ -92,8 +134,8 @@
             :right-id="(rightThesis?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

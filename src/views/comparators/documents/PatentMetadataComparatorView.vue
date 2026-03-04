@@ -35,7 +35,12 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="leftPatent" :proofs="leftPatent?.proofs" :file-items="leftPatent?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="leftPatent" 
+                    :proofs="leftPatent?.proofs"
+                    :file-items="leftPatent?.fileItems"
+                    in-comparator
+                />
             </v-col>
 
             <v-col cols="1">
@@ -82,7 +87,11 @@
                     </v-card-text>
                 </v-card>
 
-                <attachment-section :document="rightPatent" :proofs="rightPatent?.proofs" :file-items="rightPatent?.fileItems"></attachment-section>
+                <attachment-section
+                    :document="rightPatent"
+                    :proofs="rightPatent?.proofs"
+                    :file-items="rightPatent?.fileItems"
+                />
             </v-col>
         </v-row>
 

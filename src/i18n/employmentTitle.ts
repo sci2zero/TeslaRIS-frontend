@@ -22,7 +22,7 @@ const employmentTitlesSr = [
     { title: "Docent", value: EmploymentTitle.ASSISTANT_PROFESSOR },
     { title: "Profesor emeritus", value: EmploymentTitle.PROFESSOR_EMERITUS },
     { title: "Naučni saradnik", value: EmploymentTitle.SCIENTIFIC_COLLABORATOR },
-    { title: "Stariji naučni saradnik", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
+    { title: "Viši naučni saradnik", value: EmploymentTitle.SENIOR_SCIENTIFIC_COLLABORATOR },
     { title: "Naučni savetnik", value: EmploymentTitle.SCIENTIFIC_ADVISOR },
     { title: "Profesor u penziji", value: EmploymentTitle.RETIRED_PROFESSOR },
     { title: "Profesor inženjer habilitovan", value: EmploymentTitle.PROFESSOR_ENGINEER_HABILITATED },

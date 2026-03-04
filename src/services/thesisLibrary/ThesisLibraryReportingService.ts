@@ -37,6 +37,14 @@ export class ThesisLibraryReportingService extends BaseService {
         return super.sendRequest(axios.post, `thesis-library/report/closed-access?${pageable}`, body);
     }
 
+    async getSubmittedThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.post, `thesis-library/report/submitted?${pageable}`, body);
+    }
+
+    async getArchivedThesesForPeriod(body: ThesisReportRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+        return super.sendRequest(axios.post, `thesis-library/report/archived?${pageable}`, body);
+    }
+
     async downloadReport(body: ThesisReportRequest, lang: string): Promise<void> {
         const downloadStore = useDownloadStore();
         if (downloadStore.isDownloading) {

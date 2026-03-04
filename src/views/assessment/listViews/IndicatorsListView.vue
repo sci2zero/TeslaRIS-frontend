@@ -10,12 +10,13 @@
             :tab-number="1"
             layout="table"
         />
-        <indicator-table-component
-            v-show="!loading"
-            :indicators="indicators"
-            :total-indicators="totalIndicators"
-            @switch-page="switchPage"
-        />
+        <div v-show="!loading">
+            <indicator-table-component
+                :indicators="indicators"
+                :total-indicators="totalIndicators"
+                @switch-page="switchPage"
+            />
+        </div>
     </v-container>
 </template>
 
@@ -41,7 +42,7 @@ export default defineComponent({
         const indicators = ref<IndicatorResponse[]>([]);
         const totalIndicators = ref(0);
         const page = ref(0);
-        const size = ref(25);
+        const size = ref(50);
         const sort = ref("");
         const direction = ref("");
 

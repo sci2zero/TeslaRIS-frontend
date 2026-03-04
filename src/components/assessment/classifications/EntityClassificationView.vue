@@ -1,57 +1,69 @@
 <template>
-    <generic-crud-modal
-        class="mt-5"
-        :form-component="EntityClassificationForm"
-        :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
-        :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
-        :read-only="!canEdit"
-        @create="createClassification"
-    />
-    <v-row>
-        <v-col>
-            <h2 class="mt-5">
-                {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("classificationsLabel") : $t("assessmentsLabel") }}
-            </h2>
-        
-            <v-expansion-panels v-if="entityClassifications?.length > 0" v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
-                <v-expansion-panel
-                    v-for="(classification, index) in entityClassifications"
-                    :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
-                    <v-expansion-panel-text>
-                        <v-row>
-                            <p class="mt-3 mb-5 ml-3">
-                                {{ contents[index] }}
-                            </p>
-                        </v-row>
-                        <v-row v-if="classification.manual">
-                            <div v-if="classification.commissionId === loggedInUser?.commissionId || isAdmin">
-                                <generic-crud-modal
-                                    :form-component="EntityClassificationForm"
-                                    :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
-                                    entity-name=""
-                                    is-update
-                                    :read-only="!canEdit"
-                                    @update="updateClassification($event, classification.id)"
-                                />
-                            </div>
-                            <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || isAdmin)" class="ml-5">
-                                <v-btn density="compact" @click.prevent="deleteClassification(classification.id)">
-                                    {{ $t("deleteLabel") }}
-                                </v-btn>
-                            </div>
-                        </v-row>
-                    </v-expansion-panel-text>
-                </v-expansion-panel>
-            </v-expansion-panels>
-            <h3 v-else>
-                {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("noClassificationsLabel") : $t("noAssessmentsLabel") }}
-            </h3>
-        </v-col>
-    </v-row>
+    <div
+        v-if="isLoading"
+        class="d-flex flex-row justify-center align-center mt-10 mb-5">
+        <v-progress-circular
+            indeterminate
+            size="64"
+            width="6"
+            color="primary"
+        />
+    </div>
+    <div v-else>
+        <generic-crud-modal
+            class="mt-5"
+            :form-component="EntityClassificationForm"
+            :form-props="{ applicableTypes: applicableTypes, entityId: entityId, entityType: containingEntityType }"
+            :entity-name="containingEntityType === ApplicableEntityType.DOCUMENT ? 'EntityAssessment' : 'EntityClassification'"
+            :read-only="!canEdit"
+            @create="createClassification"
+        />
+        <v-row>
+            <v-col>
+                <h2 class="mt-5">
+                    {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("classificationsLabel") : $t("assessmentsLabel") }}
+                </h2>
+            
+                <v-expansion-panels v-if="entityClassifications && entityClassifications?.length > 0" v-model="openedPanel" class="mt-3 mb-1 ml1 mr-1">
+                    <v-expansion-panel
+                        v-for="(classification, index) in entityClassifications"
+                        :key="classification.id" :title="titles[index] + (classification.manual ? ` (${$t('manualLabel')})` : '')">
+                        <v-expansion-panel-text>
+                            <v-row>
+                                <p class="mt-3 mb-5 ml-3">
+                                    {{ contents[index] }}
+                                </p>
+                            </v-row>
+                            <v-row v-if="classification.manual">
+                                <div v-if="classification.commissionId === loggedInUser?.commissionId || isAdmin">
+                                    <generic-crud-modal
+                                        :form-component="EntityClassificationForm"
+                                        :form-props="{ presetClassification: classification, applicableTypes: classification.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
+                                        entity-name=""
+                                        is-update
+                                        :read-only="!canEdit"
+                                        @update="updateClassification($event, classification.id)"
+                                    />
+                                </div>
+                                <div v-if="canEdit && (classification.commissionId === loggedInUser?.commissionId || isAdmin)" class="ml-5">
+                                    <v-btn density="compact" @click.prevent="deleteClassification(classification.id)">
+                                        {{ $t("deleteLabel") }}
+                                    </v-btn>
+                                </div>
+                            </v-row>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+                <h3 v-else>
+                    {{ (containingEntityType != ApplicableEntityType.DOCUMENT) ? $t("noClassificationsLabel") : $t("noAssessmentsLabel") }}
+                </h3>
+            </v-col>
+        </v-row>
+    </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, watch } from 'vue';
+import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
 import { ref } from 'vue';
 import type { EntityClassificationResponse } from '@/models/AssessmentModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -68,8 +80,9 @@ export default defineComponent({
     components: { GenericCrudModal },
     props: {
         entityClassifications: {
-            type: Array<EntityClassificationResponse>,
-            required: true
+            type: Array as PropType<EntityClassificationResponse[] | undefined>,
+            required: false,
+            default: undefined
         },
         canEdit: {
             type: Boolean,
@@ -92,6 +105,8 @@ export default defineComponent({
     setup(props, {emit}) {
         const titles = ref<string[]>([]);
         const contents = ref<string[]>([]);
+
+        const isLoading = computed(() => props.entityClassifications === undefined);
 
         const openedPanel = ref();
 
@@ -160,12 +175,18 @@ export default defineComponent({
                 await EntityClassificationService.updatePublicationSeriesClassification(entityClassification, entityClassificationId);
             } else if (props.containingEntityType === ApplicableEntityType.DOCUMENT) {
                 await EntityClassificationService.updateDocumentClassification(entityClassification, entityClassificationId);
+            } else if (props.containingEntityType === ApplicableEntityType.PRIZE) {
+                await EntityClassificationService.updatePrizeClassification(entityClassification, entityClassificationId);
             }
 
             emit("update");
         };
 
         const deleteClassification = async (entityClassificationId: number) => {
+            if (!props.entityClassifications) {
+                return;
+            }
+
             openedPanel.value = null;
             await EntityClassificationService.deleteEntityClassification(entityClassificationId);
             const index = props.entityClassifications.findIndex(classification => classification.id === entityClassificationId);
@@ -187,7 +208,7 @@ export default defineComponent({
             updateClassification,
             deleteClassification,
             createClassification,
-            loggedInUser
+            loggedInUser, isLoading
         };
     }
 });

@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import type { DocumentAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PublicationSeriesAssessmentClassification, ResearcherAssessmentResponse } from "@/models/AssessmentModel";
+import type { DocumentAssessmentClassification, EntityClassificationResponse, EventAssessmentClassification, PrizeAssessmentClassification, PublicationSeriesAssessmentClassification, ResearcherAssessmentResponse } from "@/models/AssessmentModel";
 
 
 export class EntityClassificationService extends BaseService {
@@ -28,6 +28,10 @@ export class EntityClassificationService extends BaseService {
         return super.sendRequest(axios.get, `assessment/person-assessment-classification/assess/${personId}?startDate=${startDate}&endDate=${endDate}`);
     }
 
+    async fetchPrizeClassifications(prizeId: number): Promise<AxiosResponse<EntityClassificationResponse[]>> {
+        return super.sendRequest(axios.get, `assessment/prize-assessment-classification/${prizeId}`);
+    }
+
     async fetchPublicationSeriesClassifications(publicationSeriesId: number): Promise<AxiosResponse<EntityClassificationResponse[]>> {
         return super.sendRequest(axios.get, `assessment/publication-series-assessment-classification/${publicationSeriesId}`);
     }
@@ -44,6 +48,10 @@ export class EntityClassificationService extends BaseService {
         return super.sendRequest(axios.post, `assessment/publication-series-assessment-classification`, body, EntityClassificationService.idempotencyKey);
     }
 
+    async createPrizeClassification(body: PrizeAssessmentClassification): Promise<AxiosResponse<EntityClassificationResponse>> {
+        return super.sendRequest(axios.post, `assessment/prize-assessment-classification`, body, EntityClassificationService.idempotencyKey);
+    }
+
     async updateDocumentClassification(body: DocumentAssessmentClassification, documentClassificationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `assessment/document-assessment-classification/${body.documentId}/${documentClassificationId}`, body);
     }
@@ -54,6 +62,10 @@ export class EntityClassificationService extends BaseService {
 
     async updatePublicationSeriesClassification(body: PublicationSeriesAssessmentClassification, publicationSeriesClassificationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `assessment/publication-series-assessment-classification/${publicationSeriesClassificationId}`, body);
+    }
+
+    async updatePrizeClassification(body: PrizeAssessmentClassification, prizeClassificationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `assessment/prize-assessment-classification/${prizeClassificationId}`, body);
     }
 
     async deleteEntityClassification(entityClassificationId: number): Promise<AxiosResponse<void>> {

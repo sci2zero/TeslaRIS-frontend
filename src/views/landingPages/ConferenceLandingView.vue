@@ -36,7 +36,7 @@
                         <generic-crud-modal
                             :form-component="EventUpdateForm"
                             :form-props="{ presetEvent: conference }"
-                            entity-name="IntangibleProduct"
+                            entity-name="Conference"
                             is-update
                             is-section-update
                             :read-only="!canEdit"
@@ -87,7 +87,7 @@
                                     {{ conference.number }}
                                 </div>
                                 <div v-if="conference?.fee">
-                                    {{ $t("entryFeeLabel") }}:
+                                    {{ $t("cotizationFeeLabel") }}:
                                 </div>
                                 <div v-if="conference?.fee" class="response">
                                     {{ conference.fee }}
@@ -128,10 +128,10 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="eventIndicators?.length > 0 || canClassify" value="indicators">
+            <v-tab v-show="(eventIndicators && eventIndicators.length > 0) || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="eventClassifications?.length > 0 || canClassify" value="classifications">
+            <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
         </v-tabs>
@@ -168,17 +168,24 @@
                 <description-section
                     :description="conference?.description ? conference.description : []"
                     :can-edit="canEdit"
+                    is-general-description
                     @update="updateDescription">
                 </description-section>
             
                 <!-- Proceedings List -->
                 <div v-if="!conference?.serialEvent">
                     <br />
-                    <proceedings-list :preset-event="conference" :readonly="!canEdit"></proceedings-list>
+                    <proceedings-list
+                        :preset-event="conference"
+                        :readonly="!canEdit"
+                    />
                 </div>
 
                 <div class="mt-10">
-                    <events-relation-list :preset-event="conference" :readonly="!canEdit"></events-relation-list>
+                    <events-relation-list
+                        :preset-event="conference"
+                        :readonly="!canEdit"
+                    />
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
@@ -199,7 +206,7 @@
                     :entity-id="conference?.id"
                     :can-edit="canClassify"
                     :containing-entity-type="ApplicableEntityType.EVENT"
-                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    :applicable-types="[ApplicableEntityType.CONFERENCE]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
@@ -275,8 +282,8 @@ export default defineComponent({
         const canClassify = ref(false);
         const country = ref<Country>();
 
-        const eventIndicators = ref<EntityIndicatorResponse[]>([]);
-        const eventClassifications = ref<EntityClassificationResponse[]>([]);
+        const eventIndicators = ref<EntityIndicatorResponse[]>();
+        const eventClassifications = ref<EntityClassificationResponse[]>();
 
         const loginStore = useLoginStore();
 

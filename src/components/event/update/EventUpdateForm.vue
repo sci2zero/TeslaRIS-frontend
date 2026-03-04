@@ -5,13 +5,22 @@
                 <v-row>
                     <v-col>
                         <multilingual-text-input
-                            ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetEvent?.name, languageTags)"></multilingual-text-input>
+                            ref="nameRef"
+                            v-model="name"
+                            :rules="requiredFieldRules"
+                            :label="$t('nameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetEvent?.name, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationRef" v-model="nameAbbreviation" :label="$t('conferenceAbbreviationLabel')" :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="abbreviationRef"
+                            v-model="nameAbbreviation"
+                            :label="$t('conferenceAbbreviationLabel')"
+                            :initial-value="toMultilingualTextInput(presetEvent?.nameAbbreviation, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <h3 v-if="!serialEvent">
@@ -64,17 +73,32 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" :initial-value="toMultilingualTextInput(presetEvent?.place, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="placeRef"
+                            v-model="place"
+                            :label="$t('placeLabel')"
+                            :initial-value="toMultilingualTextInput(presetEvent?.place, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="confId" label="Conf ID" placeholder="Conf ID" :rules="confIdValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="confId"
+                            label="Conf ID"
+                            placeholder="Conf ID"
+                            :rules="confIdValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="sourceOpenAlexIdValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="sourceOpenAlexIdValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row v-if="!serialEvent">
@@ -84,16 +108,19 @@
                             :label="$t('conferenceNumberLabel')"
                         ></v-text-field>
                     </v-col>
-                    <!-- <v-col cols="5">
+                    <v-col cols="5">
                         <v-text-field
                             v-model="entryFee"
-                            :label="$t('entryFeeLabel')"
+                            :label="$t('cotizationFeeLabel')"
                         ></v-text-field>
-                    </v-col> -->
+                    </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <uri-input ref="urisRef" v-model="uris"></uri-input>
+                        <uri-input
+                            ref="urisRef"
+                            v-model="uris"
+                        />
                     </v-col>
                 </v-row>
             </v-col>

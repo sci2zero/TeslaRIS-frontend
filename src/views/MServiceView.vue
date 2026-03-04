@@ -158,6 +158,20 @@
 
             <div ref="assessmentSectionRef">
                 <v-container v-show="assessmentResponse && assessmentResponse.assessmentCode">
+                    <v-row v-if="ifTableData">
+                        <v-col cols="12" md="4">
+                            <strong>
+                                {{ $t((ifTableData as IFTableResponse).editions.filter(ed => ed).length > 1 ? "editionsLabel" : "editionLabel") }}:
+                            </strong>
+                        </v-col>
+                        <v-col cols="12" md="8">
+                            <span
+                                v-for="(edition, index) in (ifTableData as IFTableResponse).editions.filter(ed => ed)"
+                                :key="edition">
+                                {{ edition }}{{ (index < (ifTableData as IFTableResponse).editions.filter(ed => ed).length - 1) ? "," : "" }}
+                            </span>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col cols="12" md="4">
                             <strong>{{ $t("assessmentCodeLabel") }}:</strong>
@@ -222,8 +236,8 @@
                     :json-data="(ifTableData as IFTableResponse)"
                     :preset-from-year="(yearOfPublication as number) - 2"
                     :preset-to-year="(yearOfPublication as number)"
-                    @years-updated="fetchIFTableData">
-                </i-f-table-component>
+                    @years-updated="fetchIFTableData"
+                />
             </div>
         </v-form>
     </v-container>
@@ -248,7 +262,6 @@ import { getTypesForGivenLocale as getJournalPublicationTypes, getTitleFromValue
 import { getTypesForGivenLocale as getProceedingsPublicationTypes, getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
 import VueRecaptcha from 'vue3-recaptcha2';
 import { useI18n } from 'vue-i18n';
-import { useLoginStore } from '@/stores/loginStore';
 import CommissionService from '@/services/assessment/CommissionService';
 import { useUserRole } from '@/composables/useUserRole';
 import UserService from '@/services/UserService';
@@ -263,8 +276,6 @@ export default defineComponent({
         const ifTableData = ref<IFTableResponse>();
 
         const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string;
-
-        const loginStore = useLoginStore();
 
         const { isUserLoggedIn, isResearcher } = useUserRole();
 
@@ -290,7 +301,7 @@ export default defineComponent({
         const assessmentSectionRef = ref<HTMLElement | null>(null);
 
         onMounted(async () => {
-            document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}}`;
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.mService")}`;
             fetchCommissions();
 
             if (isResearcher.value) {
@@ -405,13 +416,11 @@ export default defineComponent({
         };
 
         const fetchIFTableData = (fromYear: number, toYear: number) => {
-            if (loginStore.userLoggedIn) {
-                EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(
-                    selectedJournal.value.value, fromYear, toYear
-                ).then(response => {
-                    ifTableData.value = response.data;
-                });       
-            }
+            EntityIndicatorService.fetchPublicationSeriesIFTableIndicators(
+                selectedJournal.value.value, fromYear, toYear
+            ).then(response => {
+                ifTableData.value = response.data;
+            });
         };
 
         const resetChallenge = () => {

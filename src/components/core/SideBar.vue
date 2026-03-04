@@ -276,7 +276,8 @@ const assessmentsMenu = ref<MenuItem[]>([
     { key: 'classifications', label: computed(() => i18n.t('routeLabel.classifications')), to: '/assessment/classifications', icon: 'mdi-tag-multiple' },
     { key: 'assessment-rulebooks', label: computed(() => i18n.t('assessmentRulebookPageLabel')), to: '/assessment/assessment-rulebooks', icon: 'mdi-book-open' },
     { key: 'commissions', label: computed(() => i18n.t('routeLabel.commissions')), to: '/assessment/commissions', icon: 'mdi-account-group' },
-    { key: 'reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) }
+    { key: 'reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) },
+    { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value)) }
 ]);
 
 const thesisLibraryMenu = ref<MenuItem[]>([
@@ -349,6 +350,7 @@ const menuItems = ref<MenuItem[]>([
     },
     { key: 'events', label: computed(() => i18n.t('eventListLabel')), to: '/events', icon: 'mdi-calendar', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
+    { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
     { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) }
 ]);

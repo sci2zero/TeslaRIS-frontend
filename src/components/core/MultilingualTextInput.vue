@@ -263,7 +263,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    
+    .multi-lingual-input:not(:first-child) {
+        margin-top: 2em
+    }
+
     .multi-lingual-input:first-child:not(:last-child) > div.v-col{
         padding-bottom: 0;
     }

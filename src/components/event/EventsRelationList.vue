@@ -8,6 +8,7 @@
                 <div v-if="!readonly && !presetEvent?.serialEvent" class="events-relation-submission">
                     <events-relation-submission-modal
                         :source-event="presetEvent"
+                        :event-type="eventType"
                         @create="refreshRelationsList"
                     />
                 </div>
@@ -44,7 +45,7 @@
   
 <script lang="ts">
 import { defineComponent, onMounted, ref, type PropType } from 'vue';
-import type { Conference, EventsRelation } from "@/models/EventModel";
+import { type Conference, type EventsRelation, EventType } from "@/models/EventModel";
 import { EventsRelationType } from "@/models/EventModel";
 import { watch } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -67,6 +68,10 @@ props: {
     readonly: {
         type: Boolean,
         required: true
+    },
+    eventType: {
+        type: Object as PropType<EventType>,
+        default: EventType.CONFERENCE
     }
 },
 setup(props) {
@@ -115,7 +120,11 @@ setup(props) {
     };
 
     const navigateToTargetEvent = (eventId: number) => {
-        router.push({ name: "conferenceLandingPage", params: {id: eventId} });
+        if (props.eventType === EventType.CONFERENCE) {
+            router.push({ name: "conferenceLandingPage", params: {id: eventId} });
+        } else if (props.eventType === EventType.EXHIBITION) {
+            router.push({ name: "exhibitionLandingPage", params: {id: eventId} });
+        }
     };
 
     const refreshRelationsList = () => {

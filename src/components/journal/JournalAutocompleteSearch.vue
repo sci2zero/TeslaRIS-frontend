@@ -8,7 +8,7 @@
                 :items="readonly ? [] : journals"
                 :custom-filter="((): boolean => true)"
                 :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
-                :no-data-text="$t('noDataMessage')"
+                :no-data-text="$t('nameOrIssnMessage')"
                 :multiple="multiple"
                 return-object
                 @update:search="searchJournals($event)"

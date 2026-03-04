@@ -32,7 +32,7 @@
                             {{ $t("markLabel") }}
                         </th>
                         <th class="text-left">
-                            {{ loginStore.userLoggedIn ? $t("publicationsWithPointsLabel") : $t("publicationsLabel") }}
+                            {{ loginStore.userLoggedIn ? $t("scientificResultsWithPointsLabel") : $t("scientificResultsListLabel") }}
                         </th>
                         <th v-if="loginStore.userLoggedIn" class="text-left">
                             {{ $t("numberOfPublicationsLabel") }}
@@ -52,11 +52,19 @@
                         </td>
                         <td>
                             <ul>
-                                <li v-for="(publication, index) in publications" :key="index">
-                                    <localized-link :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
+                                <li v-for="(publication, index) in publications" :key="index" class="mb-1 mt-2 publication-list">
+                                    <localized-link v-if="category.length == 2 || (category.length >= 3 && !category.startsWith('M10') && !category.startsWith('M11'))" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
                                         {{ publication.a }} 
                                         <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
                                     </localized-link>
+                                    <span v-else-if="category === 'M105' || category === 'M112'">
+                                        <strong>{{ $t("participationLabel") }}: </strong>{{ publication.a }} 
+                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                    </span>
+                                    <span v-else>
+                                        <strong>{{ $t("prizeLabel") }}: </strong>{{ publication.a }} 
+                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                    </span>
                                 </li>
                             </ul>
                         </td>
@@ -190,6 +198,11 @@ export default defineComponent({
 
 .narrow {
     width: 200px;
+}
+
+.publication-list {
+    list-style-type: disc;
+    list-style-position: outside;
 }
 
 </style>

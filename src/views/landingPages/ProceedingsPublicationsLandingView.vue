@@ -179,10 +179,10 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="documentIndicators?.length > 0" value="indicators">
+            <v-tab v-show="documentIndicators && documentIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="documentClassifications?.length > 0 || canEdit" value="assessments">
+            <v-tab v-show="(documentClassifications && documentClassifications.length > 0) || canEdit" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -362,8 +362,8 @@ export default defineComponent({
 
         const icon = ref("mdi-newspaper-variant");
 
-        const documentIndicators = ref<EntityIndicatorResponse[]>([]);
-        const documentClassifications = ref<EntityClassificationResponse[]>([]);
+        const documentIndicators = ref<EntityIndicatorResponse[]>();
+        const documentClassifications = ref<EntityClassificationResponse[]>();
 
         const loginStore = useLoginStore();
 
@@ -492,14 +492,12 @@ export default defineComponent({
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
-                    assessProceedingsPublication();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
                     fetchProceedingsPublication();
-                    assessProceedingsPublication();
                 }
             });
         };

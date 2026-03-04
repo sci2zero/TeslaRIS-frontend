@@ -15,7 +15,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -145,13 +145,20 @@
                     multiple disable-submission
                 />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || isTopLevelReport()" cols="12" md="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || metadataEnrichment || isTopLevelReport()" cols="12" md="3">
                 <organisation-unit-autocomplete-search
-                    v-model="selectedOUs" :multiple="!isTopLevelReport()"
-                    disable-submission :required="isTopLevelReport()"
+                    v-model="selectedOUs" :multiple="!isTopLevelReport() || metadataEnrichment"
+                    disable-submission :required="isTopLevelReport() || metadataEnrichment"
                     :comfortable="isSummaryReport()"
                     :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"
                 />
+            </v-col>
+            <v-col v-if="metadataEnrichment" cols="4" md="2">
+                <v-checkbox
+                    v-model="autoload"
+                    class="mt-2"
+                    :label="$t('automaticLabel')"
+                ></v-checkbox>
             </v-col>
             <v-col v-if="maintenance" cols="12" md="4">
                 <v-text-field
@@ -338,6 +345,7 @@ export default defineComponent({
         const reportGeneration = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.REPORT_GENERATION);
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
         const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
+        const metadataEnrichment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.METADATA_ENRICHMENT);
 
         const approximateEndMoment = ref<string>("");
 
@@ -377,6 +385,8 @@ export default defineComponent({
         const calculateIF5Rank = ref(true);
         const calculateJCIRank = ref(false);
 
+        const autoload = ref(true);
+
         onMounted(() => {
             fetchScheduledTasks();
 
@@ -390,7 +400,7 @@ export default defineComponent({
                 years.value.push(i);
             }
 
-            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}}`;
+            document.title = `TeslaRIS - ${i18n.t("routeLabel.scheduledTasks")}`;
 
             setTimeout(() => {
                 fetchScheduledTasks();
@@ -582,6 +592,16 @@ export default defineComponent({
                         )
                     );
                     break;
+                case ScheduledTaskType.METADATA_ENRICHMENT:
+                    scheduleTask(() => 
+                        TaskManagerService.scheduleMetadataEnrichment(
+                            timestamp, 
+                            (selectedOUs.value as { title: string; value: number; }[]).map(ou => ou.value), 
+                            autoload.value, 
+                            selectedRecurrenceType.value.value
+                        )
+                    );
+                    break;
 
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
@@ -661,7 +681,8 @@ export default defineComponent({
             selectedPublicationType, maintenance,
             approximateEndMoment, requiredFieldRules,
             calculateIF5Rank, calculateJCIRank, thesesAssessment,
-            monographPublicationsAssessment, selectedMonographs
+            monographPublicationsAssessment, selectedMonographs,
+            metadataEnrichment, autoload
         };
     },
 });

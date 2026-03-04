@@ -8,7 +8,7 @@
                         :preset-document-contributions="getContributorGroupForUpdating()"
                         :board-members-allowed="boardMembersAllowed"
                         :board-member-ids="boardMembersAllowed ? boardMemberList.map(bm => bm.personId).filter(id => !!id) : []"
-                        :lock-contribution-type="getLockedContributionType()"
+                        :lock-contribution-type="getLockedContributionTypes()"
                         :limit-one="limitOneAuthor && currentTab === 'authors'"
                         @update="sendToParent">
                     </publication-contribution-update-modal>
@@ -25,7 +25,7 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab value="authors">
+                        <v-tab v-show="!forProceedings" value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
                         <v-tab value="editors">
@@ -34,7 +34,7 @@
                         <v-tab value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab value="advisors">
+                        <v-tab v-show="!forProceedings" value="advisors">
                             {{ $t(limitOneAuthor ? "mentorsLabel" : "advisorsLabel") }}
                         </v-tab>
                         <v-tab v-show="boardMembersAllowed" value="boardMembers">
@@ -127,11 +127,15 @@ export default defineComponent({
         limitOneAuthor: {
             type: Boolean,
             default: false
+        },
+        forProceedings: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update", "positionsChanged"],
     setup(props, { emit }) {
-        const currentTab = ref("authors");
+        const currentTab = ref(props.forProceedings ? "editors" : "authors");
 
         const localContributions = ref<PersonDocumentContribution[]>([]);
 
@@ -207,21 +211,21 @@ export default defineComponent({
             emit("update", allContributions);
         };
 
-        const getLockedContributionType = () => {
+        const getLockedContributionTypes = () => {
             switch (currentTab.value) {
                 case "authors":
-                    return DocumentContributionType.AUTHOR;
+                    return [DocumentContributionType.AUTHOR];
                 case "editors":
-                    return DocumentContributionType.EDITOR;
+                    return [DocumentContributionType.EDITOR];
                 case "reviewers":
-                    return DocumentContributionType.REVIEWER;
+                    return [DocumentContributionType.REVIEWER];
                 case "advisors":
-                    return DocumentContributionType.ADVISOR;
+                    return [DocumentContributionType.ADVISOR];
                 case "boardMembers":
-                    return DocumentContributionType.BOARD_MEMBER;
+                    return [DocumentContributionType.BOARD_MEMBER];
             }
 
-            return DocumentContributionType.AUTHOR;
+            return props.forProceedings ? [DocumentContributionType.EDITOR, DocumentContributionType.REVIEWER] : [DocumentContributionType.AUTHOR];
         };
 
         const updateOrderInParentList = () => {
@@ -287,7 +291,7 @@ export default defineComponent({
             reviewerList, advisorList, boardMemberList,
             updateOrderInParentList, localContributions,
             getContributorGroupForUpdating,
-            getLockedContributionType
+            getLockedContributionTypes
         };
     },
 });

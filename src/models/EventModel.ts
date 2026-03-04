@@ -3,6 +3,7 @@ import type { PersonContribution } from "./PersonModel";
 
 export enum EventType {
     CONFERENCE = "CONFERENCE",
+    EXHIBITION = "EXHIBITION"
 }
 
 export enum EventContributionType {
@@ -65,6 +66,11 @@ export interface Conference extends Event {
     fee?: string;
     confId?: string;
     openAlexId?: string;
+}
+
+export interface Exhibition extends Event {
+    number?: string;
+    fee?: string;
 }
 
 export interface EventsRelation {

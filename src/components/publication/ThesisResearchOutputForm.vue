@@ -4,7 +4,7 @@
         <p>
             {{ $t("publicationInfoTextBeforeLink") }} 
             <localized-link to="scientific-results">
-                <a href="#"> {{ $t("addPublicationLabel") }} </a>
+                <a href="#" class="clickable-link"> {{ $t("addPublicationLabel") }} </a>
             </localized-link>
             {{ $t("publicationInfoTextAfterLink") }}
         </p>
@@ -36,9 +36,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
+import { defineComponent, watch } from 'vue';
 import { ref } from 'vue';
-import { useValidationUtils } from '@/utils/ValidationUtils';
 import ThesisResearchOutputService from '@/services/ThesisResearchOutputService';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from './PublicationTableComponent.vue';
@@ -46,6 +45,7 @@ import { type DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useI18n } from 'vue-i18n';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { computed } from 'vue';
 
 
 export default defineComponent({
@@ -64,7 +64,7 @@ export default defineComponent({
     emits: ["update", "updatePersist"],
     setup(props, { emit }) {
         const isFormValid = computed(() => tableRef.value!.selectedPublications.length > 0);
-
+        
         const i18n = useI18n();
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -75,8 +75,6 @@ export default defineComponent({
         const size = ref(1);
         const sort = ref("");
         const direction = ref("");
-
-        const { requiredFieldRules } = useValidationUtils();
 
         watch(() => props.researcherId, () => {
             fetchPersonPublications();
@@ -96,7 +94,7 @@ export default defineComponent({
             }
 
             DocumentPublicationService.findResearchOutputIds(props.thesisId).then(researchOutputResponse => {
-                let ignore = "";
+                let ignore = `&ignore=${props.thesisId}`;
                 researchOutputResponse.data.forEach(researchOutputId => {
                     ignore += `&ignore=${researchOutputId}`;
                 });
@@ -104,7 +102,7 @@ export default defineComponent({
                 DocumentPublicationService.findResearcherPublications(
                     props.researcherId as number,
                     [],
-                    `page=${page.value}&size=${size.value}&sort=${sort.value}${ignore}`
+                    `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}${ignore}`
                 ).then((publicationResponse) => {
                     personPublications.value = publicationResponse.data.content;
                     totalPersonPublications.value = publicationResponse.data.totalElements
@@ -148,12 +146,11 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, submit,
-            requiredFieldRules,
+            submit, notifications,
             personPublications,
             totalPersonPublications,
             tableRef, switchPage,
-            notifications
+            isFormValid
         };
     }
 });

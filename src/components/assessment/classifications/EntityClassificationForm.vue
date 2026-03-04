@@ -12,7 +12,7 @@
             </v-col>
         </v-row>
         <v-row
-            v-if="isDocumentEntity">
+            v-if="isDocumentEntity || isEventEntity">
             <v-col>
                 <v-checkbox
                     v-model="showAllForEntityType"
@@ -20,7 +20,7 @@
                 ></v-checkbox>
             </v-col>
         </v-row>
-        <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT'">
+        <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT' && entityType !== 'PRIZE'">
             <v-col>
                 <v-text-field
                     v-model="classificationYear"
@@ -56,7 +56,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification } from '@/models/AssessmentModel';
+import type { EntityClassificationResponse, EntityAssessmentClassification, EventAssessmentClassification, PublicationSeriesAssessmentClassification, DocumentAssessmentClassification, PrizeAssessmentClassification } from '@/models/AssessmentModel';
 import CommissionAutocompleteSearch from '../commission/CommissionAutocompleteSearch.vue';
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import { useUserRole } from '@/composables/useUserRole';
@@ -100,6 +100,11 @@ export default defineComponent({
             props.applicableTypes.includes(ApplicableEntityType.THESIS)
         );
 
+        const isEventEntity = computed(() =>
+            props.applicableTypes.includes(ApplicableEntityType.CONFERENCE) || 
+            props.applicableTypes.includes(ApplicableEntityType.EXHIBITION)
+        );
+
         const { isCommission, isViceDeanForScience } = useUserRole();
 
         onMounted(() => {
@@ -118,6 +123,8 @@ export default defineComponent({
                 applicableTypes.push(props.entityType);
             } else if (applicableTypes.includes(ApplicableEntityType.DOCUMENT)) {
                 applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.DOCUMENT);
+            } else if (applicableTypes.includes(ApplicableEntityType.EVENT)) {
+                applicableTypes = applicableTypes.filter(type => type != ApplicableEntityType.EVENT);
             }
 
             AssessmentClassificationService.fetchAllAssessmentClassificationsForApplicableType(applicableTypes).then((response) => {
@@ -163,6 +170,8 @@ export default defineComponent({
                 (entityClassification as PublicationSeriesAssessmentClassification).publicationSeriesId = props.entityId as number;
             } else if (props.entityType === ApplicableEntityType.DOCUMENT) {
                 (entityClassification as DocumentAssessmentClassification).documentId = props.entityId as number;
+            } else if (props.entityType === ApplicableEntityType.PRIZE) {
+                (entityClassification as PrizeAssessmentClassification).prizeId = props.entityId as number;
             }
 
             emit("create", entityClassification);
@@ -179,7 +188,7 @@ export default defineComponent({
             isViceDeanForScience,
             ApplicableEntityType,
             showAllForEntityType,
-            isDocumentEntity
+            isDocumentEntity, isEventEntity
         };
     }
 });
