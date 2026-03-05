@@ -61,6 +61,7 @@
                                 hide-empty-sections
                                 :persistent="false"
                                 :is-list-item="false"
+                                is-thesis-section
                                 :hide-regular-sections="showsCurrentPublicReview"
                             />
                         </div>
@@ -143,7 +144,7 @@ export default defineComponent({
                     );
             }
 
-            if (allFromSameFaculty.value) {
+            if (allFromSameFaculty.value && props.theses && props.theses.length > 1) {
                 headers.value = headers.value.filter(header => header.key !== "faculty");
             }
         };

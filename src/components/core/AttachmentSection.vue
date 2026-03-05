@@ -36,7 +36,7 @@
         </v-col>
     </v-row>
     <v-row
-        v-if="showAllThesisSections || canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isOnPublicReview && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
+        v-if="showAllThesisSections || canEditThesisAttachments || (isArchived && canSeeThesisSectionsWhenArchived) || isThesisSection && (!hideEmptySections || (commissionReports && commissionReports.length > 0))"
         class="mt-10">
         <v-col cols="12">
             <h2>{{ $t("commissionReportsLabel") }}</h2>

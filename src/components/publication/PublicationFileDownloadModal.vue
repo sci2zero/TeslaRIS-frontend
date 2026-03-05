@@ -27,11 +27,12 @@
                         v-if="containsAnyDocumentFile()"
                         :document="document"
                         :is-on-public-review="showThesisSections"
+                        :is-thesis-section="isThesisSection"
                         :file-items="document?.fileItems"
                         :proofs="document?.proofs"
                         :preliminary-files="(showThesisSections && document) ? (document as Thesis).preliminaryFiles : []"
                         :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
-                        :commission-reports="(showThesisSections && document) ? (document as Thesis).commissionReports : []"
+                        :commission-reports="(isThesisSection && document) ? (document as Thesis).commissionReports : []"
                         :hide-empty-sections="hideEmptySections"
                         :hide-regular-sections="hideRegularSections">
                     </attachment-section>
@@ -98,6 +99,10 @@ export default defineComponent({
         hideRegularSections: {
             type: Boolean,
             default: false
+        },
+        isThesisSection: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
@@ -114,7 +119,7 @@ export default defineComponent({
         });
 
         const fetchDocument = () => {
-            if (props.showThesisSections) {
+            if (props.showThesisSections || props.isThesisSection) {
                 DocumentPublicationService.readThesis(
                     props.documentId
                 ).then(response => {
