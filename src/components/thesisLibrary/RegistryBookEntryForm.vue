@@ -48,6 +48,7 @@
                     </v-btn>
                     <v-btn
                         class="ml-2"
+                        :color="step === steps.length ? 'primary' : 'default'"
                         :disabled="((validateEveryStep || step === validSteps.length) && !validSteps[step - 1]) || (step === validSteps.length && !canSave)"
                         @click="step === steps.length ? submit() : nextStep()">
                         {{ step === steps.length ? getSaveButtonLabel() : $t("nextLabel") }}
@@ -269,7 +270,7 @@ export default defineComponent({
         };
 
         const getSaveButtonLabel = () => {
-            return !isUpdate.value ? i18n.t("createNewRegistryBookEntryLabel") : i18n.t("updateLabel");
+            return !isUpdate.value ? i18n.t("readyForPromotionLabel") : i18n.t("updateLabel");
         };
 
         return {

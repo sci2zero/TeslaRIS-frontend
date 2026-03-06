@@ -1333,5 +1333,8 @@ export default {
     archivedLabel: "Archived",
     showOnlyNonFinishedLabel: "Show only non-finished promotions",
     noOUForConfigurationMessage: "Commission is not bound to organisation unit, you have to manually specify top-level institution.",
-    reportingCommissionLabel: "Commission used only for reporting"
+    reportingCommissionLabel: "Commission used only for reporting",
+    readyForPromotionLabel: "Ready for promotion",
+    shortenedReviewPeriodLabel: "Shortened public review period",
+    assessmentLastModificationDateLabel: "Assess everything changed after"
 }

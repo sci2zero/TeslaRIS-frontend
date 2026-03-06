@@ -1342,5 +1342,8 @@ export default {
     archivedLabel: "Arhivirani",
     showOnlyNonFinishedLabel: "Prikaži samo promocije koje nisu završene",
     noOUForConfigurationMessage: "Komisija nije vezana za organizacionu jedinicu, morate ručno specificirati krovnu instituciju.",
-    reportingCommissionLabel: "Komisija služi samo za izveštavanje"
+    reportingCommissionLabel: "Komisija služi samo za izveštavanje",
+    readyForPromotionLabel: "Spremno za promociju",
+    shortenedReviewPeriodLabel: "Skraćeni period javnog uvida",
+    assessmentLastModificationDateLabel: "Vrednuj sve promenjeno nakon"
 }

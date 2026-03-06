@@ -67,10 +67,18 @@
                 <v-text-field
                     v-model="publicReviewLengthDays"
                     type="number"
+                    class="mt-3"
                     :label="$t('publicReviewLengthLabel') + '*'"
                     :placeholder="$t('publicReviewLengthLabel') + '*'"
                     :rules="requiredNumericGreaterThanZeroFieldRules"
                 ></v-text-field>
+            </v-col>
+            <v-col v-if="publicReviewEndCheck" cols="4" md="2">
+                <v-checkbox
+                    v-model="shortenedReviewPeriod"
+                    class="mt-3"
+                    :label="$t('shortenedReviewPeriodLabel')"
+                ></v-checkbox>
             </v-col>
             <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
@@ -212,7 +220,7 @@
                 cols="12" sm="3" md="2">
                 <date-picker
                     v-model="startDate"
-                    :label="$t('startDateLabel') + '*'"
+                    :label="$t('assessmentLastModificationDateLabel') + '*'"
                     color="primary"
                     required
                 />
@@ -386,6 +394,8 @@ export default defineComponent({
         const calculateJCIRank = ref(false);
 
         const autoload = ref(true);
+
+        const shortenedReviewPeriod = ref(false);
 
         onMounted(() => {
             fetchScheduledTasks();
@@ -682,7 +692,7 @@ export default defineComponent({
             approximateEndMoment, requiredFieldRules,
             calculateIF5Rank, calculateJCIRank, thesesAssessment,
             monographPublicationsAssessment, selectedMonographs,
-            metadataEnrichment, autoload
+            metadataEnrichment, autoload, shortenedReviewPeriod
         };
     },
 });
