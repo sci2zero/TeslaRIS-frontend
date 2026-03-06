@@ -4,6 +4,8 @@ import axios from "axios";
 import type { AttendanceCancellationRequest, InstitutionPromotionCountsReport, PhdThesisPrePopulatedData, RegistryBookEntry } from "@/models/ThesisLibraryModel";
 import { type Page } from "@/models/Common";
 import i18n from "@/i18n";
+import { useDownloadStore } from "@/stores/downloadStore";
+import { type Composer } from "vue-i18n";
 
 
 export class RegistryBookService extends BaseService {
@@ -60,6 +62,33 @@ export class RegistryBookService extends BaseService {
 
     async getPromoteesList(promotionId: number): Promise<AxiosResponse<string[]>> {
         return super.sendRequest(axios.get, `registry-book/promotees/${promotionId}`);
+    }
+
+    async downloadPromoteesFile(promotionId: number): Promise<void> {
+        const downloadStore = useDownloadStore();
+        if (downloadStore.isDownloading) {
+            return;
+        }
+
+        const fileName = `${(i18n.vueI18n.global as Composer).t("promotedLabel")}_${promotionId}`;
+        downloadStore.downloadProgressRef?.startDownload(fileName);
+        const response = await super.sendRequest(axios.get, `registry-book/promotees-file/${promotionId}`, {
+            responseType: "blob",
+            onDownloadProgress: (progressEvent: any) => {
+                if (progressEvent.total) {
+                    const percent = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    
+                    downloadStore.downloadProgressRef?.updateProgress(percent);
+                }
+            }
+        }).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
+        });
+
+        this.initialzeDownload(response, fileName, "xlsx");
     }
 
     async previewPromoteAll(promotionId: number): Promise<AxiosResponse<string[][]>> {

@@ -92,6 +92,7 @@ export interface Commission {
     formalDescriptionOfRule: string;
     recognisedResearchAreas: string[];
     isDefault: boolean;
+    isReportingCommission: boolean;
 }
 
 export interface CommissionResponse {
@@ -103,6 +104,7 @@ export interface CommissionResponse {
     formalDescriptionOfRule: string;
     recognisedResearchAreas: string[];
     isDefault: boolean;
+    isReportingCommission: boolean;
 }
 
 export interface EntityIndicator {

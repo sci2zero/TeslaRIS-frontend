@@ -39,10 +39,20 @@
                     return-object>
                 </v-select>
             </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <v-checkbox
                     v-model="isDefault"
                     :label="$t('defaultForMServiceLabel')"
+                    class="table-checkbox"
+                    hide-details
+                />
+            </v-col>
+            <v-col>
+                <v-checkbox
+                    v-model="isReportingCommission"
+                    :label="$t('reportingCommissionLabel')"
                     class="table-checkbox"
                     hide-details
                 />
@@ -139,7 +149,8 @@ export default defineComponent({
         const description = ref<any>(props.presetCommission?.description ? props.presetCommission?.description : []);
         const dateFrom = ref(props.presetCommission?.assessmentDateFrom ? props.presetCommission.assessmentDateFrom : undefined);
         const dateTo = ref(props.presetCommission?.assessmentDateTo ? props.presetCommission.assessmentDateTo : undefined);
-        const isDefault = ref(props.presetCommission?.isDefault ? props.presetCommission?.isDefault : false)
+        const isDefault = ref(props.presetCommission?.isDefault ? props.presetCommission?.isDefault : false);
+        const isReportingCommission = ref(props.presetCommission?.isReportingCommission ? props.presetCommission?.isReportingCommission : false);
 
         const { requiredFieldRules, requiredSelectionRules, requiredMultiSelectionRules } = useValidationUtils();
 
@@ -152,7 +163,8 @@ export default defineComponent({
                 assessmentDateTo: dateTo.value as string,
                 formalDescriptionOfRule: formalDescriptionOfRule.value.value,
                 recognisedResearchAreas: selectedResearchAreas.value.map(researchArea => researchArea.value),
-                isDefault: isDefault.value
+                isDefault: isDefault.value,
+                isReportingCommission: isReportingCommission.value
             };
 
             emit("create", commission);
@@ -168,7 +180,8 @@ export default defineComponent({
             dateFrom, dateTo, ruleEngines,
             formalDescriptionOfRule, isDefault,
             researchAreas, selectedResearchAreas,
-            requiredMultiSelectionRules
+            requiredMultiSelectionRules,
+            isReportingCommission
         };
     }
 });

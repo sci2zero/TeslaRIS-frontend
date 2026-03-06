@@ -1332,5 +1332,6 @@ export default {
     submittedLabel: "Submitted in system",
     archivedLabel: "Archived",
     showOnlyNonFinishedLabel: "Show only non-finished promotions",
-    noOUForConfigurationMessage: "Commission is not bound to organisation unit, you have to manually specify top-level institution."
+    noOUForConfigurationMessage: "Commission is not bound to organisation unit, you have to manually specify top-level institution.",
+    reportingCommissionLabel: "Commission used only for reporting"
 }

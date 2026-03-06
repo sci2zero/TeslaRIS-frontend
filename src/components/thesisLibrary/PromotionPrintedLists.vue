@@ -57,6 +57,9 @@
                     </v-tabs-window>
                 </v-card-text>
                 <v-card-actions>
+                    <v-btn color="blue darken-1" @click="download">
+                        {{ $t("downloadLabel") }}
+                    </v-btn>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
@@ -64,6 +67,8 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <toast v-model="snackbar" :message="errorMessage" />
     </div>
 </template>
 
@@ -72,10 +77,13 @@
 import { ref, watch } from "vue";
 import { defineComponent } from "vue";
 import RegistryBookService from "@/services/thesisLibrary/RegistryBookService";
+import { useI18n } from "vue-i18n";
+import Toast from "../core/Toast.vue";
 
 
 export default defineComponent({
     name: "PromotionPrintedLists",
+    components: {Toast},
     props: {
         promotionId: {
             type: Number,
@@ -83,10 +91,15 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const errorMessage = ref("");
+        const snackbar = ref(false);
+
         const currentTab = ref("promotees");
         const dialog = ref(false);
         const addresses = ref<string[]>([]);
         const promotees = ref<string[]>([]);
+
+        const i18n = useI18n();
 
         watch(dialog, () => {
             if (dialog.value) {
@@ -104,6 +117,15 @@ export default defineComponent({
         const fetchPromotees = () => {
             RegistryBookService.getPromoteesList(props.promotionId).then(response => {
                 promotees.value = response.data;
+            });
+        };
+
+        const download = () => {
+            RegistryBookService.downloadPromoteesFile(
+                props.promotionId
+            ).catch(() => {
+                errorMessage.value = i18n.t("genericErrorMessage");
+                snackbar.value = true;
             });
         };
 
@@ -126,7 +148,10 @@ export default defineComponent({
             addresses,
             currentTab,
             promotees,
-            selectText
+            selectText,
+            download,
+            errorMessage,
+            snackbar
         };
     }
 });

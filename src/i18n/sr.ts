@@ -1341,5 +1341,6 @@ export default {
     submittedLabel: "Uneti u sistem",
     archivedLabel: "Arhivirani",
     showOnlyNonFinishedLabel: "Prikaži samo promocije koje nisu završene",
-    noOUForConfigurationMessage: "Komisija nije vezana za organizacionu jedinicu, morate ručno specificirati krovnu instituciju."
+    noOUForConfigurationMessage: "Komisija nije vezana za organizacionu jedinicu, morate ručno specificirati krovnu instituciju.",
+    reportingCommissionLabel: "Komisija služi samo za izveštavanje"
 }

@@ -70,6 +70,9 @@
                                 <div v-if="commission?.isDefault" class="response">
                                     {{ $t("defaultForMServiceLabel") }}
                                 </div>
+                                <div v-if="commission?.isReportingCommission" class="response">
+                                    {{ $t("reportingCommissionLabel") }}
+                                </div>
                             </v-col>
                             <v-col>
                                 <div v-if="commission?.recognisedResearchAreas && commission.recognisedResearchAreas.length > 0">
@@ -219,6 +222,7 @@ export default defineComponent({
             commission.value!.formalDescriptionOfRule = basicInfo.formalDescriptionOfRule;
             commission.value!.recognisedResearchAreas = basicInfo.recognisedResearchAreas;
             commission.value!.isDefault = basicInfo.isDefault;
+            commission.value!.isReportingCommission = basicInfo.isReportingCommission;
 
             performUpdate(true);
         };
@@ -230,7 +234,8 @@ export default defineComponent({
                 assessmentDateTo: commission.value?.assessmentDateTo as string,
                 formalDescriptionOfRule: commission.value?.formalDescriptionOfRule as string,
                 recognisedResearchAreas: commission.value?.recognisedResearchAreas as string[],
-                isDefault: commission.value?.isDefault as boolean
+                isDefault: commission.value?.isDefault as boolean,
+                isReportingCommission: commission.value?.isReportingCommission as boolean
             };
 
             CommissionService.updateCommission(commission.value?.id as number, updateRequest).then(() => {
