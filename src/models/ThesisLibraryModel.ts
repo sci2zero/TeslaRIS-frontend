@@ -186,8 +186,9 @@ export interface ThesisPublicReviewResponse {
     organisationUnitNameOther: string;
     scientificAreaSr: string;
     scientificAreaOther: string;
-    publicReviewStartDate: string;
-    publicReviewEndDate: string;
+    publicReviewStartDates: string[];
+    publicReviewEndDates: string[];
+    isOnShortenedReview: boolean;
     databaseId: number;
 }
 

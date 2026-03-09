@@ -51,7 +51,14 @@
                         </localized-link>
                     </td>
                     <td>
-                        {{ localiseDate(row.item.publicReviewStartDate) }} - {{ showReviewEndDate ? localiseDate(row.item.publicReviewEndDate) : "*" }}
+                        <div
+                            v-for="(startIso, index) in row.item.publicReviewStartDates"
+                            :key="index"
+                        >
+                            {{ localiseDate(startIso) }}
+                            -
+                            {{ getEndDisplay(row.item, startIso, index, row.item.publicReviewEndDates) }}
+                        </div>
                     </td>
                     <td>
                         <div class="d-flex flex-row justify-center">
@@ -186,12 +193,40 @@ export default defineComponent({
             emit("switchPage", event.page - 1, event.itemsPerPage);
         };
 
+        const addDays = (date: Date, days: number) => {
+            const d = new Date(date);
+            d.setDate(d.getDate() + days);
+            return d;
+        };
+
+        const getEndDisplay = (item: ThesisPublicReviewResponse, startIso: string, index: number, endDates: string[] = []) => {
+            const isLast = index === item.publicReviewStartDates.length - 1;
+
+            if (!props.showReviewEndDate && isLast) {
+                return "*";
+            }
+
+            const endIso = endDates?.[index]
+
+            if (endIso) {
+                return localiseDate(endIso);
+            }
+
+            if (startIso) {
+                const computed = addDays(new Date(startIso), item.isOnShortenedReview ? 10 : 30);
+                return localiseDate(computed.toISOString().split("T")[0]);
+            }
+
+            return "*";
+        };
+
         return {
             headers, notifications, localiseDate,
             refreshTable, tableWrapper, tableOptions,
             displayTextOrPlaceholder, selectedTheses,
             getPublicationTypeTitleFromValueAutoLocale,
-            getDocumentLandingPageBasePath, allFromSameFaculty
+            getDocumentLandingPageBasePath, allFromSameFaculty,
+            getEndDisplay
         };
     }
 });
