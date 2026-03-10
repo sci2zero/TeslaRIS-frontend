@@ -1012,7 +1012,7 @@ export default {
     downloadableDocumentsLabel: "Dokumenta za preuzimanje",
     archiveYearLabel: "Godina",
     institutionPublicReviewDissertationsLabel: "Doktorske disertacije i doktorski umetnički projekti koji su na javnom uvidu za {0}",
-    allPublicReviewDissertationsLabel: "Sve doktorske disertacije i doktorski umetnički projekti koji su na javnom uvidu",
+    allPublicReviewDissertationsLabel: "Sve doktorske disertacije i doktorski umetnički projekti koji su na{0} javnom uvidu",
     institutionPublicReviewDissertationsArchiveLabel: "Arhiva doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu za {0}",
     publicReviewDissertationsArchiveLabel: "Arhiva svih doktorskih disertacija i doktorskih umetničkih projekata na javnom uvidu",
     publicReviewDissertationsLabel: "Javni uvid disertacija",
@@ -1345,5 +1345,10 @@ export default {
     reportingCommissionLabel: "Komisija služi samo za izveštavanje",
     readyForPromotionLabel: "Spremno za promociju",
     shortenedReviewPeriodLabel: "Skraćeni period javnog uvida",
-    assessmentLastModificationDateLabel: "Vrednuj sve promenjeno nakon"
+    assessmentLastModificationDateLabel: "Vrednuj sve promenjeno nakon",
+    isArchivedLabel: "Arhivirano",
+    datesOfPublicReviewEndLabel: "Datumi završetka javnog uvida",
+    archivedDocumentFileLabel: "Arhivirano",
+    shortenedReviewLabel: "skraćenom",
+    regularReviewLabel: "regularnom"
 }

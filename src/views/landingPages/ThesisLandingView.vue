@@ -236,6 +236,13 @@
                                         {{ localiseDate(date) }}
                                     </p>
                                 </div>
+
+                                <div v-if="thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0" class="response mt-5">
+                                    <p>{{ $t("datesOfPublicReviewEndLabel") }}</p>
+                                    <p v-for="date in thesis.publicReviewEndDates" :key="date">
+                                        {{ localiseDate(date) }}
+                                    </p>
+                                </div>
                             </v-col>
                             <v-col cols="3">
                                 <div v-if="thesis?.numberOfPages">
@@ -531,8 +538,8 @@
             ref="publicDialogRef"
             :title="$t('areYouSureLabel')"
             :message="dialogMessage"
-            :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewCompleted && !continueLastReview"
-            :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewCompleted && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
+            :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
+            :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
             @continue="commitThesisStatusChange">
         </persistent-question-dialog>
 

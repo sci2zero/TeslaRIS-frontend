@@ -58,6 +58,12 @@
                         </v-select>
                     </v-col>
                 </v-row>
+                <v-row v-if="canBeArchived">
+                    <v-checkbox
+                        v-model="isArchived"
+                        :label="$t('isArchivedLabel')"
+                    />
+                </v-row>
             </v-col>
         </v-row>
 
@@ -113,6 +119,10 @@ export default defineComponent({
         alwaysOpenAccess: {
             type: Boolean,
             default: false
+        },
+        canBeArchived: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "update"],
@@ -138,6 +148,7 @@ export default defineComponent({
                 }
 
                 selectedResourceType.value = { title: resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
+                isArchived.value = props.presetDocumentFile.isArchived;
             }
 
             if (props.alwaysOpenAccess) {
@@ -155,6 +166,7 @@ export default defineComponent({
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
         const resourceTypes = computed(() => getResourceTypesForGivenLocale());
         const selectedResourceType = ref(selectionPlaceholder);
+        const isArchived = ref(false);
 
         const accessRights = [
             { title: "Creative Commons", value: AccessRights.CREATIVE_COMMONS },
@@ -177,7 +189,8 @@ export default defineComponent({
                 description: description.value,
                 resourceType: selectedResourceType.value.value != null ? selectedResourceType.value.value : ResourceType.SUPPLEMENT,
                 accessRights: AccessRights.ALL_RIGHTS_RESERVED,
-                license: selectedCCLicense.value.value
+                license: selectedCCLicense.value.value,
+                isArchived: isArchived.value
             }
 
             if (props.allowLicenceSelection) {
@@ -201,7 +214,7 @@ export default defineComponent({
             selectedAccessRight, selectedResourceType,
             addDocumentFile, requiredSelectionRules, 
             languageTags, toMultilingualTextInput,
-            selectedCCLicense
+            selectedCCLicense, isArchived
         };
     }
 });

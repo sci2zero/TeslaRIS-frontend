@@ -31,7 +31,7 @@
                             </template>
 
                             <v-list-item-title @click="download(attachment)">
-                                {{ getResourceTypeTitleFromValueAutoLocale(attachment.resourceType) }}: {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
+                                {{ attachment.isArchived ? `(${$t("archivedDocumentFileLabel")}) ` : "" }}{{ getResourceTypeTitleFromValueAutoLocale(attachment.resourceType) }}: {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
                             </v-list-item-title>
 
                             <v-list-item-subtitle>
@@ -56,6 +56,7 @@
                                             :is-proof="isProof" edit :preset-document-file="attachment"
                                             :allow-licence-selection="allowLicenceSelection"
                                             :disable-resource-type-selection="disableResourceTypeSelection"
+                                            :can-be-archived="canBeArchived"
                                             @update="sendUpdateRequestToParent($event, attachment.id)"
                                         ></document-file-submission-modal>
                                     </v-col>
@@ -135,6 +136,10 @@ export default defineComponent({
             default: false
         },
         alwaysOpenAccess: {
+            type: Boolean,
+            default: false
+        },
+        canBeArchived: {
             type: Boolean,
             default: false
         }

@@ -36,6 +36,7 @@ export interface DocumentFileResponse {
     accessRights: AccessRights;
     license: License;
     sizeInMb: number;
+    isArchived: boolean;
 }
 
 export interface DocumentFile {
@@ -45,6 +46,7 @@ export interface DocumentFile {
     resourceType: ResourceType;
     accessRights: AccessRights;
     license: License;
+    isArchived?: boolean;
 }
 
 export enum ThesisAttachmentType {

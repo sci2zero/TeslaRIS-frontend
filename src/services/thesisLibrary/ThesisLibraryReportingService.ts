@@ -67,8 +67,8 @@ export class ThesisLibraryReportingService extends BaseService {
         this.initialzeDownload(response, "report.docx", "");
     }
 
-    async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
-        return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${forMyInstitution ? ("&forMyInstitution=" + forMyInstitution) : ""}${pageable}`);
+    async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean, publicReviewType: string | null): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {
+        return super.sendRequest(axios.get, `thesis-library/dissertation-report?notDefendedOnly=${notDefendedOnly}${institutionId ? ("&institutionId=" + institutionId) : ""}${year ? ("&year=" + year) : ""}${forMyInstitution ? ("&forMyInstitution=" + forMyInstitution) : ""}${publicReviewType ? ("&publicReviewType=" + publicReviewType) : ""}${pageable}`);
     }
 
     async getEntriesNotAddedToRegBook(body: NotAddedToPromotionThesesRequest, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {

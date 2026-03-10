@@ -291,6 +291,7 @@ export interface Thesis extends Document {
     commissionReports?: DocumentFileResponse[];
     isOnPublicReview?: boolean;
     publicReviewDates?: string[];
+    publicReviewEndDates?: string[];
     publicReviewEnd?: string;
     isOnPublicReviewPause?: boolean;
     topicAcceptanceDate: string;

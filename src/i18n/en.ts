@@ -1012,7 +1012,7 @@ export default {
     downloadableDocumentsLabel: "Documents for Download",
     archiveYearLabel: "Year",
     institutionPublicReviewDissertationsLabel: "Doctoral dissertations and doctoral art projects under public review for {0}",
-    allPublicReviewDissertationsLabel: "All doctoral dissertations and doctoral art projects under public review",
+    allPublicReviewDissertationsLabel: "All doctoral dissertations and doctoral art projects under{0} public review",
     institutionPublicReviewDissertationsArchiveLabel: "Archive of doctoral dissertations and doctoral art projects under public review for {0}",
     publicReviewDissertationsArchiveLabel: "Archive of all doctoral dissertations and doctoral art projects under public review",
     publicReviewDissertationsLabel: "Dissertation public review",
@@ -1336,5 +1336,10 @@ export default {
     reportingCommissionLabel: "Commission used only for reporting",
     readyForPromotionLabel: "Ready for promotion",
     shortenedReviewPeriodLabel: "Shortened public review period",
-    assessmentLastModificationDateLabel: "Assess everything changed after"
+    assessmentLastModificationDateLabel: "Assess everything changed after",
+    isArchivedLabel: "Archived",
+    datesOfPublicReviewEndLabel: "Dates of public review completions",
+    archivedDocumentFileLabel: "Archived",
+    shortenedReviewLabel: "shortened",
+    regularReviewLabel: "regular"
 }

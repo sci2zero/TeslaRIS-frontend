@@ -47,6 +47,7 @@
                 :disable-updates="!isAdmin"
                 disable-resource-type-selection
                 :always-open-access="!isAdmin"
+                :can-be-archived="(document as Thesis).publicReviewCompleted"
                 @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"

@@ -18,7 +18,7 @@
         <h1
             v-else
             class="d-flex flex-row justify-center mb-15!">
-            {{ $t("allPublicReviewDissertationsLabel") }}
+            {{ $t("allPublicReviewDissertationsLabel", [reviewType ? ` ${$t(reviewType.toLowerCase() + "ReviewLabel")}` : ""]) }}
         </h1>
         <v-row class="d-flex justify-start">
             <v-col cols="12" sm="6" md="2">
@@ -137,6 +137,7 @@ export default defineComponent({
 
         const years = ref<number[]>([]);
         const selectedYear = ref<number | null>((currentRoute.query.year as string) ? parseInt(currentRoute.query.year as string) : null);
+        const reviewType = ref<string | null>(currentRoute.query.reviewType as string);
 
         const institutionId = ref(currentRoute.query.institutionId as string);
         const organisationUnit = ref<OrganisationUnitResponse>();
@@ -186,7 +187,8 @@ export default defineComponent({
                 selectedYear.value,
                 notDefended ? notDefended === "true" : false,
                 `&page=${page.value}&size=${size.value}`,
-                returnOnlyInstitutionRelatedTheses.value
+                returnOnlyInstitutionRelatedTheses.value,
+                reviewType.value ? (reviewType.value) : null
             ).then(response => {
                 theses.value = response.data.content;
                 totalTheses.value = response.data.totalElements;
@@ -256,7 +258,7 @@ export default defineComponent({
             navigateToSearch, navigateToThisView,
             showingNotDefended, PageContentType,
             institutionId, ThesisType, getPageType,
-            isUserBoundToOU,
+            isUserBoundToOU, reviewType,
             returnOnlyInstitutionRelatedTheses
         };
     }

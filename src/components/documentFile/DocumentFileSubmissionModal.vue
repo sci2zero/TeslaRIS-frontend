@@ -31,6 +31,7 @@
                             :always-open-access="alwaysOpenAccess"
                             :allow-licence-selection="allowLicenceSelection"
                             :disable-resource-type-selection="disableResourceTypeSelection"
+                            :can-be-archived="canBeArchived"
                             @create="emitCreateToParent"
                             @update="emitUpdateToParent"
                         />
@@ -87,6 +88,10 @@ export default defineComponent({
             default: false
         },
         alwaysOpenAccess: {
+            type: Boolean,
+            default: false
+        },
+        canBeArchived: {
             type: Boolean,
             default: false
         }
