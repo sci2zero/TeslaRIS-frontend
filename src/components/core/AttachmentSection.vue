@@ -11,6 +11,7 @@
                 :disable-updates="!isAdmin"
                 :can-make-official="isThesisSection && fileItems && !fileItems.some(f => f.resourceType === ResourceType.OFFICIAL_PUBLICATION || String(f.resourceType) === 'OFFICIAL_PUBLICATION')"
                 disable-resource-type-selection
+                :can-be-archived="(document as Thesis).publicReviewEndDates && (document as Thesis).publicReviewEndDates!.length > 0"
                 @create="addThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.FILE, document as Thesis)"
                 @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"
@@ -47,7 +48,7 @@
                 :disable-updates="!isAdmin"
                 disable-resource-type-selection
                 :always-open-access="!isAdmin"
-                :can-be-archived="(document as Thesis).publicReviewCompleted"
+                :can-be-archived="(document as Thesis).publicReviewEndDates && (document as Thesis).publicReviewEndDates!.length > 0"
                 @create="addThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @delete="deleteThesisAttachment($event, ThesisAttachmentType.COMMISSION_REPORT, document as Thesis)"
                 @update="isAdmin ? updateAttachment($event, false, document) : notifyAboutSectionChange()"

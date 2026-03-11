@@ -148,7 +148,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import PersonService from "@/services/PersonService";
-import type { BasicPerson, PersonIndex } from "@/models/PersonModel";
+import { PersonNameType, type BasicPerson, type PersonIndex } from "@/models/PersonModel";
 import { useI18n } from "vue-i18n";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import MultilingualTextInput from "./MultilingualTextInput.vue";
@@ -336,6 +336,7 @@ export default defineComponent({
                 PersonService.searchResearchers(
                     params, false, null
                 ).then((response) => {
+                    searchingName.value = true;
                     const listOfPersons: { title: string, value: number }[] = [];
                     response.data.content.forEach((person: PersonIndex) => {
                         if (i18n.locale.value.startsWith("sr")) {
@@ -363,7 +364,8 @@ export default defineComponent({
                         presetPersonNameForCreation.value = {
                             firstname: tokens[0],
                             lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
-                            otherName: ""
+                            otherName: "",
+                            nameType: PersonNameType.DISPLAY_NAME
                         };
                     }
                     
@@ -375,6 +377,8 @@ export default defineComponent({
         const filterPersons = (): boolean => {
             return true;
         };
+
+        const searchingName = ref(false);
 
         watch(() => props.presetContributionValue, () => {
             if(props.presetContributionValue && !valueSet.value) {
@@ -438,8 +442,9 @@ export default defineComponent({
                 const isCustomName =
                     firstName.value !== personPrimaryName.value.firstname || lastName.value !== personPrimaryName.value.lastname;
 
-                if (personPrimaryName.value.otherName && !isCustomName) {
+                if (personPrimaryName.value.otherName && !isCustomName && searchingName.value) {
                     middleName.value = middleName.value ? middleName.value : personPrimaryName.value.otherName;
+                    searchingName.value = false;
                 }
             }
         });
@@ -701,7 +706,8 @@ export default defineComponent({
                     presetPersonNameForCreation.value = {
                         firstname: name,
                         lastname: surname,
-                        otherName: ""
+                        otherName: "",
+                        nameType: PersonNameType.DISPLAY_NAME
                     };
                 }
             }, 0);

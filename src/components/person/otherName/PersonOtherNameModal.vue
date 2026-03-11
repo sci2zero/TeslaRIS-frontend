@@ -97,6 +97,17 @@
                                         :readonly="readOnly">
                                     </v-text-field>
                                 </v-col>
+                                <!-- <v-row>
+                                    <v-col :cols="readOnly ? 3 : 2">
+                                        <v-select
+                                            :items="nameTypes"
+                                            :label="$t('nameTypeLabel') + '*'"
+                                            :rules="requiredSelectionRules"
+                                            :readonly="readOnly"
+                                            return-object
+                                        />
+                                    </v-col>
+                                </v-row> -->
                                 <v-col cols="3">
                                     <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))" icon @click="removeOtherName(index)">
                                         <v-icon>mdi-delete</v-icon>
@@ -141,8 +152,9 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
-import type { PersonName, PersonResponse } from "@/models/PersonModel";
+import { PersonNameType, type PersonName, type PersonResponse } from "@/models/PersonModel";
 import { watch } from "vue";
+import { getPersonNameTypesForGivenLocale } from "@/i18n/personNameType";
 
 
 export default defineComponent({
@@ -162,27 +174,41 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
-        const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: ""});
+        const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: "", nameType: PersonNameType.DISPLAY_NAME});
         const otherNames = ref<PersonName[]>([]);
 
-        const { requiredFieldRules } = useValidationUtils();
+        const nameTypes = getPersonNameTypesForGivenLocale();
+
+        const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
         watch(() => props.presetPerson, () => {
             if (props.presetPerson && props.presetPerson.personOtherNames.length > 0) {
                 otherNames.value = [];
                 props.presetPerson.personOtherNames.forEach((personName) => {
-                    otherNames.value.push({id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName});
+                    otherNames.value.push({
+                        id: personName.id, 
+                        firstname: personName.firstname, 
+                        lastname: personName.lastname, 
+                        otherName: personName.otherName, 
+                        nameType: personName.nameType ? personName.nameType : PersonNameType.DISPLAY_NAME
+                    });
                 });
             }
 
             if (props.presetPerson) {
                 const personName = props.presetPerson.personName;
-                primaryName.value = {id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName};
+                primaryName.value = {
+                    id: personName.id, 
+                    firstname: personName.firstname, 
+                    lastname: personName.lastname, 
+                    otherName: personName.otherName, 
+                    nameType: personName.nameType ? personName.nameType : PersonNameType.FULL_NAME
+                };
             }
         });
 
         const addOtherName = () => {
-            otherNames.value.push({firstname: "", lastname: "", otherName: ""});
+            otherNames.value.push({firstname: "", lastname: "", otherName: "", nameType: PersonNameType.DISPLAY_NAME});
         };
 
         const removeOtherName = (index: number) => {
@@ -196,7 +222,13 @@ export default defineComponent({
 
         const update = () => {
             const newOtherNames: PersonName[] = [];
-            otherNames.value.forEach(personName => newOtherNames.push({id: personName.id, firstname: personName.firstname, lastname: personName.lastname, otherName: personName.otherName}));
+            otherNames.value.forEach(personName => newOtherNames.push({
+                id: personName.id, 
+                firstname: personName.firstname, 
+                lastname: personName.lastname, 
+                otherName: personName.otherName, 
+                nameType: personName.nameType
+            }));
             emit("update", primaryName.value, newOtherNames);
             dialog.value = false;
         };
@@ -204,7 +236,8 @@ export default defineComponent({
         return { 
             dialog, isFormValid, requiredFieldRules,
             addOtherName, otherNames, removeOtherName,
-            update, selectOtherName, primaryName
+            update, selectOtherName, primaryName,
+            nameTypes, requiredSelectionRules
         };
     }
 });

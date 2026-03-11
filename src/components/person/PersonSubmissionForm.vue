@@ -202,7 +202,7 @@ import { ref } from 'vue';
 import { computed } from 'vue';
 import PersonService from "@/services/PersonService";
 import { useRouter } from 'vue-router';
-import type { BasicPerson, PersonIndex, PersonName } from "@/models/PersonModel";
+import { PersonNameType, type BasicPerson, type PersonIndex, type PersonName } from "@/models/PersonModel";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getSexForGivenLocale } from '@/i18n/sex';
@@ -303,7 +303,7 @@ export default defineComponent({
 
         const submit = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
-                personName: {firstname: firstName.value, otherName: middleName.value, lastname: lastName.value, dateFrom: birthdate.value, dateTo: null},
+                personName: {firstname: firstName.value, otherName: middleName.value, lastname: lastName.value, dateFrom: birthdate.value, dateTo: null, nameType: PersonNameType.FULL_NAME},
                 contactEmail: email.value,
                 phoneNumber: phoneNumber.value,
                 apvnt: apvnt.value,

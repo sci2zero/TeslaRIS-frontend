@@ -46,6 +46,14 @@ export interface PersonName {
     lastname: string;
     dateFrom?: string | null;
     dateTo?: string | null;
+    nameType?: PersonNameType;
+}
+
+export enum PersonNameType {
+    PRESENTED_NAME = "PRESENTED_NAME",
+    DISPLAY_NAME = "DISPLAY_NAME",
+    CITATION_NAME = "CITATION_NAME",
+    FULL_NAME = "FULL_NAME"
 }
   
 export interface PostalAddress {
