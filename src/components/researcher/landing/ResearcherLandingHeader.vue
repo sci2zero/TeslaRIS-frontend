@@ -273,6 +273,18 @@
                                     </p>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ returnCurrentLocaleContent(props.person.personalInfo.postalAddress.state) || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.postalAddress.postalNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         {{ countryName || '-' }}
@@ -298,6 +310,18 @@
                                     <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         {{ props.person.personalInfo.contact.phoneNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.contact.faxNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.contact.mobilePhoneNumber || '-' }}
                                     </p>
                                 </div>
                             </div>
@@ -345,6 +369,12 @@
                                         {{ props.person?.personalInfo?.eNaukaId || '-' }}
                                     </p>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ $t("nationalScienceIdLabel") }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person?.personalInfo?.nationalScienceId || '-' }}
+                                    </p>
+                                </div>
                                 <div v-if="props.person?.personalInfo?.orcid">
                                     <label class="block text-sm font-medium text-gray-700">ORCID</label>
                                     <div v-if="person?.personalInfo.orcid" class="response">
@@ -372,6 +402,27 @@
                                     <label class="block text-sm font-medium text-gray-700">{{ t('ResearcherID (WoS)') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                                        <span v-else>-</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Google Scholar ID</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar"></identifier-link>
+                                        <span v-else>-</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Authenticus ID</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus"></identifier-link>
+                                        <span v-else>-</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Lattes ID</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes"></identifier-link>
                                         <span v-else>-</span>
                                     </p>
                                 </div>

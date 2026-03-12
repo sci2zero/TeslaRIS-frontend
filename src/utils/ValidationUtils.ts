@@ -27,6 +27,9 @@ export const useValidationUtils = () => {
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
     const invalidUDCMessage = computed(() => i18n.t("udcFormatError"));
     const positiveOrZeroFieldMessage = computed(() => i18n.t("positiveOrZeroFieldMessage"));
+    const invalidScholarIdMessage = computed(() => i18n.t("scholarIdFormatError"));
+    const invalidAuthenticusIdMessage = computed(() => i18n.t("authenticusIdFormatError"));
+    const invalidLattesIdMessage = computed(() => i18n.t("lattesIdFormatError"));
 
     
     const requiredFieldRules = [
@@ -279,6 +282,33 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const scholarIdPattern = /^[a-zA-Z0-9_-]{12,}$/i;
+    const scholarIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (scholarIdPattern.test(value)) return true;
+            return invalidScholarIdMessage.value;
+        }
+    ];
+
+    const personAuthenticusIdPattern = /^A-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
+    const personAuthenticusIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (personAuthenticusIdPattern.test(value)) return true;
+            return invalidAuthenticusIdMessage.value;
+        }
+    ];
+
+    const lattesIdPattern = /^\d{16}$/i;
+    const lattesIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (lattesIdPattern.test(value)) return true;
+            return invalidLattesIdMessage.value;
+        }
+    ];
+
     const nonMandatoryEmailFieldRules = [
         (value: string) => {
             if (!value) return true;
@@ -363,6 +393,7 @@ export const useValidationUtils = () => {
         institutionOpenAlexIdValidationRules, sourceOpenAlexIdValidationRules,
         rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules,
         personWebOfScienceIdValidationRules, documentWebOfScienceIdValidationRules,
-        optionalNumericZeroOrGreaterFieldRules
+        optionalNumericZeroOrGreaterFieldRules, scholarIdValidationRules,
+        personAuthenticusIdValidationRules, lattesIdValidationRules
     };
 };

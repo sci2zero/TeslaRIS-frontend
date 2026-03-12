@@ -3,7 +3,7 @@
         <v-dialog
             v-model="dialog"
             :persistent="!readOnly"
-            max-width="850px">
+            max-width="1200px">
             <template #activator="scope">
                 <v-btn
                     color="primary" dark
@@ -24,7 +24,7 @@
                     <v-container>
                         <v-form v-model="isFormValid" @submit.prevent>
                             <v-row>
-                                <v-col :cols="readOnly ? 4 : 3">
+                                <v-col cols="3">
                                     <v-text-field
                                         v-model="primaryName.firstname"
                                         :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
@@ -41,7 +41,7 @@
                                         </template>
                                     </v-text-field>
                                 </v-col>
-                                <v-col v-if="readOnly ? primaryName.otherName : true" :cols="readOnly ? 4 : 3">
+                                <v-col v-if="readOnly ? primaryName.otherName : true" :cols="readOnly ? 3 : 2">
                                     <v-text-field
                                         v-model="primaryName.otherName"
                                         :label="$t('middleNameLabel')"
@@ -49,7 +49,7 @@
                                         :readonly="readOnly">
                                     </v-text-field>
                                 </v-col>
-                                <v-col :cols="readOnly ? 4 : 3">
+                                <v-col cols="3">
                                     <v-text-field
                                         v-model="primaryName.lastname"
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
@@ -58,12 +58,31 @@
                                         :readonly="readOnly">
                                     </v-text-field>
                                 </v-col>
+                                <v-col :cols="readOnly ? 3 : 2">
+                                    <v-select
+                                        v-model="primaryName.personNameType"
+                                        :items="nameTypes"
+                                        :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
+                                        :rules="requiredSelectionRules"
+                                        :readonly="readOnly"
+                                        item-title="title"
+                                        item-value="value"
+                                    >
+                                        <template #item="{ props, item }">
+                                            <v-list-item
+                                                :title="item.raw.title"
+                                                v-bind="props"
+                                                :subtitle="undefined"
+                                            />
+                                        </template>
+                                    </v-select>
+                                </v-col>
                             </v-row>
                             <h3 v-if="readOnly && presetPerson && presetPerson.personOtherNames.length === 0">
                                 {{ $t("noOtherNamesMessage") }}
                             </h3>
                             <v-row v-for="(element, index) in otherNames" v-else :key="index">
-                                <v-col :cols="readOnly ? 4 : 3">
+                                <v-col cols="3">
                                     <v-text-field
                                         v-model="element.firstname"
                                         :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
@@ -80,7 +99,7 @@
                                         </template>
                                     </v-text-field>
                                 </v-col>
-                                <v-col v-if="readOnly ? element.otherName : true" :cols="readOnly ? 4 : 3">
+                                <v-col v-if="readOnly ? element.otherName : true" :cols="readOnly ? 3 : 2">
                                     <v-text-field
                                         v-model="element.otherName"
                                         :label="$t('middleNameLabel')"
@@ -88,7 +107,7 @@
                                         :readonly="readOnly">
                                     </v-text-field>
                                 </v-col>
-                                <v-col :cols="readOnly ? 4 : 3">
+                                <v-col cols="3">
                                     <v-text-field
                                         v-model="element.lastname"
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
@@ -97,25 +116,42 @@
                                         :readonly="readOnly">
                                     </v-text-field>
                                 </v-col>
-                                <!-- <v-row>
-                                    <v-col :cols="readOnly ? 3 : 2">
-                                        <v-select
-                                            :items="nameTypes"
-                                            :label="$t('nameTypeLabel') + '*'"
-                                            :rules="requiredSelectionRules"
-                                            :readonly="readOnly"
-                                            return-object
-                                        />
-                                    </v-col>
-                                </v-row> -->
-                                <v-col cols="3">
-                                    <v-btn v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))" icon @click="removeOtherName(index)">
+                                <v-col :cols="readOnly ? 3 : 2">
+                                    <v-select
+                                        v-model="element.personNameType"
+                                        :items="nameTypes"
+                                        :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
+                                        :rules="requiredSelectionRules"
+                                        :readonly="readOnly"
+                                        item-title="title"
+                                        item-value="value"
+                                    >
+                                        <template #item="{ props, item }">
+                                            <v-list-item
+                                                :title="item.raw.title"
+                                                v-bind="props"
+                                                :subtitle="undefined"
+                                            />
+                                        </template>
+                                    </v-select>
+                                </v-col>
+                                <v-col cols="2" class="d-flex align-center">
+                                    <v-btn
+                                        v-if="!readOnly && ((presetPerson && presetPerson.personOtherNames?.length > 0))"
+                                        icon
+                                        @click="removeOtherName(index)">
                                         <v-icon>mdi-delete</v-icon>
                                     </v-btn>
-                                    <v-btn v-if="!readOnly && element.id" icon @click="selectOtherName(element)">
+                                    <v-btn
+                                        v-if="!readOnly && element.id"
+                                        icon
+                                        @click="selectOtherName(element)">
                                         <v-icon>mdi-check-circle</v-icon>
                                     </v-btn>
-                                    <v-btn v-if="!readOnly && (index === otherNames.length - 1)" icon @click="addOtherName">
+                                    <v-btn
+                                        v-if="!readOnly && (index === otherNames.length - 1)"
+                                        icon
+                                        @click="addOtherName">
                                         <v-icon>mdi-plus</v-icon>
                                     </v-btn>
                                 </v-col>
@@ -174,7 +210,7 @@ export default defineComponent({
         const dialog = ref(false);
         const isFormValid = ref(false);
 
-        const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: "", nameType: PersonNameType.DISPLAY_NAME});
+        const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: "", personNameType: PersonNameType.DISPLAY_NAME});
         const otherNames = ref<PersonName[]>([]);
 
         const nameTypes = getPersonNameTypesForGivenLocale();
@@ -190,7 +226,7 @@ export default defineComponent({
                         firstname: personName.firstname, 
                         lastname: personName.lastname, 
                         otherName: personName.otherName, 
-                        nameType: personName.nameType ? personName.nameType : PersonNameType.DISPLAY_NAME
+                        personNameType: personName.personNameType ? personName.personNameType : PersonNameType.DISPLAY_NAME
                     });
                 });
             }
@@ -202,13 +238,13 @@ export default defineComponent({
                     firstname: personName.firstname, 
                     lastname: personName.lastname, 
                     otherName: personName.otherName, 
-                    nameType: personName.nameType ? personName.nameType : PersonNameType.FULL_NAME
+                    personNameType: personName.personNameType ? personName.personNameType : PersonNameType.FULL_NAME
                 };
             }
         });
 
         const addOtherName = () => {
-            otherNames.value.push({firstname: "", lastname: "", otherName: "", nameType: PersonNameType.DISPLAY_NAME});
+            otherNames.value.push({firstname: "", lastname: "", otherName: "", personNameType: PersonNameType.DISPLAY_NAME});
         };
 
         const removeOtherName = (index: number) => {
@@ -227,7 +263,7 @@ export default defineComponent({
                 firstname: personName.firstname, 
                 lastname: personName.lastname, 
                 otherName: personName.otherName, 
-                nameType: personName.nameType
+                personNameType: personName.personNameType
             }));
             emit("update", primaryName.value, newOtherNames);
             dialog.value = false;

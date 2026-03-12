@@ -56,6 +56,12 @@ export default defineComponent({
                     return "http://www.researcherid.com/rid/";
                 case "web_of_science":
                     return "https://www.webofscience.com/api/gateway?GWVersion=2&SrcApp=teslaris&SrcAuth=WosAPI&DestLinkType=FullRecord&DestApp=WOS_CPL&KeyUT=WOS:";
+                case "scholar":
+                    return "https://scholar.google.com/citations?user=";
+                case "lattes":
+                    return "http://lattes.cnpq.br/";
+                case "authenticus":
+                    return "https://authenticus.pt/author/";
             }
 
             return "https://doi.org/";

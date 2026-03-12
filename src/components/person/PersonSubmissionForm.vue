@@ -138,6 +138,24 @@
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
+                                    v-model="nationalScienceId"
+                                    :label="$t('nationalScienceIdLabel')"
+                                    :placeholder="$t('nationalScienceIdLabel')"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="scholarId"
+                                    label="Google Scholar ID"
+                                    placeholder="Google Scholar ID"
+                                    :rules="scholarIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
                                     v-model="apvnt"
                                     label="APVNT"
                                     placeholder="APVNT"
@@ -153,6 +171,7 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+
                         <v-row>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -171,6 +190,26 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="authenticusId"
+                                    label="Authenticus ID"
+                                    placeholder="Authenticus ID"
+                                    :rules="personAuthenticusIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="lattesId"
+                                    label="Lattes ID"
+                                    placeholder="Lattes ID"
+                                    :rules="lattesIdValidationRules"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
                         <v-row>
                             <v-col cols="12">
                                 <multilingual-text-input
@@ -281,6 +320,10 @@ export default defineComponent({
         const scopus = ref("");
         const openAlex = ref("");
         const webOfScienceId = ref("");
+        const nationalScienceId = ref("");
+        const scholarId = ref("");
+        const authenticusId = ref("");
+        const lattesId = ref("");
         const displayTitle = ref([]);
 
         const { 
@@ -288,7 +331,8 @@ export default defineComponent({
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, orcidValidationRules,
             scopusAuthorIdValidationRules, personOpenAlexIdValidationRules,
-            personWebOfScienceIdValidationRules
+            personWebOfScienceIdValidationRules, scholarIdValidationRules,
+            personAuthenticusIdValidationRules, lattesIdValidationRules
         } = useValidationUtils();
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: undefined };
@@ -303,7 +347,14 @@ export default defineComponent({
 
         const submit = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
-                personName: {firstname: firstName.value, otherName: middleName.value, lastname: lastName.value, dateFrom: birthdate.value, dateTo: null, nameType: PersonNameType.FULL_NAME},
+                personName: {
+                    firstname: firstName.value,
+                    otherName: middleName.value,
+                    lastname: lastName.value,
+                    dateFrom: birthdate.value,
+                    dateTo: null,
+                    personNameType: PersonNameType.FULL_NAME
+                },
                 contactEmail: email.value,
                 phoneNumber: phoneNumber.value,
                 apvnt: apvnt.value,
@@ -313,6 +364,10 @@ export default defineComponent({
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
                 webOfScienceResearcherId: webOfScienceId.value,
+                nationalScienceId: nationalScienceId.value,
+                scholarId: scholarId.value,
+                authenticusId: authenticusId.value,
+                lattesId: lattesId.value,
                 sex: selectedSex.value.value,
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
@@ -340,6 +395,10 @@ export default defineComponent({
                     scopus.value = "";
                     openAlex.value = "";
                     webOfScienceId.value = "";
+                    nationalScienceId.value = "";
+                    scholarId.value = "";
+                    authenticusId.value = "";
+                    lattesId.value = "";
                     selectedSex.value = selectionPlaceholder;
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
@@ -367,7 +426,9 @@ export default defineComponent({
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
             scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
-            personWebOfScienceIdValidationRules, webOfScienceId, returnToParent
+            personWebOfScienceIdValidationRules, webOfScienceId, returnToParent, scholarIdValidationRules,
+            personAuthenticusIdValidationRules, lattesIdValidationRules, nationalScienceId, scholarId,
+            authenticusId, lattesId
         };
     }
 });

@@ -197,7 +197,7 @@ export default {
     conferenceListLabel: "Konferencije",
     eventDateLabel: "Datum održavanja",
     countryLabel: "Zemlja",
-    stateLabel: "Zemlja",
+    stateLabel: "Država (Pokrajina)",
     stateColumn: "stateSr",
     placeLabel: "Mesto",
     placeColumn: "placeSr",
@@ -1350,5 +1350,17 @@ export default {
     datesOfPublicReviewEndLabel: "Datumi završetka javnog uvida",
     archivedDocumentFileLabel: "Arhivirano",
     shortenedReviewLabel: "skraćenom",
-    regularReviewLabel: "regularnom"
+    regularReviewLabel: "regularnom",
+    nameTypeLabel: "Tip imena",
+    postalNumberLabel: "Poštanski broj",
+    faxNumberLabel: "Broj faksa",
+    mobilePhoneNumberLabel: "Broj mobilnog telefona",
+    nationalScienceIdLabel: "Identifikator u nacionalnom sistemu",
+    nationalScienceIdExistsError: "Nacionalni identifikator je već u upotrebi.",
+    scholarIdExistsError: "Google Scholar ID je već u upotrebi.",
+    authenticusIdExistsError: "Authenticus ID je već u upotrebi.",
+    lattesIdExistsError: "Lattes ID je već u upotrebi.",
+    scholarIdFormatError: "Pogrešan format Google Scholar ID-a.",
+    authenticusIdFormatError: "Pogrešan format Google Scholar ID-a.",
+    lattesIdFormatError: "Pogrešan format Lattes ID-a."
 }

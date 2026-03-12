@@ -264,6 +264,9 @@ export default defineComponent({
             mergeMultilingualContentField(person1.postalAddress!.streetAndNumber, person2.postalAddress!.streetAndNumber);
             person2.postalAddress!.streetAndNumber = [];
 
+            mergeMultilingualContentField(person1.postalAddress!.state, person2.postalAddress!.state);
+            person2.postalAddress!.state = [];
+
             bulkTransferFields(person1, person2, [
                 { fieldName: "placeOfBirth", emptyValue: "" },
                 { fieldName: "localBirthDate", emptyValue: "" },
@@ -271,12 +274,19 @@ export default defineComponent({
                 { fieldName: "eCrisId", emptyValue: "" },
                 { fieldName: "eNaukaId", emptyValue: "" },
                 { fieldName: "apvnt", emptyValue: "" },
+                { fieldName: "nationalScienceId", emptyValue: "" },
+                { fieldName: "scholarId", emptyValue: "" },
+                { fieldName: "authenticusId", emptyValue: "" },
+                { fieldName: "lattesId", emptyValue: "" },
                 { fieldName: "scopusAuthorId", emptyValue: "" },
                 { fieldName: "openAlexId", emptyValue: "" },
                 { fieldName: "webOfScienceResearcherId", emptyValue: "" },
                 { fieldName: "eNaukaId", emptyValue: "" },
                 { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
-                { fieldName: "contact.phoneNumber", emptyValue: "", nested: true }
+                { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
+                { fieldName: "contact.faxNumber", emptyValue: "", nested: true },
+                { fieldName: "contact.mobilePhoneNumber", emptyValue: "", nested: true },
+                { fieldName: "postalAddress.postalNumber", emptyValue: "", nested: true }
             ]);
 
             person2.uris!.forEach(uri => {

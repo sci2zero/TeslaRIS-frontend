@@ -104,5 +104,11 @@ export default {
     contactEmailVisibleLabel: "Адреса електронске поште је видљива неулогованим корисницима",
     selectEnrichmentTypeMessage: "UI-базирани приступ ће скенирати изворе само за оне типове који су доступни приликом увоза, након чега ће сви истраживачи моћи да их дедупликују кроз форму за увоз. Аутоматски приступ ће скенирати и попунити недостајуће метаподатке за све типове докумената.",
     uiBasedLabel: "UI-базирани приступ",
-    nameOrIssnMessage: "Куцајте назив или ISSN да бисте претражили..."
+    nameOrIssnMessage: "Куцајте назив или ISSN да бисте претражили...",
+    scholarIdExistsError: "Google Scholar ID је већ у употреби.",
+    authenticusIdExistsError: "Authenticus ID је већ у употреби.",
+    lattesIdExistsError: "Lattes ID је већ у употреби.",
+    scholarIdFormatError: "Погрешан формат Google Scholar ID-а.",
+    authenticusIdFormatError: "Погрешан формат Google Scholar ID-а.",
+    lattesIdFormatError: "Погрешан формат Lattes ID-а."
 };

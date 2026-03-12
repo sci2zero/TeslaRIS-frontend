@@ -44,6 +44,11 @@
                 </v-row>
                 <v-row>
                     <v-col>
+                        <v-text-field v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" :placeholder="$t('nationalScienceIdLabel')"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
                         <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT" :rules="apvntValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
@@ -62,15 +67,75 @@
                         <v-text-field v-model="webOfScienceId" label="ResearcherID (WoS)" placeholder="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
-                <h3>{{ $t('contactLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')"></v-text-field>
+                        <v-text-field v-model="scholarId" label="Google Scholar ID" placeholder="Google Scholar ID" :rules="scholarIdValidationRules"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
+                        <v-text-field v-model="authenticusId" label="Authenticus ID" placeholder="Authenticus ID" :rules="personAuthenticusIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field v-model="lattesId" label="Lattes ID" placeholder="Lattes ID" :rules="lattesIdValidationRules"></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <uri-input
+                            ref="urisRef"
+                            v-model="uris"
+                            is-website
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input
+                            ref="displayTitleRef"
+                            v-model="displayTitle"
+                            :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.displayTitle, languageTags)"
+                            :label="$t('displayTitleLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <h3>{{ $t('contactLabel') }}</h3>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="email"
+                            :label="$t('emailLabel')"
+                            :placeholder="$t('emailLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="phoneNumber"
+                            :label="$t('phoneNumberLabel')"
+                            :placeholder="$t('phoneNumberLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="faxNumber"
+                            :label="$t('faxNumberLabel')"
+                            :placeholder="$t('faxNumberLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="mobilePhoneNumber"
+                            :label="$t('mobilePhoneNumberLabel')"
+                            :placeholder="$t('mobilePhoneNumberLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <h3>{{ $t('addressLabel') }}</h3>
@@ -87,22 +152,37 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="cityRef" v-model="city" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageTags)" :label="$t('cityLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="cityRef"
+                            v-model="city"
+                            :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.city, languageTags)"
+                            :label="$t('cityLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageTags)" :label="$t('streetAndNumberLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="streetAndNumberRef"
+                            v-model="streetAndNumber"
+                            :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.streetAndNumber, languageTags)"
+                            :label="$t('streetAndNumberLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
+                        <multilingual-text-input
+                            ref="stateRef"
+                            v-model="state"
+                            :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.postalAddress?.state, languageTags)"
+                            :label="$t('stateLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="displayTitleRef" v-model="displayTitle" :initial-value="toMultilingualTextInput(presetPerson?.personalInfo.displayTitle, languageTags)" :label="$t('displayTitleLabel')"></multilingual-text-input>
+                        <v-text-field v-model="postalNumber" :label="$t('postalNumberLabel')" :placeholder="$t('postalNumberLabel')"></v-text-field>
                     </v-col>
                 </v-row>
             </v-col>
@@ -193,8 +273,12 @@ export default defineComponent({
         });
 
         const placeOfBirth = ref(props.presetPerson?.personalInfo.placeOfBirth);
+        
         const email = ref(props.presetPerson?.personalInfo.contact.contactEmail);
         const phoneNumber = ref(props.presetPerson?.personalInfo.contact.phoneNumber);
+        const faxNumber = ref(props.presetPerson?.personalInfo.contact.faxNumber);
+        const mobilePhoneNumber = ref(props.presetPerson?.personalInfo.contact.mobilePhoneNumber);
+
         const birthdate = ref(props.presetPerson?.personalInfo.localBirthDate);
         const orcid = ref(props.presetPerson?.personalInfo.orcid);
         const eCrisId = ref(props.presetPerson?.personalInfo.eCrisId);
@@ -203,18 +287,25 @@ export default defineComponent({
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
         const openAlex = ref(props.presetPerson?.personalInfo.openAlexId);
         const webOfScienceId = ref(props.presetPerson?.personalInfo.webOfScienceResearcherId);
+        const nationalScienceId = ref(props.presetPerson?.personalInfo.nationalScienceId);
+        const scholarId = ref(props.presetPerson?.personalInfo.scholarId);
+        const authenticusId = ref(props.presetPerson?.personalInfo.authenticusId);
+        const lattesId = ref(props.presetPerson?.personalInfo.lattesId);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>();
 
         const cityRef = ref<typeof MultilingualTextInput>();
         const streetAndNumberRef = ref<typeof MultilingualTextInput>();
+        const stateRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>()
 
         const city = ref<any>([]);
         const streetAndNumber = ref<any>([]);
+        const state = ref<any>([]);
         const uris = ref<string[]>(props.presetPerson?.personalInfo.uris as string[]);
         const displayTitle = ref<any>([]);
+        const postalNumber = ref(props.presetPerson?.personalInfo.postalAddress?.postalNumber);
 
         const sexes = getSexForGivenLocale();
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
@@ -223,7 +314,8 @@ export default defineComponent({
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, personOpenAlexIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules,
-            personWebOfScienceIdValidationRules
+            personWebOfScienceIdValidationRules, scholarIdValidationRules,
+            personAuthenticusIdValidationRules, lattesIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -236,7 +328,11 @@ export default defineComponent({
                         { value: eCrisId.value as string, error: "eCrisIdExistsError" },
                         { value: orcid.value as string, error: "orcidIdExistsError" },
                         { value: openAlex.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError" }
+                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError" },
+                        { value: nationalScienceId.value as string, error: "nationalScienceIdExistsError" },
+                        { value: scholarId.value as string, error: "scholarIdExistsError" },
+                        { value: authenticusId.value as string, error: "authenticusIdExistsError" },
+                        { value: lattesId.value as string, error: "lattesIdExistsError" }
                     ],
                     props.presetPerson?.id as number,
                     (id, docId) => PersonService.checkIdentifierUsage(id, docId)
@@ -250,7 +346,9 @@ export default defineComponent({
             const updatedPerson: PersonalInfo = {
                 contact: {
                     phoneNumber: phoneNumber.value as string,
-                    contactEmail: email.value
+                    contactEmail: email.value,
+                    faxNumber: faxNumber.value,
+                    mobilePhoneNumber: mobilePhoneNumber.value
                 },
                 localBirthDate: birthdate.value || "",
                 sex: selectedSex.value.value as Sex,
@@ -262,11 +360,17 @@ export default defineComponent({
                 postalAddress: {
                     city: city.value,
                     countryId: selectedCountry.value?.value as number,
-                    streetAndNumber: streetAndNumber.value
+                    streetAndNumber: streetAndNumber.value,
+                    state: state.value,
+                    postalNumber: postalNumber.value as string
                 },
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
                 webOfScienceResearcherId: webOfScienceId.value,
+                nationalScienceId: nationalScienceId.value,
+                scholarId: scholarId.value,
+                authenticusId: authenticusId.value,
+                lattesId: lattesId.value,
                 uris: uris.value,
                 displayTitle: displayTitle.value
             };
@@ -282,14 +386,23 @@ export default defineComponent({
             streetAndNumberRef.value?.clearInput();
             streetAndNumber.value = props.presetPerson?.personalInfo.postalAddress?.streetAndNumber as MultilingualContent[];
 
+            stateRef.value?.clearInput();
+            state.value = props.presetPerson?.personalInfo.postalAddress?.state as MultilingualContent[];
+
+            postalNumber.value = props.presetPerson?.personalInfo.postalAddress?.postalNumber;
+
             selectedSex.value = {title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined};
 
             setAdditionalInfo();
 
             uris.value = props.presetPerson?.personalInfo.uris as string[];
             placeOfBirth.value = props.presetPerson?.personalInfo.placeOfBirth;
+
             email.value = props.presetPerson?.personalInfo.contact.contactEmail;
             phoneNumber.value = props.presetPerson?.personalInfo.contact.phoneNumber;
+            faxNumber.value = props.presetPerson?.personalInfo.contact.faxNumber;
+            mobilePhoneNumber.value = props.presetPerson?.personalInfo.contact.mobilePhoneNumber;
+
             birthdate.value = props.presetPerson?.personalInfo.localBirthDate;
             orcid.value = props.presetPerson?.personalInfo.orcid;
             eCrisId.value = props.presetPerson?.personalInfo.eCrisId;
@@ -298,10 +411,15 @@ export default defineComponent({
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             openAlex.value = props.presetPerson?.personalInfo.openAlexId;
             webOfScienceId.value = props.presetPerson?.personalInfo.webOfScienceResearcherId;
+            nationalScienceId.value = props.presetPerson?.personalInfo.nationalScienceId;
+            scholarId.value = props.presetPerson?.personalInfo.scholarId;
+            authenticusId.value = props.presetPerson?.personalInfo.authenticusId;
+            lattesId.value = props.presetPerson?.personalInfo.lattesId;
             urisRef.value?.refreshModelValue(uris.value);
 
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
             streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageTags.value));
+            stateRef.value?.forceRefreshModelValue(toMultilingualTextInput(state.value, languageTags.value));
         };
 
         return {
@@ -313,7 +431,10 @@ export default defineComponent({
             orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
             streetAndNumberRef, refreshForm, uris, urisRef, displayTitle,
             personOpenAlexIdValidationRules, openAlex, webOfScienceId,
-            personWebOfScienceIdValidationRules
+            personWebOfScienceIdValidationRules, state, stateRef, postalNumber,
+            faxNumber, mobilePhoneNumber, scholarIdValidationRules,
+            personAuthenticusIdValidationRules, lattesIdValidationRules,
+            nationalScienceId, scholarId, authenticusId, lattesId
         };
     }
 });

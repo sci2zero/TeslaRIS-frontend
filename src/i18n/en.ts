@@ -196,7 +196,7 @@ export default {
     conferenceListLabel: "Conferences",
     eventDateLabel: "Event Date",
     countryLabel: "Country",
-    stateLabel: "State",
+    stateLabel: "State (Province)",
     stateColumn: "stateOther",
     placeLabel: "Place",
     placeColumn: "placeOther",
@@ -1341,5 +1341,17 @@ export default {
     datesOfPublicReviewEndLabel: "Dates of public review completions",
     archivedDocumentFileLabel: "Archived",
     shortenedReviewLabel: "shortened",
-    regularReviewLabel: "regular"
+    regularReviewLabel: "regular",
+    nameTypeLabel: "Name type",
+    postalNumberLabel: "Postal number",
+    faxNumberLabel: "Fax number",
+    mobilePhoneNumberLabel: "Mobile phone number",
+    nationalScienceIdLabel: "National science identifier",
+    nationalScienceIdExistsError: "National science identifier already in use.",
+    scholarIdExistsError: "Google Scholar ID already in use.",
+    authenticusIdExistsError: "Authenticus ID already in use.",
+    lattesIdExistsError: "Lattes ID already in use.",
+    scholarIdFormatError: "Invalid Google Scholar ID format.",
+    authenticusIdFormatError: "Invalid Google Scholar ID format.",
+    lattesIdFormatError: "Invalid Lattes ID format."
 }

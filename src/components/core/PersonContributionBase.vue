@@ -365,7 +365,7 @@ export default defineComponent({
                             firstname: tokens[0],
                             lastname: tokens.length > 1 ? tokens[tokens.length - 1] : "",
                             otherName: "",
-                            nameType: PersonNameType.DISPLAY_NAME
+                            personNameType: PersonNameType.DISPLAY_NAME
                         };
                     }
                     
@@ -707,7 +707,7 @@ export default defineComponent({
                         firstname: name,
                         lastname: surname,
                         otherName: "",
-                        nameType: PersonNameType.DISPLAY_NAME
+                        personNameType: PersonNameType.DISPLAY_NAME
                     };
                 }
             }, 0);

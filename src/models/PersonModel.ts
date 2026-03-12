@@ -34,6 +34,10 @@ export interface BasicPerson {
     scopusAuthorId?: string | null;
     openAlexId?: string | null;
     webOfScienceResearcherId?: string | null;
+    nationalScienceId?: string | null;
+    scholarId?: string | null;
+    authenticusId?: string | null;
+    lattesId?: string | null;
     organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
     displayTitle: MultilingualContent[];
@@ -46,7 +50,7 @@ export interface PersonName {
     lastname: string;
     dateFrom?: string | null;
     dateTo?: string | null;
-    nameType?: PersonNameType;
+    personNameType?: PersonNameType;
 }
 
 export enum PersonNameType {
@@ -60,11 +64,15 @@ export interface PostalAddress {
     countryId: number;
     streetAndNumber: MultilingualContent[];
     city: MultilingualContent[];
+    state: MultilingualContent[];
+    postalNumber: string;
 }
   
 export interface Contact {
     contactEmail?: string;
     phoneNumber: string;
+    faxNumber?: string;
+    mobilePhoneNumber?: string;
 }
 
 export interface PersonContribution {
@@ -149,6 +157,10 @@ export interface PersonalInfo {
     scopusAuthorId?: string;
     openAlexId?: string;
     webOfScienceResearcherId?: string;
+    nationalScienceId?: string;
+    scholarId?: string;
+    authenticusId?: string;
+    lattesId?: string;
     uris: string[];
     displayTitle: MultilingualContent[];
 }
