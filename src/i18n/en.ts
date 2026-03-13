@@ -1353,5 +1353,6 @@ export default {
     lattesIdExistsError: "Lattes ID already in use.",
     scholarIdFormatError: "Invalid Google Scholar ID format.",
     authenticusIdFormatError: "Invalid Google Scholar ID format.",
-    lattesIdFormatError: "Invalid Lattes ID format."
+    lattesIdFormatError: "Invalid Lattes ID format.",
+    favoriteLabel: "Favorite"
 }

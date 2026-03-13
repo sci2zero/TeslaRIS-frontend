@@ -30,8 +30,11 @@
                 <v-card-text>
                     <v-container>
                         <person-involvement-form
-                            ref="formRef" :edit="edit" :preset-involvement="presetInvolvement" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></person-involvement-form>
+                            ref="formRef" :edit="edit"
+                            :preset-involvement="presetInvolvement"
+                            @create="emitCreateToParent"
+                            @update="emitUpdateToParent"
+                        />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>

@@ -67,8 +67,8 @@
                         :read-only="!canEdit"
                         edit
                         :preset-involvement="involvement"
-                        @update="updateInvolvement">
-                    </person-involvement-modal>
+                        @update="updateInvolvement"
+                    />
                 </div>
             </h4>
             <p v-if="involvement.involvementType === 'MEMBER_OF'">

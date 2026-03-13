@@ -139,6 +139,14 @@
                 </v-row>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-checkbox
+                    v-model="favorite"
+                    :label="$t('favoriteLabel')"
+                ></v-checkbox>
+            </v-col>
+        </v-row>
             
         <v-row>
             <p class="required-fields-message">
@@ -210,6 +218,7 @@ export default defineComponent({
         const abbreviationTitle = ref([]);
         const thesisTitle = ref([]);
         const externalOUName = ref([]);
+        const favorite = ref(props.presetInvolvement?.favorite);
 
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
 
@@ -229,7 +238,8 @@ export default defineComponent({
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
                 affiliationStatement: externalOUName.value,
-                organisationUnitId: (!enterExternalOU.value && selectedOrganisationUnit.value.value > 0) ? selectedOrganisationUnit.value.value : undefined
+                organisationUnitId: (!enterExternalOU.value && selectedOrganisationUnit.value.value > 0) ? selectedOrganisationUnit.value.value : undefined,
+                favorite: favorite.value
             };
 
             if(involvement.involvementType == InvolvementType.MEMBER_OF) {
@@ -261,7 +271,7 @@ export default defineComponent({
 
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
-            dateFrom, dateTo, saveInvolvement, enterExternalOU,
+            dateFrom, dateTo, saveInvolvement, enterExternalOU, favorite,
             languageTags, selectedInvolvementType, requiredSelectionRules,
             ouAutocompleteRef, selectedOrganisationUnit, contributionDescription,
             role, title, abbreviationTitle, thesisTitle, employmentPositions,

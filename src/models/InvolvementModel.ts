@@ -52,6 +52,7 @@ export interface Involvement {
     affiliationStatement?: MultilingualContent[];
     organisationUnitId?: number;
     organisationUnitName?: MultilingualContent[];
+    favorite?: boolean;
 }
 
 export interface Education extends Involvement {

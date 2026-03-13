@@ -1362,5 +1362,6 @@ export default {
     lattesIdExistsError: "Lattes ID je već u upotrebi.",
     scholarIdFormatError: "Pogrešan format Google Scholar ID-a.",
     authenticusIdFormatError: "Pogrešan format Google Scholar ID-a.",
-    lattesIdFormatError: "Pogrešan format Lattes ID-a."
+    lattesIdFormatError: "Pogrešan format Lattes ID-a.",
+    favoriteLabel: "Omiljeno"
 }
