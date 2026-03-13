@@ -1283,7 +1283,7 @@ export default {
     resourceDeletedMessage: "Traženi resurs je obrisan.",
     geneticMaterialLabel: "Genetski materijal",
     geneticMaterialTypeLabel: "Tip genetskog materijala",
-    addGeneticMaterialLabel: "Dodaj genetski materijal",
+    addGeneticMaterialLabel: "Genetski materijal",
     updateGeneticMaterialLabel: "Ažuriraj genetski materijal",
     personBoundToUserMessage: "Nije moguće obrisati ovog istraživača jer je vazan za korisnika.",
     latestPublicationsLabel: "Poslednje publikacije od ovog istraživača:",
