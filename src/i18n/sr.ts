@@ -1363,5 +1363,10 @@ export default {
     scholarIdFormatError: "Pogrešan format Google Scholar ID-a.",
     authenticusIdFormatError: "Pogrešan format Google Scholar ID-a.",
     lattesIdFormatError: "Pogrešan format Lattes ID-a.",
-    favoriteLabel: "Omiljeno"
+    favoriteLabel: "Omiljeno",
+    professionalAddressLabel: "Adresa radnog mesta",
+    privateAddressLabel: "Adresa stanovanja",
+    professionalContactLabel: "Profesionalni kontakt",
+    privateContactLabel: "Privatni kontakt",
+    prizeTypeLabel: "Tip nagrade"
 }

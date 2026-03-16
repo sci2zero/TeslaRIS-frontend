@@ -7,6 +7,7 @@
             :can-edit="canEdit"
             :research-area="researchArea"
             :country-name="personalInfo.country"
+            :private-country-name="personalInfo.countryPrivate"
             @update="updatePersonalInfo"
         >
             <template #actions>
@@ -371,6 +372,7 @@ export default defineComponent({
 
         const person = ref<PersonResponse>();
         const country = ref<Country>();
+        const countryPrivate = ref<Country>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -539,14 +541,19 @@ export default defineComponent({
         };
 
         const fetchAndSetCountryInfo = () => {
-            if (person.value?.personalInfo.postalAddress?.countryId === null) {
-                return;
+            if (person.value?.personalInfo.postalAddress?.countryId) {
+                CountryService.readCountry(person.value?.personalInfo.postalAddress?.countryId as number).then((response) => {
+                    country.value = response.data;
+                    personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
+                });
             }
 
-            CountryService.readCountry(person.value?.personalInfo.postalAddress?.countryId as number).then((response) => {
-                country.value = response.data;
-                personalInfo.value.country = returnCurrentLocaleContent(response.data.name);
-            });
+            if (person.value?.personalInfo.privatePostalAddress?.countryId) {
+                CountryService.readCountry(person.value?.personalInfo.privatePostalAddress?.countryId as number).then((response) => {
+                    countryPrivate.value = response.data;
+                    personalInfo.value.countryPrivate = returnCurrentLocaleContent(response.data.name);
+                });
+            }
         };
 
         const switchPage = (nextPage: number, pageSize: number, sortField: string, sortDir: string) => {
@@ -749,7 +756,7 @@ export default defineComponent({
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
-            PersonFieldVisibilityConfigurationForm, updateSuccess
+            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate
         };
 }});
 </script>

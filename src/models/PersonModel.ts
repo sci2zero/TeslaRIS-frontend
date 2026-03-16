@@ -1,5 +1,6 @@
 import type { ApproveStatus, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import type { ResearchArea } from "./OrganisationUnitModel";
 
 export interface PersonIndex {
     id: string;
@@ -149,7 +150,9 @@ export interface PersonalInfo {
     placeOfBirth?: string;
     sex: Sex;
     postalAddress?: PostalAddress;
+    privatePostalAddress?: PostalAddress;
     contact: Contact;
+    privateContact?: Contact;
     apvnt?: string;
     eCrisId?: string;
     eNaukaId?: string;
@@ -182,15 +185,32 @@ export interface PrizeResponse {
     id: number;
     title: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
     proofs: DocumentFileResponse[];
     date: string;
+    endDate: string;
+    prizeType: PrizeType;
+    favorite: boolean;
+    researchAreasId: number[];
+    researchAreas: ResearchArea[];
 }
 
 export interface Prize {
     id?: number;
     title: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
     date: string;
+    endDate: string;
+    prizeType: PrizeType;
+    favorite: boolean;
+    researchAreasId: number[];
+}
+
+export enum PrizeType {
+    AWARD = "AWARD",
+    TITLE = "TITLE",
+    OTHER = "OTHER"
 }
 
 export interface PrizeIndex {

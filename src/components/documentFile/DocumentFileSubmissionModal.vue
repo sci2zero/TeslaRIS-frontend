@@ -5,7 +5,7 @@
                 <div v-if="!edit" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
-                        color="primary" v-bind="scope.props" class="bottom-spacer"
+                        color="primary" v-bind="scope.props" class="bottom-spacer ml-2!"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
                         <v-icon size="x-large" icon="mdi-upload"></v-icon>
                     </v-btn>

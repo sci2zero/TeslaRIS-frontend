@@ -1,10 +1,14 @@
 <template>
     <v-card
-        class="pa-3"
+        class="pa-3!"
         variant="flat"
         color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <prize-modal :read-only="!canEdit" @create="createPrize"></prize-modal>
+            <prize-modal
+                :read-only="!canEdit"
+                @create="createPrize"
+            />
+
             <h3>{{ $t("prizesLabel") }}</h3>
             <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
@@ -13,7 +17,7 @@
                 group="prizes" 
                 :disabled="!inComparator"
             >
-                <div v-for="(prize, index) in prizes" :key="index" class="py-5">
+                <div v-for="(prize, index) in prizes" :key="index" class="py-5!">
                     <!-- <v-menu
                         v-if="canEdit"
                         v-model="menus[index]"
@@ -39,33 +43,53 @@
                     </v-menu> -->
 
                     <h4>
-                        <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                        <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
-                        <strong>{{ localiseDate(prize.date) }}</strong>
-                        <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                        <div v-if="canEdit" class="flex flex-row justify-end">
+                            <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
+                            <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                            <strong>{{ localiseDate(prize.date) }}</strong>
                             <v-btn
-                                class="mt-1"
+                                class="ml-4!"
                                 icon variant="outlined"
                                 color="primary"
                                 size="medium"
                                 @click="deletePrize(prize.id)">
-                                <v-icon size="large" icon="mdi-delete"></v-icon>
+                                <v-icon size="large" icon="mdi-delete" />
                             </v-btn>
                             <prize-modal
-                                class="mt-1 ml-8"
+                                class="ml-2!"
                                 :read-only="!canEdit"
                                 edit
                                 :preset-prize="prize"
-                                @update="updatePrize">
-                            </prize-modal>
+                                @update="updatePrize"
+                            />
                         </div>
                     </h4>
                     <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
                     
-                    <br />
+                    <div
+                        v-if="prize.keywords && prize.keywords.length > 0">
+                        <br />
+                        <span
+                            v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
+                            :key="keywordIndex">
+                            <v-chip
+                                outlined
+                                size="small">
+                                {{ keyword }}
+                            </v-chip>
+                        </span>
+                        <br />
+                        <br />
+                    </div>
+
                     <attachment-list
-                        :attachments="prize.proofs" :can-edit="canEdit" is-proof @create="addPrizeProof($event, prize)"
-                        @update="updatePrizeProof(prize, $event)" @delete="deletePrizeProof(prize, $event)"></attachment-list>
+                        :attachments="prize.proofs"
+                        :can-edit="canEdit"
+                        is-proof
+                        @create="addPrizeProof($event, prize)"
+                        @update="updatePrizeProof(prize, $event)"
+                        @delete="deletePrizeProof(prize, $event)"
+                    />
                     <v-divider v-if="index < (prizes ? prizes.length : 1) - 1 " class="mt-10"></v-divider>
                 </div>
             </draggable>

@@ -257,7 +257,7 @@
                         <div v-if="props.person?.personalInfo?.postalAddress" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                                 <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
-                                {{ t('addressLabel') }}
+                                {{ t('professionalAddressLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -293,11 +293,50 @@
                             </div>
                         </div>
 
+                        <div v-if="props.person?.personalInfo?.privatePostalAddress" class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
+                                {{ t('privateAddressLabel') }}
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('streetAndNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.streetAndNumber) || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('cityLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.city) || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.state) || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.privatePostalAddress.postalNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ privateCountryName || '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Contact Information -->
                         <div v-if="props.person?.personalInfo?.contact" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                                 <span class="mdi mdi-phone mr-2 text-green-600"></span>
-                                {{ t('contactLabel') }}
+                                {{ t('professionalContactLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -322,6 +361,39 @@
                                     <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
                                         {{ props.person.personalInfo.contact.mobilePhoneNumber || '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="props.person?.personalInfo?.privateContact" class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="mdi mdi-phone mr-2 text-green-600"></span>
+                                {{ t('privateContactLabel') }}
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('emailLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.privateContact.contactEmail || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.privateContact.phoneNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.privateContact.faxNumber || '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
+                                    <p class="mt-1 text-sm text-gray-900">
+                                        {{ props.person.personalInfo.privateContact.mobilePhoneNumber || '-' }}
                                     </p>
                                 </div>
                             </div>
@@ -505,6 +577,7 @@ interface Props {
     canEdit: boolean;
     researchArea?: any;
     countryName?: string;
+    privateCountryName?: string;
 }
 
 const props = defineProps<Props>();

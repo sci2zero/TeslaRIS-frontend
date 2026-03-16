@@ -1354,5 +1354,6 @@ export default {
     scholarIdFormatError: "Invalid Google Scholar ID format.",
     authenticusIdFormatError: "Invalid Google Scholar ID format.",
     lattesIdFormatError: "Invalid Lattes ID format.",
-    favoriteLabel: "Favorite"
+    favoriteLabel: "Favorite",
+    prizeTypeLabel: "Prize type"
 }

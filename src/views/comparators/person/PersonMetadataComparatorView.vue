@@ -267,6 +267,15 @@ export default defineComponent({
             mergeMultilingualContentField(person1.postalAddress!.state, person2.postalAddress!.state);
             person2.postalAddress!.state = [];
 
+            mergeMultilingualContentField(person1.privatePostalAddress!.city, person2.privatePostalAddress!.city);
+            person2.privatePostalAddress!.city = [];
+
+            mergeMultilingualContentField(person1.privatePostalAddress!.streetAndNumber, person2.privatePostalAddress!.streetAndNumber);
+            person2.privatePostalAddress!.streetAndNumber = [];
+
+            mergeMultilingualContentField(person1.privatePostalAddress!.state, person2.privatePostalAddress!.state);
+            person2.privatePostalAddress!.state = [];
+
             bulkTransferFields(person1, person2, [
                 { fieldName: "placeOfBirth", emptyValue: "" },
                 { fieldName: "localBirthDate", emptyValue: "" },
@@ -286,7 +295,12 @@ export default defineComponent({
                 { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
                 { fieldName: "contact.faxNumber", emptyValue: "", nested: true },
                 { fieldName: "contact.mobilePhoneNumber", emptyValue: "", nested: true },
-                { fieldName: "postalAddress.postalNumber", emptyValue: "", nested: true }
+                { fieldName: "privateContact.contactEmail", emptyValue: "", nested: true },
+                { fieldName: "privateContact.phoneNumber", emptyValue: "", nested: true },
+                { fieldName: "privateContact.faxNumber", emptyValue: "", nested: true },
+                { fieldName: "privateContact.mobilePhoneNumber", emptyValue: "", nested: true },
+                { fieldName: "postalAddress.postalNumber", emptyValue: "", nested: true },
+                { fieldName: "privatePostalAddress.postalNumber", emptyValue: "", nested: true }
             ]);
 
             person2.uris!.forEach(uri => {
@@ -297,6 +311,7 @@ export default defineComponent({
             person2.uris = [];
 
             person1.postalAddress!.countryId = person2.postalAddress?.countryId as number;
+            person1.privatePostalAddress!.countryId = person2.privatePostalAddress?.countryId as number;
 
             person1.sex = person2.sex;
 
