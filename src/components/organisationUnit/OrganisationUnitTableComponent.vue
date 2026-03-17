@@ -199,7 +199,7 @@
                         <div v-if="$i18n.locale.startsWith('sr') ? row.item.keywordsSr : row.item.keywordsOther" class="flex flex-wrap gap-1">
                             <localized-link 
                                 v-for="(keyword, index) in ($i18n.locale.startsWith('sr') ? row.item.keywordsSr : row.item.keywordsOther).split('\n')" 
-                                :key="index" 
+                                :key="index"
                                 :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`"
                                 class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full hover:bg-blue-200 transition-colors"
                             >

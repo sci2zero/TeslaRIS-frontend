@@ -26,14 +26,23 @@ export interface OrganisationUnitIndex {
 
 export interface OrganisationUnitRequest {
     name: MultilingualContent[];
-    nameAbbreviation?: string;
+    nameAbbreviation?: MultilingualContent[];
     keyword: MultilingualContent[];
+    description?: MultilingualContent[];
     researchAreasId: number[];
     location?: GeoLocation;
     contact?: Contact;
     scopusAfid?: string;
     openAlexId?: string;
-    ror? : string;
+    ror?: string;
+    ringgold?: string;
+    fundref?: string;
+    isni?: string;
+    athensId?: string;
+    ncesId?: string;
+    fctId?: string;
+    dgeecId?: string;
+    nifId?: string;
     uris: string[];
     allowedThesisTypes: ThesisType[];
     clientInstitutionCris: boolean;
@@ -45,12 +54,25 @@ export interface OrganisationUnitRequest {
     validatingEmailDomainDl: boolean;
     allowingSubdomainsDl: boolean;
     legalEntity: boolean;
+    sector?: OrganisationUnitSector;
+    startup?: boolean;
+    dateEstablished?: string;
+}
+
+export enum OrganisationUnitSector {
+    ACADEMIC = "ACADEMIC",
+    COMPANY = "COMPANY",
+    HEALTH = "HEALTH",
+    INSTITUTION = "INSTITUTION",
+    GOVERNMENT = "GOVERNMENT",
+    OTHER = "OTHER"
 }
 
 export interface OrganisationUnitResponse {
     id: number;
     name: MultilingualContent[];
-    nameAbbreviation?: string;
+    nameAbbreviation?: MultilingualContent[];
+    description?: MultilingualContent[];
     keyword: MultilingualContent[];
     researchAreas: ResearchArea[];
     location?: GeoLocation;
@@ -58,6 +80,14 @@ export interface OrganisationUnitResponse {
     scopusAfid?: string;
     openAlexId?: string;
     ror? : string;
+    ringgold?: string;
+    fundref?: string;
+    isni?: string;
+    athensId?: string;
+    ncesId?: string;
+    fctId?: string;
+    dgeecId?: string;
+    nifId?: string;
     uris: string[];
     logoServerFilename?: string;
     logoBackgroundHex: string;
@@ -73,6 +103,9 @@ export interface OrganisationUnitResponse {
     legalEntity: boolean;
     superInstitutionId: number;
     superInstitutionName: MultilingualContent[];
+    sector?: OrganisationUnitSector;
+    startup?: boolean;
+    dateEstablished?: string;
 }
 
 export enum OrganisationUnitsRelationType {

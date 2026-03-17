@@ -51,6 +51,7 @@ import GenericCrudModal from '../core/GenericCrudModal.vue';
 import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { ThesisType } from '@/models/PublicationModel';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -277,7 +278,7 @@ export default defineComponent({
             if (!title && organisationUnit.name.length > 0) {
                 title = organisationUnit.name[0].content;
             }
-            const toSelect = { title: `${title} | ${organisationUnit.nameAbbreviation}`, value: organisationUnit.id };
+            const toSelect = { title: `${title} ${organisationUnit.nameAbbreviation ? " | " + returnCurrentLocaleContent(organisationUnit.nameAbbreviation) : ""}`, value: organisationUnit.id };
             organisationUnits.value.push(toSelect);
             
             if (props.multiple) {

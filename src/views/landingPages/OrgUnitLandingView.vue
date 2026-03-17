@@ -11,7 +11,7 @@
                             color="primary"
                             class="d-flex justify-center align-center"
                         >
-                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${organisationUnit?.nameAbbreviation})` : "" }}
+                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -56,7 +56,124 @@
                             show-map
                         />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
+                                <div>
+                                    Scopus AFID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Open Alex ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Research Organisation Registry ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror"></identifier-link>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Ringgold ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.ringgold">
+                                        {{ organisationUnit.ringgold }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    FundRef:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.fundref">
+                                        {{ organisationUnit.fundref }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    ISNI:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.isni">
+                                        {{ organisationUnit.isni }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Athens ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.athensId">
+                                        {{ organisationUnit.athensId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    NCES ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.ncesId">
+                                        {{ organisationUnit.ncesId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    FCT ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.fctId">
+                                        {{ organisationUnit.fctId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    DGEEC ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.dgeecId">
+                                        {{ organisationUnit.dgeecId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    NIF ID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.nifId">
+                                        {{ organisationUnit.nifId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                            </v-col>
+                            <v-col cols="4">
                                 <div v-if="isAdmin && organisationUnit?.clientInstitutionCris" class="response">
                                     {{ $t("clientInstitutionCrisLabel") }}
                                 </div>
@@ -65,6 +182,21 @@
                                 </div>
                                 <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
                                     {{ $t("legalEntityLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.startup" class="response">
+                                    {{ $t("startupLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.sector">
+                                    {{ $t("organisationUnitSectorLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.sector" class="response">
+                                    {{ getOUSectorFromValueAutoLocale(organisationUnit?.sector) }}
+                                </div>
+                                <div v-if="organisationUnit?.dateEstablished" class="response">
+                                    {{ $t("dateEstablishedLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.dateEstablished" class="response">
+                                    {{ localiseDate(organisationUnit?.dateEstablished) }}
                                 </div>
                                 <div v-if="organisationUnit?.superInstitutionId">
                                     {{ $t("superOULabel") }}
@@ -95,33 +227,6 @@
                                 <div v-if="loginStore.userLoggedIn" class="response">
                                     {{ organisationUnit?.contact?.phoneNumber ? organisationUnit?.contact?.phoneNumber : $t("notYetSetMessage") }}
                                 </div>
-                                <div>
-                                    Scopus AFID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Open Alex ID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Research Organisation Registry ID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
                                 <div v-if="organisationUnit?.uris && organisationUnit.uris.length > 0">
                                     {{ $t("websiteLabel") }}:
                                 </div>
@@ -129,7 +234,7 @@
                                     <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col cols="5">
                                 <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
                                     <open-layers-map
                                         ref="mapRef" height="250px"
@@ -426,6 +531,14 @@
                     @update="updateKeywords">
                 </keyword-list>
 
+                <!-- Description -->
+                <description-section
+                    :description="organisationUnit?.description ? organisationUnit.description : []"
+                    :can-edit="canEdit"
+                    is-general-description
+                    @update="updateDescription">
+                </description-section>
+
                 <!-- Research Area -->
                 <v-row>
                     <v-col cols="12">
@@ -557,11 +670,14 @@ import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDe
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import ImportService from '@/services/importer/ImportService';
+import DescriptionSection from '@/components/core/DescriptionSection.vue';
+import { getOUSectorFromValueAutoLocale } from '@/i18n/ouSector';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection },
     setup() {
         const currentTab = ref("relations");
         const displayPersistentDialog = ref(false);
@@ -828,6 +944,11 @@ export default defineComponent({
             performUpdate(false);
         };
 
+        const updateDescription = (description: MultilingualContent[]) => {
+            organisationUnit.value!.description = description;
+            performUpdate(false);
+        };
+
         const updateBasicInfo = (basicInfo: OrganisationUnitRequest) => {
             organisationUnit.value!.name = basicInfo.name;
             organisationUnit.value!.nameAbbreviation = basicInfo.nameAbbreviation;
@@ -836,6 +957,14 @@ export default defineComponent({
             organisationUnit.value!.scopusAfid = basicInfo.scopusAfid;
             organisationUnit.value!.openAlexId = basicInfo.openAlexId;
             organisationUnit.value!.ror = basicInfo.ror;
+            organisationUnit.value!.ringgold = basicInfo.ringgold;
+            organisationUnit.value!.fundref = basicInfo.fundref;
+            organisationUnit.value!.isni = basicInfo.isni;
+            organisationUnit.value!.athensId = basicInfo.athensId;
+            organisationUnit.value!.ncesId = basicInfo.ncesId;
+            organisationUnit.value!.nifId = basicInfo.nifId;
+            organisationUnit.value!.dgeecId = basicInfo.dgeecId;
+            organisationUnit.value!.fctId = basicInfo.fctId;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
             organisationUnit.value!.clientInstitutionCris = basicInfo.clientInstitutionCris;
@@ -847,6 +976,9 @@ export default defineComponent({
             organisationUnit.value!.validatingEmailDomainDl = basicInfo.validatingEmailDomainDl;
             organisationUnit.value!.allowingSubdomainsDl = basicInfo.allowingSubdomainsDl;
             organisationUnit.value!.institutionEmailDomainDl = basicInfo.institutionEmailDomainDl;
+            organisationUnit.value!.sector = basicInfo.sector;
+            organisationUnit.value!.startup = basicInfo.startup;
+            organisationUnit.value!.dateEstablished = basicInfo.dateEstablished;
             performUpdate(false);
         };
 
@@ -887,9 +1019,19 @@ export default defineComponent({
                 name: organisationUnit.value!.name,
                 nameAbbreviation: organisationUnit.value?.nameAbbreviation,
                 keyword: organisationUnit.value!.keyword,
+                description: organisationUnit.value!.description,
                 researchAreasId: researchAreaIds,
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
+                ror: organisationUnit.value?.ror,
+                ringgold: organisationUnit.value?.ringgold,
+                fundref: organisationUnit.value?.fundref,
+                isni: organisationUnit.value?.isni,
+                athensId: organisationUnit.value?.athensId,
+                fctId: organisationUnit.value?.fctId,
+                ncesId: organisationUnit.value?.ncesId,
+                dgeecId: organisationUnit.value?.dgeecId,
+                nifId: organisationUnit.value?.nifId,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
                 clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
@@ -900,7 +1042,10 @@ export default defineComponent({
                 clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
                 validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
                 allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
-                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string,
+                sector: organisationUnit.value?.sector,
+                startup: organisationUnit.value?.startup,
+                dateEstablished: organisationUnit.value?.dateEstablished
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -918,10 +1063,20 @@ export default defineComponent({
                 name: organisationUnit.value!.name,
                 nameAbbreviation: organisationUnit.value?.nameAbbreviation,
                 keyword: organisationUnit.value!.keyword,
+                description: organisationUnit.value!.description,
                 researchAreasId: organisationUnit.value!.researchAreas.map(leafResearchArea => leafResearchArea.id as number),
                 location: organisationUnit.value?.location,
                 contact: organisationUnit.value?.contact,
                 scopusAfid: organisationUnit.value?.scopusAfid,
+                ror: organisationUnit.value?.ror,
+                ringgold: organisationUnit.value?.ringgold,
+                fundref: organisationUnit.value?.fundref,
+                isni: organisationUnit.value?.isni,
+                athensId: organisationUnit.value?.athensId,
+                fctId: organisationUnit.value?.fctId,
+                ncesId: organisationUnit.value?.ncesId,
+                dgeecId: organisationUnit.value?.dgeecId,
+                nifId: organisationUnit.value?.nifId,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
                 clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
@@ -932,7 +1087,10 @@ export default defineComponent({
                 clientInstitutionDl: organisationUnit.value?.clientInstitutionDl as boolean,
                 validatingEmailDomainDl: organisationUnit.value?.validatingEmailDomainDl as boolean,
                 allowingSubdomainsDl: organisationUnit.value?.allowingSubdomainsDl as boolean,
-                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string
+                institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string,
+                sector: organisationUnit.value?.sector,
+                startup: organisationUnit.value?.startup,
+                dateEstablished: organisationUnit.value?.dateEstablished
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -1041,7 +1199,8 @@ export default defineComponent({
             displaySettingsDL, DLDisplayConfigurationForm,
             returnOnlyNonArchived, canEditDefaultSubmissionContent,
             openMetadataEnrichmentDialog, displayPersistentDialog,
-            startMetadataEnrichment
+            startMetadataEnrichment, updateDescription,
+            getOUSectorFromValueAutoLocale, localiseDate
         };
 }})
 

@@ -19,6 +19,14 @@ export const useValidationUtils = () => {
     const invalidWebOfScienceIdMessage = computed(() => i18n.t("webOfScienceIdFormatError"));
     const invalidWebOfScienceResearcherIdMessage = computed(() => i18n.t("webOfScienceResearcherIdFormatError"));
     const invalidRorMessage = computed(() => i18n.t("invalidRorMessage"));
+    const invalidRinggoldMessage = computed(() => i18n.t("invalidRinggoldMessage"));
+    const invalidFundrefMessage = computed(() => i18n.t("invalidFundrefMessage"));
+    const invalidIsniMessage = computed(() => i18n.t("invalidIsniMessage"));
+    const invalidAthensIdMessage = computed(() => i18n.t("invalidAthensIdMessage"));
+    const invalidNcesIdMessage = computed(() => i18n.t("invalidNcesIdMessage"));
+    const invalidFctIdMessage = computed(() => i18n.t("invalidFctIdMessage"));
+    const invalidDgeecIdMessage = computed(() => i18n.t("invalidDgeecIdMessage"));
+    const invalidNifIdMessage = computed(() => i18n.t("invalidNifIdMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
@@ -255,6 +263,78 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const ringgoldPattern = /^[0-9]+$/i;
+    const ringgoldValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (ringgoldPattern.test(value)) return true;
+            return invalidRinggoldMessage.value;
+        }
+    ];
+
+    const fundrefPattern = /^[0-9]+$/i;
+    const fundrefValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (fundrefPattern.test(value)) return true;
+            return invalidFundrefMessage.value;
+        }
+    ];
+
+    const isniPattern = /^[0-9X]{16}$/i;
+    const isniValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (isniPattern.test(value)) return true;
+            return invalidIsniMessage.value;
+        }
+    ];
+
+    const athensIdPattern = /.*/i;
+    const athensIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (athensIdPattern.test(value)) return true;
+            return invalidAthensIdMessage.value;
+        }
+    ];
+
+    const ncesIdPattern = /^[0-9]+$/i;
+    const ncesIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (ncesIdPattern.test(value)) return true;
+            return invalidNcesIdMessage.value;
+        }
+    ];
+
+    const fctIdPattern = /^[0-9A-Za-z-]+$/i;
+    const fctIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (fctIdPattern.test(value)) return true;
+            return invalidFctIdMessage.value;
+        }
+    ];
+
+    const dgeecIdPattern = /^[0-9A-Za-z-]+$/i;
+    const dgeecIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (dgeecIdPattern.test(value)) return true;
+            return invalidDgeecIdMessage.value;
+        }
+    ];
+
+    const nifIdPattern = /^[0-9]+$/i;
+    const nifIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (nifIdPattern.test(value)) return true;
+            return invalidNifIdMessage.value;
+        }
+    ];
+
     const confIdPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i;
     const confIdValidationRules = [
         (value: string) => {
@@ -394,6 +474,9 @@ export const useValidationUtils = () => {
         rorValidationRules, workOpenAlexIdValidationRules, udcValidationRules,
         personWebOfScienceIdValidationRules, documentWebOfScienceIdValidationRules,
         optionalNumericZeroOrGreaterFieldRules, scholarIdValidationRules,
-        personAuthenticusIdValidationRules, lattesIdValidationRules
+        personAuthenticusIdValidationRules, lattesIdValidationRules,
+        ringgoldValidationRules, fundrefValidationRules, isniValidationRules,
+        athensIdValidationRules, ncesIdValidationRules, fctIdValidationRules,
+        dgeecIdValidationRules, nifIdValidationRules
     };
 };

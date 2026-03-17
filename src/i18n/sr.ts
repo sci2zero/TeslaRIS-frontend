@@ -1368,5 +1368,8 @@ export default {
     privateAddressLabel: "Adresa stanovanja",
     professionalContactLabel: "Profesionalni kontakt",
     privateContactLabel: "Privatni kontakt",
-    prizeTypeLabel: "Tip nagrade"
+    prizeTypeLabel: "Tip nagrade",
+    organisationUnitSectorLabel: "Organizacioni sektor",
+    startupLabel: "Startap",
+    dateEstablishedLabel: "Datum osnivanja"
 }

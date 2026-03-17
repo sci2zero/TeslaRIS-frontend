@@ -5,38 +5,130 @@
                 <v-row>
                     <v-col cols="12">
                         <multilingual-text-input
-                            ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetOU?.name, languageTags)"></multilingual-text-input>
+                            ref="nameRef"
+                            v-model="name"
+                            :rules="requiredFieldRules"
+                            :label="$t('nameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetOU?.name, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="nameAbbreviation" :label="$t('nameAbbreviationLabel')" :placeholder="$t('nameAbbreviationLabel')"></v-text-field>
+                        <multilingual-text-input
+                            ref="nameAbbreviationRef"
+                            v-model="nameAbbreviation"
+                            :label="$t('nameAbbreviationLabel')"
+                            :initial-value="toMultilingualTextInput(presetOU?.nameAbbreviation, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules"></v-text-field>
+                        <v-text-field
+                            v-model="email"
+                            :label="$t('emailLabel')"
+                            :placeholder="$t('emailLabel')"
+                            :rules="nonMandatoryEmailFieldRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')"></v-text-field>
+                        <v-text-field
+                            v-model="phoneNumber"
+                            :label="$t('phoneNumberLabel')"
+                            :placeholder="$t('phoneNumberLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="scopusAfid"
+                            label="Scopus AFID"
+                            placeholder="Scopus AFID"
+                            :rules="scopusAfidValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="institutionOpenAlexIdValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="openAlexId"
+                            label="Open Alex ID"
+                            placeholder="Open Alex ID"
+                            :rules="institutionOpenAlexIdValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="ror"
+                            label="ROR ID"
+                            placeholder="Research Organisation Registry ID"
+                            :rules="rorValidationRules"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="ringgold" label="Ringgold ID" placeholder="Ringgold ID" :rules="ringgoldValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="fundref" label="FundRef" placeholder="FundRef" :rules="fundrefValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="isni" label="ISNI" placeholder="ISNI" :rules="isniValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="athensId" label="Athens ID" placeholder="Athens ID" :rules="athensIdValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="ncesId" label="NCES ID" placeholder="NCES ID" :rules="ncesIdValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="fctId" label="FCT ID" placeholder="FCT ID" :rules="fctIdValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="dgeecId" label="DGEEC ID" placeholder="DGEEC ID" :rules="dgeecIdValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="nifId" label="NIF ID" placeholder="NIF ID" :rules="nifIdValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-select
+                            v-model="selectedOuSector"
+                            :label="$t('organisationUnitSectorLabel')"
+                            :items="ouSectors"
+                            return-object
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-checkbox
+                            v-model="startup"
+                            :label="$t('startupLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <date-picker
+                            v-model="dateEstablished"
+                            :label="$t('dateEstablishedLabel')"
+                            color="primary"
+                        />
                     </v-col>
                 </v-row>
                 <v-row v-if="isAdmin">
@@ -156,7 +248,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import type { OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
+import { type OrganisationUnitRequest, type OrganisationUnitResponse, OrganisationUnitSector } from '@/models/OrganisationUnitModel';
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
@@ -166,6 +258,7 @@ import { useI18n } from 'vue-i18n';
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import { useUserRole } from '@/composables/useUserRole';
+import { getOUSectorFromValueAutoLocale, getOUSectorsForGivenLocale } from '@/i18n/ouSector';
 
 
 export default defineComponent({
@@ -199,17 +292,29 @@ export default defineComponent({
         });
 
         const nameRef = ref<typeof MultilingualTextInput>();
+        const nameAbbreviationRef = ref<typeof MultilingualTextInput>();
         const mapRef = ref<typeof OpenLayersMap>();
         const urisRef = ref<typeof UriInput>();
 
         const name = ref<any>([]);
-        const nameAbbreviation = ref(props.presetOU?.nameAbbreviation);
+        const nameAbbreviation = ref<any>([]);
         const email = ref(props.presetOU?.contact?.contactEmail);
         const phoneNumber = ref(props.presetOU?.contact?.phoneNumber);
         const scopusAfid = ref(props.presetOU?.scopusAfid);
         const openAlexId = ref(props.presetOU?.openAlexId);
         const ror = ref(props.presetOU?.ror);
+        const ringgold = ref(props.presetOU?.ringgold);
+        const fundref = ref(props.presetOU?.fundref);
+        const isni = ref(props.presetOU?.isni);
+        const athensId = ref(props.presetOU?.athensId);
+        const ncesId = ref(props.presetOU?.ncesId);
+        const fctId = ref(props.presetOU?.fctId);
+        const dgeecId = ref(props.presetOU?.dgeecId);
+        const nifId = ref(props.presetOU?.nifId);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
+
+        const startup = ref(props.presetOU?.startup);
+        const dateEstablished = ref(props.presetOU?.dateEstablished);
 
         const clientInstitutionCris = ref(props.presetOU?.clientInstitutionCris);
         const validatingEmailDomainCris = ref(props.presetOU?.validatingEmailDomainCris);
@@ -231,10 +336,20 @@ export default defineComponent({
             : [{ title: "", value: null }]
         );
 
+        const ouSectors = getOUSectorsForGivenLocale();
+        const selectedOuSector = ref<{title: string, value: OrganisationUnitSector | null}>(
+            { 
+                title: getOUSectorFromValueAutoLocale(props.presetOU?.sector ? props.presetOU?.sector : OrganisationUnitSector.ACADEMIC) as string, 
+                value: props.presetOU?.sector ? props.presetOU?.sector : OrganisationUnitSector.ACADEMIC 
+            }
+        );
+
         const {
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
             nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
-            requiredSelectionRules
+            requiredSelectionRules, ringgoldValidationRules, fundrefValidationRules,
+            isniValidationRules, athensIdValidationRules, ncesIdValidationRules,
+            fctIdValidationRules, dgeecIdValidationRules, nifIdValidationRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -260,12 +375,21 @@ export default defineComponent({
                 name: name.value,
                 nameAbbreviation: nameAbbreviation.value,
                 keyword: props.presetOU?.keyword as MultilingualContent[],
+                description: props.presetOU?.description as MultilingualContent[],
                 researchAreasId: [],
                 location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
                 contact: {contactEmail: email.value as string, phoneNumber: phoneNumber.value as string},
                 scopusAfid: scopusAfid.value,
                 openAlexId: openAlexId.value,
                 ror: ror.value,
+                ringgold: ringgold.value,
+                fundref: fundref.value,
+                isni: isni.value,
+                athensId: athensId.value,
+                ncesId: ncesId.value,
+                fctId: fctId.value,
+                dgeecId: dgeecId.value,
+                nifId: nifId.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
                 clientInstitutionCris: clientInstitutionCris.value as boolean,
@@ -276,7 +400,10 @@ export default defineComponent({
                 clientInstitutionDl: clientInstitutionDl.value as boolean,
                 validatingEmailDomainDl: validatingEmailDomainDl.value as boolean,
                 allowingSubdomainsDl: allowingSubdomainsDl.value as boolean,
-                institutionEmailDomainDl: institutionEmailDomainDl.value as string
+                institutionEmailDomainDl: institutionEmailDomainDl.value as string,
+                sector: selectedOuSector.value.value as OrganisationUnitSector,
+                startup: startup.value,
+                dateEstablished: dateEstablished.value
             };
 
             emit("update", updatedOU);
@@ -285,14 +412,29 @@ export default defineComponent({
         const refreshForm = () => {
             nameRef.value?.clearInput();
             name.value = props.presetOU?.name as MultilingualContent[];
+            nameAbbreviationRef.value?.clearInput();
+            nameAbbreviation.value = props.presetOU?.nameAbbreviation as MultilingualContent[];
 
             uris.value = props.presetOU?.uris as string[];
-            nameAbbreviation.value = props.presetOU?.nameAbbreviation;
             email.value = props.presetOU?.contact?.contactEmail;
             phoneNumber.value = props.presetOU?.contact?.phoneNumber;
             scopusAfid.value = props.presetOU?.scopusAfid;
             openAlexId.value = props.presetOU?.openAlexId;
             ror.value = props.presetOU?.ror;
+            ringgold.value = props.presetOU?.ringgold;
+            fundref.value = props.presetOU?.fundref;
+            isni.value = props.presetOU?.isni;
+            athensId.value = props.presetOU?.athensId;
+            ncesId.value = props.presetOU?.ncesId;
+            nifId.value = props.presetOU?.nifId;
+            dgeecId.value = props.presetOU?.dgeecId;
+            fctId.value = props.presetOU?.fctId;
+            selectedOuSector.value = {
+                title: getOUSectorFromValueAutoLocale(props.presetOU?.sector as  OrganisationUnitSector) as string,
+                value: props.presetOU?.sector as OrganisationUnitSector
+            };
+            startup.value = props.presetOU?.startup;
+            dateEstablished.value = props.presetOU?.dateEstablished;
             urisRef.value?.refreshModelValue(uris.value);
 
             clientInstitutionCris.value = props.presetOU?.clientInstitutionCris;
@@ -311,6 +453,7 @@ export default defineComponent({
             });
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+            nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
         };
 
         return {
@@ -327,7 +470,14 @@ export default defineComponent({
             validatingEmailDomainCris, allowingSubdomainsCris,
             institutionEmailDomainCris, isAdmin, legalEntity,
             clientInstitutionDl, validatingEmailDomainDl,
-            allowingSubdomainsDl, institutionEmailDomainDl
+            allowingSubdomainsDl, institutionEmailDomainDl,
+            nameAbbreviationRef, ringgold, fundref, isni,
+            athensId, ncesId, fctId, dgeecId, nifId, ouSectors,
+            selectedOuSector, startup, dateEstablished,
+            ringgoldValidationRules, fundrefValidationRules,
+            isniValidationRules, athensIdValidationRules, 
+            ncesIdValidationRules, fctIdValidationRules,
+            dgeecIdValidationRules, nifIdValidationRules
         };
     }
 });

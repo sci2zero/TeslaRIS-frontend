@@ -3,7 +3,7 @@
         <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(leftOrganisationUnit?.name) }} {{ leftOrganisationUnit?.nameAbbreviation ? `(${leftOrganisationUnit?.nameAbbreviation})` : "" }}
+                    {{ returnCurrentLocaleContent(leftOrganisationUnit?.name) }} {{ leftOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(leftOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
                 <br />
 
@@ -19,6 +19,13 @@
                     :preset-keywords="(leftOrganisationUnit?.keyword as MultilingualContent[])"
                     @update="updateLeftKeywords"
                 />
+
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftOrganisationUnit?.description as MultilingualContent[])"
+                    :placeholder-label="$t('descriptionLabel')"    
+                    @update="updateLeftDescription">
+                </description-or-biography-update-form>
 
                 <br />
 
@@ -59,7 +66,7 @@
             
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(rightOrganisationUnit?.name) }} {{ rightOrganisationUnit?.nameAbbreviation ? `(${rightOrganisationUnit?.nameAbbreviation})` : "" }}
+                    {{ returnCurrentLocaleContent(rightOrganisationUnit?.name) }} {{ rightOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(rightOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
 
                 <br />
@@ -76,6 +83,13 @@
                     :preset-keywords="(rightOrganisationUnit?.keyword as MultilingualContent[])"
                     @update="updateRightKeywords"
                 />
+
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightOrganisationUnit?.description as MultilingualContent[])"
+                    :placeholder-label="$t('descriptionLabel')"
+                    @update="updateRightDescription">
+                </description-or-biography-update-form>
 
                 <br />
 
@@ -143,11 +157,12 @@ import OrganisationUnitRelationUpdateForm from '@/components/organisationUnit/up
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitMetadataComparator",
-    components: { OrganisationUnitUpdateForm, KeywordUpdateForm, ComparisonActions, ResearchAreaHierarchy, OrganisationUnitRelationUpdateForm, Toast },
+    components: { OrganisationUnitUpdateForm, KeywordUpdateForm, ComparisonActions, ResearchAreaHierarchy, OrganisationUnitRelationUpdateForm, Toast, DescriptionOrBiographyUpdateForm },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -170,6 +185,8 @@ export default defineComponent({
         const updateRightRef = ref<typeof OrganisationUnitUpdateForm>();
         const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
         const updateLeftKeywordsRef = ref<typeof KeywordUpdateForm>();
+        const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
+        const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
         const leftRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
         const rightRelationsRef = ref<typeof OrganisationUnitRelationUpdateForm>();
 
@@ -229,14 +246,27 @@ export default defineComponent({
         const mergeOrganisationUnitMetadata = (organisationUnit1: OrganisationUnitResponse, organisationUnit2: OrganisationUnitResponse) => {
             mergeMultilingualContentField(organisationUnit1.name, organisationUnit2.name);
 
+            mergeMultilingualContentField(organisationUnit1.description, organisationUnit2.description);
+            organisationUnit2.description = [];
+
             mergeMultilingualContentField(organisationUnit1.keyword, organisationUnit2.keyword);
             organisationUnit2.keyword = [];
 
+            mergeMultilingualContentField(organisationUnit1.nameAbbreviation, organisationUnit2.nameAbbreviation);
+            organisationUnit2.nameAbbreviation = [];
+
             bulkTransferFields(organisationUnit1, organisationUnit2, [
-                { fieldName: "nameAbbreviation", emptyValue: "" },
                 { fieldName: "scopusAfid", emptyValue: "" },
                 { fieldName: "openAlexId", emptyValue: "" },
                 { fieldName: "ror", emptyValue: "" },
+                { fieldName: "ringgold", emptyValue: "" },
+                { fieldName: "fundref", emptyValue: "" },
+                { fieldName: "isni", emptyValue: "" },
+                { fieldName: "athensId", emptyValue: "" },
+                { fieldName: "ncesId", emptyValue: "" },
+                { fieldName: "fctId", emptyValue: "" },
+                { fieldName: "dgeecId", emptyValue: "" },
+                { fieldName: "nifId", emptyValue: "" },
                 { fieldName: "allowedThesisTypes", emptyValue: [] },
                 { fieldName: "clientInstitutionCris", emptyValue: false },
                 { fieldName: "validatingEmailDomainCris", emptyValue: false },
@@ -247,6 +277,8 @@ export default defineComponent({
                 { fieldName: "allowingSubdomainsDl", emptyValue: false },
                 { fieldName: "institutionEmailDomainDl", emptyValue: "" },
                 { fieldName: "legalEntity", emptyValue: false, setEmpty: false },
+                { fieldName: "startup", emptyValue: false, setEmpty: false },
+                { fieldName: "dateEstablished", emptyValue: null },
                 { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
                 { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
                 { fieldName: "location.latitude", emptyValue: null, nested: true, setEmpty: false },
@@ -255,6 +287,7 @@ export default defineComponent({
             ]);
 
             organisationUnit1.researchAreas = organisationUnit2.researchAreas;
+            organisationUnit1.sector = organisationUnit2.sector;
 
             organisationUnit2.uris!.forEach(uri => {
                 if (!organisationUnit1.uris!.includes(uri)) {
@@ -271,6 +304,8 @@ export default defineComponent({
             updateRightRef.value?.submit();
             updateLeftKeywordsRef.value?.submit();
             updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
 
             if (fromLeftToRight) {
                 [rightOrganisationUnit.value, leftOrganisationUnit.value] = mergeOrganisationUnitMetadata(rightOrganisationUnit.value as OrganisationUnitResponse, leftOrganisationUnit.value as OrganisationUnitResponse);
@@ -286,6 +321,8 @@ export default defineComponent({
             updateRightRef.value?.refreshForm();
             updateLeftKeywordsRef.value?.refreshForm();
             updateRightKeywordsRef.value?.refreshForm();
+            updateLeftDescriptionRef.value?.refreshForm();
+            updateRightDescriptionRef.value?.refreshForm();
         };
 
         const leftUpdateComplete = ref(false);
@@ -298,8 +335,17 @@ export default defineComponent({
             leftOrganisationUnit.value!.scopusAfid = updatedData.scopusAfid;
             leftOrganisationUnit.value!.openAlexId = updatedData.openAlexId;
             leftOrganisationUnit.value!.ror = updatedData.ror;
+            leftOrganisationUnit.value!.ringgold = updatedData.ringgold;
+            leftOrganisationUnit.value!.fundref = updatedData.fundref;
+            leftOrganisationUnit.value!.isni = updatedData.isni;
+            leftOrganisationUnit.value!.athensId = updatedData.athensId;
+            leftOrganisationUnit.value!.ncesId = updatedData.ncesId;
+            leftOrganisationUnit.value!.nifId = updatedData.nifId;
+            leftOrganisationUnit.value!.dgeecId = updatedData.dgeecId;
+            leftOrganisationUnit.value!.fctId = updatedData.fctId;
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
+            leftOrganisationUnit.value!.description = updatedData.description;
             leftOrganisationUnit.value!.keyword = updatedData.keyword;
             leftOrganisationUnit.value!.uris = updatedData.uris;
             leftOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
@@ -312,6 +358,9 @@ export default defineComponent({
             leftOrganisationUnit.value!.allowingSubdomainsDl = updatedData.allowingSubdomainsDl;
             leftOrganisationUnit.value!.institutionEmailDomainDl = updatedData.institutionEmailDomainDl;
             leftOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
+            leftOrganisationUnit.value!.sector = updatedData.sector;
+            leftOrganisationUnit.value!.startup = updatedData.startup;
+            leftOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
 
             leftUpdateRequest.value = updatedData;
             
@@ -327,8 +376,17 @@ export default defineComponent({
             rightOrganisationUnit.value!.scopusAfid = updatedData.scopusAfid;
             rightOrganisationUnit.value!.openAlexId = updatedData.openAlexId;
             rightOrganisationUnit.value!.ror = updatedData.ror;
+            rightOrganisationUnit.value!.ringgold = updatedData.ringgold;
+            rightOrganisationUnit.value!.fundref = updatedData.fundref;
+            rightOrganisationUnit.value!.isni = updatedData.isni;
+            rightOrganisationUnit.value!.athensId = updatedData.athensId;
+            rightOrganisationUnit.value!.ncesId = updatedData.ncesId;
+            rightOrganisationUnit.value!.nifId = updatedData.nifId;
+            rightOrganisationUnit.value!.dgeecId = updatedData.dgeecId;
+            rightOrganisationUnit.value!.fctId = updatedData.fctId;
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
+            rightOrganisationUnit.value!.description = updatedData.description;
             rightOrganisationUnit.value!.keyword = updatedData.keyword;
             rightOrganisationUnit.value!.uris = updatedData.uris;
             rightOrganisationUnit.value!.allowedThesisTypes = updatedData.allowedThesisTypes;
@@ -341,6 +399,9 @@ export default defineComponent({
             rightOrganisationUnit.value!.allowingSubdomainsDl = updatedData.allowingSubdomainsDl;
             rightOrganisationUnit.value!.institutionEmailDomainDl = updatedData.institutionEmailDomainDl;
             rightOrganisationUnit.value!.legalEntity = updatedData.legalEntity;
+            rightOrganisationUnit.value!.sector = updatedData.sector;
+            rightOrganisationUnit.value!.startup = updatedData.startup;
+            rightOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
 
             rightUpdateRequest.value = updatedData;
             
@@ -354,6 +415,8 @@ export default defineComponent({
             update.value = true;
             updateLeftKeywordsRef.value?.submit();
             updateRightKeywordsRef.value?.submit();
+            updateLeftDescriptionRef.value?.submit();
+            updateRightDescriptionRef.value?.submit();
             updateLeftRef.value?.submit();
             updateRightRef.value?.submit();
             leftRelationsRef.value?.updateOURelations();
@@ -366,6 +429,14 @@ export default defineComponent({
 
         const updateRightKeywords = (keywords: MultilingualContent[]) => {
             rightOrganisationUnit.value!.keyword = keywords;
+        };
+
+        const updateLeftDescription = (description: MultilingualContent[]) => {
+            leftOrganisationUnit.value!.description = description;
+        };
+
+        const updateRightDescription = (description: MultilingualContent[]) => {
+            rightOrganisationUnit.value!.description = description;
         };
 
         const updateLeftRelations = (newRelations: OrganisationUnitRelationRequest[], toDelete: number[]) => {
@@ -479,7 +550,9 @@ export default defineComponent({
             leftRelationsRef, rightRelationsRef, isAdmin,
             updateLeftRelations, updateRightRelations,
             leftWarningMessage, rightWarningMessage,
-            EntityType
+            EntityType, updateLeftDescription,
+            updateRightDescription, updateLeftDescriptionRef,
+            updateRightDescriptionRef
         };
 }})
 
