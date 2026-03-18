@@ -200,6 +200,7 @@ export default {
     stateColumn: "stateOther",
     placeLabel: "Place",
     placeColumn: "placeOther",
+    countryColumn: "countryOther",
     itemsPerPageLabel: "Items per page:",
     journalListLabel: "Journals",
     journalLabel: "Journal",

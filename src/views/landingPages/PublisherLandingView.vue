@@ -51,10 +51,16 @@
                         <v-row v-else>
                             <v-col cols="6">
                                 <div v-if="publisher?.countryId">
-                                    {{ $t("stateLabel") }}:
+                                    {{ $t("countryLabel") }}:
                                 </div>
                                 <div v-if="publisher?.countryId" class="response">
                                     {{ returnCurrentLocaleContent(country?.name) }}
+                                </div>
+                                <div v-if="publisher?.state && publisher?.state.length > 0">
+                                    {{ $t("stateLabel") }}:
+                                </div>
+                                <div v-if="publisher?.state && publisher?.state.length > 0" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.state) }}
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -210,6 +216,7 @@ export default defineComponent({
         const updateBasicInfo = (updatedBasicInfo: Publisher) => {
             publisher.value!.name = updatedBasicInfo.name;
             publisher.value!.place = updatedBasicInfo.place;
+            publisher.value!.state = updatedBasicInfo.state;
             publisher.value!.countryId = updatedBasicInfo.countryId;
 
             PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {

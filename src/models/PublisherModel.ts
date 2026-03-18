@@ -14,6 +14,10 @@ export interface PublisherIndex {
     stateSrSortable: string;
     stateOther: string;
     stateOtherSortable: string;
+    countrySr: string;
+    countrySrSortable: string;
+    countryOther: string;
+    countryOtherSortable: string;
     databaseId: number;
 }
 
@@ -21,5 +25,6 @@ export interface Publisher {
     id?: number;
     name: MultilingualContent[];
     place: MultilingualContent[];
+    state: MultilingualContent[];
     countryId?: number
 }

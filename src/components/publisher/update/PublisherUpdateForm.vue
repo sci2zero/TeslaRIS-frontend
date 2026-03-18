@@ -5,8 +5,12 @@
                 <v-row>
                     <v-col cols="12">
                         <multilingual-text-input
-                            ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetPublisher?.name, languageTags)"></multilingual-text-input>
+                            ref="nameRef"
+                            v-model="name"
+                            :rules="requiredFieldRules"
+                            :label="$t('nameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetPublisher?.name, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -22,7 +26,22 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" :initial-value="toMultilingualTextInput(presetPublisher?.place, languageTags)"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="placeRef"
+                            v-model="place"
+                            :label="$t('placeLabel')"
+                            :initial-value="toMultilingualTextInput(presetPublisher?.place, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <multilingual-text-input
+                            ref="stateRef"
+                            v-model="state"
+                            :label="$t('stateLabel')"
+                            :initial-value="toMultilingualTextInput(presetPublisher?.state, languageTags)"
+                        />
                     </v-col>
                 </v-row>
             </v-col>
@@ -103,9 +122,11 @@ export default defineComponent({
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
+        const stateRef = ref<typeof MultilingualTextInput>();
 
         const name = ref([]);
         const place = ref([]);
+        const state = ref([]);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
@@ -116,7 +137,8 @@ export default defineComponent({
             const updatedPublisher: Publisher = {
                 name: name.value,
                 countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
-                place: place.value
+                place: place.value,
+                state: state.value
             };
 
             emit("update", updatedPublisher);
@@ -133,13 +155,14 @@ export default defineComponent({
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
             placeRef.value?.forceRefreshModelValue(toMultilingualTextInput(place.value, languageTags.value));
+            stateRef.value?.forceRefreshModelValue(toMultilingualTextInput(state.value, languageTags.value));
         };
 
         return {
             isFormValid,
-            name, nameRef,
+            name, nameRef, state,
             countries, selectedCountry,
-            place, placeRef,
+            place, placeRef, stateRef,
             requiredFieldRules,
             toMultilingualTextInput,
             submit, languageTags,

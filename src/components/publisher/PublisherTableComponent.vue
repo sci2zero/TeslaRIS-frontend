@@ -62,6 +62,12 @@
                 <td v-else>
                     {{ displayTextOrPlaceholder(row.item.stateOther) }}
                 </td>
+                <td v-if="$i18n.locale.startsWith('sr')">
+                    {{ displayTextOrPlaceholder(row.item.countrySr) }}
+                </td>
+                <td v-else>
+                    {{ displayTextOrPlaceholder(row.item.countryOther) }}
+                </td>
             </tr>
         </template>
     </v-data-table-server>
@@ -124,12 +130,14 @@ export default defineComponent({
         const nameLabel = computed(() => i18n.t("nameLabel"));
         const placeLabel = computed(() => i18n.t("placeLabel"));
         const stateLabel = computed(() => i18n.t("stateLabel"));
+        const countryLabel = computed(() => i18n.t("countryLabel"));
 
         const { isAdmin } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const placeColumn = computed(() => i18n.t("placeColumn"));
         const stateColumn = computed(() => i18n.t("stateColumn"));
+        const countryColumn = computed(() => i18n.t("countryColumn"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
@@ -137,6 +145,7 @@ export default defineComponent({
           { title: nameLabel, align: "start", sortable: true, key: nameColumn},
           { title: placeLabel, align: "start", sortable: true, key: placeColumn},
           { title: stateLabel, align: "start", sortable: true, key: stateColumn},
+          { title: countryLabel, align: "start", sortable: true, key: countryColumn}
         ];
 
         const headersSortableMappings: Map<string, string> = new Map([
@@ -145,6 +154,8 @@ export default defineComponent({
             ["placeSr", "place_sr_sortable"],
             ["placeOther", "place_other_sortable"],
             ["stateSr", "state_sr_sortable"],
+            ["stateOther", "state_other_sortable"],
+            ["countrySr", "country_sr_sortable"],
             ["stateOther", "state_other_sortable"]
         ]);
 

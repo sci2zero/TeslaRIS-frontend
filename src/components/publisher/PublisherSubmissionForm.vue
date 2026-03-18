@@ -4,7 +4,7 @@
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -20,7 +20,12 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
+                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <multilingual-text-input ref="stateRef" v-model="state" :label="$t('stateLabel')" />
                     </v-col>
                 </v-row>
             </v-col>
@@ -108,9 +113,11 @@ export default defineComponent({
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
+        const stateRef = ref<typeof MultilingualTextInput>();
 
         const name = ref<any[]>([]);
-        const place = ref([]);
+        const place = ref<any[]>([]);
+        const state = ref<any[]>([]);
 
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
@@ -122,7 +129,8 @@ export default defineComponent({
             const newPublisher: Publisher = {
                 name: name.value,
                 countryId: selectedCountry.value?.value === -1 ? undefined : selectedCountry.value?.value as number,
-                place: place.value
+                place: place.value,
+                state: state.value
             };
 
             PublisherService.createPublisher(newPublisher).then((response) => {
@@ -134,6 +142,7 @@ export default defineComponent({
             if (stayOnPage) {
                 nameRef.value?.clearInput();
                 placeRef.value?.clearInput();
+                stateRef.value?.clearInput();
 
                 selectedCountry.value = { title: "", value: -1};
 
@@ -155,7 +164,7 @@ export default defineComponent({
             countries, selectedCountry,
             place, placeRef,
             requiredFieldRules,
-            submit
+            submit, state, stateRef
         };
     }
 });

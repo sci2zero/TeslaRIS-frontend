@@ -201,6 +201,7 @@ export default {
     stateColumn: "stateSr",
     placeLabel: "Mesto",
     placeColumn: "placeSr",
+    countryColumn: "countrySr",
     itemsPerPageLabel: "Redova po stranici:",
     journalListLabel: "Časopisi",
     journalLabel: "Časopis",
