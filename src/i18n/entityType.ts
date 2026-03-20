@@ -10,7 +10,8 @@ export const entityTypeSr = [
     { title: "Časopisi", value: EntityType.JOURNAL },
     { title: "Serije knjiga", value: EntityType.BOOK_SERIES },
     { title: "Izdavači", value: EntityType.PUBLISHER },
-    { title: "Korisnički nalozi", value: EntityType.USER_ACCOUNT }
+    { title: "Korisnički nalozi", value: EntityType.USER_ACCOUNT },
+    { title: "Poeni sa vrednovanja", value: EntityType.ASSESSMENT_POINTS }
 ];
 
 export const entityTypeEn = [
@@ -21,7 +22,8 @@ export const entityTypeEn = [
     { title: "Journals", value: EntityType.JOURNAL },
     { title: "Book series", value: EntityType.BOOK_SERIES },
     { title: "Publishers", value: EntityType.PUBLISHER },
-    { title: "User accounts", value: EntityType.USER_ACCOUNT }
+    { title: "User accounts", value: EntityType.USER_ACCOUNT },
+    { title: "Assessment points", value: EntityType.ASSESSMENT_POINTS }
 ];
 
 export const getEntityTypeTitleFromValueAutoLocale = (value: EntityType) => {

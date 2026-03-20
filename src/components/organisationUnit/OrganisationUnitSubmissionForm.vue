@@ -216,6 +216,54 @@
                             </v-col>
                         </v-row>
                     </v-container>
+                    <h3>{{ $t('addressLabel') }}</h3>
+                    <v-row>
+                        <v-col>
+                            <v-select
+                                v-model="selectedCountry"
+                                hide-details="auto"
+                                :items="countries"
+                                :label="$t('countryLabel')"
+                                return-object
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="cityRef"
+                                v-model="city"
+                                :label="$t('cityLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="streetAndNumberRef"
+                                v-model="streetAndNumber"
+                                :label="$t('streetAndNumberLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="stateRef"
+                                v-model="state"
+                                :label="$t('stateLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="postalNumber"
+                                :label="$t('postalNumberLabel')"
+                                :placeholder="$t('postalNumberLabel')"
+                            />
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-col cols="12">
                             <open-layers-map
@@ -323,6 +371,17 @@ export default defineComponent({
         const startup = ref(false);
         const dateEstablished = ref();
 
+        const cityRef = ref<typeof MultilingualTextInput>();
+        const streetAndNumberRef = ref<typeof MultilingualTextInput>();
+        const stateRef = ref<typeof MultilingualTextInput>();
+        const city = ref<any>([]);
+        const streetAndNumber = ref<any>([]);
+        const state = ref<any>([]);
+        const postalNumber = ref();
+
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1 });
+
         const thesisTypes = getThesisTypesForGivenLocale();
         const selectedThesisType = ref<{title: string, value: ThesisType | null}[]>([{ title: "", value: null }]);
 
@@ -400,7 +459,14 @@ export default defineComponent({
                 institutionEmailDomainDl: institutionEmailDomainDl.value,
                 sector: selectedOuSector.value.value as OrganisationUnitSector,
                 startup: startup.value,
-                dateEstablished: dateEstablished.value
+                dateEstablished: dateEstablished.value,
+                postalAddress: {
+                    city: city.value,
+                    countryId: selectedCountry.value?.value as number,
+                    streetAndNumber: streetAndNumber.value,
+                    state: state.value,
+                    postalNumber: postalNumber.value as string
+                }
             };
 
             OrganisationUnitService.createOrganisationUnit(newOu).then((response) => {
@@ -445,6 +511,11 @@ export default defineComponent({
                     legalEntity.value = false;
                     startup.value = false;
                     dateEstablished.value = "";
+                    cityRef.value?.clearInput();
+                    streetAndNumberRef.value?.clearInput();
+                    stateRef.value?.clearInput();
+                    postalNumber.value = "";
+                    selectedCountry.value = { title: "", value: -1 };
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -480,7 +551,10 @@ export default defineComponent({
             ringgold, fundref, isni, athensId, ncesId,
             fctId, dgeecId, nifId, ouSectors,
             selectedOuSector, startup, dateEstablished,
-            description, descriptionRef
+            description, descriptionRef, city, cityRef,
+            streetAndNumber, streetAndNumberRef, state,
+            stateRef, countries, selectedCountry,
+            postalNumber
         };
     }
 });

@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import { type PostalAddress } from "./PersonModel";
 import { ThesisType } from "./PublicationModel";
 
 export interface OrganisationUnitIndex {
@@ -57,6 +58,7 @@ export interface OrganisationUnitRequest {
     sector?: OrganisationUnitSector;
     startup?: boolean;
     dateEstablished?: string;
+    postalAddress?: PostalAddress;
 }
 
 export enum OrganisationUnitSector {
