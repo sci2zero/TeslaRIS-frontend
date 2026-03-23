@@ -218,6 +218,59 @@
                         ></v-select>
                     </v-col>
                 </v-row>
+                
+                <h3>{{ $t('addressLabel') }}</h3>
+                <v-row>
+                    <v-col>
+                        <v-select
+                            v-model="selectedCountry"
+                            hide-details="auto"
+                            :items="countries"
+                            :label="$t('countryLabel')"
+                            return-object
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input
+                            ref="cityRef"
+                            v-model="city"
+                            :label="$t('cityLabel')"
+                            :initial-value="toMultilingualTextInput(presetOU?.postalAddress?.city, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input
+                            ref="streetAndNumberRef"
+                            v-model="streetAndNumber"
+                            :label="$t('streetAndNumberLabel')"
+                            :initial-value="toMultilingualTextInput(presetOU?.postalAddress?.streetAndNumber, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <multilingual-text-input
+                            ref="stateRef"
+                            v-model="state"
+                            :label="$t('stateLabel')"
+                            :initial-value="toMultilingualTextInput(presetOU?.postalAddress?.state, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-text-field
+                            v-model="postalNumber"
+                            :label="$t('postalNumberLabel')"
+                            :placeholder="$t('postalNumberLabel')"
+                        />
+                    </v-col>
+                </v-row>
+                
                 <v-row>
                     <v-col cols="12">
                         <open-layers-map
@@ -242,12 +295,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { defineComponent, onMounted, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { MultilingualContent } from '@/models/Common';
+import type { Country, MultilingualContent } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { type OrganisationUnitRequest, type OrganisationUnitResponse, OrganisationUnitSector } from '@/models/OrganisationUnitModel';
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UriInput from '@/components/core/UriInput.vue';
@@ -259,6 +312,8 @@ import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from 
 import { ThesisType } from '@/models/PublicationModel';
 import { useUserRole } from '@/composables/useUserRole';
 import { getOUSectorFromValueAutoLocale, getOUSectorsForGivenLocale } from '@/i18n/ouSector';
+import CountryService from '@/services/CountryService';
+import { type AxiosResponse } from 'axios';
 
 
 export default defineComponent({
@@ -284,6 +339,10 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
         const i18n = useI18n();
+
+        onMounted(() => {
+            fetchCountries();
+        });
 
         watch(() => props.presetOU, () => {
             if (props.presetOU) {
@@ -344,6 +403,17 @@ export default defineComponent({
             }
         );
 
+        const cityRef = ref<typeof MultilingualTextInput>();
+        const streetAndNumberRef = ref<typeof MultilingualTextInput>();
+        const stateRef = ref<typeof MultilingualTextInput>();
+        const city = ref<any>([]);
+        const streetAndNumber = ref<any>([]);
+        const state = ref<any>([]);
+        const postalNumber = ref(props.presetOU?.postalAddress?.postalNumber);
+
+        const countries = ref<{title: string, value: number}[]>([]);
+        const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1 });
+
         const {
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
             nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
@@ -351,6 +421,17 @@ export default defineComponent({
             isniValidationRules, athensIdValidationRules, ncesIdValidationRules,
             fctIdValidationRules, dgeecIdValidationRules, nifIdValidationRules
         } = useValidationUtils();
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+
+                setAdditionalInfo();
+            });
+        };
 
         const submit = async () => {
             if (props.inModal) {
@@ -403,10 +484,30 @@ export default defineComponent({
                 institutionEmailDomainDl: institutionEmailDomainDl.value as string,
                 sector: selectedOuSector.value.value as OrganisationUnitSector,
                 startup: startup.value,
-                dateEstablished: dateEstablished.value
+                dateEstablished: dateEstablished.value,
+                postalAddress: {
+                    city: city.value,
+                    countryId: selectedCountry.value?.value as number,
+                    streetAndNumber: streetAndNumber.value,
+                    state: state.value,
+                    postalNumber: postalNumber.value as string
+                }
             };
 
             emit("update", updatedOU);
+        };
+
+        const setAdditionalInfo = () => {
+            if (props.presetOU?.postalAddress && 
+                props.presetOU?.postalAddress?.countryId
+            ) {
+                const country = countries.value.find(country => 
+                    country.value === props.presetOU?.postalAddress?.countryId
+                );
+                if (country) {
+                    selectedCountry.value = country;
+                }
+            }
         };
 
         const refreshForm = () => {
@@ -414,6 +515,15 @@ export default defineComponent({
             name.value = props.presetOU?.name as MultilingualContent[];
             nameAbbreviationRef.value?.clearInput();
             nameAbbreviation.value = props.presetOU?.nameAbbreviation as MultilingualContent[];
+            cityRef.value?.clearInput();
+            city.value = props.presetOU?.postalAddress?.city as MultilingualContent[];
+            streetAndNumberRef.value?.clearInput();
+            streetAndNumber.value = props.presetOU?.postalAddress?.streetAndNumber as MultilingualContent[];
+            stateRef.value?.clearInput();
+            state.value = props.presetOU?.postalAddress?.state as MultilingualContent[];
+            postalNumber.value = props.presetOU?.postalAddress?.postalNumber;
+
+            setAdditionalInfo();
 
             uris.value = props.presetOU?.uris as string[];
             email.value = props.presetOU?.contact?.contactEmail;
@@ -454,6 +564,9 @@ export default defineComponent({
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
             nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+            cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
+            streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageTags.value));
+            stateRef.value?.forceRefreshModelValue(toMultilingualTextInput(state.value, languageTags.value));
         };
 
         return {
@@ -477,7 +590,10 @@ export default defineComponent({
             ringgoldValidationRules, fundrefValidationRules,
             isniValidationRules, athensIdValidationRules, 
             ncesIdValidationRules, fctIdValidationRules,
-            dgeecIdValidationRules, nifIdValidationRules
+            dgeecIdValidationRules, nifIdValidationRules,
+            city, cityRef, streetAndNumber, streetAndNumberRef,
+            state, stateRef, countries, selectedCountry,
+            postalNumber
         };
     }
 });

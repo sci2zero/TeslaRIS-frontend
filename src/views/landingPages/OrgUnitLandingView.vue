@@ -11,7 +11,7 @@
                             color="primary"
                             class="d-flex justify-center align-center"
                         >
-                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
+                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation && organisationUnit?.nameAbbreviation.length > 0 ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -979,6 +979,7 @@ export default defineComponent({
             organisationUnit.value!.sector = basicInfo.sector;
             organisationUnit.value!.startup = basicInfo.startup;
             organisationUnit.value!.dateEstablished = basicInfo.dateEstablished;
+            organisationUnit.value!.postalAddress = basicInfo.postalAddress;
             performUpdate(false);
         };
 
@@ -1045,7 +1046,8 @@ export default defineComponent({
                 institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string,
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
-                dateEstablished: organisationUnit.value?.dateEstablished
+                dateEstablished: organisationUnit.value?.dateEstablished,
+                postalAddress: organisationUnit.value?.postalAddress
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {
@@ -1090,7 +1092,8 @@ export default defineComponent({
                 institutionEmailDomainDl: organisationUnit.value?.institutionEmailDomainDl as string,
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
-                dateEstablished: organisationUnit.value?.dateEstablished
+                dateEstablished: organisationUnit.value?.dateEstablished,
+                postalAddress: organisationUnit.value?.postalAddress
             };
 
             OrganisationUnitService.updateOrganisationUnit(organisationUnit.value?.id as number, updateRequest).then(() => {

@@ -287,7 +287,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { defineComponent, onMounted, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -300,13 +300,15 @@ import { useI18n } from 'vue-i18n';
 import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
-import type { MultilingualContent } from '@/models/Common';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import type { Country, MultilingualContent } from '@/models/Common';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import { getOUSectorFromValueAutoLocale, getOUSectorsForGivenLocale } from '@/i18n/ouSector';
 import DatePicker from '../core/DatePicker.vue';
+import CountryService from '@/services/CountryService';
+import { type AxiosResponse } from 'axios';
 
 
 export default defineComponent({
@@ -332,6 +334,19 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
+
+        onMounted(() => {
+            fetchCountries();
+        });
+
+        const fetchCountries = () => {
+            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
+                countries.value = [{ title: "", value: -1}];
+                response.data.forEach(country => {
+                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                });
+            });
+        };
 
         const nameRef = ref<typeof MultilingualTextInput>();
         const nameAbbreviationRef = ref<typeof MultilingualTextInput>();

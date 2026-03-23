@@ -108,6 +108,7 @@ export interface OrganisationUnitResponse {
     sector?: OrganisationUnitSector;
     startup?: boolean;
     dateEstablished?: string;
+    postalAddress?: PostalAddress;
 }
 
 export enum OrganisationUnitsRelationType {

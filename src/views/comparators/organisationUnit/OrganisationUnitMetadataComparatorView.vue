@@ -255,6 +255,9 @@ export default defineComponent({
             mergeMultilingualContentField(organisationUnit1.nameAbbreviation, organisationUnit2.nameAbbreviation);
             organisationUnit2.nameAbbreviation = [];
 
+            organisationUnit1.postalAddress = organisationUnit2.postalAddress;
+            organisationUnit2.postalAddress = undefined;
+
             bulkTransferFields(organisationUnit1, organisationUnit2, [
                 { fieldName: "scopusAfid", emptyValue: "" },
                 { fieldName: "openAlexId", emptyValue: "" },
@@ -361,6 +364,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.sector = updatedData.sector;
             leftOrganisationUnit.value!.startup = updatedData.startup;
             leftOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            leftOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             leftUpdateRequest.value = updatedData;
             
@@ -402,6 +406,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.sector = updatedData.sector;
             rightOrganisationUnit.value!.startup = updatedData.startup;
             rightOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            rightOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             rightUpdateRequest.value = updatedData;
             
