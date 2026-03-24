@@ -10,6 +10,9 @@ export const monographPublicationTypeEn = [
     { title: "Polemics", value: MonographPublicationType.POLEMICS },
     { title: "Scientific critic", value: MonographPublicationType.SCIENTIFIC_CRITIC },
     { title: "Lexicographic Unit", value: MonographPublicationType.LEXICOGRAPHIC_UNIT },
+    { title: "Postface", value: MonographPublicationType.POSTFACE },
+    { title: "Book review", value: MonographPublicationType.BOOK_REVIEW },
+    { title: "Entry", value: MonographPublicationType.ENTRY }
 ];
 
 export const monographPublicationTypeSr = [
@@ -19,6 +22,9 @@ export const monographPublicationTypeSr = [
     { title: "Leksikografska jedinica", value: MonographPublicationType.LEXICOGRAPHIC_UNIT },
     { title: "Polemika", value: MonographPublicationType.POLEMICS },
     { title: "Naučna kritika", value: MonographPublicationType.SCIENTIFIC_CRITIC },
+    { title: "Pogovor", value: MonographPublicationType.POSTFACE },
+    { title: "Recenzija knjige", value: MonographPublicationType.BOOK_REVIEW },
+    { title: "Odrednica", value: MonographPublicationType.ENTRY }
 ];
 
 export const getTitleFromValue = (value: MonographPublicationType, monographPublicationTypeArray: {title: string, value: MonographPublicationType}[]) => {

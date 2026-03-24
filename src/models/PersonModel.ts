@@ -227,7 +227,7 @@ export interface PrizeIndex {
     databaseId: number;
     relatedInstitutionsIdHierarchy: number[];
     assessedBy: number[];
-    commissionAssessments: {a: number, b: string, c: boolean}[]
+    commissionAssessments: {a: number, b: string, c: boolean}[];
 }
 
 export interface PersonProfileImageRequest {
@@ -239,9 +239,10 @@ export interface PersonProfileImageRequest {
 }
 
 export interface PersonFieldVisibility {
-    phoneNumberVisible: boolean,
-    contactEmailVisible: boolean,
-    dateOfBirthVisible: boolean,
-    sexVisible: boolean,
-    birthplaceVisible: boolean
+    phoneNumberVisible: boolean;
+    contactEmailVisible: boolean;
+    dateOfBirthVisible: boolean;
+    sexVisible: boolean;
+    birthplaceVisible: boolean;
+    biographyVisible: boolean;
 }

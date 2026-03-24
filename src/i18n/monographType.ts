@@ -8,6 +8,17 @@ const monographTypeEn = [
     { title: "Book", value: MonographType.BOOK },
     { title: "Translation", value: MonographType.TRANSLATION },
     { title: "Bibliography", value: MonographType.BIBLIOGRAPHY },
+    { title: "Journal issue", value: MonographType.JOURNAL_ISSUE },
+    { title: "Script", value: MonographType.SCRIPT },
+    { title: "Encyclopedia", value: MonographType.ENCYCLOPEDIA },
+    { title: "Dictionary", value: MonographType.DICTIONARY },
+    { title: "Report", value: MonographType.REPORT },
+    { title: "Working paper", value: MonographType.WORKING_PAPER },
+    { title: "Preprint", value: MonographType.PREPRINT },
+    { title: "Manual", value: MonographType.MANUAL },
+    { title: "Data management plan", value: MonographType.DATA_MANAGEMENT_PLAN },
+    { title: "Proceedings", value: MonographType.PROCEEDINGS }
+    
 ];
 
 const monographTypeSr = [
@@ -16,6 +27,16 @@ const monographTypeSr = [
     { title: "Knjiga", value: MonographType.BOOK },
     { title: "Prevod", value: MonographType.TRANSLATION },
     { title: "Bibliografija", value: MonographType.BIBLIOGRAPHY },
+    { title: "Izdanje časopisa", value: MonographType.JOURNAL_ISSUE },
+    { title: "Skripta", value: MonographType.SCRIPT },
+    { title: "Enciklopedija", value: MonographType.ENCYCLOPEDIA },
+    { title: "Rečnik", value: MonographType.DICTIONARY },
+    { title: "Izveštaj", value: MonographType.REPORT },
+    { title: "Radni papir", value: MonographType.WORKING_PAPER },
+    { title: "Preprint", value: MonographType.PREPRINT },
+    { title: "Priručnik", value: MonographType.MANUAL },
+    { title: "Plan upravljanja podacima", value: MonographType.DATA_MANAGEMENT_PLAN },
+    { title: "Zbornik radova", value: MonographType.PROCEEDINGS }
 ];
 
 export const getTitleFromValue = (value: MonographType, monographTypeArray: {title: string, value: MonographType}[]) => {

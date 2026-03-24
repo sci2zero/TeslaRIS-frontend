@@ -238,6 +238,15 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <v-text-field
+                                v-model="udc"
+                                :label="$t('udcLabel')"
+                                :placeholder="$t('udcLabel')"
+                                :rules="udcValidationRules"></v-text-field>
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -426,6 +435,7 @@ export default defineComponent({
         const volume = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
+        const udc = ref("");
 
         const setPublicationYear = (date: string) => {
             const year = /\d{4}/.exec(date);
@@ -437,7 +447,8 @@ export default defineComponent({
         const { 
             requiredFieldRules, requiredSelectionRules, doiValidationRules,
             isbnValidationRules, scopusIdValidationRules, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules
+            documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules,
+            udcValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -492,7 +503,8 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                udc: udc.value
             };
 
             DocumentPublicationService.createMonograph(newMonograph).then((response) => {
@@ -515,6 +527,7 @@ export default defineComponent({
                     selectedResearchArea.value = { title: "", value: null };
                     selectedMonographType.value = { title: "", value: null };
                     eIsbn.value = "";
+                    udc.value = "";
                     printIsbn.value = "";
                     publicationYear.value = "";
                     contributionsRef.value?.clearInput();
@@ -590,7 +603,7 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             publisherAutocompleteRef, selectedPublisher,
             optionalNumericZeroOrGreaterFieldRules,
-            deduplicationTableRef
+            deduplicationTableRef, udc, udcValidationRules
         };
     }
 });

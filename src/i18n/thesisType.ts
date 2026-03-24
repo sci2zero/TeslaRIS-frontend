@@ -9,7 +9,8 @@ export const thesisTypeSr = [
     { title: "Doktorska disertacija", value: ThesisType.PHD },
     { title: "Doktorski umetnički projekat", value: ThesisType.PHD_ART_PROJECT },
     { title: "Diplomski rad", value: ThesisType.BACHELOR_WITH_HONORS },
-    { title: "Specijalistički rad", value: ThesisType.UNDERGRADUATE_THESIS }
+    { title: "Specijalistički rad", value: ThesisType.UNDERGRADUATE_THESIS },
+    { title: "Ostalo", value: ThesisType.OTHER }
 ];
 
 export const thesisTypeEn = [
@@ -19,7 +20,8 @@ export const thesisTypeEn = [
     { title: "Doctoral dissertation", value: ThesisType.PHD },
     { title: "Doctoral art project", value: ThesisType.PHD_ART_PROJECT },
     { title: "Bachelor with honors thesis", value: ThesisType.BACHELOR_WITH_HONORS },
-    { title: "Undergraduate thesis", value: ThesisType.UNDERGRADUATE_THESIS }
+    { title: "Undergraduate thesis", value: ThesisType.UNDERGRADUATE_THESIS },
+    { title: "Other", value: ThesisType.OTHER }
 ];
 
 export const getThesisTitleFromValueAutoLocale = (value: ThesisType | string) => {

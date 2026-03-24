@@ -121,6 +121,12 @@
                                 </div>
                             </v-col>
                             <v-col cols="6">
+                                <div v-if="monograph?.udc">
+                                    {{ $t("udcLabel") }}:
+                                </div>
+                                <div v-if="monograph?.udc" class="response">
+                                    {{ monograph.udc }}
+                                </div>
                                 <div v-if="monograph?.scopusId">
                                     Scopus ID:
                                 </div>
@@ -610,6 +616,7 @@ export default defineComponent({
             monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
             monograph.value!.publisherId = basicInfo.publisherId;
             monograph.value!.authorReprint = basicInfo.authorReprint;
+            monograph.value!.udc = basicInfo.udc;
 
             performUpdate(true);
         };

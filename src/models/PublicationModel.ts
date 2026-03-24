@@ -65,7 +65,8 @@ export enum ThesisType {
     PHD_ART_PROJECT = "PHD_ART_PROJECT",
     MASTER = "MASTER",
     BACHELOR_WITH_HONORS = "BACHELOR_WITH_HONORS",
-    UNDERGRADUATE_THESIS = "UNDERGRADUATE_THESIS"
+    UNDERGRADUATE_THESIS = "UNDERGRADUATE_THESIS",
+    OTHER = "OTHER"
 }
   
 export enum JournalPublicationType {
@@ -77,7 +78,13 @@ export enum JournalPublicationType {
     LEXICOGRAPHIC_UNIT,
     POLEMICS,
     SCIENTIFIC_CRITIC,
-    EDITORIAL
+    EDITORIAL,
+    POSTFACE,
+    BOOK_REVIEW,
+    TRANSLATION,
+    PREPRINT,
+    SHORT_FICTION,
+    ANNOTATION
 }
 
 export interface Document {
@@ -171,7 +178,17 @@ export enum MonographType {
     BOOK = "BOOK",
     BIBLIOGRAPHY = "BIBLIOGRAPHY",
     TRANSLATION = "TRANSLATION",
-    STUDY = "STUDY"
+    STUDY = "STUDY",
+    JOURNAL_ISSUE = "JOURNAL_ISSUE",
+    SCRIPT = "SCRIPT",
+    ENCYCLOPEDIA = "ENCYCLOPEDIA",
+    DICTIONARY = "DICTIONARY",
+    REPORT = "REPORT",
+    WORKING_PAPER = "WORKING_PAPER",
+    PREPRINT = "PREPRINT",
+    MANUAL = "MANUAL",
+    DATA_MANAGEMENT_PLAN = "DATA_MANAGEMENT_PLAN",
+    PROCEEDINGS = "PROCEEDINGS"
 }
 
 export interface Monograph extends Document {
@@ -187,6 +204,7 @@ export interface Monograph extends Document {
     researchAreaId?: number;
     publisherId?: number;
     authorReprint?: boolean;
+    udc?: string;
 }
 
 export enum MonographPublicationType {
@@ -196,6 +214,9 @@ export enum MonographPublicationType {
     LEXICOGRAPHIC_UNIT = "LEXICOGRAPHIC_UNIT",
     POLEMICS = "POLEMICS",
     SCIENTIFIC_CRITIC = "SCIENTIFIC_CRITIC",
+    POSTFACE = "POSTFACE",
+    BOOK_REVIEW = "BOOK_REVIEW",
+    ENTRY = "ENTRY"
 }
 
 export interface MonographPublication extends Document {
@@ -334,7 +355,8 @@ export enum MaterialProductType {
     INDUSTRIAL_PRODUCT = "INDUSTRIAL_PRODUCT",
     INFRASTRUCTURE_OBJECT = "INFRASTRUCTURE_OBJECT",
     DERIVATIVE_WORKS = "DERIVATIVE_WORKS",
-    OTHER = "OTHER"
+    OTHER = "OTHER",
+    VISUAL_ARTWORK = "VISUAL_ARTWORK"
 }
 
 export enum IntangibleProductType {
@@ -345,7 +367,20 @@ export enum IntangibleProductType {
     STRATEGY = "STRATEGY",
     POLICY = "POLICY",
     FRAMEWORK = "FRAMEWORK",
-    OTHER = "OTHER"
+    OTHER = "OTHER",
+    INVENTION = "INVENTION",
+    RESEARCH_TECHNIQUE = "RESEARCH_TECHNIQUE",
+    ONLINE_RESOURCE = "ONLINE_RESOURCE",
+    TEST = "TEST",
+    WEBSITE = "WEBSITE",
+    AUDIO_RECORDING = "AUDIO_RECORDING",
+    RADIO_TV_PROGRAM = "RADIO_TV_PROGRAM",
+    VIDEO_RECORDING = "VIDEO_RECORDING",
+    SOUND_DESIGN = "SOUND_DESIGN",
+    SET_DESIGN = "SET_DESIGN",
+    LIGHT_DESIGN = "LIGHT_DESIGN",
+    CHOREOGRAPHY = "CHOREOGRAPHY",
+    STANDARD = "STANDARD"
 }
 
 export enum GeneticMaterialType {

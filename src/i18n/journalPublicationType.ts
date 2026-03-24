@@ -12,7 +12,13 @@ const journalPublicationTypeEn = [
     { title: "Comment", value: JournalPublicationType.COMMENT },
     { title: "Preface", value: JournalPublicationType.PREFACE },
     { title: "Correction", value: JournalPublicationType.CORRECTION },
-    { title: "Editorial", value: JournalPublicationType.EDITORIAL }
+    { title: "Editorial", value: JournalPublicationType.EDITORIAL },
+    { title: "Postface", value: JournalPublicationType.POSTFACE },
+    { title: "Book review", value: JournalPublicationType.BOOK_REVIEW },
+    { title: "Translation", value: JournalPublicationType.TRANSLATION },
+    { title: "Preprint", value: JournalPublicationType.PREPRINT },
+    { title: "Short fiction", value: JournalPublicationType.SHORT_FICTION },
+    { title: "Annotation", value: JournalPublicationType.ANNOTATION }
 ];
 
 const journalPublicationTypeSr = [
@@ -24,7 +30,13 @@ const journalPublicationTypeSr = [
     { title: "Komentar", value: JournalPublicationType.COMMENT },
     { title: "Predgovor", value: JournalPublicationType.PREFACE },
     { title: "Ispravka", value: JournalPublicationType.CORRECTION },
-    { title: "Urednički uvod", value: JournalPublicationType.EDITORIAL }
+    { title: "Urednički uvod", value: JournalPublicationType.EDITORIAL },
+    { title: "Pogovor", value: JournalPublicationType.POSTFACE },
+    { title: "Prikaz knjige", value: JournalPublicationType.BOOK_REVIEW },
+    { title: "Prevod", value: JournalPublicationType.TRANSLATION },
+    { title: "Preprint", value: JournalPublicationType.PREPRINT },
+    { title: "Kratka proza", value: JournalPublicationType.SHORT_FICTION },
+    { title: "Anotacija", value: JournalPublicationType.ANNOTATION }
 ];
 
 export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {

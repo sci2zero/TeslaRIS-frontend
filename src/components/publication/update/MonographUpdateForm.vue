@@ -173,6 +173,15 @@
                 </v-text-field>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="12">
+                <v-text-field
+                    v-model="udc"
+                    :label="$t('udcLabel')"
+                    :placeholder="$t('udcLabel')"
+                    :rules="udcValidationRules"></v-text-field>
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -344,13 +353,15 @@ export default defineComponent({
         const webOfScienceId = ref(props.presetMonograph?.webOfScienceId);
         const number = ref(props.presetMonograph?.number);
         const volume = ref(props.presetMonograph?.volume);
+        const udc = ref(props.presetMonograph?.udc);
 
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
             isbnValidationRules, workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            udcValidationRules
         } = useValidationUtils();
 
         const publicationSeriesExternalValidation = ref<ExternalValidation>({ passed: true, message: "" });
@@ -416,7 +427,8 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                udc: udc.value
             };
 
             emit("update", updatedMonograph);
@@ -432,6 +444,7 @@ export default defineComponent({
             selectedLanguages.value = props.presetMonograph?.languageIds as number[];
             uris.value = props.presetMonograph?.uris as string[];
             eIsbn.value = props.presetMonograph?.eisbn;
+            udc.value = props.presetMonograph?.udc;
             printIsbn.value = props.presetMonograph?.printISBN;
             numberOfPages.value = props.presetMonograph?.numberOfPages;
             publicationYear.value = props.presetMonograph?.documentDate;
@@ -469,7 +482,8 @@ export default defineComponent({
             isbnValidationRules, snackbar, message,
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
-            selectedPublisher, optionalNumericZeroOrGreaterFieldRules
+            selectedPublisher, optionalNumericZeroOrGreaterFieldRules,
+            udc, udcValidationRules
         };
     }
 });

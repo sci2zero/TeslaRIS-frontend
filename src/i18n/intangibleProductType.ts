@@ -11,6 +11,19 @@ export const intangibleProductTypeEn = [
     { title: "Strategy", value: IntangibleProductType.STRATEGY },
     { title: "Policy", value: IntangibleProductType.POLICY },
     { title: "Framework", value: IntangibleProductType.FRAMEWORK },
+    { title: "Invention", value: IntangibleProductType.INVENTION },
+    { title: "Research technique", value: IntangibleProductType.RESEARCH_TECHNIQUE },
+    { title: "Online resource", value: IntangibleProductType.ONLINE_RESOURCE },
+    { title: "Test", value: IntangibleProductType.TEST },
+    { title: "Website", value: IntangibleProductType.WEBSITE },
+    { title: "Audio recording", value: IntangibleProductType.AUDIO_RECORDING },
+    { title: "Radio/TV program", value: IntangibleProductType.RADIO_TV_PROGRAM },
+    { title: "Video recording", value: IntangibleProductType.VIDEO_RECORDING },
+    { title: "Sound design", value: IntangibleProductType.SOUND_DESIGN },
+    { title: "Set design", value: IntangibleProductType.SET_DESIGN },
+    { title: "Light design", value: IntangibleProductType.LIGHT_DESIGN },
+    { title: "Choreography", value: IntangibleProductType.CHOREOGRAPHY },
+    { title: "Standard", value: IntangibleProductType.STANDARD },
     { title: "Other", value: IntangibleProductType.OTHER }
 ];
 
@@ -22,6 +35,19 @@ export const intangibleProductTypeSr = [
     { title: "Strategija", value: IntangibleProductType.STRATEGY },
     { title: "Politika", value: IntangibleProductType.POLICY },
     { title: "Radni okvir", value: IntangibleProductType.FRAMEWORK },
+    { title: "Pronalazak", value: IntangibleProductType.INVENTION },
+    { title: "Istraživačka tehnika", value: IntangibleProductType.RESEARCH_TECHNIQUE },
+    { title: "Mrežni resurs", value: IntangibleProductType.ONLINE_RESOURCE },
+    { title: "Test", value: IntangibleProductType.TEST },
+    { title: "Veb sajt", value: IntangibleProductType.WEBSITE },
+    { title: "Audio-snimak", value: IntangibleProductType.AUDIO_RECORDING },
+    { title: "Radio/TV program", value: IntangibleProductType.RADIO_TV_PROGRAM },
+    { title: "Video snimak", value: IntangibleProductType.VIDEO_RECORDING },
+    { title: "Dizajn zvuka", value: IntangibleProductType.SOUND_DESIGN },
+    { title: "Scenografija", value: IntangibleProductType.SET_DESIGN },
+    { title: "Dizajn svetla", value: IntangibleProductType.LIGHT_DESIGN },
+    { title: "Koreografija", value: IntangibleProductType.CHOREOGRAPHY },
+    { title: "Standard", value: IntangibleProductType.STANDARD },
     { title: "Ostalo", value: IntangibleProductType.OTHER }
 ];
 

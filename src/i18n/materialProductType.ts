@@ -8,6 +8,7 @@ export const materialProductTypeEn = [
     { title: "Industrial product", value: MaterialProductType.INDUSTRIAL_PRODUCT },
     { title: "Infrastructure object", value: MaterialProductType.INFRASTRUCTURE_OBJECT },
     { title: "Derivative works", value: MaterialProductType.DERIVATIVE_WORKS },
+    { title: "Visual artwork", value: MaterialProductType.VISUAL_ARTWORK },
     { title: "Other", value: MaterialProductType.OTHER }
 ];
 
@@ -15,6 +16,7 @@ export const materialProductTypeSr = [
     { title: "Prototip", value: MaterialProductType.PROTOTYPE },
     { title: "Industrijski proizvod", value: MaterialProductType.INDUSTRIAL_PRODUCT },
     { title: "Infrastrukturni objekat", value: MaterialProductType.INFRASTRUCTURE_OBJECT },
+    { title: "Vizuelna umetnost", value: MaterialProductType.VISUAL_ARTWORK },
     { title: "Izvedeno delo", value: MaterialProductType.DERIVATIVE_WORKS },
     { title: "Ostalo", value: MaterialProductType.OTHER }
 ];

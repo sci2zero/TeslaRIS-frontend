@@ -199,6 +199,7 @@ export default defineComponent({
                 { fieldName: "openAlexId", emptyValue: "" },
                 { fieldName: "webOfScienceId", emptyValue: "" },
                 { fieldName: "volume", emptyValue: "" },
+                { fieldName: "udc", emptyValue: "" },
                 { fieldName: "number", emptyValue: "" },
                 { fieldName: "monographType", emptyValue: null, setEmpty: false },
                 { fieldName: "documentDate", emptyValue: null, setEmpty: false },

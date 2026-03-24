@@ -40,6 +40,14 @@
                 ></v-checkbox>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-checkbox
+                    v-model="biographyVisible"
+                    :label="$t('biographyVisibleLabel')"
+                ></v-checkbox>
+            </v-col>
+        </v-row>
     </v-form>
 </template>
 
@@ -79,6 +87,7 @@ export default defineComponent({
                     dateOfBirthVisible.value = response.data.dateOfBirthVisible;
                     sexVisible.value = response.data.sexVisible;
                     birthplaceVisible.value = response.data.birthplaceVisible;
+                    biographyVisible.value = response.data.biographyVisible;
                 });
             }
         };
@@ -88,6 +97,7 @@ export default defineComponent({
         const dateOfBirthVisible = ref(false);
         const sexVisible = ref(false);
         const birthplaceVisible = ref(false);
+        const biographyVisible = ref(false);
 
         const submit = () => {
             const configuration: PersonFieldVisibility = {
@@ -96,6 +106,7 @@ export default defineComponent({
                 dateOfBirthVisible: dateOfBirthVisible.value,
                 sexVisible: sexVisible.value,
                 birthplaceVisible: birthplaceVisible.value,
+                biographyVisible: biographyVisible.value
             };
 
             PersonFieldVisibilityService.savePublicFieldVisibilityConfiguration(
@@ -110,7 +121,8 @@ export default defineComponent({
             phoneNumberVisible,
             contactEmailVisible,
             dateOfBirthVisible,
-            sexVisible, birthplaceVisible
+            sexVisible, birthplaceVisible,
+            biographyVisible
         };
     }
 });
