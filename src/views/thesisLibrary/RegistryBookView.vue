@@ -60,7 +60,7 @@
                             disable-submission
                             registry-book-relevant
                             required
-                        ></organisation-unit-autocomplete-search>
+                        />
                     </v-col>
                     <v-col cols="12" sm="6" md="5" lg="3">
                         <v-select
@@ -70,7 +70,7 @@
                             :label="$t('thesisTypeLabel')"
                             return-object
                             multiple
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <publication-table-component
@@ -176,7 +176,8 @@
                             :top-level-institution-id="loggedInUser && loggedInUser.organisationUnitId > 0 ? loggedInUser.organisationUnitId : undefined"
                             disable-submission
                             registry-book-relevant
-                        ></organisation-unit-autocomplete-search>
+                            :readonly="isInstitutionalLibrarian"
+                        />
                     </v-col>
                     <v-col cols="12" sm="6" lg="3">
                         <v-text-field
@@ -376,7 +377,9 @@ export default defineComponent({
         const { requiredSelectionRules } = useValidationUtils();
     
         const i18n = useI18n();
-        const { loggedInUser, isPromotionRegistryAdministrator, isAdmin } = useUserRole();
+        const {
+            loggedInUser, isPromotionRegistryAdministrator,
+            isAdmin, isInstitutionalLibrarian } = useUserRole();
     
         const promotions = ref<{ title: string; value: number }[]>([]);
         const finishedPromotions = ref<{ title: string; value: Promotion }[]>([]);
@@ -611,7 +614,8 @@ export default defineComponent({
         });
 
         watch(loggedInUser, () => {
-            if (loggedInUser.value && isPromotionRegistryAdministrator.value) {
+            if (loggedInUser.value &&
+                (isPromotionRegistryAdministrator.value || isInstitutionalLibrarian.value)) {
                 OrganisationUnitService.readOU(loggedInUser.value?.organisationUnitId as number).then(response => {
                     selectedInstitution.value = {
                         title: returnCurrentLocaleContent(response.data.name) as string,
@@ -788,7 +792,7 @@ export default defineComponent({
             isPromotionRegistryAdministrator, fromDateSimple,
             toDateSimple, selectedThesisTypes, thesisTypes,
             selectedPromotionFilter, finishedPromotions,
-            initiateRemoveAllFromPromotion,
+            initiateRemoveAllFromPromotion, isInstitutionalLibrarian,
             displayPersistentDialog, removeAllFromPromotion
         };
     }

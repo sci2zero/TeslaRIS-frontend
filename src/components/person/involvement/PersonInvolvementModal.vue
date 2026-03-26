@@ -19,7 +19,7 @@
                         v-else icon variant="outlined"
                         color="primary" v-bind="scope.props"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
-                        <v-icon size="large" icon="mdi-pen"></v-icon>
+                        <v-icon size="large" icon="mdi-pen" />
                     </v-btn>
                 </div>
             </template>
@@ -38,11 +38,16 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" @click="dialog = false">
+                    <v-spacer />
+                    <v-btn
+                        color="blue darken-1"
+                        @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" @click="formRef?.saveInvolvement()">
+                    <v-btn
+                        color="blue darken-1"
+                        :disabled="!formRef?.isFormValid"
+                        @click="formRef?.saveInvolvement()">
                         {{ edit ? $t("updateLabel") : $t("saveLabel") }}
                     </v-btn>
                 </v-card-actions>
@@ -92,7 +97,11 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, formRef, emitCreateToParent, emitUpdateToParent};
+        return {
+            dialog, formRef,
+            emitCreateToParent,
+            emitUpdateToParent
+        };
     }
 });
 </script>

@@ -101,8 +101,8 @@
                             limit-one basic
                             :lock-search-field="isResearcher"
                             :allow-external-associate="false"
-                            @set-input="contributions = $event">
-                        </person-publication-contribution>
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
 

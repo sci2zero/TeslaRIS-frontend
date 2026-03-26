@@ -1,5 +1,6 @@
 import type { MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
+import type { ResearchArea } from "./OrganisationUnitModel";
 
 export enum InvolvementType {
     STUDIED_AT = "STUDIED_AT",
@@ -53,17 +54,27 @@ export interface Involvement {
     organisationUnitId?: number;
     organisationUnitName?: MultilingualContent[];
     favorite?: boolean;
+    uris?: string[];
+    description?: MultilingualContent[];
+    keywords?: MultilingualContent[];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
 }
 
 export interface Education extends Involvement {
     thesisTitle?: MultilingualContent[];
     title?: MultilingualContent[];
     abbreviationTitle?: MultilingualContent[];
+    degreeCode?: MultilingualContent[];
+    degreeClassification?: MultilingualContent[];
+    degreeType?: DegreeType;
+    educationStatus?: EducationStatus;
 }
 
 export interface Membership extends Involvement {
     contributionDescription?: MultilingualContent[];
     role?: MultilingualContent[];
+    membershipType?: MembershipType
 }
 
 export interface Employment extends Involvement {
@@ -90,4 +101,29 @@ export enum PersonalTitle {
     DR_ART = "DR_ART",
     MR = "MR",
     NONE = "NONE"
+}
+
+export enum MembershipType {
+    PRESIDENT = "PRESIDENT",
+    VICE_PRESIDENT = "VICE_PRESIDENT",
+    CHAIR = "CHAIR",
+    VICE_CHAIR = "VICE_CHAIR",
+    BOARD_MEMBER = "BOARD_MEMBER",
+    REGULAR_MEMBER = "REGULAR_MEMBER",
+    ASSOCIATE_MEMBER = "ASSOCIATE_MEMBER",
+    OBSERVER = "OBSERVER",
+    OTHER = "OTHER"
+}
+
+export enum DegreeType {
+    BACHELOR = "BACHELOR",
+    MASTER = "MASTER",
+    PHD = "PHD",
+    INFORMAL_EDUCATION = "INFORMAL_EDUCATION"
+}
+
+export enum EducationStatus {
+    ONGOING = "ONGOING",
+    ATTENDED = "ATTENDED",
+    CONCLUDED = "CONCLUDED"
 }

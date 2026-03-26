@@ -1373,5 +1373,9 @@ export default {
     prizeTypeLabel: "Tip nagrade",
     organisationUnitSectorLabel: "Organizacioni sektor",
     startupLabel: "Startap",
-    dateEstablishedLabel: "Datum osnivanja"
+    dateEstablishedLabel: "Datum osnivanja",
+    degreeTypeLabel: "Tip diplome",
+    educationStatusLabel: "Status edukacije",
+    degreeCodeLabel: "Kod diplome",
+    degreeClassificationLabel: "Klasifikacija diplome"
 }

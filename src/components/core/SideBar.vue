@@ -283,10 +283,9 @@ const assessmentsMenu = ref<MenuItem[]>([
 const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'thesis-library-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/thesis-library-reporting', icon: 'mdi-file-chart', condition: computed(() => (isAdmin.value)) },
     { key: 'thesis-library-search', label: computed(() => i18n.t('simpleSearchLabel')), to: '/thesis-library-search', icon: 'mdi-magnify', condition: computed(() => (!isHeadOfLibrary.value && !isInstitutionalLibrarian.value)) },
-    { key: 'promotions', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
-    { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+    { key: 'promotions', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
+    { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isAdmin.value || isPromotionRegistryAdministrator.value)) },
     { key: 'public-dissertations', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document', condition: computed(() => (!isHeadOfLibrary.value && !isInstitutionalLibrarian.value)) },
-    { key: 'theses', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => isInstitutionalLibrarian.value) },
     { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) }
 ]);
 
@@ -302,8 +301,6 @@ const menuItems = ref<MenuItem[]>([
     { key: 'researcher-profile', label: computed(() => i18n.t('researcherProfileLabel')), to: '/persons/', dynamicValue: computed(() => personId.value), icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn && isResearcher.value && personId.value > 0) },
     { key: 'commission-profile', label: computed(() => i18n.t('commissionProfileLabel')), to: '/assessment/commissions/', dynamicValue: computed(() => commissionId.value), icon: 'mdi-account-group', condition: computed(() => loginStore.userLoggedIn && isCommission.value && commissionId.value > 0) },
     { key: 'institution-profile', label: computed(() => i18n.t('institutionProfileLabel')), to: '/organisation-units/', dynamicValue: computed(() => institutionId.value), icon: 'mdi-office-building', condition: computed(() => loginStore.userLoggedIn && (isUserBoundToOU.value as boolean) && institutionId.value > 0) },
-    { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value)) },
-    { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value)) },
     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
@@ -346,8 +343,10 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => (isAdmin.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value || isResearcher.value))
+        condition: computed(() => (isAdmin.value || isResearcher.value))
     },
+    { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
+    { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'events', label: computed(() => i18n.t('eventListLabel')), to: '/events', icon: 'mdi-calendar', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },

@@ -1360,5 +1360,9 @@ export default {
     prizeTypeLabel: "Prize type",
     organisationUnitSectorLabel: "Organisation sector",
     startupLabel: "Startup",
-    dateEstablishedLabel: "Date established"
+    dateEstablishedLabel: "Date established",
+    degreeTypeLabel: "Degree type",
+    educationStatusLabel: "Education status",
+    degreeCodeLabel: "Degree code",
+    degreeClassificationLabel: "Degree classification"
 }
