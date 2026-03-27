@@ -16,8 +16,8 @@ export class RegistryBookService extends BaseService {
         return super.sendRequest(axios.get, `registry-book/${entryId}`);
     }
 
-    async getForPromotion(promotionId: number, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
-        return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}`);
+    async getForPromotion(promotionId: number, pageable: string, institutionId: number | null = null): Promise<AxiosResponse<Page<RegistryBookEntry>>> {
+        return super.sendRequest(axios.get, `registry-book/for-promotion/${promotionId}?${pageable}${(institutionId && institutionId > 0) ? ("&institutionId=" + institutionId) : ""}`);
     }
 
     async getPromoted(institutionId: number, from: string, to: string, authorName: string, authorTitle: string, promotionId: number | undefined, pageable: string): Promise<AxiosResponse<Page<RegistryBookEntry>>> {

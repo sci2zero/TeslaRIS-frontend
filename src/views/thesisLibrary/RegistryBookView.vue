@@ -503,7 +503,7 @@ export default defineComponent({
                     const query = `page=${tableStates.forPromotion.page}&size=${tableStates.forPromotion.size}${tableStates.forPromotion.sort ? `&sort=${tableStates.forPromotion.sort},${tableStates.forPromotion.direction}` : ""}`;
                     const response = await RegistryBookService.getForPromotion(
                         selectedPromotion.value.value,
-                        query
+                        query, loggedInUser.value?.organisationUnitId
                     );
                     tableStates.forPromotion.entries = response.data.content;
                     tableStates.forPromotion.totalEntries = response.data.totalElements;
