@@ -13,16 +13,14 @@
                 return-object
                 :readonly="readOnly"
                 @update:search="searchPersons($event)"
-                @update:model-value="sendContentToParent"
-            >
+                @update:model-value="sendContentToParent">
                 <template #item="{ item, props }">
                     <v-list-item
                         v-bind="{ ...props, title: undefined }"
                     >
                         <person-publications-tooltip
                             :person-id="item.raw.value"
-                            :show="showLatestPublications"
-                        >
+                            :show="showLatestPublications">
                             {{ item.raw.title }}
                         </person-publications-tooltip>
                     </v-list-item>

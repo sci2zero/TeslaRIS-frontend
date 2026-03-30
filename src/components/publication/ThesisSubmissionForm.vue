@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="8">
+            <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col cols="12">
                         <i-d-f-metadata-prepopulator
@@ -37,8 +37,9 @@
                         <multilingual-text-input
                             ref="externalOUNameRef"
                             v-model="externalOUName" :rules="requiredFieldRules"
-                            :label="$t('externalOUNameLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('externalOUNameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetInstitutionName, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row v-if="!isInstitutionalLibrarian && !isHeadOfLibrary">
@@ -351,7 +352,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, watch } from 'vue';
+import { computed, defineComponent, nextTick, type PropType, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -363,7 +364,7 @@ import { DocumentContributionType, type PersonDocumentContribution, PublicationT
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -385,7 +386,30 @@ import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 export default defineComponent({
     name: "SubmitThesis",
     components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable },
-    setup() {
+    props: {
+        inModal: {
+            type: Boolean,
+            default: false
+        },
+        presetThesisType: {
+            type: Object as PropType<ThesisType>,
+            default: ThesisType.PHD
+        },
+        presetInstitutionId: {
+            type: Number,
+            default: undefined
+        },
+        presetInstitutionName: {
+            type: Object as PropType<MultilingualContent[]>,
+            default: undefined
+        },
+        presetYear: {
+            type: String,
+            default: undefined
+        },
+    },
+    emits: ["create"],
+    setup(props, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
         const enterExternalOU = ref(false);
@@ -442,6 +466,24 @@ export default defineComponent({
             const researcherId = route.query.researcherId;
             if (isResearcher.value || researcherId) {
                 populateSinglePossibleAuthor(researcherId ? (researcherId as string) : null);
+            }
+
+            if (props.presetInstitutionId && props.presetInstitutionId > 0) {
+                OrganisationUnitService.readOU(props.presetInstitutionId).then(response => {
+                    selectedOrganisationUnit.value = {
+                        title: returnCurrentLocaleContent(response.data.name) as string,
+                        value: response.data.id
+                    };
+                });
+            } else if (props.presetInstitutionName) {
+                enterExternalOU.value = true;
+            }
+
+            if (props.presetThesisType) {
+                selectedThesisType.value = {
+                    title: getThesisTitleFromValueAutoLocale(props.presetThesisType) as string,
+                    value: props.presetThesisType
+                };
             }
         });
 
@@ -510,7 +552,7 @@ export default defineComponent({
         const description = ref([]);
         const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref("");
+        const publicationYear = ref(props.presetYear ? props.presetYear : "");
         const doi = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
@@ -556,6 +598,10 @@ export default defineComponent({
             }
         });
 
+        const submit = () => {
+            submitThesis(true);
+        };
+
         const submitThesis = (stayOnPage: boolean) => {
             const newThesis: Thesis = {
                 title: title.value,
@@ -598,6 +644,8 @@ export default defineComponent({
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     externalOUNameRef.value?.clearInput();
@@ -740,7 +788,8 @@ export default defineComponent({
             scopusIdValidationRules, languagesWithMoreWritingSystems,
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
             topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules,
-            isOrganisationUnitDLClient, isAdmin, deduplicationTableRef
+            isOrganisationUnitDLClient, isAdmin, deduplicationTableRef,
+            submit, languageTags
         };
     }
 });

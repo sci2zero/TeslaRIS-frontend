@@ -69,6 +69,10 @@ export interface Education extends Involvement {
     degreeClassification?: MultilingualContent[];
     degreeType?: DegreeType;
     educationStatus?: EducationStatus;
+    thesisId?: number;
+    supervisorIds?: number[];
+    displaySupervisors?: MultilingualContent[];
+    supervisorNames?: string[];
 }
 
 export interface Membership extends Involvement {

@@ -1364,5 +1364,9 @@ export default {
     degreeTypeLabel: "Degree type",
     educationStatusLabel: "Education status",
     degreeCodeLabel: "Degree code",
-    degreeClassificationLabel: "Degree classification"
+    degreeClassificationLabel: "Degree classification",
+    supervisorsLabel: "Supervisors",
+    manualInputLabel: "Manual input",
+    personSearchLabel: "Search people in system",
+    createNewThesisLabel: "Create new thesis"
 }

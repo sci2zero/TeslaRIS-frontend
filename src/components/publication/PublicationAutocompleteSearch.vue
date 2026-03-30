@@ -3,7 +3,7 @@
         <v-col :cols="allowManualClearing && selectedDocumentPublication.value !== -1 ? 10 : 11">
             <v-autocomplete
                 v-model="selectedDocumentPublication"
-                :label="$t('documentLabel')"
+                :label="label ? $t(label) : $t('documentLabel')"
                 :items="readonly ? [] : documentPublications"
                 :custom-filter="((): boolean => true)"
                 :no-data-text="$t('noDataMessage')"
@@ -11,12 +11,20 @@
                 return-object
                 @update:search="searchDocuments($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedDocumentPublication.value !== -1" icon @click="clearInput()">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
+            <generic-crud-modal
+                v-if="allowCreation && allowedTypes.length == 1 && selectedDocumentPublication.value === -1"
+                :form-component="getSubmissionFormBasedOnType()"
+                :form-props="formProps"
+                :entity-name="allowedTypes[0].toLowerCase().replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase()).replaceAll(' ', '')"
+                is-submission
+                @create="newDocumentCreated"
+            />
         </v-col>
     </v-row>
 </template>
@@ -27,13 +35,25 @@ import { ref } from 'vue';
 import lodash from "lodash";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { onMounted } from 'vue';
-import { type DocumentPublicationIndex } from '@/models/PublicationModel';
+import { type Document, PublicationType, type DocumentPublicationIndex } from '@/models/PublicationModel';
 import { useI18n } from 'vue-i18n';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-
+import ThesisSubmissionForm from './ThesisSubmissionForm.vue';
+import GenericCrudModal from '../core/GenericCrudModal.vue';
+import JournalPublicationSubmissionForm from './JournalPublicationSubmissionForm.vue';
+import ProceedingsPublicationSubmissionForm from './ProceedingsPublicationSubmissionForm.vue';
+import PatentSubmissionForm from './PatentSubmissionForm.vue';
+import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
+import DatasetSubmissionForm from './DatasetSubmissionForm.vue';
+import IntangibleProductSubmissionForm from './IntangibleProductSubmissionForm.vue';
+import MonographSubmissionForm from './MonographSubmissionForm.vue';
+import MonographPublicationSubmissionForm from './MonographPublicationSubmissionForm.vue';
+import MaterialProductSubmissionForm from './MaterialProductSubmissionForm.vue';
+import GeneticMaterialSubmissionForm from './GeneticMaterialSubmissionForm.vue';
 
 export default defineComponent({
     name: "PublicationAutocompleteSearch",
+    components: { GenericCrudModal },
     props: {
         required: {
             type: Boolean,
@@ -43,6 +63,14 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        allowCreation: {
+            type: Boolean,
+            default: false
+        },
+        allowedTypes: {
+            type: Array as PropType<PublicationType[]>,
+            default: () => []
+        },
         modelValue: {
             type: Object as PropType<{ title: string, value: number } | undefined>,
             required: true,
@@ -50,9 +78,17 @@ export default defineComponent({
         readonly: {
             type: Boolean,
             default: false
+        },
+        label: {
+            type: String,
+            default: undefined
+        },
+        formProps: {
+            type: Object as PropType<Record<string, any>>,
+            default: () => ({})
         }
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "create"],
     setup(props, {emit}) {
         const searchPlaceholder = {title: "", value: -1};
         const i18n = useI18n();
@@ -85,7 +121,7 @@ export default defineComponent({
                     params,
                     null,
                     false,
-                    []
+                    props.allowedTypes
                 ).then((response) => {
                     const listOfDocuments: { title: string, value: number }[] = [];
                     response.data.content.forEach((documentPublication: DocumentPublicationIndex) => {
@@ -119,9 +155,41 @@ export default defineComponent({
             sendContentToParent();
         };
 
+        const newDocumentCreated = (document: Document) => {
+            emit("create", document);
+        };
+
+        const getSubmissionFormBasedOnType = () => {
+            switch (props.allowedTypes[0]) {
+                case PublicationType.JOURNAL_PUBLICATION:
+                    return JournalPublicationSubmissionForm;
+                case PublicationType.PROCEEDINGS_PUBLICATION:
+                    return ProceedingsPublicationSubmissionForm;
+                case PublicationType.PATENT:
+                    return PatentSubmissionForm;
+                case PublicationType.PROCEEDINGS:
+                    return ProceedingsSubmissionForm;
+                case PublicationType.DATASET:
+                    return DatasetSubmissionForm;
+                case PublicationType.INTANGIBLE_PRODUCT:
+                    return IntangibleProductSubmissionForm;
+                case PublicationType.MONOGRAPH:
+                    return MonographSubmissionForm;
+                case PublicationType.MONOGRAPH_PUBLICATION:
+                    return MonographPublicationSubmissionForm;
+                case PublicationType.THESIS:
+                    return ThesisSubmissionForm;
+                case PublicationType.MATERIAL_PRODUCT:
+                    return MaterialProductSubmissionForm;
+                case PublicationType.GENETIC_MATERIAL:
+                    return GeneticMaterialSubmissionForm;
+            }
+        };
+
         return {
             documentPublications, selectedDocumentPublication, searchDocuments,
-            sendContentToParent, clearInput, requiredSelectionRules
+            sendContentToParent, clearInput, requiredSelectionRules,
+            ThesisSubmissionForm, newDocumentCreated, getSubmissionFormBasedOnType
         };
     }
 });

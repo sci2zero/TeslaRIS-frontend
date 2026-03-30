@@ -1,6 +1,7 @@
 import { DegreeType } from "@/models/InvolvementModel";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
+import { ThesisType } from "@/models/PublicationModel";
 
 export const degreeTypeSr = [
     { title: "Osnovne studije", value: DegreeType.BACHELOR },
@@ -15,6 +16,13 @@ export const degreeTypeEn = [
     { title: "PhD", value: DegreeType.PHD },
     { title: "Informal education", value: DegreeType.INFORMAL_EDUCATION }
 ];
+
+const degreeTypeToThesisType: Record<DegreeType, ThesisType> = {
+    [DegreeType.BACHELOR]: ThesisType.BACHELOR,
+    [DegreeType.MASTER]: ThesisType.MASTER,
+    [DegreeType.PHD]: ThesisType.PHD,
+    [DegreeType.INFORMAL_EDUCATION]: ThesisType.OTHER
+};
 
 export const getDegreeTypeTitleFromValueAutoLocale = (value: DegreeType) => {
     const locale = i18n.vueI18n.global.locale;
@@ -38,4 +46,8 @@ export const getDegreeTypesForGivenLocale = () => {
         case "en":
             return degreeTypeEn;
     }
+};
+
+export const getThesisTypeFromDegreeType = (degreeType: DegreeType): ThesisType => {
+    return degreeTypeToThesisType[degreeType] ?? ThesisType.OTHER;
 };

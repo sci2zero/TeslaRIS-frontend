@@ -110,13 +110,54 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input
-                            v-model="thesisTitle"
-                            :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).thesisTitle : [], languageTags)"
-                            :label="$t('thesisTitleLabel')"
+                        <publication-autocomplete-search
+                            v-model="selectedThesis"
+                            :allowed-types="[PublicationType.THESIS]"
+                            :form-props="{
+                                presetThesisType: getThesisTypeFromDegreeType(selectedDegreeType.value),
+                                presetInstitutionId: selectedOrganisationUnit.value,
+                                presetInstitutionName: externalOUName,
+                                presetYear: dateTo ? dateTo.split('-')[0] : null
+                            }"
+                            allow-manual-clearing
+                            allow-creation
+                            :label="'thesisLabel'"
+                            @create="setCreatedThesis"
                         />
                     </v-col>
                 </v-row>
+                <div>
+                    <v-row v-show="supervisorInputMode === 'person'">
+                        <v-col>
+                            <person-autocomplete-search
+                                v-model="selectedSupervisors"
+                                multiple
+                                disable-submission
+                                label="supervisorsLabel"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row v-show="supervisorInputMode === 'manual'">
+                        <v-col>
+                            <multilingual-text-input
+                                v-model="displaySupervisors"
+                                :initial-value="toMultilingualTextInput((presetInvolvement as Education) ? (presetInvolvement as Education).displaySupervisors : [], languageTags)"
+                                :label="$t('supervisorsLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" class="d-flex justify-start">
+                            <v-btn
+                                variant="text"
+                                color="primary"
+                                prepend-icon="mdi-swap-horizontal"
+                                @click="toggleSupervisorInputMode">
+                                {{ supervisorInputMode === 'person' ? $t('manualInputLabel') : $t('personSearchLabel') }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
                 <v-row>
                     <v-col>
                         <v-select
@@ -271,17 +312,20 @@ import { getEmploymentPositionsForGivenLocale, getEmploymentPositionTitleFromVal
 import type { EmploymentPosition } from '@/models/PersonModel';
 import DatePicker from '@/components/core/DatePicker.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
-import { getDegreeTypesForGivenLocale, getDegreeTypeTitleFromValueAutoLocale } from '@/i18n/degreeType';
+import { getDegreeTypesForGivenLocale, getDegreeTypeTitleFromValueAutoLocale, getThesisTypeFromDegreeType } from '@/i18n/degreeType';
 import { getEducationStatusesForGivenLocale, getEducationStatusTitleFromValueAutoLocale } from '@/i18n/educationStatus';
 import { getMembershipTypesForGivenLocale, getMembershipTypeTitleFromValueAutoLocale } from '@/i18n/membershipType';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import UriInput from '@/components/core/UriInput.vue';
+import PublicationAutocompleteSearch from '@/components/publication/PublicationAutocompleteSearch.vue';
+import { type Document, PublicationType } from '@/models/PublicationModel';
+import PersonAutocompleteSearch from '../PersonAutocompleteSearch.vue';
 
 
 export default defineComponent({
     name: "PersonInvolvementForm",
-    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput },
+    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput, PublicationAutocompleteSearch, PersonAutocompleteSearch },
     props: {
         edit: {
             type: Boolean,
@@ -294,6 +338,10 @@ export default defineComponent({
         presetInvolvement: {
             type: Object as PropType<Education | Membership | Employment | undefined>,
             required: true
+        },
+        researcherId: {
+            type: Number,
+            default: -1
         }
     },
     emits: ["update", "create"],
@@ -302,6 +350,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         const enterExternalOU = ref(false);
+        const supervisorInputMode = ref<"person" | "manual">("person");
 
         onMounted(() => {
             if( props.presetInvolvement?.organisationUnitId) {
@@ -331,6 +380,28 @@ export default defineComponent({
                 };
             }
 
+            if(props.presetInvolvement && (props.presetInvolvement as Education).thesisId) {
+                selectedThesis.value = {
+                    title: returnCurrentLocaleContent((props.presetInvolvement as Education).thesisTitle) as string,
+                    value: (props.presetInvolvement as Education).thesisId as number
+                };
+            }
+
+            selectedSupervisors.value.splice(0);
+            if(props.presetInvolvement && 
+                (props.presetInvolvement as Education).supervisorIds?.length &&
+                (props.presetInvolvement as Education).supervisorNames?.length) {
+                supervisorInputMode.value = "person";
+                (props.presetInvolvement as Education).supervisorIds?.forEach((supervisorId: number, index: number) => {
+                    selectedSupervisors.value.push({
+                        title: (props.presetInvolvement as Education).supervisorNames?.[index] as string,
+                        value: supervisorId
+                    });
+                });
+            } else if (props.presetInvolvement) {
+                supervisorInputMode.value = (props.presetInvolvement as Education).displaySupervisors?.length ? "manual" : "person";
+            }
+
             if(props.presetInvolvement && (props.presetInvolvement as Membership).membershipType) {
                 selectedMembershipType.value = {
                     title: getMembershipTypeTitleFromValueAutoLocale((props.presetInvolvement as Membership).membershipType as MembershipType) as string, 
@@ -347,7 +418,7 @@ export default defineComponent({
         const role = ref([]);
         const title = ref([]);
         const abbreviationTitle = ref([]);
-        const thesisTitle = ref([]);
+        const displaySupervisors = ref([]);
         const externalOUName = ref([]);
         const degreeCode = ref([]);
         const degreeClassification = ref([]);
@@ -368,6 +439,9 @@ export default defineComponent({
                 value: props.presetInvolvement?.involvementType
             } : selectionPlaceholder
         );
+
+        const selectedSupervisors = ref<{title: string, value: number}[]>([]);
+        const selectedThesis = ref<{title: string, value: number}>();
 
         const degreeTypes = getDegreeTypesForGivenLocale();
         const selectedDegreeType = ref<{title: string, value: DegreeType}>(selectionPlaceholder);
@@ -419,9 +493,15 @@ export default defineComponent({
                 (involvement as Education).abbreviationTitle = abbreviationTitle.value;
                 (involvement as Education).degreeCode = degreeCode.value;
                 (involvement as Education).degreeClassification = degreeClassification.value;
-                (involvement as Education).thesisTitle = thesisTitle.value;
                 (involvement as Education).degreeType = selectedDegreeType.value.value;
                 (involvement as Education).educationStatus = selectedEducationStatus.value.value;
+                (involvement as Education).thesisId = selectedThesis.value?.value && selectedThesis.value?.value > 0 ? selectedThesis.value?.value : undefined;
+                
+                if (supervisorInputMode.value === "person") {
+                    (involvement as Education).supervisorIds = selectedSupervisors.value?.map(supervisor => supervisor.value);
+                } else {
+                    (involvement as Education).displaySupervisors = displaySupervisors.value;
+                }
             }
 
             if(props.edit) {
@@ -436,17 +516,36 @@ export default defineComponent({
             researchAreaIds.value = newResearchAreaIds;
         };
 
+        const toggleSupervisorInputMode = () => {
+            supervisorInputMode.value = supervisorInputMode.value === "person" ? "manual" : "person";
+            
+            if (supervisorInputMode.value === "person") {
+                displaySupervisors.value = [];
+            } else {
+                selectedSupervisors.value = [];
+            }
+        };
+
+        const setCreatedThesis = (thesis: Document) => {
+            selectedThesis.value = {
+                title: returnCurrentLocaleContent(thesis.title) as string,
+                value: thesis.id as number
+            };
+        };
+
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
             dateFrom, dateTo, saveInvolvement, enterExternalOU, favorite,
             languageTags, selectedInvolvementType, requiredSelectionRules,
             ouAutocompleteRef, selectedOrganisationUnit, contributionDescription,
-            role, title, abbreviationTitle, thesisTitle, employmentPositions,
+            role, title, abbreviationTitle, displaySupervisors, employmentPositions,
             selectedEmploymentPosition, requiredFieldRules, externalOUName,
             uris, degreeCode, degreeClassification, description, keywords,
             degreeTypes, selectedDegreeType, educationStatuses, selectedEducationStatus,
             membershipTypes, selectedMembershipType, researchAreasSelectionRef,
-            presetResearchAreas, saveResearchAreas
+            presetResearchAreas, saveResearchAreas, selectedSupervisors,
+            selectedThesis, PublicationType, supervisorInputMode, setCreatedThesis,
+            toggleSupervisorInputMode, getThesisTypeFromDegreeType
         };
     }
 });

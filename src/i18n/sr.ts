@@ -1377,5 +1377,9 @@ export default {
     degreeTypeLabel: "Tip diplome",
     educationStatusLabel: "Status edukacije",
     degreeCodeLabel: "Kod diplome",
-    degreeClassificationLabel: "Klasifikacija diplome"
+    degreeClassificationLabel: "Klasifikacija diplome",
+    supervisorsLabel: "Supervizori",
+    manualInputLabel: "Unesi ručno",
+    personSearchLabel: "Pronađi osobe u sistemu",
+    createNewThesisLabel: "Kreiraj novi završni rad"
 }
