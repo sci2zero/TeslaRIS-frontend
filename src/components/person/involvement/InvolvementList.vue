@@ -67,8 +67,8 @@
                         :read-only="!canEdit"
                         edit
                         :preset-involvement="involvement"
-                        @update="updateInvolvement"
                         :researcher-id="person?.id"
+                        @update="updateInvolvement"
                     />
                 </div>
             </h4>
@@ -76,8 +76,8 @@
                 {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
             </p>
             <div
-                class="mt-2"
-                v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0">
+                v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0"
+                class="mt-2">
                 <p v-if="(involvement as Education).thesisTitle">
                     {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
                 </p>
@@ -86,9 +86,9 @@
                 </p>
                 <p v-if="((involvement as Education).supervisorNames?.length ?? 0) > 0 && (involvement as Education).supervisorIds?.length">
                     {{ $t("supervisorsLabel") }}:
-                    <span v-for="(supervisor, index) in (involvement as Education).supervisorNames" :key="index">
-                        <localized-link :to="'persons/' + (involvement as Education).supervisorIds?.[index]">
-                            {{ supervisor }}{{ ((index < (involvement as Education).supervisorNames!.length - 1)) ? ", " : "" }}
+                    <span v-for="(supervisor, idx) in (involvement as Education).supervisorNames" :key="idx">
+                        <localized-link :to="'persons/' + (involvement as Education).supervisorIds?.[idx]">
+                            {{ supervisor }}{{ ((idx < (involvement as Education).supervisorNames!.length - 1)) ? ", " : "" }}
                         </localized-link>
                     </span>
                 </p>
@@ -108,8 +108,8 @@
             </p>
 
             <div
-                class="mt-2 mb-2"
-                v-if="involvement.keywords?.length">
+                v-if="involvement.keywords?.length"
+                class="mt-2 mb-2">
                 <span
                     v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(involvement.keywords)?.split('\n')"
                     :key="keywordIndex">
@@ -132,7 +132,7 @@
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
 import type { DocumentFile } from '@/models/DocumentFileModel';
-import type { Education, EducationStatus, Employment, Membership } from '@/models/InvolvementModel';
+import { type Education, EducationStatus, type Employment, type Membership } from '@/models/InvolvementModel';
 import { EmploymentPosition, type PersonResponse } from '@/models/PersonModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import type { PropType } from 'vue';
@@ -253,7 +253,7 @@ export default defineComponent({
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
             localiseDate, getEmploymentPositionTitleFromValueAutoLocale,
-            EmploymentPosition, sortedInvolvements,
+            EmploymentPosition, sortedInvolvements, EducationStatus,
             getEducationStatusTitleFromValueAutoLocale
         };
     }

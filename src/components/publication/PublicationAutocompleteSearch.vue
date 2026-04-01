@@ -50,7 +50,7 @@ import MonographSubmissionForm from './MonographSubmissionForm.vue';
 import MonographPublicationSubmissionForm from './MonographPublicationSubmissionForm.vue';
 import MaterialProductSubmissionForm from './MaterialProductSubmissionForm.vue';
 import GeneticMaterialSubmissionForm from './GeneticMaterialSubmissionForm.vue';
-import { useUserRole } from '@/composables/useUserRole';
+
 
 export default defineComponent({
     name: "PublicationAutocompleteSearch",

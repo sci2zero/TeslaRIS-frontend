@@ -131,3 +131,11 @@ export enum EducationStatus {
     ATTENDED = "ATTENDED",
     CONCLUDED = "CONCLUDED"
 }
+
+export interface EmploymentPositionHierarchy {
+    id: number;
+    name: MultilingualContent[];
+    processedName: string;
+    schemeName: string;
+    superEmploymentPositionId: number;
+}
