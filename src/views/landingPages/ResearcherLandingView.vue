@@ -207,7 +207,11 @@
                     <v-col cols="6">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <person-involvement-modal :read-only="!canEdit" @create="addInvolvement" />
+                                <person-involvement-modal
+                                    :read-only="!canEdit"
+                                    :researcher-id="person?.id"
+                                    @create="addInvolvement"
+                                />
 
                                 <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                                 <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>

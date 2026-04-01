@@ -221,7 +221,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -335,6 +336,10 @@ export default defineComponent({
             }
         };
 
+        const submit = () => {
+            submitJournalPublication(true);
+        };
+
         const submitJournalPublication = (stayOnPage: boolean) => {
             const newJournalPublication: JournalPublication = {
                 title: title.value,
@@ -360,7 +365,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createJournalPublication(newJournalPublication).then((response) => {
+            DocumentPublicationService.createJournalPublication(
+                newJournalPublication
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -406,7 +415,7 @@ export default defineComponent({
             volume, issue, startPage, endPage, publicationYear, doi, scopus,
             articleNumber, numberOfPages, description, descriptionRef,
             keywords, keywordsRef, isResearcher, uris, urisRef, doiValidationRules,
-            selectedJournal, journalAutocompleteRef, myPublications,
+            selectedJournal, journalAutocompleteRef, myPublications, submit,
             publicationTypes, selectedpublicationType, listPublications,
             contributions, contributionsRef, scopusIdValidationRules,
             requiredFieldRules, submitJournalPublication, errorMessage,

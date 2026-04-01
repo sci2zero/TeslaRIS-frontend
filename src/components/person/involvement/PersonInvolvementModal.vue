@@ -32,6 +32,7 @@
                         <person-involvement-form
                             ref="formRef" :edit="edit"
                             :preset-involvement="presetInvolvement"
+                            :researcher-id="researcherId"
                             @create="emitCreateToParent"
                             @update="emitUpdateToParent"
                         />
@@ -79,6 +80,10 @@ export default defineComponent({
         presetInvolvement: {
             type: Object as PropType<Education | Membership | Employment | undefined>,
             default: undefined
+        },
+        researcherId: {
+            type: Number,
+            default: null
         }
     },
     emits: ["update", "create"],

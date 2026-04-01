@@ -122,6 +122,7 @@
                             allow-manual-clearing
                             allow-creation
                             :label="'thesisLabel'"
+                            :researcher-id="researcherId"
                             @create="setCreatedThesis"
                         />
                     </v-col>
@@ -341,7 +342,7 @@ export default defineComponent({
         },
         researcherId: {
             type: Number,
-            default: -1
+            default: null
         }
     },
     emits: ["update", "create"],

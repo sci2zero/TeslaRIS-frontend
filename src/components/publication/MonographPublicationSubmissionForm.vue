@@ -196,7 +196,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -271,6 +272,10 @@ export default defineComponent({
             }
         });
 
+        const submit = () => {
+            submitMonographPublication(true);
+        };
+
         const submitMonographPublication = (stayOnPage: boolean) => {
             const newMonographPublication: MonographPublication = {
                 articleNumber: articleNumber.value,
@@ -293,7 +298,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createMonographPublication(newMonographPublication).then((response) => {
+            DocumentPublicationService.createMonographPublication(
+                newMonographPublication
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -369,7 +378,7 @@ export default defineComponent({
         return {
             isFormValid, additionalFields,
             snackbar, error, title, titleRef, deduplicationTableRef,
-            subtitle, subtitleRef, startPage, endPage,
+            subtitle, subtitleRef, startPage, endPage, submit,
             doi, scopus, articleNumber, numberOfPages, PublicationType,
             description, descriptionRef, keywords, keywordsRef,
             uris, urisRef, myPublications, doiValidationRules, openAlexId,

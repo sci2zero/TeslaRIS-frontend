@@ -50,6 +50,7 @@ import MonographSubmissionForm from './MonographSubmissionForm.vue';
 import MonographPublicationSubmissionForm from './MonographPublicationSubmissionForm.vue';
 import MaterialProductSubmissionForm from './MaterialProductSubmissionForm.vue';
 import GeneticMaterialSubmissionForm from './GeneticMaterialSubmissionForm.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
 export default defineComponent({
     name: "PublicationAutocompleteSearch",
@@ -86,6 +87,10 @@ export default defineComponent({
         formProps: {
             type: Object as PropType<Record<string, any>>,
             default: () => ({})
+        },
+        researcherId: {
+            type: Number,
+            default: undefined
         }
     },
     emits: ["update:modelValue", "create"],
@@ -121,7 +126,9 @@ export default defineComponent({
                     params,
                     null,
                     false,
-                    props.allowedTypes
+                    props.allowedTypes, 
+                    null, null, undefined, null, null,
+                    props.researcherId ? props.researcherId : null
                 ).then((response) => {
                     const listOfDocuments: { title: string, value: number }[] = [];
                     response.data.content.forEach((documentPublication: DocumentPublicationIndex) => {

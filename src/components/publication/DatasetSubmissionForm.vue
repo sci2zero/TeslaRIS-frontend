@@ -175,7 +175,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -221,6 +222,10 @@ export default defineComponent({
             scopusIdValidationRules
         } = useValidationUtils();
 
+        const submit = () => {
+            submitDataset(true);
+        };
+
         const submitDataset = (stayOnPage: boolean) => {
             const newDataset: Dataset = {
                 title: title.value,
@@ -241,7 +246,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createDataset(newDataset).then((response) => {
+            DocumentPublicationService.createDataset(
+                newDataset
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -327,7 +336,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules,
             popuateMetadata, PublicationType,
             documentWebOfScienceIdValidationRules,
-            webOfScienceId, scopus,
+            webOfScienceId, scopus, submit,
             scopusIdValidationRules,
             deduplicationTableRef
         };

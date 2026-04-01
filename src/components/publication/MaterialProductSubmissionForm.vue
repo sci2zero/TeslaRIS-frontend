@@ -226,7 +226,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -279,6 +280,10 @@ export default defineComponent({
             requiredSelectionRules
         } = useValidationUtils();
 
+        const submit = () => {
+            submitMaterialProduct(true);
+        };
+
         const submitMaterialProduct = (stayOnPage: boolean) => {
             const newMaterialProduct: MaterialProduct = {
                 title: title.value,
@@ -303,7 +308,11 @@ export default defineComponent({
                 researchAreasId: researchAreaIds.value
             };
 
-            DocumentPublicationService.createMaterialProduct(newMaterialProduct).then((response) => {
+            DocumentPublicationService.createMaterialProduct(
+                newMaterialProduct
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -393,7 +402,7 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules,
             deduplicationTableRef, numberProduced,
             materialProductTypes, selectedMaterialProductType,
-            requiredSelectionRules, usersRef,
+            requiredSelectionRules, usersRef, submit,
             researchAreasSelectionRef, saveResearchAreas
         };
     }

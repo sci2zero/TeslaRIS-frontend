@@ -43,7 +43,7 @@
                 <v-icon icon="mdi-circle-small">
                 </v-icon>
                 <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
-                <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }}</strong>
+                <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }} ({{ getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus) }})</strong>
                 <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
                 <v-icon icon="mdi-circle-small">
                 </v-icon>
@@ -68,18 +68,59 @@
                         edit
                         :preset-involvement="involvement"
                         @update="updateInvolvement"
+                        :researcher-id="person?.id"
                     />
                 </div>
             </h4>
             <p v-if="involvement.involvementType === 'MEMBER_OF'">
                 {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
             </p>
-            <p v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0">
-                {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
-            </p>
+            <div
+                class="mt-2"
+                v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0">
+                <p v-if="(involvement as Education).thesisTitle">
+                    {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
+                </p>
+                <p v-if="(involvement as Education).abbreviationTitle">
+                    {{ $t("abbreviationTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).abbreviationTitle) }}
+                </p>
+                <p v-if="((involvement as Education).supervisorNames?.length ?? 0) > 0 && (involvement as Education).supervisorIds?.length">
+                    {{ $t("supervisorsLabel") }}:
+                    <span v-for="(supervisor, index) in (involvement as Education).supervisorNames" :key="index">
+                        <localized-link :to="'persons/' + (involvement as Education).supervisorIds?.[index]">
+                            {{ supervisor }}{{ ((index < (involvement as Education).supervisorNames!.length - 1)) ? ", " : "" }}
+                        </localized-link>
+                    </span>
+                </p>
+                <p v-if="((involvement as Education).displaySupervisors?.length ?? 0) > 0">
+                    {{ $t("supervisorsLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).displaySupervisors) }}
+                </p>
+                <p>
+                    {{ returnCurrentLocaleContent((involvement as Education).degreeCode) }} {{ returnCurrentLocaleContent((involvement as Education).degreeClassification) }}
+                </p>
+            </div>
             <p v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">
                 {{ returnCurrentLocaleContent((involvement as Employment).role) }}
             </p>
+
+            <p class="mt-2 mb-3">
+                {{ returnCurrentLocaleContent(involvement.description) }}
+            </p>
+
+            <div
+                class="mt-2 mb-2"
+                v-if="involvement.keywords?.length">
+                <span
+                    v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(involvement.keywords)?.split('\n')"
+                    :key="keywordIndex">
+                    <v-chip
+                        outlined
+                        size="small">
+                        {{ keyword }}
+                    </v-chip>
+                </span>
+            </div>
+
             <attachment-list
                 :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
                 @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)"></attachment-list>
@@ -91,7 +132,7 @@
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getInvolvementTypeTitleFromValueAutoLocale } from '@/i18n/involvementType';
 import type { DocumentFile } from '@/models/DocumentFileModel';
-import type { Education, Employment, Membership } from '@/models/InvolvementModel';
+import type { Education, EducationStatus, Employment, Membership } from '@/models/InvolvementModel';
 import { EmploymentPosition, type PersonResponse } from '@/models/PersonModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import type { PropType } from 'vue';
@@ -105,6 +146,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
+import { getEducationStatusTitleFromValueAutoLocale } from '@/i18n/educationStatus';
 
 
 export default defineComponent({
@@ -211,7 +253,8 @@ export default defineComponent({
             deleteInvolvementProof, updateInvolvementProof, deleteInvolvement,
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
             localiseDate, getEmploymentPositionTitleFromValueAutoLocale,
-            EmploymentPosition, sortedInvolvements
+            EmploymentPosition, sortedInvolvements,
+            getEducationStatusTitleFromValueAutoLocale
         };
     }
 });

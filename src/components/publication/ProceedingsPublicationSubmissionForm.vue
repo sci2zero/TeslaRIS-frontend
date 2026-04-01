@@ -220,7 +220,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -374,6 +375,10 @@ export default defineComponent({
             selectedProceedings.value = toSelect;
         };
 
+        const submit = () => {
+            submitProceedingsPublication(true);
+        };
+
         const submitProceedingsPublication = (stayOnPage: boolean) => {
             const newProceedingsPublication: ProceedingsPublication = {
                 articleNumber: articleNumber.value,
@@ -397,7 +402,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createProceedingsPublication(newProceedingsPublication).then((response) => {
+            DocumentPublicationService.createProceedingsPublication(
+                newProceedingsPublication
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -451,7 +460,7 @@ export default defineComponent({
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
             popuateMetadata, documentWebOfScienceIdValidationRules, webOfScienceId,
-            optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef
+            optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef, submit
         };
     }
 });

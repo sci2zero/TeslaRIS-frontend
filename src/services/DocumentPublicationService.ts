@@ -18,13 +18,13 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null, authorId: number | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}`);
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}${authorId ? ("&authorId=" + authorId) : ""}`);
   }
 
   async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {

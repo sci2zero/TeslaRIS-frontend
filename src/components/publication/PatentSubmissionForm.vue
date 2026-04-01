@@ -186,7 +186,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -232,6 +233,10 @@ export default defineComponent({
             scopusIdValidationRules
         } = useValidationUtils();
 
+        const submit = () => {
+            submitPatent(true);
+        };
+
         const submitPatent = (stayOnPage: boolean) => {
             const newPatent: Patent = {
                 title: title.value,
@@ -252,7 +257,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createPatent(newPatent).then((response) => {
+            DocumentPublicationService.createPatent(
+                newPatent
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -338,7 +347,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules,
             PublicationType, popuateMetadata,
             documentWebOfScienceIdValidationRules,
-            webOfScienceId, scopus,
+            webOfScienceId, scopus, submit,
             scopusIdValidationRules,
             deduplicationTableRef
         };

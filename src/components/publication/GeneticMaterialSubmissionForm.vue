@@ -196,7 +196,8 @@ export default defineComponent({
             default: false
         }
     },
-    setup() {
+    emits: ["create"],
+    setup(_, {emit}) {
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -244,6 +245,10 @@ export default defineComponent({
             requiredSelectionRules
         } = useValidationUtils();
 
+        const submit = () => {
+            submitGeneticMaterial(true);
+        };
+
         const submitGeneticMaterial = (stayOnPage: boolean) => {
             const newGeneticMaterial: GeneticMaterial = {
                 title: title.value,
@@ -265,7 +270,11 @@ export default defineComponent({
                 proofs: []
             };
 
-            DocumentPublicationService.createGeneticMaterial(newGeneticMaterial).then((response) => {
+            DocumentPublicationService.createGeneticMaterial(
+                newGeneticMaterial
+            ).then((response) => {
+                emit("create", response.data);
+
                 if (stayOnPage) {
                     titleRef.value?.clearInput();
                     subtitleRef.value?.clearInput();
@@ -345,7 +354,7 @@ export default defineComponent({
             contributions, contributionsRef, errorMessage,
             requiredFieldRules, submitGeneticMaterial, scopus,
             workOpenAlexIdValidationRules, webOfScienceId,
-            documentWebOfScienceIdValidationRules,
+            documentWebOfScienceIdValidationRules, submit,
             deduplicationTableRef, selectedGeneticMaterialType,
             geneticMaterialTypes, requiredSelectionRules
         };
