@@ -118,6 +118,7 @@ import PrizeListView from "@/views/PrizeListView.vue";
 import SubmitExhibitionView from "@/views/SubmitExhibitionView.vue";
 import ExhibitionLandingView from "@/views/landingPages/ExhibitionLandingView.vue";
 import ExhibitionMetadataComparatorView from "@/views/comparators/event/ExhibitionMetadataComparatorView.vue";
+import EmploymentPositionListView from "@/views/EmploymentPositionListView.vue";
 
 
 const roles = {
@@ -1099,6 +1100,15 @@ const router = createRouter({
                     path: "research-areas",
                     name: "researchAreas",
                     component: ResearchAreaListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "employment-positions",
+                    name: "employmentPositions",
+                    component: EmploymentPositionListView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

@@ -49,7 +49,7 @@
 <script lang="ts">
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, type PropType, ref, watch } from 'vue';
 import Placeholder from '@tiptap/extension-placeholder'
 import { useI18n } from 'vue-i18n';
 import lodash from "lodash";
@@ -61,7 +61,7 @@ export default defineComponent({
     components: { EditorContent, BubbleMenu },
     props: {
         modelValue: {
-            type: String,
+            type: Object as PropType<string | undefined>,
             required: true,
         },
         editable: {
@@ -160,7 +160,7 @@ export default defineComponent({
             if (props.limitDisplay > 0 && newVal && newVal.length > props.limitDisplay) {
                 truncatedHtml.value = truncateHtml(newVal, props.limitDisplay);
             } else {
-                truncatedHtml.value = newVal;
+                truncatedHtml.value = newVal as string;
             }
         }, { immediate: true });
 

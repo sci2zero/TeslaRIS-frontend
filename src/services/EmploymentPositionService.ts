@@ -2,12 +2,18 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { EmploymentPositionHierarchy } from "@/models/InvolvementModel";
+import { type Page } from "@/models/Common";
+import i18n from "@/i18n";
 
 
 export class EmploymentPositionService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
+  
+  async searchEmploymentPositions(tokens: string): Promise<AxiosResponse<Page<EmploymentPositionHierarchy>>> {
+    return super.sendRequest(axios.get, `employment-position/search?${tokens}&lang=${i18n.vueI18n.global.locale}`);
+  }
   
   async fetchChildEmploymentPositions(parentId: number | null): Promise<AxiosResponse<EmploymentPositionHierarchy[]>> {
     return super.sendRequest(axios.get, `employment-position/children/${parentId}`);

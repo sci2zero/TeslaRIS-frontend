@@ -133,9 +133,10 @@ export enum EducationStatus {
 }
 
 export interface EmploymentPositionHierarchy {
-    id: number;
+    id?: number;
     name: MultilingualContent[];
     processedName: string;
     schemeName: string;
-    superEmploymentPositionId: number;
+    superEmploymentPositionId?: number;
+    superEmploymentPositionName?: MultilingualContent[];
 }

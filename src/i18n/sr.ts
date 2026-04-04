@@ -1381,5 +1381,11 @@ export default {
     supervisorsLabel: "Supervizori",
     manualInputLabel: "Unesi ručno",
     personSearchLabel: "Pronađi osobe u sistemu",
-    createNewThesisLabel: "Kreiraj novi završni rad"
+    createNewThesisLabel: "Kreiraj novi završni rad",
+    employmentPositionListLabel: "Radna mesta",
+    processedNameLabel: "Interni naziv",
+    schemeNameLabel: "Naziv sheme",
+    createNewEmploymentPositionLabel: "Kreiraj novo radno mesto",
+    updateEmploymentPositionLabel: "Ažuriraj radno mesto",
+    superEmploymentPositionLabel: "Roditeljsko radno mesto"
 }

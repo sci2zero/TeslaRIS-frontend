@@ -262,6 +262,7 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'publishers', label: computed(() => i18n.t('publisherListLabel')), to: '/publishers', icon: 'mdi-domain' },
     { key: 'countries', label: computed(() => i18n.t('countryListLabel')), to: '/countries', icon: 'mdi-earth' },
     { key: 'research-areas', label: computed(() => i18n.t('researchAreaListLabel')), to: '/research-areas', icon: 'mdi-flask' },
+    { key: 'employment-positions', label: computed(() => i18n.t('employmentPositionListLabel')), to: '/employment-positions', icon: 'mdi-card-account-details-outline' },
     { key: 'deduplication', label: computed(() => i18n.t('routeLabel.deduplication')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'branding', label: computed(() => i18n.t('brandingLabel')), to: '/branding', icon: 'mdi-palette' },
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },

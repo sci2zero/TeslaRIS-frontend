@@ -1368,5 +1368,11 @@ export default {
     supervisorsLabel: "Supervisors",
     manualInputLabel: "Manual input",
     personSearchLabel: "Search people in system",
-    createNewThesisLabel: "Create new thesis"
+    createNewThesisLabel: "Create new thesis",
+    employmentPositionListLabel: "Employment positions",
+    processedNameLabel: "Processed name",
+    schemeNameLabel: "Scheme name",
+    createNewEmploymentPositionLabel: "Create employment position",
+    updateEmploymentPositionLabel: "Update employment position",
+    superEmploymentPositionLabel: "Super employment position"
 }

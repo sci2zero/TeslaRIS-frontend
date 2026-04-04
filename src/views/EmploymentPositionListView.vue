@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1>{{ $t("researchAreaListLabel") }}</h1>
+        <h1>{{ $t("employmentPositionListLabel") }}</h1>
         <br />
         <br />
         <search-bar-component @search="clearSortAndPerformSearch" />
@@ -13,11 +13,11 @@
             :tab-number="2"
             layout="table"
         />
-        <research-area-table-component
+        <employment-position-table-component
             v-else
             ref="tableRef"
-            :research-areas="researchAreas"
-            :total-research-areas="totalCountries"
+            :employment-positions="employmentPositions"
+            :total-employment-positions="totalCountries"
             @switch-page="switchPage"
         />
     </v-container>
@@ -26,25 +26,23 @@
 <script lang="ts">
 import { defineComponent, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
-import ResearchAreaService from '@/services/ResearchAreaService';
-import ResearchAreaTableComponent from '@/components/researchArea/ResearchAreaTableComponent.vue';
+import EmploymentPositionService from '@/services/EmploymentPositionService';
+import EmploymentPositionTableComponent from '@/components/core/employmentPosition/EmploymentPositionTableComponent.vue';
 import { ref } from 'vue';
-import type { ResearchAreaResponse } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { type EmploymentPositionHierarchy } from '@/models/InvolvementModel';
 
 
 export default defineComponent({
-    name: "ResearchAreaListView",
-    components: { SearchBarComponent, ResearchAreaTableComponent, TabContentLoader },
+    name: "EmploymentPositionListView",
+    components: { SearchBarComponent, EmploymentPositionTableComponent, TabContentLoader },
     setup() {
         const loading = ref(false);
 
         const searchParams = ref("tokens=");
-        const researchAreas = ref<ResearchAreaResponse[]>([]);
+        const employmentPositions = ref<EmploymentPositionHierarchy[]>([]);
         const totalCountries = ref(0);
         const page = ref(0);
         const size = ref(1);
@@ -52,10 +50,10 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
-        const tableRef = ref<typeof ResearchAreaTableComponent>();
+        const tableRef = ref<typeof EmploymentPositionTableComponent>();
 
         onMounted(() => {
-            document.title = i18n.t("researchAreaListLabel");
+            document.title = i18n.t("employmentPositionListLabel");
             loading.value = true;
         });
 
@@ -73,13 +71,9 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            ResearchAreaService.searchResearchAreas(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
+            EmploymentPositionService.searchEmploymentPositions(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
             .then((response) => {
-                response.data.content.forEach(researchArea => {
-                    researchArea.displayDescription = displayTextOrPlaceholder((returnCurrentLocaleContent(researchArea.description) as string));
-                });
-                
-                researchAreas.value = response.data.content;
+                employmentPositions.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
             })
             .finally(() => {
@@ -96,7 +90,7 @@ export default defineComponent({
         };
 
         return {
-            search, researchAreas, totalCountries, switchPage,
+            search, employmentPositions, totalCountries, switchPage,
             clearSortAndPerformSearch, tableRef, loading
         };
     }

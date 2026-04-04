@@ -4,7 +4,7 @@
             <v-btn
                 density="compact"
                 class="bottom-spacer"
-                :disabled="selectedResearchAreas.length === 0"
+                :disabled="selectedEmploymentPositions.length === 0"
                 @click="startDeletionProcess">
                 {{ $t("deleteLabel") }}
             </v-btn>
@@ -13,23 +13,23 @@
         <v-col cols="auto">
             <research-area-modal
                 :preset-research-area="undefined"
-                @submit="createNewResearchArea">
+                @submit="createNewEmploymentPosition">
             </research-area-modal>
             <generic-crud-modal
-                :form-component="ResearchAreaForm"
-                :form-props="{ presetResearchArea: undefined }"
-                entity-name="ResearchArea"
-                @create="createNewResearchArea"
+                :form-component="EmploymentPositionForm"
+                :form-props="{ presetEmploymentPosition: undefined }"
+                entity-name="EmploymentPosition"
+                @create="createNewEmploymentPosition"
             />
         </v-col>
     </v-row>
 
     <v-data-table-server
-        v-model="selectedResearchAreas"
+        v-model="selectedEmploymentPositions"
         :sort-by="tableOptions.sortBy"
-        :items="researchAreas"
+        :items="employmentPositions"
         :headers="headers"
-        :items-length="totalResearchAreas"
+        :items-length="totalEmploymentPositions"
         :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
         :items-per-page="25"
@@ -42,7 +42,7 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedResearchAreas"
+                        v-model="selectedEmploymentPositions"
                         :value="row.item"
                         class="table-checkbox"
                         hide-details
@@ -50,21 +50,17 @@
                 </td>
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
                 <td>
-                    <rich-text-editor
-                        v-model="row.item.displayDescription"
-                        :editable="false"
-                        :limit-display="100">
-                    </rich-text-editor>
+                    {{ row.item.schemeName }}
                 </td>
-                <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superResearchAreaName) as string) }}</td>
+                <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superEmploymentPositionName) as string) }}</td>
                 <td>
                     <generic-crud-modal
                         class="mt-2"
-                        :form-component="ResearchAreaForm"
-                        :form-props="{ presetResearchArea: row.item }"
-                        entity-name="ResearchArea"
+                        :form-component="EmploymentPositionForm"
+                        :form-props="{ presetEmploymentPosition: row.item }"
+                        entity-name="EmploymentPosition"
                         is-update
-                        @update="updateResearchArea(row.item.id as number, $event)"
+                        @update="updateEmploymentPosition(row.item.id as number, $event)"
                     />
                 </td>
             </tr>
@@ -87,7 +83,7 @@
         v-model="displayPersistentDialog"
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
-        :entity-names="selectedResearchAreas.map(entity => returnCurrentLocaleContent(entity.name) as string)"
+        :entity-names="selectedEmploymentPositions.map(entity => returnCurrentLocaleContent(entity.name) as string)"
         @continue="deleteSelection">
     </persistent-question-dialog>
 </template>
@@ -98,31 +94,30 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
-import type { ResearchAreaRequest, ResearchAreaResponse } from '@/models/Common';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import ResearchAreaService from '@/services/ResearchAreaService';
-import GenericCrudModal from '../core/GenericCrudModal.vue';
-import ResearchAreaForm from './ResearchAreaForm.vue';
+import EmploymentPositionService from '@/services/EmploymentPositionService';
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import EmploymentPositionForm from './EmploymentPositionForm.vue';
 import { isEqual } from 'lodash';
-import RichTextEditor from '../core/RichTextEditor.vue';
-import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import PersistentQuestionDialog from '../comparators/PersistentQuestionDialog.vue';
+import { type EmploymentPositionHierarchy } from '@/models/InvolvementModel';
 
 
 export default defineComponent({
-    name: "ResearchAreaTableComponent",
-    components: { GenericCrudModal, RichTextEditor, PersistentQuestionDialog },
+    name: "EmploymentPositionTableComponent",
+    components: { GenericCrudModal, PersistentQuestionDialog },
     props: {
-        researchAreas: {
-            type: Array<ResearchAreaResponse>,
+        employmentPositions: {
+            type: Array<EmploymentPositionHierarchy>,
             required: true
         }, 
-        totalResearchAreas: {
+        totalEmploymentPositions: {
             type: Number,
             required: true
         }},
     emits: ["switchPage"],
     setup(_, {emit}) {
-        const selectedResearchAreas = ref<ResearchAreaResponse[]>([]);
+        const selectedEmploymentPositions = ref<EmploymentPositionHierarchy[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
         const i18n = useI18n();
@@ -132,16 +127,16 @@ export default defineComponent({
         const timeout = 5000;
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
-        const abstractLabel = computed(() => i18n.t("descriptionLabel"));
-        const superAreaLabel = computed(() => i18n.t("superResearchAreaLabel"));
+        const schemeNameLabel = computed(() => i18n.t("schemeNameLabel"));
+        const superPositionLabel = computed(() => i18n.t("superEmploymentPositionLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 25, sortBy:[{key: "name", order: "asc"}]});
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: "name.content"},
-          { title: abstractLabel, align: "start", sortable: true, key: "description"},
-          { title: superAreaLabel, align: "start", sortable: false, key: "superResearchAreaName"},
+          { title: schemeNameLabel, align: "start", sortable: true, key: "schemeName"},
+          { title: superPositionLabel, align: "start", sortable: false, key: "superEmploymentPositionName"},
           { title: actionLabel}
         ];
 
@@ -161,17 +156,17 @@ export default defineComponent({
         };
 
         const deleteSelection = () => {
-            Promise.all(selectedResearchAreas.value.map((researchArea: ResearchAreaResponse) => {
-                return ResearchAreaService.deleteResearchArea(researchArea.id as number)
+            Promise.all(selectedEmploymentPositions.value.map((employmentPosition: EmploymentPositionHierarchy) => {
+                return EmploymentPositionService.deleteEmploymentPosition(employmentPosition.id as number)
                     .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
+                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(employmentPosition.name) }));
                     })
                     .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
-                        return researchArea;
+                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(employmentPosition.name) }));
+                        return employmentPosition;
                     });
             })).then((failedDeletions) => {
-                selectedResearchAreas.value = selectedResearchAreas.value.filter((researchArea) => failedDeletions.includes(researchArea));
+                selectedEmploymentPositions.value = selectedEmploymentPositions.value.filter((employmentPosition) => failedDeletions.includes(employmentPosition));
                 refreshTable(tableOptions.value);
             });
         };
@@ -187,8 +182,8 @@ export default defineComponent({
             notifications.value.delete(notificationId);
         };
 
-        const createNewResearchArea = (researchArea: ResearchAreaRequest) => {
-            ResearchAreaService.createResearchArea(researchArea).then(() => {
+        const createNewEmploymentPosition = (employmentPosition: EmploymentPositionHierarchy) => {
+            EmploymentPositionService.createEmploymentPosition(employmentPosition).then(() => {
                 if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
                     emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
                 } else {
@@ -197,8 +192,8 @@ export default defineComponent({
             });
         };
 
-        const updateResearchArea = (researchAreaId: number, researchArea: ResearchAreaRequest) => {
-            ResearchAreaService.updateResearchArea(researchAreaId, researchArea).then(() => {
+        const updateEmploymentPosition = (employmentPositionId: number, employmentPosition: EmploymentPositionHierarchy) => {
+            EmploymentPositionService.updateEmploymentPosition(employmentPositionId, employmentPosition).then(() => {
                 addNotification(i18n.t("updatedSuccessMessage"));
                 if (tableOptions.value.sortBy && tableOptions.value.sortBy.length > 0) {
                     emit("switchPage", tableOptions.value.page - 1, tableOptions.value.itemsPerPage, tableOptions.value.sortBy[0].key, tableOptions.value.sortBy[0].order);
@@ -237,8 +232,8 @@ export default defineComponent({
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
-            selectedResearchAreas, notifications, createNewResearchArea,
-            updateResearchArea, setSortAndPageOption, ResearchAreaForm,
+            selectedEmploymentPositions, notifications, createNewEmploymentPosition,
+            updateEmploymentPosition, setSortAndPageOption, EmploymentPositionForm,
             displayPersistentDialog, startDeletionProcess
         };
     }
