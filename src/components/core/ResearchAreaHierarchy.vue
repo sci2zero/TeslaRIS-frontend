@@ -5,7 +5,7 @@
             :list="researchAreas" group="researchAreaHierarchy" item-key="id" :disabled="!inComparator"
             @change="onDropCallback">
             <tree-hierarchy-recursive
-                :preset-research-area="researchAreaTree"
+                :preset-node-data="researchAreaTree"
             />
         </draggable>
     </ul>

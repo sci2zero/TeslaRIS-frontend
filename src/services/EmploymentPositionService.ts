@@ -15,6 +15,10 @@ export class EmploymentPositionService extends BaseService {
     return super.sendRequest(axios.get, `employment-position/search?${tokens}&lang=${i18n.vueI18n.global.locale}`);
   }
   
+  async readEmploymentPosition(employmentPositionId: number): Promise<AxiosResponse<EmploymentPositionHierarchy>> {
+    return super.sendRequest(axios.get, `employment-position/${employmentPositionId}`);
+  }
+
   async fetchChildEmploymentPositions(parentId: number | null): Promise<AxiosResponse<EmploymentPositionHierarchy[]>> {
     return super.sendRequest(axios.get, `employment-position/children/${parentId}`);
   }

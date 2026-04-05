@@ -1,15 +1,15 @@
 <template>
-    <ul v-for="(researchArea, index) in researchAreas" :key="index">
+    <ul v-for="(node, index) in nodeData" :key="index">
         <li class="item">
-            <h4>{{ returnCurrentLocaleContent(researchArea.name) }}</h4>
+            <h4>{{ returnCurrentLocaleContent(node.name) }}</h4>
             <p>
-                {{ returnCurrentLocaleContent(researchArea.description) }}
+                {{ returnCurrentLocaleContent(node.description) }}
             </p>
         </li>
 
         <li>
             <tree-hierarchy-recursive
-                :preset-research-area="researchArea.children"
+                :preset-node-data="node.children"
             />
         </li>
     </ul>
@@ -25,20 +25,20 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 export default defineComponent({
     name: "TreeHierarchyRecursive",
     props: {
-        presetResearchArea: {
+        presetNodeData: {
             type: Object as PropType<any[]>,
             required: true
         },
     },
     setup(props) {
-        const researchAreas = ref<any[]>(props.presetResearchArea);
+        const nodeData = ref<any[]>(props.presetNodeData);
 
-        watch(() => props.presetResearchArea, () => {
-            researchAreas.value = props.presetResearchArea;
+        watch(() => props.presetNodeData, () => {
+            nodeData.value = props.presetNodeData;
         });
 
         return {
-            researchAreas,
+            nodeData,
             returnCurrentLocaleContent
         };
     },

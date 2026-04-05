@@ -31,6 +31,15 @@
                 />
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <employment-position-selection
+                    :employment-positions-hierarchy="selectedEmploymentPosition"
+                    submit-on-click
+                    @update="saveSuperIds"
+                />
+            </v-col>
+        </v-row>
 
         <v-row>
             <p class="required-fields-message">
@@ -44,16 +53,16 @@
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { type EmploymentPositionHierarchy } from '@/models/InvolvementModel';
+import EmploymentPositionSelection from './EmploymentPositionSelection.vue';
 
 
 export default defineComponent({
     name: "EmploymentPositionForm",
-    components: { MultilingualTextInput },
+    components: { MultilingualTextInput, EmploymentPositionSelection },
     props: {
         presetEmploymentPosition: {
             type: Object as PropType<EmploymentPositionHierarchy | undefined>,
@@ -66,24 +75,18 @@ export default defineComponent({
 
         const { languageTags } = useLanguageTags();
 
-        onMounted(() => {
-            setDetails();
-        });
-
-        const setDetails = () => {
-            if(props.presetEmploymentPosition?.superEmploymentPositionId) {
-                selectedEmploymentPosition.value = {title: returnCurrentLocaleContent(props.presetEmploymentPosition.superEmploymentPositionName) as string, value: props.presetEmploymentPosition.superEmploymentPositionId};
-            }
-        };
-
         const nameRef = ref<typeof MultilingualTextInput>();
 
         const name = ref<any>([]);
         const processedName = ref<string>(props.presetEmploymentPosition?.processedName ?? "");
         const schemeName = ref<string>(props.presetEmploymentPosition?.schemeName ?? "");
 
-        const searchPlaceholder = {title: "", value: -1};
-        const selectedEmploymentPosition = ref<{ title: string, value: number }>(searchPlaceholder);
+        const selectedEmploymentPosition = ref<number[]>(
+            props.presetEmploymentPosition?.superEmploymentPositionId ? 
+            [props.presetEmploymentPosition?.superEmploymentPositionId] : []
+        );
+
+        const employmentPositionIds = ref<number[]>([]);
 
         const { requiredFieldRules } = useValidationUtils();
 
@@ -92,10 +95,14 @@ export default defineComponent({
                 name: name.value,
                 processedName: processedName.value,
                 schemeName: schemeName.value,
-                superEmploymentPositionId: selectedEmploymentPosition.value.value > 0 ? selectedEmploymentPosition.value.value : undefined
+                superEmploymentPositionId: employmentPositionIds.value.length > 0 ? employmentPositionIds.value[0] : undefined
             };
 
             emit("create", employmentPosition);
+        };
+
+        const saveSuperIds = (newEmploymentPositionIds: number[]) => {
+            employmentPositionIds.value = newEmploymentPositionIds;
         };
 
         return {
@@ -104,7 +111,8 @@ export default defineComponent({
             nameRef, processedName,
             toMultilingualTextInput,
             languageTags, requiredFieldRules,
-            selectedEmploymentPosition, submit
+            selectedEmploymentPosition,
+            submit, saveSuperIds
         };
     }
 });
