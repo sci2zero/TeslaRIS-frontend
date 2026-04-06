@@ -114,7 +114,8 @@ export default {
         materialProductLandingPage: "Detalji materijalnog proizvoda",
         geneticMaterialLandingPage: "Detalji genetskog materijala",
         submitGeneticMaterial: "Dodavanje genetskog materijala",
-        prizes: "Nagrade"
+        prizes: "Nagrade",
+        employmentPositions: "Radna mesta"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -922,6 +923,7 @@ export default {
     redirectionFinishedMessage: "Uspešno ste preusmereni, možete zatvoriti stranicu.",
     displayTitleLabel: "Titula za prikazivanje",
     chooseFromListLabel: "Izaberi iz liste",
+    chooseFromHierarchyLabel: "Izaberi iz hijerarhije",
     selectColorLabel: "Izaberi boju",
     selectBackgroundColorLabel: "Izaberi boju pozadine",
     papersLabel: "Radovi",

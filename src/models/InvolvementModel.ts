@@ -83,6 +83,8 @@ export interface Membership extends Involvement {
 
 export interface Employment extends Involvement {
     employmentPosition?: EmploymentPosition;
+    employmentPositionId?: number;
+    employmentPositionName?: MultilingualContent[];
     role?: MultilingualContent[];
 }
 

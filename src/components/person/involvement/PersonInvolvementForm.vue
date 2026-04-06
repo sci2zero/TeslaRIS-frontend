@@ -239,7 +239,7 @@
 
         <v-row v-if="selectedInvolvementType?.value === 'EMPLOYED_AT' || selectedInvolvementType?.value === 'HIRED_BY' || selectedInvolvementType?.value === 'CANDIDATE'">
             <v-col>
-                <v-row>
+                <v-row v-if="!useHierarchy">
                     <v-col>
                         <v-select
                             v-model="selectedEmploymentPosition"
@@ -249,6 +249,26 @@
                         />
                     </v-col>
                 </v-row>
+                <v-row v-else>
+                    <v-col>
+                        <employment-position-selection
+                            :employment-positions-hierarchy="selectedEmploymentPositionHierarchy"
+                            submit-on-click
+                            @update="saveEmploymentId"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col class="d-flex justify-end">
+                        <v-btn variant="outlined" @click="useHierarchy = !useHierarchy">
+                            {{ useHierarchy 
+                                ? $t("chooseFromListLabel") 
+                                : $t("chooseFromHierarchyLabel") 
+                            }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+
                 <v-row>
                     <v-col>
                         <multilingual-text-input
@@ -322,11 +342,12 @@ import UriInput from '@/components/core/UriInput.vue';
 import PublicationAutocompleteSearch from '@/components/publication/PublicationAutocompleteSearch.vue';
 import { type Document, PublicationType } from '@/models/PublicationModel';
 import PersonAutocompleteSearch from '../PersonAutocompleteSearch.vue';
+import EmploymentPositionSelection from '@/components/core/employmentPosition/EmploymentPositionSelection.vue';
 
 
 export default defineComponent({
     name: "PersonInvolvementForm",
-    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput, PublicationAutocompleteSearch, PersonAutocompleteSearch },
+    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput, PublicationAutocompleteSearch, PersonAutocompleteSearch, EmploymentPositionSelection },
     props: {
         edit: {
             type: Boolean,
@@ -461,6 +482,17 @@ export default defineComponent({
         const presetResearchAreas = ref<ResearchArea[]>(props.presetInvolvement?.researchAreas as ResearchArea[]);
         const researchAreaIds = ref<number[]>(props.presetInvolvement?.researchAreas?.map(researchArea => researchArea.id) as number[]);
 
+        const selectedEmploymentPositionHierarchy = ref<number[]>(
+            (props.presetInvolvement as Employment)?.employmentPositionId ? 
+            [(props.presetInvolvement as Employment)?.employmentPositionId as number] : []
+        );
+
+        const employmentPositionId = ref<number | undefined>((props.presetInvolvement as Employment)?.employmentPositionId);
+
+        const saveEmploymentId = (newEmploymentPositionIds: number[]) => {
+            employmentPositionId.value = (newEmploymentPositionIds.length ?? 0) > 0 ? newEmploymentPositionIds[0] : undefined;
+        };
+
         const saveInvolvement = () => {
             const involvement: Involvement = {
                 id: props.presetInvolvement?.id,
@@ -485,7 +517,8 @@ export default defineComponent({
                     involvement.involvementType == InvolvementType.EMPLOYED_AT ||
                     involvement.involvementType == InvolvementType.CANDIDATE) {
                 (involvement as Employment).role = role.value;
-                (involvement as Employment).employmentPosition = selectedEmploymentPosition.value.value;
+                (involvement as Employment).employmentPosition = useHierarchy.value ? undefined : selectedEmploymentPosition.value.value;
+                (involvement as Employment).employmentPositionId = useHierarchy.value ? employmentPositionId.value : undefined;
             } 
             else if(involvement.involvementType == InvolvementType.STUDIED_AT ||
                     involvement.involvementType == InvolvementType.POSTDOC_AT ||
@@ -534,6 +567,8 @@ export default defineComponent({
             };
         };
 
+        const useHierarchy = ref((props.presetInvolvement as Employment).employmentPositionId ?? false);
+
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
             dateFrom, dateTo, saveInvolvement, enterExternalOU, favorite,
@@ -546,7 +581,8 @@ export default defineComponent({
             membershipTypes, selectedMembershipType, researchAreasSelectionRef,
             presetResearchAreas, saveResearchAreas, selectedSupervisors,
             selectedThesis, PublicationType, supervisorInputMode, setCreatedThesis,
-            toggleSupervisorInputMode, getThesisTypeFromDegreeType
+            toggleSupervisorInputMode, getThesisTypeFromDegreeType,
+            selectedEmploymentPositionHierarchy, saveEmploymentId, useHierarchy
         };
     }
 });

@@ -113,7 +113,8 @@ export default {
         materialProductLandingPage: "Material product details",
         geneticMaterialLandingPage: "Genetec material details",
         submitGeneticMaterial: "Dodavanje genetskog materijala",
-        prizes: "Prizes"
+        prizes: "Prizes",
+        employmentPositions: "Employment positions"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -139,7 +140,6 @@ export default {
     emailFormatError: "Invalid email format",
     searchBarPlaceholder: "Search",
     hideDetailsLabel: "Hide details",
-    
     fullNameLabel: "Full Name",
     firstNameLabel: "Name",
     surnameLabel: "Surname",
@@ -922,6 +922,7 @@ export default {
     redirectionFinishedMessage: "Redirection successfull, you may close this page now.",
     displayTitleLabel: "Display title",
     chooseFromListLabel: "Choose from list",
+    chooseFromHierarchyLabel: "Choose from hierarchy",
     selectColorLabel: "Select color",
     selectBackgroundColorLabel: "Select background color",
     papersLabel: "Papers",

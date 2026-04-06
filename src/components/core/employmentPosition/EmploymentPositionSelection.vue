@@ -1,16 +1,19 @@
 <template>
-    <v-treeview
-        v-model:selected="selectedEmploymentPositions"
-        v-model:opened="openNodes"
-        :items="employmentPositions"
-        select-strategy="independent"
-        item-title="title"
-        item-value="id"
-        selected-color="indigo"
-        selectable
-        :load-children="onNodeOpen"
-        @click:select="handleSelection"
-    />
+    <div>
+        <h3>{{ $t(label ? label : "employmentPositionLabel") }}</h3>
+        <v-treeview
+            v-model:selected="selectedEmploymentPositions"
+            v-model:opened="openNodes"
+            :items="employmentPositions"
+            select-strategy="independent"
+            item-title="title"
+            item-value="id"
+            selected-color="indigo"
+            selectable
+            :load-children="onNodeOpen"
+            @click:select="handleSelection"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -26,7 +29,7 @@ export default defineComponent({
     props: {
         limitOne: {
             type: Boolean,
-            default: false
+            default: true
         },
         employmentPositionsHierarchy: {
             type: Object as PropType<number[] | undefined>,
@@ -35,6 +38,10 @@ export default defineComponent({
         submitOnClick: {
             type: Boolean,
             default: false
+        },
+        label: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["update"],

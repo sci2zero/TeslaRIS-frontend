@@ -44,7 +44,7 @@
                 </v-icon>
                 <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
                 <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }} ({{ getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus) }})</strong>
-                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
+                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ (involvement as Employment).employmentPositionId ? returnCurrentLocaleContent((involvement as Employment).employmentPositionName) : getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
                 <v-icon icon="mdi-circle-small">
                 </v-icon>
                 <span v-if="involvement.dateFrom">

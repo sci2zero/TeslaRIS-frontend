@@ -36,6 +36,7 @@
                 <employment-position-selection
                     :employment-positions-hierarchy="selectedEmploymentPosition"
                     submit-on-click
+                    label="superEmploymentPositionLabel"
                     @update="saveSuperIds"
                 />
             </v-col>
