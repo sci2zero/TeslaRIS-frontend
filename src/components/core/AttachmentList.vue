@@ -7,8 +7,8 @@
                 :allow-licence-selection="allowLicenceSelection"
                 :always-open-access="alwaysOpenAccess"
                 :disable-resource-type-selection="disableResourceTypeSelection"
-                @create="sendDataToParent">
-            </document-file-submission-modal>
+                @create="sendDataToParent"
+            />
 
             <v-row>
                 <v-list
@@ -58,7 +58,7 @@
                                             :disable-resource-type-selection="disableResourceTypeSelection"
                                             :can-be-archived="canBeArchived"
                                             @update="sendUpdateRequestToParent($event, attachment.id)"
-                                        ></document-file-submission-modal>
+                                        />
                                     </v-col>
                                     <v-col v-if="(canMakeOfficial && canEdit) && (isAdmin || isInstitutionalLibrarian)">
                                         <v-btn
@@ -144,7 +144,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ["create", "delete", "update"],
+    emits: ["create", "delete", "update", "made-official"],
     setup(_, { emit }) {
         const errorMessage = ref("");
         const snackbar = ref(false);
@@ -188,7 +188,7 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string),
                 documentFile.id as number
             ).then(() => {
-                emit("update", documentFile);
+                emit("made-official", documentFile);
             });
         };
 

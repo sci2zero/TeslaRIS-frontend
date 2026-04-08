@@ -265,7 +265,6 @@ import PersonDocumentContributionTabs from '@/components/core/PersonDocumentCont
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -495,7 +494,6 @@ export default defineComponent({
             dataset, icon, publisher, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment, deleteAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, DatasetUpdateForm,
             StatisticsType, documentIndicators, localiseDate, PublicationType,

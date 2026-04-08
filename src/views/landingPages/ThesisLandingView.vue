@@ -461,7 +461,7 @@
                     :commission-reports="thesis?.commissionReports"
                     :is-on-public-review="thesis?.isOnPublicReview"
                     @update="fetchThesis"
-                ></attachment-section>
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -570,7 +570,6 @@ import PersonDocumentContributionTabs from '@/components/core/PersonDocumentCont
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -1021,7 +1020,6 @@ export default defineComponent({
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
-            addAttachment, updateAttachment, deleteAttachment, AlternateTitleForm,
             updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,
             updateBasicInfo, organisationUnit, ThesisUpdateForm, updateRemark,
@@ -1035,7 +1033,7 @@ export default defineComponent({
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
-            DocumentContributionType, removeSubstitution
+            DocumentContributionType, removeSubstitution, AlternateTitleForm
         };
 }})
 

@@ -296,7 +296,6 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
@@ -538,7 +537,6 @@ export default defineComponent({
             totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
-            addAttachment, deleteAttachment, updateAttachment, publicationTypes,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
@@ -546,7 +544,7 @@ export default defineComponent({
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
             fetchValidationStatus, PublicationType, updateRemark, isAdmin,
-            isCommission
+            isCommission, publicationTypes
         };
 }})
 

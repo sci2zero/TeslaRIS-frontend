@@ -315,7 +315,6 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import ProceedingsService from '@/services/ProceedingsService';
 import { useRoute, useRouter } from 'vue-router';
@@ -599,7 +598,6 @@ export default defineComponent({
             returnCurrentLocaleContent, localiseDate,
             languageMap, publicationSeriesType, displayConfiguration,
             searchKeyword, goToURL, canEdit, publisher,
-            addAttachment, deleteAttachment, updateAttachment,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,

@@ -293,7 +293,6 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
@@ -524,10 +523,9 @@ export default defineComponent({
 
         return {
             monographPublication, publications, event, totalPublications,
-            returnCurrentLocaleContent, handleResearcherUnbind,
+            returnCurrentLocaleContent, handleResearcherUnbind, icon,
             languageTagMap, monograph, MonographPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
-            addAttachment, deleteAttachment, updateAttachment, icon,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             documentIndicators, StatisticsType, currentTab, currentRoute,

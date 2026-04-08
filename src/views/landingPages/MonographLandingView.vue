@@ -359,7 +359,6 @@ import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import KeywordList from '@/components/core/KeywordList.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
@@ -665,14 +664,12 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
-            addAttachment, updateAttachment,
             updateKeywords, updateDescription,
             snackbar, snackbarMessage, event,
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
-            MonographUpdateForm, deleteAttachment,
             handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType,
             currentTab, updateResearchAreas,
@@ -682,7 +679,7 @@ export default defineComponent({
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
             publisher, updateRemark, displayConfiguration,
-            isAdmin, isCommission
+            isAdmin, isCommission, MonographUpdateForm
         };
 }})
 

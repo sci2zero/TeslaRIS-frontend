@@ -313,7 +313,6 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
-import { addAttachment, updateAttachment, deleteAttachment } from "@/utils/AttachmentUtil";
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
@@ -557,11 +556,10 @@ export default defineComponent({
         return {
             journalPublication, icon, canClassify, fetchJournalPublication,
             publications, event, totalPublications, isResearcher,
-            returnCurrentLocaleContent, handleResearcherUnbind,
+            returnCurrentLocaleContent, handleResearcherUnbind, actionsRef,
             languageTagMap, journal, JournalPublicationUpdateForm,
             StatisticsType, documentIndicators, currentTab, createIndicator,
             searchKeyword, goToURL, canEdit, localiseDate, fetchIndicators,
-            addAttachment, deleteAttachment, updateAttachment, actionsRef,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,

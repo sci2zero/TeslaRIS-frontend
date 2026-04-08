@@ -24,30 +24,43 @@ export const addAttachment = (attachment: DocumentFile, isProof: boolean, docume
     });
 };
 
-export const addThesisAttachment = (attachment: DocumentFile, attachmentType: ThesisAttachmentType, thesis?: Thesis) => {
+export const addThesisAttachment = (
+    attachment: DocumentFile,
+    attachmentType: ThesisAttachmentType,
+    thesis?: Thesis,
+    onFinished?: (response: any) => void
+) => {
     const uploadStore = useUploadStore();
+
     if (uploadStore.isUploading) {
         return;
     }
+
     uploadStore.uploadProgressRef?.startUpload(attachment.file.name);
 
-    DocumentFileService.addThesisFileAttachment(attachment, thesis?.id as number, attachmentType).then((response => {
-        switch(attachmentType) {
-            case ThesisAttachmentType.FILE:
-                thesis?.preliminaryFiles?.push(response.data);
-                break;
-            case ThesisAttachmentType.SUPPLEMENT:
-                thesis?.preliminarySupplements?.push(response.data);
-                break;
-            case ThesisAttachmentType.COMMISSION_REPORT:
-                thesis?.commissionReports?.push(response.data);
-                break;
-        }
+    DocumentFileService
+        .addThesisFileAttachment(attachment, thesis?.id as number, attachmentType)
+        .then((response) => {
 
-        uploadStore.uploadProgressRef?.updateProgress(100);
-    })).catch(() => {
-        uploadStore.uploadProgressRef?.cancelUpload(true);
-    });
+            switch (attachmentType) {
+                case ThesisAttachmentType.FILE:
+                    thesis?.preliminaryFiles?.push(response.data);
+                    break;
+                case ThesisAttachmentType.SUPPLEMENT:
+                    thesis?.preliminarySupplements?.push(response.data);
+                    break;
+                case ThesisAttachmentType.COMMISSION_REPORT:
+                    thesis?.commissionReports?.push(response.data);
+                    break;
+            }
+
+            uploadStore.uploadProgressRef?.updateProgress(100);
+
+            onFinished?.(response);
+        })
+        .catch(() => {
+            uploadStore.uploadProgressRef?.cancelUpload(true);
+        });
 };
 
 export const updateAttachment = (attachment: DocumentFile, isProof: boolean, document?: Document) => {
@@ -56,7 +69,7 @@ export const updateAttachment = (attachment: DocumentFile, isProof: boolean, doc
         return;
     }
 
-    if (attachment.file.size > 0) {
+    if ((attachment.file?.size ?? 0) > 0) {
         uploadStore.uploadProgressRef?.startUpload(attachment.file.name);
     }
 
@@ -81,7 +94,7 @@ export const updateAttachment = (attachment: DocumentFile, isProof: boolean, doc
             }
         }
 
-        if (attachment.file.size > 0) {
+        if ((attachment.file?.size ?? 0) > 0) {
             uploadStore.uploadProgressRef?.updateProgress(100);
         }
     }).catch(() => {
