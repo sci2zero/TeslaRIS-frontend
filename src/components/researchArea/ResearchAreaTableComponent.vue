@@ -132,7 +132,7 @@ export default defineComponent({
         const timeout = 5000;
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
-        const abstractLabel = computed(() => i18n.t("descriptionLabel"));
+        const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const superAreaLabel = computed(() => i18n.t("superResearchAreaLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
@@ -140,7 +140,7 @@ export default defineComponent({
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: "name.content"},
-          { title: abstractLabel, align: "start", sortable: true, key: "description"},
+          { title: descriptionLabel, align: "start", sortable: true, key: "description"},
           { title: superAreaLabel, align: "start", sortable: false, key: "superResearchAreaName"},
           { title: actionLabel}
         ];

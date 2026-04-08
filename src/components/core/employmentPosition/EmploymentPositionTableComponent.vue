@@ -50,6 +50,13 @@
                 </td>
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
                 <td>
+                    <rich-text-editor
+                        v-model="row.item.displayDescription"
+                        :editable="false"
+                        :limit-display="100">
+                    </rich-text-editor>
+                </td>
+                <td>
                     {{ row.item.schemeName }}
                 </td>
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superEmploymentPositionName) as string) }}</td>
@@ -101,11 +108,12 @@ import EmploymentPositionForm from './EmploymentPositionForm.vue';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../comparators/PersistentQuestionDialog.vue';
 import { type EmploymentPositionHierarchy } from '@/models/InvolvementModel';
+import RichTextEditor from '../RichTextEditor.vue';
 
 
 export default defineComponent({
     name: "EmploymentPositionTableComponent",
-    components: { GenericCrudModal, PersistentQuestionDialog },
+    components: { GenericCrudModal, PersistentQuestionDialog, RichTextEditor },
     props: {
         employmentPositions: {
             type: Array<EmploymentPositionHierarchy>,
@@ -127,6 +135,7 @@ export default defineComponent({
         const timeout = 5000;
 
         const nameLabel = computed(() => i18n.t("nameLabel"));
+        const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const schemeNameLabel = computed(() => i18n.t("schemeNameLabel"));
         const superPositionLabel = computed(() => i18n.t("superEmploymentPositionLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
@@ -135,6 +144,7 @@ export default defineComponent({
 
         const headers = [
           { title: nameLabel, align: "start", sortable: true, key: "name.content"},
+          { title: descriptionLabel, align: "start", sortable: false, key: "description"},
           { title: schemeNameLabel, align: "start", sortable: true, key: "schemeName"},
           { title: superPositionLabel, align: "start", sortable: false, key: "superEmploymentPositionName"},
           { title: actionLabel}

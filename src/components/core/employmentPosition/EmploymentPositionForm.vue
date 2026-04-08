@@ -13,6 +13,18 @@
         </v-row>
         <v-row>
             <v-col>
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-rich is-area
+                    :rules="requiredFieldRules"
+                    :label="$t('descriptionLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetEmploymentPosition?.description, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
                 <v-text-field
                     v-model="processedName"
                     :label="$t('processedNameLabel') + '*'"
@@ -77,8 +89,10 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         const nameRef = ref<typeof MultilingualTextInput>();
+        const descriptionRef = ref<typeof MultilingualTextInput>();
 
         const name = ref<any>([]);
+        const description = ref<any>([]);
         const processedName = ref<string>(props.presetEmploymentPosition?.processedName ?? "");
         const schemeName = ref<string>(props.presetEmploymentPosition?.schemeName ?? "");
 
@@ -94,6 +108,7 @@ export default defineComponent({
         const submit = () => {
             const employmentPosition: EmploymentPositionHierarchy = {
                 name: name.value,
+                description: description.value,
                 processedName: processedName.value,
                 schemeName: schemeName.value,
                 superEmploymentPositionId: employmentPositionIds.value.length > 0 ? employmentPositionIds.value[0] : undefined
@@ -109,6 +124,7 @@ export default defineComponent({
         return {
             isFormValid,
             name, schemeName,
+            description, descriptionRef,
             nameRef, processedName,
             toMultilingualTextInput,
             languageTags, requiredFieldRules,

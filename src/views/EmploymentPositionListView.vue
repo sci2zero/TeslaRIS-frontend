@@ -33,6 +33,8 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { type EmploymentPositionHierarchy } from '@/models/InvolvementModel';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
 
 export default defineComponent({
@@ -73,6 +75,11 @@ export default defineComponent({
             searchParams.value = tokenParams;
             EmploymentPositionService.searchEmploymentPositions(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`)
             .then((response) => {
+                response.data.content.forEach(employmentPosition => {
+                    employmentPosition.displayDescription =
+                        displayTextOrPlaceholder((returnCurrentLocaleContent(employmentPosition.description) as string));
+                });
+
                 employmentPositions.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
             })
