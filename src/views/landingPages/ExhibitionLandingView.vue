@@ -80,8 +80,11 @@
                                 <div v-if="exhibition?.fee" class="response">
                                     {{ exhibition.fee }}
                                 </div>
-                                <div v-if="keywords && keywords.length > 0">
-                                    {{ $t("keywordsLabel") }}:
+                                <div v-if="(exhibition?.displayOrganizer?.length ?? 0) > 0">
+                                    {{ $t("organizerLabel") }}:
+                                </div>
+                                <div v-if="(exhibition?.displayOrganizer?.length ?? 0) > 0" class="response">
+                                    {{ returnCurrentLocaleContent(exhibition?.displayOrganizer) }}
                                 </div>
                                 <div v-if="exhibition?.uris && exhibition?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -332,6 +335,7 @@ export default defineComponent({
             exhibition.value!.fee = basicInfo.fee;
             exhibition.value!.number = basicInfo.number;
             exhibition.value!.uris = basicInfo.uris;
+            exhibition.value!.displayOrganizer = basicInfo.displayOrganizer;
 
             performUpdate(true);
         };

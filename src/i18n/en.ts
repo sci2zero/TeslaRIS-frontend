@@ -1375,5 +1375,6 @@ export default {
     schemeNameLabel: "Scheme name",
     createNewEmploymentPositionLabel: "Create employment position",
     updateEmploymentPositionLabel: "Update employment position",
-    superEmploymentPositionLabel: "Super employment position"
+    superEmploymentPositionLabel: "Super employment position",
+    organizerLabel: "Organizer"
 }

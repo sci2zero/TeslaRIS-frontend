@@ -120,7 +120,16 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <multilingual-text-input
+                                ref="displayOrganizerRef"
+                                v-model="displayOrganizer"
+                                :label="$t('organizerLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                 </v-container>
@@ -227,6 +236,7 @@ export default defineComponent({
         };
 
         const name = ref<any[]>([]);
+        const displayOrganizer = ref<any[]>([]);
         const nameAbbreviation = ref([]);
         const description = ref([]);
         const keywords = ref([]);
@@ -243,6 +253,7 @@ export default defineComponent({
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
 
         const nameRef = ref<typeof MultilingualTextInput>();
+        const displayOrganizerRef = ref<typeof MultilingualTextInput>();
         const abbreviationRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
@@ -298,7 +309,8 @@ export default defineComponent({
                 fee: entryFee.value,
                 number: exhibitionNumber.value,
                 contributions: [],
-                uris: uris.value
+                uris: uris.value,
+                displayOrganizer: displayOrganizer.value
             };
 
             EventService.createExhibition(newExhibition).then((response) => {
@@ -309,6 +321,7 @@ export default defineComponent({
 
                 if (stayOnPage) {
                     nameRef.value?.clearInput();
+                    displayOrganizerRef.value?.clearInput();
                     abbreviationRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
@@ -342,7 +355,7 @@ export default defineComponent({
             requiredFieldRules, submit, timePeriodInput, dateRangeFormatError,
             nameRef, abbreviationRef, placeRef, keywordsRef, descriptionRef,
             uris, urisRef, canAddSerialEvents, dateRangeError,
-            manualValidationsPassed
+            manualValidationsPassed, displayOrganizer, displayOrganizerRef
         };
     }
 });

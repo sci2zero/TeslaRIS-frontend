@@ -58,7 +58,8 @@ interface Event {
     place: MultilingualContent[];
     contributions?: PersonEventContribution[];
     countryId?: number;
-    uris: string[]
+    uris: string[];
+    displayOrganizer: MultilingualContent[];
 }
 
 export interface Conference extends Event {

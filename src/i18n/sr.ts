@@ -1389,5 +1389,6 @@ export default {
     schemeNameLabel: "Naziv sheme",
     createNewEmploymentPositionLabel: "Kreiraj novo radno mesto",
     updateEmploymentPositionLabel: "Ažuriraj radno mesto",
-    superEmploymentPositionLabel: "Roditeljsko radno mesto"
+    superEmploymentPositionLabel: "Roditeljsko radno mesto",
+    organizerLabel: "Organizator"
 }

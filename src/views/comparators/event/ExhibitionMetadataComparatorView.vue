@@ -207,6 +207,9 @@ export default defineComponent({
             mergeMultilingualContentField(exhibition1.description, exhibition2.description);
             exhibition2.description = [];
 
+            mergeMultilingualContentField(exhibition1.displayOrganizer, exhibition2.displayOrganizer);
+            exhibition2.displayOrganizer = [];
+
             bulkTransferFields(exhibition1, exhibition2, [
                 { fieldName: "dateFrom", emptyValue: null, setEmpty: false },
                 { fieldName: "dateTo", emptyValue: null, setEmpty: false },
@@ -266,6 +269,7 @@ export default defineComponent({
             leftExhibition.value!.fee = basicInfo.fee;
             leftExhibition.value!.number = basicInfo.number;
             leftExhibition.value!.uris = basicInfo.uris;
+            leftExhibition.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -284,6 +288,7 @@ export default defineComponent({
             rightExhibition.value!.fee = basicInfo.fee;
             rightExhibition.value!.number = basicInfo.number;
             rightExhibition.value!.uris = basicInfo.uris;
+            rightExhibition.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

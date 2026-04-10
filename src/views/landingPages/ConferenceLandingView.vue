@@ -92,8 +92,11 @@
                                 <div v-if="conference?.fee" class="response">
                                     {{ conference.fee }}
                                 </div>
-                                <div v-if="keywords && keywords.length > 0">
-                                    {{ $t("keywordsLabel") }}:
+                                <div v-if="(conference?.displayOrganizer?.length ?? 0) > 0">
+                                    {{ $t("organizerLabel") }}:
+                                </div>
+                                <div v-if="(conference?.displayOrganizer?.length ?? 0) > 0" class="response">
+                                    {{ returnCurrentLocaleContent(conference?.displayOrganizer) }}
                                 </div>
                                 <div v-if="conference?.uris && conference?.uris.length > 0">
                                     {{ $t("uriInputLabel") }}:
@@ -390,6 +393,7 @@ export default defineComponent({
             conference.value!.confId = basicInfo.confId;
             conference.value!.openAlexId = basicInfo.openAlexId;
             conference.value!.uris = basicInfo.uris;
+            conference.value!.displayOrganizer = basicInfo.displayOrganizer;
 
             performUpdate(true);
         };

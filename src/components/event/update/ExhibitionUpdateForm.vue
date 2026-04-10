@@ -97,6 +97,16 @@
                 </v-row>
                 <v-row>
                     <v-col>
+                        <multilingual-text-input
+                            ref="displayOrganizerRef"
+                            v-model="displayOrganizer"
+                            :label="$t('organizerLabel')"
+                            :initial-value="toMultilingualTextInput(presetEvent?.displayOrganizer, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
                         <uri-input
                             ref="urisRef"
                             v-model="uris"
@@ -203,11 +213,13 @@ export default defineComponent({
 
         const urisRef = ref<typeof MultilingualTextInput>();
         const nameRef = ref<typeof MultilingualTextInput>();
+        const displayOrganizerRef = ref<typeof MultilingualTextInput>();
         const abbreviationRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
 
-        const name = ref<any>([]);
-        const nameAbbreviation = ref<any>([]);
+        const name = ref<any[]>([]);
+        const displayOrganizer = ref<any[]>([]);
+        const nameAbbreviation = ref<any[]>([]);
 
         const dateFrom = ref(props.presetEvent?.dateFrom);
         const dateTo = ref(props.presetEvent?.dateTo);
@@ -292,7 +304,8 @@ export default defineComponent({
                 fee: entryFee.value,
                 number: exhibitionNumber.value,
                 contributions: props.presetEvent?.contributions,
-                uris: uris.value
+                uris: uris.value,
+                displayOrganizer: displayOrganizer.value
             }
 
             emit("update", updatedEvent);
@@ -301,6 +314,9 @@ export default defineComponent({
         const refreshForm = () => {
             nameRef.value?.clearInput();
             name.value = props.presetEvent?.name as MultilingualContent[];
+
+            displayOrganizerRef.value?.clearInput();
+            displayOrganizer.value = props.presetEvent?.displayOrganizer as MultilingualContent[];
 
             abbreviationRef.value?.clearInput();
             nameAbbreviation.value = props.presetEvent?.nameAbbreviation as MultilingualContent[];
@@ -321,16 +337,18 @@ export default defineComponent({
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
             abbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+            displayOrganizerRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayOrganizer.value, languageTags.value));
         };
 
         return {
-            isFormInputValid, isFormValid, dateRangeError,
-            name, nameAbbreviation, urisRef, refreshForm, uris, message, snackbar,
-            languageTags, toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
+            isFormInputValid, isFormValid, dateRangeError, name, nameAbbreviation,
+            urisRef, refreshForm, uris, message, snackbar, languageTags, 
+            toMultilingualTextInput, placeRef, nameRef, abbreviationRef,
             requiredFieldRules, publicationSeriesExternalValidation, submit,
             dateFrom, dateTo, countries, place, exhibitionNumber, entryFee, serialEvent,
             eventYear, selectedCountry, timePeriodInput, confIdValidationRules,
-            sourceOpenAlexIdValidationRules, dateRangeFormatError
+            sourceOpenAlexIdValidationRules, dateRangeFormatError,
+            displayOrganizer, displayOrganizerRef
         };
     }
 });

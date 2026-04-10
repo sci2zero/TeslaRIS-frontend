@@ -117,6 +117,16 @@
                 </v-row>
                 <v-row>
                     <v-col>
+                        <multilingual-text-input
+                            ref="displayOrganizerRef"
+                            v-model="displayOrganizer"
+                            :label="$t('organizerLabel')"
+                            :initial-value="toMultilingualTextInput(presetEvent?.displayOrganizer, languageTags)"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
                         <uri-input
                             ref="urisRef"
                             v-model="uris"
@@ -194,7 +204,12 @@ export default defineComponent({
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
                 countries.value = [{ title: "", value: -1}];
                 response.data.forEach(country => {
-                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
+                    countries.value.push(
+                        {
+                            title: returnCurrentLocaleContent(country.name) as string,
+                            value: country.id as number
+                        }
+                    );
                 });
 
                 setAdditionalInfo();
@@ -210,6 +225,7 @@ export default defineComponent({
                 const country = countries.value.find(country => 
                     country.value === props.presetEvent?.countryId
                 );
+
                 if (country) {
                     selectedCountry.value = country;
                 }
@@ -224,16 +240,20 @@ export default defineComponent({
 
         const urisRef = ref<typeof MultilingualTextInput>();
         const nameRef = ref<typeof MultilingualTextInput>();
+        const displayOrganizerRef = ref<typeof MultilingualTextInput>();
         const abbreviationRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
 
-        const name = ref<any>([]);
-        const nameAbbreviation = ref<any>([]);
+        const name = ref<any[]>([]);
+        const displayOrganizer = ref<any[]>([]);
+        const nameAbbreviation = ref<any[]>([]);
 
         const dateFrom = ref(props.presetEvent?.dateFrom);
         const dateTo = ref(props.presetEvent?.dateTo);
         const eventYear = ref(props.presetEvent?.dateFrom.split("-")[0]);
-        const timePeriodInput = ref(!((new Date(dateTo.value as string).getTime() - new Date(dateFrom.value as string).getTime()) > (30 * 24 * 60 * 60 * 1000)));
+        const timePeriodInput = ref(
+            !((new Date(dateTo.value as string).getTime() - new Date(dateFrom.value as string).getTime()) > (30 * 24 * 60 * 60 * 1000))
+        );
         
         const countries = ref<{title: string, value: number}[]>([]);
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1});
@@ -317,7 +337,8 @@ export default defineComponent({
                 contributions: props.presetEvent?.contributions,
                 confId: confId.value,
                 openAlexId: openAlexId.value,
-                uris: uris.value
+                uris: uris.value,
+                displayOrganizer: displayOrganizer.value
             }
 
             emit("update", updatedEvent);
@@ -329,6 +350,9 @@ export default defineComponent({
 
             abbreviationRef.value?.clearInput();
             nameAbbreviation.value = props.presetEvent?.nameAbbreviation as MultilingualContent[];
+
+            displayOrganizerRef.value?.clearInput();
+            displayOrganizer.value = props.presetEvent?.displayOrganizer as MultilingualContent[];
 
             placeRef.value?.clearInput();
             place.value = props.presetEvent?.place as MultilingualContent[];
@@ -348,6 +372,7 @@ export default defineComponent({
 
             nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
             abbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+            displayOrganizerRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayOrganizer.value, languageTags.value));
         };
 
         return {
@@ -357,7 +382,8 @@ export default defineComponent({
             requiredFieldRules, publicationSeriesExternalValidation, submit,
             dateFrom, dateTo, countries, place, conferenceNumber, entryFee, serialEvent,
             eventYear, selectedCountry, timePeriodInput, confIdValidationRules, confId,
-            openAlexId, sourceOpenAlexIdValidationRules, dateRangeFormatError
+            openAlexId, sourceOpenAlexIdValidationRules, dateRangeFormatError,
+            displayOrganizer, displayOrganizerRef
         };
     }
 });

@@ -196,6 +196,9 @@ export default defineComponent({
             mergeMultilingualContentField(conference1.nameAbbreviation, conference2.nameAbbreviation);
             conference2.nameAbbreviation = [];
 
+            mergeMultilingualContentField(conference1.displayOrganizer, conference2.displayOrganizer);
+            conference2.displayOrganizer = [];
+
             conference1.countryId = conference2.countryId;
             conference2.countryId = undefined;
 
@@ -269,6 +272,7 @@ export default defineComponent({
             leftConference.value!.confId = basicInfo.confId;
             leftConference.value!.openAlexId = basicInfo.openAlexId;
             leftConference.value!.uris = basicInfo.uris;
+            leftConference.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -289,6 +293,7 @@ export default defineComponent({
             rightConference.value!.confId = basicInfo.confId;
             rightConference.value!.openAlexId = basicInfo.openAlexId;
             rightConference.value!.uris = basicInfo.uris;
+            rightConference.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
