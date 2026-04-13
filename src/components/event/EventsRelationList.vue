@@ -124,6 +124,10 @@ setup(props) {
             router.push({ name: "conferenceLandingPage", params: {id: eventId} });
         } else if (props.eventType === EventType.EXHIBITION) {
             router.push({ name: "exhibitionLandingPage", params: {id: eventId} });
+        } else if (props.eventType === EventType.COURSE) {
+            router.push({ name: "courseLandingPage", params: {id: eventId} });
+        } else if (props.eventType === EventType.OTHER_EVENT) {
+            router.push({ name: "otherEventLandingPage", params: {id: eventId} });
         }
     };
 

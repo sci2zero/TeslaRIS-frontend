@@ -3,7 +3,9 @@ import type { PersonContribution } from "./PersonModel";
 
 export enum EventType {
     CONFERENCE = "CONFERENCE",
-    EXHIBITION = "EXHIBITION"
+    EXHIBITION = "EXHIBITION",
+    COURSE = "COURSE",
+    OTHER_EVENT = "OTHER_EVENT"
 }
 
 export enum EventContributionType {
@@ -72,6 +74,29 @@ export interface Conference extends Event {
 export interface Exhibition extends Event {
     number?: string;
     fee?: string;
+}
+
+export interface Course extends Event {
+    courseLevel?: string;
+    courseCode?: string;
+    numberOfCredits?: string;
+    academicYear?: string;
+    groupName?: MultilingualContent[];
+    numberOfStudents?: number;
+}
+
+export enum OtherEventType {
+    WEBINAR = "WEBINAR",
+    LECTURE = "LECTURE",
+    PERFORMANCE = "PERFORMANCE",
+    PLAY = "PLAY",
+    CEREMONY = "CEREMONY",
+    TRIAL = "TRIAL",
+    THESIS_DEFENCE = "THESIS_DEFENCE"
+}
+
+export interface OtherEvent extends Event {
+    type?: OtherEventType;
 }
 
 export interface EventsRelation {

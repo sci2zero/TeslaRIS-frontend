@@ -114,7 +114,9 @@ export default {
         geneticMaterialLandingPage: "Genetec material details",
         submitGeneticMaterial: "Dodavanje genetskog materijala",
         prizes: "Prizes",
-        employmentPositions: "Employment positions"
+        employmentPositions: "Employment positions",
+        submitCourse: "Submit course",
+        submitOtherEvent: "Submit other event"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1376,5 +1378,14 @@ export default {
     createNewEmploymentPositionLabel: "Create employment position",
     updateEmploymentPositionLabel: "Update employment position",
     superEmploymentPositionLabel: "Super employment position",
-    organizerLabel: "Organizer"
+    organizerLabel: "Organizer",
+    courseLevelLabel: "Course level",
+    courseCodeLabel: "course code",
+    numberOfCreditsLabel: "Number of credits",
+    numberOfStudentsLabel: "Number of students",
+    academicYearLabel: "Academic year",
+    groupNameLabel: "GroupName",
+    createNewCourseLabel: "Create new course",
+    createNewOtherEventLabel: "Create new other event",
+    otherEventTypeLabel: "Other event type"
 }

@@ -5,12 +5,16 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const eventTypeEn = [
     { title: "Conference", value: EventType.CONFERENCE },
-    { title: "Exhibition", value: EventType.EXHIBITION }
+    { title: "Exhibition", value: EventType.EXHIBITION },
+    { title: "Course", value: EventType.COURSE },
+    { title: "OtherEvent", value: EventType.OTHER_EVENT }
 ];
 
 export const eventTypeSr = [
     { title: "Konferencija", value: EventType.CONFERENCE },
-    { title: "Izložba", value: EventType.EXHIBITION }
+    { title: "Izložba", value: EventType.EXHIBITION },
+    { title: "Kurs", value: EventType.COURSE },
+    { title: "Drugi tip događaja", value: EventType.OTHER_EVENT },
 ];
 
 export const getEventTypeTitleFromValue = (

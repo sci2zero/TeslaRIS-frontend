@@ -119,6 +119,8 @@ import SubmitExhibitionView from "@/views/SubmitExhibitionView.vue";
 import ExhibitionLandingView from "@/views/landingPages/ExhibitionLandingView.vue";
 import ExhibitionMetadataComparatorView from "@/views/comparators/event/ExhibitionMetadataComparatorView.vue";
 import EmploymentPositionListView from "@/views/EmploymentPositionListView.vue";
+import SubmitCourseView from "@/views/SubmitCourseView.vue";
+import SubmitOtherEventView from "@/views/SubmitOtherEventView.vue";
 
 
 const roles = {
@@ -313,6 +315,24 @@ const router = createRouter({
                     path: "submit-exhibition",
                     name: "submitExhibition",
                     component: SubmitExhibitionView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-course",
+                    name: "submitCourse",
+                    component: SubmitCourseView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                    },
+                },
+                {
+                    path: "submit-other-event",
+                    name: "submitOtherEvent",
+                    component: SubmitOtherEventView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],

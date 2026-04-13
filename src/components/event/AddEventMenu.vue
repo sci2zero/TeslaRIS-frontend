@@ -54,10 +54,14 @@ export default defineComponent({
         const i18n = useI18n();
         const addConferenceEventLabel = computed(() => i18n.t("createNewConferenceLabel"));
         const addExhibitionEventLabel = computed(() => i18n.t("createNewExhibitionLabel"));
+        const addCourseEventLabel = computed(() => i18n.t("createNewCourseLabel"));
+        const addOtherEventLabel = computed(() => i18n.t("createNewOtherEventLabel"));
 
         const submissionMenuItems = ref([
             { title: addConferenceEventLabel, value: "submitConference" },
-            { title: addExhibitionEventLabel, value: "submitExhibition" }
+            { title: addExhibitionEventLabel, value: "submitExhibition" },
+            { title: addCourseEventLabel, value: "submitCourse" },
+            { title: addOtherEventLabel, value: "submitOtherEvent" }
         ]);
 
         return {

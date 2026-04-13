@@ -102,7 +102,9 @@ export default defineComponent({
 
         const isEventEntity = computed(() =>
             props.applicableTypes.includes(ApplicableEntityType.CONFERENCE) || 
-            props.applicableTypes.includes(ApplicableEntityType.EXHIBITION)
+            props.applicableTypes.includes(ApplicableEntityType.EXHIBITION) || 
+            props.applicableTypes.includes(ApplicableEntityType.COURSE) || 
+            props.applicableTypes.includes(ApplicableEntityType.OTHER_EVENT)
         );
 
         const { isCommission, isViceDeanForScience } = useUserRole();

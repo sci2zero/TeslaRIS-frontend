@@ -36,6 +36,10 @@ export const getEventMetadataComparisonPageName = (type: EventType | string): st
             return "conferenceMetadataComparator";
         case EventType.EXHIBITION:
             return "exhibitionMetadataComparator";
+        case EventType.COURSE:
+            return "courseMetadataComparator";
+        case EventType.OTHER_EVENT:
+            return "otherEVentMetadataComparator";
     }
 
     return "";
@@ -94,6 +98,10 @@ export const getEventLandingPageBasePath = (type: EventType | string): string =>
             return "events/conference/";
         case EventType.EXHIBITION:
             return "events/exhibition/";
+        case EventType.COURSE:
+            return "events/course/";
+        case EventType.OTHER_EVENT:
+            return "events/other-event/";
     }
 
     return "";

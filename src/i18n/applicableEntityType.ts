@@ -2,6 +2,7 @@ import { ApplicableEntityType } from "@/models/Common";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 import { PublicationType } from "@/models/PublicationModel";
+import { EventType } from "@/models/EventModel";
 
 
 export const applicableEntityTypeSr = [
@@ -17,6 +18,8 @@ export const applicableEntityTypeSr = [
     { title: "Događaj", value: ApplicableEntityType.EVENT },
     { title: "Konferencija", value: ApplicableEntityType.CONFERENCE },
     { title: "Izložba", value: ApplicableEntityType.EXHIBITION },
+    { title: "Kurs", value: ApplicableEntityType.COURSE },
+    { title: "Drugi tip događaja", value: ApplicableEntityType.OTHER_EVENT },
     { title: "Dokument", value: ApplicableEntityType.DOCUMENT },
     { title: "Istraživač", value: ApplicableEntityType.PERSON },
     { title: "Organizaciona jedinica", value: ApplicableEntityType.ORGANISATION_UNIT },
@@ -38,6 +41,8 @@ export const applicableEntityTypeEn = [
     { title: "Event", value: ApplicableEntityType.EVENT },
     { title: "Conference", value: ApplicableEntityType.CONFERENCE },
     { title: "Exhibition", value: ApplicableEntityType.EXHIBITION },
+    { title: "Course", value: ApplicableEntityType.COURSE },
+    { title: "Other event", value: ApplicableEntityType.OTHER_EVENT },
     { title: "Document", value: ApplicableEntityType.DOCUMENT },
     { title: "Researcher", value: ApplicableEntityType.PERSON },
     { title: "Organisation unit", value: ApplicableEntityType.ORGANISATION_UNIT },
@@ -70,7 +75,7 @@ export const getApplicableEntityTypesForGivenLocale = () => {
     }
 };
 
-export const getApplicableEntityTypeForDocumentType = (documentType: PublicationType) => {
+export const getApplicableEntityTypeForDocumentType = (documentType: PublicationType): ApplicableEntityType => {
     switch(documentType) {
         case PublicationType.MONOGRAPH:
             return ApplicableEntityType.MONOGRAPH;
@@ -93,5 +98,20 @@ export const getApplicableEntityTypeForDocumentType = (documentType: Publication
             return ApplicableEntityType.THESIS;
         default:
             return ApplicableEntityType.DOCUMENT;
+    }
+};
+
+export const getApplicableEntityTypeForEventType = (eventType: EventType): ApplicableEntityType => {
+    switch(eventType) {
+        case EventType.CONFERENCE:
+            return ApplicableEntityType.CONFERENCE;
+        case EventType.EXHIBITION:
+            return ApplicableEntityType.EXHIBITION;
+        case EventType.COURSE:
+            return ApplicableEntityType.COURSE;
+        case EventType.OTHER_EVENT:
+            return ApplicableEntityType.OTHER_EVENT;
+        default:
+            return ApplicableEntityType.CONFERENCE;
     }
 };

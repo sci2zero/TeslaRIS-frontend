@@ -3,6 +3,7 @@ import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 import { ThesisType } from "@/models/PublicationModel";
 
+
 export const degreeTypeSr = [
     { title: "Osnovne studije", value: DegreeType.BACHELOR },
     { title: "Master", value: DegreeType.MASTER },

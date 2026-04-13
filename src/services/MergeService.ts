@@ -99,6 +99,22 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `assessment-merge/exhibition-classification/source/${sourceExhibitionId}/target/${targetExhibitionId}`);
     }
 
+    async switchAllIndicatorsToOtherCourse(sourceCourseId: number, targetCourseId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/course-indicator/source/${sourceCourseId}/target/${targetCourseId}`);
+    }
+
+    async switchAllClassificationsToOtherCourse(sourceCourseId: number, targetCourseId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/course-classification/source/${sourceCourseId}/target/${targetCourseId}`);
+    }
+
+    async switchAllIndicatorsToOtherEvent(sourceOtherEventId: number, targetOtherEventId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/other-event-indicator/source/${sourceOtherEventId}/target/${targetOtherEventId}`);
+    }
+
+    async switchAllClassificationsToOtherEvent(sourceOtherEventId: number, targetOtherEventId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `assessment-merge/other-event-classification/source/${sourceOtherEventId}/target/${targetOtherEventId}`);
+    }
+
     async switchProceedingsPublicationToOtherProceedings(targetProceedingsId: number, publicationId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/proceedings/${targetProceedingsId}/publication/${publicationId}`);
     }

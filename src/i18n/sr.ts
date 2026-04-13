@@ -115,7 +115,9 @@ export default {
         geneticMaterialLandingPage: "Detalji genetskog materijala",
         submitGeneticMaterial: "Dodavanje genetskog materijala",
         prizes: "Nagrade",
-        employmentPositions: "Radna mesta"
+        employmentPositions: "Radna mesta",
+        submitCourse: "Dodavanje kursa",
+        submitOtherEvent: "Dodavanje drugog tipa događaja"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1390,5 +1392,14 @@ export default {
     createNewEmploymentPositionLabel: "Kreiraj novo radno mesto",
     updateEmploymentPositionLabel: "Ažuriraj radno mesto",
     superEmploymentPositionLabel: "Roditeljsko radno mesto",
-    organizerLabel: "Organizator"
+    organizerLabel: "Organizator",
+    courseLevelLabel: "Nivo kursa",
+    courseCodeLabel: "Kod kursa",
+    numberOfCreditsLabel: "Broj poena",
+    numberOfStudentsLabel: "Broj polaznika",
+    academicYearLabel: "Akademska godina",
+    groupNameLabel: "Naziv grupe",
+    createNewCourseLabel: "Dodaj kurs",
+    createNewOtherEventLabel: "Dodaj drugi tip događaja",
+    otherEventTypeLabel: "Tip događaja"
 }

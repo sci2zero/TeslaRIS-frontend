@@ -93,7 +93,7 @@
                     <entity-classification-modal-content
                         :entity-id="row.item.databaseId"
                         :entity-type="ApplicableEntityType.EVENT"
-                        :applicable-type="row.item.eventType === EventType.CONFERENCE ? ApplicableEntityType.CONFERENCE : ApplicableEntityType.EXHIBITION"
+                        :applicable-type="getApplicableEntityTypeForEventType(row.item.eventType)"
                         @classified="eventClassified(row.item)"
                         @update="refreshTable(tableOptions)">
                     </entity-classification-modal-content>
@@ -141,6 +141,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 import { getEventTypeTitleFromValueAutoLocale } from '@/i18n/eventType';
+import { getApplicableEntityTypeForEventType } from '@/i18n/applicableEntityType';
 
 
 export default defineComponent({
@@ -317,6 +318,12 @@ export default defineComponent({
                 case EventType.EXHIBITION:
                     metadataComparisonPageName = "exhibitionMetadataComparator";
                     break;
+                case EventType.COURSE:
+                    metadataComparisonPageName = "courseMetadataComparator";
+                    break;
+                case EventType.OTHER_EVENT:
+                    metadataComparisonPageName = "otherEventMetadataComparator";
+                    break;
             }
 
             router.push({name: metadataComparisonPageName, params: {
@@ -377,6 +384,10 @@ export default defineComponent({
                     return "conference";
                 case EventType.EXHIBITION:
                     return "exhibition";
+                case EventType.COURSE:
+                    return "course";
+                case EventType.OTHER_EVENT:
+                    return "other-event";
                 default:
                     return "conference"; // should never happen
             }
@@ -391,7 +402,7 @@ export default defineComponent({
             eventClassified, ApplicableEntityType,
             displayPersistentDialog, startDeletionProcess,
             getEventTypeTitleFromValueAutoLocale, EventType,
-            getPathByEventType
+            getPathByEventType, getApplicableEntityTypeForEventType
         };
     }
 });

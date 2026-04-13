@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page } from "@/models/Common";
-import type { Conference, EventIndex, EventsRelation, EventType, Exhibition } from "@/models/EventModel";
+import type { Conference, Course, EventIndex, EventsRelation, EventType, Exhibition, OtherEvent } from "@/models/EventModel";
 
 export class EventService extends BaseService {
 
@@ -59,6 +59,22 @@ export class EventService extends BaseService {
 
   async updateExhibition(exhibitionId: number, updatedExhibition: Exhibition): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `exhibition/${exhibitionId}`, updatedExhibition);
+  }
+
+  async createCourse(body: Course): Promise<AxiosResponse<Course>> {
+    return super.sendRequest(axios.post, "course", body, EventService.idempotencyKey);
+  }
+
+  async updateCourse(courseId: number, updatedCourse: Course): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `course/${courseId}`, updatedCourse);
+  }
+
+  async createOtherEvent(body: OtherEvent): Promise<AxiosResponse<OtherEvent>> {
+    return super.sendRequest(axios.post, "other-event", body, EventService.idempotencyKey);
+  }
+
+  async updateOtherEvent(otherEventId: number, updatedOtherEvent: OtherEvent): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `other-event/${otherEventId}`, updatedOtherEvent);
   }
 
   async canEdit(conferenceId: number): Promise<AxiosResponse<boolean>> {
