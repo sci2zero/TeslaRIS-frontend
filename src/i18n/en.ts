@@ -8,6 +8,8 @@ export default {
         events: "Events",
         conferenceLandingPage: "Conference",
         exhibitionLandingPage: "Exhibition",
+        courseLandingPage: "Course",
+        otherEventLandingPage: "Other event",
         eventProceedingsComparator: "Event Proceedings Comparator",
         eventMetadataComparator: "Event Metadata Comparator",
         conferenceMetadataComparator: "Conference Metadata Comparator",
@@ -1387,5 +1389,7 @@ export default {
     groupNameLabel: "GroupName",
     createNewCourseLabel: "Create new course",
     createNewOtherEventLabel: "Create new other event",
-    otherEventTypeLabel: "Other event type"
+    otherEventTypeLabel: "Other event type",
+    otherEventLabel: "Other event",
+    courseLabel: "Course"
 }

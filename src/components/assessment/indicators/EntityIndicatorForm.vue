@@ -8,8 +8,8 @@
                     :label="$t('indicatorLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
-                    :readonly="presetDocumentIndicator !== undefined">
-                </v-select>
+                    :readonly="presetDocumentIndicator !== undefined"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -18,14 +18,14 @@
                     v-model="fromDate"
                     :label="$t('startDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="toDate"
                     :label="$t('endDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -74,16 +74,16 @@
                     v-model="numericValue" type="number"
                     :label="$t('valueLabel') + '*'"
                     :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredNumericFieldRules">
-                </v-text-field>
+                    :rules="requiredNumericFieldRules"
+                />
             </v-col>
             <v-col v-if="inputType === IndicatorContentType.TEXT">
                 <v-text-field
                     v-model="textualValue"
                     :label="$t('valueLabel') + '*'"
                     :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules"
+                />
             </v-col>
         </v-row>
         <v-row v-if="!presetDocumentIndicator">
@@ -92,8 +92,8 @@
                     v-model="files"
                     :title="$t('dragDropFilesLabel')"
                     density="compact"
-                    multiple>
-                </v-file-upload>
+                    multiple
+                />
             </v-col>
         </v-row>
 
@@ -182,7 +182,7 @@ export default defineComponent({
             const indicator = applicableIndicatorsRaw.value.find(indicator => indicator.id === selectedIndicator.value?.value);
             
             if (indicator && indicator.contentType !== IndicatorContentType.ANYTHING) {
-                inputType.value = indicator.contentType as IndicatorContentType;
+                inputType.value = indicator.contentType as IndicatorContentType ?? IndicatorContentType.BOOL;
             } else {
                 typeSelectionEnebled.value = true;
                 deduceStartingType();
@@ -202,7 +202,7 @@ export default defineComponent({
         };
 
         const numericValue = ref<number>(props.presetDocumentIndicator?.numericValue as number);
-        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean || false);
+        const booleanValue = ref<boolean>(props.presetDocumentIndicator?.booleanValue as boolean ?? false);
         const textualValue = ref<string>(props.presetDocumentIndicator?.textualValue as string);
         const fromDate = ref<string | undefined>(props.presetDocumentIndicator?.fromDate ? props.presetDocumentIndicator.fromDate : undefined);
         const toDate = ref<string | undefined>(props.presetDocumentIndicator?.toDate ? props.presetDocumentIndicator.toDate : undefined);

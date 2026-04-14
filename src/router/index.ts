@@ -121,6 +121,8 @@ import ExhibitionMetadataComparatorView from "@/views/comparators/event/Exhibiti
 import EmploymentPositionListView from "@/views/EmploymentPositionListView.vue";
 import SubmitCourseView from "@/views/SubmitCourseView.vue";
 import SubmitOtherEventView from "@/views/SubmitOtherEventView.vue";
+import CourseLandingView from "@/views/CourseLandingView.vue";
+import OtherEventLandingView from "@/views/OtherEventLandingView.vue";
 
 
 const roles = {
@@ -268,6 +270,24 @@ const router = createRouter({
                             path: "exhibition/:id",
                             name: "exhibitionLandingPage",
                             component: ExhibitionLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "course/:id",
+                            name: "courseLandingPage",
+                            component: CourseLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "other-event/:id",
+                            name: "otherEventLandingPage",
+                            component: OtherEventLandingView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

@@ -96,7 +96,7 @@ export enum OtherEventType {
 }
 
 export interface OtherEvent extends Event {
-    type?: OtherEventType;
+    type: OtherEventType;
 }
 
 export interface EventsRelation {

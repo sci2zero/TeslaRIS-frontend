@@ -3,20 +3,34 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetIndicator?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetIndicator?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetIndicator?.description, languageTags)" is-area></multilingual-text-input>
+                    ref="descriptionRef"
+                    v-model="description"
+                    :rules="requiredFieldRules"
+                    :label="$t('descriptionLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetIndicator?.description, languageTags)"
+                    is-area
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field
+                    v-model="code"
+                    :label="$t('codeLabel') + '*'"
+                    :placeholder="$t('codeLabel') + '*'"
+                    :rules="requiredFieldRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -26,8 +40,8 @@
                     :items="accessLevels"
                     :label="$t('accessLevelLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -38,8 +52,8 @@
                     :label="$t('applicableTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     return-object
-                    multiple>
-                </v-select>
+                    multiple
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -49,8 +63,8 @@
                     :items="contentTypes"
                     :label="$t('contentTypeLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object
+                />
             </v-col>
         </v-row>
 
@@ -99,16 +113,28 @@ export default defineComponent({
 
         const fetchDetails = () => {
             if(props.presetIndicator) {
-                IndicatorService.fetchIndicatorAccessLevel(props.presetIndicator.id).then(response => {
-                    selectedAccessLevel.value = {title: getTitleFromValueAutoLocale(response.data) as string, value: response.data};
+                IndicatorService.fetchIndicatorAccessLevel(
+                    props.presetIndicator.id
+                ).then(response => {
+                    selectedAccessLevel.value = {
+                        title: getTitleFromValueAutoLocale(response.data) as string,
+                        value: response.data
+                    };
                 });
 
                 selectedApplicableTypes.value = [];
                 props.presetIndicator.applicableEntityTypes.forEach(applicableType => {
-                    selectedApplicableTypes.value.push({title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string, value: applicableType});
+                    selectedApplicableTypes.value.push(
+                        {
+                            title: getApplicableEntityTypeTitleFromValueAutoLocale(applicableType) as string,
+                            value: applicableType
+                        });
                 });
 
-                selectedContentType.value = {title: getIndicatorContentTypeTitleFromValueAutoLocale(props.presetIndicator.contentType) as string, value: props.presetIndicator.contentType};
+                selectedContentType.value = {
+                    title: getIndicatorContentTypeTitleFromValueAutoLocale(props.presetIndicator.contentType ?? IndicatorContentType.BOOL) as string,
+                    value: props.presetIndicator.contentType  ?? IndicatorContentType.BOOL
+                };
             }
         };
 
@@ -116,13 +142,16 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
 
         const accessLevels = getAccessLevelForGivenLocale();
-        const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>({title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
+        const selectedAccessLevel = ref<{ title: string, value: AccessLevel }>(
+            {title: getTitleFromValueAutoLocale(AccessLevel.OPEN) as string, value: AccessLevel.OPEN});
 
         const applicableTypes = getApplicableEntityTypesForGivenLocale();
-        const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([{title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string, value: ApplicableEntityType.ALL}]);
+        const selectedApplicableTypes = ref<{ title: string, value: ApplicableEntityType }[]>([
+            {title: getApplicableEntityTypeTitleFromValueAutoLocale(ApplicableEntityType.ALL) as string, value: ApplicableEntityType.ALL}]);
 
         const contentTypes = getIndicatorContentTypeForGivenLocale();
-        const selectedContentType = ref<{ title: string, value: IndicatorContentType }>({title: getIndicatorContentTypeTitleFromValueAutoLocale(IndicatorContentType.TEXT) as string, value: IndicatorContentType.TEXT});
+        const selectedContentType = ref<{ title: string, value: IndicatorContentType }>(
+            {title: getIndicatorContentTypeTitleFromValueAutoLocale(IndicatorContentType.TEXT) as string, value: IndicatorContentType.TEXT});
 
         const title = ref<any>([]);
         const description = ref<any>([]);

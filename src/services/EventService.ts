@@ -29,6 +29,14 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.get, `exhibition/${exhibitionId}`);
   }
 
+  async readCourse(courseId: number): Promise<AxiosResponse<Course>> {
+    return super.sendRequest(axios.get, `course/${courseId}`);
+  }
+
+  async readOtherEvent(otherEventId: number): Promise<AxiosResponse<OtherEvent>> {
+    return super.sendRequest(axios.get, `other-event/${otherEventId}`);
+  }
+
   async deleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `conference/${conferenceId}`);
   }

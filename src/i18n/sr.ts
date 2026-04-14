@@ -8,6 +8,8 @@ export default {
         events: "Događaji",
         conferenceLandingPage: "Konferencija",
         exhibitionLandingPage: "Izložba",
+        courseLandingPage: "Kurs",
+        otherEventLandingPage: "Drugi tip događaja",
         eventProceedingsComparator: "Poređenje radova događaja",
         eventMetadataComparator: "Poređenje metapodataka događaja",
         conferenceMetadataComparator: "Poređenje metapodataka konferencija",
@@ -1401,5 +1403,7 @@ export default {
     groupNameLabel: "Naziv grupe",
     createNewCourseLabel: "Dodaj kurs",
     createNewOtherEventLabel: "Dodaj drugi tip događaja",
-    otherEventTypeLabel: "Tip događaja"
+    otherEventTypeLabel: "Tip događaja",
+    otherEventLabel: "Drugi tip događaja",
+    courseLabel: "Kurs"
 }
