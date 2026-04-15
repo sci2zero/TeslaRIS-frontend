@@ -320,10 +320,13 @@ export default defineComponent({
                     (exportRequest as DocumentTableExportRequest).harvard = harvard.value;
                     (exportRequest as DocumentTableExportRequest).chicago = chicago.value;
                     (exportRequest as DocumentTableExportRequest).vancouver = vancouver.value;
-                    (exportRequest as DocumentTableExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
-                    (exportRequest as DocumentTableExportRequest).institutionId = props.endpointBodyParameters.institutionId;
-                    (exportRequest as DocumentTableExportRequest).commissionId = props.endpointBodyParameters.commissionId;
-                    (exportRequest as DocumentTableExportRequest).onlyUnmanaged = props.endpointBodyParameters.onlyUnmanaged;
+
+                    if (props.endpointBodyParameters) {
+                        (exportRequest as DocumentTableExportRequest).allowedTypes = props.endpointBodyParameters.allowedTypes;
+                        (exportRequest as DocumentTableExportRequest).institutionId = props.endpointBodyParameters.institutionId;
+                        (exportRequest as DocumentTableExportRequest).commissionId = props.endpointBodyParameters.commissionId;
+                        (exportRequest as DocumentTableExportRequest).onlyUnmanaged = props.endpointBodyParameters.onlyUnmanaged;
+                    }
 
                     TableExportService.exportDocumentTable(
                         exportRequest as DocumentTableExportRequest

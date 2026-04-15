@@ -212,8 +212,7 @@
 
         <v-tabs-window
             v-show="proceedings"
-            v-model="currentTab"
-        >
+            v-model="currentTab">
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
                 <publication-table-component
@@ -221,8 +220,11 @@
                     :total-publications="totalPublications"
                     in-comparator
                     show-publication-concrete-type
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage"
+                    enable-export
+                    :endpoint-type="ExportableEndpointType.PROCEEDINGS_PUBLICATIONS"
+                    :endpoint-token-parameters="[`${proceedings?.id}`]"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -301,7 +303,7 @@
 </template>
 
 <script lang="ts">
-import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, ExportableEndpointType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -602,7 +604,7 @@ export default defineComponent({
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType, currentRoute, updateRemark,
-            isAdmin, isCommission
+            isAdmin, isCommission, ExportableEndpointType
         };
 }})
 

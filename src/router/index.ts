@@ -123,6 +123,8 @@ import SubmitCourseView from "@/views/SubmitCourseView.vue";
 import SubmitOtherEventView from "@/views/SubmitOtherEventView.vue";
 import CourseLandingView from "@/views/CourseLandingView.vue";
 import OtherEventLandingView from "@/views/OtherEventLandingView.vue";
+import CourseMetadataComparatorView from "@/views/comparators/event/CourseMetadataComparatorView.vue";
+import OtherEventMetadataComparatorView from "@/views/comparators/event/OtherEventMetadataComparatorView.vue";
 
 
 const roles = {
@@ -315,6 +317,24 @@ const router = createRouter({
                             path: 'exhibition/metadata-comparator/:leftId/:rightId',
                             name: "exhibitionMetadataComparator",
                             component: ExhibitionMetadataComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'course/metadata-comparator/:leftId/:rightId',
+                            name: "courseMetadataComparator",
+                            component: CourseMetadataComparatorView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: 'other-event/metadata-comparator/:leftId/:rightId',
+                            name: "otherEventMetadataComparator",
+                            component: OtherEventMetadataComparatorView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

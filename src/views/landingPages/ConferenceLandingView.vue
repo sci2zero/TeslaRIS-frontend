@@ -150,8 +150,11 @@
                     <publication-table-component
                         :publications="publications"
                         :total-publications="totalPublications"
-                        @switch-page="switchPublicationsPage">
-                    </publication-table-component>
+                        @switch-page="switchPublicationsPage"
+                        enable-export
+                        :endpoint-type="ExportableEndpointType.EVENT_PUBLICATIONS"
+                        :endpoint-token-parameters="[`${conference?.id}`]"
+                    />
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
@@ -159,21 +162,21 @@
                     :event-id="conference?.id"
                     :contribution-list="conference?.contributions ? conference.contributions : []"
                     :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-event-contribution-tabs>
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list
                     :keywords="conference?.keywords ? conference?.keywords : []"
                     :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
                 <description-section
                     :description="conference?.description ? conference.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
             
                 <!-- Proceedings List -->
                 <div v-if="!conference?.serialEvent">
@@ -233,7 +236,7 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
-import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
+import { ApplicableEntityType, ExportableEndpointType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/utils/DateUtil';
@@ -438,7 +441,7 @@ export default defineComponent({
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify
+            fetchClassifications, canClassify, ExportableEndpointType
         };
 }})
 

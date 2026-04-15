@@ -515,11 +515,13 @@ export default defineComponent({
             return "";
         };
 
-        function toTitleCase(str: string) {
-            return str.toLowerCase().replace(/\b\w/g, function(char) {
-                return char.toUpperCase();
-            });
-        }
+        const toTitleCase = (str: string) => {
+            return str
+                .toLowerCase()
+                .replace(/(^|\P{L})(\p{L})/gu, (_, boundary, char) =>
+                    boundary + char.toUpperCase()
+                );
+        };
 
         const sendContentToParent = () => {
             let otherName = ["", "", "", null, null];

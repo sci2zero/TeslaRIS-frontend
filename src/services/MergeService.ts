@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents } from "@/models/MergeModel";
 import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
@@ -153,6 +153,14 @@ export class MergeService extends BaseService {
 
     async saveMergedExhibitionsMetadata(leftExhibitionId: number, rightExhibitionId: number, body: MergedExhibitions): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/exhibition/metadata/${leftExhibitionId}/${rightExhibitionId}`, body);
+    }
+
+    async saveMergedCoursesMetadata(leftCourseId: number, rightCourseId: number, body: MergedCourses): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/course/metadata/${leftCourseId}/${rightCourseId}`, body);
+    }
+
+    async saveMergedOtherEventsMetadata(leftOtherEventId: number, rightOtherEventId: number, body: MergedOtherEvents): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/other-event/metadata/${leftOtherEventId}/${rightOtherEventId}`, body);
     }
 
     async saveMergedJournalsMetadata(leftJournalId: number, rightJournalId: number, body: MergedJournals): Promise<AxiosResponse<void>> {

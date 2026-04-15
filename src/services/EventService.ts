@@ -45,12 +45,28 @@ export class EventService extends BaseService {
     return super.sendRequest(axios.delete, `exhibition/${exhibitionId}`);
   }
 
+  async deleteCourse(courseId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `course/${courseId}`);
+  }
+
+  async deleteOtherEvent(otherEventId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `other-event/${otherEventId}`);
+  }
+
   async forceDeleteConference(conferenceId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `conference/force/${conferenceId}`);
   }
 
   async forceDeleteExhibition(exhibitionId: number): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.delete, `exhibition/force/${exhibitionId}`);
+  }
+
+  async forceDeleteCourse(courseId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `course/force/${courseId}`);
+  }
+
+  async forceDeleteOtherEvent(otherEventId: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, `other-event/force/${otherEventId}`);
   }
 
   async createConference(body: Conference): Promise<AxiosResponse<Conference>> {

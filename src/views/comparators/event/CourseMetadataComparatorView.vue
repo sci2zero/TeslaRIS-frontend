@@ -1,15 +1,15 @@
 <template>
-    <v-container id="exhibition-publications-comparator">
+    <v-container id="course-publications-comparator">
         <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(leftExhibition?.name) }}
+                    {{ returnCurrentLocaleContent(leftCourse?.name) }}
                 </h2>
                 <br />
 
-                <exhibition-update-form
+                <course-update-form
                     ref="updateLeftRef"
-                    :preset-event="leftExhibition"
+                    :preset-event="leftCourse"
                     in-comparator
                     :in-modal="false"
                     @update="updateLeft"
@@ -19,14 +19,14 @@
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
-                    :preset-description-or-biography="(leftExhibition?.description as MultilingualContent[])"
+                    :preset-description-or-biography="(leftCourse?.description as MultilingualContent[])"
                     :placeholder-label="$t('eventDescriptionLabel')"
                     @update="updateLeftDescription"
                 />
 
                 <keyword-update-form
                     ref="updateLeftKeywordsRef"
-                    :preset-keywords="(leftExhibition?.keywords as MultilingualContent[])"
+                    :preset-keywords="(leftCourse?.keywords as MultilingualContent[])"
                     @update="updateRightKeywords"
                 />
 
@@ -40,8 +40,8 @@
                         </div>
 
                         <person-event-contribution-list
-                            :contribution-list="leftExhibition?.contributions ? leftExhibition.contributions : []"
-                            :event-id="leftExhibition?.id"
+                            :contribution-list="leftCourse?.contributions ? leftCourse.contributions : []"
+                            :event-id="leftCourse?.id"
                             in-comparator
                             :can-reorder="true"
                         />
@@ -60,14 +60,14 @@
             
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(rightExhibition?.name) }}
+                    {{ returnCurrentLocaleContent(rightCourse?.name) }}
                 </h2>
 
                 <br />
 
-                <exhibition-update-form
+                <course-update-form
                     ref="updateRightRef"
-                    :preset-event="rightExhibition"
+                    :preset-event="rightCourse"
                     in-comparator
                     :in-modal="false"
                     @update="updateRight"
@@ -77,14 +77,14 @@
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
-                    :preset-description-or-biography="(rightExhibition?.description as MultilingualContent[])"
+                    :preset-description-or-biography="(rightCourse?.description as MultilingualContent[])"
                     :placeholder-label="$t('eventDescriptionLabel')"
                     @update="updateRightDescription"
                 />
 
                 <keyword-update-form
                     ref="updateRightKeywordsRef"
-                    :preset-keywords="(rightExhibition?.keywords as MultilingualContent[])"
+                    :preset-keywords="(rightCourse?.keywords as MultilingualContent[])"
                     @update="updateRightKeywords"
                 />
 
@@ -98,8 +98,8 @@
                         </div>
 
                         <person-event-contribution-list
-                            :contribution-list="rightExhibition?.contributions ? rightExhibition.contributions : []"
-                            :event-id="rightExhibition?.id"
+                            :contribution-list="rightCourse?.contributions ? rightCourse.contributions : []"
+                            :event-id="rightCourse?.id"
                             in-comparator
                             :can-reorder="true"
                         />
@@ -111,8 +111,8 @@
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
             supports-force-delete
-            :left-id="(leftExhibition?.id as number)"
-            :right-id="(rightExhibition?.id as number)"
+            :left-id="(leftCourse?.id as number)"
+            :right-id="(rightCourse?.id as number)"
             :entity-type="EntityType.EVENT"
             @update="updateAll"
             @delete="deleteSide"
@@ -137,7 +137,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import type { Exhibition, PersonEventContribution } from '@/models/EventModel';
+import type { Course, PersonEventContribution } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import type { MultilingualContent } from '@/models/Common';
 import PersonEventContributionList from '@/components/core/PersonEventContributionList.vue';
@@ -149,12 +149,12 @@ import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import MergeService from '@/services/MergeService';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
-import ExhibitionUpdateForm from '@/components/event/update/ExhibitionUpdateForm.vue';
+import CourseUpdateForm from '@/components/event/update/CourseUpdateForm.vue';
 
 
 export default defineComponent({
-    name: "ExhibitionMetadataComparator",
-    components: { ExhibitionUpdateForm, PersonEventContributionList, Toast, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    name: "CourseMetadataComparator",
+    components: { CourseUpdateForm, PersonEventContributionList, Toast, PersistentStopDialog, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -162,11 +162,11 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const leftExhibition = ref<Exhibition>();
-        const rightExhibition = ref<Exhibition>();
+        const leftCourse = ref<Course>();
+        const rightCourse = ref<Course>();
 
-        const updateLeftRef = ref<typeof ExhibitionUpdateForm>();
-        const updateRightRef = ref<typeof ExhibitionUpdateForm>();
+        const updateLeftRef = ref<typeof CourseUpdateForm>();
+        const updateRightRef = ref<typeof CourseUpdateForm>();
         const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
         const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
         const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
@@ -178,70 +178,76 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("eventMetadataComparatorLabel");
-            fetchExhibitions();
+            fetchCourses();
         });
 
-        const fetchExhibitions = () => {
-            EventService.readExhibition(parseInt(currentRoute.params.leftId as string)).then((response) => {
+        const fetchCourses = () => {
+            EventService.readCourse(parseInt(currentRoute.params.leftId as string)).then((response) => {
                 if (response.data.serialEvent) {
                     showStopDialog.value = true;
                     return;
                 }
 
-                leftExhibition.value = response.data;
-                leftExhibition.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                leftCourse.value = response.data;
+                leftCourse.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
-            EventService.readExhibition(parseInt(currentRoute.params.rightId as string)).then((response) => {
+            EventService.readCourse(parseInt(currentRoute.params.rightId as string)).then((response) => {
                 if (response.data.serialEvent) {
                     showStopDialog.value = true;
                     return;
                 }
 
-                rightExhibition.value = response.data;
-                rightExhibition.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                rightCourse.value = response.data;
+                rightCourse.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
-        const mergeExhibitionMetadata = (exhibition1: Exhibition, exhibition2: Exhibition) => {
-            mergeMultilingualContentField(exhibition1.name, exhibition2.name);
+        const mergeCourseMetadata = (course1: Course, course2: Course) => {
+            mergeMultilingualContentField(course1.name, course2.name);
 
-            mergeMultilingualContentField(exhibition1.nameAbbreviation, exhibition2.nameAbbreviation);
-            exhibition2.nameAbbreviation = [];
+            mergeMultilingualContentField(course1.nameAbbreviation, course2.nameAbbreviation);
+            course2.nameAbbreviation = [];
 
-            exhibition1.countryId = exhibition2.countryId;
-            exhibition2.countryId = undefined;
+            course1.countryId = course2.countryId;
+            course2.countryId = undefined;
 
-            mergeMultilingualContentField(exhibition1.place, exhibition2.place);
-            exhibition2.place = [];
+            mergeMultilingualContentField(course1.place, course2.place);
+            course2.place = [];
 
-            mergeMultilingualContentField(exhibition1.keywords, exhibition2.keywords);
-            exhibition2.keywords = [];
+            mergeMultilingualContentField(course1.keywords, course2.keywords);
+            course2.keywords = [];
 
-            mergeMultilingualContentField(exhibition1.description, exhibition2.description);
-            exhibition2.description = [];
+            mergeMultilingualContentField(course1.description, course2.description);
+            course2.description = [];
 
-            mergeMultilingualContentField(exhibition1.displayOrganizer, exhibition2.displayOrganizer);
-            exhibition2.displayOrganizer = [];
+            mergeMultilingualContentField(course1.displayOrganizer, course2.displayOrganizer);
+            course2.displayOrganizer = [];
 
-            bulkTransferFields(exhibition1, exhibition2, [
+            mergeMultilingualContentField(course1.groupName, course2.groupName);
+            course2.groupName = [];
+
+            bulkTransferFields(course1, course2, [
                 { fieldName: "dateFrom", emptyValue: null, setEmpty: false },
                 { fieldName: "dateTo", emptyValue: null, setEmpty: false },
-                { fieldName: "fee", emptyValue: "" },
-                { fieldName: "number", emptyValue: "" }
+                { fieldName: "courseLevel", emptyValue: "" },
+                { fieldName: "courseCode", emptyValue: "" },
+                { fieldName: "numberOfCredits", emptyValue: "" },
+                { fieldName: "numberOfStudents", emptyValue: 0 },
+                { fieldName: "academicYear", emptyValue: "" }
             ]);
 
-            exhibition2.uris.forEach(uri => {
-                if (!exhibition1.uris.includes(uri)) {
-                    exhibition1.uris.push(uri);
+            course2.uris.forEach(uri => {
+                if (!course1.uris.includes(uri)) {
+                    course1.uris.push(uri);
                 }
             });
-            exhibition2.uris = [];
+            course2.uris = [];
 
-            exhibition1.contributions = exhibition1.contributions?.concat(exhibition2.contributions as PersonEventContribution[]);
-            exhibition2.contributions = [];
+            course1.contributions = course1.contributions?.concat(course2.contributions as PersonEventContribution[]);
+            course2.contributions = [];
 
-            return [exhibition1, exhibition2];
+            return [course1, course2];
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
@@ -253,9 +259,9 @@ export default defineComponent({
             updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
-                [rightExhibition.value, leftExhibition.value] = mergeExhibitionMetadata(rightExhibition.value as Exhibition, leftExhibition.value as Exhibition);
+                [rightCourse.value, leftCourse.value] = mergeCourseMetadata(rightCourse.value as Course, leftCourse.value as Course);
             } else {
-                [leftExhibition.value, rightExhibition.value] = mergeExhibitionMetadata(leftExhibition.value as Exhibition, rightExhibition.value as Exhibition);
+                [leftCourse.value, rightCourse.value] = mergeCourseMetadata(leftCourse.value as Course, rightCourse.value as Course);
             }
 
             updateLeftRef.value?.refreshForm();
@@ -270,18 +276,22 @@ export default defineComponent({
         const rightUpdateComplete = ref(false);
         const update = ref(false);
 
-        const updateLeft = (basicInfo: Exhibition) => {
-            leftExhibition.value!.name = basicInfo.name;
-            leftExhibition.value!.nameAbbreviation = basicInfo.nameAbbreviation;
-            leftExhibition.value!.dateFrom = basicInfo.dateFrom;
-            leftExhibition.value!.dateTo = basicInfo.dateTo;
-            leftExhibition.value!.countryId = basicInfo.countryId;
-            leftExhibition.value!.place = basicInfo.place;
-            leftExhibition.value!.serialEvent = basicInfo.serialEvent;
-            leftExhibition.value!.fee = basicInfo.fee;
-            leftExhibition.value!.number = basicInfo.number;
-            leftExhibition.value!.uris = basicInfo.uris;
-            leftExhibition.value!.displayOrganizer = basicInfo.displayOrganizer;
+        const updateLeft = (basicInfo: Course) => {
+            leftCourse.value!.name = basicInfo.name;
+            leftCourse.value!.nameAbbreviation = basicInfo.nameAbbreviation;
+            leftCourse.value!.dateFrom = basicInfo.dateFrom;
+            leftCourse.value!.dateTo = basicInfo.dateTo;
+            leftCourse.value!.countryId = basicInfo.countryId;
+            leftCourse.value!.place = basicInfo.place;
+            leftCourse.value!.serialEvent = basicInfo.serialEvent;
+            leftCourse.value!.courseLevel = basicInfo.courseLevel;
+            leftCourse.value!.courseCode = basicInfo.courseCode;
+            leftCourse.value!.academicYear = basicInfo.academicYear;
+            leftCourse.value!.numberOfCredits = basicInfo.numberOfCredits;
+            leftCourse.value!.numberOfStudents = basicInfo.numberOfStudents;
+            leftCourse.value!.groupName = basicInfo.groupName;
+            leftCourse.value!.uris = basicInfo.uris;
+            leftCourse.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -289,18 +299,22 @@ export default defineComponent({
             }
         };
 
-        const updateRight = (basicInfo: Exhibition) => {
-            rightExhibition.value!.name = basicInfo.name;
-            rightExhibition.value!.nameAbbreviation = basicInfo.nameAbbreviation;
-            rightExhibition.value!.dateFrom = basicInfo.dateFrom;
-            rightExhibition.value!.dateTo = basicInfo.dateTo;
-            rightExhibition.value!.countryId = basicInfo.countryId;
-            rightExhibition.value!.place = basicInfo.place;
-            rightExhibition.value!.serialEvent = basicInfo.serialEvent;
-            rightExhibition.value!.fee = basicInfo.fee;
-            rightExhibition.value!.number = basicInfo.number;
-            rightExhibition.value!.uris = basicInfo.uris;
-            rightExhibition.value!.displayOrganizer = basicInfo.displayOrganizer;
+        const updateRight = (basicInfo: Course) => {
+            rightCourse.value!.name = basicInfo.name;
+            rightCourse.value!.nameAbbreviation = basicInfo.nameAbbreviation;
+            rightCourse.value!.dateFrom = basicInfo.dateFrom;
+            rightCourse.value!.dateTo = basicInfo.dateTo;
+            rightCourse.value!.countryId = basicInfo.countryId;
+            rightCourse.value!.place = basicInfo.place;
+            rightCourse.value!.serialEvent = basicInfo.serialEvent;
+            rightCourse.value!.courseLevel = basicInfo.courseLevel;
+            rightCourse.value!.courseCode = basicInfo.courseCode;
+            rightCourse.value!.academicYear = basicInfo.academicYear;
+            rightCourse.value!.numberOfCredits = basicInfo.numberOfCredits;
+            rightCourse.value!.numberOfStudents = basicInfo.numberOfStudents;
+            rightCourse.value!.groupName = basicInfo.groupName;
+            rightCourse.value!.uris = basicInfo.uris;
+            rightCourse.value!.displayOrganizer = basicInfo.displayOrganizer;
             
             if (update.value) {
                 rightUpdateComplete.value = true;
@@ -324,11 +338,11 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
 
-                MergeService.saveMergedExhibitionsMetadata(
-                    leftExhibition.value?.id as number, rightExhibition.value?.id as number,
+                MergeService.saveMergedCoursesMetadata(
+                    leftCourse.value?.id as number, rightCourse.value?.id as number,
                     {
-                        leftExhibition: leftExhibition.value as Exhibition, 
-                        rightExhibition: rightExhibition.value as Exhibition
+                        leftCourse: leftCourse.value as Course, 
+                        rightCourse: rightCourse.value as Course
                     }
                 )
                 .then(() => {
@@ -343,38 +357,38 @@ export default defineComponent({
         };
 
         const updateLeftDescription = (description: MultilingualContent[]) => {
-            leftExhibition.value!.description = description;
+            leftCourse.value!.description = description;
         };
 
         const updateRightDescription = (description: MultilingualContent[]) => {
-            rightExhibition.value!.description = description;
+            rightCourse.value!.description = description;
         };
 
         const updateLeftKeywords = (keywords: MultilingualContent[]) => {
-            leftExhibition.value!.keywords = keywords;
+            leftCourse.value!.keywords = keywords;
         };
 
         const updateRightKeywords = (keywords: MultilingualContent[]) => {
-            rightExhibition.value!.keywords = keywords;
+            rightCourse.value!.keywords = keywords;
         };
 
         const deleteSide = async (side: ComparisonSide, isForceDelete = false) => {
-            const id = side === ComparisonSide.LEFT ? leftExhibition.value?.id : rightExhibition.value?.id;
-            const transferTargetId = side === ComparisonSide.LEFT ? rightExhibition.value?.id : leftExhibition.value?.id;
-            const name = side === ComparisonSide.LEFT ? leftExhibition.value?.name : rightExhibition.value?.name;
+            const id = side === ComparisonSide.LEFT ? leftCourse.value?.id : rightCourse.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightCourse.value?.id : leftCourse.value?.id;
+            const name = side === ComparisonSide.LEFT ? leftCourse.value?.name : rightCourse.value?.name;
 
             try {
                 const deleteAction = isForceDelete
-                    ? EventService.forceDeleteExhibition(id as number)
-                    : EventService.deleteExhibition(id as number);
+                    ? EventService.forceDeleteCourse(id as number)
+                    : EventService.deleteCourse(id as number);
 
                 await deleteAction;
 
-                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.EXHIBITION);
-                await MergeService.switchAllIndicatorsToOtherExhibition(id as number, transferTargetId as number);
-                await MergeService.switchAllClassificationsToOtherExhibition(id as number, transferTargetId as number);
+                await MergeService.migrateGenericIdentifierHistory(id as number, transferTargetId as number, EntityType.COURSE);
+                await MergeService.switchAllIndicatorsToOtherCourse(id as number, transferTargetId as number);
+                await MergeService.switchAllClassificationsToOtherCourse(id as number, transferTargetId as number);
 
-                router.push({ name: "exhibitionLandingPage", params: { id: transferTargetId } });
+                router.push({ name: "courseLandingPage", params: { id: transferTargetId } });
             } catch (_error) {
                 snackbarMessage.value = i18n.t(
                     "deleteFailedNotification", 
@@ -387,7 +401,7 @@ export default defineComponent({
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
-            leftExhibition, rightExhibition,
+            leftCourse, rightCourse,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef, EntityType,
             updateRight, showStopDialog, deleteSide,
