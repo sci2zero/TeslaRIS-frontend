@@ -8,13 +8,13 @@ export class EventService extends BaseService {
 
   private static idempotencyKey: string = super.generateIdempotencyKey();
 
-  async searchEvents(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null, returnEventsWithoutProceedings: boolean | null = null, eventTypes: EventType[] | []): Promise<AxiosResponse<Page<EventIndex>>> {
+  async searchEvents(tokens: string, returnOnlyNonSerialEvents: boolean, returnOnlySerialEvents: boolean, returnOnlyInstitutionBoundEvents: boolean, returnOnlyUnclassifiedEntities: boolean, commissionId: number | null = null, returnEventsWithoutProceedings: boolean | null = null, eventTypes: EventType[] | [], returnEventsWithoutContributions: boolean | null = null): Promise<AxiosResponse<Page<EventIndex>>> {
     let allowedTypesParam= "";
     eventTypes.forEach(allowedType => {
       allowedTypesParam += `&eventTypes=${allowedType}`;
     });
 
-    return super.sendRequest(axios.get, `event/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}${returnEventsWithoutProceedings ? `&emptyEventsOnly=${returnEventsWithoutProceedings}`: ""}${allowedTypesParam}`);
+    return super.sendRequest(axios.get, `event/simple-search?${tokens}&returnOnlyNonSerialEvents=${returnOnlyNonSerialEvents}&returnOnlySerialEvents=${returnOnlySerialEvents}&forMyInstitution=${returnOnlyInstitutionBoundEvents}&unclassified=${returnOnlyUnclassifiedEntities}${commissionId ? `&commissionId=${commissionId}`: ""}${returnEventsWithoutProceedings ? `&emptyEventsOnly=${returnEventsWithoutProceedings}`: ""}${allowedTypesParam}${returnEventsWithoutContributions ? `&noContributionEventsOnly=${returnEventsWithoutContributions}`: ""}`);
   }
 
   async searchConferencesForImport(parameters: string): Promise<AxiosResponse<Page<EventIndex>>> {

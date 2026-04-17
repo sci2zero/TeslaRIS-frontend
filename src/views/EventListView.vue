@@ -45,6 +45,12 @@
                 :label="$t('showOnlyWithoutProceedingsLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="returnEventsWithoutContributions"
+                :label="$t('showOnlyWithoutContributionsLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
 
         <tab-content-loader
@@ -128,6 +134,7 @@ export default defineComponent({
         const returnSerialEvents = ref(true);
         const returnOnlyUnclassifiedEntities = ref(true);
         const returnEventsWithoutProceedings = ref(false);
+        const returnEventsWithoutContributions = ref(false);
         const tableRef = ref<typeof EventTableComponent>();
 
         const commissions = ref<{title: string, value: number}[]>([]);
@@ -162,7 +169,8 @@ export default defineComponent({
             returnOnlyInstitutionRelatedEntities,
             returnOnlyUnclassifiedEntities,
             selectedCommission,
-            returnEventsWithoutProceedings
+            returnEventsWithoutProceedings,
+            returnEventsWithoutContributions
         ], () => {
             search(searchParams.value);
             loading.value = true;
@@ -191,7 +199,8 @@ export default defineComponent({
                 returnOnlyInstitutionRelatedEntities.value as boolean,
                 (isCommission.value || isAdmin && selectedCommission.value.value > 0) && returnOnlyUnclassifiedEntities.value,
                 selectedCommission.value.value > 0 ? selectedCommission.value.value : null,
-                returnEventsWithoutProceedings.value, selectedEventTypes.value.map(t => t.value)
+                returnEventsWithoutProceedings.value, selectedEventTypes.value.map(t => t.value),
+                returnEventsWithoutContributions.value
             ).then((response) => {
                 events.value = response.data.content;
                 totalEvents.value = response.data.totalElements;
@@ -231,7 +240,8 @@ export default defineComponent({
             returnOnlyInstitutionRelatedEntities, isCommission,
             returnOnlyUnclassifiedEntities, loading, commissions,
             selectedCommission, onClearCommission, toggleEventType,
-            returnEventsWithoutProceedings, selectedEventTypes
+            returnEventsWithoutProceedings, selectedEventTypes,
+            returnEventsWithoutContributions
         };
     }
 });

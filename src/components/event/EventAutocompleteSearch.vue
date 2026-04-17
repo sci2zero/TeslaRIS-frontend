@@ -127,7 +127,8 @@ export default defineComponent({
                     params, props.returnOnlyNonSerialEvents, 
                     props.returnOnlySerialEvents, 
                     false, false, null, null, 
-                    [props.eventType as EventType]
+                    [props.eventType as EventType],
+                    false
                 ).then((response) => {
                     events.value = response.data.content.map((conference: EventIndex) => ({
                         title: `${i18n.locale.value.startsWith("sr") ? conference.nameSr : conference.nameOther} ${conference.dateFromTo ? ("| " + conference.dateFromTo) : ""}`,

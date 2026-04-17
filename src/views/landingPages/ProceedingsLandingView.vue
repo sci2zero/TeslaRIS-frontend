@@ -220,10 +220,10 @@
                     :total-publications="totalPublications"
                     in-comparator
                     show-publication-concrete-type
-                    @switch-page="switchPage"
                     enable-export
                     :endpoint-type="ExportableEndpointType.PROCEEDINGS_PUBLICATIONS"
                     :endpoint-token-parameters="[`${proceedings?.id}`]"
+                    @switch-page="switchPage"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">

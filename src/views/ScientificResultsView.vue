@@ -136,6 +136,15 @@
                                 ></v-checkbox>
                             </span>
 
+                            <span>
+                                <v-checkbox
+                                    v-if="isAdmin && showProceedingsOnly"
+                                    v-model="noContributionsProceedingsOnly"
+                                    :label="$t('noContributionsProceedingsOnlyLabel')"
+                                    class=""
+                                ></v-checkbox>
+                            </span>
+
                             <div class="flex items-center gap-2">
                                 <span v-if="isAdmin || isInstitutionalEditor">
                                     <v-btn
@@ -240,6 +249,7 @@ export default defineComponent({
 
         const showProceedingsOnly = ref(false);
         const emptyProceedingsOnly = ref(false);
+        const noContributionsProceedingsOnly = ref(false);
 
         const {
             isCommission, isAdmin, isInstitutionalEditor,
@@ -292,7 +302,8 @@ export default defineComponent({
             loggedInUser, returnOnlyInstitutionRelatedEntities,
             returnOnlyUnassessedEntities, selectedPublicationTypes,
             returnOnlyUnmanagedPublications, returnOnlyNonArchived,
-            showProceedingsOnly, emptyProceedingsOnly
+            showProceedingsOnly, emptyProceedingsOnly,
+            noContributionsProceedingsOnly
         ], () => {
             if (!initialLoad.value) {
                 search(searchParams.value);
@@ -315,9 +326,9 @@ export default defineComponent({
             const isSimpleSearch = currentTab.value === "simpleSearch" || tokenParams === "tokens=*";
             const serviceMethod = isSimpleSearch
                 ? (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value)
+                    DocumentPublicationService.searchDocumentPublications(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, null, returnOnlyUnmanagedPublications.value, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value, noContributionsProceedingsOnly.value)
                 : (tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[]) =>
-                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value);
+                    DocumentPublicationService.performAdvancedSearch(tokens, institutionId, returnOnlyUnclassifiedEntities, allowedTypes, returnOnlyNonArchived.value, showProceedingsOnly.value, emptyProceedingsOnly.value, noContributionsProceedingsOnly.value);
 
             const organisationUnitId = returnOnlyInstitutionRelatedEntities.value
                 ? (loggedInUser.value?.organisationUnitId as number)
@@ -399,7 +410,7 @@ export default defineComponent({
             togglePublicationType, toggleAdvancedSearch,
             isInstitutionalLibrarian, isHeadOfLibrary,
             returnOnlyNonArchived, showProceedingsOnly,
-            emptyProceedingsOnly
+            emptyProceedingsOnly, noContributionsProceedingsOnly
         };
     }
 });

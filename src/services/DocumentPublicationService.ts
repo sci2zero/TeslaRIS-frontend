@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { DocumentContributionType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type PublicationType, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { DocumentContributionType, PublicationType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -18,22 +18,22 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, "document/count");
   }
 
-  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null, authorId: number | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async searchDocumentPublications(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], authorReprint: boolean | null = null, unmanaged: boolean | null = null, notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null, noContributionsProceedingsOnly: boolean | null = null, authorId: number | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}${authorId ? ("&authorId=" + authorId) : ""}`);
+    return super.sendRequest(axios.get, `document/simple-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}${authorReprint ? ("&authorReprint=" + authorReprint) : ""}${unmanaged ? ("&unmanaged=" + unmanaged) : ""}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}${noContributionsProceedingsOnly ? ("&noContributionsProceedingsOnly=" + noContributionsProceedingsOnly) : ""}${authorId ? ("&authorId=" + authorId) : ""}`);
   }
 
-  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+  async performAdvancedSearch(tokens: string, institutionId: number | null, returnOnlyUnclassifiedEntities: boolean, allowedTypes: PublicationType[], notArchivedOnly: boolean = false, showProceedings: boolean | null = null, emptyProceedingsOnly: boolean | null = null, noContributionsProceedingsOnly: boolean | null = null): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
     let allowedTypesParam= "";
     allowedTypes.forEach(allowedType => {
       allowedTypesParam += `&allowedTypes=${allowedType}`;
     });
     
-    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}`);
+    return super.sendRequest(axios.get, `document/advanced-search?${tokens}${institutionId ? ("&institutionId=" + institutionId) : ""}&unclassified=${returnOnlyUnclassifiedEntities}${allowedTypesParam}&notArchivedOnly=${notArchivedOnly}${showProceedings ? ("&showProceedings=" + showProceedings) : ""}${emptyProceedingsOnly ? ("&emptyProceedingsOnly=" + emptyProceedingsOnly) : ""}${noContributionsProceedingsOnly ? ("&noContributionsProceedingsOnly=" + noContributionsProceedingsOnly) : ""}`);
   }
 
   async readJournalPublication(journalPublicationId: number): Promise<AxiosResponse<JournalPublication>> {
@@ -72,8 +72,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `journal-publication/journal/${journalId}/my-publications`);
   }
 
-  async findPublicationsInJournal(journalId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
-    return super.sendRequest(axios.get, `journal-publication/journal/${journalId}?${pageable}`);
+  async findPublicationsInJournal(journalId: number, pageable: string, publicationType: PublicationType = PublicationType.JOURNAL_PUBLICATION): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {
+    return super.sendRequest(axios.get, `journal-publication/journal/${journalId}?${pageable}&publicationType=${publicationType}`);
   }
 
   async findPublicationsInProceedings(proceedingsId: number, pageable: string): Promise<AxiosResponse<Page<DocumentPublicationIndex>>> {

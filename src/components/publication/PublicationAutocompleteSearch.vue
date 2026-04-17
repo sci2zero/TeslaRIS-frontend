@@ -127,7 +127,7 @@ export default defineComponent({
                     null,
                     false,
                     props.allowedTypes, 
-                    null, null, undefined, null, null,
+                    null, null, undefined, null, null, null,
                     props.researcherId ? props.researcherId : null
                 ).then((response) => {
                     const listOfDocuments: { title: string, value: number }[] = [];

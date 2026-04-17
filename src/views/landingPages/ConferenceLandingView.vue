@@ -150,10 +150,10 @@
                     <publication-table-component
                         :publications="publications"
                         :total-publications="totalPublications"
-                        @switch-page="switchPublicationsPage"
                         enable-export
                         :endpoint-type="ExportableEndpointType.EVENT_PUBLICATIONS"
                         :endpoint-token-parameters="[`${conference?.id}`]"
+                        @switch-page="switchPublicationsPage"
                     />
                 </div>
             </v-tabs-window-item>
