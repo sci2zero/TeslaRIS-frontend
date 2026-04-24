@@ -37,8 +37,8 @@
             <v-col>
                 <v-text-field
                     v-model="regularExpression"
-                    :label="$t('regularExpressionLabel') + '*'"
-                    :placeholder="$t('regularExpressionLabel') + '*'"
+                    :label="$t('regularExpressionLabel')"
+                    :placeholder="$t('regularExpressionLabel')"
                     :rules="regexValidationRules"
                 />
             </v-col>
@@ -47,8 +47,8 @@
             <v-col>
                 <v-text-field
                     v-model="uriPrefix"
-                    :label="$t('uriPrefixLabel') + '*'"
-                    :placeholder="$t('uriPrefixLabel') + '*'"
+                    :label="$t('uriPrefixLabel')"
+                    :placeholder="$t('uriPrefixLabel')"
                 />
             </v-col>
         </v-row>

@@ -119,7 +119,8 @@ export default {
         prizes: "Nagrade",
         employmentPositions: "Radna mesta",
         submitCourse: "Dodavanje kursa",
-        submitOtherEvent: "Dodavanje drugog tipa događaja"
+        submitOtherEvent: "Dodavanje drugog tipa događaja",
+        identifiers: "Identifikatori"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1418,5 +1419,8 @@ export default {
     identifierLabel: "Identifikator",
     invalidRegexMessage: "Pogrešan format regularnog izraza.",
     regularExpressionLabel: "Regularni izraz",
-    uriPrefixLabel: "URI prefiks"
+    uriPrefixLabel: "URI prefiks",
+    identifierListLabel: "Identifikatori",
+    createNewIdentifierLabel: "Kreiraj novi identifikator",
+    updateIdentifierLabel: "Ažuriraj identifikator"
 }

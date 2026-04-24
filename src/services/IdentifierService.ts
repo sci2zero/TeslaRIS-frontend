@@ -2,14 +2,14 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { AccessLevel, ApplicableEntityType, Page } from "@/models/Common";
-import { Identifier, IdentifierResponse } from "@/models/IdentifierModel";
+import type { Identifier, IdentifierResponse } from "@/models/IdentifierModel";
 import i18n from "@/i18n";
 
 
 export class IdentifierService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
-    
+
 
     async fetchIdentifiersForApplicableTypes(entityTypes: ApplicableEntityType[]): Promise<AxiosResponse<IdentifierResponse[]>> {
         let url = "identifier/list?";

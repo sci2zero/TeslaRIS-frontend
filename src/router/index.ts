@@ -125,6 +125,7 @@ import CourseLandingView from "@/views/CourseLandingView.vue";
 import OtherEventLandingView from "@/views/OtherEventLandingView.vue";
 import CourseMetadataComparatorView from "@/views/comparators/event/CourseMetadataComparatorView.vue";
 import OtherEventMetadataComparatorView from "@/views/comparators/event/OtherEventMetadataComparatorView.vue";
+import IdentifiersListView from "@/views/IdentifiersListView.vue";
 
 
 const roles = {
@@ -1169,6 +1170,15 @@ const router = createRouter({
                     path: "employment-positions",
                     name: "employmentPositions",
                     component: EmploymentPositionListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "identifiers",
+                    name: "identifiers",
+                    component: IdentifiersListView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

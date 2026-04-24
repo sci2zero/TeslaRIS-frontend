@@ -118,7 +118,8 @@ export default {
         prizes: "Prizes",
         employmentPositions: "Employment positions",
         submitCourse: "Submit course",
-        submitOtherEvent: "Submit other event"
+        submitOtherEvent: "Submit other event",
+        identifiers: "Identifiers"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1404,5 +1405,8 @@ export default {
     identifierLabel: "Identifier",
     invalidRegexMessage: "Wrong regular expression format.",
     regularExpressionLabel: "Regular expression",
-    uriPrefixLabel: "URI prefix"
+    uriPrefixLabel: "URI prefix",
+    identifierListLabel: "Identifiers",
+    createNewIdentifierLabel: "Create new identifier",
+    updateIdentifierLabel: "Update identifier"
 }
