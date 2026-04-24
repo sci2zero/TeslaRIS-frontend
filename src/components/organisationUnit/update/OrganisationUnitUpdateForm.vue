@@ -85,23 +85,17 @@
                         <v-text-field v-model="isni" label="ISNI" placeholder="ISNI" :rules="isniValidationRules" />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-text-field v-model="athensId" label="Athens ID" placeholder="Athens ID" :rules="athensIdValidationRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12" md="6">
-                        <v-text-field v-model="ncesId" label="NCES ID" placeholder="NCES ID" :rules="ncesIdValidationRules" />
-                    </v-col>
-                    <v-col cols="12" md="6">
                         <v-text-field v-model="fctId" label="FCT ID" placeholder="FCT ID" :rules="fctIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col cols="12" md="6">
-                        <v-text-field v-model="dgeecId" label="DGEEC ID" placeholder="DGEEC ID" :rules="dgeecIdValidationRules" />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                        <v-text-field v-model="nifId" label="NIF ID" placeholder="NIF ID" :rules="nifIdValidationRules" />
+                    <v-col cols="12">
+                        <v-text-field
+                            v-model="taxNumber"
+                            :label="$t('taxNumberLabel')"
+                            :placeholder="$t('taxNumberLabel')"
+                            :rules="taxNumberValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -365,11 +359,8 @@ export default defineComponent({
         const ringgold = ref(props.presetOU?.ringgold);
         const fundref = ref(props.presetOU?.fundref);
         const isni = ref(props.presetOU?.isni);
-        const athensId = ref(props.presetOU?.athensId);
-        const ncesId = ref(props.presetOU?.ncesId);
         const fctId = ref(props.presetOU?.fctId);
-        const dgeecId = ref(props.presetOU?.dgeecId);
-        const nifId = ref(props.presetOU?.nifId);
+        const taxNumber = ref(props.presetOU?.taxNumber);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
         const startup = ref(props.presetOU?.startup);
@@ -418,8 +409,7 @@ export default defineComponent({
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
             nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
             requiredSelectionRules, ringgoldValidationRules, fundrefValidationRules,
-            isniValidationRules, athensIdValidationRules, ncesIdValidationRules,
-            fctIdValidationRules, dgeecIdValidationRules, nifIdValidationRules
+            isniValidationRules, fctIdValidationRules, taxNumberValidationRules
         } = useValidationUtils();
 
         const fetchCountries = () => {
@@ -466,11 +456,8 @@ export default defineComponent({
                 ringgold: ringgold.value,
                 fundref: fundref.value,
                 isni: isni.value,
-                athensId: athensId.value,
-                ncesId: ncesId.value,
                 fctId: fctId.value,
-                dgeecId: dgeecId.value,
-                nifId: nifId.value,
+                taxNumber: taxNumber.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
                 clientInstitutionCris: clientInstitutionCris.value as boolean,
@@ -534,10 +521,7 @@ export default defineComponent({
             ringgold.value = props.presetOU?.ringgold;
             fundref.value = props.presetOU?.fundref;
             isni.value = props.presetOU?.isni;
-            athensId.value = props.presetOU?.athensId;
-            ncesId.value = props.presetOU?.ncesId;
-            nifId.value = props.presetOU?.nifId;
-            dgeecId.value = props.presetOU?.dgeecId;
+            taxNumber.value = props.presetOU?.taxNumber;
             fctId.value = props.presetOU?.fctId;
             selectedOuSector.value = {
                 title: getOUSectorFromValueAutoLocale(props.presetOU?.sector as  OrganisationUnitSector) as string,
@@ -585,12 +569,10 @@ export default defineComponent({
             clientInstitutionDl, validatingEmailDomainDl,
             allowingSubdomainsDl, institutionEmailDomainDl,
             nameAbbreviationRef, ringgold, fundref, isni,
-            athensId, ncesId, fctId, dgeecId, nifId, ouSectors,
+            fctId, taxNumber, ouSectors, taxNumberValidationRules,
             selectedOuSector, startup, dateEstablished,
             ringgoldValidationRules, fundrefValidationRules,
-            isniValidationRules, athensIdValidationRules, 
-            ncesIdValidationRules, fctIdValidationRules,
-            dgeecIdValidationRules, nifIdValidationRules,
+            isniValidationRules, fctIdValidationRules,
             city, cityRef, streetAndNumber, streetAndNumberRef,
             state, stateRef, countries, selectedCountry,
             postalNumber

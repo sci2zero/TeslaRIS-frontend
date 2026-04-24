@@ -22,11 +22,8 @@ export const useValidationUtils = () => {
     const invalidRinggoldMessage = computed(() => i18n.t("invalidRinggoldMessage"));
     const invalidFundrefMessage = computed(() => i18n.t("invalidFundrefMessage"));
     const invalidIsniMessage = computed(() => i18n.t("invalidIsniMessage"));
-    const invalidAthensIdMessage = computed(() => i18n.t("invalidAthensIdMessage"));
-    const invalidNcesIdMessage = computed(() => i18n.t("invalidNcesIdMessage"));
     const invalidFctIdMessage = computed(() => i18n.t("invalidFctIdMessage"));
-    const invalidDgeecIdMessage = computed(() => i18n.t("invalidDgeecIdMessage"));
-    const invalidNifIdMessage = computed(() => i18n.t("invalidNifIdMessage"));
+    const invalidTaxNumberMessage = computed(() => i18n.t("invalidTaxNumberMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
@@ -38,6 +35,7 @@ export const useValidationUtils = () => {
     const invalidScholarIdMessage = computed(() => i18n.t("scholarIdFormatError"));
     const invalidAuthenticusIdMessage = computed(() => i18n.t("authenticusIdFormatError"));
     const invalidLattesIdMessage = computed(() => i18n.t("lattesIdFormatError"));
+    const invalidRegexMessage = computed(() => i18n.t("invalidRegexMessage"));
 
     
     const requiredFieldRules = [
@@ -290,24 +288,6 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const athensIdPattern = /.*/i;
-    const athensIdValidationRules = [
-        (value: string) => {
-            if (!value || value.trim() === "") return true;
-            if (athensIdPattern.test(value)) return true;
-            return invalidAthensIdMessage.value;
-        }
-    ];
-
-    const ncesIdPattern = /^[0-9]+$/i;
-    const ncesIdValidationRules = [
-        (value: string) => {
-            if (!value || value.trim() === "") return true;
-            if (ncesIdPattern.test(value)) return true;
-            return invalidNcesIdMessage.value;
-        }
-    ];
-
     const fctIdPattern = /^[0-9A-Za-z-]+$/i;
     const fctIdValidationRules = [
         (value: string) => {
@@ -317,21 +297,24 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const dgeecIdPattern = /^[0-9A-Za-z-]+$/i;
-    const dgeecIdValidationRules = [
+    const taxNumberPattern = /^[0-9]+$/i;
+    const taxNumberValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
-            if (dgeecIdPattern.test(value)) return true;
-            return invalidDgeecIdMessage.value;
+            if (taxNumberPattern.test(value)) return true;
+            return invalidTaxNumberMessage.value;
         }
     ];
 
-    const nifIdPattern = /^[0-9]+$/i;
-    const nifIdValidationRules = [
+    const regexValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
-            if (nifIdPattern.test(value)) return true;
-            return invalidNifIdMessage.value;
+            try {
+                new RegExp(value);
+                return true;
+            } catch (_e) {
+                return invalidRegexMessage.value;
+            }
         }
     ];
 
@@ -476,7 +459,6 @@ export const useValidationUtils = () => {
         optionalNumericZeroOrGreaterFieldRules, scholarIdValidationRules,
         personAuthenticusIdValidationRules, lattesIdValidationRules,
         ringgoldValidationRules, fundrefValidationRules, isniValidationRules,
-        athensIdValidationRules, ncesIdValidationRules, fctIdValidationRules,
-        dgeecIdValidationRules, nifIdValidationRules
+        taxNumberValidationRules, fctIdValidationRules, regexValidationRules
     };
 };

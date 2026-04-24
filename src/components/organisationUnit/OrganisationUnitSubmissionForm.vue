@@ -70,23 +70,17 @@
                             <v-text-field v-model="isni" label="ISNI" placeholder="ISNI" :rules="isniValidationRules" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field v-model="athensId" label="Athens ID" placeholder="Athens ID" :rules="athensIdValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="ncesId" label="NCES ID" placeholder="NCES ID" :rules="ncesIdValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
                             <v-text-field v-model="fctId" label="FCT ID" placeholder="FCT ID" :rules="fctIdValidationRules" />
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="dgeecId" label="DGEEC ID" placeholder="DGEEC ID" :rules="dgeecIdValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="nifId" label="NIF ID" placeholder="NIF ID" :rules="nifIdValidationRules" />
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="taxNumber"
+                                :label="$t('taxNumberLabel')"
+                                :placeholder="$t('taxNumberLabel')"
+                                :rules="taxNumberValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -364,11 +358,8 @@ export default defineComponent({
         const ringgold = ref("");
         const fundref = ref("");
         const isni = ref("");
-        const athensId = ref("");
-        const ncesId = ref("");
         const fctId = ref("");
-        const dgeecId = ref("");
-        const nifId = ref("");
+        const taxNumber = ref("");
 
         const phoneNumber = ref("");
         const keywords = ref([]);
@@ -436,9 +427,7 @@ export default defineComponent({
             institutionOpenAlexIdValidationRules,
             requiredSelectionRules, ringgoldValidationRules,
             fundrefValidationRules, isniValidationRules,
-            athensIdValidationRules, ncesIdValidationRules,
-            fctIdValidationRules, dgeecIdValidationRules,
-            nifIdValidationRules
+            fctIdValidationRules, taxNumberValidationRules
         } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
@@ -456,11 +445,8 @@ export default defineComponent({
                 ringgold: ringgold.value,
                 fundref: fundref.value,
                 isni: isni.value,
-                athensId: athensId.value,
-                ncesId: ncesId.value,
                 fctId: fctId.value,
-                dgeecId: dgeecId.value,
-                nifId: nifId.value,
+                taxNumber: taxNumber.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
                 clientInstitutionCris: clientInstitutionCris.value,
@@ -503,11 +489,8 @@ export default defineComponent({
                     ringgold.value = "";
                     fundref.value = "";
                     isni.value = "";
-                    athensId.value = "";
-                    ncesId.value = "";
                     fctId.value = "";
-                    dgeecId.value = "";
-                    nifId.value = "";
+                    taxNumber.value = "";
                     selectedThesisType.value = [];
                     selectedOuSector.value = 
                         { 
@@ -557,19 +540,16 @@ export default defineComponent({
             thesisTypes, selectedThesisType, isAdmin,
             requiredSelectionRules, allowingSubdomainsCris,
             validatingEmailDomainCris, institutionEmailDomainCris,
-            clientInstitutionDl, allowingSubdomainsDl,
+            clientInstitutionDl, allowingSubdomainsDl, ouSectors,
             validatingEmailDomainDl, institutionEmailDomainDl,
             ringgoldValidationRules, fundrefValidationRules,
-            isniValidationRules, athensIdValidationRules,
-            ncesIdValidationRules, fctIdValidationRules,
-            dgeecIdValidationRules, nifIdValidationRules,
-            ringgold, fundref, isni, athensId, ncesId,
-            fctId, dgeecId, nifId, ouSectors,
+            isniValidationRules, fctIdValidationRules,
+            ringgold, fundref, isni, fctId, taxNumber,
             selectedOuSector, startup, dateEstablished,
             description, descriptionRef, city, cityRef,
             streetAndNumber, streetAndNumberRef, state,
             stateRef, countries, selectedCountry,
-            postalNumber
+            postalNumber, taxNumberValidationRules
         };
     }
 });

@@ -39,11 +39,8 @@ export interface OrganisationUnitRequest {
     ringgold?: string;
     fundref?: string;
     isni?: string;
-    athensId?: string;
-    ncesId?: string;
     fctId?: string;
-    dgeecId?: string;
-    nifId?: string;
+    taxNumber?: string;
     uris: string[];
     allowedThesisTypes: ThesisType[];
     clientInstitutionCris: boolean;
@@ -85,11 +82,8 @@ export interface OrganisationUnitResponse {
     ringgold?: string;
     fundref?: string;
     isni?: string;
-    athensId?: string;
-    ncesId?: string;
     fctId?: string;
-    dgeecId?: string;
-    nifId?: string;
+    taxNumber?: string;
     uris: string[];
     logoServerFilename?: string;
     logoBackgroundHex: string;

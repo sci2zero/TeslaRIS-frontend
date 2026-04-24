@@ -265,11 +265,8 @@ export default defineComponent({
                 { fieldName: "ringgold", emptyValue: "" },
                 { fieldName: "fundref", emptyValue: "" },
                 { fieldName: "isni", emptyValue: "" },
-                { fieldName: "athensId", emptyValue: "" },
-                { fieldName: "ncesId", emptyValue: "" },
                 { fieldName: "fctId", emptyValue: "" },
-                { fieldName: "dgeecId", emptyValue: "" },
-                { fieldName: "nifId", emptyValue: "" },
+                { fieldName: "taxNumber", emptyValue: "" },
                 { fieldName: "allowedThesisTypes", emptyValue: [] },
                 { fieldName: "clientInstitutionCris", emptyValue: false },
                 { fieldName: "validatingEmailDomainCris", emptyValue: false },
@@ -341,10 +338,7 @@ export default defineComponent({
             leftOrganisationUnit.value!.ringgold = updatedData.ringgold;
             leftOrganisationUnit.value!.fundref = updatedData.fundref;
             leftOrganisationUnit.value!.isni = updatedData.isni;
-            leftOrganisationUnit.value!.athensId = updatedData.athensId;
-            leftOrganisationUnit.value!.ncesId = updatedData.ncesId;
-            leftOrganisationUnit.value!.nifId = updatedData.nifId;
-            leftOrganisationUnit.value!.dgeecId = updatedData.dgeecId;
+            leftOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             leftOrganisationUnit.value!.fctId = updatedData.fctId;
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
@@ -383,10 +377,7 @@ export default defineComponent({
             rightOrganisationUnit.value!.ringgold = updatedData.ringgold;
             rightOrganisationUnit.value!.fundref = updatedData.fundref;
             rightOrganisationUnit.value!.isni = updatedData.isni;
-            rightOrganisationUnit.value!.athensId = updatedData.athensId;
-            rightOrganisationUnit.value!.ncesId = updatedData.ncesId;
-            rightOrganisationUnit.value!.nifId = updatedData.nifId;
-            rightOrganisationUnit.value!.dgeecId = updatedData.dgeecId;
+            rightOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             rightOrganisationUnit.value!.fctId = updatedData.fctId;
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;

@@ -1407,5 +1407,16 @@ export default {
     createNewOtherEventLabel: "Dodaj drugi tip događaja",
     otherEventTypeLabel: "Tip događaja",
     otherEventLabel: "Drugi tip događaja",
-    courseLabel: "Kurs"
+    courseLabel: "Kurs",
+    taxNumberLabel: "Poreski broj",
+    invalidRorMessage: "Pogrešan format Lattes ID-a.",
+    invalidRinggoldMessage: "Pogrešan format Ringgold ID-a.",
+    invalidFundrefMessage: "Pogrešan format FundRef ID-a.",
+    invalidIsniMessage: "Pogrešan format ISNI-a.",
+    invalidFctIdMessage: "Pogrešan format FCT ID-a.",
+    invalidTaxNumberMessage: "Pogrešan format poreskog broja.",
+    identifierLabel: "Identifikator",
+    invalidRegexMessage: "Pogrešan format regularnog izraza.",
+    regularExpressionLabel: "Regularni izraz",
+    uriPrefixLabel: "URI prefiks"
 }

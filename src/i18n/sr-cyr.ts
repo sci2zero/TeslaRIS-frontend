@@ -110,5 +110,11 @@ export default {
     lattesIdExistsError: "Lattes ID је већ у употреби.",
     scholarIdFormatError: "Погрешан формат Google Scholar ID-а.",
     authenticusIdFormatError: "Погрешан формат Google Scholar ID-а.",
-    lattesIdFormatError: "Погрешан формат Lattes ID-а."
+    lattesIdFormatError: "Погрешан формат Lattes ID-а.",
+    invalidRorMessage: "Погрешан формат Lattes ID-а.",
+    invalidRinggoldMessage: "Погрешан формат Ringgold ID-а.",
+    invalidFundrefMessage: "Погрешан формат FundRef ID-а.",
+    invalidIsniMessage: "Погрешан формат ISNI-а.",
+    invalidFctIdMessage: "Погрешан формат FCT ID-а.",
+    uriPrefixLabel: "URI префикс"
 };

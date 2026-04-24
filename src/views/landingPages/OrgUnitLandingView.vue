@@ -118,28 +118,6 @@
                                     </span>
                                 </div>
                                 <div>
-                                    Athens ID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.athensId">
-                                        {{ organisationUnit.athensId }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    NCES ID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.ncesId">
-                                        {{ organisationUnit.ncesId }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
                                     FCT ID:
                                 </div>
                                 <div class="response">
@@ -151,22 +129,11 @@
                                     </span>
                                 </div>
                                 <div>
-                                    DGEEC ID:
+                                    {{ $t("taxNumberLabel") }}
                                 </div>
                                 <div class="response">
-                                    <p v-if="organisationUnit?.dgeecId">
-                                        {{ organisationUnit.dgeecId }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    NIF ID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.nifId">
-                                        {{ organisationUnit.nifId }}
+                                    <p v-if="organisationUnit?.taxNumber">
+                                        {{ organisationUnit.taxNumber }}
                                     </p>
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
@@ -960,10 +927,7 @@ export default defineComponent({
             organisationUnit.value!.ringgold = basicInfo.ringgold;
             organisationUnit.value!.fundref = basicInfo.fundref;
             organisationUnit.value!.isni = basicInfo.isni;
-            organisationUnit.value!.athensId = basicInfo.athensId;
-            organisationUnit.value!.ncesId = basicInfo.ncesId;
-            organisationUnit.value!.nifId = basicInfo.nifId;
-            organisationUnit.value!.dgeecId = basicInfo.dgeecId;
+            organisationUnit.value!.taxNumber = basicInfo.taxNumber;
             organisationUnit.value!.fctId = basicInfo.fctId;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
@@ -1028,11 +992,8 @@ export default defineComponent({
                 ringgold: organisationUnit.value?.ringgold,
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
-                athensId: organisationUnit.value?.athensId,
                 fctId: organisationUnit.value?.fctId,
-                ncesId: organisationUnit.value?.ncesId,
-                dgeecId: organisationUnit.value?.dgeecId,
-                nifId: organisationUnit.value?.nifId,
+                taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
                 clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
@@ -1074,11 +1035,8 @@ export default defineComponent({
                 ringgold: organisationUnit.value?.ringgold,
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
-                athensId: organisationUnit.value?.athensId,
                 fctId: organisationUnit.value?.fctId,
-                ncesId: organisationUnit.value?.ncesId,
-                dgeecId: organisationUnit.value?.dgeecId,
-                nifId: organisationUnit.value?.nifId,
+                taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
                 clientInstitutionCris: organisationUnit.value?.clientInstitutionCris as boolean,
