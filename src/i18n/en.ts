@@ -1408,5 +1408,9 @@ export default {
     uriPrefixLabel: "URI prefix",
     identifierListLabel: "Identifiers",
     createNewIdentifierLabel: "Create new identifier",
-    updateIdentifierLabel: "Update identifier"
+    updateIdentifierLabel: "Update identifier",
+    otherIdentifiersLabel: "Other identifiers",
+    createNewEntityIdentifierLabel: "Add identifier",
+    entityIdentifierRegexMismatchMessage: "Wrong identifier format.",
+    visitLinkLabel: "Visit link"
 }

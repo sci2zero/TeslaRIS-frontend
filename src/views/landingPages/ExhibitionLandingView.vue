@@ -96,6 +96,16 @@
                                 <div v-if="exhibition?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="eventIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="exhibition?.id" 
+                                        :containing-entity-type="ApplicableEntityType.EVENT"
+                                        :concrete-entity-type="ApplicableEntityType.EXHIBITION"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -229,11 +239,14 @@ import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "ExhibitionLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
+    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -255,6 +268,7 @@ export default defineComponent({
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
         const eventClassifications = ref<EntityClassificationResponse[]>();
+        const eventIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -271,6 +285,7 @@ export default defineComponent({
                 StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
+            fetchIdentifiers();
             fetchExhibition();
             fetchIndicators();
         });
@@ -284,6 +299,12 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchEventClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 eventClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchEventIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIdentifiers.value = response.data;
             });
         };
 
@@ -371,7 +392,7 @@ export default defineComponent({
         };
 
         return {
-            exhibition, icon,
+            exhibition, icon, fetchIdentifiers,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
@@ -379,7 +400,8 @@ export default defineComponent({
             country, ExhibitionUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify, EventType
+            fetchClassifications, canClassify, EventType,
+            eventIdentifiers
         };
 }})
 

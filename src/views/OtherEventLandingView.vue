@@ -90,6 +90,16 @@
                                 <div v-if="otherEvent?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="eventIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="otherEvent?.id" 
+                                        :containing-entity-type="ApplicableEntityType.EVENT"
+                                        :concrete-entity-type="ApplicableEntityType.OTHER_EVENT"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -208,11 +218,14 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { getOtherEventTypeTitleFromValueAutoLocale } from '@/i18n/otherEventType';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "OtherEventLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
+    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -234,6 +247,7 @@ export default defineComponent({
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
         const eventClassifications = ref<EntityClassificationResponse[]>();
+        const eventIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -250,6 +264,7 @@ export default defineComponent({
                 StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
+            fetchIdentifiers();
             fetchOtherEvent();
             fetchIndicators();
         });
@@ -306,6 +321,12 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchEventIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIdentifiers.value = response.data;
+            });
+        };
+
         const updateBasicInfo = (basicInfo: OtherEvent) => {
             otherEvent.value!.name = basicInfo.name;
             otherEvent.value!.nameAbbreviation = basicInfo.nameAbbreviation;
@@ -359,8 +380,8 @@ export default defineComponent({
             country, OtherEventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify,
-            getOtherEventTypeTitleFromValueAutoLocale
+            fetchClassifications, canClassify, fetchIdentifiers,
+            getOtherEventTypeTitleFromValueAutoLocale, eventIdentifiers
         };
 }})
 

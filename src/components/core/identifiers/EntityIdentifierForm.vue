@@ -15,10 +15,11 @@
         <v-row>
             <v-col>
                 <v-text-field
+                    ref="form"
                     v-model="identifierValue"
                     :label="$t('valueLabel') + '*'"
                     :placeholder="$t('valueLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    :rules="[...requiredFieldRules, identifierRegexRule]"
                 />
             </v-col>
         </v-row>
@@ -32,14 +33,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+import { computed, defineComponent, nextTick, type PropType } from 'vue';
 import { ref } from 'vue';
 import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import { DocumentIdentifier, EntityIdentifier, EntityIdentifierResponse, EventIdentifier, IdentifierResponse, OrganisationUnitIdentifier, PersonIdentifier, PublicationSeriesIdentifier } from '@/models/IdentifierModel';
+import type { DocumentIdentifier, EntityIdentifier, EntityIdentifierResponse, EventIdentifier, IdentifierResponse, OrganisationUnitIdentifier, PersonIdentifier, PublicationSeriesIdentifier } from '@/models/IdentifierModel';
 import IdentifierService from '@/services/IdentifierService';
+import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
@@ -66,12 +68,16 @@ export default defineComponent({
     setup(props, { emit }) {
         const isFormValid = ref(false);
 
+        const i18n = useI18n();
+
         const applicableIdentifiersRaw = ref<IdentifierResponse[]>([]);
         const applicableIdentifiers = ref<{title: string, value: number}[]>([]);
 
         onMounted(() => {
             fetchDetails();
         });
+
+        const form = ref<HTMLFormElement | null>(null);
 
         const fetchDetails = () => {
             IdentifierService.fetchIdentifiersForApplicableTypes(props.applicableTypes).then(response => {
@@ -90,6 +96,10 @@ export default defineComponent({
                             value: props.presetIdentifier.identifierResponse.id
                         };
                 }
+
+                nextTick(() => {
+                    form.value?.validate();
+                });
             });
         };
 
@@ -120,11 +130,33 @@ export default defineComponent({
             emit("create", { identifier: entityIdentifier });
         };
 
+        const identifierRegexRule = computed(() => {
+            return (value: string) => {
+                if (!value) {
+                    return false;
+                }
+
+                const regex = applicableIdentifiersRaw.value
+                    .find(identifier => identifier.id === selectedIdentifier.value.value)?.regularExpression;
+
+                if (!regex) {
+                    return true;
+                }
+
+                try {
+                    const re = new RegExp(`^(?:${regex})$`);
+                    return re.test(value) || i18n.t("entityIdentifierRegexMismatchMessage");
+                } catch (_e) {
+                    return i18n.t("entityIdentifierRegexMismatchMessage");
+                }
+            };
+        });
+
         return {
-            isFormValid, identifierValue, submit,
+            isFormValid, identifierValue, submit, form,
             requiredFieldRules, requiredSelectionRules,
             applicableIdentifiers, selectedIdentifier,
-            requiredNumericFieldRules
+            requiredNumericFieldRules, identifierRegexRule
         };
     }
 });

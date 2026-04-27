@@ -108,6 +108,16 @@
                                 <div v-if="conference?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="eventIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="conference?.id" 
+                                        :containing-entity-type="ApplicableEntityType.EVENT"
+                                        :concrete-entity-type="ApplicableEntityType.CONFERENCE"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -257,11 +267,14 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -290,6 +303,7 @@ export default defineComponent({
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
         const eventClassifications = ref<EntityClassificationResponse[]>();
+        const eventIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -306,6 +320,7 @@ export default defineComponent({
                 StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
+            fetchIdentifiers();
             fetchConference();
             fetchIndicators();
         });
@@ -313,6 +328,12 @@ export default defineComponent({
         const fetchIndicators = () => {
             EntityIndicatorService.fetchEventIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 eventIndicators.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchEventIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIdentifiers.value = response.data;
             });
         };
 
@@ -441,7 +462,8 @@ export default defineComponent({
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify, ExportableEndpointType
+            fetchClassifications, canClassify, ExportableEndpointType,
+            fetchIdentifiers, eventIdentifiers
         };
 }})
 

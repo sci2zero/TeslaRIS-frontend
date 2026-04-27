@@ -1422,5 +1422,9 @@ export default {
     uriPrefixLabel: "URI prefiks",
     identifierListLabel: "Identifikatori",
     createNewIdentifierLabel: "Kreiraj novi identifikator",
-    updateIdentifierLabel: "Ažuriraj identifikator"
+    updateIdentifierLabel: "Ažuriraj identifikator",
+    otherIdentifiersLabel: "Ostali identifikatori",
+    createNewEntityIdentifierLabel: "Dodaj identifikator",
+    entityIdentifierRegexMismatchMessage: "Neispravan format identifikatora.",
+    visitLinkLabel: "Poseti link"
 }

@@ -120,6 +120,16 @@
                                 <div v-if="course?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="eventIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="course?.id" 
+                                        :containing-entity-type="ApplicableEntityType.EVENT"
+                                        :concrete-entity-type="ApplicableEntityType.COURSE"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -237,11 +247,14 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import CourseUpdateForm from '@/components/event/update/CourseUpdateForm.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "CourseLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader },
+    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -263,6 +276,7 @@ export default defineComponent({
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
         const eventClassifications = ref<EntityClassificationResponse[]>();
+        const eventIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -279,6 +293,7 @@ export default defineComponent({
                 StatisticsService.registerEventView(parseInt(currentRoute.params.id as string));
             }
 
+            fetchIdentifiers();
             fetchCourse();
             fetchIndicators();
         });
@@ -292,6 +307,12 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchEventClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 eventClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchEventIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                eventIdentifiers.value = response.data;
             });
         };
 
@@ -393,7 +414,8 @@ export default defineComponent({
             country, CourseUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
-            fetchClassifications, canClassify
+            fetchClassifications, canClassify, fetchIdentifiers,
+            eventIdentifiers
         };
 }})
 

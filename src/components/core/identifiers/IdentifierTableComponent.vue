@@ -125,7 +125,7 @@ export default defineComponent({
         });
 
         const headers = [
-          { title: titleLabel, align: "start", sortable: true, key: "title.content"},
+          { title: titleLabel, align: "start", sortable: true, key: "t.content"},
           { title: descriptionLabel, align: "start", sortable: false, key: "description.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: regularExpressionLabel, align: "start", sortable: true, key: "regularExpression"},
