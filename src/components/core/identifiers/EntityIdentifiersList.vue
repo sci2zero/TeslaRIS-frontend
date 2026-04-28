@@ -143,6 +143,12 @@ export default defineComponent({
                 await EntityIdentifierService.updateDocumentIdentifier(entityIdentifier.identifier, entityIdentifierId);
             } else if (props.containingEntityType === ApplicableEntityType.EVENT) {
                 await EntityIdentifierService.updateEventIdentifier(entityIdentifier.identifier, entityIdentifierId);
+            } else if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                await EntityIdentifierService.updatePublicationSeriesIdentifier(entityIdentifier.identifier, entityIdentifierId);
+            } else if (props.containingEntityType === ApplicableEntityType.ORGANISATION_UNIT) {
+                await EntityIdentifierService.updateOrganisationUnitIdentifier(entityIdentifier.identifier, entityIdentifierId);
+            } else if (props.containingEntityType === ApplicableEntityType.PERSON) {
+                await EntityIdentifierService.updatePersonIdentifier(entityIdentifier.identifier, entityIdentifierId);
             }
 
             emit("updated");
@@ -153,6 +159,12 @@ export default defineComponent({
                 await EntityIdentifierService.createDocumentIdentifier(entityIdentifier.identifier);
             } else if (props.containingEntityType === ApplicableEntityType.EVENT) {
                 await EntityIdentifierService.createEventIdentifier(entityIdentifier.identifier);
+            } else if (props.containingEntityType === ApplicableEntityType.PUBLICATION_SERIES) {
+                await EntityIdentifierService.createPublicationSeriesIdentifier(entityIdentifier.identifier);
+            } else if (props.containingEntityType === ApplicableEntityType.PERSON) {
+                await EntityIdentifierService.createPersonIdentifier(entityIdentifier.identifier);
+            } else if (props.containingEntityType === ApplicableEntityType.ORGANISATION_UNIT) {
+                await EntityIdentifierService.createOrganisationUnitIdentifier(entityIdentifier.identifier);
             }
 
             emit("updated");

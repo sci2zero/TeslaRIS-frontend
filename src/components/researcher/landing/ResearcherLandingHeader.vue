@@ -8,8 +8,8 @@
                         <person-profile-image
                             :filename="person?.imageServerFilename"
                             :person-id="person?.id"
-                            :can-edit="canEdit">
-                        </person-profile-image>
+                            :can-edit="canEdit"
+                        />
                         <!-- <img
                             src="https://media.licdn.com/dms/image/v2/C5603AQGxtzCVK6GaHA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1563263024808?e=2147483647&v=beta&t=RMkrpatN3DzSBMhrc7DVkuG98ug5ixG-bwYh5yO-bd0"
                             alt="Researcher Profile" class="w-full h-full object-cover" /> -->
@@ -498,6 +498,16 @@
                                         <span v-else>-</span>
                                     </p>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="personIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="person?.id" 
+                                        :containing-entity-type="ApplicableEntityType.PERSON"
+                                        :concrete-entity-type="ApplicableEntityType.PERSON"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -554,7 +564,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -568,6 +578,10 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import { ApplicableEntityType } from '@/models/Common';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 interface Props {
@@ -592,6 +606,12 @@ const {isResearcher, isAdmin} = useUserRole();
 const tabs = computed(() => [
     { id: 'personal', name: t('allDetailsLabel') },
 ]);
+
+onMounted(() => {
+    fetchIdentifiers();
+});
+
+const personIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
 const primaryEmployment = computed(() => 
     props.employments.length > 0 
@@ -625,6 +645,14 @@ const formatSex = (sex: Sex | null | undefined): string => {
 
 const updatePersonalInfo = (personalInfo: PersonalInfo) => {
     emit("update", personalInfo);
+};
+
+const fetchIdentifiers = () => {
+    EntityIdentifierService.fetchPersonIdentifiers(
+        props.person?.id as number
+    ).then(response => {
+        personIdentifiers.value = response.data;
+    });
 };
 
 </script>

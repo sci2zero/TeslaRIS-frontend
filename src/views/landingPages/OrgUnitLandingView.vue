@@ -200,6 +200,16 @@
                                 <div class="response">
                                     <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="organisationUnitIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="organisationUnit?.id" 
+                                        :containing-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
+                                        :concrete-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                             <v-col cols="5">
                                 <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
@@ -640,11 +650,14 @@ import ImportService from '@/services/importer/ImportService';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { getOUSectorFromValueAutoLocale } from '@/i18n/ouSector';
 import { localiseDate } from '@/utils/DateUtil';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList },
     setup() {
         const currentTab = ref("relations");
         const displayPersistentDialog = ref(false);
@@ -724,6 +737,8 @@ export default defineComponent({
         const displaySettings = useOUChartDisplay(parseInt(currentRoute.params.id as string));
         const displaySettingsDL = useDLChartDisplay(parseInt(currentRoute.params.id as string));
 
+        const organisationUnitIdentifiers = ref<EntityIdentifierResponse[]>([]);
+
         onMounted(() => {
             if (loginStore.userLoggedIn) {
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
@@ -738,6 +753,7 @@ export default defineComponent({
             StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
             
             fetchOU(true);
+            fetchIdentifiers();
             fetchIndicators();
             fetchRelations();
 
@@ -813,6 +829,12 @@ export default defineComponent({
         const fetchIndicators = () => {
             EntityIndicatorService.fetchOUIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 ouIndicators.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchOUIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                organisationUnitIdentifiers.value = response.data;
             });
         };
 
@@ -1161,7 +1183,8 @@ export default defineComponent({
             returnOnlyNonArchived, canEditDefaultSubmissionContent,
             openMetadataEnrichmentDialog, displayPersistentDialog,
             startMetadataEnrichment, updateDescription,
-            getOUSectorFromValueAutoLocale, localiseDate
+            getOUSectorFromValueAutoLocale, localiseDate,
+            organisationUnitIdentifiers, fetchIdentifiers
         };
 }})
 

@@ -97,7 +97,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("monographPublicationsComparatorLabel");
+            document.title = i18n.t("routeLabel.monographPublicationsComparator");
             fetchMonographs();
             fetchPublications();
         });

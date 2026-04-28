@@ -121,7 +121,7 @@ export default defineComponent({
         });
 
         const searchBookSeries = lodash.debounce((input: string) => {
-            if (input.includes("|")) {
+            if (!input || input.includes("|")) {
                 return;
             }
 

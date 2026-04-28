@@ -80,6 +80,16 @@
                                 <div class="response">
                                     <uri-list :uris="bookSeries?.uris"></uri-list>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="publicationSeriesIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="bookSeries?.id" 
+                                        :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                                        :concrete-entity-type="ApplicableEntityType.BOOK_SERIES"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -171,11 +181,14 @@ import EntityIndicatorService from '@/services/assessment/EntityIndicatorService
 import { type EntityIndicatorResponse } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -204,6 +217,7 @@ export default defineComponent({
         const router = useRouter();
 
         const bookSeriesIndicators = ref<EntityIndicatorResponse[]>();
+        const publicationSeriesIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -215,6 +229,7 @@ export default defineComponent({
             }
 
             fetchBookSeries(true);
+            fetchIdentifiers();
             fetchIndicators();
         });
 
@@ -225,6 +240,12 @@ export default defineComponent({
         const fetchIndicators = () => {
             EntityIndicatorService.fetchPublicationSeriesIndicators(parseInt(currentRoute.params.id as string)).then(response => {
                 bookSeriesIndicators.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchPublicationSeriesIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                publicationSeriesIdentifiers.value = response.data;
             });
         };
 
@@ -316,9 +337,9 @@ export default defineComponent({
         };
 
         return {
-            bookSeries, icon,
-            publications, 
-            totalPublications,
+            bookSeries, icon, publications, 
+            fetchIdentifiers, totalPublications,
+            publicationSeriesIdentifiers,
             switchPage, currentTab,
             returnCurrentLocaleContent,
             languageMap, canEdit,

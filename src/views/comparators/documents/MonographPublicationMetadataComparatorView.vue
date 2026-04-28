@@ -152,7 +152,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("monographPublicationMetadataComparatorLabel");
+            document.title = i18n.t("routeLabel.monographPublicationMetadataComparator");
             fetchMonographs();
         });
 

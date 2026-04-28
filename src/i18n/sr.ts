@@ -116,6 +116,7 @@ export default {
         materialProductLandingPage: "Detalji materijalnog proizvoda",
         geneticMaterialLandingPage: "Detalji genetskog materijala",
         submitGeneticMaterial: "Dodavanje genetskog materijala",
+        geneticMaterialMetadataComparator: "Poređenje genetskih materijala",
         prizes: "Nagrade",
         employmentPositions: "Radna mesta",
         submitCourse: "Dodavanje kursa",

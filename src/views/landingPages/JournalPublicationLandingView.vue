@@ -155,6 +155,16 @@
                                 <div class="response">
                                     <uri-list :uris="journalPublication?.uris"></uri-list>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="journalPublication?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.JOURNAL_PUBLICATION"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -346,11 +356,14 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -378,6 +391,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -405,6 +419,7 @@ export default defineComponent({
             fetchJournalPublication();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
 
+            fetchIdentifiers();
             fetchIndicators();
         };
 
@@ -417,6 +432,12 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -564,7 +585,8 @@ export default defineComponent({
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
-            fetchValidationStatus, PublicationType, updateRemark, displayConfiguration
+            fetchValidationStatus, PublicationType, updateRemark, displayConfiguration,
+            documentIdentifiers, fetchIdentifiers
         };
 }})
 

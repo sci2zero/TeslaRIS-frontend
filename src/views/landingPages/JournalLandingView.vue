@@ -80,6 +80,16 @@
                                 <div class="response">
                                     <uri-list :uris="journal?.uris"></uri-list>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="publicationSeriesIdentifiers"
+                                        :can-edit="canEdit" 
+                                        :entity-id="journal?.id" 
+                                        :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                                        :concrete-entity-type="ApplicableEntityType.JOURNAL"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -192,11 +202,14 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -225,6 +238,7 @@ export default defineComponent({
 
         const journalIndicators = ref<EntityIndicatorResponse[]>();
         const journalClassifications = ref<EntityClassificationResponse[]>();
+        const publicationSeriesIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -242,6 +256,7 @@ export default defineComponent({
             }
 
             fetchJournal(true);
+            fetchIdentifiers();
             fetchIndicators();
         });
 
@@ -280,6 +295,12 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchPublicationSeriesClassifications(parseInt(currentRoute.params.id as string)).then((response) => {
                 journalClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchPublicationSeriesIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+                publicationSeriesIdentifiers.value = response.data;
             });
         };
 
@@ -364,7 +385,8 @@ export default defineComponent({
             updateContributions, ApplicableEntityType,
             currentTab, PublicationSeriesUpdateForm,
             journalClassifications, createJournalClassification,
-            fetchClassifications
+            fetchClassifications, publicationSeriesIdentifiers,
+            fetchIdentifiers
         };
 }})
 

@@ -5,17 +5,30 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftProceedings?.title) }}
                 </h2>
+                
                 <br />
 
                 <proceedings-update-form
-                    ref="updateLeftRef" :preset-proceedings="leftProceedings" in-comparator :in-modal="false"
-                    @update="updateLeft"></proceedings-update-form>
+                    ref="updateLeftRef"
+                    :preset-proceedings="leftProceedings"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftProceedings?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftProceedings?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftProceedings?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftProceedings?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,8 +43,8 @@
                             :contribution-list="leftProceedings?.contributions ? leftProceedings.contributions : []"
                             :document-id="leftProceedings?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -60,14 +73,26 @@
                 <br />
 
                 <proceedings-update-form
-                    ref="updateRightRef" :preset-proceedings="rightProceedings" in-comparator :in-modal="false"
-                    @update="updateRight"></proceedings-update-form>
+                    ref="updateRightRef"
+                    :preset-proceedings="rightProceedings"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightProceedings?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightProceedings?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightProceedings?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightProceedings?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -82,8 +107,8 @@
                             :contribution-list="rightProceedings?.contributions ? rightProceedings.contributions : []"
                             :document-id="rightProceedings?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 

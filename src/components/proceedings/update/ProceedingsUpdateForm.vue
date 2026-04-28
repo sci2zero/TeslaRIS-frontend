@@ -9,8 +9,8 @@
                             v-model="title"
                             :rules="requiredFieldRules"
                             :label="$t('titleLabel') + '*'"
-                            :initial-value="toMultilingualTextInput(presetProceedings?.title, languageTags)">
-                        </multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(presetProceedings?.title, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -29,8 +29,8 @@
                             v-model="publicationYear"
                             :rules="requiredFieldRules"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel')">
-                        </v-text-field>
+                            :placeholder="$t('yearOfPublicationLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -48,8 +48,8 @@
                             ref="subtitleRef"
                             v-model="subtitle"
                             :label="$t('subtitleLabel')"
-                            :initial-value="toMultilingualTextInput(presetProceedings?.subTitle, languageTags)">
-                        </multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(presetProceedings?.subTitle, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -58,13 +58,13 @@
                             ref="acronymRef"
                             v-model="acronym"
                             :label="$t('nameAbbreviationLabel')"
-                            :initial-value="toMultilingualTextInput(presetProceedings?.acronym, languageTags)">
-                        </multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(presetProceedings?.acronym, languageTags)"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <uri-input ref="urisRef" v-model="uris"></uri-input>
+                        <uri-input ref="urisRef" v-model="uris" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -74,7 +74,7 @@
                             :label="$t('languageLabel')"
                             :items="languageList"
                             multiple
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -84,8 +84,8 @@
                             type="number"
                             :label="$t('numberOfPagesLabel')"
                             :placeholder="$t('numberOfPagesLabel')"
-                            :rules="optionalNumericZeroOrGreaterFieldRules">
-                        </v-text-field>
+                            :rules="optionalNumericZeroOrGreaterFieldRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -94,15 +94,14 @@
                             v-model="eIsbn"
                             label="E-ISBN"
                             placeholder="E-ISBN"
-                            :rules="isbnValidationRules">
-                        </v-text-field>
+                            :rules="isbnValidationRules"
+                        />
                     </v-col>
                     <v-col cols="2" class="text-center">
                         <v-btn 
                             icon 
                             class="mx-2"
-                            @click="[printIsbn, eIsbn] = [eIsbn, printIsbn]"
-                        >
+                            @click="[printIsbn, eIsbn] = [eIsbn, printIsbn]">
                             <v-icon>mdi-swap-horizontal</v-icon>
                         </v-btn>
                     </v-col>
@@ -111,13 +110,18 @@
                             v-model="printIsbn"
                             label="Print ISBN"
                             placeholder="Print ISBN"
-                            :rules="isbnValidationRules">
-                        </v-text-field>
+                            :rules="isbnValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="doi"
+                            label="DOI"
+                            placeholder="DOI"
+                            :rules="doiValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -145,15 +149,15 @@
                         <v-text-field
                             v-model="publicationSeriesVolume"
                             :label="$t('publicationSeriesVolumeLabel')"
-                            :placeholder="$t('publicationSeriesVolumeLabel')">
-                        </v-text-field>
+                            :placeholder="$t('publicationSeriesVolumeLabel')"
+                        />
                     </v-col>
                     <v-col cols="6">
                         <v-text-field
                             v-model="publicationSeriesIssue"
                             :label="$t('publicationSeriesIssueLabel')"
-                            :placeholder="$t('publicationSeriesIssueLabel')">
-                        </v-text-field>
+                            :placeholder="$t('publicationSeriesIssueLabel')"
+                        />
                     </v-col>
                 </v-row>
             </v-col>
@@ -164,24 +168,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
 
