@@ -111,7 +111,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="patent?.uris"></uri-list>
+                                    <uri-list :uris="patent?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="patent?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.PATENT"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -294,11 +304,14 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -322,6 +335,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -347,6 +361,7 @@ export default defineComponent({
             }
 
             fetchPatent();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -388,6 +403,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -487,7 +510,8 @@ export default defineComponent({
             StatisticsType, documentIndicators, actionsRef, currentRoute,
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators, fetchValidationStatus,
-            PublicationType, updateRemark, displayConfiguration, isAdmin, isCommission
+            PublicationType, updateRemark, displayConfiguration, isAdmin, isCommission,
+            fetchIdentifiers, documentIdentifiers
         };
 }})
 

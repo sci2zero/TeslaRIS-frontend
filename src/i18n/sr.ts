@@ -1427,5 +1427,11 @@ export default {
     otherIdentifiersLabel: "Ostali identifikatori",
     createNewEntityIdentifierLabel: "Dodaj identifikator",
     entityIdentifierRegexMismatchMessage: "Neispravan format identifikatora.",
-    visitLinkLabel: "Poseti link"
+    visitLinkLabel: "Poseti link",
+    presentersLabel: "Prezenteri",
+    translatorsLabel: "Prevodioci",
+    assistantStaffLabel: "Pomoćno osoblje",
+    arguersLabel: "Branioci",
+    ownersLabel: "Valsnici",
+    identifierInUseMessage: "Identifikator je već u upotrebi"
 }

@@ -72,7 +72,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="materialProduct?.documentDate" class="response">
-                                    {{ materialProduct.documentDate }}
+                                    {{ localiseDate(materialProduct.documentDate) }}
                                 </div>
                                 <div v-if="materialProduct?.publisherId || materialProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -123,7 +123,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="materialProduct?.uris"></uri-list>
+                                    <uri-list :uris="materialProduct?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="materialProduct?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.MATERIAL_PRODUCT"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -328,11 +338,15 @@ import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal
 import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import { localiseDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -356,6 +370,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -387,6 +402,7 @@ export default defineComponent({
             }
 
             fetchMaterialProduct();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -428,6 +444,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -537,7 +561,8 @@ export default defineComponent({
             fetchIndicators, createIndicator, PublicationType,
             fetchMaterialProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas, isAdmin,
-            getMaterialProductTypeTitleFromValueAutoLocale
+            getMaterialProductTypeTitleFromValueAutoLocale,
+            documentIdentifiers, fetchIdentifiers, localiseDate
         };
 }})
 

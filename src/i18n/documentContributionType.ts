@@ -8,7 +8,12 @@ export const contributionTypesEn = [
     { title: "Editor", value: DocumentContributionType.EDITOR },
     { title: "Reviewer", value: DocumentContributionType.REVIEWER },
     { title: "Advisor", value: DocumentContributionType.ADVISOR },
-    { title: "Board Member", value: DocumentContributionType.BOARD_MEMBER }
+    { title: "Board Member", value: DocumentContributionType.BOARD_MEMBER },
+    { title: "Presenter", value: DocumentContributionType.PRESENTER },
+    { title: "Translator", value: DocumentContributionType.TRANSLATOR },
+    { title: "Assistant staff", value: DocumentContributionType.ASSISTANT_STAFF },
+    { title: "Arguer", value: DocumentContributionType.ARGUER },
+    { title: "Owner", value: DocumentContributionType.OWNER }
 ];
 
 export const contributionTypesSr = [
@@ -16,7 +21,12 @@ export const contributionTypesSr = [
     { title: "Urednik", value: DocumentContributionType.EDITOR },
     { title: "Recenzent", value: DocumentContributionType.REVIEWER },
     { title: "Savetnik", value: DocumentContributionType.ADVISOR },
-    { title: "Član komisije", value: DocumentContributionType.BOARD_MEMBER }
+    { title: "Član komisije", value: DocumentContributionType.BOARD_MEMBER },
+    { title: "Prezenter", value: DocumentContributionType.PRESENTER },
+    { title: "Prevodioc", value: DocumentContributionType.TRANSLATOR },
+    { title: "Pomoćno osoblje", value: DocumentContributionType.ASSISTANT_STAFF },
+    { title: "Branioc", value: DocumentContributionType.ARGUER },
+    { title: "Vlasnik", value: DocumentContributionType.OWNER }
 ];
 
 export const getTitleFromValueAutoLocale = (value: DocumentContributionType) => {

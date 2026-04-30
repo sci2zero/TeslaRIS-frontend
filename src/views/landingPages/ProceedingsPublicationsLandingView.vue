@@ -138,7 +138,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="proceedingsPublication?.uris"></uri-list>
+                                    <uri-list :uris="proceedingsPublication?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="proceedingsPublication?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.PROCEEDINGS_PUBLICATION"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -329,11 +339,14 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -363,6 +376,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -388,6 +402,7 @@ export default defineComponent({
             }
 
             fetchProceedingsPublication();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -401,6 +416,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -544,7 +567,7 @@ export default defineComponent({
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
             fetchValidationStatus, PublicationType, updateRemark, isAdmin,
-            isCommission, publicationTypes
+            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers
         };
 }})
 

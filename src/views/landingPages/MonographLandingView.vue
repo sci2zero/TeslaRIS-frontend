@@ -171,7 +171,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="monograph?.uris"></uri-list>
+                                    <uri-list :uris="monograph?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="monograph?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.MONOGRAPH"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -401,11 +411,14 @@ import PublisherService from '@/services/PublisherService';
 import { type Publisher } from '@/models/PublisherModel';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -442,6 +455,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -467,6 +481,7 @@ export default defineComponent({
             }
 
             fetchMonograph();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -504,6 +519,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -679,7 +702,8 @@ export default defineComponent({
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
             publisher, updateRemark, displayConfiguration,
-            isAdmin, isCommission, MonographUpdateForm
+            isAdmin, isCommission, MonographUpdateForm,
+            fetchIdentifiers, documentIdentifiers
         };
 }})
 

@@ -157,7 +157,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="proceedings?.uris"></uri-list>
+                                    <uri-list :uris="proceedings?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="proceedings?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.PROCEEDINGS"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -350,11 +360,14 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("");
 
@@ -388,6 +401,7 @@ export default defineComponent({
         const icon = ref("mdi-newspaper-variant-multiple");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore= useLoginStore();
 
@@ -405,6 +419,7 @@ export default defineComponent({
             }
 
             fetchProceedings(true);
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -493,6 +508,14 @@ export default defineComponent({
                         });
                     });
                 }
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
+            });
         };
 
         const searchKeyword = (keyword: string) => {
@@ -597,9 +620,9 @@ export default defineComponent({
             proceedings, icon, fetchIndicators, PublicationType,
             publications, event, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
-            returnCurrentLocaleContent, localiseDate,
+            returnCurrentLocaleContent, localiseDate, fetchIdentifiers,
             languageMap, publicationSeriesType, displayConfiguration,
-            searchKeyword, goToURL, canEdit, publisher,
+            searchKeyword, goToURL, canEdit, publisher, documentIdentifiers,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,

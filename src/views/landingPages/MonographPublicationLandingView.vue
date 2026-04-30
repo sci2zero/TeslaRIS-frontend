@@ -139,7 +139,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="monographPublication?.uris"></uri-list>
+                                    <uri-list :uris="monographPublication?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="monographPublication?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -325,11 +335,14 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -357,6 +370,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -382,6 +396,7 @@ export default defineComponent({
             }
 
             fetchMonographPublication();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -427,6 +442,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -532,7 +555,8 @@ export default defineComponent({
             ApplicableEntityType, canClassify, documentClassifications,
             fetchClassifications, createClassification, fetchIndicators,
             createIndicator, actionsRef, fetchValidationStatus, PublicationType,
-            updateRemark, displayConfiguration, isAdmin, isCommission
+            updateRemark, displayConfiguration, isAdmin, isCommission,
+            fetchIdentifiers, documentIdentifiers
         };
 }})
 

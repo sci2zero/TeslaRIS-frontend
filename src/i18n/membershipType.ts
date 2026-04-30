@@ -11,6 +11,7 @@ export const membershipTypeSr = [
     { title: "Redovni član", value: MembershipType.REGULAR_MEMBER },
     { title: "Pridruženi član", value: MembershipType.ASSOCIATE_MEMBER },
     { title: "Posmatrač", value: MembershipType.OBSERVER },
+    { title: "Član komisije", value: MembershipType.COMMISSION_MEMBER },
     { title: "Drugo", value: MembershipType.OTHER }
 ];
 
@@ -23,6 +24,7 @@ export const membershipTypeEn = [
     { title: "Regular Member", value: MembershipType.REGULAR_MEMBER },
     { title: "Associate Member", value: MembershipType.ASSOCIATE_MEMBER },
     { title: "Observer", value: MembershipType.OBSERVER },
+    { title: "Commission member", value: MembershipType.COMMISSION_MEMBER },
     { title: "Other", value: MembershipType.OTHER }
 ];
 

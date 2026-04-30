@@ -123,7 +123,17 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="intangibleProduct?.uris"></uri-list>
+                                    <uri-list :uris="intangibleProduct?.uris" />
+                                </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="intangibleProduct?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.INTANGIBLE_PRODUCT"
+                                        @updated="fetchIdentifiers"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -328,11 +338,14 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import { getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -356,6 +369,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -387,6 +401,7 @@ export default defineComponent({
             }
 
             fetchIntangibleProduct();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -428,6 +443,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -536,7 +559,7 @@ export default defineComponent({
             fetchIntangibleProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas,
             getIntangibleProductTypeTitleFromValueAutoLocale,
-            isAdmin, isCommission
+            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers
         };
 }})
 

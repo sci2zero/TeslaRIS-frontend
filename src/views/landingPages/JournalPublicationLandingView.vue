@@ -436,7 +436,9 @@ export default defineComponent({
         };
 
         const fetchIdentifiers = () => {
-            EntityIdentifierService.fetchDocumentIdentifiers(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentIdentifiers.value = response.data;
             });
         };

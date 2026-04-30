@@ -1413,5 +1413,11 @@ export default {
     otherIdentifiersLabel: "Other identifiers",
     createNewEntityIdentifierLabel: "Add identifier",
     entityIdentifierRegexMismatchMessage: "Wrong identifier format.",
-    visitLinkLabel: "Visit link"
+    visitLinkLabel: "Visit link",
+    presentersLabel: "Presenters",
+    translatorsLabel: "Translators",
+    assistantStaffLabel: "Assistant staff",
+    arguersLabel: "Arguers",
+    ownersLabel: "Owners",
+    identifierInUseMessage: "Identifier is already in use."
 }

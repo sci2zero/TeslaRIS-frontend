@@ -40,6 +40,21 @@
                         <v-tab v-show="boardMembersAllowed" value="boardMembers">
                             {{ $t("boardMembersLabel") }}
                         </v-tab>
+                        <v-tab value="presenters">
+                            {{ $t("presentersLabel") }}
+                        </v-tab>
+                        <v-tab value="translators">
+                            {{ $t("translatorsLabel") }}
+                        </v-tab>
+                        <v-tab value="assistantStaff">
+                            {{ $t("assistantStaffLabel") }}
+                        </v-tab>
+                        <v-tab v-show="boardMembersAllowed" value="arguers">
+                            {{ $t("arguersLabel") }}
+                        </v-tab>
+                        <v-tab v-show="boardMembersAllowed" value="owners">
+                            {{ $t("ownersLabel") }}
+                        </v-tab>
                     </v-tabs>
 
                     <v-window v-model="currentTab">
@@ -79,6 +94,46 @@
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="boardMemberList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
+                            </person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="presenters">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="presenterList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
+                            </person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="translators">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="translatorList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
+                            </person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="assistantStaff">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="assistantStaffList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
+                            </person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="arguers">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="arguerList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList">
+                            </person-document-contribution-list>
+                        </v-window-item>
+                        <v-window-item value="owners">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="ownerList"
                                 :can-reorder="!readOnly"
                                 @positions-changed="updateOrderInParentList">
                             </person-document-contribution-list>
@@ -144,6 +199,11 @@ export default defineComponent({
         const reviewerList = ref<PersonDocumentContribution[]>([]);
         const advisorList = ref<PersonDocumentContribution[]>([]);
         const boardMemberList = ref<PersonDocumentContribution[]>([]);
+        const presenterList = ref<PersonDocumentContribution[]>([]);
+        const translatorList = ref<PersonDocumentContribution[]>([]);
+        const assistantStaffList = ref<PersonDocumentContribution[]>([]);
+        const arguerList = ref<PersonDocumentContribution[]>([]);
+        const ownerList = ref<PersonDocumentContribution[]>([]);
 
         onMounted(() => {
             if (props.contributionList) {
@@ -180,6 +240,26 @@ export default defineComponent({
                 localContributions.value.filter(
                     (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]
                 );
+            presenterList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.PRESENTER]
+                );
+            translatorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.TRANSLATOR]
+                );
+            assistantStaffList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ASSISTANT_STAFF]
+                );
+            arguerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ARGUER]
+                );
+            ownerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.OWNER]
+                );
 
             selectFirstNonEmptyTab();
         };
@@ -190,7 +270,12 @@ export default defineComponent({
                 editors: editorList.value,
                 reviewers: reviewerList.value,
                 advisors: advisorList.value,
-                boardMembers: boardMemberList.value
+                boardMembers: boardMemberList.value,
+                presenters: presenterList.value,
+                translators: translatorList.value,
+                assistantStaff: assistantStaffList.value,
+                arguers: arguerList.value,
+                owners: ownerList.value
             };
 
             const tabs = Object.keys(contributionLists);
@@ -223,6 +308,16 @@ export default defineComponent({
                     return [DocumentContributionType.ADVISOR];
                 case "boardMembers":
                     return [DocumentContributionType.BOARD_MEMBER];
+                case "presenters":
+                    return [DocumentContributionType.PRESENTER];
+                case "translators":
+                    return [DocumentContributionType.TRANSLATOR];
+                case "assistantStaff":
+                    return [DocumentContributionType.ASSISTANT_STAFF];
+                case "arguers":
+                    return [DocumentContributionType.ARGUER];
+                case "owners":
+                    return [DocumentContributionType.OWNER];
             }
 
             return props.forProceedings ? [DocumentContributionType.EDITOR, DocumentContributionType.REVIEWER] : [DocumentContributionType.AUTHOR];
@@ -235,6 +330,11 @@ export default defineComponent({
             reviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
             advisorList.value.forEach(contribution => indexes.push(contribution.id as number));
             boardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
+            presenterList.value.forEach(contribution => indexes.push(contribution.id as number));
+            translatorList.value.forEach(contribution => indexes.push(contribution.id as number));
+            assistantStaffList.value.forEach(contribution => indexes.push(contribution.id as number));
+            arguerList.value.forEach(contribution => indexes.push(contribution.id as number));
+            ownerList.value.forEach(contribution => indexes.push(contribution.id as number));
 
             updateContributionPositions(indexes);
             selectFirstNonEmptyTab();
@@ -263,6 +363,16 @@ export default defineComponent({
                 currentTab.value = "advisors";
             } else if (boardMemberList.value.length > 0) {
                 currentTab.value = "boardMembers";
+            } else if (presenterList.value.length > 0) {
+                currentTab.value = "presenters";
+            } else if (translatorList.value.length > 0) {
+                currentTab.value = "translators";
+            } else if (assistantStaffList.value.length > 0) {
+                currentTab.value = "assistantStaff";
+            } else if (arguerList.value.length > 0) {
+                currentTab.value = "arguers";
+            } else if (ownerList.value.length > 0) {
+                currentTab.value = "owners";
             } else {
                 currentTab.value = "";
             }
@@ -280,6 +390,16 @@ export default defineComponent({
                     return advisorList.value;
                 case "boardMembers":
                     return boardMemberList.value;
+                case "presenters":
+                    return presenterList.value;
+                case "translators":
+                    return translatorList.value;
+                case "assistantStaff":
+                    return assistantStaffList.value;
+                case "arguers":
+                    return arguerList.value;
+                case "owners":
+                    return ownerList.value;
             }
 
             return boardMemberList.value;
@@ -290,8 +410,9 @@ export default defineComponent({
             currentTab, authorList, editorList,
             reviewerList, advisorList, boardMemberList,
             updateOrderInParentList, localContributions,
-            getContributorGroupForUpdating,
-            getLockedContributionTypes
+            getContributorGroupForUpdating, presenterList,
+            getLockedContributionTypes, translatorList,
+            assistantStaffList, arguerList, ownerList
         };
     },
 });

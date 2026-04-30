@@ -114,6 +114,16 @@
                                 <div class="response">
                                     <uri-list :uris="dataset?.uris"></uri-list>
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="dataset?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.DATASET"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -295,11 +305,14 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -322,6 +335,7 @@ export default defineComponent({
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
 
@@ -347,6 +361,7 @@ export default defineComponent({
             }
 
             fetchDataset();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -392,6 +407,14 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then(response => {
                 documentIndicators.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -500,7 +523,8 @@ export default defineComponent({
             currentRoute, actionsRef, canClassify, ApplicableEntityType,
             fetchClassifications, documentClassifications, createClassification,
             createIndicator, fetchIndicators, fetchValidationStatus, updateRemark,
-            displayConfiguration, isAdmin, isCommission
+            displayConfiguration, isAdmin, isCommission, documentIdentifiers,
+            fetchIdentifiers
         };
 }})
 

@@ -26,6 +26,11 @@ export interface DocumentPublicationIndex {
     reviewerNames: string;
     advisorIds: number[];
     advisorNames: string;
+    presenterIds: number[];
+    translatorIds: number[];
+    assistantStaffIds: number[];
+    arguerIds: number[];
+    ownerIds: number[];
     year: number | null;
     type: PublicationType;
     publicationSeriesId: number | null;
@@ -134,7 +139,12 @@ export enum DocumentContributionType {
     EDITOR = "EDITOR",
     REVIEWER = "REVIEWER",
     ADVISOR = "ADVISOR",
-    BOARD_MEMBER = "BOARD_MEMBER"
+    BOARD_MEMBER = "BOARD_MEMBER",
+    PRESENTER = "PRESENTER",
+    TRANSLATOR = "TRANSLATOR",
+    ASSISTANT_STAFF = "ASSISTANT_STAFF",
+    ARGUER = "ARGUER",
+    OWNER = "OWNER"
 }
 
 export interface ProceedingsPublication extends Document {

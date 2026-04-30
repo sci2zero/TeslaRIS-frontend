@@ -154,6 +154,16 @@
                                 <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.typeOfTitle) }}
                                 </div>
+                                <div>
+                                    <entity-identifiers-list
+                                        :entity-identifiers="documentIdentifiers"
+                                        :can-edit="canEdit"
+                                        :entity-id="thesis?.id" 
+                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                        :concrete-entity-type="ApplicableEntityType.THESIS"
+                                        @updated="fetchIdentifiers"
+                                    />
+                                </div>
                             </v-col>
                             <v-col cols="3">
                                 <div v-if="thesis?.eisbn">
@@ -612,11 +622,14 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import ThesisSubstitutionForm from '@/components/publication/ThesisSubstitutionForm.vue';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
     setup() {
         const currentTab = ref("contributions");
 
@@ -647,6 +660,7 @@ export default defineComponent({
         const registryBookEntryId = ref(-1);
 
         const documentClassifications = ref<EntityClassificationResponse[]>();
+        const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const icon = ref("mdi-certificate-outline");
 
@@ -676,6 +690,7 @@ export default defineComponent({
             }
 
             fetchThesis();
+            fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
         };
@@ -760,6 +775,14 @@ export default defineComponent({
         const fetchClassifications = () => {
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchDocumentIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                documentIdentifiers.value = response.data;
             });
         };
 
@@ -1033,7 +1056,8 @@ export default defineComponent({
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
-            DocumentContributionType, removeSubstitution, AlternateTitleForm
+            DocumentContributionType, removeSubstitution, AlternateTitleForm,
+            fetchIdentifiers, documentIdentifiers
         };
 }})
 
