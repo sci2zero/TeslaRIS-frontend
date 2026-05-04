@@ -56,7 +56,7 @@
                         <basic-info-loader v-if="!dataset" />
                         <v-row>
                             <v-col cols="6">
-                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)"></citation-selector>
+                                <citation-selector ref="citationRef" :document-id="parseInt(currentRoute.params.id as string)" />
                                 <div v-if="dataset?.internalNumber">
                                     {{ $t("internalNumberLabel") }}:
                                 </div>
@@ -83,48 +83,14 @@
                                     </localized-link>
                                 </div>
                             </v-col>
-                            <v-col cols="6">
-                                <div v-if="dataset?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="dataset?.scopusId" class="response">
-                                    <identifier-link :identifier="dataset.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="dataset?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="dataset?.doi" class="response">
-                                    <identifier-link :identifier="dataset.doi"></identifier-link>
-                                </div>
-                                <div v-if="dataset?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="dataset?.openAlexId" class="response">
-                                    <identifier-link :identifier="dataset.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="dataset?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="dataset?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="dataset.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
-                                <div v-if="dataset?.uris && dataset?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="dataset?.uris"></uri-list>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="dataset?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.DATASET"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
+                            <document-common-fields-display
+                                :document="dataset"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.DATASET"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -278,8 +244,6 @@ import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
@@ -306,13 +270,14 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);
@@ -467,6 +432,8 @@ export default defineComponent({
             dataset.value!.openAlexId = basicInfo.openAlexId;
             dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
             dataset.value!.authorReprint = basicInfo.authorReprint;
+
+            updateCommonBasicInfo(dataset, basicInfo);
             
             performUpdate(true);
         };

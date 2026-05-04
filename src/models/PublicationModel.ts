@@ -92,6 +92,14 @@ export enum JournalPublicationType {
     ANNOTATION
 }
 
+export enum PublicationStatus {
+    SUBMITTED = "SUBMITTED",
+    IN_REVIEW = "IN_REVIEW",
+    ACCEPTED = "ACCEPTED",
+    IN_PRINT = "IN_PRINT",
+    PUBLISHED = "PUBLISHED"
+}
+
 export interface Document {
     id?: number;
     title: MultilingualContent[];
@@ -105,6 +113,10 @@ export interface Document {
     scopusId?: string;
     openAlexId?: string;
     webOfScienceId?: string;
+    handleId?: string;
+    arxivId?: string;
+    pubmedId?: string;
+    ssrnId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
@@ -112,6 +124,25 @@ export interface Document {
     areFilesValid?: boolean;
     isArchived?: boolean;
     remark?: MultilingualContent[];
+    peerReviewed?: boolean;
+    openAccess?: boolean;
+    publicationStatus?: PublicationStatus;
+    geoSpaceDescription?: MultilingualContent[];
+    chronologicalSpaceDescription?: MultilingualContent[];
+    city?: MultilingualContent[];
+}
+
+export interface CommonFieldsData {
+    handleId?: string;
+    arxivId?: string;
+    pubmedId?: string;
+    ssrnId?: string;
+    city?: MultilingualContent[];
+    geoSpaceDescription?: MultilingualContent[];
+    chronologicalSpaceDescription?: MultilingualContent[];
+    peerReviewed?: boolean;
+    openAccess?: boolean;
+    publicationStatus?: PublicationStatus;
 }
 
 export interface JournalPublication extends Document {
@@ -185,7 +216,7 @@ export interface ProceedingsPublication extends Document {
 
 export enum MonographType {
     RESEARCH_MONOGRAPH = "RESEARCH_MONOGRAPH",
-    BOOK = "BOOK",
+    EDITED_BOOK = "EDITED_BOOK",
     BIBLIOGRAPHY = "BIBLIOGRAPHY",
     TRANSLATION = "TRANSLATION",
     STUDY = "STUDY",

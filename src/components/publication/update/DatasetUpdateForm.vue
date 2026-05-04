@@ -76,10 +76,15 @@
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
         
         <v-row>
             <p class="required-fields-message">
@@ -98,7 +103,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Dataset } from '@/models/PublicationModel';
+import type { CommonFieldsData, Dataset } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -109,11 +114,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "DatasetUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields },
     props: {
         presetDataset: {
             type: Object as PropType<Dataset | undefined>,
@@ -135,6 +142,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -151,6 +159,7 @@ export default defineComponent({
 
         watch(() => props.presetDataset, () => {
             if (props.presetDataset) {
+                updatePresetCommonFields();
                 refreshForm();
             }
         });
@@ -171,6 +180,10 @@ export default defineComponent({
         const datasetNumber = ref(props.presetDataset?.internalNumber);
         const uris = ref<string[]>(props.presetDataset?.uris as string[]);
         const scopus = ref(props.presetDataset?.scopusId);
+
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
 
         const {
             requiredFieldRules, doiValidationRules,
@@ -213,10 +226,15 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedDataset);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetDataset, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -238,6 +256,10 @@ export default defineComponent({
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
 
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
+
             fetchDetails();
         };
 
@@ -250,7 +272,8 @@ export default defineComponent({
             titleRef, subtitleRef, urisRef, snackbar,
             workOpenAlexIdValidationRules, openAlexId,
             webOfScienceId, documentWebOfScienceIdValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules, commonFieldsRef,
+            commonFieldsData, presetCommonFieldsData
         };
     }
 });

@@ -1419,5 +1419,10 @@ export default {
     assistantStaffLabel: "Assistant staff",
     arguersLabel: "Arguers",
     ownersLabel: "Owners",
-    identifierInUseMessage: "Identifier is already in use."
+    identifierInUseMessage: "Identifier is already in use.",
+    geoSpaceDescriptionLabel: "Geo space description",
+    chronologicalSpaceDescriptionLabel: "Chronological space description",
+    peerReviewedLabel: "Peer reviewed",
+    openAccessLabel: "Open access",
+    publicationStatusLabel: "Publication status"
 }

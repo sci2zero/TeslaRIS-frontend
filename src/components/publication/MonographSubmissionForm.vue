@@ -356,8 +356,8 @@ export default defineComponent({
 
             if (props.inModal) {
                 selectedMonographType.value = {
-                    title: getMonographTypeTitleFromValueAutoLocale(MonographType.BOOK) as string,
-                    value: MonographType.BOOK
+                    title: getMonographTypeTitleFromValueAutoLocale(MonographType.EDITED_BOOK) as string,
+                    value: MonographType.EDITED_BOOK
                 };
             } else {
                 selectedMonographType.value = {

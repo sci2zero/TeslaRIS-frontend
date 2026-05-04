@@ -25,6 +25,10 @@ export const useValidationUtils = () => {
     const invalidFctIdMessage = computed(() => i18n.t("invalidFctIdMessage"));
     const invalidTaxNumberMessage = computed(() => i18n.t("invalidTaxNumberMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
+    const invalidHandleIdMessage = computed(() => i18n.t("handleIdFormatError"));
+    const invalidArxivIdMessage = computed(() => i18n.t("handleIdFormatError"));
+    const invalidPubmedIdMessage = computed(() => i18n.t("handleIdFormatError"));
+    const invalidSsrnIdMessage = computed(() => i18n.t("handleIdFormatError"));
     const invalidConfIdMessage = computed(() => i18n.t("confIdFormatError"));
     const emailFormatMessage = computed(() => i18n.t("emailFormatError"));
     const requiredFutureDateMessage = computed(() => i18n.t("requiredFutureDateMessage"));
@@ -105,6 +109,42 @@ export const useValidationUtils = () => {
             if (!value || value.trim() === "") return true;
             if (scopusIdPattern.test(value)) return true;
             return invalidScopusIdMessage.value;
+        }
+    ];
+
+    const handleIdPattern = /^(?:\d{2}\.\d{3,}\.\d+\/\S+)$/i;
+    const handleIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (handleIdPattern.test(value)) return true;
+            return invalidHandleIdMessage.value;
+        }
+    ];
+
+    const arxivIdPattern = /^(?:\d{4}\.\d{4,5}|[a-z-]+\/\d{7})$/i;
+    const arxivIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (arxivIdPattern.test(value)) return true;
+            return invalidArxivIdMessage.value;
+        }
+    ];
+
+    const pubmedIdPattern = /^(?:\d{1,8})$/i;
+    const pubmedIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (pubmedIdPattern.test(value)) return true;
+            return invalidPubmedIdMessage.value;
+        }
+    ];
+
+    const ssrnIdPattern = /^(?:\d+)$/i;
+    const ssrnIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (ssrnIdPattern.test(value)) return true;
+            return invalidSsrnIdMessage.value;
         }
     ];
 
@@ -459,6 +499,8 @@ export const useValidationUtils = () => {
         optionalNumericZeroOrGreaterFieldRules, scholarIdValidationRules,
         personAuthenticusIdValidationRules, lattesIdValidationRules,
         ringgoldValidationRules, fundrefValidationRules, isniValidationRules,
-        taxNumberValidationRules, fctIdValidationRules, regexValidationRules
+        taxNumberValidationRules, fctIdValidationRules, regexValidationRules,
+        handleIdValidationRules, arxivIdValidationRules, pubmedIdValidationRules,
+        ssrnIdValidationRules
     };
 };

@@ -1433,5 +1433,10 @@ export default {
     assistantStaffLabel: "Pomoćno osoblje",
     arguersLabel: "Branioci",
     ownersLabel: "Valsnici",
-    identifierInUseMessage: "Identifikator je već u upotrebi"
+    identifierInUseMessage: "Identifikator je već u upotrebi",
+    geoSpaceDescriptionLabel: "Opis geoprostora",
+    chronologicalSpaceDescriptionLabel: "Opis hronološkog prostora",
+    peerReviewedLabel: "Recenzirano",
+    openAccessLabel: "Otvorenog pristupa",
+    publicationStatusLabel: "Status publikacije"
 }
