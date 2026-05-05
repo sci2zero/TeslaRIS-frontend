@@ -84,8 +84,6 @@
                                 <div v-if="proceedingsPublication?.documentDate" class="response">
                                     {{ localiseDate(proceedingsPublication.documentDate) }}
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
                                 <div v-if="proceedingsPublication?.startPage">
                                     {{ $t("startPageLabel") }}:
                                 </div>
@@ -101,56 +99,22 @@
                                 <div v-if="proceedingsPublication?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
                                 </div>
-                                <div v-if="proceedingsPublication?.numberOfPages" class="response">
-                                    {{ proceedingsPublication.numberOfPages }}
-                                </div>
-                                <div v-if="proceedingsPublication?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="proceedingsPublication?.scopusId" class="response">
-                                    <identifier-link :identifier="proceedingsPublication.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="proceedingsPublication?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="proceedingsPublication?.doi" class="response">
-                                    <identifier-link :identifier="proceedingsPublication.doi"></identifier-link>
-                                </div>
-                                <div v-if="proceedingsPublication?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="proceedingsPublication?.openAlexId" class="response">
-                                    <identifier-link :identifier="proceedingsPublication.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="proceedingsPublication?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="proceedingsPublication?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="proceedingsPublication.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
                                 <div v-if="proceedingsPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
                                 </div>
-                                <div v-if="proceedingsPublication?.uris && proceedingsPublication?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="proceedingsPublication?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="proceedingsPublication?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.PROCEEDINGS_PUBLICATION"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
                             </v-col>
+
+                            <document-common-fields-display
+                                :document="proceedingsPublication"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.PROCEEDINGS_PUBLICATION"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -312,8 +276,6 @@ import ProceedingsService from '@/services/ProceedingsService';
 import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { localiseDate } from '@/utils/DateUtil';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -341,12 +303,12 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

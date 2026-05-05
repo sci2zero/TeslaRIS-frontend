@@ -1,5 +1,5 @@
 <template>
-    <v-col cols="6">
+    <v-col :cols="cols">
         <div v-if="document?.scopusId">
             {{ $t('scopusIdLabel') }}:
         </div>
@@ -153,6 +153,10 @@ export default defineComponent({
         documentIdentifiers: {
             type: Array<EntityIdentifierResponse>,
             default: () => []
+        },
+        cols: {
+            type: Number,
+            default: 6
         }
     },
     emits: ["identifiers-updated"],

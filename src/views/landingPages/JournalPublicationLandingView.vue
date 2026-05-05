@@ -111,32 +111,6 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div v-if="journalPublication?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="journalPublication?.scopusId" class="response">
-                                    <identifier-link :identifier="journalPublication.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="journalPublication?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="journalPublication?.doi" class="response">
-                                    <identifier-link :identifier="journalPublication.doi"></identifier-link>
-                                </div>
-                                <div v-if="journalPublication?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="journalPublication?.openAlexId" class="response">
-                                    <identifier-link :identifier="journalPublication.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="journalPublication?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="journalPublication?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="journalPublication.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
                                 <div v-if="journalPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -149,23 +123,15 @@
                                 <div v-if="journalPublication?.numberOfPages" class="response">
                                     {{ journalPublication.numberOfPages }}
                                 </div>
-                                <div v-if="journalPublication?.uris && journalPublication?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="journalPublication?.uris"></uri-list>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="journalPublication?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.JOURNAL_PUBLICATION"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
                             </v-col>
+                            <document-common-fields-display
+                                :document="journalPublication"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.JOURNAL_PUBLICATION"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -329,8 +295,6 @@ import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import { localiseDate } from '@/utils/DateUtil';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
@@ -356,14 +320,15 @@ import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, IndicatorsSection, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 
@@ -525,6 +490,8 @@ export default defineComponent({
             journalPublication.value!.journalPublicationType = basicInfo.journalPublicationType;
             journalPublication.value!.openAlexId = basicInfo.openAlexId;
             journalPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
+
+            updateCommonBasicInfo(journalPublication, basicInfo);
 
             performUpdate(true);
         };

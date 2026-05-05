@@ -109,8 +109,6 @@
                                         {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
                                     </v-chip>
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
                                 <div v-if="proceedings?.eISBN">
                                     E-ISBN:
                                 </div>
@@ -123,53 +121,22 @@
                                 <div v-if="proceedings?.printISBN" class="response">
                                     {{ proceedings.printISBN }}
                                 </div>
-                                <div v-if="proceedings?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="proceedings?.scopusId" class="response">
-                                    <identifier-link :identifier="proceedings.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="proceedings?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="proceedings?.doi" class="response">
-                                    <identifier-link :identifier="proceedings.doi"></identifier-link>
-                                </div>
-                                <div v-if="proceedings?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="proceedings?.openAlexId" class="response">
-                                    <identifier-link :identifier="proceedings.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="proceedings?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="proceedings?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="proceedings.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
                                 <div v-if="proceedings?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
                                 </div>
                                 <div v-if="proceedings?.numberOfPages" class="response">
                                     {{ proceedings.numberOfPages }}
                                 </div>
-                                <div v-if="proceedings?.uris && proceedings?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="proceedings?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="proceedings?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.PROCEEDINGS"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
                             </v-col>
+
+                            <document-common-fields-display
+                                :document="proceedings"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -337,8 +304,6 @@ import { PublicationSeriesType, type PublicationSeries } from '@/models/Publicat
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { localiseDate } from '@/utils/DateUtil';
@@ -362,12 +327,12 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, PublicationTableComponent, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("");
 

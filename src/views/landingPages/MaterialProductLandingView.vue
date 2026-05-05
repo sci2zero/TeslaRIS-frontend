@@ -94,48 +94,15 @@
                                     {{ returnCurrentLocaleContent(materialProduct.productUsers) }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
-                                <div v-if="materialProduct?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="materialProduct?.scopusId" class="response">
-                                    <identifier-link :identifier="materialProduct.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="materialProduct?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="materialProduct?.doi" class="response">
-                                    <identifier-link :identifier="materialProduct.doi"></identifier-link>
-                                </div>
-                                <div v-if="materialProduct?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="materialProduct?.openAlexId" class="response">
-                                    <identifier-link :identifier="materialProduct.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="materialProduct?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="materialProduct?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="materialProduct.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
-                                <div v-if="materialProduct?.uris && materialProduct?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="materialProduct?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="materialProduct?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.MATERIAL_PRODUCT"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
+                            
+                            <document-common-fields-display
+                                :document="materialProduct"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.MATERIAL_PRODUCT"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -309,8 +276,6 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentAssessmentClassification, type DocumentIndicator, type EntityClassificationResponse, type EntityIndicatorResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -340,13 +305,13 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import { localiseDate } from '@/utils/DateUtil';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

@@ -88,48 +88,15 @@
                                     </localized-link>
                                 </div>
                             </v-col>
-                            <v-col cols="6">
-                                <div v-if="geneticMaterial?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="geneticMaterial?.scopusId" class="response">
-                                    <identifier-link :identifier="geneticMaterial.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="geneticMaterial?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="geneticMaterial?.doi" class="response">
-                                    <identifier-link :identifier="geneticMaterial.doi"></identifier-link>
-                                </div>
-                                <div v-if="geneticMaterial?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="geneticMaterial?.openAlexId" class="response">
-                                    <identifier-link :identifier="geneticMaterial.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="geneticMaterial?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="geneticMaterial?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="geneticMaterial.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
-                                <div v-if="geneticMaterial?.uris && geneticMaterial?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="geneticMaterial?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="geneticMaterial?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.GENETIC_MATERIAL"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
+                            
+                            <document-common-fields-display
+                                :document="geneticMaterial"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.GENETIC_MATERIAL"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -281,8 +248,6 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import StatisticsService from '@/services/StatisticsService';
@@ -310,12 +275,12 @@ import { getGeneticMaterialTypeTitleFromValueAutoLocale } from '@/i18n/geneticMa
 import GeneticMaterialUpdateForm from '@/components/publication/update/GeneticMaterialUpdateForm.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "GeneticMaterialLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

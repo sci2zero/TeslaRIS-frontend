@@ -174,6 +174,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -195,7 +201,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { type DocumentPublicationIndex, type JournalPublication, JournalPublicationType, type PersonDocumentContribution, PublicationType } from "@/models/PublicationModel";
+import { type CommonFieldsData, type DocumentPublicationIndex, type JournalPublication, JournalPublicationType, type PersonDocumentContribution, PublicationType } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
@@ -210,11 +216,12 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -270,6 +277,10 @@ export default defineComponent({
 
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
+
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
 
         const {
             requiredFieldRules, doiValidationRules,
@@ -362,7 +373,8 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 doi: doi.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createJournalPublication(
@@ -391,6 +403,8 @@ export default defineComponent({
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -421,7 +435,8 @@ export default defineComponent({
             requiredFieldRules, submitJournalPublication, errorMessage,
             popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
             webOfScienceId, optionalNumericZeroOrGreaterFieldRules, disableYearInput,
-            deduplicationTableRef
+            deduplicationTableRef, commonFieldsData, presetCommonFieldsData,
+            commonFieldsRef
         };
     }
 });

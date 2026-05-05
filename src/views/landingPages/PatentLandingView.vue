@@ -82,48 +82,15 @@
                                     </localized-link>
                                 </div>
                             </v-col>
-                            <v-col cols="6">
-                                <div v-if="patent?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="patent?.scopusId" class="response">
-                                    <identifier-link :identifier="patent.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="patent?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="patent?.doi" class="response">
-                                    <identifier-link :identifier="patent.doi"></identifier-link>
-                                </div>
-                                <div v-if="patent?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="patent?.openAlexId" class="response">
-                                    <identifier-link :identifier="patent.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="patent?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="patent?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="patent.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
-                                <div v-if="patent?.uris && patent?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="patent?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="patent?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.PATENT"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
+                            
+                            <document-common-fields-display
+                                :document="patent"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.PATENT"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -276,8 +243,6 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
@@ -304,14 +269,14 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "PatentLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

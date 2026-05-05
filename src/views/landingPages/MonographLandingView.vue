@@ -119,38 +119,13 @@
                                         {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
                                     </v-chip>
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
                                 <div v-if="monograph?.udc">
                                     {{ $t("udcLabel") }}:
                                 </div>
                                 <div v-if="monograph?.udc" class="response">
                                     {{ monograph.udc }}
                                 </div>
-                                <div v-if="monograph?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="monograph?.scopusId" class="response">
-                                    <identifier-link :identifier="monograph.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="monograph?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="monograph?.doi" class="response">
-                                    <identifier-link :identifier="monograph.doi"></identifier-link>
-                                </div>
-                                <div v-if="monograph?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="monograph?.openAlexId" class="response">
-                                    <identifier-link :identifier="monograph.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="monograph?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="monograph?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="monograph.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
+
                                 <div v-if="monograph?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
@@ -167,23 +142,16 @@
                                         {{ returnCurrentLocaleContent(publicationSeries?.title) }}
                                     </localized-link>
                                 </div>
-                                <div v-if="monograph?.uris && monograph?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="monograph?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="monograph?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.MONOGRAPH"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
                             </v-col>
+
+                            <document-common-fields-display
+                                :document="monograph"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.MONOGRAPH"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -381,8 +349,6 @@ import type { Conference } from '@/models/EventModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
@@ -413,12 +379,12 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, UriList, IdentifierLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

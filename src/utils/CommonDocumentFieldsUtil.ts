@@ -46,3 +46,29 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.chronologicalSpaceDescription = basicInfo.chronologicalSpaceDescription;
     document.value!.publicationStatus = basicInfo.publicationStatus;
 };
+
+type IdentifierValue = string | undefined;
+
+const getValue = (value: IdentifierValue): string => {
+    return typeof value === 'string' ? value : "";
+};
+
+export const getCommonIdentifiers = (
+    doi: IdentifierValue,
+    scopus: IdentifierValue,
+    openAlexId: IdentifierValue,
+    webOfScienceId: IdentifierValue,
+    handleId: IdentifierValue,
+    arxivId: IdentifierValue,
+    pubmedId: IdentifierValue,
+    ssrnId: IdentifierValue
+) => [
+    { value: getValue(doi), error: "doiExistsError" },
+    { value: getValue(scopus), error: "scopusIdExistsError" },
+    { value: getValue(openAlexId), error: "openAlexIdExistsError" },
+    { value: getValue(webOfScienceId), error: "webOfScienceIdExistsError" },
+    { value: getValue(handleId), error: "handleIdExistsError" },
+    { value: getValue(arxivId), error: "arxivIdExistsError" },
+    { value: getValue(pubmedId), error: "pubmedIdExistsError" },
+    { value: getValue(ssrnId), error: "ssrnIdExistsError" },
+];

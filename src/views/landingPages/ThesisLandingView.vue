@@ -142,30 +142,12 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                                <div v-if="thesis?.uris && thesis?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div v-if="thesis?.uris && thesis?.uris.length > 0" class="response">
-                                    <uri-list :uris="thesis?.uris"></uri-list>
-                                </div>
                                 <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0">
                                     {{ $t("typeOfTitleLabel") }}:
                                 </div>
                                 <div v-if="thesis?.typeOfTitle && thesis?.typeOfTitle.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(thesis.typeOfTitle) }}
                                 </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="thesis?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.THESIS"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
                                 <div v-if="thesis?.eisbn">
                                     eISBN:
                                 </div>
@@ -178,24 +160,61 @@
                                 <div v-if="thesis?.printISBN" class="response">
                                     {{ thesis.printISBN }}
                                 </div>
-                                <div v-if="thesis?.doi">
-                                    DOI:
+                            </v-col>
+
+                            <document-common-fields-display
+                                :document="thesis"
+                                :cols="3"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.THESIS"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
+                            <v-col cols="3">
+                                <div v-if="thesis?.numberOfPages">
+                                    {{ $t("numberOfPagesLabel") }}:
                                 </div>
-                                <div v-if="thesis?.doi" class="response">
-                                    <identifier-link :identifier="thesis.doi"></identifier-link>
+                                <div v-if="thesis?.numberOfPages" class="response">
+                                    {{ thesis.numberOfPages }}
                                 </div>
-                                <div v-if="thesis?.openAlexId">
-                                    Open Alex ID:
+                                <div v-if="thesis?.numberOfChapters">
+                                    {{ $t("numberOfChaptersLabel") }}:
                                 </div>
-                                <div v-if="thesis?.openAlexId" class="response">
-                                    <identifier-link :identifier="thesis.openAlexId" type="open_alex"></identifier-link>
+                                <div v-if="thesis?.numberOfChapters" class="response">
+                                    {{ thesis.numberOfChapters }}
                                 </div>
-                                <div v-if="thesis?.webOfScienceId">
-                                    Web of Science ID:
+                                <div v-if="thesis?.numberOfReferences">
+                                    {{ $t("numberOfReferencesLabel") }}:
                                 </div>
-                                <div v-if="thesis?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="thesis.webOfScienceId" type="web_of_science"></identifier-link>
+                                <div v-if="thesis?.numberOfReferences" class="response">
+                                    {{ thesis.numberOfReferences }}
                                 </div>
+                                <div v-if="thesis?.numberOfIllustrations">
+                                    {{ $t("numberOfIllustrationsLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfIllustrations" class="response">
+                                    {{ thesis.numberOfIllustrations }}
+                                </div>
+                                <div v-if="thesis?.numberOfGraphs">
+                                    {{ $t("numberOfGraphsLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfGraphs" class="response">
+                                    {{ thesis.numberOfGraphs }}
+                                </div>
+                                <div v-if="thesis?.numberOfTables">
+                                    {{ $t("numberOfTablesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfTables" class="response">
+                                    {{ thesis.numberOfTables }}
+                                </div>
+                                <div v-if="thesis?.numberOfAppendices">
+                                    {{ $t("numberOfAppendicesLabel") }}:
+                                </div>
+                                <div v-if="thesis?.numberOfAppendices" class="response">
+                                    {{ thesis.numberOfAppendices }}
+                                </div>
+
                                 <div v-if="thesis?.udc">
                                     {{ $t("udcLabel") }}:
                                 </div>
@@ -252,50 +271,6 @@
                                     <p v-for="date in thesis.publicReviewEndDates" :key="date">
                                         {{ localiseDate(date) }}
                                     </p>
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <div v-if="thesis?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfPages" class="response">
-                                    {{ thesis.numberOfPages }}
-                                </div>
-                                <div v-if="thesis?.numberOfChapters">
-                                    {{ $t("numberOfChaptersLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfChapters" class="response">
-                                    {{ thesis.numberOfChapters }}
-                                </div>
-                                <div v-if="thesis?.numberOfReferences">
-                                    {{ $t("numberOfReferencesLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfReferences" class="response">
-                                    {{ thesis.numberOfReferences }}
-                                </div>
-                                <div v-if="thesis?.numberOfIllustrations">
-                                    {{ $t("numberOfIllustrationsLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfIllustrations" class="response">
-                                    {{ thesis.numberOfIllustrations }}
-                                </div>
-                                <div v-if="thesis?.numberOfGraphs">
-                                    {{ $t("numberOfGraphsLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfGraphs" class="response">
-                                    {{ thesis.numberOfGraphs }}
-                                </div>
-                                <div v-if="thesis?.numberOfTables">
-                                    {{ $t("numberOfTablesLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfTables" class="response">
-                                    {{ thesis.numberOfTables }}
-                                </div>
-                                <div v-if="thesis?.numberOfAppendices">
-                                    {{ $t("numberOfAppendicesLabel") }}:
-                                </div>
-                                <div v-if="thesis?.numberOfAppendices" class="response">
-                                    {{ thesis.numberOfAppendices }}
                                 </div>
                             </v-col>
                         </v-row>
@@ -583,8 +558,6 @@ import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import { localiseDate } from '@/utils/DateUtil';
@@ -624,12 +597,12 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import ThesisSubstitutionForm from '@/components/publication/ThesisSubstitutionForm.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, UriList, IdentifierLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

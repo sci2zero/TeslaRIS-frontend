@@ -94,48 +94,15 @@
                                     {{ returnCurrentLocaleContent(intangibleProduct.productUsers) }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
-                                <div v-if="intangibleProduct?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="intangibleProduct?.scopusId" class="response">
-                                    <identifier-link :identifier="intangibleProduct.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="intangibleProduct?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="intangibleProduct?.doi" class="response">
-                                    <identifier-link :identifier="intangibleProduct.doi"></identifier-link>
-                                </div>
-                                <div v-if="intangibleProduct?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="intangibleProduct?.openAlexId" class="response">
-                                    <identifier-link :identifier="intangibleProduct.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="intangibleProduct?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="intangibleProduct?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="intangibleProduct.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
-                                <div v-if="intangibleProduct?.uris && intangibleProduct?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="intangibleProduct?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="intangibleProduct?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.INTANGIBLE_PRODUCT"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
+                            
+                            <document-common-fields-display
+                                :document="intangibleProduct"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.INTANGIBLE_PRODUCT"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -309,8 +276,6 @@ import PublisherService from '@/services/PublisherService';
 import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import IntangibleProductUpdateForm from '@/components/publication/update/IntangibleProductUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -340,12 +305,12 @@ import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import { getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, UriList, IdentifierLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 

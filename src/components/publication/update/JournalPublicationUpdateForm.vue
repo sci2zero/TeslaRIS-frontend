@@ -105,6 +105,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -122,7 +128,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
+import type { CommonFieldsData, JournalPublication, JournalPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
@@ -135,11 +141,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields },
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
@@ -161,7 +169,12 @@ export default defineComponent({
 
         const { languageTags } = useLanguageTags();
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -176,6 +189,7 @@ export default defineComponent({
 
         watch(() => props.presetJournalPublication, () => {
             if (props.presetJournalPublication) {
+                updatePresetCommonFields();
                 refreshForm();
             }
         });
@@ -219,10 +233,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetJournalPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -256,6 +276,7 @@ export default defineComponent({
                 journalPublicationType: selectedpublicationType.value.value as JournalPublicationType,
                 fileItems: [],
                 proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedJournalPublication);
@@ -286,7 +307,15 @@ export default defineComponent({
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
 
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
+
             fetchDetails();
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetJournalPublication, presetCommonFieldsData);
         };
 
         return {
@@ -302,7 +331,9 @@ export default defineComponent({
             refreshForm, urisRef, message, snackbar,
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

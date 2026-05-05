@@ -80,6 +80,7 @@
                 />
             </v-col>
         </v-row>
+        
         <document-common-fields
             ref="commonFieldsRef"
             v-model="commonFieldsData"
@@ -115,7 +116,7 @@ import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
-import { updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -196,10 +197,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetDataset?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)

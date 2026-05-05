@@ -97,32 +97,6 @@
                                         {{ returnCurrentLocaleContent(event?.name) }}
                                     </localized-link>
                                 </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div v-if="monographPublication?.scopusId">
-                                    Scopus ID:
-                                </div>
-                                <div v-if="monographPublication?.scopusId" class="response">
-                                    <identifier-link :identifier="monographPublication.scopusId" type="scopus" />
-                                </div>
-                                <div v-if="monographPublication?.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="monographPublication?.doi" class="response">
-                                    <identifier-link :identifier="monographPublication.doi"></identifier-link>
-                                </div>
-                                <div v-if="monographPublication?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="monographPublication?.openAlexId" class="response">
-                                    <identifier-link :identifier="monographPublication.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="monographPublication?.webOfScienceId">
-                                    Web of Science ID:
-                                </div>
-                                <div v-if="monographPublication?.webOfScienceId" class="response">
-                                    <identifier-link :identifier="monographPublication.webOfScienceId" type="web_of_science"></identifier-link>
-                                </div>
                                 <div v-if="monographPublication?.articleNumber">
                                     {{ $t("articleNumberLabel") }}:
                                 </div>
@@ -135,23 +109,16 @@
                                 <div v-if="monographPublication?.numberOfPages" class="response">
                                     {{ monographPublication.numberOfPages }}
                                 </div>
-                                <div v-if="monographPublication?.uris && monographPublication?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="monographPublication?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="documentIdentifiers"
-                                        :can-edit="canEdit"
-                                        :entity-id="monographPublication?.id" 
-                                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                        :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
                             </v-col>
+
+                            <document-common-fields-display
+                                :document="monographPublication"
+                                :can-edit="canEdit"
+                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                                :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
+                                :document-identifiers="documentIdentifiers"
+                                @identifiers-updated="fetchIdentifiers"
+                            />
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -309,8 +276,6 @@ import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
 import type { Monograph } from '@/models/PublicationModel';
 import MonographService from '@/services/DocumentPublicationService';
 import { localiseDate } from '@/utils/DateUtil';
-import UriList from '@/components/core/UriList.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -337,12 +302,12 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, UriList, IdentifierLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, EntityIdentifiersList },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
 
