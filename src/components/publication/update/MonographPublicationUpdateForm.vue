@@ -97,6 +97,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -114,7 +120,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { MonographPublication, MonographPublicationType } from '@/models/PublicationModel';
+import type { CommonFieldsData, MonographPublication, MonographPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MonographService from '@/services/DocumentPublicationService';
@@ -127,11 +133,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "MonographPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast, DocumentCommonFields },
     props: {
         presetMonographPublication: {
             type: Object as PropType<MonographPublication | undefined>,
@@ -154,6 +162,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -195,6 +204,10 @@ export default defineComponent({
         const numberOfPages = ref(props.presetMonographPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetMonographPublication?.uris as string[]);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
@@ -210,10 +223,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetMonographPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -245,9 +264,14 @@ export default defineComponent({
                 monographPublicationType: selectedpublicationType.value.value as MonographPublicationType,
                 fileItems: [],
                 proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedMonographPublication);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetMonographPublication, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -268,11 +292,17 @@ export default defineComponent({
             webOfScienceId.value = props.presetMonographPublication?.webOfScienceId;
             articleNumber.value = props.presetMonographPublication?.articleNumber;
 
+            updateDocumentCommonFields(props.presetMonographPublication, presetCommonFieldsData);
+
             selectedpublicationType.value = {title: props.presetMonographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(props.presetMonographPublication?.monographPublicationType as MonographPublicationType) as string : "", value: props.presetMonographPublication?.monographPublicationType ? props.presetMonographPublication?.monographPublicationType as MonographPublicationType : null};
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -289,9 +319,10 @@ export default defineComponent({
             publicationTypes, selectedpublicationType,
             scopusIdValidationRules, titleRef, subtitleRef,
             urisRef, requiredSelectionRules, webOfScienceId,
-            workOpenAlexIdValidationRules,
+            workOpenAlexIdValidationRules, commonFieldsData,
             optionalNumericZeroOrGreaterFieldRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            commonFieldsRef, presetCommonFieldsData
         };
     }
 });

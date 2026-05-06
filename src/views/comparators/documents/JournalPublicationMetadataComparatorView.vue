@@ -130,6 +130,7 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -212,6 +213,8 @@ export default defineComponent({
             journalPublication1.contributions = journalPublication1.contributions?.concat(journalPublication2.contributions as PersonDocumentContribution[]);
             journalPublication2.contributions = [];
 
+            mergeCommonMetadata(journalPublication1, journalPublication2);
+
             return [journalPublication1, journalPublication2];
         };
 
@@ -261,6 +264,8 @@ export default defineComponent({
             leftJournalPublication.value!.scopusId = updatedInfo.scopusId;
             leftJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
             leftJournalPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
+
+            updateCommonBasicInfo(leftJournalPublication, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -288,6 +293,8 @@ export default defineComponent({
             rightJournalPublication.value!.scopusId = updatedInfo.scopusId;
             rightJournalPublication.value!.openAlexId = updatedInfo.openAlexId;
             rightJournalPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
+
+            updateCommonBasicInfo(rightJournalPublication, updatedInfo);
             
             if (update.value) {
                 rightUpdateComplete.value = true;

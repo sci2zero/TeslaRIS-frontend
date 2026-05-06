@@ -1424,5 +1424,9 @@ export default {
     chronologicalSpaceDescriptionLabel: "Chronological space description",
     peerReviewedLabel: "Peer reviewed",
     openAccessLabel: "Open access",
-    publicationStatusLabel: "Publication status"
+    publicationStatusLabel: "Publication status",
+    handleIdExistsError: "Handle ID already in use.",
+    arxivIdExistsError: "ArXiv ID already in use.",
+    pubmedIdExistsError: "PubMed ID already in use.",
+    ssrnIdExistsError: "SSRN ID already in use."
 }

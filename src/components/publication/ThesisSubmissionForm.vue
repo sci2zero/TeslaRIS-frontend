@@ -338,6 +338,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -360,7 +366,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { DocumentContributionType, type PersonDocumentContribution, PublicationType, type Thesis, ThesisType } from "@/models/PublicationModel";
+import { type CommonFieldsData, DocumentContributionType, type PersonDocumentContribution, PublicationType, type Thesis, ThesisType } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -381,11 +387,12 @@ import UserService from '@/services/UserService';
 import PersonService from '@/services/PersonService';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -581,6 +588,10 @@ export default defineComponent({
         const ouAutocompleteRef = ref<typeof OrganisationUnitAutocompleteSearch>();
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, workOpenAlexIdValidationRules,
@@ -641,6 +652,7 @@ export default defineComponent({
                 udc: udc.value,
                 placeOfKeep: placeOfKeep.value,
                 typeOfTitle: typeOfTitle.value,
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createThesis(newThesis).then((response) => {
@@ -681,6 +693,8 @@ export default defineComponent({
                     scopus.value = "";
                     typeOfTitleRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -789,7 +803,8 @@ export default defineComponent({
             alternateTitleRef, alternateTitle, isHeadOfLibrary,
             topLevelInstitutionId, optionalNumericZeroOrGreaterFieldRules,
             isOrganisationUnitDLClient, isAdmin, deduplicationTableRef,
-            submit, languageTags
+            submit, languageTags, commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

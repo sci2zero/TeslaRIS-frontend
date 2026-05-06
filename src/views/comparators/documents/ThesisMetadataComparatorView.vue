@@ -163,6 +163,7 @@ import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -267,6 +268,8 @@ export default defineComponent({
             thesis1.contributions = thesis1.contributions?.concat(thesis2.contributions as PersonDocumentContribution[]);
             thesis2.contributions = [];
 
+            mergeCommonMetadata(thesis1, thesis2);
+
             return [thesis1, thesis2];
         };
 
@@ -328,6 +331,8 @@ export default defineComponent({
             leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             leftThesis.value!.authorReprint = updatedInfo.authorReprint;
             leftThesis.value!.scopusId = updatedInfo.scopusId;
+
+            updateCommonBasicInfo(leftThesis, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -367,6 +372,9 @@ export default defineComponent({
             rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             rightThesis.value!.authorReprint = updatedInfo.authorReprint;
             rightThesis.value!.scopusId = updatedInfo.scopusId;
+
+            console.log(updatedInfo)
+            updateCommonBasicInfo(rightThesis, updatedInfo);
             
             if (update.value) {
                 rightUpdateComplete.value = true;

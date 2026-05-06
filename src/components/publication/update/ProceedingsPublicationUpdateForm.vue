@@ -109,6 +109,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -126,7 +132,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
+import type { CommonFieldsData, ProceedingsPublication, ProceedingsPublicationType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import type { Conference } from '@/models/EventModel';
@@ -142,11 +148,13 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationUpdateForm",
-    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal, Toast},
+    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal, Toast, DocumentCommonFields },
     props: {
         presetProceedingsPublication: {
             type: Object as PropType<ProceedingsPublication | undefined>,
@@ -170,6 +178,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -225,6 +234,10 @@ export default defineComponent({
         const numberOfPages = ref(props.presetProceedingsPublication?.numberOfPages);
         const uris = ref<string[]>(props.presetProceedingsPublication?.uris as string[]);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
@@ -277,10 +290,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError"},
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetProceedingsPublication?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -312,9 +331,14 @@ export default defineComponent({
                 proceedingsId: selectedProceedings.value.value,
                 fileItems: [],
                 proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedProceedingsPublication);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetProceedingsPublication, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -334,11 +358,22 @@ export default defineComponent({
             openAlexId.value = props.presetProceedingsPublication?.openAlexId;
             webOfScienceId.value = props.presetProceedingsPublication?.webOfScienceId;
             articleNumber.value = props.presetProceedingsPublication?.articleNumber;
-            selectedpublicationType.value = {title: props.presetProceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "", value: props.presetProceedingsPublication?.proceedingsPublicationType ? props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null};
+            selectedpublicationType.value = {
+                title: props.presetProceedingsPublication?.proceedingsPublicationType ? 
+                    getTitleFromValueAutoLocale(props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType) as string : "",
+                value: props.presetProceedingsPublication?.proceedingsPublicationType ?
+                    props.presetProceedingsPublication?.proceedingsPublicationType as ProceedingsPublicationType : null
+            };
+
+            updateDocumentCommonFields(props.presetProceedingsPublication, presetCommonFieldsData);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -356,7 +391,8 @@ export default defineComponent({
             refreshForm, urisRef, ProceedingsSubmissionForm,
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules,
-            optionalNumericZeroOrGreaterFieldRules
+            optionalNumericZeroOrGreaterFieldRules,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

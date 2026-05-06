@@ -303,6 +303,7 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -466,6 +467,8 @@ export default defineComponent({
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
             monographPublication.value!.openAlexId = basicInfo.openAlexId;
             monographPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
+
+            updateCommonBasicInfo(monographPublication, basicInfo);
 
             performUpdate(true);
         };

@@ -177,6 +177,7 @@ import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -264,6 +265,8 @@ export default defineComponent({
             intangibleProduct1.researchAreasId = intangibleProduct1.researchAreasId?.concat(intangibleProduct2.researchAreasId as number[]);
             intangibleProduct2.researchAreasId = [];
 
+            mergeCommonMetadata(intangibleProduct1, intangibleProduct2);
+
             return [intangibleProduct1, intangibleProduct2];
         };
 
@@ -312,6 +315,8 @@ export default defineComponent({
             leftIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
             leftIntangibleProduct.value!.researchAreasId =
                 leftIntangibleProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
+
+            updateCommonBasicInfo(leftIntangibleProduct, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -338,6 +343,8 @@ export default defineComponent({
             rightIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
             rightIntangibleProduct.value!.researchAreasId =
                 rightIntangibleProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
+
+            updateCommonBasicInfo(rightIntangibleProduct, updatedInfo);
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

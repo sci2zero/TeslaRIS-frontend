@@ -97,6 +97,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -114,7 +120,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { GeneticMaterial, GeneticMaterialType } from '@/models/PublicationModel';
+import type { CommonFieldsData, GeneticMaterial, GeneticMaterialType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -126,11 +132,13 @@ import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { getGeneticMaterialTypesForGivenLocale, getGeneticMaterialTypeTitleFromValueAutoLocale } from '@/i18n/geneticMaterialType';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "GeneticMaterialUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields },
     props: {
         presetGeneticMaterial: {
             type: Object as PropType<GeneticMaterial | undefined>,
@@ -152,6 +160,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -203,6 +212,10 @@ export default defineComponent({
             }
         );
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -215,10 +228,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetGeneticMaterial?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -246,10 +265,15 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value?.value === -2,
                 geneticMaterialType: selectedGeneticMaterialType.value.value as GeneticMaterialType,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedGeneticMaterial);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetGeneticMaterial, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -267,6 +291,8 @@ export default defineComponent({
             webOfScienceId.value = props.presetGeneticMaterial?.webOfScienceId;
             scopus.value = props.presetGeneticMaterial?.scopusId;
 
+            updateDocumentCommonFields(props.presetGeneticMaterial, presetCommonFieldsData);
+
             selectedGeneticMaterialType.value =
                 { 
                     title: getGeneticMaterialTypeTitleFromValueAutoLocale(props.presetGeneticMaterial?.geneticMaterialType as GeneticMaterialType) as string,
@@ -276,6 +302,10 @@ export default defineComponent({
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -291,7 +321,8 @@ export default defineComponent({
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
             scopus, scopusIdValidationRules, geneticMaterialTypes,
-            selectedGeneticMaterialType, requiredSelectionRules
+            selectedGeneticMaterialType, requiredSelectionRules,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

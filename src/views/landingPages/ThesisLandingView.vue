@@ -598,6 +598,7 @@ import ThesisSubstitutionForm from '@/components/publication/ThesisSubstitutionF
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -847,6 +848,8 @@ export default defineComponent({
             thesis.value!.placeOfKeep = basicInfo.placeOfKeep;
             thesis.value!.typeOfTitle = basicInfo.typeOfTitle;
             thesis.value!.authorReprint = basicInfo.authorReprint;
+
+            updateCommonBasicInfo(thesis, basicInfo);
 
             performUpdate(true);
         };

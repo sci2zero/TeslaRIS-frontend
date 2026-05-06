@@ -134,6 +134,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -227,6 +228,8 @@ export default defineComponent({
             monograph1.contributions = monograph1.contributions?.concat(monograph2.contributions as PersonDocumentContribution[]);
             monograph2.contributions = [];
 
+            mergeCommonMetadata(monograph1, monograph2);
+
             return [monograph1, monograph2];
         };
 
@@ -278,6 +281,8 @@ export default defineComponent({
             leftMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftMonograph.value!.publisherId = updatedInfo.publisherId;
             leftMonograph.value!.authorReprint = updatedInfo.authorReprint;
+
+            updateCommonBasicInfo(leftMonograph, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -307,6 +312,8 @@ export default defineComponent({
             rightMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightMonograph.value!.publisherId = updatedInfo.publisherId;
             rightMonograph.value!.authorReprint = updatedInfo.authorReprint;
+
+            updateCommonBasicInfo(rightMonograph, updatedInfo);
             
             if (update.value) {
                 rightUpdateComplete.value = true;

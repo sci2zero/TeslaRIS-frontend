@@ -1,5 +1,7 @@
+import { mergeMultilingualContentField } from '@/i18n/MultilingualContentUtil';
 import type { CommonFieldsData, Document } from '@/models/PublicationModel';
 import type { Ref } from 'vue';
+import { bulkTransferFields } from './FieldTransferUtil';
 
 
 export const extractCommonFields = <T extends Partial<CommonFieldsData>>(
@@ -45,6 +47,27 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.geoSpaceDescription = basicInfo.geoSpaceDescription;
     document.value!.chronologicalSpaceDescription = basicInfo.chronologicalSpaceDescription;
     document.value!.publicationStatus = basicInfo.publicationStatus;
+};
+
+export const mergeCommonMetadata = (document1: Document, document2: Document) => {
+    mergeMultilingualContentField(document1.geoSpaceDescription, document2.geoSpaceDescription);
+    document2.geoSpaceDescription = [];
+
+    mergeMultilingualContentField(document1.chronologicalSpaceDescription, document2.chronologicalSpaceDescription);
+    document2.chronologicalSpaceDescription = [];
+
+    mergeMultilingualContentField(document1.city, document2.city);
+    document2.city = [];
+
+    bulkTransferFields(document1, document2, [
+        { fieldName: "handleId", emptyValue: "" },
+        { fieldName: "arxivId", emptyValue: "" },
+        { fieldName: "pubmedId", emptyValue: "" },
+        { fieldName: "ssrnId", emptyValue: "" },
+        { fieldName: "peerReviewed", emptyValue: false },
+        { fieldName: "openAccess", emptyValue: false },
+        { fieldName: "publicationStatus", emptyValue: null, setEmpty: false }
+    ]);
 };
 
 type IdentifierValue = string | undefined;

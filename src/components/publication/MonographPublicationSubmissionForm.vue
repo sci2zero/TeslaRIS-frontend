@@ -148,6 +148,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -173,7 +179,7 @@ import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { MonographPublication, PersonDocumentContribution } from "@/models/PublicationModel";
+import type { CommonFieldsData, MonographPublication, PersonDocumentContribution } from "@/models/PublicationModel";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getMonographPublicationTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/monographPublicationType";
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
@@ -185,11 +191,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitMonographPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, MonographAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -239,6 +246,10 @@ export default defineComponent({
 
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
+
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
 
         const { 
             requiredFieldRules, requiredSelectionRules,
@@ -295,7 +306,8 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 scopusId: scopus.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createMonographPublication(
@@ -323,6 +335,8 @@ export default defineComponent({
                     numberOfPages.value = null;
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -387,7 +401,8 @@ export default defineComponent({
             contributions, contributionsRef, scopusIdValidationRules, popuateMetadata,
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
             availableMonograph, errorMessage, workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules
+            documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

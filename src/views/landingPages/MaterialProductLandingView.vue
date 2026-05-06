@@ -307,6 +307,7 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import { localiseDate } from '@/utils/DateUtil';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -468,6 +469,8 @@ export default defineComponent({
             materialProduct.value!.productUsers = basicInfo.productUsers;
             materialProduct.value!.numberProduced = basicInfo.numberProduced;
             materialProduct.value!.materialProductType = basicInfo.materialProductType;
+
+            updateCommonBasicInfo(materialProduct, basicInfo);
 
             performUpdate(true);
         };

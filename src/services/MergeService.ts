@@ -180,7 +180,7 @@ export class MergeService extends BaseService {
     }
 
     async saveMergedGeneticMaterialMetadata(leftGeneticMaterialId: number, rightGeneticMaterialId: number, body: MergedGeneticMaterial): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/material-product/metadata/${leftGeneticMaterialId}/${rightGeneticMaterialId}`, body);
+        return super.sendRequest(axios.patch, `merge/genetic-material/metadata/${leftGeneticMaterialId}/${rightGeneticMaterialId}`, body);
     }
 
     async saveMergedDatasetsMetadata(leftDatasetId: number, rightDatasetId: number, body: MergedDatasets): Promise<AxiosResponse<void>> {

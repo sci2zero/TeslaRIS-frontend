@@ -328,6 +328,7 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -513,6 +514,9 @@ export default defineComponent({
             proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             proceedings.value!.acronym = updatedInfo.acronym;
             proceedings.value!.authorReprint = updatedInfo.authorReprint;
+
+            updateCommonBasicInfo(proceedings, updatedInfo);
+
             performUpdate(false);
         };
 

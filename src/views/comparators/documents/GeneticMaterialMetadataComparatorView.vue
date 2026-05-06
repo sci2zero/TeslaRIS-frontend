@@ -155,6 +155,7 @@ import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -233,6 +234,8 @@ export default defineComponent({
                 geneticMaterial1.contributions?.concat(geneticMaterial2.contributions as PersonDocumentContribution[]);
             geneticMaterial2.contributions = [];
 
+            mergeCommonMetadata(geneticMaterial1, geneticMaterial2);
+
             return [geneticMaterial1, geneticMaterial2];
         };
 
@@ -280,6 +283,8 @@ export default defineComponent({
             leftGeneticMaterial.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             leftGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
+
+            updateCommonBasicInfo(leftGeneticMaterial, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -303,6 +308,8 @@ export default defineComponent({
             rightGeneticMaterial.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             rightGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
+
+            updateCommonBasicInfo(rightGeneticMaterial, updatedInfo);
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

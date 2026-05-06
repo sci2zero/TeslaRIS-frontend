@@ -284,6 +284,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -301,7 +307,7 @@ import { ref } from 'vue';
 import type { LanguageResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Thesis, ThesisType } from '@/models/PublicationModel';
+import type { CommonFieldsData, Thesis, ThesisType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -320,11 +326,13 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
 import DatePicker from '@/components/core/DatePicker.vue';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker},
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, DocumentCommonFields },
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,
@@ -371,6 +379,7 @@ export default defineComponent({
                 });
             });
             
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -466,6 +475,10 @@ export default defineComponent({
         const scopus = ref(props.presetThesis?.scopusId as string);
         const typeOfTitle = ref<any>([]);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
@@ -481,9 +494,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetThesis?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -530,10 +550,15 @@ export default defineComponent({
                 eisbn: eIsbn.value,
                 udc: udc.value,
                 placeOfKeep: placeOfKeep.value,
-                typeOfTitle: typeOfTitle.value
+                typeOfTitle: typeOfTitle.value,
+                ...commonFieldsData.value
             };
 
             emit("update", updatedThesis);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetThesis, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -578,6 +603,8 @@ export default defineComponent({
             udc.value = props.presetThesis?.udc as string;
             scopus.value = props.presetThesis?.scopusId as string;
 
+            updateDocumentCommonFields(props.presetThesis, presetCommonFieldsData);
+
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
@@ -589,6 +616,10 @@ export default defineComponent({
                 value: 
                     props.presetThesis?.thesisType ? props.presetThesis?.thesisType as ThesisType : undefined
             };
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -612,7 +643,8 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             scientificArea, scientificSubArea, typeOfTitle, scientificAreaRef,
             scientificSubAreaRef, placeOfKeepRef, optionalNumericZeroOrGreaterFieldRules,
-            isOrganisationUnitDLClient, isHeadOfLibrary, languagesWithMoreWritingSystems
+            isOrganisationUnitDLClient, isHeadOfLibrary, languagesWithMoreWritingSystems,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

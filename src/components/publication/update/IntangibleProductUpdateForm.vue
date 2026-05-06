@@ -117,6 +117,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -134,7 +140,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { IntangibleProduct, IntangibleProductType } from '@/models/PublicationModel';
+import type { CommonFieldsData, IntangibleProduct, IntangibleProductType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -148,11 +154,13 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import { getIntangibleProductTypesForGivenLocale, getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "IntangibleProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields },
     props: {
         presetIntangibleProduct: {
             type: Object as PropType<IntangibleProduct | undefined>,
@@ -178,6 +186,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -218,6 +227,10 @@ export default defineComponent({
         const scopus = ref(props.presetIntangibleProduct?.scopusId);
         const productUsers = ref<any>([]);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -230,10 +243,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetIntangibleProduct?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -263,10 +282,15 @@ export default defineComponent({
                 productUsers: productUsers.value,
                 intangibleProductType: selectedIntangibleProductType.value.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedIntangibleProduct);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetIntangibleProduct, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -284,6 +308,8 @@ export default defineComponent({
             webOfScienceId.value = props.presetIntangibleProduct?.webOfScienceId;
             scopus.value = props.presetIntangibleProduct?.scopusId;
 
+            updateDocumentCommonFields(props.presetIntangibleProduct, presetCommonFieldsData);
+
             selectedIntangibleProductType.value = 
                 { 
                     title: getIntangibleProductTypeTitleFromValueAutoLocale(props.presetIntangibleProduct?.intangibleProductType as IntangibleProductType) as string, 
@@ -298,6 +324,10 @@ export default defineComponent({
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             usersRef.value?.forceRefreshModelValue(toMultilingualTextInput(productUsers.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -330,7 +360,8 @@ export default defineComponent({
             scopus, scopusIdValidationRules, presetResearchAreas,
             researchAreaIds, intangibleProductTypes, productUsers,
             selectedIntangibleProductType, saveResearchAreas,
-            requiredSelectionRules
+            requiredSelectionRules, commonFieldsRef,
+            commonFieldsData, presetCommonFieldsData
         };
     }
 });

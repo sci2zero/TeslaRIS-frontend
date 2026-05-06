@@ -306,6 +306,7 @@ import { getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangi
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -466,6 +467,8 @@ export default defineComponent({
             intangibleProduct.value!.researchAreasId = basicInfo.researchAreasId;
             intangibleProduct.value!.productUsers = basicInfo.productUsers;
             intangibleProduct.value!.intangibleProductType = basicInfo.intangibleProductType;
+
+            updateCommonBasicInfo(intangibleProduct, basicInfo);
 
             performUpdate(true);
         };

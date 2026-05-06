@@ -189,7 +189,6 @@ export default defineComponent({
 
         watch(() => props.presetJournalPublication, () => {
             if (props.presetJournalPublication) {
-                updatePresetCommonFields();
                 refreshForm();
             }
         });
@@ -301,7 +300,14 @@ export default defineComponent({
             articleNumber.value = props.presetJournalPublication?.articleNumber;
             volume.value = props.presetJournalPublication?.volume;
             issue.value = props.presetJournalPublication?.issue;
-            selectedpublicationType.value = {title: props.presetJournalPublication?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetJournalPublication?.journalPublicationType ? props.presetJournalPublication?.journalPublicationType as JournalPublicationType : null};
+            selectedpublicationType.value = {
+                title: props.presetJournalPublication?.journalPublicationType ?
+                    getTitleFromValueAutoLocale(props.presetJournalPublication?.journalPublicationType as JournalPublicationType) as string : "", 
+                value: props.presetJournalPublication?.journalPublicationType ?
+                    props.presetJournalPublication?.journalPublicationType as JournalPublicationType : null
+            };
+
+            updateDocumentCommonFields(props.presetJournalPublication, presetCommonFieldsData);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));

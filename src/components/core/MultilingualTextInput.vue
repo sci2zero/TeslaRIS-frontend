@@ -141,6 +141,9 @@ export default defineComponent({
                     inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
                     filterFromInputChoices(input.language);
                 });
+
+                ensureAtLeastOneInput();
+
                 sendContentToParent();
             }
         };
@@ -153,6 +156,9 @@ export default defineComponent({
                     inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
                     filterFromInputChoices(input.language);
                 });
+
+                ensureAtLeastOneInput();
+
                 sendContentToParent();
             }
         };
@@ -164,6 +170,9 @@ export default defineComponent({
                 inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
                 filterFromInputChoices(input.language);
             });
+        
+            ensureAtLeastOneInput();
+
             sendContentToParent();
         };
 
@@ -191,6 +200,8 @@ export default defineComponent({
             returnToInputChoices(removedLanguage);
 
             sendContentToParent();
+
+            ensureAtLeastOneInput();
         };
 
         const updatedLanguage = (index: number) => {
@@ -243,7 +254,20 @@ export default defineComponent({
                                 languageTagId: input.language.value, 
                                 priority: inputs.value.length - index});
             });
+
             emit("update:modelValue", returnObject);
+            
+            ensureAtLeastOneInput();
+        };
+
+        const ensureAtLeastOneInput = () => {
+            if (inputs.value.length === 0 && supportedLanguages.value.length > 0) {
+                inputs.value.push({
+                    language: supportedLanguages.value[0],
+                    text: "",
+                    supportedLanguages: supportedLanguages.value
+                });
+            }
         };
 
         return {

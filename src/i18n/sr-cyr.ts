@@ -116,5 +116,9 @@ export default {
     invalidFundrefMessage: "Погрешан формат FundRef ID-а.",
     invalidIsniMessage: "Погрешан формат ISNI-а.",
     invalidFctIdMessage: "Погрешан формат FCT ID-а.",
-    uriPrefixLabel: "URI префикс"
+    uriPrefixLabel: "URI префикс",
+    handleIdExistsError: "Handle ID је већ у употреби.",
+    arxivIdExistsError: "ArXiv ID је већ у употреби.",
+    pubmedIdExistsError: "PubMed ID је већ у употреби.",
+    ssrnIdExistsError: "SSRN ID је већ у употреби."
 };

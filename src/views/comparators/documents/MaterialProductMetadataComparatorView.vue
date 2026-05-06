@@ -182,6 +182,7 @@ import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -270,6 +271,8 @@ export default defineComponent({
             materialProduct1.researchAreasId = materialProduct1.researchAreasId?.concat(materialProduct2.researchAreasId as number[]);
             materialProduct2.researchAreasId = [];
 
+            mergeCommonMetadata(materialProduct1, materialProduct2);
+
             return [materialProduct1, materialProduct2];
         };
 
@@ -319,6 +322,8 @@ export default defineComponent({
             leftMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;
             leftMaterialProduct.value!.researchAreasId =
                 leftMaterialProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
+
+            updateCommonBasicInfo(leftMaterialProduct, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -346,6 +351,8 @@ export default defineComponent({
             rightMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;
             rightMaterialProduct.value!.researchAreasId =
                 rightMaterialProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
+
+            updateCommonBasicInfo(rightMaterialProduct, updatedInfo);
                         
             if (update.value) {
                 rightUpdateComplete.value = true;

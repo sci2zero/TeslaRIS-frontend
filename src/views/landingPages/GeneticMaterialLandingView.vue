@@ -276,6 +276,7 @@ import GeneticMaterialUpdateForm from '@/components/publication/update/GeneticMa
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -434,6 +435,8 @@ export default defineComponent({
             geneticMaterial.value!.webOfScienceId = basicInfo.webOfScienceId;
             geneticMaterial.value!.authorReprint = basicInfo.authorReprint;
             geneticMaterial.value!.geneticMaterialType = basicInfo.geneticMaterialType;
+
+            updateCommonBasicInfo(geneticMaterial, basicInfo);
 
             performUpdate(true);
         };

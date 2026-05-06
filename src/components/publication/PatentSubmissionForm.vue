@@ -142,6 +142,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -165,7 +171,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { type PersonDocumentContribution, PublicationType, type Patent } from "@/models/PublicationModel";
+import { type PersonDocumentContribution, PublicationType, type Patent, type CommonFieldsData } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
@@ -175,11 +181,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitPatent",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -226,6 +233,10 @@ export default defineComponent({
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+        
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -254,7 +265,8 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createPatent(
@@ -278,6 +290,8 @@ export default defineComponent({
                     scopus.value = "";
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -349,7 +363,9 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules,
             webOfScienceId, scopus, submit,
             scopusIdValidationRules,
-            deduplicationTableRef
+            deduplicationTableRef,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

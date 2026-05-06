@@ -168,6 +168,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -194,7 +200,7 @@ import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
+import type { CommonFieldsData, PersonDocumentContribution, ProceedingsPublication } from "@/models/PublicationModel";
 import ProceedingsService from '@/services/ProceedingsService';
 import type { Proceedings, ProceedingsResponse } from '@/models/ProceedingsModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
@@ -209,11 +215,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitProceedingsPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, GenericCrudModal, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -265,6 +272,10 @@ export default defineComponent({
 
         const i18n = useI18n();
         const errorMessage = ref(i18n.t("genericErrorMessage"));
+
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
 
         const {
             requiredFieldRules, requiredSelectionRules,
@@ -399,7 +410,8 @@ export default defineComponent({
                 scopusId: scopus.value,
                 eventId: selectedEvent.value.value,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createProceedingsPublication(
@@ -429,6 +441,8 @@ export default defineComponent({
                     myPublications.value = [];
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -460,7 +474,8 @@ export default defineComponent({
             availableProceedings, selectedProceedings, returnCurrentLocaleContent,
             searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
             popuateMetadata, documentWebOfScienceIdValidationRules, webOfScienceId,
-            optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef, submit
+            optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef, submit,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

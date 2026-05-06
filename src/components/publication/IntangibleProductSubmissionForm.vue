@@ -171,6 +171,12 @@
                             />
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -193,7 +199,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { PublicationType, type PersonDocumentContribution, type IntangibleProduct, IntangibleProductType } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type IntangibleProduct, IntangibleProductType, type CommonFieldsData } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -205,11 +211,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getIntangibleProductTypesForGivenLocale } from '@/i18n/intangibleProductType';
 import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitIntangibleProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -261,6 +268,10 @@ export default defineComponent({
         const intangibleProductTypes = getIntangibleProductTypesForGivenLocale();
         const selectedIntangibleProductType = ref<{title: string, value: IntangibleProductType | null}>({ title: "", value: null });
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -293,7 +304,8 @@ export default defineComponent({
                 proofs: [],
                 productUsers: productUsers.value,
                 intangibleProductType: selectedIntangibleProductType.value.value as IntangibleProductType,
-                researchAreasId: researchAreaIds.value
+                researchAreasId: researchAreaIds.value,
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createIntangibleProduct(
@@ -319,6 +331,8 @@ export default defineComponent({
                     usersRef.value?.clearInput();
                     researchAreasSelectionRef.value?.resetForm();
                     selectedIntangibleProductType.value = { title: "", value: null };
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -389,7 +403,8 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, usersRef,
             deduplicationTableRef, requiredSelectionRules,
             intangibleProductTypes, selectedIntangibleProductType,
-            researchAreasSelectionRef, saveResearchAreas, submit
+            researchAreasSelectionRef, saveResearchAreas, submit,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

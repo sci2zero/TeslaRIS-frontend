@@ -181,6 +181,12 @@
                             />
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -203,7 +209,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { PublicationType, type PersonDocumentContribution, type MaterialProduct, MaterialProductType } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type MaterialProduct, MaterialProductType, type CommonFieldsData } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -215,11 +221,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getMaterialProductTypesForGivenLocale } from '@/i18n/materialProductType';
 import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitMaterialProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -272,6 +279,10 @@ export default defineComponent({
         const materialProductTypes = getMaterialProductTypesForGivenLocale();
         const selectedMaterialProductType = ref<{title: string, value: MaterialProductType | null}>({ title: "", value: null });
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -305,7 +316,8 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: [],
-                researchAreasId: researchAreaIds.value
+                researchAreasId: researchAreaIds.value,
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createMaterialProduct(
@@ -332,6 +344,8 @@ export default defineComponent({
                     usersRef.value?.clearInput();
                     researchAreasSelectionRef.value?.resetForm();
                     selectedMaterialProductType.value = { title: "", value: null };
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -403,7 +417,9 @@ export default defineComponent({
             deduplicationTableRef, numberProduced,
             materialProductTypes, selectedMaterialProductType,
             requiredSelectionRules, usersRef, submit,
-            researchAreasSelectionRef, saveResearchAreas
+            researchAreasSelectionRef, saveResearchAreas,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

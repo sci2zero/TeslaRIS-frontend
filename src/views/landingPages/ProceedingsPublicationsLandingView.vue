@@ -304,6 +304,7 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -466,6 +467,8 @@ export default defineComponent({
             proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
             proceedingsPublication.value!.openAlexId = basicInfo.openAlexId;
             proceedingsPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
+
+            updateCommonBasicInfo(proceedingsPublication, basicInfo);
 
             performUpdate(true);
         };

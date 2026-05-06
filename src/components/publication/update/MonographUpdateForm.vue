@@ -183,6 +183,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -200,7 +206,7 @@ import { ref } from 'vue';
 import type { ExternalValidation, LanguageResponse, LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { MonographType, Monograph } from '@/models/PublicationModel';
+import type { MonographType, Monograph, CommonFieldsData } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
@@ -221,11 +227,13 @@ import Toast from '@/components/core/Toast.vue';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import PublisherService from '@/services/PublisherService';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: {MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch},
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch, DocumentCommonFields },
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,
@@ -267,6 +275,8 @@ export default defineComponent({
                 populateSelectionData();
             });
 
+
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -355,6 +365,10 @@ export default defineComponent({
         const volume = ref(props.presetMonograph?.volume);
         const udc = ref(props.presetMonograph?.udc);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, requiredSelectionRules,
             doiValidationRules, scopusIdValidationRules,
@@ -381,12 +395,18 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        ),
                         { value: eIsbn.value as string, error: "eisbnExistsError" },
-                        { value: printIsbn.value as string, error: "printIsbnExistsError" },
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: scopus.value as string, error: "scopusIdExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"}
+                        { value: printIsbn.value as string, error: "printIsbnExistsError" }
                     ],
                     props.presetMonograph?.id as number,
                     (id, docId) => DocumentPublicationService.checkMonographIdentifierUsage(id, docId)
@@ -428,10 +448,15 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: [],
-                udc: udc.value
+                udc: udc.value,
+                ...commonFieldsData.value
             };
 
             emit("update", updatedMonograph);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetMonograph, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -454,11 +479,21 @@ export default defineComponent({
             webOfScienceId.value = props.presetMonograph?.webOfScienceId;
             volume.value = props.presetMonograph?.volume;
             number.value = props.presetMonograph?.number;
-            selectedMonographType.value = {title: props.presetMonograph?.monographType ? getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string : "", value: props.presetMonograph?.monographType ? props.presetMonograph?.monographType as MonographType : null};
+            selectedMonographType.value = {
+                title: props.presetMonograph?.monographType ?
+                    getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string : "",
+                value: props.presetMonograph?.monographType ? props.presetMonograph?.monographType as MonographType : null
+            };
+
+            updateDocumentCommonFields(props.presetMonograph, presetCommonFieldsData);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -483,7 +518,8 @@ export default defineComponent({
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
             selectedPublisher, optionalNumericZeroOrGreaterFieldRules,
-            udc, udcValidationRules
+            udc, udcValidationRules, commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

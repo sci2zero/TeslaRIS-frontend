@@ -130,6 +130,7 @@ import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -207,6 +208,8 @@ export default defineComponent({
             patent1.contributions = patent1.contributions?.concat(patent2.contributions as PersonDocumentContribution[]);
             patent2.contributions = [];
 
+            mergeCommonMetadata(patent1, patent2);
+
             return [patent1, patent2];
         };
 
@@ -251,6 +254,8 @@ export default defineComponent({
             leftPatent.value!.openAlexId = updatedInfo.openAlexId;
             leftPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftPatent.value!.authorReprint = updatedInfo.authorReprint;
+
+            updateCommonBasicInfo(leftPatent, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -273,6 +278,8 @@ export default defineComponent({
             rightPatent.value!.openAlexId = updatedInfo.openAlexId;
             rightPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightPatent.value!.authorReprint = updatedInfo.authorReprint;
+
+            updateCommonBasicInfo(rightPatent, updatedInfo);
             
             if (update.value) {
                 rightUpdateComplete.value = true;

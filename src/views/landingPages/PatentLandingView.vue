@@ -272,6 +272,7 @@ import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -423,6 +424,8 @@ export default defineComponent({
             patent.value!.openAlexId = basicInfo.openAlexId;
             patent.value!.webOfScienceId = basicInfo.webOfScienceId;
             patent.value!.authorReprint = basicInfo.authorReprint;
+
+            updateCommonBasicInfo(patent, basicInfo);
 
             performUpdate(true);
         };

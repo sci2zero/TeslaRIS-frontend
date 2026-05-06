@@ -134,6 +134,12 @@
             </v-col>
         </v-row>
 
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
+
         <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
@@ -151,7 +157,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { MaterialProduct, MaterialProductType } from '@/models/PublicationModel';
+import type { CommonFieldsData, MaterialProduct, MaterialProductType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -165,11 +171,13 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { getMaterialProductTypesForGivenLocale, getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "MaterialProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields },
     props: {
         presetMaterialProduct: {
             type: Object as PropType<MaterialProduct | undefined>,
@@ -195,6 +203,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -250,6 +259,10 @@ export default defineComponent({
             }
         );
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -262,10 +275,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetMaterialProduct?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -296,10 +315,15 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedMaterialProduct);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetMaterialProduct, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -318,6 +342,8 @@ export default defineComponent({
             scopus.value = props.presetMaterialProduct?.scopusId;
             numberProduced.value = props.presetMaterialProduct?.numberProduced;
 
+            updateDocumentCommonFields(props.presetMaterialProduct, presetCommonFieldsData);
+
             selectedMaterialProductType.value = 
                 { 
                     title: getMaterialProductTypeTitleFromValueAutoLocale(props.presetMaterialProduct?.materialProductType as MaterialProductType) as string, 
@@ -332,6 +358,10 @@ export default defineComponent({
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             usersRef.value?.forceRefreshModelValue(toMultilingualTextInput(productUsers.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -352,7 +382,8 @@ export default defineComponent({
             webOfScienceId, documentWebOfScienceIdValidationRules,
             scopus, scopusIdValidationRules, numberProduced,
             materialProductTypes, selectedMaterialProductType,
-            researchAreasSelectionRef, presetResearchAreas
+            researchAreasSelectionRef, presetResearchAreas,
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }
 });

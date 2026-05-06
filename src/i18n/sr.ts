@@ -1438,5 +1438,9 @@ export default {
     chronologicalSpaceDescriptionLabel: "Opis hronološkog prostora",
     peerReviewedLabel: "Recenzirano",
     openAccessLabel: "Otvorenog pristupa",
-    publicationStatusLabel: "Status publikacije"
+    publicationStatusLabel: "Status publikacije",
+    handleIdExistsError: "Handle ID je već u upotrebi.",
+    arxivIdExistsError: "ArXiv ID je već u upotrebi.",
+    pubmedIdExistsError: "PubMed ID je već u upotrebi.",
+    ssrnIdExistsError: "SSRN ID je već u upotrebi."
 }

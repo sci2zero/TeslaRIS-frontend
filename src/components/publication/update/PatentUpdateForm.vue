@@ -3,13 +3,22 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetPatent?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetPatent?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetPatent?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetPatent?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -19,21 +28,30 @@
                     type="number"
                     :label="$t('yearOfPublicationLabel') + '*'"
                     :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field
+                    v-model="doi"
+                    label="DOI"
+                    placeholder="DOI"
+                    :rules="doiValidationRules"
+                />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="patentNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                <v-text-field
+                    v-model="patentNumber"
+                    :label="$t('internalNumberLabel')"
+                    :placeholder="$t('internalNumberLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -41,8 +59,8 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -51,26 +69,32 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
+
+        <document-common-fields
+            ref="commonFieldsRef"
+            v-model="commonFieldsData"
+            :preset-data="presetCommonFieldsData"
+        />
         
         <v-row>
             <p class="required-fields-message">
@@ -89,7 +113,7 @@ import { ref } from 'vue';
 import type { MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { Patent } from '@/models/PublicationModel';
+import type { CommonFieldsData, Patent } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -99,11 +123,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import DocumentCommonFields from '../DocumentCommonFields.vue';
+import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
     name: "PatentUpdateForm",
-    components: {MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast},
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields },
     props: {
         presetPatent: {
             type: Object as PropType<Patent | undefined>,
@@ -125,6 +151,7 @@ export default defineComponent({
         const { languageTags } = useLanguageTags();
 
         onMounted(() => {
+            updatePresetCommonFields();
             fetchDetails();
         });
 
@@ -162,6 +189,10 @@ export default defineComponent({
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
         const scopus = ref(props.presetPatent?.scopusId);
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -173,10 +204,16 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: doi.value as string, error: "doiExistsError" },
-                        { value: openAlexId.value as string, error: "openAlexIdExistsError"},
-                        { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError"},
-                        { value: scopus.value as string, error: "scopusIdExistsError"}
+                        ...getCommonIdentifiers(
+                            doi.value,
+                            scopus.value,
+                            openAlexId.value,
+                            webOfScienceId.value,
+                            commonFieldsData.value.handleId,
+                            commonFieldsData.value.arxivId,
+                            commonFieldsData.value.pubmedId,
+                            commonFieldsData.value.ssrnId
+                        )
                     ],
                     props.presetPatent?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
@@ -203,10 +240,15 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             emit("update", updatedPatent);
+        };
+
+        const updatePresetCommonFields = () => {
+            updateDocumentCommonFields(props.presetPatent, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
@@ -224,9 +266,15 @@ export default defineComponent({
             webOfScienceId.value = props.presetPatent?.webOfScienceId;
             scopus.value = props.presetPatent?.scopusId;
 
+            updateDocumentCommonFields(props.presetPatent, presetCommonFieldsData);
+
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
+
+            if (commonFieldsRef.value && presetCommonFieldsData.value) {
+                commonFieldsRef.value.refreshForm(presetCommonFieldsData.value);
+            }
 
             fetchDetails();
         };
@@ -247,7 +295,9 @@ export default defineComponent({
             refreshForm, urisRef,
             openAlexId, webOfScienceId,
             workOpenAlexIdValidationRules,
-            documentWebOfScienceIdValidationRules
+            documentWebOfScienceIdValidationRules,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

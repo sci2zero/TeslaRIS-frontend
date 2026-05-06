@@ -160,7 +160,6 @@ export default defineComponent({
 
         watch(() => props.presetDataset, () => {
             if (props.presetDataset) {
-                updatePresetCommonFields();
                 refreshForm();
             }
         });
@@ -258,6 +257,8 @@ export default defineComponent({
             openAlexId.value = props.presetDataset?.openAlexId;
             webOfScienceId.value = props.presetDataset?.webOfScienceId;
             scopus.value = props.presetDataset?.scopusId;
+
+            updateDocumentCommonFields(props.presetDataset, presetCommonFieldsData);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));

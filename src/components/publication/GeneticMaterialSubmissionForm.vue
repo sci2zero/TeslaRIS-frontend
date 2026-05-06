@@ -152,6 +152,12 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -174,7 +180,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { PublicationType, type PersonDocumentContribution, type GeneticMaterial, type GeneticMaterialType } from "@/models/PublicationModel";
+import { PublicationType, type PersonDocumentContribution, type GeneticMaterial, type GeneticMaterialType, type CommonFieldsData } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
@@ -185,11 +191,12 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getGeneticMaterialTypesForGivenLocale } from '@/i18n/geneticMaterialType';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitGeneticMaterial",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -237,6 +244,10 @@ export default defineComponent({
         const geneticMaterialTypes = getGeneticMaterialTypesForGivenLocale();
         const selectedGeneticMaterialType = ref<{title: string, value: GeneticMaterialType | null}>({ title: "", value: null });
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const {
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
@@ -267,7 +278,8 @@ export default defineComponent({
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
-                proofs: []
+                proofs: [],
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createGeneticMaterial(
@@ -291,6 +303,8 @@ export default defineComponent({
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
                     selectedGeneticMaterialType.value = { title: "", value: null };
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     error.value = false;
                     snackbar.value = true;
@@ -356,7 +370,9 @@ export default defineComponent({
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules, submit,
             deduplicationTableRef, selectedGeneticMaterialType,
-            geneticMaterialTypes, requiredSelectionRules
+            geneticMaterialTypes, requiredSelectionRules,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });

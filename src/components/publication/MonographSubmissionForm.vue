@@ -247,6 +247,12 @@
                                 :rules="udcValidationRules"></v-text-field>
                         </v-col>
                     </v-row>
+
+                    <document-common-fields
+                        ref="commonFieldsRef"
+                        v-model="commonFieldsData"
+                        :preset-data="presetCommonFieldsData"
+                    />
                 </v-container>
             </v-col>
         </v-row>
@@ -276,7 +282,7 @@ import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
 import UriInput from '../core/UriInput.vue';
 import JournalAutocompleteSearch from '../journal/JournalAutocompleteSearch.vue';
-import { MonographType, type PersonDocumentContribution, PublicationType, type Monograph } from "@/models/PublicationModel";
+import { MonographType, type PersonDocumentContribution, PublicationType, type Monograph, type CommonFieldsData } from "@/models/PublicationModel";
 import BookSeriesAutocompleteSearch from '../bookSeries/BookSeriesAutocompleteSearch.vue';
 import { watch } from 'vue';
 import type { ExternalValidation } from "@/models/Common";
@@ -294,11 +300,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
+import DocumentCommonFields from './DocumentCommonFields.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch, PublicationDeduplicationTable },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch, PublicationDeduplicationTable, DocumentCommonFields },
     props: {
         inModal: {
             type: Boolean,
@@ -444,6 +451,10 @@ export default defineComponent({
             }
         };
 
+        const commonFieldsRef = ref<typeof DocumentCommonFields>();
+        const commonFieldsData = ref<CommonFieldsData>({});
+        const presetCommonFieldsData = ref<CommonFieldsData | undefined>(undefined);
+
         const { 
             requiredFieldRules, requiredSelectionRules, doiValidationRules,
             isbnValidationRules, scopusIdValidationRules, workOpenAlexIdValidationRules,
@@ -504,7 +515,8 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: [],
-                udc: udc.value
+                udc: udc.value,
+                ...commonFieldsData.value
             };
 
             DocumentPublicationService.createMonograph(newMonograph).then((response) => {
@@ -533,6 +545,8 @@ export default defineComponent({
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
+                    commonFieldsRef.value?.clearInputs();
+                    commonFieldsData.value = {};
 
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
@@ -603,7 +617,9 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules, webOfScienceId,
             publisherAutocompleteRef, selectedPublisher,
             optionalNumericZeroOrGreaterFieldRules,
-            deduplicationTableRef, udc, udcValidationRules
+            deduplicationTableRef, udc, udcValidationRules,
+            commonFieldsRef, commonFieldsData,
+            presetCommonFieldsData
         };
     }
 });
