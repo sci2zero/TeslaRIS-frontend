@@ -413,16 +413,8 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: Patent) => {
-            patent.value!.title = basicInfo.title;
-            patent.value!.subTitle = basicInfo.subTitle;
-            patent.value!.documentDate = basicInfo.documentDate;
-            patent.value!.doi = basicInfo.doi;
-            patent.value!.scopusId = basicInfo.scopusId;
-            patent.value!.uris = basicInfo.uris;
             patent.value!.publisherId = basicInfo.publisherId;
             patent.value!.number = basicInfo.number;
-            patent.value!.openAlexId = basicInfo.openAlexId;
-            patent.value!.webOfScienceId = basicInfo.webOfScienceId;
             patent.value!.authorReprint = basicInfo.authorReprint;
 
             updateCommonBasicInfo(patent, basicInfo);

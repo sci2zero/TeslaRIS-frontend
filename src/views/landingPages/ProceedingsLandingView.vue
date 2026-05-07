@@ -493,15 +493,7 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (updatedInfo: Proceedings) => {
-            proceedings.value!.title = updatedInfo.title;
-            proceedings.value!.subTitle = updatedInfo.subTitle;
-            proceedings.value!.description = updatedInfo.description;
-            proceedings.value!.keywords = updatedInfo.keywords;
-            proceedings.value!.uris = updatedInfo.uris;
-            proceedings.value!.documentDate = updatedInfo.documentDate;
-            proceedings.value!.doi = updatedInfo.doi;
             proceedings.value!.eISBN = updatedInfo.eISBN;
-            proceedings.value!.eventId = updatedInfo.eventId;
             proceedings.value!.languageIds = updatedInfo.languageIds;
             proceedings.value!.numberOfPages = updatedInfo.numberOfPages;
             proceedings.value!.printISBN = updatedInfo.printISBN;
@@ -509,9 +501,6 @@ export default defineComponent({
             proceedings.value!.publicationSeriesIssue = updatedInfo.publicationSeriesIssue;
             proceedings.value!.publicationSeriesVolume = updatedInfo.publicationSeriesVolume;
             proceedings.value!.publisherId = updatedInfo.publisherId;
-            proceedings.value!.scopusId = updatedInfo.scopusId;
-            proceedings.value!.openAlexId = updatedInfo.openAlexId;
-            proceedings.value!.webOfScienceId = updatedInfo.webOfScienceId;
             proceedings.value!.acronym = updatedInfo.acronym;
             proceedings.value!.authorReprint = updatedInfo.authorReprint;
 

@@ -421,16 +421,8 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: Dataset) => {
-            dataset.value!.title = basicInfo.title;
-            dataset.value!.subTitle = basicInfo.subTitle;
-            dataset.value!.documentDate = basicInfo.documentDate;
-            dataset.value!.doi = basicInfo.doi;
-            dataset.value!.scopusId = basicInfo.scopusId;
-            dataset.value!.uris = basicInfo.uris;
             dataset.value!.publisherId = basicInfo.publisherId;
             dataset.value!.internalNumber = basicInfo.internalNumber;
-            dataset.value!.openAlexId = basicInfo.openAlexId;
-            dataset.value!.webOfScienceId = basicInfo.webOfScienceId;
             dataset.value!.authorReprint = basicInfo.authorReprint;
 
             updateCommonBasicInfo(dataset, basicInfo);

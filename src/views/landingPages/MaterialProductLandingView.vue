@@ -454,16 +454,8 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: MaterialProduct) => {
-            materialProduct.value!.title = basicInfo.title;
-            materialProduct.value!.subTitle = basicInfo.subTitle;
-            materialProduct.value!.documentDate = basicInfo.documentDate;
-            materialProduct.value!.doi = basicInfo.doi;
-            materialProduct.value!.scopusId = basicInfo.scopusId;
-            materialProduct.value!.uris = basicInfo.uris;
             materialProduct.value!.publisherId = basicInfo.publisherId;
             materialProduct.value!.internalNumber = basicInfo.internalNumber;
-            materialProduct.value!.openAlexId = basicInfo.openAlexId;
-            materialProduct.value!.webOfScienceId = basicInfo.webOfScienceId;
             materialProduct.value!.authorReprint = basicInfo.authorReprint;
             materialProduct.value!.researchAreasId = basicInfo.researchAreasId;
             materialProduct.value!.productUsers = basicInfo.productUsers;

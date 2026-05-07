@@ -816,12 +816,6 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: Thesis) => {
-            thesis.value!.title = basicInfo.title;
-            thesis.value!.subTitle = basicInfo.subTitle;
-            thesis.value!.documentDate = basicInfo.documentDate;
-            thesis.value!.doi = basicInfo.doi;
-            thesis.value!.scopusId = basicInfo.scopusId;
-            thesis.value!.uris = basicInfo.uris;
             thesis.value!.publisherId = basicInfo.publisherId;
             thesis.value!.organisationUnitId = basicInfo.organisationUnitId;
             thesis.value!.numberOfPages = basicInfo.numberOfPages;
@@ -837,8 +831,6 @@ export default defineComponent({
             thesis.value!.topicAcceptanceDate = basicInfo.topicAcceptanceDate;
             thesis.value!.thesisDefenceDate = basicInfo.thesisDefenceDate;
             thesis.value!.thesisType = basicInfo.thesisType;
-            thesis.value!.openAlexId = basicInfo.openAlexId;
-            thesis.value!.webOfScienceId = basicInfo.webOfScienceId;
             thesis.value!.scientificArea = basicInfo.scientificArea;
             thesis.value!.scientificSubArea = basicInfo.scientificSubArea;
             thesis.value!.eisbn = basicInfo.eisbn;

@@ -423,16 +423,8 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: GeneticMaterial) => {
-            geneticMaterial.value!.title = basicInfo.title;
-            geneticMaterial.value!.subTitle = basicInfo.subTitle;
-            geneticMaterial.value!.documentDate = basicInfo.documentDate;
-            geneticMaterial.value!.doi = basicInfo.doi;
-            geneticMaterial.value!.scopusId = basicInfo.scopusId;
-            geneticMaterial.value!.uris = basicInfo.uris;
             geneticMaterial.value!.publisherId = basicInfo.publisherId;
             geneticMaterial.value!.internalNumber = basicInfo.internalNumber;
-            geneticMaterial.value!.openAlexId = basicInfo.openAlexId;
-            geneticMaterial.value!.webOfScienceId = basicInfo.webOfScienceId;
             geneticMaterial.value!.authorReprint = basicInfo.authorReprint;
             geneticMaterial.value!.geneticMaterialType = basicInfo.geneticMaterialType;
 

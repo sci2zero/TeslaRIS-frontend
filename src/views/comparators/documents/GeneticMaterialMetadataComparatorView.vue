@@ -42,8 +42,8 @@
                             :contribution-list="leftGeneticMaterial?.contributions ? leftGeneticMaterial.contributions : []"
                             :document-id="leftGeneticMaterial?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -106,8 +106,8 @@
                             :contribution-list="rightGeneticMaterial?.contributions ? rightGeneticMaterial.contributions : []"
                             :document-id="rightGeneticMaterial?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -126,8 +126,8 @@
             :right-id="(rightGeneticMaterial?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -138,20 +138,18 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { GeneticMaterial } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import GeneticMaterialUpdateForm from '@/components/publication/update/GeneticMaterialUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
@@ -198,43 +196,13 @@ export default defineComponent({
         };
 
         const mergeGeneticMaterialMetadata = (geneticMaterial1: GeneticMaterial, geneticMaterial2: GeneticMaterial) => {
-            mergeMultilingualContentField(geneticMaterial1.title, geneticMaterial2.title);
-
-            mergeMultilingualContentField(geneticMaterial1.subTitle, geneticMaterial2.subTitle);
-            geneticMaterial2.subTitle = [];
-
-            mergeMultilingualContentField(geneticMaterial1.keywords, geneticMaterial2.keywords);
-            geneticMaterial2.keywords = [];
-
-            mergeMultilingualContentField(geneticMaterial1.description, geneticMaterial2.description);
-            geneticMaterial2.description = [];
-
-            mergeDocumentAttachments(geneticMaterial1, geneticMaterial2);
-
+            mergeCommonMetadata(geneticMaterial1, geneticMaterial2);
+            
             bulkTransferFields(geneticMaterial1, geneticMaterial2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
             ]);
-
-            geneticMaterial2.uris!.forEach(uri => {
-                if (!geneticMaterial1.uris!.includes(uri)) {
-                    geneticMaterial1.uris!.push(uri);
-                }
-            });
-            geneticMaterial2.uris = [];
-
-            geneticMaterial1.contributions = 
-                geneticMaterial1.contributions?.concat(geneticMaterial2.contributions as PersonDocumentContribution[]);
-            geneticMaterial2.contributions = [];
-
-            mergeCommonMetadata(geneticMaterial1, geneticMaterial2);
 
             return [geneticMaterial1, geneticMaterial2];
         };
@@ -268,19 +236,8 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: GeneticMaterial) => {
-            leftGeneticMaterial.value!.title = updatedInfo.title;
-            leftGeneticMaterial.value!.subTitle = updatedInfo.subTitle;
-            leftGeneticMaterial.value!.description = updatedInfo.description;
-            leftGeneticMaterial.value!.keywords = updatedInfo.keywords;
-            leftGeneticMaterial.value!.uris = updatedInfo.uris;
-            leftGeneticMaterial.value!.documentDate = updatedInfo.documentDate;
-            leftGeneticMaterial.value!.doi = updatedInfo.doi;
             leftGeneticMaterial.value!.internalNumber = updatedInfo.internalNumber;
-            leftGeneticMaterial.value!.eventId = updatedInfo.eventId;
             leftGeneticMaterial.value!.publisherId = updatedInfo.publisherId;
-            leftGeneticMaterial.value!.scopusId = updatedInfo.scopusId;
-            leftGeneticMaterial.value!.openAlexId = updatedInfo.openAlexId;
-            leftGeneticMaterial.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             leftGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
 
@@ -293,19 +250,8 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: GeneticMaterial) => {
-            rightGeneticMaterial.value!.title = updatedInfo.title;
-            rightGeneticMaterial.value!.subTitle = updatedInfo.subTitle;
-            rightGeneticMaterial.value!.description = updatedInfo.description;
-            rightGeneticMaterial.value!.keywords = updatedInfo.keywords;
-            rightGeneticMaterial.value!.uris = updatedInfo.uris;
-            rightGeneticMaterial.value!.documentDate = updatedInfo.documentDate;
-            rightGeneticMaterial.value!.doi = updatedInfo.doi;
             rightGeneticMaterial.value!.internalNumber = updatedInfo.internalNumber;
-            rightGeneticMaterial.value!.eventId = updatedInfo.eventId;
             rightGeneticMaterial.value!.publisherId = updatedInfo.publisherId;
-            rightGeneticMaterial.value!.scopusId = updatedInfo.scopusId;
-            rightGeneticMaterial.value!.openAlexId = updatedInfo.openAlexId;
-            rightGeneticMaterial.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             rightGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
 

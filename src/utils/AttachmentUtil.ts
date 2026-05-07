@@ -138,4 +138,27 @@ export const mergeDocumentAttachments = (document1: Document, document2: Documen
         document1.fileItems?.push(proof);
     });
     document2.fileItems = [];
+
+    const isThesis = (doc: Document): doc is Thesis => {
+        return 'preliminaryFiles' in doc || 
+               'preliminarySupplements' in doc || 
+               'commissionReports' in doc;
+    };
+
+    if (isThesis(document1) && isThesis(document2)) {
+        document2.preliminaryFiles?.forEach(file => {
+            document1.preliminaryFiles?.push(file);
+        });
+        document2.preliminaryFiles = [];
+
+        document2.preliminarySupplements?.forEach(supplement => {
+            document1.preliminarySupplements?.push(supplement);
+        });
+        document2.preliminarySupplements = [];
+
+        document2.commissionReports?.forEach(report => {
+            document1.commissionReports?.push(report);
+        });
+        document2.commissionReports = [];
+    }
 };

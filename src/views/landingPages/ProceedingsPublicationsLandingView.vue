@@ -453,20 +453,12 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: ProceedingsPublication) => {
-            proceedingsPublication.value!.title = basicInfo.title;
-            proceedingsPublication.value!.subTitle = basicInfo.subTitle;
-            proceedingsPublication.value!.doi = basicInfo.doi;
-            proceedingsPublication.value!.scopusId = basicInfo.scopusId;
-            proceedingsPublication.value!.uris = basicInfo.uris;
-            proceedingsPublication.value!.eventId = basicInfo.eventId;
             proceedingsPublication.value!.proceedingsId = basicInfo.proceedingsId;
             proceedingsPublication.value!.startPage = basicInfo.startPage;
             proceedingsPublication.value!.endPage = basicInfo.endPage;
             proceedingsPublication.value!.numberOfPages = basicInfo.numberOfPages;
             proceedingsPublication.value!.articleNumber = basicInfo.articleNumber;
             proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
-            proceedingsPublication.value!.openAlexId = basicInfo.openAlexId;
-            proceedingsPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             updateCommonBasicInfo(proceedingsPublication, basicInfo);
 

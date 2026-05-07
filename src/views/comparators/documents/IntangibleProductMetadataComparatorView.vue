@@ -42,8 +42,8 @@
                             :contribution-list="leftIntangibleProduct?.contributions ? leftIntangibleProduct.contributions : []"
                             :document-id="leftIntangibleProduct?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -52,8 +52,8 @@
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="leftIntangibleProduct?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -116,8 +116,8 @@
                             :contribution-list="rightIntangibleProduct?.contributions ? rightIntangibleProduct.contributions : []"
                             :document-id="rightIntangibleProduct?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -126,8 +126,8 @@
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="rightIntangibleProduct?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -146,8 +146,8 @@
             :right-id="(rightIntangibleProduct?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -158,20 +158,18 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { IntangibleProduct } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import IntangibleProductUpdateForm from '@/components/publication/update/IntangibleProductUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
@@ -220,52 +218,21 @@ export default defineComponent({
         };
 
         const mergeIntangibleProductMetadata = (intangibleProduct1: IntangibleProduct, intangibleProduct2: IntangibleProduct) => {
-            mergeMultilingualContentField(intangibleProduct1.title, intangibleProduct2.title);
-
-            mergeMultilingualContentField(intangibleProduct1.subTitle, intangibleProduct2.subTitle);
-            intangibleProduct2.subTitle = [];
-
-            mergeMultilingualContentField(intangibleProduct1.keywords, intangibleProduct2.keywords);
-            intangibleProduct2.keywords = [];
-
-            mergeMultilingualContentField(intangibleProduct1.description, intangibleProduct2.description);
-            intangibleProduct2.description = [];
-
-            mergeMultilingualContentField(intangibleProduct1.productUsers, intangibleProduct2.productUsers);
-            intangibleProduct2.productUsers = [];
-
-            mergeDocumentAttachments(intangibleProduct1, intangibleProduct2);
+            mergeCommonMetadata(intangibleProduct1, intangibleProduct2);
 
             bulkTransferFields(intangibleProduct1, intangibleProduct2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
                 { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "intangibleProductType", emptyValue: null, setEmpty: false }
             ]);
-
-            intangibleProduct2.uris!.forEach(uri => {
-                if (!intangibleProduct1.uris!.includes(uri)) {
-                    intangibleProduct1.uris!.push(uri);
-                }
-            });
-            intangibleProduct2.uris = [];
-
-            intangibleProduct1.contributions = intangibleProduct1.contributions?.concat(intangibleProduct2.contributions as PersonDocumentContribution[]);
-            intangibleProduct2.contributions = [];
 
             intangibleProduct1.researchAreas = intangibleProduct1.researchAreas?.concat(intangibleProduct2.researchAreas as ResearchArea[]);
             intangibleProduct2.researchAreas = [];
 
             intangibleProduct1.researchAreasId = intangibleProduct1.researchAreasId?.concat(intangibleProduct2.researchAreasId as number[]);
             intangibleProduct2.researchAreasId = [];
-
-            mergeCommonMetadata(intangibleProduct1, intangibleProduct2);
 
             return [intangibleProduct1, intangibleProduct2];
         };
@@ -297,19 +264,8 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: IntangibleProduct) => {
-            leftIntangibleProduct.value!.title = updatedInfo.title;
-            leftIntangibleProduct.value!.subTitle = updatedInfo.subTitle;
-            leftIntangibleProduct.value!.description = updatedInfo.description;
-            leftIntangibleProduct.value!.keywords = updatedInfo.keywords;
-            leftIntangibleProduct.value!.uris = updatedInfo.uris;
-            leftIntangibleProduct.value!.documentDate = updatedInfo.documentDate;
-            leftIntangibleProduct.value!.doi = updatedInfo.doi;
             leftIntangibleProduct.value!.internalNumber = updatedInfo.internalNumber;
-            leftIntangibleProduct.value!.eventId = updatedInfo.eventId;
             leftIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
-            leftIntangibleProduct.value!.scopusId = updatedInfo.scopusId;
-            leftIntangibleProduct.value!.openAlexId = updatedInfo.openAlexId;
-            leftIntangibleProduct.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftIntangibleProduct.value!.authorReprint = updatedInfo.authorReprint;
             leftIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             leftIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
@@ -325,19 +281,8 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: IntangibleProduct) => {
-            rightIntangibleProduct.value!.title = updatedInfo.title;
-            rightIntangibleProduct.value!.subTitle = updatedInfo.subTitle;
-            rightIntangibleProduct.value!.description = updatedInfo.description;
-            rightIntangibleProduct.value!.keywords = updatedInfo.keywords;
-            rightIntangibleProduct.value!.uris = updatedInfo.uris;
-            rightIntangibleProduct.value!.documentDate = updatedInfo.documentDate;
-            rightIntangibleProduct.value!.doi = updatedInfo.doi;
             rightIntangibleProduct.value!.internalNumber = updatedInfo.internalNumber;
-            rightIntangibleProduct.value!.eventId = updatedInfo.eventId;
             rightIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
-            rightIntangibleProduct.value!.scopusId = updatedInfo.scopusId;
-            rightIntangibleProduct.value!.openAlexId = updatedInfo.openAlexId;
-            rightIntangibleProduct.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightIntangibleProduct.value!.authorReprint = updatedInfo.authorReprint;
             rightIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             rightIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;

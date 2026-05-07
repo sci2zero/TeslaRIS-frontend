@@ -43,8 +43,8 @@
                             :contribution-list="leftMaterialProduct?.contributions ? leftMaterialProduct.contributions : []"
                             :document-id="leftMaterialProduct?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -55,8 +55,8 @@
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="leftMaterialProduct?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -119,8 +119,8 @@
                             :contribution-list="rightMaterialProduct?.contributions ? rightMaterialProduct.contributions : []"
                             :document-id="rightMaterialProduct?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -131,8 +131,8 @@
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="rightMaterialProduct?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -169,14 +169,12 @@ import type { MaterialProduct } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
@@ -225,53 +223,24 @@ export default defineComponent({
         };
 
         const mergeMaterialProductMetadata = (materialProduct1: MaterialProduct, materialProduct2: MaterialProduct) => {
-            mergeMultilingualContentField(materialProduct1.title, materialProduct2.title);
-
-            mergeMultilingualContentField(materialProduct1.subTitle, materialProduct2.subTitle);
-            materialProduct2.subTitle = [];
-
-            mergeMultilingualContentField(materialProduct1.keywords, materialProduct2.keywords);
-            materialProduct2.keywords = [];
-
-            mergeMultilingualContentField(materialProduct1.description, materialProduct2.description);
-            materialProduct2.description = [];
+            mergeCommonMetadata(materialProduct1, materialProduct2);
 
             mergeMultilingualContentField(materialProduct1.productUsers, materialProduct2.productUsers);
             materialProduct2.productUsers = [];
 
-            mergeDocumentAttachments(materialProduct1, materialProduct2);
-
             bulkTransferFields(materialProduct1, materialProduct2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "numberProduced", emptyValue: null },
                 { fieldName: "materialProductType", emptyValue: null, setEmpty: false }
             ]);
 
-            materialProduct2.uris!.forEach(uri => {
-                if (!materialProduct1.uris!.includes(uri)) {
-                    materialProduct1.uris!.push(uri);
-                }
-            });
-            materialProduct2.uris = [];
-
-            materialProduct1.contributions = materialProduct1.contributions?.concat(materialProduct2.contributions as PersonDocumentContribution[]);
-            materialProduct2.contributions = [];
-
             materialProduct1.researchAreas = materialProduct1.researchAreas?.concat(materialProduct2.researchAreas as ResearchArea[]);
             materialProduct2.researchAreas = [];
 
             materialProduct1.researchAreasId = materialProduct1.researchAreasId?.concat(materialProduct2.researchAreasId as number[]);
             materialProduct2.researchAreasId = [];
-
-            mergeCommonMetadata(materialProduct1, materialProduct2);
 
             return [materialProduct1, materialProduct2];
         };
@@ -303,19 +272,8 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: MaterialProduct) => {
-            leftMaterialProduct.value!.title = updatedInfo.title;
-            leftMaterialProduct.value!.subTitle = updatedInfo.subTitle;
-            leftMaterialProduct.value!.description = updatedInfo.description;
-            leftMaterialProduct.value!.keywords = updatedInfo.keywords;
-            leftMaterialProduct.value!.uris = updatedInfo.uris;
-            leftMaterialProduct.value!.documentDate = updatedInfo.documentDate;
-            leftMaterialProduct.value!.doi = updatedInfo.doi;
             leftMaterialProduct.value!.internalNumber = updatedInfo.internalNumber;
-            leftMaterialProduct.value!.eventId = updatedInfo.eventId;
             leftMaterialProduct.value!.publisherId = updatedInfo.publisherId;
-            leftMaterialProduct.value!.scopusId = updatedInfo.scopusId;
-            leftMaterialProduct.value!.openAlexId = updatedInfo.openAlexId;
-            leftMaterialProduct.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftMaterialProduct.value!.authorReprint = updatedInfo.authorReprint;
             leftMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             leftMaterialProduct.value!.productUsers = updatedInfo.productUsers;
@@ -332,19 +290,8 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: MaterialProduct) => {
-            rightMaterialProduct.value!.title = updatedInfo.title;
-            rightMaterialProduct.value!.subTitle = updatedInfo.subTitle;
-            rightMaterialProduct.value!.description = updatedInfo.description;
-            rightMaterialProduct.value!.keywords = updatedInfo.keywords;
-            rightMaterialProduct.value!.uris = updatedInfo.uris;
-            rightMaterialProduct.value!.documentDate = updatedInfo.documentDate;
-            rightMaterialProduct.value!.doi = updatedInfo.doi;
             rightMaterialProduct.value!.internalNumber = updatedInfo.internalNumber;
-            rightMaterialProduct.value!.eventId = updatedInfo.eventId;
             rightMaterialProduct.value!.publisherId = updatedInfo.publisherId;
-            rightMaterialProduct.value!.scopusId = updatedInfo.scopusId;
-            rightMaterialProduct.value!.openAlexId = updatedInfo.openAlexId;
-            rightMaterialProduct.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightMaterialProduct.value!.authorReprint = updatedInfo.authorReprint;
             rightMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             rightMaterialProduct.value!.productUsers = updatedInfo.productUsers;

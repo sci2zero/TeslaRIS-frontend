@@ -587,12 +587,6 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: Monograph) => {
-            monograph.value!.title = basicInfo.title;
-            monograph.value!.subTitle = basicInfo.subTitle;
-            monograph.value!.documentDate = basicInfo.documentDate;
-            monograph.value!.doi = basicInfo.doi;
-            monograph.value!.scopusId = basicInfo.scopusId;
-            monograph.value!.uris = basicInfo.uris;
             monograph.value!.number = basicInfo.number;
             monograph.value!.volume = basicInfo.volume;
             monograph.value!.researchAreaId = basicInfo.researchAreaId;
@@ -601,8 +595,6 @@ export default defineComponent({
             monograph.value!.numberOfPages = basicInfo.numberOfPages;
             monograph.value!.eisbn = basicInfo.eisbn;
             monograph.value!.printISBN = basicInfo.printISBN;
-            monograph.value!.openAlexId = basicInfo.openAlexId;
-            monograph.value!.webOfScienceId = basicInfo.webOfScienceId;
             monograph.value!.publisherId = basicInfo.publisherId;
             monograph.value!.authorReprint = basicInfo.authorReprint;
             monograph.value!.udc = basicInfo.udc;

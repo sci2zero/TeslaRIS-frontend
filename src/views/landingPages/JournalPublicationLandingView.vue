@@ -473,13 +473,6 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: JournalPublication) => {
-            journalPublication.value!.title = basicInfo.title;
-            journalPublication.value!.subTitle = basicInfo.subTitle;
-            journalPublication.value!.documentDate = basicInfo.documentDate;
-            journalPublication.value!.doi = basicInfo.doi;
-            journalPublication.value!.scopusId = basicInfo.scopusId;
-            journalPublication.value!.uris = basicInfo.uris;
-            journalPublication.value!.eventId = basicInfo.eventId;
             journalPublication.value!.journalId = basicInfo.journalId;
             journalPublication.value!.startPage = basicInfo.startPage;
             journalPublication.value!.endPage = basicInfo.endPage;
@@ -488,8 +481,6 @@ export default defineComponent({
             journalPublication.value!.numberOfPages = basicInfo.numberOfPages;
             journalPublication.value!.articleNumber = basicInfo.articleNumber;
             journalPublication.value!.journalPublicationType = basicInfo.journalPublicationType;
-            journalPublication.value!.openAlexId = basicInfo.openAlexId;
-            journalPublication.value!.webOfScienceId = basicInfo.webOfScienceId;
 
             updateCommonBasicInfo(journalPublication, basicInfo);
 

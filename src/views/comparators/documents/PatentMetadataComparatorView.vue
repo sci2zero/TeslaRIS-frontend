@@ -8,14 +8,26 @@
                 <br />
 
                 <patent-update-form
-                    ref="updateLeftRef" :preset-patent="leftPatent" in-comparator :in-modal="false"
-                    @update="updateLeft"></patent-update-form>
+                    ref="updateLeftRef"
+                    :preset-patent="leftPatent"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftPatent?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftPatent?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftPatent?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftPatent?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,8 +42,8 @@
                             :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []"
                             :document-id="leftPatent?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -60,14 +72,26 @@
                 <br />
 
                 <patent-update-form
-                    ref="updateRightRef" :preset-patent="rightPatent" in-comparator :in-modal="false"
-                    @update="updateRight"></patent-update-form>
+                    ref="updateRightRef"
+                    :preset-patent="rightPatent"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightPatent?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightPatent?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightPatent?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightPatent?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -82,8 +106,8 @@
                             :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []"
                             :document-id="rightPatent?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -101,8 +125,8 @@
             :right-id="(rightPatent?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -113,13 +137,12 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { Patent } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
@@ -127,7 +150,6 @@ import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
@@ -173,42 +195,13 @@ export default defineComponent({
         };
 
         const mergePatentMetadata = (patent1: Patent, patent2: Patent) => {
-            mergeMultilingualContentField(patent1.title, patent2.title);
-
-            mergeMultilingualContentField(patent1.subTitle, patent2.subTitle);
-            patent2.subTitle = [];
-
-            mergeDocumentAttachments(patent1, patent2);
-
-            mergeMultilingualContentField(patent1.keywords, patent2.keywords);
-            patent2.keywords = [];
-
-            mergeMultilingualContentField(patent1.description, patent2.description);
-            patent2.description = [];
-
+            mergeCommonMetadata(patent1, patent2);
+            
             bulkTransferFields(patent1, patent2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "number", emptyValue: "" },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
             ]);
-
-            patent2.uris!.forEach(uri => {
-                if (!patent1.uris!.includes(uri)) {
-                    patent1.uris!.push(uri);
-                }
-            });
-            patent2.uris = [];
-
-            patent1.contributions = patent1.contributions?.concat(patent2.contributions as PersonDocumentContribution[]);
-            patent2.contributions = [];
-
-            mergeCommonMetadata(patent1, patent2);
 
             return [patent1, patent2];
         };
@@ -240,19 +233,8 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: Patent) => {
-            leftPatent.value!.title = updatedInfo.title;
-            leftPatent.value!.subTitle = updatedInfo.subTitle;
-            leftPatent.value!.description = updatedInfo.description;
-            leftPatent.value!.keywords = updatedInfo.keywords;
-            leftPatent.value!.uris = updatedInfo.uris;
-            leftPatent.value!.documentDate = updatedInfo.documentDate;
-            leftPatent.value!.doi = updatedInfo.doi;
             leftPatent.value!.number = updatedInfo.number;
-            leftPatent.value!.eventId = updatedInfo.eventId;
             leftPatent.value!.publisherId = updatedInfo.publisherId;
-            leftPatent.value!.scopusId = updatedInfo.scopusId;
-            leftPatent.value!.openAlexId = updatedInfo.openAlexId;
-            leftPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftPatent.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftPatent, updatedInfo);
@@ -264,19 +246,8 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: Patent) => {
-            rightPatent.value!.title = updatedInfo.title;
-            rightPatent.value!.subTitle = updatedInfo.subTitle;
-            rightPatent.value!.description = updatedInfo.description;
-            rightPatent.value!.keywords = updatedInfo.keywords;
-            rightPatent.value!.uris = updatedInfo.uris;
-            rightPatent.value!.documentDate = updatedInfo.documentDate;
-            rightPatent.value!.doi = updatedInfo.doi;
             rightPatent.value!.number = updatedInfo.number;
-            rightPatent.value!.eventId = updatedInfo.eventId;
             rightPatent.value!.publisherId = updatedInfo.publisherId;
-            rightPatent.value!.scopusId = updatedInfo.scopusId;
-            rightPatent.value!.openAlexId = updatedInfo.openAlexId;
-            rightPatent.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightPatent.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightPatent, updatedInfo);

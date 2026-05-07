@@ -453,16 +453,8 @@ export default defineComponent({
         };
 
         const updateBasicInfo = (basicInfo: IntangibleProduct) => {
-            intangibleProduct.value!.title = basicInfo.title;
-            intangibleProduct.value!.subTitle = basicInfo.subTitle;
-            intangibleProduct.value!.documentDate = basicInfo.documentDate;
-            intangibleProduct.value!.doi = basicInfo.doi;
-            intangibleProduct.value!.scopusId = basicInfo.scopusId;
-            intangibleProduct.value!.uris = basicInfo.uris;
             intangibleProduct.value!.publisherId = basicInfo.publisherId;
             intangibleProduct.value!.internalNumber = basicInfo.internalNumber;
-            intangibleProduct.value!.openAlexId = basicInfo.openAlexId;
-            intangibleProduct.value!.webOfScienceId = basicInfo.webOfScienceId;
             intangibleProduct.value!.authorReprint = basicInfo.authorReprint;
             intangibleProduct.value!.researchAreasId = basicInfo.researchAreasId;
             intangibleProduct.value!.productUsers = basicInfo.productUsers;

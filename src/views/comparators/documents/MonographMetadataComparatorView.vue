@@ -8,14 +8,26 @@
                 <br />
 
                 <monograph-update-form
-                    ref="updateLeftRef" :preset-monograph="leftMonograph" in-comparator :in-modal="false"
-                    @update="updateLeft"></monograph-update-form>
+                    ref="updateLeftRef"
+                    :preset-monograph="leftMonograph"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftMonograph?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftMonograph?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftMonograph?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftMonograph?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,8 +42,8 @@
                             :contribution-list="leftMonograph?.contributions ? leftMonograph.contributions : []"
                             :document-id="leftMonograph?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -60,14 +72,26 @@
                 <br />
 
                 <monograph-update-form
-                    ref="updateRightRef" :preset-monograph="rightMonograph" in-comparator :in-modal="false"
-                    @update="updateRight"></monograph-update-form>
+                    ref="updateRightRef"
+                    :preset-monograph="rightMonograph"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightMonograph?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightMonograph?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightMonograph?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightMonograph?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -82,8 +106,8 @@
                             :contribution-list="rightMonograph?.contributions ? rightMonograph.contributions : []"
                             :document-id="rightMonograph?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -104,8 +128,8 @@
             :right-id="(rightMonograph?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -116,19 +140,17 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographUpdateForm from '@/components/publication/update/MonographUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
@@ -178,33 +200,16 @@ export default defineComponent({
         };
 
         const mergeMonographMetadata = (monograph1: Monograph, monograph2: Monograph) => {
-            mergeMultilingualContentField(monograph1.title, monograph2.title);
-
-            mergeMultilingualContentField(monograph1.subTitle, monograph2.subTitle);
-            monograph2.subTitle = [];
-
-            mergeMultilingualContentField(monograph1.keywords, monograph2.keywords);
-            monograph2.keywords = [];
-
-            mergeMultilingualContentField(monograph1.description, monograph2.description);
-            monograph2.description = [];
-
-            mergeDocumentAttachments(monograph1, monograph2);
+            mergeCommonMetadata(monograph1, monograph2);
 
             bulkTransferFields(monograph1, monograph2, [
                 { fieldName: "eisbn", emptyValue: "" },
                 { fieldName: "printISBN", emptyValue: "" },
                 { fieldName: "numberOfPages", emptyValue: 0 },
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
                 { fieldName: "volume", emptyValue: "" },
                 { fieldName: "udc", emptyValue: "" },
                 { fieldName: "number", emptyValue: "" },
                 { fieldName: "monographType", emptyValue: null, setEmpty: false },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publicationSeriesId", emptyValue: null, setEmpty: false },
                 { fieldName: "researchAreaId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
@@ -217,18 +222,6 @@ export default defineComponent({
                 }
             });
             monograph2.languageIds = [];
-
-            monograph2.uris!.forEach(uri => {
-                if (!monograph1.uris!.includes(uri)) {
-                    monograph1.uris!.push(uri);
-                }
-            });
-            monograph2.uris = [];
-
-            monograph1.contributions = monograph1.contributions?.concat(monograph2.contributions as PersonDocumentContribution[]);
-            monograph2.contributions = [];
-
-            mergeCommonMetadata(monograph1, monograph2);
 
             return [monograph1, monograph2];
         };
@@ -260,15 +253,7 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: Monograph) => {
-            leftMonograph.value!.title = updatedInfo.title;
-            leftMonograph.value!.subTitle = updatedInfo.subTitle;
-            leftMonograph.value!.description = updatedInfo.description;
-            leftMonograph.value!.keywords = updatedInfo.keywords;
-            leftMonograph.value!.uris = updatedInfo.uris;
-            leftMonograph.value!.documentDate = updatedInfo.documentDate;
-            leftMonograph.value!.doi = updatedInfo.doi;
             leftMonograph.value!.eisbn = updatedInfo.eisbn;
-            leftMonograph.value!.eventId = updatedInfo.eventId;
             leftMonograph.value!.languageIds = updatedInfo.languageIds;
             leftMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             leftMonograph.value!.printISBN = updatedInfo.printISBN;
@@ -276,9 +261,6 @@ export default defineComponent({
             leftMonograph.value!.volume = updatedInfo.volume;
             leftMonograph.value!.number = updatedInfo.number;
             leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
-            leftMonograph.value!.scopusId = updatedInfo.scopusId;
-            leftMonograph.value!.openAlexId = updatedInfo.openAlexId;
-            leftMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftMonograph.value!.publisherId = updatedInfo.publisherId;
             leftMonograph.value!.authorReprint = updatedInfo.authorReprint;
 
@@ -291,15 +273,7 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: Monograph) => {
-            rightMonograph.value!.title = updatedInfo.title;
-            rightMonograph.value!.subTitle = updatedInfo.subTitle;
-            rightMonograph.value!.description = updatedInfo.description;
-            rightMonograph.value!.keywords = updatedInfo.keywords;
-            rightMonograph.value!.uris = updatedInfo.uris;
-            rightMonograph.value!.documentDate = updatedInfo.documentDate;
-            rightMonograph.value!.doi = updatedInfo.doi;
             rightMonograph.value!.eisbn = updatedInfo.eisbn;
-            rightMonograph.value!.eventId = updatedInfo.eventId;
             rightMonograph.value!.languageIds = updatedInfo.languageIds;
             rightMonograph.value!.numberOfPages = updatedInfo.numberOfPages;
             rightMonograph.value!.printISBN = updatedInfo.printISBN;
@@ -307,9 +281,6 @@ export default defineComponent({
             rightMonograph.value!.volume = updatedInfo.volume;
             rightMonograph.value!.number = updatedInfo.number;
             rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
-            rightMonograph.value!.scopusId = updatedInfo.scopusId;
-            rightMonograph.value!.openAlexId = updatedInfo.openAlexId;
-            rightMonograph.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightMonograph.value!.publisherId = updatedInfo.publisherId;
             rightMonograph.value!.authorReprint = updatedInfo.authorReprint;
 

@@ -152,7 +152,6 @@ import type { Thesis } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
@@ -206,16 +205,7 @@ export default defineComponent({
         };
 
         const mergeThesisMetadata = (thesis1: Thesis, thesis2: Thesis) => {
-            mergeMultilingualContentField(thesis1.title, thesis2.title);
-
-            mergeMultilingualContentField(thesis1.subTitle, thesis2.subTitle);
-            thesis2.subTitle = [];
-
-            mergeMultilingualContentField(thesis1.keywords, thesis2.keywords);
-            thesis2.keywords = [];
-
-            mergeMultilingualContentField(thesis1.description, thesis2.description);
-            thesis2.description = [];
+            mergeCommonMetadata(thesis1, thesis2);
 
             mergeMultilingualContentField(thesis1.scientificArea, thesis2.scientificArea);
             thesis2.scientificArea = [];
@@ -232,11 +222,6 @@ export default defineComponent({
             mergeDocumentAttachments(thesis1, thesis2);
 
             bulkTransferFields(thesis1, thesis2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "topicAcceptanceDate", emptyValue: null, setEmpty: false },
                 { fieldName: "thesisDefenceDate", emptyValue: null, setEmpty: false },
                 { fieldName: "organisationUnitId", emptyValue: null, setEmpty: false },
@@ -251,24 +236,11 @@ export default defineComponent({
                 { fieldName: "numberOfIllustrations", emptyValue: "" },
                 { fieldName: "numberOfTables", emptyValue: "" },
                 { fieldName: "numberOfAppendices", emptyValue: "" },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "languageId", emptyValue: undefined },
                 { fieldName: "writingLanguageTagId", emptyValue: undefined }
             ]);
-
-            thesis2.uris!.forEach(uri => {
-                if (!thesis1.uris!.includes(uri)) {
-                    thesis1.uris!.push(uri);
-                }
-            });
-            thesis2.uris = [];
-
-            thesis1.contributions = thesis1.contributions?.concat(thesis2.contributions as PersonDocumentContribution[]);
-            thesis2.contributions = [];
-
-            mergeCommonMetadata(thesis1, thesis2);
 
             return [thesis1, thesis2];
         };
@@ -300,15 +272,6 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: Thesis) => {
-            leftThesis.value!.title = updatedInfo.title;
-            leftThesis.value!.subTitle = updatedInfo.subTitle;
-            leftThesis.value!.description = updatedInfo.description;
-            leftThesis.value!.keywords = updatedInfo.keywords;
-            leftThesis.value!.uris = updatedInfo.uris;
-            leftThesis.value!.documentDate = updatedInfo.documentDate;
-            leftThesis.value!.doi = updatedInfo.doi;
-            leftThesis.value!.openAlexId = updatedInfo.openAlexId;
-            leftThesis.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             leftThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
             leftThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
@@ -330,7 +293,6 @@ export default defineComponent({
             leftThesis.value!.udc = updatedInfo.udc;
             leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             leftThesis.value!.authorReprint = updatedInfo.authorReprint;
-            leftThesis.value!.scopusId = updatedInfo.scopusId;
 
             updateCommonBasicInfo(leftThesis, updatedInfo);
             
@@ -341,15 +303,6 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: Thesis) => {
-            rightThesis.value!.title = updatedInfo.title;
-            rightThesis.value!.subTitle = updatedInfo.subTitle;
-            rightThesis.value!.description = updatedInfo.description;
-            rightThesis.value!.keywords = updatedInfo.keywords;
-            rightThesis.value!.uris = updatedInfo.uris;
-            rightThesis.value!.documentDate = updatedInfo.documentDate;
-            rightThesis.value!.doi = updatedInfo.doi;
-            rightThesis.value!.openAlexId = updatedInfo.openAlexId;
-            rightThesis.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightThesis.value!.numberOfPages = updatedInfo.numberOfPages;
             rightThesis.value!.numberOfChapters = updatedInfo.numberOfChapters;
             rightThesis.value!.numberOfReferences = updatedInfo.numberOfReferences;
@@ -371,9 +324,7 @@ export default defineComponent({
             rightThesis.value!.udc = updatedInfo.udc;
             rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
             rightThesis.value!.authorReprint = updatedInfo.authorReprint;
-            rightThesis.value!.scopusId = updatedInfo.scopusId;
 
-            console.log(updatedInfo)
             updateCommonBasicInfo(rightThesis, updatedInfo);
             
             if (update.value) {

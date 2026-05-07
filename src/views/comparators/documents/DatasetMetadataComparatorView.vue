@@ -8,14 +8,26 @@
                 <br />
 
                 <dataset-update-form
-                    ref="updateLeftRef" :preset-dataset="leftDataset" in-comparator :in-modal="false"
-                    @update="updateLeft"></dataset-update-form>
+                    ref="updateLeftRef"
+                    :preset-dataset="leftDataset"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftDataset?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftDataset?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftDataset?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftDataset?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,8 +42,8 @@
                             :contribution-list="leftDataset?.contributions ? leftDataset.contributions : []"
                             :document-id="leftDataset?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -60,14 +72,26 @@
                 <br />
 
                 <dataset-update-form
-                    ref="updateRightRef" :preset-dataset="rightDataset" in-comparator :in-modal="false"
-                    @update="updateRight"></dataset-update-form>
+                    ref="updateRightRef"
+                    :preset-dataset="rightDataset"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightDataset?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightDataset?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightDataset?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightDataset?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -82,8 +106,8 @@
                             :contribution-list="rightDataset?.contributions ? rightDataset.contributions : []"
                             :document-id="rightDataset?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -102,8 +126,8 @@
             :right-id="(rightDataset?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -114,20 +138,18 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { Dataset } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import DatasetUpdateForm from '@/components/publication/update/DatasetUpdateForm.vue';
-import type { PersonDocumentContribution } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
@@ -174,42 +196,13 @@ export default defineComponent({
         };
 
         const mergeDatasetMetadata = (dataset1: Dataset, dataset2: Dataset) => {
-            mergeMultilingualContentField(dataset1.title, dataset2.title);
-
-            mergeMultilingualContentField(dataset1.subTitle, dataset2.subTitle);
-            dataset2.subTitle = [];
-
-            mergeMultilingualContentField(dataset1.keywords, dataset2.keywords);
-            dataset2.keywords = [];
-
-            mergeMultilingualContentField(dataset1.description, dataset2.description);
-            dataset2.description = [];
-
-            mergeDocumentAttachments(dataset1, dataset2);
+            mergeCommonMetadata(dataset1, dataset2);
 
             bulkTransferFields(dataset1, dataset2, [
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
                 { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
             ]);
-
-            dataset2.uris!.forEach(uri => {
-                if (!dataset1.uris!.includes(uri)) {
-                    dataset1.uris!.push(uri);
-                }
-            });
-            dataset2.uris = [];
-
-            dataset1.contributions = dataset1.contributions?.concat(dataset2.contributions as PersonDocumentContribution[]);
-            dataset2.contributions = [];
-
-            mergeCommonMetadata(dataset1, dataset2);
 
             return [dataset1, dataset2];
         };
@@ -241,19 +234,8 @@ export default defineComponent({
         const update = ref(false);
 
         const updateLeft = (updatedInfo: Dataset) => {
-            leftDataset.value!.title = updatedInfo.title;
-            leftDataset.value!.subTitle = updatedInfo.subTitle;
-            leftDataset.value!.description = updatedInfo.description;
-            leftDataset.value!.keywords = updatedInfo.keywords;
-            leftDataset.value!.uris = updatedInfo.uris;
-            leftDataset.value!.documentDate = updatedInfo.documentDate;
-            leftDataset.value!.doi = updatedInfo.doi;
             leftDataset.value!.internalNumber = updatedInfo.internalNumber;
-            leftDataset.value!.eventId = updatedInfo.eventId;
             leftDataset.value!.publisherId = updatedInfo.publisherId;
-            leftDataset.value!.scopusId = updatedInfo.scopusId;
-            leftDataset.value!.openAlexId = updatedInfo.openAlexId;
-            leftDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
             leftDataset.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftDataset, updatedInfo);
@@ -265,19 +247,8 @@ export default defineComponent({
         };
 
         const updateRight = (updatedInfo: Dataset) => {
-            rightDataset.value!.title = updatedInfo.title;
-            rightDataset.value!.subTitle = updatedInfo.subTitle;
-            rightDataset.value!.description = updatedInfo.description;
-            rightDataset.value!.keywords = updatedInfo.keywords;
-            rightDataset.value!.uris = updatedInfo.uris;
-            rightDataset.value!.documentDate = updatedInfo.documentDate;
-            rightDataset.value!.doi = updatedInfo.doi;
             rightDataset.value!.internalNumber = updatedInfo.internalNumber;
-            rightDataset.value!.eventId = updatedInfo.eventId;
             rightDataset.value!.publisherId = updatedInfo.publisherId;
-            rightDataset.value!.scopusId = updatedInfo.scopusId;
-            rightDataset.value!.openAlexId = updatedInfo.openAlexId;
-            rightDataset.value!.webOfScienceId = updatedInfo.webOfScienceId;
             rightDataset.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightDataset, updatedInfo);
