@@ -29,11 +29,6 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
                 <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
             </v-col>
         </v-row>
@@ -309,8 +304,7 @@ export default defineComponent({
 
         return {
             isFormValid, snackbar,
-            title, subtitle, message,
-            publicationYear, doi, scopus,
+            title, subtitle, message, doi, scopus,
             selectedMonograph, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,

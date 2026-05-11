@@ -1,52 +1,56 @@
 import type { LanguageTagResponse, MultilingualContent } from "@/models/Common";
 import i18n from ".";
+import { transliterateValueToCyrillic } from "@/utils/StringUtil";
 
-export const returnCurrentLocaleContent = (multilingualContentList: MultilingualContent[] | undefined): string | null => {
-    let selectedContent: MultilingualContent | null = null;
-
-    if (!multilingualContentList) {
+export const returnCurrentLocaleContent = (
+    multilingualContentList: MultilingualContent[] | undefined
+): string | null => {
+    if (!multilingualContentList || multilingualContentList.length === 0) {
         return null;
     }
-    
+
     const currentLocale = i18n.vueI18n.global.locale.toString().toUpperCase();
-    multilingualContentList.forEach((multilingualContent) => {
-        if (multilingualContent.languageTag === currentLocale) {
-            selectedContent = multilingualContent;
-        }
-    });
 
-    if (!selectedContent) {
-        multilingualContentList.forEach((multilingualContent) => {
-            if (currentLocale.includes("-") && currentLocale.startsWith(multilingualContent.languageTag)) {
-                selectedContent = multilingualContent;
-            }
-        });
+    // 1. Exact match (e.g. SR-CYR)
+    const exactMatch = multilingualContentList.find(
+        mc => mc.languageTag.toUpperCase() === currentLocale
+    );
+    if (exactMatch) {
+        return exactMatch.content;
     }
 
-    if (selectedContent) {
-        return (selectedContent as MultilingualContent).content;
-    } else {
-
-        if (multilingualContentList.length === 0) {
-            return null;
-        }
-
-        const notWantedLocales = i18n.vueI18n.global.availableLocales.filter(locale => locale.toUpperCase() !== currentLocale);
-
-        const filteredList = multilingualContentList.filter(multilingualContent => !notWantedLocales.includes(multilingualContent.languageTag.toLowerCase()));
-        if (filteredList.length > 0) {
-            multilingualContentList = filteredList;
-        }
-
-        const maxPriorityContent = multilingualContentList.reduce((prev, current) => {
-            return (prev.priority > current.priority) ? prev : current;
-        });
-        
-        return maxPriorityContent.content;
+    // 2. If current locale is a subtag then match against prefix
+    //    e.g. UI=SR-CYR, content has SR-CYR-RS - still matches
+    const prefixMatch = multilingualContentList.find(
+        mc => mc.languageTag.toUpperCase().startsWith(currentLocale)
+    );
+    if (prefixMatch) {
+        return prefixMatch.content;
     }
+
+    // 3. If base language matches then strip script/region from UI locale
+    //    e.g. UI=SR-CYR - try SR
+    const baseLang = currentLocale.split("-")[0];
+    const baseLangMatch = multilingualContentList.find(
+        mc => mc.languageTag.toUpperCase().split("-")[0] === baseLang
+    );
+    if (baseLangMatch) {
+        const isCyrillic = currentLocale.includes("CYR");
+        return isCyrillic
+            ? transliterateValueToCyrillic(baseLangMatch.content)
+            : baseLangMatch.content;
+    }
+
+    // 4. Highest priority fallback
+    return multilingualContentList.reduce((prev, current) =>
+        prev.priority > current.priority ? prev : current
+    ).content;
 };
 
-export const toMultilingualTextInput = (multilingualContentArray: MultilingualContent[] | undefined, supportedLanguages: LanguageTagResponse[]): { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] => {
+export const toMultilingualTextInput = (
+    multilingualContentArray: MultilingualContent[] | undefined,
+    supportedLanguages: LanguageTagResponse[]
+): { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] => {
     const presetInput: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] = [];
 
     if (!multilingualContentArray) {
@@ -64,7 +68,10 @@ export const toMultilingualTextInput = (multilingualContentArray: MultilingualCo
     return presetInput;
 };
 
-export const mergeMultilingualContentField = (content1: MultilingualContent[] | undefined, content2: MultilingualContent[] | undefined) => {
+export const mergeMultilingualContentField = (
+    content1: MultilingualContent[] | undefined,
+    content2: MultilingualContent[] | undefined
+) => {
     if (content1 === undefined) {
         content1 = [];
     }

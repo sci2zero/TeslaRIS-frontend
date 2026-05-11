@@ -954,7 +954,7 @@ export default {
     saveOldPublicationLabel: "Sačuvaj stari rad",
     overwriteOldPublicationLabel: "Zameni rad novim",
     dismissAllLabel: "Odbaci sve",
-    selectYourselfLabel: "Koji od ovih autora ste vi?",
+    selectYourselfLabel: "Koji od ovih autora ste Vi?",
     orChooseLocalLabel: "ili izaberite lokalno",
     uploadLabel: "Otpremi",
     openAlexIdFormatError: "Pogrešan OpenAlexID format.",

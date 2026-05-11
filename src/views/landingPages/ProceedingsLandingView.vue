@@ -195,9 +195,9 @@
                 <publication-table-component
                     :publications="publications"
                     :total-publications="totalPublications"
-                    in-comparator
                     show-publication-concrete-type
                     enable-export
+                    :allow-comparison="isInstitutionalEditor"
                     :endpoint-type="ExportableEndpointType.PROCEEDINGS_PUBLICATIONS"
                     :endpoint-token-parameters="[`${proceedings?.id}`]"
                     @switch-page="switchPage"
@@ -343,7 +343,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const { isResearcher, isAdmin, isCommission, isInstitutionalEditor } = useUserRole();
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
@@ -585,7 +585,7 @@ export default defineComponent({
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType, currentRoute, updateRemark,
-            isAdmin, isCommission, ExportableEndpointType
+            isAdmin, isCommission, ExportableEndpointType, isInstitutionalEditor
         };
 }})
 

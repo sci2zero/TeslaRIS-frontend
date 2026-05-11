@@ -311,6 +311,7 @@
                                 <publication-file-download-modal
                                     :document-id="(item.databaseId as number)"
                                     :show-thesis-sections="item.type === 'THESIS'"
+                                    :is-thesis-section="item.type === 'THESIS'"
                                     hide-empty-sections
                                     :persistent="false"
                                     :is-list-item="false"
