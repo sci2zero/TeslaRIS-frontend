@@ -162,7 +162,7 @@ import { onMounted } from "vue";
 import LanguageService from "@/services/LanguageService";
 import InvolvementService from "@/services/InvolvementService";
 import { localiseDate } from "@/utils/DateUtil";
-import { removeTrailingPipeRegex } from "@/utils/StringUtil";
+import { foldSerbianText, removeTrailingPipeRegex } from "@/utils/StringUtil";
 import GenericCrudModal from "./GenericCrudModal.vue";
 import PersonSubmissionForm from "../person/PersonSubmissionForm.vue";
 import { useUserRole } from "@/composables/useUserRole";
@@ -222,6 +222,8 @@ export default defineComponent({
     emits: ["setInput"],
     setup(props, {emit}) {
         const { canUserAddPersons, isResearcher, isAdmin, isInstitutionalEditor } = useUserRole();
+
+        const commonSurnameSuffixes = import.meta.env.VITE_COMMON_SURNAME_SUFFIXES || "";
 
         const contributionDescription = ref([]);
         const affiliationStatement = ref<any>([]);
@@ -490,14 +492,51 @@ export default defineComponent({
                 return;
             }
 
-            const nameTokens = extractTextInParentheses(selectionTitle).split(" ");
-            if (nameTokens.length > 0) {
-                lastName.value = toTitleCase(nameTokens[0]);
+            const extracted = extractTextInParentheses(selectionTitle)?.trim();
 
-                if (nameTokens.length > 1) {
-                    firstName.value = toTitleCase(nameTokens[nameTokens.length - 1]);
+            if (!extracted) {
+                return;
+            }
+
+            const nameTokens = extracted
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (nameTokens.length === 0) {
+                return;
+            }
+
+            const surnameSuffixes = commonSurnameSuffixes
+                .split(",")
+                .map((s: string) => s.trim().toLowerCase());
+
+            let surnameIndex = -1;
+
+            for (let i = 0; i < nameTokens.length; i++) {
+                const token = nameTokens[i].toLowerCase();
+
+                if (
+                    surnameSuffixes.some((suffix: string) =>
+                        foldSerbianText(token).endsWith(suffix)
+                    )
+                ) {
+                    surnameIndex = i;
+                    break;
                 }
             }
+
+            // Fallback: assume last token is surname
+            if (surnameIndex === -1) {
+                surnameIndex = nameTokens.length - 1;
+            }
+
+            lastName.value = toTitleCase(nameTokens[surnameIndex]);
+
+            const firstNameTokens = nameTokens.filter(
+                (_, index) => index !== surnameIndex
+            );
+
+            firstName.value = toTitleCase(firstNameTokens.join(" "));
         };
 
         const clearCustomNameValues = () => {

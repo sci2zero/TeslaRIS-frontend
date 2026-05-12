@@ -22,7 +22,7 @@ export class PersonService extends BaseService {
     return super.sendRequest(axios.get, "person/for-user");
   }
 
-  async searchResearchers(tokens: string, strict: boolean, institutionId: number | null): Promise<AxiosResponse<Page<PersonIndex>>> {
+  async searchResearchers(tokens: string, strict: boolean, institutionId: number | null, withNoInvolvements: boolean = false, withNoContributions: boolean = false): Promise<AxiosResponse<Page<PersonIndex>>> {
     if (!tokens.includes("tokens=")) {
         if(tokens.trim() === "") {
           tokens = "tokens=*"
@@ -31,7 +31,7 @@ export class PersonService extends BaseService {
         }
     }
 
-    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}`);
+    return super.sendRequest(axios.get, `person/simple-search?${tokens}&strict=${strict}${institutionId ? ("&institutionId=" + institutionId) : ""}&withoutInvolvements=${withNoInvolvements}&withoutContributions=${withNoContributions}`);
   }
 
   async searchResearchersAdvanced(tokens: string): Promise<AxiosResponse<Page<PersonIndex>>> {

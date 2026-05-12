@@ -1442,5 +1442,8 @@ export default {
     handleIdExistsError: "Handle ID je već u upotrebi.",
     arxivIdExistsError: "ArXiv ID je već u upotrebi.",
     pubmedIdExistsError: "PubMed ID je već u upotrebi.",
-    ssrnIdExistsError: "SSRN ID je već u upotrebi."
+    ssrnIdExistsError: "SSRN ID je već u upotrebi.",
+    updateProceedingsLabel: "Ažuriraj zbornik radova",
+    showPersonsWithNoInvolvementsLabel: "Prikaži osobe bez angažovanja",
+    showPersonsWithNoContributionsLabel: "Prikaži osobe bez kontribucija"
 }

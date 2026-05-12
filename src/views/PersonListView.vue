@@ -11,6 +11,18 @@
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
             ></v-checkbox>
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="withNoInvolvements"
+                :label="$t('showPersonsWithNoInvolvementsLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
+            <v-checkbox
+                v-if="isAdmin"
+                v-model="withNoContributions"
+                :label="$t('showPersonsWithNoContributionsLabel')"
+                class="ml-4 mt-5"
+            ></v-checkbox>
         </span>
 
         <tab-content-loader
@@ -69,6 +81,9 @@ export default defineComponent({
         const sort = ref("");
         const direction = ref("");
 
+        const withNoInvolvements = ref(false);
+        const withNoContributions = ref(false);
+
         const i18n = useI18n();
         const router = useRouter();
 
@@ -83,7 +98,10 @@ export default defineComponent({
 
         const initialLoad = ref(true);
 
-        watch([loggedInUser, returnOnlyInstitutionRelatedEntities], () => {
+        watch([
+            loggedInUser, returnOnlyInstitutionRelatedEntities,
+            withNoInvolvements, withNoContributions
+        ], () => {
             if (!initialLoad.value) {
                 search(searchParams.value);
             }
@@ -100,7 +118,8 @@ export default defineComponent({
             PersonService.searchResearchers(
                 `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
                 false,
-                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null)
+                returnOnlyInstitutionRelatedEntities.value ? loggedInUser.value?.organisationUnitId as number : null,
+                withNoInvolvements.value, withNoContributions.value)
             .then((response) => {
                 persons.value = response.data.content;
                 totalPersons.value = response.data.totalElements;
@@ -138,7 +157,8 @@ export default defineComponent({
             isInstitutionalEditor, isUserBoundToOU,
             returnOnlyInstitutionRelatedEntities,
             ExportableEndpointType, searchParams,
-            loading
+            loading, withNoInvolvements,
+            withNoContributions
         };
     }
 });

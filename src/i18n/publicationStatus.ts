@@ -12,7 +12,7 @@ const publicationStatusEn = [
 ];
 
 const publicationStatusSr = [
-    { title: "Submitted", value: PublicationStatus.SUBMITTED },
+    { title: "Podneto za objavljivanje", value: PublicationStatus.SUBMITTED },
     { title: "U procesu recenzije", value: PublicationStatus.IN_REVIEW },
     { title: "Prihvaćen", value: PublicationStatus.ACCEPTED },
     { title: "U procesu štampe", value: PublicationStatus.IN_PRINT },

@@ -1428,5 +1428,8 @@ export default {
     handleIdExistsError: "Handle ID already in use.",
     arxivIdExistsError: "ArXiv ID already in use.",
     pubmedIdExistsError: "PubMed ID already in use.",
-    ssrnIdExistsError: "SSRN ID already in use."
+    ssrnIdExistsError: "SSRN ID already in use.",
+    updateProceedingsLabel: "Update proceedings",
+    showPersonsWithNoInvolvementsLabel: "Show persons with no involvements",
+    showPersonsWithNoContributionsLabel: "Show persons with no contributions"
 }

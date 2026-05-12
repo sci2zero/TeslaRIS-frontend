@@ -37,6 +37,8 @@ export interface EventIndex {
     placeSr: string;
     placeOther: string;
     dateFromTo: string;
+    dateFrom: string;
+    dateTo: string;
     dateSortable: string;
     databaseId: number;
     eventType: EventType;

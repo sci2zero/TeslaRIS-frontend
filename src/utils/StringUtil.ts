@@ -1,4 +1,4 @@
-import { toCyrillic } from "@/i18n/serbianTransliteration";
+import { toCyrillic, toLatin } from "@/i18n/serbianTransliteration";
 
 
 export const removeTrailingPipeRegex = (text: string): string => {
@@ -23,4 +23,17 @@ export const transliterateValueToCyrillic = (value: string): string => {
 export const formatNumber = (num: number) => {
     const fixed = num.toFixed(1);
     return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
+};
+
+export const foldSerbianText = (value: string): string => {
+    if (!value) {
+        return value;
+    }
+
+    const latin = toLatin(value) ?? value;
+
+    return latin
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 };
