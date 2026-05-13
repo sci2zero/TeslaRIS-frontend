@@ -10,7 +10,7 @@
                 disable-submission
                 :only-harvestable-institutions="showOnlyHarvestableInstitutions"
                 :label="$t('institutionLabel')"
-            ></organisation-unit-autocomplete-search>
+            />
         </v-col>
         <v-col v-if="!showAll" cols="2">
             <v-checkbox

@@ -116,7 +116,7 @@
                 v-model="affiliationStatement"
                 :label="$t('affiliationStatementLabel')"
                 :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                @update:model-value="sendContentToParent"></multilingual-text-input>
+                @update:model-value="sendContentToParent" />
         </v-col>
     </v-row>
     <v-row v-show="((personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate) && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
@@ -601,6 +601,11 @@ export default defineComponent({
                 return;
             }
 
+            if (props.presetContributionValue?.personId !== selectedPerson.value.value) {
+                affiliationStatement.value = [];
+                affiliationStatementRef.value?.clearInput();
+            }
+
             enterExternalOU.value = false;
 
             InvolvementService.getPersonEmployments(selectedPerson.value.value).then((response) => {
@@ -637,7 +642,7 @@ export default defineComponent({
                     sendContentToParent();
                 }
 
-                if (personAffiliations.value.length === 0) {
+                if (personAffiliations.value.length === 0 || ((affiliationStatement.value?.length || 0) > 0)) {
                     enterExternalOU.value = true;
                 } else {
                     enterExternalOU.value = false;

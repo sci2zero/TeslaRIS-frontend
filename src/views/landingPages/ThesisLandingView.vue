@@ -430,8 +430,9 @@
                     :read-only="!canEdit || thesis?.isOnPublicReview"
                     board-members-allowed
                     limit-one-author
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
+                    for-thesis
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section 

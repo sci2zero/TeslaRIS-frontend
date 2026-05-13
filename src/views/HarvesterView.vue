@@ -17,7 +17,7 @@
                                 required
                                 disable-submission
                                 :only-harvestable-institutions="searchHarvestableInstitutions"
-                            ></organisation-unit-autocomplete-search>
+                            />
                         </v-col>
                         <v-col cols="12" md="2">
                             <v-checkbox
@@ -82,7 +82,7 @@
                     <v-tab v-if="isAdmin" value="skgifSources">
                         {{ $t("skgifSourcesLabel") }}
                     </v-tab>
-                    <v-tab v-if="isResearcher" value="files">
+                    <v-tab v-if="isResearcher || isAdmin" value="files">
                         {{ $t("blibliographisFormatFilesLabel") }}
                     </v-tab>
                     <v-tab v-if="isAdmin || isInstitutionalEditor" value="scheduledHarvests">
@@ -102,14 +102,14 @@
                                     :label="$t('startDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker-split>
+                                />
                                 <date-picker
                                     v-else
                                     v-model="startDate"
                                     :label="$t('startDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker>
+                                />
                             </v-col>
                             <v-col cols="12" sm="4">
                                 <date-picker-split
@@ -118,14 +118,14 @@
                                     :label="$t('endDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker-split>
+                                />
                                 <date-picker
                                     v-else
                                     v-model="endDate"
                                     :label="$t('endDateLabel')"
                                     color="primary"
                                     required
-                                ></date-picker>
+                                />
                             </v-col>
                         </v-row>
                         <v-row v-if="canPerformHarvest" class="d-flex flex-row justify-center">

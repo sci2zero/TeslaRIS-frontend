@@ -1432,7 +1432,7 @@ export default {
     translatorsLabel: "Prevodioci",
     assistantStaffLabel: "Pomoćno osoblje",
     arguersLabel: "Branioci",
-    ownersLabel: "Valsnici",
+    ownersLabel: "Vlasnici",
     identifierInUseMessage: "Identifikator je već u upotrebi",
     geoSpaceDescriptionLabel: "Opis geoprostora",
     chronologicalSpaceDescriptionLabel: "Opis hronološkog prostora",

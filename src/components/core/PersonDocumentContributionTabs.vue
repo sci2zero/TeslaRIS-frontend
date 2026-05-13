@@ -28,10 +28,10 @@
                         <v-tab v-show="!forProceedings" value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
-                        <v-tab value="editors">
+                        <v-tab v-show="!forThesis" value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab value="reviewers">
+                        <v-tab v-show="!forThesis" value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
                         <v-tab v-show="!forProceedings" value="advisors">
@@ -46,13 +46,13 @@
                         <v-tab value="translators">
                             {{ $t("translatorsLabel") }}
                         </v-tab>
-                        <v-tab value="assistantStaff">
+                        <v-tab v-show="!forThesis" value="assistantStaff">
                             {{ $t("assistantStaffLabel") }}
                         </v-tab>
                         <v-tab v-show="boardMembersAllowed" value="arguers">
                             {{ $t("arguersLabel") }}
                         </v-tab>
-                        <v-tab v-show="boardMembersAllowed" value="owners">
+                        <v-tab v-show="!forThesis" value="owners">
                             {{ $t("ownersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -184,6 +184,10 @@ export default defineComponent({
             default: false
         },
         forProceedings: {
+            type: Boolean,
+            default: false
+        },
+        forThesis: {
             type: Boolean,
             default: false
         }
