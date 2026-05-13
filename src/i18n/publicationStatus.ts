@@ -14,9 +14,9 @@ const publicationStatusEn = [
 const publicationStatusSr = [
     { title: "Podneto za objavljivanje", value: PublicationStatus.SUBMITTED },
     { title: "U procesu recenzije", value: PublicationStatus.IN_REVIEW },
-    { title: "Prihvaćen", value: PublicationStatus.ACCEPTED },
+    { title: "Prihvaćeno", value: PublicationStatus.ACCEPTED },
     { title: "U procesu štampe", value: PublicationStatus.IN_PRINT },
-    { title: "Objavljen", value: PublicationStatus.PUBLISHED }
+    { title: "Objavljeno", value: PublicationStatus.PUBLISHED }
 ];
 
 export const getTitleFromValue = (value: PublicationStatus, publicationStatusArray: {title: string, value: PublicationStatus}[]) => {
