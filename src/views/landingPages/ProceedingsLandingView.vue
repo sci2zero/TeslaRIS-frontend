@@ -211,16 +211,16 @@
                     shows-board-and-reviewers
                     :board-members-allowed="false"
                     for-proceedings
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section
                     :document="proceedings"
                     :can-edit="canEdit"
                     :proofs="proceedings?.proofs"
-                    :file-items="proceedings?.fileItems">
-                </attachment-section>
+                    :file-items="proceedings?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -229,15 +229,15 @@
                     :keywords="proceedings?.keywords ? proceedings.keywords : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="proceedings?.description"
                     :can-edit="canEdit"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="proceedings?.remark"

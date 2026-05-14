@@ -187,6 +187,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        forMonograph: {
+            type: Boolean,
+            default: false
+        },
         forThesis: {
             type: Boolean,
             default: false
@@ -324,7 +328,9 @@ export default defineComponent({
                     return [DocumentContributionType.OWNER];
             }
 
-            return props.forProceedings ? [DocumentContributionType.EDITOR, DocumentContributionType.REVIEWER] : [DocumentContributionType.AUTHOR];
+            return (props.forProceedings || props.forMonograph) ? 
+                [DocumentContributionType.EDITOR, DocumentContributionType.REVIEWER] : 
+                [DocumentContributionType.AUTHOR];
         };
 
         const updateOrderInParentList = () => {

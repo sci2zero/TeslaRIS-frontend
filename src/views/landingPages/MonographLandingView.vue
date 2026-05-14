@@ -179,8 +179,11 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab v-show="monograph?.monographType === MonographType.EDITED_BOOK" value="publications">
+                {{ $t("scientificResultsListLabel") }}
+            </v-tab>
             <v-tab value="contributions">
-                {{ $t("contributionsLabel") }}
+                {{ $t(monograph?.monographType === MonographType.EDITED_BOOK ? "editorsAndReviewersLabel" : "contributionsLabel") }}
             </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
@@ -206,21 +209,33 @@
             v-show="monograph"
             v-model="currentTab"
         >
+            <v-tabs-window-item value="publications">
+                <h2>{{ $t("monographPublicationsLabel") }}</h2>
+                <publication-table-component
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    in-comparator
+                    show-publication-concrete-type
+                    @switch-page="switchPage"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="monograph?.id"
                     :contribution-list="monograph?.contributions ? monograph?.contributions : []"
                     :read-only="!canEdit || monograph?.isArchived"
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
+                    :shows-board-and-reviewers="monograph?.monographType === MonographType.EDITED_BOOK"
+                    :for-monograph="monograph?.monographType === MonographType.EDITED_BOOK"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section
                     :document="monograph"
                     :can-edit="canEdit && !monograph?.isArchived"
                     :proofs="monograph?.proofs"
-                    :file-items="monograph?.fileItems">
-                </attachment-section>
+                    :file-items="monograph?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -228,15 +243,15 @@
                     :keywords="monograph?.keywords ? monograph.keywords : []"
                     :can-edit="canEdit && !monograph?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="monograph?.description"
                     :can-edit="canEdit && !monograph?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="monograph?.remark"
@@ -244,20 +259,6 @@
                     is-remark
                     @update="updateRemark"
                 />
-                
-                <!-- Publications Table -->
-                <v-row>
-                    <v-col cols="12">
-                        <h2>{{ $t("monographPublicationsLabel") }}</h2>
-                        <publication-table-component
-                            :publications="publications"
-                            :total-publications="totalPublications"
-                            in-comparator
-                            show-publication-concrete-type
-                            @switch-page="switchPage">
-                        </publication-table-component>
-                    </v-col>
-                </v-row>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
                 <v-row>
@@ -268,12 +269,12 @@
                                     :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []"
                                     :read-only="!canEdit || monograph?.isArchived"
                                     limit-one
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas"
+                                />
                                 <div><b>{{ $t("researchAreasLabel") }}</b></div>
                                 <research-area-hierarchy
-                                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []">
-                                </research-area-hierarchy>
+                                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"
+                                />
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -330,7 +331,7 @@ import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
+import { MonographType, PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
@@ -431,10 +432,10 @@ export default defineComponent({
         const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
         onMounted(() => {
-            fetchDisplayData();
+            fetchDisplayData(true);
         });
 
-        const fetchDisplayData = () => {
+        const fetchDisplayData = (uponStartup: boolean) => {
             if (loginStore.userLoggedIn) {
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
@@ -447,7 +448,7 @@ export default defineComponent({
                 fetchClassifications();
             }
 
-            fetchMonograph();
+            fetchMonograph(uponStartup);
             fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
@@ -463,7 +464,7 @@ export default defineComponent({
             populateData();
         });
 
-        const fetchMonograph = () => {
+        const fetchMonograph = (uponStartup: boolean) => {
             DocumentPublicationService.readMonograph(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
@@ -476,8 +477,13 @@ export default defineComponent({
                 monograph.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 fetchConnectedEntities();
-                fetchPublications();
                 populateData();
+
+                if(uponStartup) {
+                    Promise.all([fetchPublications()]).then(() => {
+                        setStartTab();
+                    });
+                }
             }).catch(() => {
                 router.push({ name: "notFound" });
             });
@@ -525,7 +531,10 @@ export default defineComponent({
                 return;
             }
 
-            DocumentPublicationService.findPublicationsInMonograph(monograph.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((publicationResponse) => {
+            return DocumentPublicationService.findPublicationsInMonograph(
+                monograph.value?.id as number,
+                `page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+            ).then((publicationResponse) => {
                 publications.value = publicationResponse.data.content;
                 totalPublications.value = publicationResponse.data.totalElements
             });
@@ -559,6 +568,14 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
+        };
+
+        const setStartTab = () => {
+            if(totalPublications.value > 0) {
+                currentTab.value = "publications";
+            } else {
+                currentTab.value = "contributions";
+            }
         };
 
         const goToURL = (uri: string) => {
@@ -598,6 +615,7 @@ export default defineComponent({
             monograph.value!.publisherId = basicInfo.publisherId;
             monograph.value!.authorReprint = basicInfo.authorReprint;
             monograph.value!.udc = basicInfo.udc;
+            monograph.value!.monographType = basicInfo.monographType;
 
             updateCommonBasicInfo(monograph, basicInfo);
 
@@ -609,13 +627,13 @@ export default defineComponent({
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchMonograph();
+                    fetchMonograph(false);
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchMonograph();
+                    fetchMonograph(false);
                 }
             });
         };
@@ -623,7 +641,7 @@ export default defineComponent({
         const handleResearcherUnbind = () => {
             snackbarMessage.value = i18n.t("unbindSuccessfullMessage");
             snackbar.value = true;
-            fetchDisplayData();
+            fetchDisplayData(false);
         };
 
         const {createDocumentClassification, createDocumentIndicator} = useDocumentAssessmentActions();
@@ -664,7 +682,8 @@ export default defineComponent({
             fetchValidationStatus, PublicationType,
             publisher, updateRemark, displayConfiguration,
             isAdmin, isCommission, MonographUpdateForm,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers,
+            MonographType
         };
 }})
 

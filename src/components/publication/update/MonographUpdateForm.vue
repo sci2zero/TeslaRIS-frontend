@@ -27,7 +27,8 @@
                     :label="$t('monographTypeLabel') + '*'"
                     :items="monographTypes"
                     :rules="requiredSelectionRules"
-                ></v-select>
+                    return-object
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -35,8 +36,8 @@
                 <multilingual-text-input
                     v-model="subtitle"
                     :label="$t('subtitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetMonograph?.subTitle, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetMonograph?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -51,7 +52,7 @@
                     :label="$t('researchAreaLabel')"
                     :items="researchAreasSelectable"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -61,7 +62,7 @@
                     :label="$t('languageLabel')"
                     :items="languageList"
                     multiple
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -71,8 +72,8 @@
                     type="number"
                     :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfPagesLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -81,8 +82,8 @@
                     v-model="eIsbn"
                     label="E-ISBN"
                     placeholder="E-ISBN"
-                    :rules="isbnValidationRules">
-                </v-text-field>
+                    :rules="isbnValidationRules"
+                />
             </v-col>
             <v-col cols="2" class="text-center">
                 <v-btn 
@@ -98,13 +99,13 @@
                     v-model="printIsbn"
                     label="Print ISBN"
                     placeholder="Print ISBN"
-                    :rules="isbnValidationRules">
-                </v-text-field>
+                    :rules="isbnValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -127,10 +128,10 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')" />
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="number" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
+                <v-text-field v-model="number" :label="$t('issueLabel')" :placeholder="$t('issueLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -138,8 +139,8 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint
+                />
             </v-col>
         </v-row>
         <!-- <v-row>
@@ -153,24 +154,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -179,7 +180,8 @@
                     v-model="udc"
                     :label="$t('udcLabel')"
                     :placeholder="$t('udcLabel')"
-                    :rules="udcValidationRules"></v-text-field>
+                    :rules="udcValidationRules"
+                />
             </v-col>
         </v-row>
 
