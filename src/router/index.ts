@@ -126,6 +126,9 @@ import OtherEventLandingView from "@/views/OtherEventLandingView.vue";
 import CourseMetadataComparatorView from "@/views/comparators/event/CourseMetadataComparatorView.vue";
 import OtherEventMetadataComparatorView from "@/views/comparators/event/OtherEventMetadataComparatorView.vue";
 import IdentifiersListView from "@/views/IdentifiersListView.vue";
+import PerformanceRelatedOutputLandingView from "@/views/landingPages/PerformanceRelatedOutputLandingView.vue";
+import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
+import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
 
 
 const roles = {
@@ -1009,6 +1012,38 @@ const router = createRouter({
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "thesisMetadataComparator",
                                     component: ThesisMetadataComparatorView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor],
+                                    },
+                                },
+                            ]
+                        },
+                        {
+                            path: "performance-related-output",
+                            children: [
+                                {
+                                    path: ":id",
+                                    name: "performanceRelatedOutputLandingPage",
+                                    component: PerformanceRelatedOutputLandingView,
+                                    meta: {
+                                        authenticated: false,
+                                        authorities: [],
+                                    },
+                                },
+                                {
+                                    path: "submit-performance-related-output",
+                                    name: "submitPerformanceRelatedOutput",
+                                    component: SubmitPerformanceRelatedOutputView,
+                                    meta: {
+                                        authenticated: true,
+                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                                    },
+                                },
+                                {
+                                    path: 'metadata-comparator/:leftId/:rightId',
+                                    name: "performanceRelatedOutputMetadataComparator",
+                                    component: PerformanceRelatedOutputMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor],

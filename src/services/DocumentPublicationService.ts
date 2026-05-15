@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { DocumentContributionType, PublicationType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse } from "@/models/PublicationModel";
+import { DocumentContributionType, PublicationType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse, type PerformanceRelatedOutput } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -68,6 +68,10 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `monograph/${monographId}`);
   }
 
+  async readPerformanceRelatedOutput(performanceRelatedOutputId: number): Promise<AxiosResponse<PerformanceRelatedOutput>> {
+    return super.sendRequest(axios.get, `performance-related-output/${performanceRelatedOutputId}`);
+  }
+
   async findMyPublicationsInJournal(journalId: number): Promise<AxiosResponse<DocumentPublicationIndex[]>> {
     return super.sendRequest(axios.get, `journal-publication/journal/${journalId}/my-publications`);
   }
@@ -127,6 +131,10 @@ export class DocumentPublicationService extends BaseService {
 
   async createMonographPublication(body: MonographPublication): Promise<AxiosResponse<MonographPublication>> {
     return super.sendRequest(axios.post, "monograph-publication", body, DocumentPublicationService.idempotencyKey);
+  }
+
+  async createPerformanceRelatedOutput(body: PerformanceRelatedOutput): Promise<AxiosResponse<PerformanceRelatedOutput>> {
+    return super.sendRequest(axios.post, "performance-related-output", body, DocumentPublicationService.idempotencyKey);
   }
 
   async findMyPublicationsInEvent(eventId: number): Promise<AxiosResponse<ProceedingsPublicationResponse[]>> {
@@ -192,6 +200,10 @@ export class DocumentPublicationService extends BaseService {
 
   async updateJournalPublication(journalPublicationId: number, updatedJournalPublication: JournalPublication): Promise<AxiosResponse<void>> {
     return super.sendRequest(axios.put, `journal-publication/${journalPublicationId}`, updatedJournalPublication);
+  }
+
+  async updatePerformanceRelatedOutput(performanceRelatedOutputId: number, updatedPerformanceRelatedOutput: PerformanceRelatedOutput): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `performance-related-output/${performanceRelatedOutputId}`, updatedPerformanceRelatedOutput);
   }
 
   async reorderContribution(publicationId: number, contributionId: number, oldOrderNumber: number, newOrderNumber: number): Promise<AxiosResponse<void>> {

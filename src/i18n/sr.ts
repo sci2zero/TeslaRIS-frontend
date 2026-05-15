@@ -121,7 +121,9 @@ export default {
         employmentPositions: "Radna mesta",
         submitCourse: "Dodavanje kursa",
         submitOtherEvent: "Dodavanje drugog tipa događaja",
-        identifiers: "Identifikatori"
+        identifiers: "Identifikatori",
+        submitPerformanceRelatedOutput: "Dodavanje rezultata vezanog za performans",
+        performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1445,5 +1447,12 @@ export default {
     ssrnIdExistsError: "SSRN ID je već u upotrebi.",
     updateProceedingsLabel: "Ažuriraj zbornik radova",
     showPersonsWithNoInvolvementsLabel: "Prikaži osobe bez angažovanja",
-    showPersonsWithNoContributionsLabel: "Prikaži osobe bez kontribucija"
+    showPersonsWithNoContributionsLabel: "Prikaži osobe bez kontribucija",
+    addPerformanceRelatedOutputLabel: "Rezultat vezan za performans",
+    producerLabel: "Producent",
+    distributorLabel: "Distributer",
+    sourceTitleLabel: "Izvorni naslov",
+    otherActorsLabel: "Ostali akteri",
+    performanceRelatedOutputTypeLabel: "Tip rezultata",
+    performanceRelatedOutputLabel: "Rezultat vezan za performans"
 }

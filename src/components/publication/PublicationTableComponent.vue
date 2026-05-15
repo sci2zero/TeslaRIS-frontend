@@ -811,6 +811,8 @@ export default defineComponent({
                     return 'mdi-hammer-wrench';
                 case 'GENETIC_MATERIAL':
                     return 'mdi-sprout';
+                case 'PERFORMANCE_RELATED_OUTPUT':
+                    return 'mdi-drama-masks';
                 default:
                     return 'mdi-file-document';
             }

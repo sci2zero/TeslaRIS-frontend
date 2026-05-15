@@ -50,6 +50,7 @@ import MonographSubmissionForm from './MonographSubmissionForm.vue';
 import MonographPublicationSubmissionForm from './MonographPublicationSubmissionForm.vue';
 import MaterialProductSubmissionForm from './MaterialProductSubmissionForm.vue';
 import GeneticMaterialSubmissionForm from './GeneticMaterialSubmissionForm.vue';
+import PerformanceRelatedOutputSubmissionForm from './PerformanceRelatedOutputSubmissionForm.vue';
 
 
 export default defineComponent({
@@ -190,6 +191,8 @@ export default defineComponent({
                     return MaterialProductSubmissionForm;
                 case PublicationType.GENETIC_MATERIAL:
                     return GeneticMaterialSubmissionForm;
+                case PublicationType.PERFORMANCE_RELATED_OUTPUT:
+                    return PerformanceRelatedOutputSubmissionForm;
             }
         };
 

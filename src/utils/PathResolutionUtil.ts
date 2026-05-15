@@ -26,6 +26,8 @@ export const getMetadataComparisonPageName = (type: PublicationType | string): s
             return "materialProductMetadataComparator"
         case "GENETIC_MATERIAL":
             return "geneticMaterialMetadataComparator"
+        case "PERFORMANCE_RELATED_OUTPUT":
+            return "performanceRelatedOutputMetadataComparator"
     }
     return "";
 };
@@ -88,6 +90,8 @@ export const getDocumentLandingPageBasePath = (type: PublicationType | string): 
             return "scientific-results/material-product/";
         case "GENETIC_MATERIAL":
             return "scientific-results/genetic-material/";
+        case "PERFORMANCE_RELATED_OUTPUT":
+            return "scientific-results/performance-related-output/";
     }
     return "";
 };
@@ -131,6 +135,8 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "materialProductLandingPage";
         case "GENETIC_MATERIAL":
             return "geneticMaterialLandingPage";
+        case "PERFORMANCE_RELATED_OUTPUT":
+            return "performanceRelatedOutputLandingPage";
     }
     return "";
 };

@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents, MergedPerformanceRelatedOutputs } from "@/models/MergeModel";
 import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
@@ -209,6 +209,10 @@ export class MergeService extends BaseService {
 
     async saveMergedMonographPublicationsMetadata(leftMonographPublicationId: number, rightMonographPublicationId: number, body: MergedMonographPublications): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/monograph-publication/metadata/${leftMonographPublicationId}/${rightMonographPublicationId}`, body);
+    }
+
+    async saveMergedPerformanceRelatedOutputMetadata(leftPerformanceRelatedOutputId: number, rightPerformanceRelatedOutputId: number, body: MergedPerformanceRelatedOutputs): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/monograph-publication/metadata/${leftPerformanceRelatedOutputId}/${rightPerformanceRelatedOutputId}`, body);
     }
 
     async switchAllIndicatorsToOtherDocument(sourceDocumentId: number, targetDocumentId: number): Promise<AxiosResponse<void>> {

@@ -6,6 +6,7 @@ import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import { getGeneticMaterialTypeTitleFromValueAutoLocale } from '@/i18n/geneticMaterialType';
 import { useI18n } from 'vue-i18n';
+import { getPerformanceRelatedOutputTypeTitleFromValueAutoLocale } from '@/i18n/performanceRelatedOutputType';
 
 
 export function getNameFromOrdinal(enumObj: any, ordinal: number): string | undefined {
@@ -43,5 +44,7 @@ export const getDocumentTypeDisplayValue = (documentType: string, publicationTyp
             return getMaterialProductTypeTitleFromValueAutoLocale(publicationType);
         case "GENETIC_MATERIAL":
             return getGeneticMaterialTypeTitleFromValueAutoLocale(publicationType);
+        case "PERFORMANCE_RELATED_OUTPUT":
+            return getPerformanceRelatedOutputTypeTitleFromValueAutoLocale(publicationType);
     }
 };

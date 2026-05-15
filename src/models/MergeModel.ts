@@ -4,7 +4,7 @@ import type { Journal } from "./JournalModel";
 import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
-import type { Dataset, GeneticMaterial, JournalPublication, MaterialProduct, Monograph, MonographPublication, Patent, ProceedingsPublication, IntangibleProduct, Thesis } from "./PublicationModel";
+import type { Dataset, GeneticMaterial, JournalPublication, MaterialProduct, Monograph, MonographPublication, Patent, ProceedingsPublication, IntangibleProduct, Thesis, PerformanceRelatedOutput } from "./PublicationModel";
 import type { Publisher } from "./PublisherModel";
 
 
@@ -112,6 +112,11 @@ export interface MergedMonographs extends MergedDocuments {
 export interface MergedMonographPublications extends MergedDocuments {
     leftMonographPublication: MonographPublication;
     rightMonographPublication: MonographPublication;
+}
+
+export interface MergedPerformanceRelatedOutputs extends MergedDocuments {
+    leftPerformanceRelatedOutput: PerformanceRelatedOutput;
+    rightPerformanceRelatedOutput: PerformanceRelatedOutput;
 }
 
 export interface MergedPublishers {

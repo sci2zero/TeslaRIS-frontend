@@ -102,9 +102,11 @@ export default defineComponent({
                 case "DATASET":
                     return "datasetLandingPage";
                 case "MATERIAL_PRODUCT":
-                    return "datasetLandingPage";
+                    return "materialProductLandingPage";
                 case "GENETIC_MATERIAL":
-                    return "datasetLandingPage";
+                    return "geneticMaterialLandingPage";
+                case "PERFORMANCE_RELATED_OUTPUT":
+                    return "performanceRelatedOutputLandingPage";
                 default:
                     return "notFound";
             }

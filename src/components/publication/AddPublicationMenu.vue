@@ -66,6 +66,7 @@ export default defineComponent({
         const addThesisLabel = computed(() => i18n.t("addThesisLabel"));
         const addMaterialProductLabel = computed(() => i18n.t("addMaterialProductLabel"));
         const addGeneticMaterialLabel = computed(() => i18n.t("addGeneticMaterialLabel"));
+        const addPerformanceRelatedOutputLabel = computed(() => i18n.t("addPerformanceRelatedOutputLabel"));
 
         const submissionMenuItems = ref([
             { title: addJournalPublicationLabel, value: "submitJournalPublication" },
@@ -77,7 +78,8 @@ export default defineComponent({
             { title: addIntangibleProductLabel, value: "submitIntangibleProduct" },
             { title: addDatasetLabel, value: "submitDataset" },
             { title: addMaterialProductLabel, value: "submitMaterialProduct" },
-            { title: addGeneticMaterialLabel, value: "submitGeneticMaterial" }
+            { title: addGeneticMaterialLabel, value: "submitGeneticMaterial" },
+            { title: addPerformanceRelatedOutputLabel, value: "submitPerformanceRelatedOutput" }
         ]);
 
         return {

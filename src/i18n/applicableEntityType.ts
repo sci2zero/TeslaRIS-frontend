@@ -13,6 +13,7 @@ export const applicableEntityTypeSr = [
     { title: "Patent", value: ApplicableEntityType.PATENT },
     { title: "Materijalni proizvod", value: ApplicableEntityType.MATERIAL_PRODUCT },
     { title: "Genetski materijal", value: ApplicableEntityType.GENETIC_MATERIAL },
+    { title: "Rezultat vezan za performans", value: ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT },
     { title: "Skup podataka", value: ApplicableEntityType.DATASET },
     { title: "Završni rad", value: ApplicableEntityType.THESIS },
     { title: "Događaj", value: ApplicableEntityType.EVENT },
@@ -36,6 +37,7 @@ export const applicableEntityTypeEn = [
     { title: "Patent", value: ApplicableEntityType.PATENT },
     { title: "Material product", value: ApplicableEntityType.MATERIAL_PRODUCT },
     { title: "Genetic material", value: ApplicableEntityType.GENETIC_MATERIAL },
+    { title: "Performance related output", value: ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT },
     { title: "Dataset", value: ApplicableEntityType.DATASET },
     { title: "Thesis", value: ApplicableEntityType.THESIS },
     { title: "Event", value: ApplicableEntityType.EVENT },
@@ -92,6 +94,8 @@ export const getApplicableEntityTypeForDocumentType = (documentType: Publication
             return ApplicableEntityType.INTANGIBLE_PRODUCT;
         case PublicationType.GENETIC_MATERIAL:
             return ApplicableEntityType.GENETIC_MATERIAL;
+        case PublicationType.PERFORMANCE_RELATED_OUTPUT:
+            return ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT;
         case PublicationType.DATASET:
             return ApplicableEntityType.DATASET;
         case PublicationType.THESIS:

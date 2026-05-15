@@ -1,9 +1,10 @@
-import type { MultilingualContent } from "./Common";
+import type { LanguageTagResponse, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
 import { type ResearchArea } from "./OrganisationUnitModel";
 import type { PersonContribution } from "./PersonModel";
+
 
 export interface DocumentPublicationIndex {
     id: string;
@@ -60,7 +61,8 @@ export enum PublicationType {
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
     THESIS = "THESIS",
     MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
-    GENETIC_MATERIAL = "GENETIC_MATERIAL"
+    GENETIC_MATERIAL = "GENETIC_MATERIAL",
+    PERFORMANCE_RELATED_OUTPUT = "PERFORMANCE_RELATED_OUTPUT"
 }
 
 export enum ThesisType {
@@ -441,4 +443,29 @@ export interface ThesisLibraryFormatsResponse {
 export interface TermFrequency {
     a: string;
     b: number;
+}
+
+export enum PerformanceRelatedOutputType {
+    SLIDES = "SLIDES",
+    POSTER = "POSTER",
+    CATALOGUE = "CATALOGUE",
+    ARTISTIC_EXHIBITION = "ARTISTIC_EXHIBITION",
+    MUSICAL_PERFORMANCE = "MUSICAL_PERFORMANCE",
+    ART_PERFORMANCE = "ART_PERFORMANCE",
+    THEATRIC_PLAY = "THEATRIC_PLAY",
+    CURATORIAL_MUSEUM_EXHIBITION = "CURATORIAL_MUSEUM_EXHIBITION",
+    LITIGATION = "LITIGATION",
+    BROADCAST_INTERVIEW = "BROADCAST_INTERVIEW",
+    TEXT_INTERVIEW = "TEXT_INTERVIEW",
+    NON_RESEARCH_PRESENTATION = "NON_RESEARCH_PRESENTATION"
+}
+
+export interface PerformanceRelatedOutput extends Document {
+    type: PerformanceRelatedOutputType;
+    producer?: MultilingualContent[];
+    distributor?: MultilingualContent[];
+    sourceTitle?: MultilingualContent[];
+    otherActors?: MultilingualContent[];
+    languageTagIds?: number[];
+    languageTags?: LanguageTagResponse[];
 }

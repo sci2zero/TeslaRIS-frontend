@@ -120,7 +120,9 @@ export default {
         employmentPositions: "Employment positions",
         submitCourse: "Submit course",
         submitOtherEvent: "Submit other event",
-        identifiers: "Identifiers"
+        identifiers: "Identifiers",
+        submitPerformanceRelatedOutput: "Submit performance related output",
+        performanceRelatedOutputLandingPage: "Performance related output details"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1431,5 +1433,12 @@ export default {
     ssrnIdExistsError: "SSRN ID already in use.",
     updateProceedingsLabel: "Update proceedings",
     showPersonsWithNoInvolvementsLabel: "Show persons with no involvements",
-    showPersonsWithNoContributionsLabel: "Show persons with no contributions"
+    showPersonsWithNoContributionsLabel: "Show persons with no contributions",
+    addPerformanceRelatedOutputLabel: "Performance related output",
+    producerLabel: "Producer",
+    distributorLabel: "Distributor",
+    sourceTitleLabel: "Source title",
+    otherActorsLabel: "Other actors",
+    performanceRelatedOutputTypeLabel: "Performance related output type",
+    performanceRelatedOutputLabel: "Performance related output"
 }

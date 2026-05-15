@@ -96,6 +96,7 @@ export default defineComponent({
             props.applicableTypes.includes(ApplicableEntityType.PATENT) || 
             props.applicableTypes.includes(ApplicableEntityType.MATERIAL_PRODUCT) || 
             props.applicableTypes.includes(ApplicableEntityType.GENETIC_MATERIAL) || 
+            props.applicableTypes.includes(ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT) || 
             props.applicableTypes.includes(ApplicableEntityType.DATASET) || 
             props.applicableTypes.includes(ApplicableEntityType.THESIS)
         );
