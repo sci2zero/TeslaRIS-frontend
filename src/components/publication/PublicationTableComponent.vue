@@ -532,7 +532,7 @@ export default defineComponent({
             if (isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || props.sortByDateDefault) {
                 tableOptions.value.sortBy = [{key: "year", order: "desc"}];
             }
-        })
+        });
 
         watch(tableWrapper, () => {
             if (tableWrapper.value) {
@@ -584,8 +584,8 @@ export default defineComponent({
                 itemsPerPage: 10,
                 sortBy:[
                     {
-                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "year" : titleColumn),
-                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "desc" : "asc")
+                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "year" : titleColumn),
+                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "desc" : "asc")
                     }
                 ]
             }
@@ -734,8 +734,8 @@ export default defineComponent({
                     isEqual(
                         [
                             {
-                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "year" : titleColumn.value),
-                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value) ? "desc" : "asc")
+                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "year" : titleColumn.value),
+                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "desc" : "asc")
                             }
                         ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0

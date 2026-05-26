@@ -4,9 +4,9 @@
             <v-file-input
                 v-model="file"
                 :label="$t('fileLabel') + '*'"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                 @change="handleFileChange"
-            ></v-file-input>
+            />
         </v-row>
         <v-row>
             <VuePictureCropper
@@ -161,7 +161,6 @@ export default defineComponent({
                 throw new Error('Unsupported URL format');
             }
         };
-
 
         return {
             isFormValid, file, submit,
