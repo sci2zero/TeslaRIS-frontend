@@ -59,6 +59,8 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.chronologicalSpaceDescription = basicInfo.chronologicalSpaceDescription;
     document.value!.publicationStatus = basicInfo.publicationStatus;
     document.value!.eventId = basicInfo.eventId;
+    document.value!.authorReprint = basicInfo.authorReprint;
+    document.value!.edition = basicInfo.edition;
 };
 
 export const mergeCommonMetadata = (document1: Document, document2: Document) => {
@@ -84,6 +86,9 @@ export const mergeCommonMetadata = (document1: Document, document2: Document) =>
     mergeMultilingualContentField(document1.city, document2.city);
     document2.city = [];
 
+    mergeMultilingualContentField(document1.edition, document2.edition);
+    document2.edition = [];
+
     bulkTransferFields(document1, document2, [
         { fieldName: "doi", emptyValue: "" },
         { fieldName: "scopusId", emptyValue: "" },
@@ -97,7 +102,8 @@ export const mergeCommonMetadata = (document1: Document, document2: Document) =>
         { fieldName: "peerReviewed", emptyValue: false },
         { fieldName: "openAccess", emptyValue: false },
         { fieldName: "publicationStatus", emptyValue: null, setEmpty: false },
-        { fieldName: "eventId", emptyValue: null, setEmpty: false }
+        { fieldName: "eventId", emptyValue: null, setEmpty: false },
+        { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
     ]);
 
     document2.uris!.forEach(uri => {

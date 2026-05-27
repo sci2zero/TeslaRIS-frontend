@@ -16,8 +16,8 @@
                             ref="eventAutocompleteRef"
                             v-model="selectedMonograph"
                             required
-                            only-books>
-                        </monograph-autocomplete-search>
+                            only-books
+                        />
                     </v-col>
                 </v-row>
                 <v-row v-if="selectedMonograph && selectedMonograph.value != -1 && myPublications.length > 0">
@@ -41,8 +41,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -56,17 +56,17 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
 
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -83,7 +83,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event" />
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -92,34 +92,44 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
                                 v-model="numberOfPages" type="number"
                                 :min="0" :label="$t('numberOfPagesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                                :placeholder="$t('numberOfPagesLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <multilingual-text-input
+                                ref="sectionRef"
+                                v-model="section"
+                                :label="$t('sectionLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -217,6 +227,7 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const sectionRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
@@ -231,6 +242,7 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref<any[]>([]);
+        const section = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const availableMonograph = ref<{title: string, value: number}[]>([]);
         const selectedMonograph = ref(searchPlaceholder);
@@ -307,6 +319,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 fileItems: [],
                 proofs: [],
+                section: section.value,
                 ...commonFieldsData.value
             };
 
@@ -320,6 +333,7 @@ export default defineComponent({
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
+                    sectionRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     monographAutocompleteRef.value?.clearInput();
                     availableMonograph.value = [];
@@ -402,7 +416,7 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules, submitMonographPublication,
             availableMonograph, errorMessage, workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules, optionalNumericZeroOrGreaterFieldRules,
-            commonFieldsRef, commonFieldsData, presetCommonFieldsData
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData, section, sectionRef
         };
     }
 });

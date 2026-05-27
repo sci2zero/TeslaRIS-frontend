@@ -1440,5 +1440,6 @@ export default {
     sourceTitleLabel: "Source title",
     otherActorsLabel: "Other actors",
     performanceRelatedOutputTypeLabel: "Performance related output type",
-    performanceRelatedOutputLabel: "Performance related output"
+    performanceRelatedOutputLabel: "Performance related output",
+    sectionLabel: "Section"
 }

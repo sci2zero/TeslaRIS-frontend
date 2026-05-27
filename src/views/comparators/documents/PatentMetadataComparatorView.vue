@@ -199,8 +199,7 @@ export default defineComponent({
             
             bulkTransferFields(patent1, patent2, [
                 { fieldName: "number", emptyValue: "" },
-                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false }
             ]);
 
             return [patent1, patent2];
@@ -235,7 +234,6 @@ export default defineComponent({
         const updateLeft = (updatedInfo: Patent) => {
             leftPatent.value!.number = updatedInfo.number;
             leftPatent.value!.publisherId = updatedInfo.publisherId;
-            leftPatent.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftPatent, updatedInfo);
             
@@ -248,7 +246,6 @@ export default defineComponent({
         const updateRight = (updatedInfo: Patent) => {
             rightPatent.value!.number = updatedInfo.number;
             rightPatent.value!.publisherId = updatedInfo.publisherId;
-            rightPatent.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightPatent, updatedInfo);
             

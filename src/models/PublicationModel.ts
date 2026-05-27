@@ -132,6 +132,8 @@ export interface Document {
     geoSpaceDescription?: MultilingualContent[];
     chronologicalSpaceDescription?: MultilingualContent[];
     city?: MultilingualContent[];
+    edition?: MultilingualContent[];
+    authorReprint?: boolean;
 }
 
 export interface CommonFieldsData {
@@ -145,6 +147,7 @@ export interface CommonFieldsData {
     peerReviewed?: boolean;
     openAccess?: boolean;
     publicationStatus?: PublicationStatus;
+    edition?: MultilingualContent[];
 }
 
 export interface JournalPublication extends Document {
@@ -156,7 +159,8 @@ export interface JournalPublication extends Document {
     volume: string;
     issue: string;
     journalId: number;
-  }
+    section?: MultilingualContent[];
+}
 
 export interface PersonDocumentContribution extends PersonContribution {
     contributionType: DocumentContributionType;
@@ -187,6 +191,7 @@ export interface ProceedingsPublication extends Document {
     numberOfPages: number;
     articleNumber: string;
     proceedingsId: number;
+    section?: MultilingualContent[];
 }
 
 export enum ProceedingsPublicationType {
@@ -198,6 +203,8 @@ export enum ProceedingsPublicationType {
     LEXICOGRAPHIC_UNIT,
     POLEMICS,
     SCIENTIFIC_CRITIC,
+    POSTFACE,
+    BOOK_REVIEW
 }
 
 export interface ProceedingsPublicationResponse {
@@ -246,7 +253,6 @@ export interface Monograph extends Document {
     languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
-    authorReprint?: boolean;
     udc?: string;
 }
 
@@ -269,18 +275,17 @@ export interface MonographPublication extends Document {
     numberOfPages?: number;
     articleNumber?: string;
     monographId?: number;
+    section?: MultilingualContent[];
 }
 
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
-    authorReprint?: boolean;
 }
 
 export interface IntangibleProduct extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     intangibleProductType: IntangibleProductType;
     productUsers: MultilingualContent[];
     researchAreasId: number[];
@@ -290,7 +295,6 @@ export interface IntangibleProduct extends Document {
 export interface MaterialProduct extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     numberProduced: number;
     materialProductType: MaterialProductType;
     productUsers: MultilingualContent[];
@@ -301,14 +305,12 @@ export interface MaterialProduct extends Document {
 export interface GeneticMaterial extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     geneticMaterialType: GeneticMaterialType
 }
 
 export interface Dataset extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
 }
 
 export interface DeduplicationSuggestion {
@@ -348,7 +350,6 @@ export interface Thesis extends Document {
     scientificArea?: MultilingualContent[];
     scientificSubArea?: MultilingualContent[];
     publisherId?: number;
-    authorReprint?: boolean;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
     preliminarySupplements?: DocumentFileResponse[];

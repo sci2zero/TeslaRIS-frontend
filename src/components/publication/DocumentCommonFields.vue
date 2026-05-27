@@ -76,6 +76,17 @@
         </v-row>
 
         <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="editionRef"
+                    v-model="localEdition"
+                    :label="$t('editionLabel')"
+                    @update:model-value="emitUpdate"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col cols="5">
                 <v-checkbox
                     v-model="localPeerReviewed"
@@ -147,6 +158,7 @@ export default defineComponent({
         const localPubmedId = ref(props.modelValue?.pubmedId || props.presetData?.pubmedId || "");
         const localSsrnId = ref(props.modelValue?.ssrnId || props.presetData?.ssrnId || "");
         const localCity = ref<any[]>(props.modelValue?.city || props.presetData?.city || []);
+        const localEdition = ref<any[]>(props.modelValue?.edition || props.presetData?.edition || []);
         const localGeoSpaceDescription = ref<any[]>(
             props.modelValue?.geoSpaceDescription || props.presetData?.geoSpaceDescription || []
         );
@@ -181,6 +193,7 @@ export default defineComponent({
         const cityRef = ref<typeof MultilingualTextInput>();
         const geoSpaceDescriptionRef = ref<typeof MultilingualTextInput>();
         const chronologicalSpaceDescriptionRef = ref<typeof MultilingualTextInput>();
+        const editionRef = ref<typeof MultilingualTextInput>();
 
         const publicationStatuses = computed(() => getPublicationStatusesForGivenLocale());
 
@@ -195,7 +208,8 @@ export default defineComponent({
                 chronologicalSpaceDescription: localChronologicalSpaceDescription.value,
                 peerReviewed: localPeerReviewed.value,
                 openAccess: localOpenAccess.value,
-                publicationStatus: localPublicationStatus.value.value
+                publicationStatus: localPublicationStatus.value.value,
+                edition: localEdition.value
             };
             emit("update:modelValue", data);
             emit("change", data);
@@ -214,6 +228,7 @@ export default defineComponent({
                 localPubmedId.value = newModelValue.pubmedId || "";
                 localSsrnId.value = newModelValue.ssrnId || "";
                 localCity.value = newModelValue.city || [];
+                localEdition.value = newModelValue.edition || [];
                 localGeoSpaceDescription.value = newModelValue.geoSpaceDescription || [];
                 localChronologicalSpaceDescription.value = newModelValue.chronologicalSpaceDescription || [];
                 localPeerReviewed.value = newModelValue.peerReviewed || false;
@@ -233,6 +248,7 @@ export default defineComponent({
             localPubmedId.value = data.pubmedId || "";
             localSsrnId.value = data.ssrnId || "";
             localCity.value = data.city || [];
+            localEdition.value = data.edition || [];
             localGeoSpaceDescription.value = data.geoSpaceDescription || [];
             localChronologicalSpaceDescription.value = data.chronologicalSpaceDescription || [];
             localPeerReviewed.value = data.peerReviewed || false;
@@ -246,6 +262,10 @@ export default defineComponent({
 
             if (cityRef.value && data.city) {
                 cityRef.value.forceRefreshModelValue(toMultilingualTextInput(data.city, languageTags.value));
+            }
+
+            if (editionRef.value && data.edition) {
+                editionRef.value.forceRefreshModelValue(toMultilingualTextInput(data.edition, languageTags.value));
             }
 
             if (geoSpaceDescriptionRef.value && data.geoSpaceDescription) {
@@ -263,6 +283,7 @@ export default defineComponent({
             localPubmedId.value = "";
             localSsrnId.value = "";
             localCity.value = [];
+            localEdition.value = [];
             localGeoSpaceDescription.value = [];
             localChronologicalSpaceDescription.value = [];
             localPeerReviewed.value = false;
@@ -284,14 +305,14 @@ export default defineComponent({
         });
 
         return {
-            localHandleId,
+            localHandleId, localEdition,
             localArxivId, localPubmedId,
             localSsrnId, localCity,
             localGeoSpaceDescription,
             localChronologicalSpaceDescription,
             localPeerReviewed, localOpenAccess,
             localPublicationStatus,
-            publicationStatuses,
+            publicationStatuses, editionRef,
             geoSpaceDescriptionRef, cityRef,
             chronologicalSpaceDescriptionRef,
             handleIdValidationRules,

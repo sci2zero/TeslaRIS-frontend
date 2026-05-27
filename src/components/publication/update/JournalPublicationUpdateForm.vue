@@ -2,47 +2,60 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="10">
-                <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" required></journal-autocomplete-search>
+                <journal-autocomplete-search
+                    ref="journalAutocompleteRef"
+                    v-model="selectedJournal"
+                    required
+                />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetJournalPublication?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetJournalPublication?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetJournalPublication?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetJournalPublication?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')" />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
+                <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')"></v-text-field>
+                <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')" />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -51,13 +64,13 @@
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel')"
-                    return-object>
-                </v-select>
+                    return-object
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
             </v-col>
             <v-col cols="5">
                 <v-text-field
@@ -70,12 +83,22 @@
         </v-row>
         <v-row>
             <v-col>
+                <multilingual-text-input
+                    ref="sectionRef"
+                    v-model="section"
+                    :label="$t('sectionLabel')"
+                    :initial-value="toMultilingualTextInput(presetJournalPublication?.section, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
                 <uri-input ref="urisRef" v-model="uris"></uri-input>
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent"></event-autocomplete-search>
+                <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" />
             </v-col>
         </v-row>
         <v-row>
@@ -195,6 +218,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const sectionRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderJournal = {title: returnCurrentLocaleContent(journal.value?.title) as string, value: journal.value?.id as number};
@@ -205,6 +229,7 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
+        const section = ref<any>([]);
         const volume = ref(props.presetJournalPublication?.volume);
         const issue = ref(props.presetJournalPublication?.issue);
         const startPage = ref(props.presetJournalPublication?.startPage);
@@ -275,6 +300,7 @@ export default defineComponent({
                 journalPublicationType: selectedpublicationType.value.value as JournalPublicationType,
                 fileItems: [],
                 proofs: [],
+                section: section.value,
                 ...commonFieldsData.value
             };
 
@@ -287,6 +313,9 @@ export default defineComponent({
 
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetJournalPublication?.subTitle as MultilingualContent[];
+
+            sectionRef.value?.clearInput();
+            section.value = props.presetJournalPublication?.section as MultilingualContent[];
 
             uris.value = props.presetJournalPublication?.uris as string[];
             startPage.value = props.presetJournalPublication?.startPage;
@@ -311,6 +340,7 @@ export default defineComponent({
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            sectionRef.value?.forceRefreshModelValue(toMultilingualTextInput(section.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
 
             if (commonFieldsRef.value && presetCommonFieldsData.value) {
@@ -339,7 +369,7 @@ export default defineComponent({
             documentWebOfScienceIdValidationRules,
             optionalNumericZeroOrGreaterFieldRules,
             commonFieldsRef, commonFieldsData,
-            presetCommonFieldsData
+            presetCommonFieldsData, section, sectionRef
         };
     }
 });

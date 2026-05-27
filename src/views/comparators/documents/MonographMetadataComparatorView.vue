@@ -212,8 +212,7 @@ export default defineComponent({
                 { fieldName: "monographType", emptyValue: null, setEmpty: false },
                 { fieldName: "publicationSeriesId", emptyValue: null, setEmpty: false },
                 { fieldName: "researchAreaId", emptyValue: null, setEmpty: false },
-                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false }
             ]);
 
             monograph2.languageIds!.forEach(languageId => {
@@ -262,7 +261,6 @@ export default defineComponent({
             leftMonograph.value!.number = updatedInfo.number;
             leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             leftMonograph.value!.publisherId = updatedInfo.publisherId;
-            leftMonograph.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftMonograph, updatedInfo);
             
@@ -282,7 +280,6 @@ export default defineComponent({
             rightMonograph.value!.number = updatedInfo.number;
             rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             rightMonograph.value!.publisherId = updatedInfo.publisherId;
-            rightMonograph.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightMonograph, updatedInfo);
             

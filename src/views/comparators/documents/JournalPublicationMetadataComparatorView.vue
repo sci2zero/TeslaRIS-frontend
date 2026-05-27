@@ -138,7 +138,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
@@ -198,6 +198,9 @@ export default defineComponent({
         const mergeJournalMetadata = (journalPublication1: JournalPublication, journalPublication2: JournalPublication) => {
             mergeCommonMetadata(journalPublication1, journalPublication2);
 
+            mergeMultilingualContentField(journalPublication1.section, journalPublication2.section);
+            journalPublication2.section = [];
+
             bulkTransferFields(journalPublication1, journalPublication2, [
                 { fieldName: "numberOfPages", emptyValue: 0 },
                 { fieldName: "volume", emptyValue: "" },
@@ -247,6 +250,7 @@ export default defineComponent({
             leftJournalPublication.value!.issue = updatedInfo.issue;
             leftJournalPublication.value!.journalId = updatedInfo.journalId;
             leftJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
+            leftJournalPublication.value!.section = updatedInfo.section;
 
             updateCommonBasicInfo(leftJournalPublication, updatedInfo);
             
@@ -265,6 +269,7 @@ export default defineComponent({
             rightJournalPublication.value!.issue = updatedInfo.issue;
             rightJournalPublication.value!.journalId = updatedInfo.journalId;
             rightJournalPublication.value!.numberOfPages = updatedInfo.numberOfPages;
+            rightJournalPublication.value!.section = updatedInfo.section;
 
             updateCommonBasicInfo(rightJournalPublication, updatedInfo);
             

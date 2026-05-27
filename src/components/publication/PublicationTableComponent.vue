@@ -529,9 +529,7 @@ export default defineComponent({
                 headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
             }
 
-            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || props.sortByDateDefault) {
-                tableOptions.value.sortBy = [{key: "year", order: "desc"}];
-            }
+            tableOptions.value.sortBy = [{key: "year", order: "desc"}];
         });
 
         watch(tableWrapper, () => {
@@ -570,9 +568,9 @@ export default defineComponent({
         const {
             isAdmin, isCommission,
             isInstitutionalEditor,
-            isInstitutionalLibrarian,
-            isHeadOfLibrary, loggedInUser,
-            isUserLoggedIn, isResearcher
+            loggedInUser,
+            isUserLoggedIn,
+            isResearcher
         } = useUserRole();
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
@@ -584,8 +582,8 @@ export default defineComponent({
                 itemsPerPage: 10,
                 sortBy:[
                     {
-                        key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "year" : titleColumn),
-                        order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "desc" : "asc")
+                        key: "year",
+                        order: "desc"
                     }
                 ]
             }
@@ -734,8 +732,8 @@ export default defineComponent({
                     isEqual(
                         [
                             {
-                                key: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "year" : titleColumn.value),
-                                order: ((isInstitutionalLibrarian.value || isHeadOfLibrary.value || isCommission.value || isAdmin.value) ? "desc" : "asc")
+                                key: "year",
+                                order: "desc"
                             }
                         ], tableOptions.value.sortBy) ||
                     tableOptions.value.sortBy.length === 0

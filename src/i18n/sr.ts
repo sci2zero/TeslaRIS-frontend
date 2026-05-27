@@ -1454,5 +1454,6 @@ export default {
     sourceTitleLabel: "Izvorni naslov",
     otherActorsLabel: "Ostali akteri",
     performanceRelatedOutputTypeLabel: "Tip rezultata",
-    performanceRelatedOutputLabel: "Rezultat vezan za performans"
+    performanceRelatedOutputLabel: "Rezultat vezan za performans",
+    sectionLabel: "Sekcija"
 }

@@ -105,6 +105,12 @@
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
                                 </div>
+                                <div v-if="proceedingsPublication?.section">
+                                    {{ $t("sectionLabel") }}:
+                                </div>
+                                <div v-if="proceedingsPublication?.section" class="response">
+                                    {{ returnCurrentLocaleContent(proceedingsPublication.section) }}
+                                </div>
                             </v-col>
 
                             <document-common-fields-display
@@ -459,6 +465,7 @@ export default defineComponent({
             proceedingsPublication.value!.numberOfPages = basicInfo.numberOfPages;
             proceedingsPublication.value!.articleNumber = basicInfo.articleNumber;
             proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
+            proceedingsPublication.value!.section = basicInfo.section;
 
             updateCommonBasicInfo(proceedingsPublication, basicInfo);
 

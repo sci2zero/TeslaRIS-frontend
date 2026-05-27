@@ -200,8 +200,7 @@ export default defineComponent({
 
             bulkTransferFields(dataset1, dataset2, [
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false }
             ]);
 
             return [dataset1, dataset2];
@@ -236,7 +235,6 @@ export default defineComponent({
         const updateLeft = (updatedInfo: Dataset) => {
             leftDataset.value!.internalNumber = updatedInfo.internalNumber;
             leftDataset.value!.publisherId = updatedInfo.publisherId;
-            leftDataset.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftDataset, updatedInfo);
             
@@ -249,7 +247,6 @@ export default defineComponent({
         const updateRight = (updatedInfo: Dataset) => {
             rightDataset.value!.internalNumber = updatedInfo.internalNumber;
             rightDataset.value!.publisherId = updatedInfo.publisherId;
-            rightDataset.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightDataset, updatedInfo);
             

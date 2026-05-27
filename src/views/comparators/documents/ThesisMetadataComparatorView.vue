@@ -237,7 +237,6 @@ export default defineComponent({
                 { fieldName: "numberOfTables", emptyValue: "" },
                 { fieldName: "numberOfAppendices", emptyValue: "" },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "languageId", emptyValue: undefined },
                 { fieldName: "writingLanguageTagId", emptyValue: undefined }
             ]);
@@ -292,7 +291,6 @@ export default defineComponent({
             leftThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             leftThesis.value!.udc = updatedInfo.udc;
             leftThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
-            leftThesis.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(leftThesis, updatedInfo);
             
@@ -323,7 +321,6 @@ export default defineComponent({
             rightThesis.value!.placeOfKeep = updatedInfo.placeOfKeep;
             rightThesis.value!.udc = updatedInfo.udc;
             rightThesis.value!.typeOfTitle = updatedInfo.typeOfTitle;
-            rightThesis.value!.authorReprint = updatedInfo.authorReprint;
 
             updateCommonBasicInfo(rightThesis, updatedInfo);
             

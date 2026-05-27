@@ -8,14 +8,26 @@
                 <br />
 
                 <proceedings-publication-update-form
-                    ref="updateLeftRef" :preset-proceedings-publication="leftProceedingsPublication" in-comparator :in-modal="false"
-                    @update="updateLeft"></proceedings-publication-update-form>
+                    ref="updateLeftRef"
+                    :preset-proceedings-publication="leftProceedingsPublication"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateLeft"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateLeftDescriptionRef" :preset-description-or-biography="(leftProceedingsPublication?.description as MultilingualContent[])" @update="updateLeftDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateLeftDescriptionRef"
+                    :preset-description-or-biography="(leftProceedingsPublication?.description as MultilingualContent[])"
+                    @update="updateLeftDescription"
+                />
 
-                <keyword-update-form ref="updateLeftKeywordsRef" :preset-keywords="(leftProceedingsPublication?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateLeftKeywordsRef"
+                    :preset-keywords="(leftProceedingsPublication?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -30,8 +42,8 @@
                             :contribution-list="leftProceedingsPublication?.contributions ? leftProceedingsPublication.contributions : []"
                             :document-id="leftProceedingsPublication?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -60,14 +72,26 @@
                 <br />
 
                 <proceedings-publication-update-form
-                    ref="updateRightRef" :preset-proceedings-publication="rightProceedingsPublication" in-comparator :in-modal="false"
-                    @update="updateRight"></proceedings-publication-update-form>
+                    ref="updateRightRef"
+                    :preset-proceedings-publication="rightProceedingsPublication"
+                    in-comparator
+                    :in-modal="false"
+                    @update="updateRight"
+                />
 
                 <br />
 
-                <description-or-biography-update-form ref="updateRightDescriptionRef" :preset-description-or-biography="(rightProceedingsPublication?.description as MultilingualContent[])" @update="updateRightDescription"></description-or-biography-update-form>
+                <description-or-biography-update-form
+                    ref="updateRightDescriptionRef"
+                    :preset-description-or-biography="(rightProceedingsPublication?.description as MultilingualContent[])"
+                    @update="updateRightDescription"
+                />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightProceedingsPublication?.keywords as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form
+                    ref="updateRightKeywordsRef"
+                    :preset-keywords="(rightProceedingsPublication?.keywords as MultilingualContent[])"
+                    @update="updateRightKeywords"
+                />
 
                 <br />
 
@@ -82,8 +106,8 @@
                             :contribution-list="rightProceedingsPublication?.contributions ? rightProceedingsPublication.contributions : []"
                             :document-id="rightProceedingsPublication?.id"
                             :can-reorder="true"
-                            in-comparator>
-                        </person-document-contribution-list>
+                            in-comparator
+                        />
                     </v-card-text>
                 </v-card>
 
@@ -102,8 +126,8 @@
             :right-id="(rightProceedingsPublication?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
-            @delete="deleteSide($event)">
-        </comparison-actions>
+            @delete="deleteSide($event)"
+        />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -118,18 +142,18 @@ import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
-import type { PersonDocumentContribution, ProceedingsPublication } from '@/models/PublicationModel';
+import type { ProceedingsPublication } from '@/models/PublicationModel';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
 import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
-import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
+import { mergeCommonMetadata } from '@/utils/CommonDocumentFieldsUtil';
 
 
 export default defineComponent({
@@ -172,43 +196,19 @@ export default defineComponent({
         };
 
         const mergeProceedingsMetadata = (proceedingsPublication1: ProceedingsPublication, proceedingsPublication2: ProceedingsPublication) => {
-            mergeMultilingualContentField(proceedingsPublication1.title, proceedingsPublication2.title);
+            mergeCommonMetadata(proceedingsPublication1, proceedingsPublication2);
 
-            mergeMultilingualContentField(proceedingsPublication1.subTitle, proceedingsPublication2.subTitle);
-            proceedingsPublication2.subTitle = [];
-
-            mergeMultilingualContentField(proceedingsPublication1.keywords, proceedingsPublication2.keywords);
-            proceedingsPublication2.keywords = [];
-
-            mergeMultilingualContentField(proceedingsPublication1.description, proceedingsPublication2.description);
-            proceedingsPublication2.description = [];
-
-            mergeDocumentAttachments(proceedingsPublication1, proceedingsPublication2);
+            mergeMultilingualContentField(proceedingsPublication1.section, proceedingsPublication2.section);
+            proceedingsPublication2.section = [];
             
             bulkTransferFields(proceedingsPublication1, proceedingsPublication2, [
-                { fieldName: "doi", emptyValue: "" },
-                { fieldName: "scopusId", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" },
-                { fieldName: "webOfScienceId", emptyValue: "" },
                 { fieldName: "numberOfPages", emptyValue: 0 },
-                { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "startPage", emptyValue: "" },
                 { fieldName: "endPage", emptyValue: "" },
                 { fieldName: "articleNumber", emptyValue: "" },
                 { fieldName: "proceedingsPublicationType", emptyValue: null, setEmpty: false },
-                { fieldName: "eventId", emptyValue: null, setEmpty: false },
                 { fieldName: "proceedingsId", emptyValue: null, setEmpty: false }
             ]);
-
-            proceedingsPublication2.uris!.forEach(uri => {
-                if (!proceedingsPublication1.uris!.includes(uri)) {
-                    proceedingsPublication1.uris!.push(uri);
-                }
-            });
-            proceedingsPublication2.uris = [];
-
-            proceedingsPublication1.contributions = proceedingsPublication1.contributions?.concat(proceedingsPublication2.contributions as PersonDocumentContribution[]);
-            proceedingsPublication2.contributions = [];
 
             return [proceedingsPublication1, proceedingsPublication2];
         };
@@ -257,6 +257,7 @@ export default defineComponent({
             leftProceedingsPublication.value!.scopusId = updatedInfo.scopusId;
             leftProceedingsPublication.value!.openAlexId = updatedInfo.openAlexId;
             leftProceedingsPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            leftProceedingsPublication.value!.section = updatedInfo.section;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -282,6 +283,7 @@ export default defineComponent({
             rightProceedingsPublication.value!.scopusId = updatedInfo.scopusId;
             rightProceedingsPublication.value!.openAlexId = updatedInfo.openAlexId;
             rightProceedingsPublication.value!.webOfScienceId = updatedInfo.webOfScienceId;
+            rightProceedingsPublication.value!.section = updatedInfo.section;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

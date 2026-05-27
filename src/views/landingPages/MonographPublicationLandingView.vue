@@ -109,6 +109,12 @@
                                 <div v-if="monographPublication?.numberOfPages" class="response">
                                     {{ monographPublication.numberOfPages }}
                                 </div>
+                                <div v-if="monographPublication?.section">
+                                    {{ $t("sectionLabel") }}:
+                                </div>
+                                <div v-if="monographPublication?.section" class="response">
+                                    {{ returnCurrentLocaleContent(monographPublication.section) }}
+                                </div>
                             </v-col>
 
                             <document-common-fields-display
@@ -458,6 +464,7 @@ export default defineComponent({
             monographPublication.value!.numberOfPages = basicInfo.numberOfPages;
             monographPublication.value!.articleNumber = basicInfo.articleNumber;
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
+            monographPublication.value!.section = basicInfo.section;
 
             updateCommonBasicInfo(monographPublication, basicInfo);
 
