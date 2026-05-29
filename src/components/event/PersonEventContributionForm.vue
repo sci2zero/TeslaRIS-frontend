@@ -35,6 +35,16 @@
                 </v-select>
             </v-col>
         </v-row>
+        <v-row v-if="lockContributionType === EventContributionType.WITNESS || (typeof lockContributionType === 'number' && getNameFromOrdinal(EventContributionType, lockContributionType) === EventContributionType.WITNESS.toString())">
+            <v-col>
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="input.caseName"
+                    :label="$t('caseNameLabel')"
+                    :initial-value="toMultilingualTextInput(input.eventContributionType, languageTags)"
+                />
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 
@@ -47,11 +57,15 @@ import PersonContributionBase from "../core/PersonContributionBase.vue";
 import type { PropType } from "vue";
 import { onMounted } from "vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/eventContributionType";
+import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil.js";
+import { useLanguageTags } from "@/composables/useLanguageTags.js";
+import MultilingualTextInput from "../core/MultilingualTextInput.vue";
+import { getNameFromOrdinal } from "@/utils/EnumUtil.js";
 
 
 export default defineComponent({
     name: "PersonEventContributionForm",
-    components: {PersonContributionBase},
+    components: { PersonContributionBase, MultilingualTextInput },
     props: {
         presetContributions: {
             type: Array as PropType<PersonEventContribution[]>,
@@ -75,13 +89,17 @@ export default defineComponent({
             [
                 {
                     eventContributionType: {
-                        title: getTitleFromValueAutoLocale(props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER),
-                        value: props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                        title: getTitleFromValueAutoLocale(
+                            (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                        ),
+                        value: (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
                     }
                 }
             ]
         );
         const baseContributionRef = ref<any>([]);
+
+        const { languageTags } = useLanguageTags();
 
         onMounted(() => {
             if(props.presetContributions && props.presetContributions.length > 0) {
@@ -100,7 +118,15 @@ export default defineComponent({
                             institutionIds: contribution.institutionIds
                         }, 
                     eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType), value: contribution.eventContributionType},
-                    id: contribution.id});
+                    caseName: contribution.caseName,
+                    locationJurisdiction: contribution.locationJurisdiction,
+                    lectureHoursPerWeek: contribution.lectureHoursPerWeek,
+                    tutorialHoursPerWeek: contribution.tutorialHoursPerWeek,
+                    labHoursPerWeek: contribution.labHoursPerWeek,
+                    otherContactHoursPerWeek: contribution.otherContactHoursPerWeek,
+                    numberOfReviewsOrAssessment: contribution.numberOfReviewsOrAssessment,
+                    id: contribution.id
+                });
                 });
             }
         });
@@ -109,7 +135,7 @@ export default defineComponent({
 
         const addInput = () => {
             const contributionType =
-                props.lockContributionType ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
 
             inputs.value.push({eventContributionType: {
                     title: getTitleFromValueAutoLocale(contributionType), 
@@ -162,15 +188,26 @@ export default defineComponent({
                                     orderNumber: index + 1,
                                     personName: personName,
                                     eventContributionType: input.eventContributionType.value,
-                                    institutionIds: input.contribution.institutionIds
+                                    institutionIds: input.contribution.institutionIds,
+                                    caseName: input.caseName,
+                                    locationJurisdiction: input.locationJurisdiction,
+                                    lectureHoursPerWeek: input.lectureHoursPerWeek,
+                                    tutorialHoursPerWeek: input.tutorialHoursPerWeek,
+                                    labHoursPerWeek: input.labHoursPerWeek,
+                                    otherContactHoursPerWeek: input.otherContactHoursPerWeek,
+                                    numberOfReviewsOrAssessment: input.numberOfReviewsOrAssessment
                                 });
             });
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, 
-                contributionTypes, baseContributionRef,
-                sendContentToParent, clearInput}
+        return {
+            inputs, addInput, removeInput,
+            contributionTypes, baseContributionRef,
+            sendContentToParent, clearInput,
+            EventContributionType, languageTags,
+            toMultilingualTextInput, getNameFromOrdinal
+        }
     }
 });
 </script>

@@ -1441,5 +1441,15 @@ export default {
     otherActorsLabel: "Other actors",
     performanceRelatedOutputTypeLabel: "Performance related output type",
     performanceRelatedOutputLabel: "Performance related output",
-    sectionLabel: "Section"
+    sectionLabel: "Section",
+    organizersLabel: "Organizers",
+    invitedSpeakersLabel: "Invited speakers",
+    keynoteSpeakersLabel: "Keynote speakers",
+    performersLabel: "Performers",
+    producersLabel: "Producers",
+    instructorsLabel: "Instructors",
+    teachersLabel: "Professors",
+    examinersLabel: "Examiners",
+    witnessesLabel: "Witnesses",
+    othersLabel: "Others"
 }

@@ -166,8 +166,9 @@
                     :event-id="course?.id"
                     :contribution-list="course?.contributions ? course.contributions : []"
                     :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-event-contribution-tabs>
+                    :event="course"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list

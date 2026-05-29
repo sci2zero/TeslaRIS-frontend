@@ -9,7 +9,7 @@ export const otherEventTypeSr = [
     { title: "Performans", value: OtherEventType.PERFORMANCE },
     { title: "Predstava", value: OtherEventType.PLAY },
     { title: "Odbrana završnog rada", value: OtherEventType.THESIS_DEFENCE },
-    { title: "Eksperiment/Proba", value: OtherEventType.TRIAL },
+    { title: "Eksperiment/Proba/Suđenje", value: OtherEventType.TRIAL },
     { title: "Vebinar", value: OtherEventType.WEBINAR }
 ];
 

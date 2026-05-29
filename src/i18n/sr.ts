@@ -1455,5 +1455,15 @@ export default {
     otherActorsLabel: "Ostali akteri",
     performanceRelatedOutputTypeLabel: "Tip rezultata",
     performanceRelatedOutputLabel: "Rezultat vezan za performans",
-    sectionLabel: "Sekcija"
+    sectionLabel: "Sekcija",
+    organizersLabel: "Organizatori",
+    invitedSpeakersLabel: "Pozvani govornici",
+    keynoteSpeakersLabel: "Glavni govornici",
+    performersLabel: "Izvođači",
+    producersLabel: "Producenti",
+    instructorsLabel: "Instruktori",
+    teachersLabel: "Profesori",
+    examinersLabel: "Ispitivači",
+    witnessesLabel: "Svedoci",
+    othersLabel: "Ostali"
 }

@@ -4,18 +4,30 @@ import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const contributionTypesEn = [
-    {title: "Organisation Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR},
-    {title: "Organisation Board Members", value: EventContributionType.ORGANIZATION_BOARD_MEMBER},
-    {title: "Panelists", value: EventContributionType.PANELISTS},
-    {title: "Audience", value: EventContributionType.AUDIENCE},
-    {title: "Programme Board Member", value: EventContributionType.PROGRAMME_BOARD_MEMBER},
-    {title: "Reviewer", value: EventContributionType.REVIEWER},
-    {title: "Speaker", value: EventContributionType.SPEAKER},
-    {title: "Chair", value: EventContributionType.CHAIR},
-    {title: "Demonstrator", value: EventContributionType.DEMONSTRATOR},
+    { title: "Organizer", value: EventContributionType.ORGANIZER },
+    { title: "Organisation Board Chair", value: EventContributionType.ORGANIZATION_BOARD_CHAIR },
+    { title: "Organisation Board Members", value: EventContributionType.ORGANIZATION_BOARD_MEMBER },
+    { title: "Panelists", value: EventContributionType.PANELISTS },
+    { title: "Audience", value: EventContributionType.AUDIENCE },
+    { title: "Programme Board Member", value: EventContributionType.PROGRAMME_BOARD_MEMBER },
+    { title: "Reviewer", value: EventContributionType.REVIEWER },
+    { title: "Speaker", value: EventContributionType.SPEAKER },
+    { title: "Invited Speaker", value: EventContributionType.INVITED_SPEAKER },
+    { title: "Keynote Speaker", value: EventContributionType.KEYNOTE_SPEAKER },
+    { title: "Chair", value: EventContributionType.CHAIR },
+    { title: "Demonstrator", value: EventContributionType.DEMONSTRATOR },
+    { title: "Performer", value: EventContributionType.PERFORMER },
+    { title: "Producer", value: EventContributionType.PRODUCER },
+    { title: "Instructor", value: EventContributionType.INSTRUCTOR },
+    { title: "Teacher", value: EventContributionType.TEACHER },
+    { title: "Examiner", value: EventContributionType.EXAMINER },
+    { title: "Witness", value: EventContributionType.WITNESS },
+    { title: "Arguer", value: EventContributionType.ARGUER },
+    { title: "Other", value: EventContributionType.OTHER }
 ]
 
 export const contributionTypesSr = [
+    { title: "Organizator", value: EventContributionType.ORGANIZER},
     { title: "Predsednik Organizacionog Odbora", value: EventContributionType.ORGANIZATION_BOARD_CHAIR },
     { title: "Član Organizacionog Odbora", value: EventContributionType.ORGANIZATION_BOARD_MEMBER },
     { title: "Panelist", value: EventContributionType.PANELISTS },
@@ -23,8 +35,18 @@ export const contributionTypesSr = [
     { title: "Član Programskog Odbora", value: EventContributionType.PROGRAMME_BOARD_MEMBER },
     { title: "Recenzent", value: EventContributionType.REVIEWER },
     { title: "Govornik", value: EventContributionType.SPEAKER },
+    { title: "Pozvani govornik", value: EventContributionType.INVITED_SPEAKER },
+    { title: "Glavni govornik", value: EventContributionType.KEYNOTE_SPEAKER },
     { title: "Presedavajući", value: EventContributionType.CHAIR },
     { title: "Demonstrator", value: EventContributionType.DEMONSTRATOR },
+    { title: "Izvođač", value: EventContributionType.PERFORMER },
+    { title: "Producent", value: EventContributionType.PRODUCER },
+    { title: "Instruktor", value: EventContributionType.INSTRUCTOR },
+    { title: "Profesor", value: EventContributionType.TEACHER },
+    { title: "Ispitivač", value: EventContributionType.EXAMINER },
+    { title: "Svedok", value: EventContributionType.WITNESS },
+    { title: "Branioc", value: EventContributionType.ARGUER },
+    { title: "Drugo", value: EventContributionType.OTHER }
 ];
 
 export const getTitleFromValue = (value: EventContributionType, contributionTypeArray: {title: string, value: EventContributionType}[]) => {
