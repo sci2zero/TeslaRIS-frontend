@@ -91,7 +91,7 @@ export default defineComponent({
             default: ""
         }
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "update"],
     setup(props, {emit}) {
         const userPreferredLanguage = ref<{tag: string, id: number}>({tag: "", id: -1});
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
@@ -256,6 +256,7 @@ export default defineComponent({
             });
 
             emit("update:modelValue", returnObject);
+            emit("update");
             
             ensureAtLeastOneInput();
         };

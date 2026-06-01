@@ -4,20 +4,49 @@
             <v-col :cols="inModal ? 12 : 8">
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="titleRef"
+                            v-model="title"
+                            :rules="requiredFieldRules"
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <multilingual-text-input ref="abbreviationsRef" v-model="nameAbbreviations" :label="$t('nameAbbreviationLabel')"></multilingual-text-input>
+                        <multilingual-text-input
+                            ref="abbreviationsRef"
+                            v-model="nameAbbreviations"
+                            :label="$t('nameAbbreviationLabel')"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field v-model="eIssn" label="E-ISSN" placeholder="E-ISSN" :rules="eIssnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="eIssn"
+                            label="E-ISSN"
+                            placeholder="E-ISSN"
+                            :rules="eIssnValidationRules"
+                        />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field v-model="printIssn" label="Print ISSN" placeholder="Print ISSN" :rules="printIssnValidationRules"></v-text-field>
+                        <v-text-field
+                            v-model="printIssn"
+                            label="Print ISSN"
+                            placeholder="Print ISSN"
+                            :rules="printIssnValidationRules"
+                        />
+                    </v-col>
+                </v-row>
+                <v-row v-if="inputType === PublicationSeriesType.JOURNAL.toString()">
+                    <v-col>
+                        <v-select
+                            v-model="selectedArticleCollectionSeriesType"
+                            :label="$t('articleCollectionSeriesTypeLabel')"
+                            :items="articleCollectionSeriesTypes"
+                            return-object
+                        />
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -29,8 +58,8 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -39,8 +68,8 @@
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="sourceOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="sourceOpenAlexIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -50,12 +79,12 @@
                                 :label="$t('languageLabel')"
                                 :items="languageList"
                                 multiple
-                            ></v-select>
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                 </v-container>
@@ -73,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -92,6 +121,8 @@ import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { useUserRole } from '@/composables/useUserRole';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { getArticleCollectionSeriesTypesForGivenLocale, getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType.js';
+import { ArticleCollectionSeriesType, type Journal } from '@/models/JournalModel.js';
 
 
 export default defineComponent({
@@ -125,6 +156,14 @@ export default defineComponent({
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
         const defaultLanguage = ref(-1);
+
+        const articleCollectionSeriesTypes = computed(() => getArticleCollectionSeriesTypesForGivenLocale());
+        const selectedArticleCollectionSeriesType = ref<{title: string, value: ArticleCollectionSeriesType}>(
+            {
+                title: getArticleCollectionSeriesTypeTitleFromValueAutoLocale(ArticleCollectionSeriesType.JOURNAL) as string,
+                value: ArticleCollectionSeriesType.JOURNAL
+            }
+        );
 
         onMounted(() => {
             LanguageService.getAllLanguages().then((response: AxiosResponse<LanguageResponse[]>) => {
@@ -191,8 +230,13 @@ export default defineComponent({
             };
 
             switch(props.inputType) {
-                case PublicationSeriesType.JOURNAL.toString():
-                    JournalService.createJournal(newPublicationSeries).then((response) => {
+                case PublicationSeriesType.JOURNAL.toString(): {
+                    const newJournal: Journal = {
+                        ...newPublicationSeries,
+                        type: selectedArticleCollectionSeriesType.value.value
+                    };
+
+                    JournalService.createJournal(newJournal).then((response) => {
                         if (props.inModal) {
                             emit("create", response.data);
                             return;
@@ -206,6 +250,11 @@ export default defineComponent({
                             printIssn.value = "";
                             openAlexId.value = "";
                             selectedLanguages.value = [defaultLanguage.value];
+                            selectedArticleCollectionSeriesType.value = 
+                                {
+                                    title: getArticleCollectionSeriesTypeTitleFromValueAutoLocale(ArticleCollectionSeriesType.JOURNAL) as string,
+                                    value: ArticleCollectionSeriesType.JOURNAL
+                                };
 
                             message.value = i18n.t("savedMessage");
                             snackbar.value = true;
@@ -217,6 +266,7 @@ export default defineComponent({
                         snackbar.value = true;
                     });
                     break;
+                }
                 case PublicationSeriesType.BOOK_SERIES.toString():
                     BookSeriesService.createBookSeries(newPublicationSeries).then((response) => {
                         if (props.inModal) {
@@ -252,7 +302,9 @@ export default defineComponent({
             eIssn, printIssn, languageList, selectedLanguages,
             nameAbbreviations, abbreviationsRef, subtitle,
             requiredFieldRules, uris, urisRef, openAlexId,
-            sourceOpenAlexIdValidationRules, subtitleRef
+            sourceOpenAlexIdValidationRules, subtitleRef,
+            articleCollectionSeriesTypes, PublicationSeriesType,
+            selectedArticleCollectionSeriesType
         };
     }
 });

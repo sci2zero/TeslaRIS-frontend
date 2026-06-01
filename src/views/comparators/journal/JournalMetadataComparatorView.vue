@@ -153,7 +153,8 @@ export default defineComponent({
             bulkTransferFields(journal1, journal2, [
                 { fieldName: "eissn", emptyValue: "" },
                 { fieldName: "printISSN", emptyValue: "" },
-                { fieldName: "openAlexId", emptyValue: "" }
+                { fieldName: "openAlexId", emptyValue: "" },
+                { fieldName: "type", emptyValue: null, setEmpty: false, condition: () => true }
             ]);
 
             journal2.languageIds.forEach(languageId => {
@@ -203,6 +204,7 @@ export default defineComponent({
             leftJournal.value!.uris = updatedJournal.uris;
             leftJournal.value!.subtitle = updatedJournal.subtitle;
             leftJournal.value!.openAlexId = updatedJournal.openAlexId;
+            leftJournal.value!.type = updatedJournal.type;
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -219,6 +221,7 @@ export default defineComponent({
             rightJournal.value!.uris = updatedJournal.uris;
             rightJournal.value!.subtitle = updatedJournal.subtitle;
             rightJournal.value!.openAlexId = updatedJournal.openAlexId;
+            rightJournal.value!.type = updatedJournal.type;
             
             if (update.value) {
                 rightUpdateComplete.value = true;

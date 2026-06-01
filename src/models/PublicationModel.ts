@@ -90,8 +90,9 @@ export enum JournalPublicationType {
     BOOK_REVIEW,
     TRANSLATION,
     PREPRINT,
-    SHORT_FICTION,
-    ANNOTATION
+    CREATIVE_WORK,
+    ANNOTATED_NOTE,
+    OTHER
 }
 
 export enum PublicationStatus {

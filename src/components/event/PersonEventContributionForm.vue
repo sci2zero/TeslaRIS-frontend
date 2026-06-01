@@ -14,7 +14,10 @@
             </v-col>
             <v-col cols="2">
                 <v-col>
-                    <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
+                    <v-btn
+                        v-show="inputs.length > ((presetContributions && presetContributions.length > 0) ? 0 : 1)"
+                        icon
+                        @click="removeInput(index)">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <v-btn v-show="index === inputs.length - 1" icon @click="addInput">
@@ -30,18 +33,85 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
-                    :readonly="lockContributionType !== undefined"
+                    :readonly="lockContributionType !== undefined && lockContributionType.length === 1"
                     @update:model-value="sendContentToParent">
                 </v-select>
             </v-col>
         </v-row>
-        <v-row v-if="lockContributionType === EventContributionType.WITNESS || (typeof lockContributionType === 'number' && getNameFromOrdinal(EventContributionType, lockContributionType) === EventContributionType.WITNESS.toString())">
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.ARGUER, 'ARGUER')">
+            <v-col>
+                <v-checkbox
+                    v-model="input.mainArguer"
+                    :label="$t('mainArguerLabel')"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.WITNESS, 'WITNESS')">
             <v-col>
                 <multilingual-text-input
-                    ref="descriptionRef"
+                    ref="caseNameRef"
                     v-model="input.caseName"
                     :label="$t('caseNameLabel')"
-                    :initial-value="toMultilingualTextInput(input.eventContributionType, languageTags)"
+                    :initial-value="toMultilingualTextInput(input.caseName, languageTags)"
+                    @update="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.WITNESS, 'WITNESS')">
+            <v-col>
+                <multilingual-text-input
+                    ref="locationJurisdictionRef"
+                    v-model="input.locationJurisdiction"
+                    :label="$t('locationJurisdictionLabel')"
+                    :initial-value="toMultilingualTextInput(input.locationJurisdiction, languageTags)"
+                    @update="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.SPEAKER, 'SPEAKER')">
+            <v-col>
+                <v-text-field
+                    v-model="input.lectureHoursPerWeek"
+                    :label="$t('lectureHoursPerWeekLabel')"
+                    :placeholder="$t('lectureHoursPerWeekLabel')"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+            <v-col>
+                <v-text-field
+                    v-model="input.tutorialHoursPerWeek"
+                    :label="$t('tutorialHoursPerWeekLabel')"
+                    :placeholder="$t('tutorialHoursPerWeekLabel')"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.SPEAKER, 'SPEAKER')">
+            <v-col>
+                <v-text-field
+                    v-model="input.labHoursPerWeek"
+                    :label="$t('labHoursPerWeekLabel')"
+                    :placeholder="$t('labHoursPerWeekLabel')"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+            <v-col>
+                <v-text-field
+                    v-model="input.otherContactHoursPerWeek"
+                    :label="$t('otherContactHoursPerWeekLabel')"
+                    :placeholder="$t('otherContactHoursPerWeekLabel')"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.REVIEWER, 'REVIEWER')">
+            <v-col>
+                <v-text-field
+                    v-model="input.numberOfReviewsOrAssessment"
+                    :label="$t('numberOfReviewsOrAssessmentLabel')"
+                    :placeholder="$t('numberOfReviewsOrAssessmentLabel')"
+                    @update:model-value="sendContentToParent"
                 />
             </v-col>
         </v-row>
@@ -76,7 +146,7 @@ export default defineComponent({
             default: false
         },
         lockContributionType: {
-            type: Object as PropType<EventContributionType | undefined>,
+            type: Object as PropType<EventContributionType[] | undefined>,
             default: undefined
         }
     },
@@ -90,9 +160,9 @@ export default defineComponent({
                 {
                     eventContributionType: {
                         title: getTitleFromValueAutoLocale(
-                            (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                            (props.lockContributionType !== undefined) ? props.lockContributionType[0] : EventContributionType.PROGRAMME_BOARD_MEMBER
                         ),
-                        value: (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                        value: (props.lockContributionType !== undefined) ? props.lockContributionType[0] : EventContributionType.PROGRAMME_BOARD_MEMBER
                     }
                 }
             ]
@@ -105,42 +175,57 @@ export default defineComponent({
             if(props.presetContributions && props.presetContributions.length > 0) {
                 inputs.value.splice(0);
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({
-                        contribution: {
-                            personId: contribution.personId, 
-                            description: contribution.contributionDescription, 
-                            affiliationStatement: contribution.displayAffiliationStatement, 
-                            selectedOtherName: [
-                                        contribution.personName?.firstname, 
-                                        contribution.personName?.otherName, 
-                                        contribution.personName?.lastname
-                                    ],
-                            institutionIds: contribution.institutionIds
-                        }, 
-                    eventContributionType: {title: getTitleFromValueAutoLocale(contribution.eventContributionType), value: contribution.eventContributionType},
-                    caseName: contribution.caseName,
-                    locationJurisdiction: contribution.locationJurisdiction,
-                    lectureHoursPerWeek: contribution.lectureHoursPerWeek,
-                    tutorialHoursPerWeek: contribution.tutorialHoursPerWeek,
-                    labHoursPerWeek: contribution.labHoursPerWeek,
-                    otherContactHoursPerWeek: contribution.otherContactHoursPerWeek,
-                    numberOfReviewsOrAssessment: contribution.numberOfReviewsOrAssessment,
-                    id: contribution.id
-                });
+                    inputs.value.push(
+                        {
+                            contribution: {
+                                personId: contribution.personId, 
+                                description: contribution.contributionDescription, 
+                                affiliationStatement: contribution.displayAffiliationStatement, 
+                                selectedOtherName: [
+                                            contribution.personName?.firstname, 
+                                            contribution.personName?.otherName, 
+                                            contribution.personName?.lastname
+                                        ],
+                                institutionIds: contribution.institutionIds
+                            }, 
+                        eventContributionType: {
+                            title: getTitleFromValueAutoLocale(contribution.eventContributionType),
+                            value: contribution.eventContributionType
+                        },
+                        caseName: contribution.caseName,
+                        locationJurisdiction: contribution.locationJurisdiction,
+                        lectureHoursPerWeek: contribution.lectureHoursPerWeek,
+                        tutorialHoursPerWeek: contribution.tutorialHoursPerWeek,
+                        labHoursPerWeek: contribution.labHoursPerWeek,
+                        otherContactHoursPerWeek: contribution.otherContactHoursPerWeek,
+                        numberOfReviewsOrAssessment: contribution.numberOfReviewsOrAssessment,
+                        mainArguer: contribution.mainArguer,
+                        id: contribution.id
+                    });
                 });
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale());
+        const contributionTypes = computed(() => {
+            const types = getTypesForGivenLocale();
+
+            if (types && props.lockContributionType) {
+                return types.filter(type => props.lockContributionType?.includes(type.value));
+            }
+
+            return types;
+        });
 
         const addInput = () => {
             const contributionType =
-                (props.lockContributionType !== undefined) ? props.lockContributionType : EventContributionType.PROGRAMME_BOARD_MEMBER
+                (props.lockContributionType !== undefined) ? props.lockContributionType[0] : EventContributionType.PROGRAMME_BOARD_MEMBER
 
-            inputs.value.push({eventContributionType: {
+            inputs.value.push({
+                eventContributionType: {
                     title: getTitleFromValueAutoLocale(contributionType), 
                     value: contributionType
-                }
+                },
+                mainArguer: false
             });
         };
 
@@ -173,40 +258,59 @@ export default defineComponent({
 
         const sendContentToParent = () => {
             const returnObject: PersonEventContribution[] = [];
+
             inputs.value.forEach((input, index) => {
+                if(!input.contribution) {
+                    return;
+                }
+
                 let personName = undefined;
                 if (input.contribution.selectedOtherName) {
-                    personName = {firstname: input.contribution.selectedOtherName[0], 
-                                  otherName: input.contribution.selectedOtherName[1],
-                                  lastname: input.contribution.selectedOtherName[2],
-                                  dateFrom: input.contribution.selectedOtherName[3],
-                                  dateTo: input.contribution.selectedOtherName[4]}
+                    personName = {
+                        firstname: input.contribution.selectedOtherName[0], 
+                        otherName: input.contribution.selectedOtherName[1],
+                        lastname: input.contribution.selectedOtherName[2],
+                        dateFrom: input.contribution.selectedOtherName[3],
+                        dateTo: input.contribution.selectedOtherName[4]
+                    };
                 }
-                returnObject.push({contributionDescription: input.contribution.description,
-                                    personId: input.contribution.personId,
-                                    displayAffiliationStatement: input.contribution.affiliationStatement,
-                                    orderNumber: index + 1,
-                                    personName: personName,
-                                    eventContributionType: input.eventContributionType.value,
-                                    institutionIds: input.contribution.institutionIds,
-                                    caseName: input.caseName,
-                                    locationJurisdiction: input.locationJurisdiction,
-                                    lectureHoursPerWeek: input.lectureHoursPerWeek,
-                                    tutorialHoursPerWeek: input.tutorialHoursPerWeek,
-                                    labHoursPerWeek: input.labHoursPerWeek,
-                                    otherContactHoursPerWeek: input.otherContactHoursPerWeek,
-                                    numberOfReviewsOrAssessment: input.numberOfReviewsOrAssessment
-                                });
+                returnObject.push({
+                    contributionDescription: input.contribution.description,
+                    personId: input.contribution.personId,
+                    displayAffiliationStatement: input.contribution.affiliationStatement,
+                    orderNumber: index + 1,
+                    personName: personName,
+                    eventContributionType: input.eventContributionType.value,
+                    institutionIds: input.contribution.institutionIds,
+                    caseName: input.caseName,
+                    locationJurisdiction: input.locationJurisdiction,
+                    lectureHoursPerWeek: input.lectureHoursPerWeek,
+                    tutorialHoursPerWeek: input.tutorialHoursPerWeek,
+                    labHoursPerWeek: input.labHoursPerWeek,
+                    otherContactHoursPerWeek: input.otherContactHoursPerWeek,
+                    numberOfReviewsOrAssessment: input.numberOfReviewsOrAssessment,
+                    mainArguer: input.mainArguer
+                });
             });
             emit("setInput", returnObject);
         };
+
+        const showPerTypeFields = 
+            (eventContributionType: EventContributionType | number | string, compareWith: EventContributionType, stringRepr: string) => 
+                eventContributionType === compareWith || 
+                eventContributionType === stringRepr || 
+                (
+                    typeof eventContributionType === 'number' && 
+                    getNameFromOrdinal(EventContributionType, eventContributionType) === stringRepr
+                );
 
         return {
             inputs, addInput, removeInput,
             contributionTypes, baseContributionRef,
             sendContentToParent, clearInput,
             EventContributionType, languageTags,
-            toMultilingualTextInput, getNameFromOrdinal
+            toMultilingualTextInput, getNameFromOrdinal,
+            showPerTypeFields
         }
     }
 });

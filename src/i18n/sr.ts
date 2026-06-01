@@ -1465,5 +1465,14 @@ export default {
     teachersLabel: "Profesori",
     examinersLabel: "Ispitivači",
     witnessesLabel: "Svedoci",
-    othersLabel: "Ostali"
+    othersLabel: "Ostali",
+    mainArguerLabel: "Glavni branioc",
+    numberOfReviewsOrAssessmentLabel: "Broj recenzija/vrednovanja",
+    lectureHoursPerWeekLabel: "Sati predavanja nedeljno",
+    tutorialHoursPerWeekLabel: "Sati tutorijala nedeljno",
+    labHoursPerWeekLabel: "Sati vežbi nedeljno",
+    otherContactHoursPerWeekLabel: "Ostalih kontakt sati nedeljno",
+    locationJurisdictionLabel: "Nadležnost lokacije",
+    caseNameLabel: "Naziv slučaja",
+    articleCollectionSeriesTypeLabel: "Tip serije kolekcije članaka"
 }

@@ -12,6 +12,7 @@
                         {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
                         {{ ' ' + contribution.personName?.lastname }}
                         {{ displayContributionType(contribution) }}
+                        {{ contribution.mainArguer ? `(${$t("mainArguerLabel")})` : "" }}
                     </strong>
                 </h4>
             </localized-link>
@@ -21,6 +22,7 @@
                     {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
                     {{ ' ' + contribution.personName?.lastname }}
                     {{ displayContributionType(contribution) }}
+                    {{ contribution.mainArguer ? `(${$t("mainArguerLabel")})` : "" }}
                 </strong>
             </h4>
             <div v-if="contribution.institutionIds?.length === 0">

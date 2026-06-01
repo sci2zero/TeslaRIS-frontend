@@ -17,8 +17,9 @@ const journalPublicationTypeEn = [
     { title: "Book review", value: JournalPublicationType.BOOK_REVIEW },
     { title: "Translation", value: JournalPublicationType.TRANSLATION },
     { title: "Preprint", value: JournalPublicationType.PREPRINT },
-    { title: "Short fiction", value: JournalPublicationType.SHORT_FICTION },
-    { title: "Annotation", value: JournalPublicationType.ANNOTATION }
+    { title: "Creative work", value: JournalPublicationType.CREATIVE_WORK },
+    { title: "Annotated note", value: JournalPublicationType.ANNOTATED_NOTE },
+    { title: "Other", value: JournalPublicationType.ANNOTATED_NOTE }
 ];
 
 const journalPublicationTypeSr = [
@@ -35,8 +36,9 @@ const journalPublicationTypeSr = [
     { title: "Prikaz knjige", value: JournalPublicationType.BOOK_REVIEW },
     { title: "Prevod", value: JournalPublicationType.TRANSLATION },
     { title: "Preprint", value: JournalPublicationType.PREPRINT },
-    { title: "Kratka proza", value: JournalPublicationType.SHORT_FICTION },
-    { title: "Anotacija", value: JournalPublicationType.ANNOTATION }
+    { title: "Kreativni rad", value: JournalPublicationType.CREATIVE_WORK },
+    { title: "Anotirana beleška", value: JournalPublicationType.ANNOTATED_NOTE },
+    { title: "Ostalo", value: JournalPublicationType.ANNOTATED_NOTE }
 ];
 
 export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {

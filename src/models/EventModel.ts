@@ -59,13 +59,14 @@ export interface EventIndex {
   
 export interface PersonEventContribution extends PersonContribution {
     eventContributionType: EventContributionType;
-    lectureHoursPerWeek: string;
-    tutorialHoursPerWeek: string;
-    labHoursPerWeek: string;
-    otherContactHoursPerWeek: string;
-    numberOfReviewsOrAssessment: number;
-    caseName: MultilingualContent[];
-    locationJurisdiction: MultilingualContent[];
+    lectureHoursPerWeek?: string;
+    tutorialHoursPerWeek?: string;
+    labHoursPerWeek?: string;
+    otherContactHoursPerWeek?: string;
+    numberOfReviewsOrAssessment?: number;
+    caseName?: MultilingualContent[];
+    locationJurisdiction?: MultilingualContent[];
+    mainArguer?: boolean;
 }
   
 export interface Event {
@@ -82,6 +83,7 @@ export interface Event {
     countryId?: number;
     uris: string[];
     displayOrganizer: MultilingualContent[];
+    eventType?: EventType;
 }
 
 export interface Conference extends Event {

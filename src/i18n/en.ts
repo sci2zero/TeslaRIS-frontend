@@ -1451,5 +1451,14 @@ export default {
     teachersLabel: "Professors",
     examinersLabel: "Examiners",
     witnessesLabel: "Witnesses",
-    othersLabel: "Others"
+    othersLabel: "Others",
+    mainArguerLabel: "Main arguer",
+    numberOfReviewsOrAssessmentLabel: "Number of reviews/assessments",
+    lectureHoursPerWeekLabel: "Lecture hours per week",
+    tutorialHoursPerWeekLabel: "Tutorial hours  per week",
+    labHoursPerWeekLabel: "Lab hours per week",
+    otherContactHoursPerWeekLabel: "Other contact hours per week",
+    locationJurisdictionLabel: "Nadležnost lokacije",
+    caseNameLabel: "Naziv slučaja",
+    articleCollectionSeriesTypeLabel: "Article collection series type"
 }
