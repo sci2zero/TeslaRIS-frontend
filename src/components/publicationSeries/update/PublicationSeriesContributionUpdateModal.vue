@@ -63,7 +63,7 @@ export default defineComponent({
             required: true
         },
         lockContributionType: {
-            type: Object as PropType<PublicationSeriesContributionType | undefined>,
+            type: Object as PropType<PublicationSeriesContributionType[] | undefined>,
             default: undefined
         }
     },
@@ -93,8 +93,9 @@ export default defineComponent({
                                     lastname: contribution.personName.lastname
                                 },
                     contributionType: contribution.contributionType,
+                    isMainContributor: contribution.isMainContributor,
                     dateFrom: contribution.dateFrom,
-                    dateTo: contribution.dateTo
+                    dateTo: contribution.dateTo,
                 });
 
             });

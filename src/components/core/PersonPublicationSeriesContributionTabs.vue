@@ -7,8 +7,8 @@
                         :read-only="readOnly"
                         :preset-publication-series-contributions="getContributorGroupForUpdating()"
                         :lock-contribution-type="getLockedContributionType()"
-                        @update="sendToParent">
-                    </publication-series-contribution-update-modal>
+                        @update="sendToParent"
+                    />
 
                     <div
                         v-if="contributionList?.length === 0"
@@ -28,10 +28,18 @@
                         <v-tab value="associateEditors">
                             {{ $t("associateEditorsLabel") }}
                         </v-tab>
+                        <v-tab value="invitedEditors">
+                            {{ $t("invitedEditorsLabel") }}
+                        </v-tab>
                         <v-tab value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab value="scientificBoardMembers">
+                        <v-tab value="adhocReviewers">
+                            {{ $t("adHocReviewersLabel") }}
+                        </v-tab>
+                        <v-tab
+                            v-show="showScientificBoardMembers"
+                            value="scientificBoardMembers">
                             {{ $t("scientificBoardMembersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -42,32 +50,48 @@
                                 :contribution-list="editorList"
                                 :publication-series-id="publicationSeriesId"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-publication-series-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="associateEditors">
                             <person-publication-series-contribution-list
                                 :contribution-list="associateEditorList"
                                 :publication-series-id="publicationSeriesId"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-publication-series-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
+                        </v-window-item>
+                        <v-window-item value="invitedEditors">
+                            <person-publication-series-contribution-list
+                                :contribution-list="invitedEditorList"
+                                :publication-series-id="publicationSeriesId"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-publication-series-contribution-list
                                 :contribution-list="reviewerList"
                                 :publication-series-id="publicationSeriesId"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-publication-series-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
+                        </v-window-item>
+                        <v-window-item value="adhocReviewers">
+                            <person-publication-series-contribution-list
+                                :contribution-list="adhocReviewerList"
+                                :publication-series-id="publicationSeriesId"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="scientificBoardMembers">
                             <person-publication-series-contribution-list
                                 :contribution-list="scientificBoardMemberList"
                                 :publication-series-id="publicationSeriesId"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-publication-series-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -77,13 +101,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType } from 'vue';
+import { computed, defineComponent, onMounted, type PropType } from 'vue';
 import { PublicationSeriesContributionType, type PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/publicationSeriesContributionType';
 import PublicationSeriesContributionUpdateModal from "@/components/publicationSeries/update/PublicationSeriesContributionUpdateModal.vue"
 import { ref } from 'vue';
 import { watch } from 'vue';
 import PersonPublicationSeriesContributionList from './PersonPublicationSeriesContributionList.vue';
+import { ArticleCollectionSeriesType } from '@/models/JournalModel.js';
 
 
 export default defineComponent({
@@ -105,6 +130,10 @@ export default defineComponent({
         showsBoardAndReviewers: {
             type: Boolean,
             default: false
+        },
+        articleCollectionSeriesType: {
+            type: Object as PropType<ArticleCollectionSeriesType | undefined>,
+            default: undefined
         }
     },
     emits: ["update"],
@@ -115,7 +144,9 @@ export default defineComponent({
 
         const editorList = ref<PersonPublicationSeriesContribution[]>([]);
         const associateEditorList = ref<PersonPublicationSeriesContribution[]>([]);
+        const invitedEditorList = ref<PersonPublicationSeriesContribution[]>([]);
         const reviewerList = ref<PersonPublicationSeriesContribution[]>([]);
+        const adhocReviewerList = ref<PersonPublicationSeriesContribution[]>([]);
         const scientificBoardMemberList = ref<PersonPublicationSeriesContribution[]>([]);
 
         onMounted(() => {
@@ -141,9 +172,17 @@ export default defineComponent({
                 localContributions.value.filter(
                     (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ASSOCIATE_EDITOR]
                 );
+            invitedEditorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.INVITED_EDITOR]
+                );
             reviewerList.value =
                 localContributions.value.filter(
                     (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.REVIEWER]
+                );
+            adhocReviewerList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == PublicationSeriesContributionType[PublicationSeriesContributionType.ADHOC_REVIEWER]
                 );
             scientificBoardMemberList.value =
                 localContributions.value.filter(
@@ -157,7 +196,9 @@ export default defineComponent({
             const indexes: number[] = [];
             editorList.value.forEach(contribution => indexes.push(contribution.id as number));
             associateEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
+            invitedEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
             reviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
+            adhocReviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
             scientificBoardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
 
             updateContributionPositions(indexes);
@@ -180,7 +221,9 @@ export default defineComponent({
             const contributionLists: Record<string, any[]> = {
                 editors: editorList.value,
                 associateEditors: associateEditorList.value,
+                invitedEditors: invitedEditorList.value,
                 reviewers: reviewerList.value,
+                adhocReviewers: adhocReviewerList.value,
                 scientificBoardMembers: scientificBoardMemberList.value
             };
 
@@ -205,16 +248,20 @@ export default defineComponent({
         const getLockedContributionType = () => {
             switch (currentTab.value) {
                 case "editors":
-                    return PublicationSeriesContributionType.EDITOR;
+                    return [PublicationSeriesContributionType.EDITOR];
                 case "associateEditors":
-                    return PublicationSeriesContributionType.ASSOCIATE_EDITOR;
+                    return [PublicationSeriesContributionType.ASSOCIATE_EDITOR];
+                case "invitedEditors":
+                    return [PublicationSeriesContributionType.INVITED_EDITOR];
                 case "reviewers":
-                    return PublicationSeriesContributionType.REVIEWER;
+                    return [PublicationSeriesContributionType.REVIEWER];
+                case "adhocReviewers":
+                    return [PublicationSeriesContributionType.ADHOC_REVIEWER];
                 case "scientificBoardMembers":
-                    return PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER;
+                    return [PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER];
             }
 
-            return undefined;
+            return getGlobalAllowedContributionTypesList();
         };
 
         const getContributorGroupForUpdating = () => {
@@ -223,8 +270,12 @@ export default defineComponent({
                     return editorList.value;
                 case "associatedEditors":
                     return associateEditorList.value;
+                case "invitedEditors":
+                    return invitedEditorList.value;
                 case "reviewers":
                     return reviewerList.value;
+                case "adhocReviewers":
+                    return adhocReviewerList.value;
                 case "scientificBoardMembers":
                     return scientificBoardMemberList.value;
             }
@@ -237,13 +288,41 @@ export default defineComponent({
                 currentTab.value = "editors";
             } else if (associateEditorList.value.length > 0) {
                 currentTab.value = "associateEditors";
+            } else if (invitedEditorList.value.length > 0) {
+                currentTab.value = "invitedEditors";
             } else if (reviewerList.value.length > 0) {
                 currentTab.value = "reviewers";
+            } else if (adhocReviewerList.value.length > 0) {
+                currentTab.value = "adhocReviewers";
             } else if (scientificBoardMemberList.value.length > 0) {
                 currentTab.value = "scientificBoardMembers";
             } else {
                 currentTab.value = "";
             }
+        };
+
+        const showScientificBoardMembers = computed(() => 
+            props.articleCollectionSeriesType === undefined || 
+            props.articleCollectionSeriesType === ArticleCollectionSeriesType.JOURNAL || 
+            props.articleCollectionSeriesType === ArticleCollectionSeriesType.MAGAZINE
+        );
+
+        const getGlobalAllowedContributionTypesList = (): PublicationSeriesContributionType[] => {
+            const contributionTypes: PublicationSeriesContributionType[] = [];
+
+            contributionTypes.push(
+                PublicationSeriesContributionType.EDITOR,
+                PublicationSeriesContributionType.ASSOCIATE_EDITOR,
+                PublicationSeriesContributionType.INVITED_EDITOR,
+                PublicationSeriesContributionType.REVIEWER,
+                PublicationSeriesContributionType.ADHOC_REVIEWER
+            );
+
+            if (showScientificBoardMembers.value) {
+                contributionTypes.push(PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER);
+            }
+
+            return contributionTypes;
         };
 
         return {
@@ -255,7 +334,10 @@ export default defineComponent({
             localContributions,
             updateOrderInParentList,
             getLockedContributionType,
-            getContributorGroupForUpdating
+            getContributorGroupForUpdating,
+            invitedEditorList, adhocReviewerList,
+            ArticleCollectionSeriesType,
+            showScientificBoardMembers
         };
     },
 });

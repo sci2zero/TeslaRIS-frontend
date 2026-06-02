@@ -1474,5 +1474,7 @@ export default {
     otherContactHoursPerWeekLabel: "Ostalih kontakt sati nedeljno",
     locationJurisdictionLabel: "Nadležnost lokacije",
     caseNameLabel: "Naziv slučaja",
-    articleCollectionSeriesTypeLabel: "Tip serije kolekcije članaka"
+    articleCollectionSeriesTypeLabel: "Tip serije kolekcije članaka",
+    invitedEditorsLabel: "Pozvani urednici",
+    adHocReviewersLabel: "Ad hok recenzenti"
 }

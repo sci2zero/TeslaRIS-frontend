@@ -431,6 +431,8 @@
                     board-members-allowed
                     limit-one-author
                     for-thesis
+                    :document-type="PublicationType.THESIS"
+                    :concrete-type="(thesis?.thesisType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

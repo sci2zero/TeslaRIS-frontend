@@ -13,6 +13,7 @@
                         {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
                         {{ ' ' + contribution.personName?.lastname }}
                         {{ displayContributionType(contribution) }}
+                        {{ contribution.isMainContributor ? `(${$t("mainContributorLabel")})` : "" }}
                     </strong>
                 </h4>
             </localized-link>
@@ -22,6 +23,7 @@
                     {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
                     {{ ' ' + contribution.personName?.lastname }}
                     {{ displayContributionType(contribution) }}
+                    {{ contribution.isMainContributor ? `(${$t("mainContributorLabel")})` : "" }}
                 </strong>
             </h4>
             

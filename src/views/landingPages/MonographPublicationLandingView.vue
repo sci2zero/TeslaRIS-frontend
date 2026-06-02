@@ -181,6 +181,8 @@
                     :document-id="monographPublication?.id"
                     :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []"
                     :read-only="!canEdit || monographPublication?.isArchived"
+                    :document-type="PublicationType.MONOGRAPH_PUBLICATION"
+                    :concrete-type="(monographPublication?.monographPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

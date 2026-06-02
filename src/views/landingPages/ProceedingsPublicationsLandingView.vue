@@ -201,6 +201,8 @@
                     :document-id="proceedingsPublication?.id"
                     :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []"
                     :read-only="!canEdit || proceedingsPublication?.isArchived"
+                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    :concrete-type="(proceedingsPublication?.proceedingsPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

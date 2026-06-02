@@ -1,5 +1,4 @@
 import { JournalPublicationType } from "@/models/PublicationModel";
-import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
@@ -42,7 +41,7 @@ const journalPublicationTypeSr = [
 ];
 
 export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {
-    return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
+    return (journalPublicationTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: JournalPublicationType | string) => {
@@ -55,11 +54,7 @@ export const getTitleFromValueAutoLocale = (value: JournalPublicationType | stri
         journalPublicationTypeArray = transliterateContentToCyrillic(journalPublicationTypeSr);
     }
 
-    if (typeof value === "number") {
-        return (journalPublicationTypeArray.find(item => item.value === value) || {}).title;
-    } else if (typeof value === "string") {
-        return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value) || {}).title;
-    }
+    return (journalPublicationTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getTypesForGivenLocale = () => {

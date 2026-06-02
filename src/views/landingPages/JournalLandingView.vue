@@ -144,8 +144,9 @@
                     :publication-series-id="journal?.id"
                     :read-only="!canEdit"
                     shows-board-and-reviewers
-                    @update="updateContributions">
-                </person-publication-series-contribution-tabs>
+                    :article-collection-series-type="journal?.type"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

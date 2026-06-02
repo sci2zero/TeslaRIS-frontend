@@ -152,6 +152,8 @@
                     :document-id="geneticMaterial?.id"
                     :contribution-list="geneticMaterial?.contributions ? geneticMaterial?.contributions : []"
                     :read-only="!canEdit || geneticMaterial?.isArchived"
+                    :document-type="PublicationType.GENETIC_MATERIAL"
+                    :concrete-type="(geneticMaterial?.geneticMaterialType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

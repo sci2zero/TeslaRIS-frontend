@@ -158,6 +158,8 @@
                     :document-id="intangibleProduct?.id"
                     :contribution-list="intangibleProduct?.contributions ? intangibleProduct?.contributions : []"
                     :read-only="!canEdit || intangibleProduct?.isArchived"
+                    :document-type="PublicationType.INTANGIBLE_PRODUCT"
+                    :concrete-type="(intangibleProduct?.intangibleProductType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

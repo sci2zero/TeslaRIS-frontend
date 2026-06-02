@@ -158,6 +158,8 @@
                     :document-id="materialProduct?.id"
                     :contribution-list="materialProduct?.contributions ? materialProduct?.contributions : []"
                     :read-only="!canEdit || materialProduct?.isArchived"
+                    :document-type="PublicationType.MATERIAL_PRODUCT"
+                    :concrete-type="(materialProduct?.materialProductType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

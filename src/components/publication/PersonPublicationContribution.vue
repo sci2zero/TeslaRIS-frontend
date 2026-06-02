@@ -36,8 +36,17 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
-                    @update:model-value="sendContentToParent">
-                </v-select>
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="!basic && canBeMainContributor(input)">
+            <v-col>
+                <v-checkbox
+                    v-model="input.isMainContributor"
+                    :label="$t('mainContributorLabel')"
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
         </v-row>
         <v-row v-if="!basic">
@@ -45,38 +54,38 @@
                 <v-checkbox
                     v-model="input.isCorrespondingContributor"
                     :label="$t('correspondingContributorLabel')"
-                    @update:model-value="sendContentToParent">
-                </v-checkbox>
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
             <v-col v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)">
                 <v-checkbox
                     v-model="input.isBoardPresident"
                     :label="$t('boardPresidentLabel')"
-                    @update:model-value="sendContentToParent">
-                </v-checkbox>
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
             <v-col v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)">
                 <v-checkbox
                     v-model="input.isAlsoABoardMember"
                     :label="$t('isAlsoABoardMemberLabel')"
-                    @update:model-value="sendContentToParent">
-                </v-checkbox>
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
             <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
                 <v-select
                     v-model="input.employmentTitle"
                     :items="employmentTitles"
                     :label="$t('employmentPositionLabel')"
-                    @update:model-value="sendContentToParent">
-                </v-select>
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
             <v-col v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')">
                 <v-select
                     v-model="input.personalTitle"
                     :items="personalTitles"
                     :label="$t('academicTitleLabel')"
-                    @update:model-value="sendContentToParent">
-                </v-select>
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
         </v-row>
     </v-container>
@@ -215,7 +224,7 @@ export default defineComponent({
                         contributionType: {
                             title: getTitleFromValueAutoLocale(contribution.contributionType),
                             value: contribution.contributionType
-                        }, 
+                        },
                         isMainContributor: contribution.isMainContributor,
                         isCorrespondingContributor: contribution.isCorrespondingContributor,
                         isBoardPresident: contribution.isBoardPresident ?? false,
@@ -286,7 +295,7 @@ export default defineComponent({
                 contributionType: {
                     title: getTitleFromValueAutoLocale(DocumentContributionType.AUTHOR), 
                     value: DocumentContributionType.AUTHOR
-                }, 
+                },
                 isMainContributor: false, 
                 isCorrespondingContributor: false,
             }];
@@ -338,7 +347,7 @@ export default defineComponent({
                     orderNumber: index + 1,
                     personName: personName,
                     contributionType: props.basic ? DocumentContributionType.AUTHOR : input.contributionType.value,
-                    isMainContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? index === 0 : input.isMainContributor) : false,
+                    isMainContributor: canBeMainContributor(input) ? (props.basic ? index === 0 : input.isMainContributor) : false,
                     isCorrespondingContributor: input.contributionType.value === DocumentContributionType.AUTHOR ? (props.basic ? false : input.isCorrespondingContributor) : false,
                     isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
                     institutionIds: input.contribution.institutionIds,
@@ -382,6 +391,16 @@ export default defineComponent({
             return true;
         };
 
+        const canBeMainContributor = ((input: any) => 
+            [
+                DocumentContributionType.AUTHOR,
+                DocumentContributionType.PRESENTER,
+                DocumentContributionType.EDITOR,
+                DocumentContributionType.ADVISOR,
+                DocumentContributionType.ARGUER
+            ].includes(input.contributionType?.value)
+        );
+
         return {
             inputs, addInput, removeInput,
             contributionTypes, sendContentToParent,
@@ -390,7 +409,8 @@ export default defineComponent({
             populateFormData, fillInputs, fillDummyAuthors,
             checkWhetherCurrentUserShouldBeDisplayed,
             shouldDiplayBoardPresidentBox,
-            shouldDisplayAlsoBoardMemberBox
+            shouldDisplayAlsoBoardMemberBox,
+            canBeMainContributor
         }
     }
 });

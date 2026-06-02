@@ -147,6 +147,7 @@
                     :document-id="patent?.id"
                     :contribution-list="patent?.contributions ? patent?.contributions : []"
                     :read-only="!canEdit || patent?.isArchived"
+                    :document-type="PublicationType.PATENT"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

@@ -197,6 +197,8 @@
                     :document-id="journalPublication?.id"
                     :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []"
                     :read-only="!canEdit || journalPublication?.isArchived"
+                    :document-type="PublicationType.JOURNAL_PUBLICATION"
+                    :concrete-type="(journalPublication?.journalPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

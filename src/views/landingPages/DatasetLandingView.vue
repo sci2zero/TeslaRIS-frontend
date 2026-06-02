@@ -147,8 +147,9 @@
                     :document-id="dataset?.id"
                     :contribution-list="dataset?.contributions ? dataset?.contributions : []"
                     :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-document-contribution-tabs>
+                    :document-type="PublicationType.DATASET"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section

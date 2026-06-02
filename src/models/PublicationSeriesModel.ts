@@ -16,15 +16,18 @@ export interface PublicationSeries {
 
 export interface PersonPublicationSeriesContribution extends PersonContribution {
     contributionType: PublicationSeriesContributionType;
+    isMainContributor?: boolean;
     dateFrom?: string;
     dateTo?: string;
 }
 
 export enum PublicationSeriesContributionType {
-    EDITOR,
-    ASSOCIATE_EDITOR,
-    REVIEWER,
-    SCIENTIFIC_BOARD_MEMBER,
+    EDITOR = "EDITOR",
+    ASSOCIATE_EDITOR = "ASSOCIATE_EDITOR",
+    REVIEWER = "REVIEWER",
+    SCIENTIFIC_BOARD_MEMBER = "SCIENTIFIC_BOARD_MEMBER",
+    INVITED_EDITOR = "INVITED_EDITOR",
+    ADHOC_REVIEWER = "ADHOC_REVIEWER"
 }
 
 export enum PublicationSeriesType {

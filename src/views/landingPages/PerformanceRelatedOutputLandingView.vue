@@ -165,6 +165,8 @@
                     :document-id="performanceRelatedOutput?.id"
                     :contribution-list="performanceRelatedOutput?.contributions ? performanceRelatedOutput?.contributions : []"
                     :read-only="!canEdit || performanceRelatedOutput?.isArchived"
+                    :document-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+                    :concrete-type="(performanceRelatedOutput?.type as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

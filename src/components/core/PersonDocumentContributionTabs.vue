@@ -10,8 +10,8 @@
                         :board-member-ids="boardMembersAllowed ? boardMemberList.map(bm => bm.personId).filter(id => !!id) : []"
                         :lock-contribution-type="getLockedContributionTypes()"
                         :limit-one="limitOneAuthor && currentTab === 'authors'"
-                        @update="sendToParent">
-                    </publication-contribution-update-modal>
+                        @update="sendToParent"
+                    />
 
                     <div
                         v-if="contributionList?.length === 0"
@@ -25,34 +25,34 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-show="!forProceedings" value="authors">
+                        <v-tab v-show="!forProceedings && showAuthorsOrStaff()" value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis" value="editors">
+                        <v-tab v-show="!forThesis && showEditors()" value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis" value="reviewers">
+                        <v-tab v-show="!forThesis && showReviewers" value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forProceedings" value="advisors">
+                        <v-tab v-show="!forProceedings && documentType === PublicationType.THESIS" value="advisors">
                             {{ $t(limitOneAuthor ? "mentorsLabel" : "advisorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="boardMembersAllowed" value="boardMembers">
+                        <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="boardMembers">
                             {{ $t("boardMembersLabel") }}
                         </v-tab>
-                        <v-tab value="presenters">
+                        <v-tab v-show="documentType === PublicationType.PERFORMANCE_RELATED_OUTPUT" value="presenters">
                             {{ $t("presentersLabel") }}
                         </v-tab>
                         <v-tab value="translators">
                             {{ $t("translatorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis" value="assistantStaff">
+                        <v-tab v-show="!forThesis && showAuthorsOrStaff()" value="assistantStaff">
                             {{ $t("assistantStaffLabel") }}
                         </v-tab>
-                        <v-tab v-show="boardMembersAllowed" value="arguers">
+                        <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="arguers">
                             {{ $t("arguersLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis" value="owners">
+                        <v-tab v-show="!forThesis && showOwners()" value="owners">
                             {{ $t("ownersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -63,80 +63,80 @@
                                 :document-id="documentId"
                                 :contribution-list="authorList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="editors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="editorList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="reviewers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="reviewerList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="advisors">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="advisorList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="boardMembers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="boardMemberList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="presenters">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="presenterList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="translators">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="translatorList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="assistantStaff">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="assistantStaffList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="arguers">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="arguerList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                         <v-window-item value="owners">
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="ownerList"
                                 :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList">
-                            </person-document-contribution-list>
+                                @positions-changed="updateOrderInParentList"
+                            />
                         </v-window-item>
                     </v-window>
                 </v-card-text>
@@ -146,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { DocumentContributionType, type PersonDocumentContribution } from '@/models/PublicationModel';
+import { DocumentContributionType, MonographType, PerformanceRelatedOutputType, PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import { defineComponent, onMounted, type PropType } from 'vue';
 import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
@@ -194,6 +194,14 @@ export default defineComponent({
         forThesis: {
             type: Boolean,
             default: false
+        },
+        documentType: {
+            type: Object as PropType<PublicationType>,
+            required: true
+        },
+        concreteType: {
+            type: String,
+            default: ""
         }
     },
     emits: ["update", "positionsChanged"],
@@ -415,6 +423,44 @@ export default defineComponent({
             return boardMemberList.value;
         };
 
+        const showAuthorsOrStaff = () => 
+            ![
+                MonographType.JOURNAL_ISSUE,
+                PerformanceRelatedOutputType.LITIGATION,
+                PerformanceRelatedOutputType.BROADCAST_INTERVIEW,
+                PerformanceRelatedOutputType.TEXT_INTERVIEW,
+                PerformanceRelatedOutputType.NON_RESEARCH_PRESENTATION
+            ].includes(props.concreteType as MonographType | PerformanceRelatedOutputType);
+
+        const showEditors = () => 
+            [
+                MonographType.EDITED_BOOK,
+                MonographType.JOURNAL_ISSUE,
+                MonographType.ENCYCLOPEDIA,
+                MonographType.DICTIONARY,
+                MonographType.REPORT,
+            ].includes(props.concreteType as MonographType);
+
+        const showInvitedEditors = () => 
+            [
+                MonographType.JOURNAL_ISSUE
+            ].includes(props.concreteType as MonographType);
+
+        const showReviewers = () => 
+            [
+                PublicationType.PROCEEDINGS_PUBLICATION,
+                PublicationType.MONOGRAPH_PUBLICATION,
+                PublicationType.JOURNAL_PUBLICATION,
+                PublicationType.THESIS,
+            ].includes(props.documentType);
+
+        const showOwners = () => 
+            [
+                PublicationType.INTANGIBLE_PRODUCT,
+                PublicationType.MATERIAL_PRODUCT,
+                PublicationType.GENETIC_MATERIAL
+            ].includes(props.documentType);
+
         return {
             sendToParent, getTitleFromValueAutoLocale,
             currentTab, authorList, editorList,
@@ -422,7 +468,9 @@ export default defineComponent({
             updateOrderInParentList, localContributions,
             getContributorGroupForUpdating, presenterList,
             getLockedContributionTypes, translatorList,
-            assistantStaffList, arguerList, ownerList
+            assistantStaffList, arguerList, ownerList,
+            PublicationType, showAuthorsOrStaff, showEditors,
+            showInvitedEditors, showReviewers, showOwners
         };
     },
 });

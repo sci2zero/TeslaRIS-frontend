@@ -33,9 +33,18 @@
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
-                    :readonly="lockContributionType !== undefined"
-                    @update:model-value="sendContentToParent">
-                </v-select>
+                    :readonly="lockContributionType !== undefined && lockContributionType.length === 1"
+                    @update:model-value="sendContentToParent"
+                />
+            </v-col>
+        </v-row>
+        <v-row v-if="canBeMainContributor(input)">
+            <v-col>
+                <v-checkbox
+                    v-model="input.isMainContributor"
+                    :label="$t('mainContributorLabel')"
+                    @update:model-value="sendContentToParent"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -45,7 +54,7 @@
                     :label="$t('fromLabel')"
                     color="primary"
                     @update:model-value="sendContentToParent"
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="6">
                 <date-picker
@@ -53,7 +62,7 @@
                     :label="$t('toLabel')"
                     color="primary"
                     @update:model-value="sendContentToParent"
-                ></date-picker>
+                />
             </v-col>
         </v-row>
     </v-container>
@@ -84,7 +93,7 @@ export default defineComponent({
             default: false
         },
         lockContributionType: {
-            type: Object as PropType<PublicationSeriesContributionType | undefined>,
+            type: Object as PropType<PublicationSeriesContributionType[] | undefined>,
             default: undefined
         }
     },
@@ -97,10 +106,11 @@ export default defineComponent({
                     {
                         contributionType: {
                             title: getTitleFromValueAutoLocale(
-                                props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
+                                props.lockContributionType ? props.lockContributionType[0] : PublicationSeriesContributionType.EDITOR
                             ),
-                            value: props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR
-                        }
+                            value: props.lockContributionType ? props.lockContributionType[0] : PublicationSeriesContributionType.EDITOR
+                        },
+                        isMainContributor: false
                     }
                 ]
             );
@@ -122,6 +132,7 @@ export default defineComponent({
                                                     institutionIds: contribution.institutionIds
                                                     }, 
                     contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType},
+                    isMainContributor: contribution.isMainContributor,
                     dateFrom: contribution.dateFrom,
                     dateTo: contribution.dateTo,
                     id: contribution.id});
@@ -129,17 +140,29 @@ export default defineComponent({
             }
         });
 
-        const contributionTypes = computed(() => getTypesForGivenLocale());
+        const contributionTypes = computed(() => {
+            const types = getTypesForGivenLocale();
+
+            if (types && props.lockContributionType) {
+                return types.filter(type => props.lockContributionType?.includes(type.value));
+            }
+
+            return types;
+        });
 
         const addInput = () => {
             const contributionType =
-                props.lockContributionType ? props.lockContributionType : PublicationSeriesContributionType.EDITOR;
+                props.lockContributionType ? props.lockContributionType[0] : PublicationSeriesContributionType.EDITOR;
                 
-            inputs.value.push({contributionType: {
-                    title: getTitleFromValueAutoLocale(contributionType), 
-                    value: contributionType
+            inputs.value.push(
+                {
+                    contributionType: {
+                        title: getTitleFromValueAutoLocale(contributionType), 
+                        value: contributionType
+                    },
+                    isMainContributor: false
                 }
-            });
+            );
         };
 
         const removeInput = (index: number) => {
@@ -154,11 +177,16 @@ export default defineComponent({
         };
 
         const clearInput = () => {
-            inputs.value = [{contribution: {}, contributionType: {
-                    title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
-                    value: PublicationSeriesContributionType.EDITOR
+            inputs.value = [
+                {
+                    contribution: {},
+                    contributionType: {
+                        title: getTitleFromValueAutoLocale(PublicationSeriesContributionType.EDITOR), 
+                        value: PublicationSeriesContributionType.EDITOR
+                    },
+                    isMainContributor: false 
                 }
-            }];
+            ];
             baseContributionRef.value
             .filter((ref: any) => ref)
             .forEach((ref: typeof PersonContributionBase) => {
@@ -186,15 +214,26 @@ export default defineComponent({
                                     contributionType: input.contributionType.value,
                                     dateFrom: input.dateFrom,
                                     dateTo: input.dateTo,
-                                    institutionIds: input.contribution.institutionIds
+                                    institutionIds: input.contribution.institutionIds,
+                                    isMainContributor: canBeMainContributor(input) ? input.isMainContributor : false,
                                 });
             });
             emit("setInput", returnObject);
         };
 
-        return {inputs, addInput, removeInput, 
-                contributionTypes, baseContributionRef,
-                sendContentToParent, clearInput}
+        const canBeMainContributor = ((input: any) => 
+            [
+                PublicationSeriesContributionType.EDITOR,
+                PublicationSeriesContributionType.SCIENTIFIC_BOARD_MEMBER
+            ].includes(input.contributionType?.value)
+        );
+
+        return {
+            inputs, addInput, removeInput, 
+            contributionTypes, baseContributionRef,
+            sendContentToParent, clearInput,
+            canBeMainContributor
+        }
     }
 });
 </script>
