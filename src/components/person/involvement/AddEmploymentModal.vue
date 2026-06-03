@@ -20,8 +20,8 @@
                             <v-col>
                                 <person-autocomplete-search
                                     v-model="selectedPerson"
-                                    required>
-                                </person-autocomplete-search>
+                                    required
+                                />
                             </v-col>
                         </v-row>
                         <v-row>
@@ -31,8 +31,8 @@
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel') + '*'"
                                     :rules="requiredSelectionRules"
-                                    return-object>
-                                </v-select>
+                                    return-object
+                                />
                             </v-col>
                         </v-row>
                     </v-form>

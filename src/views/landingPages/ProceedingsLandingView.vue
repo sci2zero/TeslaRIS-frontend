@@ -210,7 +210,6 @@
                     :read-only="!canEdit"
                     shows-board-and-reviewers
                     :board-members-allowed="false"
-                    for-proceedings
                     :document-type="PublicationType.PROCEEDINGS"
                     @update="updateContributions"
                 />

@@ -25,16 +25,22 @@
                         color="deep-purple-accent-4"
                         align-tabs="start"
                     >
-                        <v-tab v-show="!forProceedings && showAuthorsOrStaff()" value="authors">
+                        <v-tab v-show="showAuthorsOrStaff()" value="authors">
                             {{ $t("authorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis && showEditors()" value="editors">
+                        <v-tab v-show="showEditors()" value="editors">
                             {{ $t("editorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis && showReviewers" value="reviewers">
+                        <v-tab v-show="showEditors()" value="editors">
+                            {{ $t("associatedEditorsLabel") }}
+                        </v-tab>
+                        <v-tab v-show="showInvitedEditors()" value="editors">
+                            {{ $t("invitedEditorsLabel") }}
+                        </v-tab>
+                        <v-tab v-show="showReviewers()" value="reviewers">
                             {{ $t("reviewersLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forProceedings && documentType === PublicationType.THESIS" value="advisors">
+                        <v-tab v-show="documentType === PublicationType.THESIS" value="advisors">
                             {{ $t(limitOneAuthor ? "mentorsLabel" : "advisorsLabel") }}
                         </v-tab>
                         <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="boardMembers">
@@ -46,13 +52,13 @@
                         <v-tab value="translators">
                             {{ $t("translatorsLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis && showAuthorsOrStaff()" value="assistantStaff">
+                        <v-tab v-show="showAuthorsOrStaff()" value="assistantStaff">
                             {{ $t("assistantStaffLabel") }}
                         </v-tab>
                         <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="arguers">
                             {{ $t("arguersLabel") }}
                         </v-tab>
-                        <v-tab v-show="!forThesis && showOwners()" value="owners">
+                        <v-tab v-show="showOwners()" value="owners">
                             {{ $t("ownersLabel") }}
                         </v-tab>
                     </v-tabs>
@@ -70,6 +76,22 @@
                             <person-document-contribution-list
                                 :document-id="documentId"
                                 :contribution-list="editorList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList"
+                            />
+                        </v-window-item>
+                        <v-window-item value="associatedEditors">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="associatedEditorList"
+                                :can-reorder="!readOnly"
+                                @positions-changed="updateOrderInParentList"
+                            />
+                        </v-window-item>
+                        <v-window-item value="invitedEditors">
+                            <person-document-contribution-list
+                                :document-id="documentId"
+                                :contribution-list="invitedEditorList"
                                 :can-reorder="!readOnly"
                                 @positions-changed="updateOrderInParentList"
                             />
@@ -183,18 +205,6 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
-        forProceedings: {
-            type: Boolean,
-            default: false
-        },
-        forMonograph: {
-            type: Boolean,
-            default: false
-        },
-        forThesis: {
-            type: Boolean,
-            default: false
-        },
         documentType: {
             type: Object as PropType<PublicationType>,
             required: true
@@ -206,12 +216,14 @@ export default defineComponent({
     },
     emits: ["update", "positionsChanged"],
     setup(props, { emit }) {
-        const currentTab = ref(props.forProceedings ? "editors" : "authors");
+        const currentTab = ref(props.documentType === PublicationType.PROCEEDINGS ? "editors" : "authors");
 
         const localContributions = ref<PersonDocumentContribution[]>([]);
 
         const authorList = ref<PersonDocumentContribution[]>([]);
         const editorList = ref<PersonDocumentContribution[]>([]);
+        const associatedEditorList = ref<PersonDocumentContribution[]>([]);
+        const invitedEditorList = ref<PersonDocumentContribution[]>([]);
         const reviewerList = ref<PersonDocumentContribution[]>([]);
         const advisorList = ref<PersonDocumentContribution[]>([]);
         const boardMemberList = ref<PersonDocumentContribution[]>([]);
@@ -243,6 +255,14 @@ export default defineComponent({
             editorList.value =
                 localContributions.value.filter(
                     (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.EDITOR]
+                );
+            associatedEditorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ASSOCIATED_EDITOR]
+                );
+            invitedEditorList.value =
+                localContributions.value.filter(
+                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.INVITED_EDITOR]
                 );
             reviewerList.value =
                 localContributions.value.filter(
@@ -284,6 +304,8 @@ export default defineComponent({
             const contributionLists: Record<string, any[]> = {
                 authors: authorList.value,
                 editors: editorList.value,
+                associatedEditors: associatedEditorList.value,
+                invitedEditors: invitedEditorList.value,
                 reviewers: reviewerList.value,
                 advisors: advisorList.value,
                 boardMembers: boardMemberList.value,
@@ -318,6 +340,10 @@ export default defineComponent({
                     return [DocumentContributionType.AUTHOR];
                 case "editors":
                     return [DocumentContributionType.EDITOR];
+                case "associatedEditors":
+                    return [DocumentContributionType.ASSOCIATED_EDITOR];
+                case "invitedEditors":
+                    return [DocumentContributionType.INVITED_EDITOR];
                 case "reviewers":
                     return [DocumentContributionType.REVIEWER];
                 case "advisors":
@@ -336,15 +362,15 @@ export default defineComponent({
                     return [DocumentContributionType.OWNER];
             }
 
-            return (props.forProceedings || props.forMonograph) ? 
-                [DocumentContributionType.EDITOR, DocumentContributionType.REVIEWER] : 
-                [DocumentContributionType.AUTHOR];
+            return getGlobalAllowedContributionTypesList();
         };
 
         const updateOrderInParentList = () => {
             const indexes: number[] = [];
             authorList.value.forEach(contribution => indexes.push(contribution.id as number));
             editorList.value.forEach(contribution => indexes.push(contribution.id as number));
+            associatedEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
+            invitedEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
             reviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
             advisorList.value.forEach(contribution => indexes.push(contribution.id as number));
             boardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
@@ -375,6 +401,10 @@ export default defineComponent({
                 currentTab.value = "authors";
             } else if (editorList.value.length > 0) {
                 currentTab.value = "editors";
+            } else if (associatedEditorList.value.length > 0) {
+                currentTab.value = "associatedEditors";
+            } else if (invitedEditorList.value.length > 0) {
+                currentTab.value = "invitedEditors";
             } else if (reviewerList.value.length > 0) {
                 currentTab.value = "reviewers";
             } else if (advisorList.value.length > 0) {
@@ -402,6 +432,10 @@ export default defineComponent({
                     return authorList.value;
                 case "editors":
                     return editorList.value;
+                case "associatedEditors":
+                    return associatedEditorList.value;
+                case "invitedEditors":
+                    return invitedEditorList.value;
                 case "reviewers":
                     return reviewerList.value;
                 case "advisors":
@@ -461,6 +495,47 @@ export default defineComponent({
                 PublicationType.GENETIC_MATERIAL
             ].includes(props.documentType);
 
+        const getGlobalAllowedContributionTypesList = (): DocumentContributionType[] => {
+            const contributionTypes: DocumentContributionType[] = [];
+
+            if (showAuthorsOrStaff()) {
+                contributionTypes.push(DocumentContributionType.AUTHOR, DocumentContributionType.ASSISTANT_STAFF);
+            }
+
+            if (showEditors()) {
+                contributionTypes.push(DocumentContributionType.EDITOR, DocumentContributionType.ASSOCIATED_EDITOR);
+            }
+
+            if (showInvitedEditors()) {
+                contributionTypes.push(DocumentContributionType.INVITED_EDITOR);
+            }
+
+            if (showReviewers()) {
+                contributionTypes.push(DocumentContributionType.REVIEWER);
+            }
+
+            if (showOwners()) {
+                contributionTypes.push(DocumentContributionType.OWNER);
+            }
+
+            if (props.documentType === PublicationType.THESIS) {
+                contributionTypes.push(DocumentContributionType.ADVISOR);
+
+                if (props.boardMembersAllowed) {
+                    contributionTypes.push(DocumentContributionType.BOARD_MEMBER);
+                    contributionTypes.push(DocumentContributionType.ARGUER);
+                }
+            }
+
+            if (props.documentType === PublicationType.PERFORMANCE_RELATED_OUTPUT) {
+                contributionTypes.push(DocumentContributionType.PRESENTER);
+            }
+
+            contributionTypes.push(DocumentContributionType.TRANSLATOR);
+
+            return contributionTypes;
+        };
+
         return {
             sendToParent, getTitleFromValueAutoLocale,
             currentTab, authorList, editorList,
@@ -470,7 +545,8 @@ export default defineComponent({
             getLockedContributionTypes, translatorList,
             assistantStaffList, arguerList, ownerList,
             PublicationType, showAuthorsOrStaff, showEditors,
-            showInvitedEditors, showReviewers, showOwners
+            showInvitedEditors, showReviewers, showOwners,
+            associatedEditorList, invitedEditorList
         };
     },
 });

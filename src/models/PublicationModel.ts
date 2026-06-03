@@ -175,6 +175,8 @@ export interface PersonDocumentContribution extends PersonContribution {
 export enum DocumentContributionType {
     AUTHOR = "AUTHOR",
     EDITOR = "EDITOR",
+    ASSOCIATED_EDITOR = "ASSOCIATED_EDITOR",
+    INVITED_EDITOR = "INVITED_EDITOR",
     REVIEWER = "REVIEWER",
     ADVISOR = "ADVISOR",
     BOARD_MEMBER = "BOARD_MEMBER",
@@ -239,7 +241,8 @@ export enum MonographType {
     PREPRINT = "PREPRINT",
     MANUAL = "MANUAL",
     DATA_MANAGEMENT_PLAN = "DATA_MANAGEMENT_PLAN",
-    PROCEEDINGS = "PROCEEDINGS"
+    PROCEEDINGS = "PROCEEDINGS",
+    BOOK = "BOOK"
 }
 
 export interface Monograph extends Document {

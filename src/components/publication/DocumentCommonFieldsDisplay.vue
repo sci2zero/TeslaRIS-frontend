@@ -99,7 +99,7 @@
         </div>
 
         <div v-if="isAdmin && document?.openAccess !== undefined">
-            {{ $t("openAccessLabel") }}:
+            {{ $t("isOpenAccessLabel") }}:
         </div>
         <div v-if="isAdmin && document?.openAccess !== undefined" class="response">
             {{ document.openAccess ? $t('yesLabel') : $t('noLabel') }}

@@ -578,7 +578,7 @@ export default defineComponent({
                 selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
             }
 
-            if (contributions.value.length === 0) {
+            if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
                 contributions.value = metadata.contributions;
                 contributionsRef.value?.fillDummyAuthors(contributions.value.length);
 
@@ -587,7 +587,7 @@ export default defineComponent({
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
 
-            if (keywords.value.length === 0) {
+            if (keywords.value.length === 0 && metadata.keywords.length !== 0) {
                 additionalFields.value = true;
                 await nextTick();
                 

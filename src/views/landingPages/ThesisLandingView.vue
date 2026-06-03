@@ -430,7 +430,6 @@
                     :read-only="!canEdit || thesis?.isOnPublicReview"
                     board-members-allowed
                     limit-one-author
-                    for-thesis
                     :document-type="PublicationType.THESIS"
                     :concrete-type="(thesis?.thesisType as string)"
                     @update="updateContributions"

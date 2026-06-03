@@ -6,6 +6,8 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 export const contributionTypesEn = [
     { title: "Author", value: DocumentContributionType.AUTHOR },
     { title: "Editor", value: DocumentContributionType.EDITOR },
+    { title: "Associated editor", value: DocumentContributionType.ASSOCIATED_EDITOR },
+    { title: "Invited editor", value: DocumentContributionType.INVITED_EDITOR },
     { title: "Reviewer", value: DocumentContributionType.REVIEWER },
     { title: "Advisor", value: DocumentContributionType.ADVISOR },
     { title: "Board Member", value: DocumentContributionType.BOARD_MEMBER },
@@ -19,6 +21,8 @@ export const contributionTypesEn = [
 export const contributionTypesSr = [
     { title: "Autor", value: DocumentContributionType.AUTHOR },
     { title: "Urednik", value: DocumentContributionType.EDITOR },
+    { title: "Pridruženi urednik", value: DocumentContributionType.ASSOCIATED_EDITOR },
+    { title: "Pozvani urednik", value: DocumentContributionType.INVITED_EDITOR },
     { title: "Recenzent", value: DocumentContributionType.REVIEWER },
     { title: "Savetnik", value: DocumentContributionType.ADVISOR },
     { title: "Član komisije", value: DocumentContributionType.BOARD_MEMBER },

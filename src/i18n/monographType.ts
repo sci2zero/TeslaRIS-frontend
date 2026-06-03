@@ -5,7 +5,8 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 const monographTypeEn = [
     { title: "Research Monograph", value: MonographType.RESEARCH_MONOGRAPH },
     { title: "Study", value: MonographType.STUDY },
-    { title: "Book", value: MonographType.EDITED_BOOK },
+    { title: "Edited book", value: MonographType.EDITED_BOOK },
+    { title: "Book", value: MonographType.BOOK },
     { title: "Translation", value: MonographType.TRANSLATION },
     { title: "Bibliography", value: MonographType.BIBLIOGRAPHY },
     { title: "Journal issue", value: MonographType.JOURNAL_ISSUE },
@@ -24,7 +25,8 @@ const monographTypeEn = [
 const monographTypeSr = [
     { title: "Istraživačka monografija", value: MonographType.RESEARCH_MONOGRAPH },
     { title: "Studija", value: MonographType.STUDY },
-    { title: "Knjiga", value: MonographType.EDITED_BOOK },
+    { title: "Urednička knjiga", value: MonographType.EDITED_BOOK },
+    { title: "Knjiga", value: MonographType.BOOK },
     { title: "Prevod", value: MonographType.TRANSLATION },
     { title: "Bibliografija", value: MonographType.BIBLIOGRAPHY },
     { title: "Izdanje časopisa", value: MonographType.JOURNAL_ISSUE },

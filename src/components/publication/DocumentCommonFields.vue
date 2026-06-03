@@ -97,7 +97,7 @@
             <v-col cols="5">
                 <v-checkbox
                     v-model="localOpenAccess"
-                    :label="$t('openAccessLabel')"
+                    :label="$t('isOpenAccessLabel')"
                     @update:model-value="emitUpdate"
                 />
             </v-col>

@@ -225,7 +225,6 @@
                     :contribution-list="monograph?.contributions ? monograph?.contributions : []"
                     :read-only="!canEdit || monograph?.isArchived"
                     :shows-board-and-reviewers="monograph?.monographType === MonographType.EDITED_BOOK"
-                    :for-monograph="monograph?.monographType === MonographType.EDITED_BOOK"
                     :document-type="PublicationType.MONOGRAPH"
                     :concrete-type="(monograph?.monographType as string)"
                     @update="updateContributions"
