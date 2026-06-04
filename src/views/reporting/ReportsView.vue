@@ -34,24 +34,40 @@
                             v-model="selectedCommissions"
                             only-load-commissions
                             required
-                            :multiple="isSummaryReport()">
-                        </commission-autocomplete-search>
+                            :multiple="isSummaryReport()"
+                        />
                     </v-col>
                     <v-col v-if="isTopLevelReport()" cols="12" sm="3" md="3">
                         <organisation-unit-autocomplete-search
-                            v-model="selectedOUs" :multiple="!isTopLevelReport()" disable-submission :required="isTopLevelReport()"
-                            :comfortable="isSummaryReport()" :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"></organisation-unit-autocomplete-search>
+                            v-model="selectedOUs"
+                            :multiple="!isTopLevelReport()"
+                            disable-submission
+                            :required="isTopLevelReport()"
+                            :comfortable="isSummaryReport()"
+                            :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"
+                        />
                     </v-col>
-                    <v-col cols="12" sm="3" md="2">
+                    <v-col v-if="isScientificProductionReport" cols="12" sm="3" md="2">
+                        <v-text-field
+                            v-model="startYear"
+                            type="number"
+                            :max="(new Date()).getFullYear() - 1"
+                            :label="$t('fromLabel') + '*'"
+                            :placeholder="$t('fromLabel') + '*'"
+                            :rules="requiredNumericFieldRules"
+                            :class="isSummaryReport() ? 'comfortable' : ''"
+                        />
+                    </v-col>
+                    <v-col v-if="isScientificProductionReport" cols="12" sm="3" md="2">
                         <v-text-field
                             v-model="selectedYear"
                             type="number"
                             :max="(new Date()).getFullYear()"
-                            :label="$t('reportYearLabel') + '*'"
-                            :placeholder="$t('reportYearLabel') + '*'"
+                            :label="$t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') + '*'"
+                            :placeholder="$t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') + '*'"
                             :rules="requiredNumericFieldRules"
                             :class="isSummaryReport() ? 'comfortable' : ''"
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row
@@ -71,11 +87,14 @@
                             :items="recurrenceTypes"
                             :label="$t('recurrenceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object
+                        />
                     </v-col>
                     <v-col cols="12" sm="3" md="1">
-                        <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleReportGeneration">
+                        <v-btn
+                            class="mt-3"
+                            :disabled="!isFormValid"
+                            @click="scheduleReportGeneration">
                             {{ $t("scheduleLabel") }}
                         </v-btn>
                     </v-col>
@@ -86,16 +105,16 @@
                 {{ $t("alreadyGeneratedReportsLabel") }}
             </h2>
 
-            <v-row v-if="generatedReports.length > 0" class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
+            <v-row
+                v-if="generatedReports.length > 0"
+                class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
                 <v-list
                     :lines="false"
                     density="comfortable"
-                    class="bigger-font"
-                >
+                    class="bigger-font">
                     <v-list-item
                         v-for="generatedReport in generatedReports" :key="generatedReport.name"
-                        :value="generatedReport.value"
-                    >
+                        :value="generatedReport.value">
                         <v-list-item-title @click="downloadReport(generatedReport.name, generatedReport.value)">
                             {{ generatedReport.name }}
                         </v-list-item-title>
@@ -106,8 +125,8 @@
             <scheduled-tasks-list
                 class="mt-10"
                 :scheduled-tasks="scheduledTasks"
-                @delete="deleteScheduledLoadTask">
-            </scheduled-tasks-list>
+                @delete="deleteScheduledLoadTask"
+            />
         </v-tabs-window-item>
         <v-tabs-window-item value="generated">
             <h2
@@ -119,12 +138,10 @@
             <v-list
                 :lines="false"
                 density="comfortable"
-                class="bigger-font mt-5"
-            >
+                class="bigger-font mt-5">
                 <v-list-item
                     v-for="generatedReport in allGeneratedReports" :key="generatedReport.name"
-                    :value="generatedReport.value"
-                >
+                    :value="generatedReport.value">
                     <v-list-item-title @click="downloadReport(generatedReport.name, generatedReport.value)">
                         {{ generatedReport.name }}
                     </v-list-item-title>
@@ -175,6 +192,7 @@ export default defineComponent({
         const selectedCommissions = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
         const selectedOUs = ref<{title: string, value: number}[] | {title: string, value: number}>([]);
 
+        const startYear = ref<number>((new Date()).getFullYear() - 1);
         const selectedYear = ref<number>((new Date()).getFullYear());
 
         const generatedReports = ref<{name: string, value: number}[]>([]);
@@ -267,7 +285,8 @@ export default defineComponent({
             if (
                 selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION || 
                 selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED || 
-                selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY
+                selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY || 
+                selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION
             ) {
                 return true;
             }
@@ -283,12 +302,16 @@ export default defineComponent({
             return false;
         };
 
+        const isScientificProductionReport = computed(() => 
+            selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION);
+
         const scheduleReportGeneration = () => {
             const topLevelInstitutionId = (selectedOUs.value as {title: string, value: number}).value;
             TaskManagerService.scheduleReportGeneration(
                 null, selectedReportType.value,
                 selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? (selectedCommissions.value as {title: string, value: number}[]).map(commission => commission.value) : [(selectedCommissions.value as {title: string, value: number}).value],
-                selectedYear.value, topLevelInstitutionId, "sr", selectedRecurrenceType.value.value
+                selectedYear.value, topLevelInstitutionId, "sr", selectedRecurrenceType.value.value,
+                selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION ? startYear.value : null
             )
             .then(() => fetchScheduledTasks())
             .catch((axiosError: AxiosError<ErrorResponse>) => {
@@ -328,7 +351,8 @@ export default defineComponent({
             downloadReport, scheduledTasks,
             deleteScheduledLoadTask, message, snackbar,
             currentTab, allGeneratedReports,
-            recurrenceTypes, selectedRecurrenceType
+            recurrenceTypes, selectedRecurrenceType,
+            isScientificProductionReport, startYear
         };
     }
 });

@@ -642,7 +642,8 @@ export default defineComponent({
                 (
                     selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION || 
                     selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED || 
-                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY || 
+                    selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION
                 )
             ) {
                 return true;
