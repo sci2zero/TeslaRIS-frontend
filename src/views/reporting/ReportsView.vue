@@ -58,7 +58,7 @@
                             :class="isSummaryReport() ? 'comfortable' : ''"
                         />
                     </v-col>
-                    <v-col v-if="isScientificProductionReport" cols="12" sm="3" md="2">
+                    <v-col cols="12" sm="3" md="2">
                         <v-text-field
                             v-model="selectedYear"
                             type="number"
@@ -309,7 +309,9 @@ export default defineComponent({
             const topLevelInstitutionId = (selectedOUs.value as {title: string, value: number}).value;
             TaskManagerService.scheduleReportGeneration(
                 null, selectedReportType.value,
-                selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? (selectedCommissions.value as {title: string, value: number}[]).map(commission => commission.value) : [(selectedCommissions.value as {title: string, value: number}).value],
+                selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? 
+                    (selectedCommissions.value as {title: string, value: number}[]).map(commission => commission.value) : 
+                    [(selectedCommissions.value as {title: string, value: number}).value],
                 selectedYear.value, topLevelInstitutionId, "sr", selectedRecurrenceType.value.value,
                 selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION ? startYear.value : null
             )
