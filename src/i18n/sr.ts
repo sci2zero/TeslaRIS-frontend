@@ -123,7 +123,8 @@ export default {
         submitOtherEvent: "Dodavanje drugog tipa događaja",
         identifiers: "Identifikatori",
         submitPerformanceRelatedOutput: "Dodavanje rezultata vezanog za performans",
-        performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans"
+        performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans",
+        fundingLandingPage: "Detalji finansiranja",
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1454,5 +1455,20 @@ export default {
     sourceTitleLabel: "Izvorni naslov",
     otherActorsLabel: "Ostali akteri",
     performanceRelatedOutputTypeLabel: "Tip rezultata",
-    performanceRelatedOutputLabel: "Rezultat vezan za performans"
+    performanceRelatedOutputLabel: "Rezultat vezan za performans",
+    grantAgreementIdLabel: "Grant ID",
+    fundingTypesLabel: "Tipovi finansiranja",
+    dateAwardedLabel: "Datum nagrađivanja",
+    dateFromLabel: "Datum početka",
+    dateToLabel: "Datum kraja",
+    dateSubmittedLabel: "Datum unosa",
+    amountLabel: "Količina novca",
+    urisLabel: "Linkovi",
+    oaMandatedLabel: "Obaveza otvorenog pristupa (OA obaveza)",
+    oaMandateUrlLabel: "OA URL",
+    competitiveLabel: "Kompetetivno",
+    renewableLabel: "Obnovljivo",
+    fundingPartsLabel: "Stavke finansiranja",
+    agreementsLabel: "Ugovori",
+
 }
