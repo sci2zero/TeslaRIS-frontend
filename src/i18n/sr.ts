@@ -561,7 +561,7 @@ export default {
     updateCountryLabel: "Ažuriraj zemlju",
     countryCodeLabel: "Kod zemlje",
     countryListLabel: "Zemlje",
-    addEmployeeLabel: "Dodaj novog korisnika...",
+    addEmployeeLabel: "Dodaj novog zaposlenog...",
     alumniLabel: "Alumni",
     descriptionLabel: "Opis",
     superResearchAreaLabel: "Krovna oblast istraživanja",
@@ -1481,5 +1481,6 @@ export default {
     createConferenceLabel: "Konferencija",
     createExhibitionLabel: "Izložba",
     createCourseLabel: "Kurs",
-    createOtherEventLabel: "Drugi tip događaja"
+    createOtherEventLabel: "Drugi tip događaja",
+    addNewUserLabel: "Dodaj novog korisnika..."
 }

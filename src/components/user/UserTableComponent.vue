@@ -6,7 +6,7 @@
                     color="primary"
                     v-bind="props"
                 >
-                    {{ $t("addEmployeeLabel") }}
+                    {{ $t("addNewUserLabel") }}
                 </v-btn>
             </template>
 

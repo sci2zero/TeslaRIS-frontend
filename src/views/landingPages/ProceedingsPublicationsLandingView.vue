@@ -105,10 +105,10 @@
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
                                 </div>
-                                <div v-if="proceedingsPublication?.section">
+                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0">
                                     {{ $t("sectionLabel") }}:
                                 </div>
-                                <div v-if="proceedingsPublication?.section" class="response">
+                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0" class="response">
                                     {{ returnCurrentLocaleContent(proceedingsPublication.section) }}
                                 </div>
                             </v-col>

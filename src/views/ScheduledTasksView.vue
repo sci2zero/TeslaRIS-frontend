@@ -117,11 +117,19 @@
                     multiple
                 />
             </v-col>
+            <v-col v-if="reportGeneration && isScientificProductionReport" cols="12" sm="3" md="2">
+                <v-select
+                    v-model="startYear"
+                    :items="years"
+                    :label="$t('fromLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
+                />
+            </v-col>
             <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedYears"
                     :items="years"
-                    :label="(reportGeneration ? $t('reportYearLabel') : $t('yearsLabel')) + '*'"
+                    :label="(reportGeneration ? $t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') : $t('yearsLabel')) + '*'"
                     :rules="requiredMultiSelectionRules"
                     :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
                     :multiple="!reportGeneration">
@@ -358,6 +366,7 @@ export default defineComponent({
         const approximateEndMoment = ref<string>("");
 
         const years = ref<number[]>([]);
+        const startYear = ref<number>((new Date()).getFullYear() - 1);
         const selectedYears = ref<number[]>([(new Date()).getFullYear()]);
 
         const startDate = ref<string>();
@@ -544,7 +553,8 @@ export default defineComponent({
                             timestamp, selectedReportType.value,
                             selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? selectedCommissions.value.map(commission => commission.value) : [selectedCommission.value.value],
                             selectedYears.value, (selectedOUs.value as {title: string, value: number}).value, "sr",
-                            selectedRecurrenceType.value.value
+                            selectedRecurrenceType.value.value,
+                            selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION ? startYear.value : null
                         )
                     );
                     break;
@@ -660,6 +670,9 @@ export default defineComponent({
             return false;
         };
 
+        const isScientificProductionReport = computed(() => 
+            selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION);
+
         return {
             scheduleDate, scheduledTasks, publicReviewLengthDays,
             applicableTypes, selectedApplicableEntityType,
@@ -693,7 +706,8 @@ export default defineComponent({
             approximateEndMoment, requiredFieldRules,
             calculateIF5Rank, calculateJCIRank, thesesAssessment,
             monographPublicationsAssessment, selectedMonographs,
-            metadataEnrichment, autoload, shortenedReviewPeriod
+            metadataEnrichment, autoload, shortenedReviewPeriod,
+            isScientificProductionReport, startYear
         };
     },
 });

@@ -123,10 +123,10 @@
                                 <div v-if="journalPublication?.numberOfPages" class="response">
                                     {{ journalPublication.numberOfPages }}
                                 </div>
-                                <div v-if="journalPublication?.section">
+                                <div v-if="journalPublication?.section?.length ?? 0 > 0">
                                     {{ $t("sectionLabel") }}:
                                 </div>
-                                <div v-if="journalPublication?.section" class="response">
+                                <div v-if="journalPublication?.section?.length ?? 0 > 0" class="response">
                                     {{ returnCurrentLocaleContent(journalPublication.section) }}
                                 </div>
                             </v-col>

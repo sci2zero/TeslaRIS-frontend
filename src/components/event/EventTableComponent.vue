@@ -228,7 +228,9 @@ export default defineComponent({
         const refreshTable = (event: any) => {
             if (tableOptions.value.initialCustomConfiguration) {
                 tableOptions.value.initialCustomConfiguration = false;
+                const pageSize = event.itemsPerPage;
                 event = tableOptions.value;
+                event.itemsPerPage = pageSize ?? 10;
             }
             tableOptions.value = event;
             let sortField: string | undefined = "";
@@ -237,6 +239,7 @@ export default defineComponent({
                 sortField = headersSortableMappings.get(event.sortBy[0].key);
                 sortDir = event.sortBy[0].order.toUpperCase();
             }
+
             emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
         };
 

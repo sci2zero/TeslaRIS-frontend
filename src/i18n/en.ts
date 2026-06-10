@@ -560,7 +560,7 @@ export default {
     updateCountryLabel: "Update country",
     countryCodeLabel: "Country Code",
     countryListLabel: "Countries",
-    addEmployeeLabel: "Add new user...",
+    addEmployeeLabel: "Add new employee...",
     alumniLabel: "Alumni",
     descriptionLabel: "Description",
     superResearchAreaLabel: "Super research area",
@@ -1467,5 +1467,6 @@ export default {
     createConferenceLabel: "Conference",
     createExhibitionLabel: "Exhibition",
     createCourseLabel: "Course",
-    createOtherEventLabel: "Other event"
+    createOtherEventLabel: "Other event",
+    addNewUserLabel: "Add new user..."
 }

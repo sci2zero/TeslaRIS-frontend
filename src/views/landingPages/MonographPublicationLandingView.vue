@@ -109,10 +109,10 @@
                                 <div v-if="monographPublication?.numberOfPages" class="response">
                                     {{ monographPublication.numberOfPages }}
                                 </div>
-                                <div v-if="monographPublication?.section">
+                                <div v-if="monographPublication?.section?.length ?? 0 > 0">
                                     {{ $t("sectionLabel") }}:
                                 </div>
-                                <div v-if="monographPublication?.section" class="response">
+                                <div v-if="monographPublication?.section?.length ?? 0 > 0" class="response">
                                     {{ returnCurrentLocaleContent(monographPublication.section) }}
                                 </div>
                             </v-col>
