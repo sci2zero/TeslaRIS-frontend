@@ -36,6 +36,7 @@ env:
   VITE_APP_VERSION: ${{ inputs.version }}
   VITE_UNPAYWALL_EMAIL: ${{ vars.UNPAYWALL_EMAIL }}
   VITE_SERVER_TIMEZONE: ${{ vars.SERVER_TIMEZONE }}
+  VITE_COMMON_SURNAME_SUFFIXES: ${{ vars.COMMON_SURNAME_SUFFIXES }}
 
 jobs:
   build-frontend:
