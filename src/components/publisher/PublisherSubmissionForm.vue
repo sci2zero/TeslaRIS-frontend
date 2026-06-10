@@ -55,8 +55,8 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import CountryService from '@/services/CountryService';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import Toast from '../core/Toast.vue';
-import { useUserRole } from '@/composables/useUserRole';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -91,16 +91,17 @@ export default defineComponent({
         });
 
         const { languageTags } = useLanguageTags();
-        const { loggedInUser } = useUserRole();
         watch(() => languageTags.value, () => {
             presetName();
         });
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}

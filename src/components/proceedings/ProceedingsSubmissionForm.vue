@@ -239,8 +239,8 @@ import Toast from '../core/Toast.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { PublicationType } from '@/models/PublicationModel';
-import { useUserRole } from '@/composables/useUserRole';
 import EventService from '@/services/EventService';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -276,7 +276,6 @@ export default defineComponent({
         const selectedLanguages = ref<number[]>([]);
         const defaultLanguage = ref(-1);
 
-        const { loggedInUser } = useUserRole();
         const { languageTags } = useLanguageTags();
 
         watch(() => languageTags.value, () => {
@@ -285,9 +284,11 @@ export default defineComponent({
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}

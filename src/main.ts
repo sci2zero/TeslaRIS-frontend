@@ -9,9 +9,11 @@ import './assets/vuetify-custom.scss';
 import './assets/main.css';
 import i18n from './i18n';
 import { createHead } from "@vueuse/head";
+import { initializeLanguageDetector } from "./utils/LanguageDetector.js";
 
 const pinia = createPinia();
 const head = createHead();
+await initializeLanguageDetector();
 
 loadFonts();
 i18n.setup();

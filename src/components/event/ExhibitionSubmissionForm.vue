@@ -165,6 +165,7 @@ import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import { useLanguageTags } from '@/composables/useLanguageTags';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -196,7 +197,7 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
 
-        const { canAddSerialEvents, loggedInUser } = useUserRole();
+        const { canAddSerialEvents } = useUserRole();
 
         onMounted(() => {
             fetchCountries();
@@ -222,9 +223,11 @@ export default defineComponent({
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}

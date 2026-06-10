@@ -298,9 +298,9 @@ import Toast from '../core/Toast.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearch.vue';
-import { useUserRole } from '@/composables/useUserRole';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -332,8 +332,6 @@ export default defineComponent({
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
         const selectedLanguages = ref<number[]>([]);
-
-        const { loggedInUser } = useUserRole();
 
         onMounted(() => {
             LanguageService.getAllLanguageTags().then((response: AxiosResponse<LanguageTagResponse[]>) => {
@@ -380,9 +378,11 @@ export default defineComponent({
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}

@@ -296,13 +296,13 @@ import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import type { Country, MultilingualContent } from '@/models/Common';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import { useUserRole } from '@/composables/useUserRole';
 import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import { getOUSectorFromValueAutoLocale, getOUSectorsForGivenLocale } from '@/i18n/ouSector';
 import DatePicker from '../core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
 import { type AxiosResponse } from 'axios';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -400,7 +400,6 @@ export default defineComponent({
         );
 
         const { languageTags } = useLanguageTags();
-        const { loggedInUser, isAdmin } = useUserRole();
 
         watch(() => languageTags.value, () => {
             presetName();
@@ -408,9 +407,11 @@ export default defineComponent({
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}

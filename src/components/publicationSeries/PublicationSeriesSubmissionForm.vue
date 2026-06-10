@@ -119,10 +119,10 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import UriInput from '@/components/core/UriInput.vue';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
-import { useUserRole } from '@/composables/useUserRole';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { getArticleCollectionSeriesTypesForGivenLocale, getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType.js';
 import { ArticleCollectionSeriesType, type Journal } from '@/models/JournalModel.js';
+import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
 export default defineComponent({
@@ -178,16 +178,17 @@ export default defineComponent({
         });
 
         const { languageTags } = useLanguageTags();
-        const { loggedInUser } = useUserRole();
         watch(() => languageTags.value, () => {
             presetName();
         });
 
         const presetName = async () => {
             if (props.presetName) {
+                const detectedLocale = await detectLanguage(props.presetName);
                 const tag = languageTags.value.find(
-                    lt => lt.languageCode === loggedInUser.value?.preferredReferenceCataloguingLanguage.toUpperCase()
+                    lt => lt.languageCode === detectedLocale
                 );
+
                 if (tag) {
                     const mc: MultilingualContent[] = [
                         {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
