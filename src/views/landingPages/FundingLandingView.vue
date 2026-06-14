@@ -134,11 +134,11 @@
 
         <v-tabs-window v-show="funding" v-model="currentTab">
             <v-tabs-window-item value="fundingParts">
-                <!-- TODO: Implementirati FundingParts komponentu -->
+                <!-- TODO: Implement when FundingPart logic is fixed on the backend -->
                 <v-card class="pa-3" variant="flat">
                     <v-card-text>
-                        <div v-if="fundingParts && fundingParts.length > 0">
-                            <div v-for="part in fundingParts" :key="part.id" class="mb-3">
+                        <div v-if="funding?.fundingParts && funding?.fundingParts?.length > 0">
+                            <div v-for="part in funding?.fundingParts" :key="part.id" class="mb-3">
                                 {{ returnCurrentLocaleContent(part.description) }}
                             </div>
                         </div>
@@ -197,7 +197,6 @@ import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import FundingService from "@/services/project/FundingService";
 import type { Funding } from "@/models/FundingModel";
-import type { FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
@@ -215,7 +214,6 @@ const router = useRouter();
 const i18n = useI18n();
 
 const funding = ref<Funding>();
-const fundingParts = ref<FundingPart[]>([]);
 const currentTab = ref("fundingParts");
 const icon = ref("mdi-cash-multiple");
 
@@ -243,6 +241,9 @@ const fetchFunding = async () => {
             parseInt(route.params.id as string)
         );
         funding.value = response.data;
+
+        console.log("TEST: " + funding.value.fundingParts.length);
+        console.log("TEST: " + JSON.stringify(funding.value.fundingParts));
 
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
