@@ -81,26 +81,11 @@
                     </v-col>
                 </v-row>
 
-                <!-- TODO: Create separate MonetaryAmount component -->
-                <!-- Amount -->
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="amount"
-                            :label="$t('amountLabel')"
-                            type="number"
-                            :min="0"
-                            :rules="optionalNumericZeroOrGreaterFieldRules"
-                        />
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="currencyId"
-                            :label="$t('currencyLabel')"
-                            type="number"
-                        />
-                    </v-col>
-                </v-row>
+                <monetary-amount-input
+                    ref="monetaryAmountRef"
+                    v-model="amount"
+                    :required="false"
+                />
 
                 <!-- Funding Call (text) -->
                 <v-row>
@@ -219,6 +204,8 @@ import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 import type {Funding, FundingType} from "@/models/FundingModel";
+import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
+import type { MonetaryAmount } from "@/models/Common";
 
 const emit = defineEmits(["create"]);
 
@@ -249,20 +236,20 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const dateSubmitted = ref("");
 const dateAwarded = ref("");
-const amount = ref<number | null>(null);
-const currencyId = ref<number | null>(null);
 const competitive = ref(false);
 const renewable = ref(false);
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
+const amount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
+
+const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 
 const fundingTypes = computed(() => getFundingTypesForGivenLocale());
 
 const {
     requiredFieldRules,
     doiValidationRules,
-    optionalNumericZeroOrGreaterFieldRules
 } = useValidationUtils();
 
 const requiredSelectionRules = [(v: any[]) => v.length > 0 || i18n.t("requiredFieldMessage")];
@@ -281,7 +268,7 @@ const submitFunding = (stayOnPage: boolean) => {
         dateTo: dateTo.value || undefined,
         dateSubmitted: dateSubmitted.value || undefined,
         dateAwarded: dateAwarded.value || undefined,
-        amount: amount.value && currencyId.value ? { amount: amount.value, currencyId: currencyId.value } : undefined,
+        amount: amount.value,
         competitive: competitive.value,
         renewable: renewable.value,
         oaMandated: oaMandated.value,
@@ -314,8 +301,7 @@ const submitFunding = (stayOnPage: boolean) => {
             dateTo.value = "";
             dateSubmitted.value = "";
             dateAwarded.value = "";
-            amount.value = null;
-            currencyId.value = null;
+            amount.value = undefined;
             competitive.value = false;
             renewable.value = false;
             oaMandated.value = false;
