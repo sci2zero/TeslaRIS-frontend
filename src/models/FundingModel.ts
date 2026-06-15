@@ -1,4 +1,4 @@
-import type {MultilingualContent} from "@/models/Common";
+import type {MonetaryAmount, MultilingualContent} from "@/models/Common";
 import type {DocumentFileResponse} from "@/models/DocumentFileModel";
 
 export interface Funding {
@@ -32,11 +32,6 @@ export interface Funding {
     dateTo?: string;
     oaMandated?: boolean;
     oaMandateUrl?: string;
-}
-
-export interface MonetaryAmount {
-    currencyId: number;
-    amount: number;
 }
 
 export enum FundingType {

@@ -401,3 +401,15 @@ export interface MaintenanceInformation {
     startTime: string;
     approximateEndMoment: string;
 }
+
+export interface Currency {
+    currencyId: number;
+    name: MultilingualContent[];
+    code: string;
+    symbol: string;
+}
+
+export interface MonetaryAmount {
+    currencyId: number;
+    amount: number;
+}
