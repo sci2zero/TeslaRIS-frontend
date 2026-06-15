@@ -125,6 +125,7 @@ export default {
         submitPerformanceRelatedOutput: "Dodavanje rezultata vezanog za performans",
         performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans",
         fundingLandingPage: "Detalji finansiranja",
+        submitFunding: "Dodavanje finansiranja",
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1470,5 +1471,7 @@ export default {
     renewableLabel: "Obnovljivo",
     fundingPartsLabel: "Stavke finansiranja",
     agreementsLabel: "Ugovori",
+    addFundingLabel: "Finansiranje",
+    currencyLabel: "Valuta",
 
 }

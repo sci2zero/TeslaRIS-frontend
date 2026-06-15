@@ -124,6 +124,7 @@ export default {
         submitPerformanceRelatedOutput: "Submit performance related output",
         performanceRelatedOutputLandingPage: "Performance related output details",
         fundingLandingPage: "Funding Details",
+        submitFunding: "Submit Funding",
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1456,4 +1457,6 @@ export default {
     renewableLabel: "Is renewable",
     fundingPartsLabel: "Funding parts",
     agreementsLabel: "Agreements",
+    addFundingLabel: "Funding",
+    currencyLabel: "Currency",
 }
