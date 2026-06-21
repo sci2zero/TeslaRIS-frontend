@@ -470,11 +470,11 @@ export default defineComponent({
                 allowingSubdomainsDl: allowingSubdomainsDl.value as boolean,
                 institutionEmailDomainDl: institutionEmailDomainDl.value as string,
                 sector: selectedOuSector.value.value as OrganisationUnitSector,
-                startup: startup.value,
+                startup: startup.value !== null ? startup.value : false,
                 dateEstablished: dateEstablished.value,
                 postalAddress: {
                     city: city.value,
-                    countryId: selectedCountry.value?.value as number,
+                    countryId: (selectedCountry.value?.value as number > 0)? selectedCountry.value?.value as number : undefined,
                     streetAndNumber: streetAndNumber.value,
                     state: state.value,
                     postalNumber: postalNumber.value as string

@@ -62,7 +62,7 @@ export enum PersonNameType {
 }
   
 export interface PostalAddress {
-    countryId: number;
+    countryId?: number;
     streetAndNumber: MultilingualContent[];
     city: MultilingualContent[];
     state: MultilingualContent[];
