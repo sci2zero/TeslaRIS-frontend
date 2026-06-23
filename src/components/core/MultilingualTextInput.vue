@@ -274,14 +274,19 @@ export default defineComponent({
                 if (!input.text || input.text === "<p></p>") {
                     input.text = "";
                     return;
-                } else if(input.text.trim() === "") {
+                } else if (input.text.trim() === "") {
                     return;
                 }
-                returnObject.push({content: input.text, 
-                                languageTag: input.language.title, 
-                                languageTagId: input.language.value, 
-                                priority: inputs.value.length - index});
+
+                returnObject.push({
+                    content: input.text, 
+                    languageTag: input.language.title, 
+                    languageTagId: input.language.value, 
+                    priority: inputs.value.length - index
+                });
             });
+
+            returnObject.sort((a, b) => a.priority - b.priority);
 
             emit("update:modelValue", returnObject);
             emit("update");
