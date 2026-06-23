@@ -57,17 +57,17 @@
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>
-                                <div v-if="proceedings?.eventId" class="response">
+                                <div v-if="proceedings?.eventName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'events/conference/' + proceedings?.eventId">
-                                        {{ returnCurrentLocaleContent(event?.name) }}
+                                        {{ returnCurrentLocaleContent(proceedings?.eventName) }}
                                     </localized-link>
                                 </div>
                                 <div v-if="proceedings?.publisherId || proceedings?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="proceedings?.publisherId" class="response">
+                                <div v-if="proceedings?.publisherName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'publishers/' + proceedings?.publisherId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(proceedings?.publisherName) }}
                                     </localized-link>
                                 </div>
                                 <div v-else-if="proceedings?.authorReprint" class="response">
@@ -292,14 +292,10 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import type { Conference } from '@/models/EventModel';
-import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import ProceedingsService from '@/services/ProceedingsService';
 import { useRoute, useRouter } from 'vue-router';
 import type { Proceedings } from '@/models/ProceedingsModel';
-import PublisherService from '@/services/PublisherService';
-import type { Publisher } from '@/models/PublisherModel';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
 import JournalService from '@/services/JournalService';
 import BookSeriesService from '@/services/BookSeriesService';
@@ -343,14 +339,14 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission, isInstitutionalEditor } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isInstitutionalEditor
+        } = useUserRole();
         const canEdit = ref(false);
 
         const proceedings = ref<Proceedings>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
-        
-        const event = ref<Conference>();
-        const publisher = ref<Publisher>();
         
         const publicationSeries = ref<PublicationSeries>();
         const publicationSeriesType = ref<PublicationSeriesType>(PublicationSeriesType.JOURNAL);
@@ -379,7 +375,9 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
-                DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                DocumentPublicationService.canEdit(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
             }
@@ -391,7 +389,9 @@ export default defineComponent({
         };
 
         const fetchIndicators = () => {
-            EntityIndicatorService.fetchDocumentIndicators(parseInt(currentRoute.params.id as string)).then(response => {
+            EntityIndicatorService.fetchDocumentIndicators(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
                 documentIndicators.value = response.data;
             });
         };
@@ -453,27 +453,17 @@ export default defineComponent({
         };
 
         const fetchConnectedEntities = () => {
-            EventService.readConference(proceedings.value?.eventId as number).then((eventResponse) => {
-                    event.value = eventResponse.data;
+            if(proceedings.value?.publicationSeriesId) {
+                JournalService.readJournal(proceedings.value.publicationSeriesId).then((journalResponse) => {
+                    publicationSeries.value = journalResponse.data;
+                    publicationSeriesType.value = PublicationSeriesType.JOURNAL;
+                }).catch(() => {
+                    BookSeriesService.readBookSeries(proceedings.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
+                        publicationSeries.value = bookSeriesResponse.data;
+                        publicationSeriesType.value = PublicationSeriesType.BOOK_SERIES;
+                    });
                 });
-
-                if(proceedings.value?.publisherId) {
-                    PublisherService.readPublisher(proceedings.value.publisherId).then((response) => {
-                        publisher.value = response.data;
-                    });
-                }
-
-                if(proceedings.value?.publicationSeriesId) {
-                    JournalService.readJournal(proceedings.value.publicationSeriesId).then((journalResponse) => {
-                        publicationSeries.value = journalResponse.data;
-                        publicationSeriesType.value = PublicationSeriesType.JOURNAL;
-                    }).catch(() => {
-                        BookSeriesService.readBookSeries(proceedings.value?.publicationSeriesId as number).then((bookSeriesResponse) => {
-                            publicationSeries.value = bookSeriesResponse.data;
-                            publicationSeriesType.value = PublicationSeriesType.BOOK_SERIES;
-                        });
-                    });
-                }
+            }
         };
 
         const fetchIdentifiers = () => {
@@ -506,7 +496,7 @@ export default defineComponent({
 
             updateCommonBasicInfo(proceedings, updatedInfo);
 
-            performUpdate(false);
+            performUpdate(true);
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -529,7 +519,10 @@ export default defineComponent({
                 proceedings.value.publicationSeriesId = undefined;
             }
 
-            ProceedingsService.updateProceedings(proceedings.value?.id as number, proceedings.value as Proceedings).then(() => {
+            ProceedingsService.updateProceedings(
+                proceedings.value?.id as number,
+                proceedings.value as Proceedings
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 fetchConnectedEntities();
@@ -562,8 +555,13 @@ export default defineComponent({
         };
 
         const createIndicator = (documentIndicator: {indicator: DocumentIndicator, files: File[]}) => {
-            EntityIndicatorService.createDocumentIndicator(documentIndicator.indicator).then((response) => {
-                EntityIndicatorService.uploadFilesAndFetchIndicators(documentIndicator.files, response.data.id).then(() => {
+            EntityIndicatorService.createDocumentIndicator(
+                documentIndicator.indicator
+            ).then((response) => {
+                EntityIndicatorService.uploadFilesAndFetchIndicators(
+                    documentIndicator.files,
+                    response.data.id
+                ).then(() => {
                     fetchIndicators();
                 });
             });
@@ -576,11 +574,11 @@ export default defineComponent({
 
         return {
             proceedings, icon, fetchIndicators, PublicationType,
-            publications, event, currentTab, createIndicator,
+            publications, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseDate, fetchIdentifiers,
             languageMap, publicationSeriesType, displayConfiguration,
-            searchKeyword, goToURL, canEdit, publisher, documentIdentifiers,
+            searchKeyword, goToURL, canEdit, documentIdentifiers,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,

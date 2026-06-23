@@ -135,6 +135,8 @@ export interface Document {
     city?: MultilingualContent[];
     edition?: MultilingualContent[];
     authorReprint?: boolean;
+    publisherName?: MultilingualContent[];
+    eventName?: MultilingualContent[];
 }
 
 export interface CommonFieldsData {
@@ -257,6 +259,7 @@ export interface Monograph extends Document {
     languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
+    publisherName?: MultilingualContent[];
     udc?: string;
 }
 
@@ -279,12 +282,14 @@ export interface MonographPublication extends Document {
     numberOfPages?: number;
     articleNumber?: string;
     monographId?: number;
+    monographName?: MultilingualContent[];
     section?: MultilingualContent[];
 }
 
 export interface Patent extends Document {
     number: string;
     publisherId?: number;
+    publisherName?: MultilingualContent[];
 }
 
 export interface IntangibleProduct extends Document {

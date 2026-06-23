@@ -84,9 +84,9 @@
                                 <div v-if="monographPublication?.monographId">
                                     {{ $t("monographLabel") }}:
                                 </div>
-                                <div v-if="monographPublication?.monographId" class="response">
+                                <div v-if="monographPublication?.monographName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'scientific-results/monograph/' + monographPublication?.monographId">
-                                        {{ returnCurrentLocaleContent(monograph?.title) }}
+                                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
                                     </localized-link>
                                 </div>
                                 <div v-if="monographPublication?.eventId">
@@ -281,8 +281,6 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
-import type { Monograph } from '@/models/PublicationModel';
-import MonographService from '@/services/DocumentPublicationService';
 import { localiseDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -333,7 +331,6 @@ export default defineComponent({
         const monographPublication = ref<MonographPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         const event = ref<Conference>();
-        const monograph = ref<Monograph>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -396,10 +393,6 @@ export default defineComponent({
                         event.value = eventResponse.data;
                     })
                 }
-
-                MonographService.readMonograph(monographPublication.value.monographId as number).then(response => {
-                    monograph.value = response.data;
-                });
     
                 populateData();
             }).catch(() => {
@@ -515,7 +508,7 @@ export default defineComponent({
         return {
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind, icon,
-            languageTagMap, monograph, MonographPublicationUpdateForm,
+            languageTagMap, MonographPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,

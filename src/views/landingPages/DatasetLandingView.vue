@@ -72,9 +72,9 @@
                                 <div v-if="dataset?.publisherId || dataset?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="dataset?.publisherId" class="response">
+                                <div v-if="dataset?.publisherName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'publishers/' + dataset?.publisherId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(dataset?.publisherName) }}
                                     </localized-link>
                                 </div>
                                 <div v-else-if="dataset?.authorReprint" class="response">
@@ -240,8 +240,6 @@ import type { Dataset } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import PublisherService from '@/services/PublisherService';
-import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -288,7 +286,6 @@ export default defineComponent({
         const router = useRouter();
 
         const dataset = ref<Dataset>();
-        const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const { isResearcher, isAdmin, isCommission } = useUserRole();
@@ -347,12 +344,6 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(dataset.value.title) as string;
 
                 dataset.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
-
-                if(dataset.value.publisherId) {
-                    PublisherService.readPublisher(dataset.value.publisherId).then((publisherResponse) => {
-                        publisher.value = publisherResponse.data;
-                    })
-                }
     
                 populateData();
             }).catch(() => {
@@ -474,7 +465,7 @@ export default defineComponent({
         };
 
         return {
-            dataset, icon, publisher, isResearcher, currentTab,
+            dataset, icon, isResearcher, currentTab,
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, searchKeyword, goToURL, canEdit,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

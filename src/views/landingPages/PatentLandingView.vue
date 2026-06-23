@@ -71,9 +71,9 @@
                                 <div v-if="patent?.publisherId || patent?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="patent?.publisherId" class="response">
+                                <div v-if="patent?.publisherName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'publishers/' + patent?.publisherId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(patent?.publisherName) }}
                                     </localized-link>
                                 </div>
                                 <div v-else-if="patent?.authorReprint" class="response">
@@ -240,8 +240,6 @@ import type { Patent } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import PublisherService from '@/services/PublisherService';
-import type { Publisher } from '@/models/PublisherModel';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -289,7 +287,6 @@ export default defineComponent({
         const router = useRouter();
 
         const patent = ref<Patent>();
-        const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const { isResearcher, isAdmin, isCommission } = useUserRole();
@@ -348,12 +345,6 @@ export default defineComponent({
                 document.title = returnCurrentLocaleContent(patent.value.title) as string;
 
                 patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
-
-                if(patent.value.publisherId) {
-                    PublisherService.readPublisher(patent.value.publisherId).then((publisherResponse) => {
-                        publisher.value = publisherResponse.data;
-                    })
-                }
     
                 populateData();
             }).catch(() => {
@@ -463,7 +454,7 @@ export default defineComponent({
         };
 
         return {
-            patent, icon, publisher, currentTab, ApplicableEntityType,
+            patent, icon, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, PatentUpdateForm, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
