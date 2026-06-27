@@ -412,4 +412,6 @@ export interface Currency {
 export interface MonetaryAmount {
     currencyId: number;
     amount: number;
+    currencyCode?: string;
+    currencySymbol?: string;
 }
