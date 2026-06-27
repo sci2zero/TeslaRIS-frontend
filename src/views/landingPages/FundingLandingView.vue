@@ -78,7 +78,7 @@
                             <!-- Right column -->
                             <v-col cols="6">
                                 <div v-if="funding.amount">{{ $t("amountLabel") }}:</div>
-                                <div v-if="funding.amount" class="response">{{ funding.amount.amount }}</div>
+                                <div v-if="funding.amount" class="response">{{ formatAmount(funding.amount.amount, locale) }}</div>
 
                                 <div v-if="funding.uris && funding.uris.length > 0">{{ $t("urisLabel") }}:</div>
                                 <div v-if="funding.uris && funding.uris.length > 0" class="response">
@@ -134,25 +134,22 @@
 
         <v-tabs-window v-show="funding" v-model="currentTab">
             <v-tabs-window-item value="fundingParts">
-                <!-- TODO: Implement when FundingPart logic is fixed on the backend -->
-                <v-card class="pa-3" variant="flat">
-                    <v-card-text>
-                        <div v-if="funding?.fundingParts && funding?.fundingParts?.length > 0">
-                            <div v-for="part in funding?.fundingParts" :key="part.id" class="mb-3">
-                                {{ returnCurrentLocaleContent(part.description) }}
-                            </div>
-                        </div>
-                        <div v-else>
-                            {{ $t("notYetSetMessage") }}
-                        </div>
-                    </v-card-text>
-                </v-card>
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <funding-part-list
+                            :funding-parts="funding?.fundingParts ? funding.fundingParts : []"
+                            :can-edit="canEdit"
+                            @create="addAgreement($event)"
+                            @delete="deleteAgreement($event)"
+                            @update="updateAgreement($event)"
+                        />
+                    </v-col>
+                </v-row>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="documents">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <h2>{{ $t("agreementsLabel") }}</h2>
                         <attachment-list
                             :attachments="funding?.agreements ? funding.agreements : []"
                             :can-edit="canEdit"
@@ -207,11 +204,13 @@ import { useUploadStore } from "@/stores/uploadStore";
 import type { DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
-
+import FundingPartList from "@/components/project/FundingPartList.vue";
+import {formatAmount} from "@/utils/MonetaryUtil";
 
 const route = useRoute();
 const router = useRouter();
 const i18n = useI18n();
+const { locale } = useI18n();
 
 const funding = ref<Funding>();
 const currentTab = ref("fundingParts");

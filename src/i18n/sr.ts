@@ -1473,5 +1473,6 @@ export default {
     agreementsLabel: "Ugovori",
     addFundingLabel: "Finansiranje",
     currencyLabel: "Valuta",
+    fundingCallLabel: "Poziv za finansiranje"
 
 }

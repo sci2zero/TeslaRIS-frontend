@@ -1459,4 +1459,5 @@ export default {
     agreementsLabel: "Agreements",
     addFundingLabel: "Funding",
     currencyLabel: "Currency",
+    fundingCallLabel: "Funding call",
 }
