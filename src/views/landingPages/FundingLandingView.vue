@@ -12,8 +12,23 @@
                             class="text-center"
                         >
                             <rich-title-renderer :title="title" />
+                            <div>
+                                <generic-crud-modal
+                                    class="mb-6"
+                                    :form-component="AlternateNameForm"
+                                    :form-props="{ presetName: funding?.name, presetNameAbbreviation: funding?.nameAbbreviation }"
+                                    entity-name="Name"
+                                    is-update
+                                    is-section-update
+                                    :read-only="!canEdit || thesis?.isOnPublicReview"
+                                    @update="updateName"
+                                />
+                            </div>
                         </v-skeleton-loader>
                     </v-card-title>
+                    <v-card-subtitle class="text-center">
+                        {{ $t("fundingLabel") }}
+                    </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
@@ -48,16 +63,16 @@
                                 </div>
 
                                 <div v-if="funding.dateFrom">{{ $t("dateFromLabel") }}:</div>
-                                <div v-if="funding.dateFrom" class="response">{{ funding.dateFrom }}</div>
+                                <div v-if="funding.dateFrom" class="response">{{ localiseDate(funding.dateFrom) }}</div>
 
                                 <div v-if="funding.dateTo">{{ $t("dateToLabel") }}:</div>
-                                <div v-if="funding.dateTo" class="response">{{ funding.dateTo }}</div>
+                                <div v-if="funding.dateTo" class="response">{{ localiseDate(funding.dateTo) }}</div>
 
                                 <div v-if="funding.dateSubmitted">{{ $t("dateSubmittedLabel") }}:</div>
-                                <div v-if="funding.dateSubmitted" class="response">{{ funding.dateSubmitted }}</div>
+                                <div v-if="funding.dateSubmitted" class="response">{{ localiseDate(funding.dateSubmitted) }}</div>
 
                                 <div v-if="funding.dateAwarded">{{ $t("dateAwardedLabel") }}:</div>
-                                <div v-if="funding.dateAwarded" class="response">{{ funding.dateAwarded }}</div>
+                                <div v-if="funding.dateAwarded" class="response">{{ localiseDate(funding.dateAwarded) }}</div>
 
                                 <div v-if="funding.displayFunder && funding.displayFunder.length > 0">{{ $t("funderLabel") }}:</div>
                                 <div v-if="funding.displayFunder && funding.displayFunder.length > 0" class="response">
@@ -78,7 +93,7 @@
                             <!-- Right column -->
                             <v-col cols="6">
                                 <div v-if="funding.amount">{{ $t("amountLabel") }}:</div>
-                                <div v-if="funding.amount" class="response">{{ formatAmount(funding.amount.amount, locale) }}</div>
+                                <div v-if="funding.amount" class="response">{{ formatAmount(funding.amount.amount, locale) }} {{ funding.amount.currencyCode }}</div>
 
                                 <div v-if="funding.uris && funding.uris.length > 0">{{ $t("urisLabel") }}:</div>
                                 <div v-if="funding.uris && funding.uris.length > 0" class="response">
@@ -199,14 +214,17 @@ import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
-import {useLoginStore} from "@/stores/loginStore";
+import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
 import type { DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import FundingPartList from "@/components/project/FundingPartList.vue";
-import {formatAmount} from "@/utils/MonetaryUtil";
+import { formatAmount } from "@/utils/MonetaryUtil";
 import FundingPartService from "@/services/project/FundingPartService";
+import { localiseDate } from '@/utils/DateUtil';
+import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -242,9 +260,6 @@ const fetchFunding = async () => {
         );
         funding.value = response.data;
 
-        console.log("TEST: " + funding.value.fundingParts.length);
-        console.log("TEST: " + JSON.stringify(funding.value.fundingParts));
-
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
         }
@@ -264,20 +279,29 @@ const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
 };
 
+const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
+    funding.value!.name = nameInformation.name;
+    funding.value!.nameAbbreviation = nameInformation.nameAbbreviation;
+    performUpdate(true);
+};
+
 const updateKeywords = (keywords: MultilingualContent[]) => {
     funding.value!.keywords = keywords;
-    performUpdate();
+    performUpdate(true);
 };
 
 const updateDescription = (description: MultilingualContent[]) => {
     funding.value!.description = description;
-    performUpdate();
+    performUpdate(true);
 };
 
-const performUpdate = () => {
+const performUpdate = (reload: boolean) => {
     FundingService.updateFunding(funding.value?.id as number, funding.value as Funding).then(() => {
         snackbarMessage.value = i18n.t("updatedSuccessMessage");
         snackbar.value = true;
+        if (reload) {
+            fetchFunding();
+        }
     }).catch(() => {
         snackbarMessage.value = i18n.t("genericErrorMessage");
         snackbar.value = true;

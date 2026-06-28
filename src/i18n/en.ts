@@ -1467,4 +1467,6 @@ export default {
     fundingApplicationLabel: "Funding Application",
     personProjectContributionLabel: "Person Project",
     organisationUnitProjectContributionLabel: "Organisation Unit Contribution",
+    noFundingPartsMessage: "No Funding Parts Provided.",
+    updateNameLabel: "Update name",
 }

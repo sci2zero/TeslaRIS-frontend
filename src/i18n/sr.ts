@@ -1481,5 +1481,6 @@ export default {
     fundingApplicationLabel: "Zahtev za finansiranje",
     personProjectContributionLabel: "Osoba projekta",
     organisationUnitProjectContributionLabel: "Kontribucija organizacione jedinice",
-
+    noFundingPartsMessage: "Nisu priložene stavke finansiranja.",
+    updateNameLabel: "Ažuriraj naziv",
 }
