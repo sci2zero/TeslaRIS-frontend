@@ -1,11 +1,10 @@
 <template>
     <v-card class="pa-3" variant="flat" color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-<!--            TODO: Uncomment when submission modal is done-->
-<!--            <funding-part-submission-modal-->
-<!--                v-if="canEdit"-->
-<!--                @create="sendDataToParent"-->
-<!--            />-->
+            <funding-part-submission-modal
+                v-if="canEdit"
+                @create="sendDataToParent"
+            />
 
             <v-row>
                 <v-list
@@ -20,9 +19,9 @@
                         :disabled="false"
                     >
                         <v-list-item
-                            v-for="(funding, fundingIndex) in fundingParts"
+                            v-for="(fundingPart, fundingIndex) in fundingParts"
                             :key="fundingIndex"
-                            :value="funding.id"
+                            :value="fundingPart.id"
                             color="primary"
                         >
                             <template #prepend>
@@ -30,11 +29,11 @@
                             </template>
 
                             <v-list-item-title>
-                                <strong>{{ formatAmount(funding.amount?.amount, locale) }} {{ funding.amount?.currencyCode }}</strong>
+                                <strong>{{ formatAmount(fundingPart.amount?.amount, locale) }} {{ fundingPart.amount?.currencyCode }}</strong>
                             </v-list-item-title>
 
                             <v-list-item-subtitle>
-                                {{ returnCurrentLocaleContent(funding.description) }}
+                                {{ returnCurrentLocaleContent(fundingPart.description) }}
                             </v-list-item-subtitle>
 
                             <template #append>
@@ -42,18 +41,17 @@
                                     <v-col v-if="!disableUpdates || isInstitutionalLibrarian || isAdmin || isHeadOfLibrary">
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
-                                            class="inline-action" @click="sendDeleteRequestToParent(funding.id)">
+                                            class="inline-action" @click="sendDeleteRequestToParent(fundingPart.id)">
                                             <v-icon size="x-large" icon="mdi-delete"></v-icon>
                                         </v-btn>
                                     </v-col>
-<!--                                    TODO: Uncomment when submission modal is done-->
-<!--                                    <v-col v-if="!disableUpdates">-->
-<!--                                        <funding-part-submission-modal-->
-<!--                                            edit-->
-<!--                                            :preset-funding-part="funding"-->
-<!--                                            @update="sendUpdateRequestToParent($event, funding.id)"-->
-<!--                                        />-->
-<!--                                    </v-col>-->
+                                    <v-col v-if="!disableUpdates">
+                                        <funding-part-submission-modal
+                                            edit
+                                            :preset-funding-part="fundingPart"
+                                            @update="sendUpdateRequestToParent($event, fundingPart.id)"
+                                        />
+                                    </v-col>
                                 </v-row>
                             </template>
                         </v-list-item>
@@ -74,6 +72,7 @@ import { useUserRole } from '@/composables/useUserRole';
 import { useI18n } from 'vue-i18n';
 import { formatAmount } from "@/utils/MonetaryUtil";
 import type { FundingPart } from '@/models/FundingModel';
+import FundingPartSubmissionModal from "@/components/project/FundingPartSubmissionModal.vue";
 
 const { locale } = useI18n();
 
@@ -97,16 +96,16 @@ const emit = defineEmits<{
 
 const { isAdmin, isHeadOfLibrary, isInstitutionalLibrarian } = useUserRole();
 
-// const sendDataToParent = (fundingPart: FundingPart) => {
-//     emit("create", fundingPart);
-// };
-//
-// const sendUpdateRequestToParent = (fundingPart: FundingPart, fundingPartId: number | undefined) => {
-//     if (fundingPartId !== undefined) {
-//         fundingPart.id = fundingPartId;
-//     }
-//     emit("update", fundingPart);
-// };
+const sendDataToParent = (fundingPart: FundingPart) => {
+    emit("create", fundingPart);
+};
+
+const sendUpdateRequestToParent = (fundingPart: FundingPart, fundingPartId: number | undefined) => {
+    if (fundingPartId !== undefined) {
+        fundingPart.id = fundingPartId;
+    }
+    emit("update", fundingPart);
+};
 
 const sendDeleteRequestToParent = (fundingPartId: number | undefined) => {
     if (fundingPartId !== undefined) {

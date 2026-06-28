@@ -139,9 +139,9 @@
                         <funding-part-list
                             :funding-parts="funding?.fundingParts ? funding.fundingParts : []"
                             :can-edit="canEdit"
-                            @create="addAgreement($event)"
-                            @delete="deleteAgreement($event)"
-                            @update="updateAgreement($event)"
+                            @create="addFundingPart($event)"
+                            @delete="deleteFundingPart($event)"
+                            @update="updateFundingPart($event)"
                         />
                     </v-col>
                 </v-row>
@@ -193,7 +193,7 @@ import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import FundingService from "@/services/project/FundingService";
-import type { Funding } from "@/models/FundingModel";
+import type { Funding, FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
@@ -206,6 +206,7 @@ import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import FundingPartList from "@/components/project/FundingPartList.vue";
 import {formatAmount} from "@/utils/MonetaryUtil";
+import FundingPartService from "@/services/project/FundingPartService";
 
 const route = useRoute();
 const router = useRouter();
@@ -322,6 +323,36 @@ const updateAgreement = (attachment: DocumentFile) => {
         }
     }).catch(() => {
         uploadStore.uploadProgressRef?.cancelUpload(true);
+    });
+};
+
+const addFundingPart = (fundingPart: FundingPart) => {
+    if (funding.value === undefined || funding.value.id === undefined) {
+        return;
+    }
+    // TODO: Remove this when FundingApplication is connected to the Funding
+    fundingPart.fundingApplicationId = 1;
+
+    fundingPart.fundingId = funding.value.id;
+
+    FundingPartService.createFundingPart(fundingPart).then((response) => {
+        funding.value?.fundingParts?.push(response.data);
+    });
+};
+
+const updateFundingPart = (fundingPart: FundingPart) => {
+    // TODO: Remove this when FundingApplication is connected to the Funding
+    fundingPart.fundingApplicationId = 1;
+
+    FundingPartService.updateFundingPart(fundingPart.id as number, fundingPart).then(() => {
+        funding.value!.fundingParts = funding.value?.fundingParts?.filter(fp => fp.id !== fundingPart.id) ?? [];
+        funding.value?.fundingParts?.push(fundingPart);
+    });
+};
+
+const deleteFundingPart = (fundingPartId: number) => {
+    FundingPartService.deleteFundingPart(fundingPartId).then(() => {
+        funding.value!.fundingParts = funding.value?.fundingParts?.filter(fp => fp.id !== fundingPartId) ?? [];
     });
 };
 

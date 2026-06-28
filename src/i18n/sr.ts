@@ -1473,6 +1473,13 @@ export default {
     agreementsLabel: "Ugovori",
     addFundingLabel: "Finansiranje",
     currencyLabel: "Valuta",
-    fundingCallLabel: "Poziv za finansiranje"
+    fundingCallLabel: "Poziv za finansiranje",
+    addFundingPartLabel: "Dodaj stavku finansiranja",
+    fundingLabel: "Finansiranje",
+    projectEventLabel: "Dogadjaj projekta",
+    projectDocumentLabel: "Dokument projekta",
+    fundingApplicationLabel: "Zahtev za finansiranje",
+    personProjectContributionLabel: "Osoba projekta",
+    organisationUnitProjectContributionLabel: "Kontribucija organizacione jedinice",
 
 }

@@ -1460,4 +1460,11 @@ export default {
     addFundingLabel: "Funding",
     currencyLabel: "Currency",
     fundingCallLabel: "Funding call",
+    addFundingPartLabel: "Add Funding Part",
+    fundingLabel: "Funding",
+    projectEventLabel: "Project Event",
+    projectDocumentLabel: "Project Document",
+    fundingApplicationLabel: "Funding Application",
+    personProjectContributionLabel: "Person Project",
+    organisationUnitProjectContributionLabel: "Organisation Unit Contribution",
 }
