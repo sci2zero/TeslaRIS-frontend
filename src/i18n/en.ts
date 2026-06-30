@@ -1372,6 +1372,7 @@ export default {
     organisationUnitSectorLabel: "Organisation sector",
     startupLabel: "Startup",
     dateEstablishedLabel: "Date established",
+    dateDissolvedLabel: "Date dissolved",
     degreeTypeLabel: "Degree type",
     educationStatusLabel: "Education status",
     degreeCodeLabel: "Degree code",
@@ -1468,5 +1469,10 @@ export default {
     createExhibitionLabel: "Exhibition",
     createCourseLabel: "Course",
     createOtherEventLabel: "Other event",
-    addNewUserLabel: "Add new user..."
+    addNewUserLabel: "Add new user...",
+    invalidGridMessage: "Wrong GRID format.",
+    invalidWikidataMessage: "Wrong Wikidata format.",
+    nationalIdLabel: "National identifier",
+    numberOfEmployeesLabel: "Number of employees",
+    activeLabel: "Organisation unit is active"
 }

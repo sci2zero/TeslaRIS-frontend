@@ -266,6 +266,10 @@ export default defineComponent({
                 { fieldName: "fundref", emptyValue: "" },
                 { fieldName: "isni", emptyValue: "" },
                 { fieldName: "fctId", emptyValue: "" },
+                { fieldName: "grid", emptyValue: "" },
+                { fieldName: "wikidata", emptyValue: "" },
+                { fieldName: "nationalId", emptyValue: "" },
+                { fieldName: "numberOfEmployees", emptyValue: "" },
                 { fieldName: "taxNumber", emptyValue: "" },
                 { fieldName: "allowedThesisTypes", emptyValue: [] },
                 { fieldName: "clientInstitutionCris", emptyValue: false },
@@ -275,10 +279,12 @@ export default defineComponent({
                 { fieldName: "clientInstitutionDl", emptyValue: false },
                 { fieldName: "validatingEmailDomainDl", emptyValue: false },
                 { fieldName: "allowingSubdomainsDl", emptyValue: false },
+                { fieldName: "active", emptyValue: false },
                 { fieldName: "institutionEmailDomainDl", emptyValue: "" },
                 { fieldName: "legalEntity", emptyValue: false, setEmpty: false },
                 { fieldName: "startup", emptyValue: false, setEmpty: false },
                 { fieldName: "dateEstablished", emptyValue: null },
+                { fieldName: "dateDissolved", emptyValue: null },
                 { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
                 { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
                 { fieldName: "location.latitude", emptyValue: null, nested: true, setEmpty: false },
@@ -340,6 +346,10 @@ export default defineComponent({
             leftOrganisationUnit.value!.isni = updatedData.isni;
             leftOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             leftOrganisationUnit.value!.fctId = updatedData.fctId;
+            leftOrganisationUnit.value!.grid = updatedData.grid;
+            leftOrganisationUnit.value!.wikidata = updatedData.wikidata;
+            leftOrganisationUnit.value!.nationalId = updatedData.nationalId;
+            leftOrganisationUnit.value!.numberOfEmployees = updatedData.numberOfEmployees;
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.description = updatedData.description;
@@ -358,6 +368,8 @@ export default defineComponent({
             leftOrganisationUnit.value!.sector = updatedData.sector;
             leftOrganisationUnit.value!.startup = updatedData.startup;
             leftOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            leftOrganisationUnit.value!.dateDissolved = updatedData.dateDissolved;
+            leftOrganisationUnit.value!.active = updatedData.active;
             leftOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             leftUpdateRequest.value = updatedData;
@@ -379,6 +391,9 @@ export default defineComponent({
             rightOrganisationUnit.value!.isni = updatedData.isni;
             rightOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             rightOrganisationUnit.value!.fctId = updatedData.fctId;
+            rightOrganisationUnit.value!.grid = updatedData.grid;
+            rightOrganisationUnit.value!.wikidata = updatedData.wikidata;
+            rightOrganisationUnit.value!.nationalId = updatedData.nationalId;
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.description = updatedData.description;
@@ -397,6 +412,8 @@ export default defineComponent({
             rightOrganisationUnit.value!.sector = updatedData.sector;
             rightOrganisationUnit.value!.startup = updatedData.startup;
             rightOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            rightOrganisationUnit.value!.dateDissolved = updatedData.dateDissolved;
+            rightOrganisationUnit.value!.active = updatedData.active;
             rightOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             rightUpdateRequest.value = updatedData;

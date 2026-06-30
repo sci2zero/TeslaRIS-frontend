@@ -120,5 +120,7 @@ export default {
     handleIdExistsError: "Handle ID је већ у употреби.",
     arxivIdExistsError: "ArXiv ID је већ у употреби.",
     pubmedIdExistsError: "PubMed ID је већ у употреби.",
-    ssrnIdExistsError: "SSRN ID је већ у употреби."
+    ssrnIdExistsError: "SSRN ID је већ у употреби.",
+    invalidGridMessage: "Погрешан формат GRID-а.",
+    invalidWikidataMessage: "Погрешан формат Wikidata ID-а."
 };

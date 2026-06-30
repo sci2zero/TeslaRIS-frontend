@@ -1386,6 +1386,7 @@ export default {
     organisationUnitSectorLabel: "Organizacioni sektor",
     startupLabel: "Startap",
     dateEstablishedLabel: "Datum osnivanja",
+    dateDissolvedLabel: "Datum gašenja",
     degreeTypeLabel: "Tip diplome",
     educationStatusLabel: "Status edukacije",
     degreeCodeLabel: "Kod diplome",
@@ -1482,5 +1483,10 @@ export default {
     createExhibitionLabel: "Izložba",
     createCourseLabel: "Kurs",
     createOtherEventLabel: "Drugi tip događaja",
-    addNewUserLabel: "Dodaj novog korisnika..."
+    addNewUserLabel: "Dodaj novog korisnika...",
+    invalidGridMessage: "Pogrešan format GRID-a.",
+    invalidWikidataMessage: "Pogrešan format Wikidata ID-a.",
+    nationalIdLabel: "Nacionalni identifikator",
+    numberOfEmployeesLabel: "Broj zaposlenih",
+    activeLabel: "Organizaciona jedinica je aktivna"
 }

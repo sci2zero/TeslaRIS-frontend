@@ -62,6 +62,8 @@ export default defineComponent({
                     return "http://lattes.cnpq.br/";
                 case "authenticus":
                     return "https://authenticus.pt/author/";
+                case "wikidata":
+                    return "https://www.wikidata.org/wiki/";
             }
 
             return "https://doi.org/";

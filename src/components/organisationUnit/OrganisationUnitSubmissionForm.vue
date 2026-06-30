@@ -74,6 +74,24 @@
                         </v-col>
                     </v-row>
                     <v-row>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="grid" label="GRID" placeholder="GRID" :rules="gridValidationRules" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="wikidata" label="Wikidata ID" placeholder="Wikidata ID" :rules="wikidataValidationRules" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="nationalId" :label="$t('nationalIdLabel')" :placeholder="$t('nationalIdLabel')" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" :placeholder="$t('numberOfEmployeesLabel')" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
                         <v-col cols="12">
                             <v-text-field
                                 v-model="taxNumber"
@@ -129,6 +147,21 @@
                                 v-model="dateEstablished"
                                 :label="$t('dateEstablishedLabel')"
                                 color="primary"
+                            />
+                        </v-col>
+                        <v-col>
+                            <date-picker
+                                v-model="dateDissolved"
+                                :label="$t('dateDissolvedLabel')"
+                                color="primary"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="isAdmin">
+                        <v-col>
+                            <v-checkbox
+                                v-model="active"
+                                :label="$t('activeLabel')"
                             />
                         </v-col>
                     </v-row>
@@ -303,6 +336,7 @@ import DatePicker from '../core/DatePicker.vue';
 import CountryService from '@/services/CountryService';
 import { type AxiosResponse } from 'axios';
 import { detectLanguage } from '@/utils/LanguageDetector.js';
+import { useUserRole } from '@/composables/useUserRole.js';
 
 
 export default defineComponent({
@@ -329,17 +363,26 @@ export default defineComponent({
         const i18n = useI18n();
         const router = useRouter();
 
+        const { isAdmin } = useUserRole();
+
         onMounted(() => {
             fetchCountries();
         });
 
         const fetchCountries = () => {
-            CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
-                countries.value = [{ title: "", value: -1}];
-                response.data.forEach(country => {
-                    countries.value.push({title: returnCurrentLocaleContent(country.name) as string, value: country.id as number});
-                });
-            });
+            CountryService.readAllCountries().then(
+                (response: AxiosResponse<Country[]>) => {
+                    countries.value = [{ title: "", value: -1}];
+                    response.data.forEach(country => {
+                        countries.value.push(
+                            {
+                                title: returnCurrentLocaleContent(country.name) as string,
+                                value: country.id as number
+                            }
+                        );
+                    });
+                }
+            );
         };
 
         const nameRef = ref<typeof MultilingualTextInput>();
@@ -359,7 +402,11 @@ export default defineComponent({
         const fundref = ref("");
         const isni = ref("");
         const fctId = ref("");
+        const grid = ref("");
+        const wikidata = ref("");
+        const nationalId = ref("");
         const taxNumber = ref("");
+        const numberOfEmployees = ref("");
 
         const phoneNumber = ref("");
         const keywords = ref([]);
@@ -376,6 +423,8 @@ export default defineComponent({
         const legalEntity = ref(false);
         const startup = ref(false);
         const dateEstablished = ref();
+        const dateDissolved = ref();
+        const active = ref(true);
 
         const cityRef = ref<typeof MultilingualTextInput>();
         const streetAndNumberRef = ref<typeof MultilingualTextInput>();
@@ -414,7 +463,12 @@ export default defineComponent({
 
                 if (tag) {
                     const mc: MultilingualContent[] = [
-                        {content: props.presetName, languageTag: tag.languageCode, languageTagId: tag.id, priority: 1}
+                        {
+                            content: props.presetName,
+                            languageTag: tag.languageCode,
+                            languageTagId: tag.id,
+                            priority: 1
+                        }
                     ];
                     name.value = mc;
                     nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(mc, languageTags.value));
@@ -428,7 +482,8 @@ export default defineComponent({
             institutionOpenAlexIdValidationRules,
             requiredSelectionRules, ringgoldValidationRules,
             fundrefValidationRules, isniValidationRules,
-            fctIdValidationRules, taxNumberValidationRules
+            fctIdValidationRules, taxNumberValidationRules,
+            gridValidationRules, wikidataValidationRules
         } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
@@ -438,8 +493,15 @@ export default defineComponent({
                 description: description.value,
                 keyword: keywords.value,
                 researchAreasId: [],
-                location: {latitude: mapRef.value?.currentPosition.lat, longitude: mapRef.value?.currentPosition.lon, address: mapRef.value?.address},
-                contact: {contactEmail: email.value, phoneNumber: phoneNumber.value},
+                location: {
+                    latitude: mapRef.value?.currentPosition.lat,
+                    longitude: mapRef.value?.currentPosition.lon,
+                    address: mapRef.value?.address
+                },
+                contact: {
+                    contactEmail: email.value,
+                    phoneNumber: phoneNumber.value
+                },
                 scopusAfid: scopusAfid.value,
                 openAlexId: openAlexId.value,
                 ror: ror.value,
@@ -448,6 +510,9 @@ export default defineComponent({
                 isni: isni.value,
                 fctId: fctId.value,
                 taxNumber: taxNumber.value,
+                grid: grid.value,
+                wikidata: wikidata.value,
+                nationalId: nationalId.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
                 clientInstitutionCris: clientInstitutionCris.value,
@@ -462,6 +527,9 @@ export default defineComponent({
                 sector: selectedOuSector.value.value as OrganisationUnitSector,
                 startup: startup.value,
                 dateEstablished: dateEstablished.value,
+                dateDissolved: dateDissolved.value,
+                active: active.value,
+                numberOfEmployees: numberOfEmployees.value,
                 postalAddress: {
                     city: city.value,
                     countryId: selectedCountry.value?.value as number,
@@ -492,6 +560,11 @@ export default defineComponent({
                     isni.value = "";
                     fctId.value = "";
                     taxNumber.value = "";
+                    grid.value = "";
+                    wikidata.value = "";
+                    nationalId.value = "";
+                    numberOfEmployees.value = "";
+                    active.value = true;
                     selectedThesisType.value = [];
                     selectedOuSector.value = 
                         { 
@@ -510,6 +583,7 @@ export default defineComponent({
                     legalEntity.value = false;
                     startup.value = false;
                     dateEstablished.value = "";
+                    dateDissolved.value = "";
                     cityRef.value?.clearInput();
                     streetAndNumberRef.value?.clearInput();
                     stateRef.value?.clearInput();
@@ -535,7 +609,7 @@ export default defineComponent({
             requiredFieldRules, clientInstitutionCris,
             submit, mapRef, scopusAfid, uris,
             scopusAfidValidationRules, legalEntity,
-            nonMandatoryEmailFieldRules,
+            nonMandatoryEmailFieldRules, numberOfEmployees,
             openAlexId, rorValidationRules, ror,
             institutionOpenAlexIdValidationRules,
             thesisTypes, selectedThesisType, isAdmin,
@@ -549,8 +623,10 @@ export default defineComponent({
             selectedOuSector, startup, dateEstablished,
             description, descriptionRef, city, cityRef,
             streetAndNumber, streetAndNumberRef, state,
-            stateRef, countries, selectedCountry,
-            postalNumber, taxNumberValidationRules
+            stateRef, countries, selectedCountry, active,
+            postalNumber, taxNumberValidationRules,
+            grid, wikidata, nationalId, dateDissolved,
+            gridValidationRules, wikidataValidationRules
         };
     }
 });
