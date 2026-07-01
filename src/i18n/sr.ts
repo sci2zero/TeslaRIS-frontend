@@ -561,7 +561,7 @@ export default {
     updateCountryLabel: "Ažuriraj zemlju",
     countryCodeLabel: "Kod zemlje",
     countryListLabel: "Zemlje",
-    addEmployeeLabel: "Dodaj novog zaposlenog...",
+    addEmployeeLabel: "Dodaj novog zaposlenog",
     alumniLabel: "Alumni",
     descriptionLabel: "Opis",
     superResearchAreaLabel: "Krovna oblast istraživanja",
@@ -1488,5 +1488,7 @@ export default {
     invalidWikidataMessage: "Pogrešan format Wikidata ID-a.",
     nationalIdLabel: "Nacionalni identifikator",
     numberOfEmployeesLabel: "Broj zaposlenih",
-    activeLabel: "Organizaciona jedinica je aktivna"
+    activeLabel: "Organizaciona jedinica je aktivna",
+    noEIssnLabel: "Nema E-ISSN",
+    noPrintIssnLabel: "Nema Print ISSN"
 }

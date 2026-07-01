@@ -122,5 +122,7 @@ export default {
     pubmedIdExistsError: "PubMed ID је већ у употреби.",
     ssrnIdExistsError: "SSRN ID је већ у употреби.",
     invalidGridMessage: "Погрешан формат GRID-а.",
-    invalidWikidataMessage: "Погрешан формат Wikidata ID-а."
+    invalidWikidataMessage: "Погрешан формат Wikidata ID-а.",
+    noEIssnLabel: "Нема E-ISSN",
+    noPrintIssnLabel: "Нема Print ISSN"
 };

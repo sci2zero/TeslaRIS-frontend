@@ -560,7 +560,7 @@ export default {
     updateCountryLabel: "Update country",
     countryCodeLabel: "Country Code",
     countryListLabel: "Countries",
-    addEmployeeLabel: "Add new employee...",
+    addEmployeeLabel: "Add new employee",
     alumniLabel: "Alumni",
     descriptionLabel: "Description",
     superResearchAreaLabel: "Super research area",
@@ -1474,5 +1474,7 @@ export default {
     invalidWikidataMessage: "Wrong Wikidata format.",
     nationalIdLabel: "National identifier",
     numberOfEmployeesLabel: "Number of employees",
-    activeLabel: "Organisation unit is active"
+    activeLabel: "Organisation unit is active",
+    noEIssnLabel: "No E-ISSN",
+    noPrintIssnLabel: "No Print ISSN"
 }
