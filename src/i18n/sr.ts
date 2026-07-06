@@ -79,7 +79,7 @@ export default {
         notifications: "Obaveštenja",
         deduplication: "Deduplikacija",
         countries: "Zemlje",
-        languageTags: "Jezici",
+        languageTags: "Jezičke oznake",
         researchAreas: "Istraživačke oblasti",
         documentClaim: "Preuzimanje dokumenata",
         scheduledTasks: "Zakazani zadaci",
@@ -1490,5 +1490,6 @@ export default {
     numberOfEmployeesLabel: "Broj zaposlenih",
     activeLabel: "Organizaciona jedinica je aktivna",
     noEIssnLabel: "Nema E-ISSN",
-    noPrintIssnLabel: "Nema Print ISSN"
+    noPrintIssnLabel: "Nema Print ISSN",
+    languageTagListLabel: "Jezičke oznake"
 }

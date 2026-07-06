@@ -79,7 +79,7 @@ export default {
         notifications: "Notifications",
         deduplication: "Deduplication",
         countries: "Countries",
-        languageTags: "Language Tags",
+        languageTags: "Language tags",
         researchAreas: "Research Areas",
         documentClaim: "Document Claim",
         scheduledTasks: "Scheduled Tasks",
@@ -1476,5 +1476,6 @@ export default {
     numberOfEmployeesLabel: "Number of employees",
     activeLabel: "Organisation unit is active",
     noEIssnLabel: "No E-ISSN",
-    noPrintIssnLabel: "No Print ISSN"
+    noPrintIssnLabel: "No Print ISSN",
+    languageTagListLabel: "Language tags"
 }
