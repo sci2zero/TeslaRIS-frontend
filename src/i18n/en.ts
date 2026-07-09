@@ -1469,4 +1469,7 @@ export default {
     organisationUnitProjectContributionLabel: "Organisation Unit Contribution",
     noFundingPartsMessage: "No Funding Parts Provided.",
     updateNameLabel: "Update name",
+    updateFundingLabel: "Update funding",
+    funderLabel: "Funder",
+    fundingProgramLabel: "Funding program",
 }

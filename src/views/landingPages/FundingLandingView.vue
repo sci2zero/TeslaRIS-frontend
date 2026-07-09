@@ -43,6 +43,17 @@
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
+                        <generic-crud-modal
+                            :form-component="FundingUpdateForm"
+                            :form-props="{ presetFunding: funding }"
+                            entity-name="Funding"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
+
+                        <!-- Basic Info -->
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
@@ -225,6 +236,7 @@ import FundingPartService from "@/services/project/FundingPartService";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
+import FundingUpdateForm from "@/components/project/FundingUpdateForm.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -294,6 +306,11 @@ const updateDescription = (description: MultilingualContent[]) => {
     funding.value!.description = description;
     performUpdate(true);
 };
+
+const updateBasicInfo = (basicInfo: Funding) => {
+    funding.value = { ...funding.value, ...basicInfo };
+    performUpdate(true);
+}
 
 const performUpdate = (reload: boolean) => {
     FundingService.updateFunding(funding.value?.id as number, funding.value as Funding).then(() => {

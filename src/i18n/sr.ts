@@ -1483,4 +1483,7 @@ export default {
     organisationUnitProjectContributionLabel: "Kontribucija organizacione jedinice",
     noFundingPartsMessage: "Nisu priložene stavke finansiranja.",
     updateNameLabel: "Ažuriraj naziv",
+    updateFundingLabel: "Ažuriraj finansiranje",
+    funderLabel: "Finansijer",
+    fundingProgramLabel: "Program finansiranja",
 }

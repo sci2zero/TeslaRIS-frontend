@@ -1,0 +1,318 @@
+<template>
+    <v-form v-model="isFormValid" @submit.prevent>
+        <v-row>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="doi"
+                    label="DOI"
+                    placeholder="DOI"
+                    :rules="doiValidationRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="6">
+                <v-text-field
+                    v-model="grantAgreementId"
+                    :label="$t('grantAgreementIdLabel')"
+                    :placeholder="$t('grantAgreementIdLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedFundingTypes"
+                    :label="$t('fundingTypesLabel')"
+                    :items="fundingTypeOptions"
+                    item-title="title"
+                    item-value="value"
+                    multiple
+                    chips
+                    closable-chips>
+                </v-select>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateFrom"
+                    :label="$t('dateFromLabel')"
+                    color="primary">
+                </date-picker>
+            </v-col>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                    color="primary">
+                </date-picker>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateSubmitted"
+                    :label="$t('dateSubmittedLabel')"
+                    color="primary">
+                </date-picker>
+            </v-col>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateAwarded"
+                    :label="$t('dateAwardedLabel')"
+                    color="primary">
+                </date-picker>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="displayFunderRef"
+                    v-model="displayFunder"
+                    :label="$t('funderLabel')"
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayFunder, languageTags)">
+                </multilingual-text-input>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="displayCallRef"
+                    v-model="displayCall"
+                    :label="$t('fundingCallLabel')"
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayCall, languageTags)">
+                </multilingual-text-input>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="displayProgramRef"
+                    v-model="displayProgram"
+                    :label="$t('fundingProgramLabel')"
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayProgram, languageTags)">
+                </multilingual-text-input>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="4">
+                <v-text-field
+                    v-model="amountValue"
+                    type="number"
+                    :label="$t('amountLabel')"
+                    :placeholder="$t('amountLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules">
+                </v-text-field>
+            </v-col>
+            <v-col cols="4">
+                <v-select
+                    v-model="selectedCurrency"
+                    :label="$t('currencyLabel')"
+                    :items="currencyOptions"
+                    item-title="title"
+                    item-value="value">
+                </v-select>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <uri-input ref="urisRef" v-model="uris"></uri-input>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <v-switch
+                    v-model="oaMandated"
+                    :label="$t('oaMandatedLabel')"
+                    color="primary"
+                    hide-details>
+                </v-switch>
+            </v-col>
+            <v-col v-if="oaMandated" cols="6">
+                <v-text-field
+                    v-model="oaMandateUrl"
+                    :label="$t('oaMandateUrlLabel')"
+                    :placeholder="$t('oaMandateUrlLabel')">
+                </v-text-field>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <v-switch
+                    v-model="competitive"
+                    :label="$t('competitiveLabel')"
+                    color="primary"
+                    hide-details>
+                </v-switch>
+            </v-col>
+            <v-col cols="6">
+                <v-switch
+                    v-model="renewable"
+                    :label="$t('renewableLabel')"
+                    color="primary"
+                    hide-details>
+                </v-switch>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <p class="required-fields-message">
+                {{ $t("requiredFieldsMessage") }}
+            </p>
+        </v-row>
+    </v-form>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch, type PropType } from 'vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
+import UriInput from '@/components/core/UriInput.vue';
+import DatePicker from '@/components/core/DatePicker.vue';
+import { useValidationUtils } from '@/utils/ValidationUtils';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import type { MultilingualContent } from '@/models/Common';
+import type { Funding, FundingType } from '@/models/FundingModel';
+import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
+import CurrencyService from '@/services/CurrencyService';
+import type { Currency } from '@/models/Common';
+
+const props = defineProps({
+    presetFunding: {
+        type: Object as PropType<Funding | undefined>,
+        required: true
+    }
+});
+
+const emit = defineEmits(["update"]);
+
+const isFormValid = ref(false);
+const { languageTags } = useLanguageTags();
+
+const {
+    doiValidationRules,
+    optionalNumericZeroOrGreaterFieldRules
+} = useValidationUtils();
+
+// Refs for multilingual inputs
+const displayFunderRef = ref<typeof MultilingualTextInput>();
+const displayCallRef = ref<typeof MultilingualTextInput>();
+const displayProgramRef = ref<typeof MultilingualTextInput>();
+const urisRef = ref<typeof UriInput>();
+
+// Simple fields
+const doi = ref(props.presetFunding?.doi);
+const grantAgreementId = ref(props.presetFunding?.grantAgreementId);
+const dateFrom = ref(props.presetFunding?.dateFrom as string);
+const dateTo = ref(props.presetFunding?.dateTo as string);
+const dateSubmitted = ref(props.presetFunding?.dateSubmitted as string);
+const dateAwarded = ref(props.presetFunding?.dateAwarded as string);
+const uris = ref<string[]>(props.presetFunding?.uris as string[] ?? []);
+const oaMandated = ref<boolean>(props.presetFunding?.oaMandated ?? false);
+const oaMandateUrl = ref(props.presetFunding?.oaMandateUrl);
+const competitive = ref<boolean>(props.presetFunding?.competitive ?? false);
+const renewable = ref<boolean>(props.presetFunding?.renewable ?? false);
+
+// Multilingual fields
+const displayFunder = ref<any>([]);
+const displayCall = ref<any>([]);
+const displayProgram = ref<any>([]);
+
+// Funding types
+const fundingTypeOptions = computed(() => getFundingTypesForGivenLocale());
+const selectedFundingTypes = ref<FundingType[]>(props.presetFunding?.fundingTypes ?? []);
+
+// Amount + currency
+const amountValue = ref<number | undefined>(props.presetFunding?.amount?.amount);
+const selectedCurrency = ref<number | undefined>(props.presetFunding?.amount?.currencyId);
+const currencyOptions = ref<{ title: string, value: number }[]>([]);
+
+const fetchCurrencies = () => {
+    CurrencyService.getAllCurrencies().then((response: { data: Currency[] }) => {
+        currencyOptions.value = response.data.map((currency: Currency) => ({
+            title: `${currency.code} (${currency.symbol})`,
+            value: currency.currencyId
+        }));
+    });
+};
+
+fetchCurrencies();
+
+watch(() => props.presetFunding, () => {
+    if (props.presetFunding) {
+        refreshForm();
+    }
+});
+
+const refreshForm = () => {
+    doi.value = props.presetFunding?.doi;
+    grantAgreementId.value = props.presetFunding?.grantAgreementId;
+    dateFrom.value = props.presetFunding?.dateFrom as string;
+    dateTo.value = props.presetFunding?.dateTo as string;
+    dateSubmitted.value = props.presetFunding?.dateSubmitted as string;
+    dateAwarded.value = props.presetFunding?.dateAwarded as string;
+    oaMandated.value = props.presetFunding?.oaMandated ?? false;
+    oaMandateUrl.value = props.presetFunding?.oaMandateUrl;
+    competitive.value = props.presetFunding?.competitive ?? false;
+    renewable.value = props.presetFunding?.renewable ?? false;
+    selectedFundingTypes.value = props.presetFunding?.fundingTypes ?? [];
+    amountValue.value = props.presetFunding?.amount?.amount;
+    selectedCurrency.value = props.presetFunding?.amount?.currencyId;
+
+    displayFunderRef.value?.clearInput();
+    displayFunder.value = props.presetFunding?.displayFunder as MultilingualContent[];
+
+    displayCallRef.value?.clearInput();
+    displayCall.value = props.presetFunding?.displayCall as MultilingualContent[];
+
+    displayProgramRef.value?.clearInput();
+    displayProgram.value = props.presetFunding?.displayProgram as MultilingualContent[];
+
+    urisRef.value?.refreshModelValue(props.presetFunding?.uris as string[] ?? []);
+    uris.value = props.presetFunding?.uris as string[] ?? [];
+
+    displayFunderRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayFunder.value, languageTags.value));
+    displayCallRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayCall.value, languageTags.value));
+    displayProgramRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayProgram.value, languageTags.value));
+};
+
+const submit = () => {
+    const updatedFunding = {
+        doi: doi.value,
+        grantAgreementId: grantAgreementId.value,
+        fundingTypes: selectedFundingTypes.value,
+        dateFrom: dateFrom.value,
+        dateTo: dateTo.value,
+        dateSubmitted: dateSubmitted.value,
+        dateAwarded: dateAwarded.value,
+        displayFunder: displayFunder.value,
+        displayCall: displayCall.value,
+        displayProgram: displayProgram.value,
+        amount: amountValue.value !== undefined && selectedCurrency.value !== undefined
+            ? { amount: amountValue.value, currencyId: selectedCurrency.value }
+            : undefined,
+        uris: uris.value,
+        oaMandated: oaMandated.value,
+        oaMandateUrl: oaMandated.value ? oaMandateUrl.value : undefined,
+        competitive: competitive.value,
+        renewable: renewable.value
+    };
+
+    emit("update", updatedFunding);
+};
+
+defineExpose({
+    submit,
+    isFormValid,
+    refreshForm
+});
+</script>
