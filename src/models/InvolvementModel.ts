@@ -50,7 +50,7 @@ export interface Involvement {
     dateTo?: string;
     proofs?: DocumentFileResponse[];
     involvementType: InvolvementType;
-    affiliationStatement?: MultilingualContent[];
+    displayOrganisationUnit?: MultilingualContent[];
     organisationUnitId?: number;
     organisationUnitName?: MultilingualContent[];
     favorite?: boolean;

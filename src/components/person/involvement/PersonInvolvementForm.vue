@@ -20,7 +20,7 @@
                         <multilingual-text-input
                             ref="externalOUNameRef"
                             v-model="externalOUName" :rules="requiredFieldRules"
-                            :initial-value="toMultilingualTextInput(presetInvolvement && presetInvolvement.affiliationStatement ? presetInvolvement.affiliationStatement : [], languageTags)"
+                            :initial-value="toMultilingualTextInput(presetInvolvement && presetInvolvement.displayOrganisationUnit ? presetInvolvement.displayOrganisationUnit : [], languageTags)"
                             :label="$t('externalOUNameLabel') + '*'"
                         />
                     </v-col>
@@ -294,7 +294,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="selectedInvolvementType?.value === 'STUDIED_AT' || selectedInvolvementType?.value === 'POSTDOC_AT' || selectedInvolvementType?.value === 'COMPLETED_COURSE_AT'">
+        <div>
             <h2
                 class="mt-5!">
                 {{ $t("researchAreasLabel") }}
@@ -499,7 +499,7 @@ export default defineComponent({
                 dateFrom: dateFrom.value as string,
                 dateTo: dateTo.value as string,
                 involvementType: selectedInvolvementType.value?.value as InvolvementType,
-                affiliationStatement: externalOUName.value,
+                displayOrganisationUnit: externalOUName.value,
                 organisationUnitId: (!enterExternalOU.value && selectedOrganisationUnit.value.value > 0) ? selectedOrganisationUnit.value.value : undefined,
                 favorite: favorite.value,
                 uris: uris.value,

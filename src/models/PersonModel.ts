@@ -172,6 +172,10 @@ export interface ExpertiseOrSkillResponse {
     id: number;
     name: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    favorite: boolean;
+    researchAreasId: number[];
+    researchAreas: ResearchArea[];
     proofs: DocumentFileResponse[];
 }
 
@@ -179,6 +183,9 @@ export interface ExpertiseOrSkill {
     id?: number;
     name: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    favorite: boolean;
+    researchAreasId: number[];
 }
 
 export interface PrizeResponse {

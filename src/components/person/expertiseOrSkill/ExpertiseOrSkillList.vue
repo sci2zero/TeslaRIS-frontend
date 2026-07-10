@@ -4,7 +4,7 @@
         variant="flat"
         color="grey-lighten-5">
         <v-card-text class="edit-pen-container">
-            <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill"></expertise-or-skill-modal>
+            <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill" />
             <h3>{{ $t("expertisesAndSkillsLabel") }}</h3>
             <strong v-if="expertiseOrSkills?.length === 0">{{ $t("notYetSetMessage") }}</strong>
             <br />
@@ -39,10 +39,10 @@
                     </v-menu> -->
 
                     <h4>
-                        <strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong>
-                        <div v-if="canEdit" class="d-flex flex-row justify-end edit-pen">
+                        <div v-if="canEdit" class="flex flex-row justify-end">
+                            <strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong>
                             <v-btn
-                                class="mt-1"
+                                class="ml-4!"
                                 icon variant="outlined"
                                 color="primary"
                                 size="medium"
@@ -51,7 +51,7 @@
                             </v-btn>
                             <expertise-or-skill-modal
                                 :read-only="!canEdit"
-                                class="mt-1 ml-8"
+                                class="ml-2!"
                                 edit
                                 :preset-expertise-or-skill="expertiseOrSkill"
                                 @update="updateExpertiseOrSkill"
@@ -60,7 +60,22 @@
                     </h4>
                     <p>{{ returnCurrentLocaleContent(expertiseOrSkill.description) }}</p>
                     
-                    <br />
+                    <div
+                        v-if="expertiseOrSkill.keywords && expertiseOrSkill.keywords.length > 0">
+                        <br />
+                        <span
+                            v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(expertiseOrSkill.keywords)?.split('\n')"
+                            :key="keywordIndex">
+                            <v-chip
+                                outlined
+                                size="small">
+                                {{ keyword }}
+                            </v-chip>
+                        </span>
+                        <br />
+                        <br />
+                    </div>
+
                     <attachment-list
                         :attachments="expertiseOrSkill.proofs"
                         :can-edit="canEdit"
@@ -69,10 +84,11 @@
                         @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)"
                         @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)">
                     </attachment-list>
+                    
                     <v-divider
                         v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1"
-                        class="mt-10">
-                    </v-divider>
+                        class="mt-10"
+                    />
                 </div>
             </draggable>
         </v-card-text>

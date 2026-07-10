@@ -88,7 +88,7 @@ export default defineComponent({
                 dateFrom: new Date().toJSON().slice(0, 10), // today's date
                 dateTo: undefined,
                 involvementType: InvolvementType.EMPLOYED_AT,
-                affiliationStatement: [],
+                displayOrganisationUnit: [],
                 organisationUnitId: props.institutionId,
                 role: [],
                 employmentPosition: selectedEmploymentPosition.value.value

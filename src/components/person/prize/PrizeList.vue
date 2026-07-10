@@ -90,7 +90,11 @@
                         @update="updatePrizeProof(prize, $event)"
                         @delete="deletePrizeProof(prize, $event)"
                     />
-                    <v-divider v-if="index < (prizes ? prizes.length : 1) - 1 " class="mt-10"></v-divider>
+                    
+                    <v-divider
+                        v-if="index < (prizes ? prizes.length : 1) - 1"
+                        class="mt-10"
+                    />
                 </div>
             </draggable>
         </v-card-text>

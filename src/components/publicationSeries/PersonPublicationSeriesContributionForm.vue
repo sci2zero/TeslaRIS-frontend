@@ -120,18 +120,22 @@ export default defineComponent({
             if(props.presetContributions && props.presetContributions.length > 0) {
                 inputs.value = [];
                 props.presetContributions.forEach(contribution => {
-                    inputs.value.push({contribution: {
-                                                    personId: contribution.personId, 
-                                                    description: contribution.contributionDescription, 
-                                                    affiliationStatement: contribution.displayAffiliationStatement, 
-                                                    selectedOtherName: [
-                                                                contribution.personName?.firstname, 
-                                                                contribution.personName?.otherName, 
-                                                                contribution.personName?.lastname
-                                                            ],
-                                                    institutionIds: contribution.institutionIds
-                                                    }, 
-                    contributionType: {title: getTitleFromValueAutoLocale(contribution.contributionType), value: contribution.contributionType},
+                    inputs.value.push({
+                        contribution: {
+                            personId: contribution.personId, 
+                            description: contribution.contributionDescription, 
+                            affiliationStatement: contribution.displayAffiliationStatement, 
+                            selectedOtherName: [
+                                        contribution.personName?.firstname, 
+                                        contribution.personName?.otherName, 
+                                        contribution.personName?.lastname
+                                    ],
+                            institutionIds: contribution.institutionIds
+                        }, 
+                    contributionType: {
+                        title: getTitleFromValueAutoLocale(contribution.contributionType),
+                        value: contribution.contributionType
+                    },
                     isMainContributor: contribution.isMainContributor,
                     dateFrom: contribution.dateFrom,
                     dateTo: contribution.dateTo,
