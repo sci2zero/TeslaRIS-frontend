@@ -87,6 +87,10 @@ export interface PersonContribution {
     postalAddress?: PostalAddress;
     contact?: Contact;
     displayInstitutionNames?: MultilingualContent[][];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
+    dateFrom?: string;
+    dateTo?: string;
 }
 
 export enum EmploymentPosition {

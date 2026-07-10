@@ -96,6 +96,7 @@ export default defineComponent({
                     isMainContributor: contribution.isMainContributor,
                     dateFrom: contribution.dateFrom,
                     dateTo: contribution.dateTo,
+                    researchAreasId: contribution.researchAreasId
                 });
 
             });

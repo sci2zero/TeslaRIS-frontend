@@ -100,7 +100,10 @@ export default defineComponent({
                     tutorialHoursPerWeek: contribution.tutorialHoursPerWeek,
                     labHoursPerWeek: contribution.labHoursPerWeek,
                     otherContactHoursPerWeek: contribution.otherContactHoursPerWeek,
-                    mainArguer: contribution.mainArguer
+                    mainArguer: contribution.mainArguer,
+                    dateFrom: contribution.dateFrom,
+                    dateTo: contribution.dateTo,
+                    researchAreasId: contribution.researchAreasId
                 });
 
             });

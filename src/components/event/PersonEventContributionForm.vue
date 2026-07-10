@@ -186,7 +186,10 @@ export default defineComponent({
                                             contribution.personName?.otherName, 
                                             contribution.personName?.lastname
                                         ],
-                                institutionIds: contribution.institutionIds
+                                institutionIds: contribution.institutionIds,
+                                dateFrom: contribution.dateFrom,
+                                dateTo: contribution.dateTo,
+                                researchAreas: contribution.researchAreas
                             }, 
                         eventContributionType: {
                             title: getTitleFromValueAutoLocale(contribution.eventContributionType),
@@ -289,7 +292,10 @@ export default defineComponent({
                     labHoursPerWeek: input.labHoursPerWeek,
                     otherContactHoursPerWeek: input.otherContactHoursPerWeek,
                     numberOfReviewsOrAssessment: input.numberOfReviewsOrAssessment,
-                    mainArguer: input.mainArguer
+                    mainArguer: input.mainArguer,
+                    dateFrom: input.contribution.dateFrom,
+                    dateTo: input.contribution.dateTo,
+                    researchAreasId: input.contribution.researchAreasId
                 });
             });
             emit("setInput", returnObject);

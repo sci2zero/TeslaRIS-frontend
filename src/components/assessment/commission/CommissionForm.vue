@@ -18,7 +18,7 @@
                     :label="$t('fromLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
             <v-col>
                 <date-picker
@@ -26,7 +26,7 @@
                     :label="$t('toLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
