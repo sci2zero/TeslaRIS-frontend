@@ -92,6 +92,12 @@
                                 @identifiers-updated="fetchIdentifiers"
                             />
                         </v-row>
+                        <v-row>
+                            <data-quality-remarks-dialog
+                                :entity-type="PublicationType.DATASET"
+                                :entity-id="dataset?.id"
+                            />
+                        </v-row>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -272,11 +278,12 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 
 
 export default defineComponent({
     name: "DatasetLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, DataQualityRemarksDialog },
     setup() {
         const currentTab = ref("contributions");
         const snackbar = ref(false);

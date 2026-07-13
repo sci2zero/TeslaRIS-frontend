@@ -1491,5 +1491,6 @@ export default {
     activeLabel: "Organizaciona jedinica je aktivna",
     noEIssnLabel: "Nema E-ISSN",
     noPrintIssnLabel: "Nema Print ISSN",
-    languageTagListLabel: "Jezičke oznake"
+    languageTagListLabel: "Jezičke oznake",
+    dataQualityReportLabel: "Podaci nisu kompletni proverite izvestaj o kvalitetu"
 }

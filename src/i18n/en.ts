@@ -1477,5 +1477,6 @@ export default {
     activeLabel: "Organisation unit is active",
     noEIssnLabel: "No E-ISSN",
     noPrintIssnLabel: "No Print ISSN",
-    languageTagListLabel: "Language tags"
+    languageTagListLabel: "Language tags",
+    dataQualityReportLabel: "Data is incomplete, check the quality report"
 }
