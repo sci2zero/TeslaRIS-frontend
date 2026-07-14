@@ -12,8 +12,6 @@ export const getMetadataComparisonPageName = (type: PublicationType | string): s
             return "patentMetadataComparator";
         case "PROCEEDINGS":
             return "proceedingsMetadataComparator";
-        case "DATASET":
-            return "datasetMetadataComparator";
         case "INTANGIBLE_PRODUCT":
             return "intangibleProductMetadataComparator";
         case "MONOGRAPH":
@@ -76,8 +74,6 @@ export const getDocumentLandingPageBasePath = (type: PublicationType | string): 
             return "scientific-results/patent/";
         case "PROCEEDINGS":
             return "proceedings/";
-        case "DATASET":
-            return "scientific-results/dataset/";
         case "INTANGIBLE_PRODUCT":
             return "scientific-results/intangible-product/";
         case "MONOGRAPH":
@@ -121,8 +117,6 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "patentLandingPage";
         case "PROCEEDINGS":
             return "proceedingsLandingPage";
-        case "DATASET":
-            return "datasetLandingPage";
         case "INTANGIBLE_PRODUCT":
             return "intangibleProductLandingPage";
         case "MONOGRAPH":

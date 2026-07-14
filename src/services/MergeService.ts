@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { EntityType, MergedBookSeries, MergedConferences, MergedDatasets, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents, MergedPerformanceRelatedOutputs } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents, MergedPerformanceRelatedOutputs } from "@/models/MergeModel";
 import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
@@ -181,10 +181,6 @@ export class MergeService extends BaseService {
 
     async saveMergedGeneticMaterialMetadata(leftGeneticMaterialId: number, rightGeneticMaterialId: number, body: MergedGeneticMaterial): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.patch, `merge/genetic-material/metadata/${leftGeneticMaterialId}/${rightGeneticMaterialId}`, body);
-    }
-
-    async saveMergedDatasetsMetadata(leftDatasetId: number, rightDatasetId: number, body: MergedDatasets): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/dataset/metadata/${leftDatasetId}/${rightDatasetId}`, body);
     }
 
     async saveMergedPatentsMetadata(leftPatentId: number, rightPatentId: number, body: MergedPatents): Promise<AxiosResponse<void>> {

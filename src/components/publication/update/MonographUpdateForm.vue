@@ -405,7 +405,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         ),
                         { value: eIsbn.value as string, error: "eisbnExistsError" },
                         { value: printIsbn.value as string, error: "printIsbnExistsError" }

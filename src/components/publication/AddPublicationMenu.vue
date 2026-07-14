@@ -60,7 +60,6 @@ export default defineComponent({
         const addProceedingsPublicationLabel = computed(() => i18n.t("addProceedingsPublicationLabel"));
         const addPatentLabel = computed(() => i18n.t("addPatentLabel"));
         const addIntangibleProductLabel = computed(() => i18n.t("addIntangibleProductLabel"));
-        const addDatasetLabel = computed(() => i18n.t("addDatasetLabel"));
         const createNewMonographLabel = computed(() => i18n.t("createNewMonographLabel"));
         const addMonographPublicationLabel = computed(() => i18n.t("addMonographPublicationLabel"));
         const addThesisLabel = computed(() => i18n.t("addThesisLabel"));
@@ -76,7 +75,6 @@ export default defineComponent({
             { title: addThesisLabel, value: "submitThesis" },
             { title: addPatentLabel, value: "submitPatent" },
             { title: addIntangibleProductLabel, value: "submitIntangibleProduct" },
-            { title: addDatasetLabel, value: "submitDataset" },
             { title: addMaterialProductLabel, value: "submitMaterialProduct" },
             { title: addGeneticMaterialLabel, value: "submitGeneticMaterial" },
             { title: addPerformanceRelatedOutputLabel, value: "submitPerformanceRelatedOutput" }

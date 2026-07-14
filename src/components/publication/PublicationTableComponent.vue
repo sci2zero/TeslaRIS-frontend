@@ -795,8 +795,6 @@ export default defineComponent({
                     return 'mdi-presentation';
                 case 'PATENT':
                     return 'mdi-shield-check';
-                case 'DATASET':
-                    return 'mdi-database';
                 case 'INTANGIBLE_PRODUCT':
                     return 'mdi-code-tags';
                 case 'MONOGRAPH':

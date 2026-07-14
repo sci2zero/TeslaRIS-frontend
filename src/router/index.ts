@@ -27,7 +27,6 @@ import SubmitProceedingsPublicationView from "@/views/SubmitProceedingsPublicati
 import ResetPasswordView from "@/views/ResetPasswordView.vue";
 import SubmitPatentView from "@/views/SubmitPatentView.vue";
 import SubmitIntangibleProductView from "@/views/SubmitIntangibleProductView.vue";
-import SubmitDatasetView from "@/views/SubmitDatasetView.vue";
 import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
 import NewResearcherLandingView from "@/views/landingPages/NewResearcherLandingView.vue";
@@ -38,7 +37,6 @@ import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vu
 import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
 import JournalPublicationLandingView from "@/views/landingPages/JournalPublicationLandingView.vue";
 import IntangibleProductLandingView from "@/views/landingPages/IntangibleProductLandingView.vue";
-import DatasetLandingView from "@/views/landingPages/DatasetLandingView.vue";
 import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
 import ProceedingsPublicationsLandingView from "@/views/landingPages/ProceedingsPublicationsLandingView.vue";
 import ProceedingsLandingView from "@/views/landingPages/ProceedingsLandingView.vue";
@@ -62,7 +60,6 @@ import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
-import DatasetMetadataComparatorView from "@/views/comparators/documents/DatasetMetadataComparatorView.vue";
 import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
 import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
 import ThesisMetadataComparatorView from "@/views/comparators/documents/ThesisMetadataComparatorView.vue";
@@ -839,38 +836,6 @@ const router = createRouter({
                                     path: 'metadata-comparator/:leftId/:rightId',
                                     name: "geneticMaterialMetadataComparator",
                                     component: GeneticMaterialMetadataComparatorView,
-                                    meta: {
-                                        authenticated: true,
-                                        authorities: [roles.admin, roles.institutionalEditor],
-                                    },
-                                },
-                            ]
-                        },
-                        {
-                            path: "dataset",
-                            children: [
-                                {
-                                    path: ":id",
-                                    name: "datasetLandingPage",
-                                    component: DatasetLandingView,
-                                    meta: {
-                                        authenticated: false,
-                                        authorities: [],
-                                    },
-                                },
-                                {
-                                    path: "submit-dataset",
-                                    name: "submitDataset",
-                                    component: SubmitDatasetView,
-                                    meta: {
-                                        authenticated: true,
-                                        authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
-                                    },
-                                },
-                                {
-                                    path: 'metadata-comparator/:leftId/:rightId',
-                                    name: "datasetMetadataComparator",
-                                    component: DatasetMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor],

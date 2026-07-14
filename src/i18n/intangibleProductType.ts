@@ -5,6 +5,7 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const intangibleProductTypeEn = [
     { title: "Software", value: IntangibleProductType.SOFTWARE },
+    { title: "Dataset", value: IntangibleProductType.DATASET },
     { title: "Model", value: IntangibleProductType.MODEL },
     { title: "Process", value: IntangibleProductType.PROCESS },
     { title: "Method", value: IntangibleProductType.METHOD },
@@ -17,6 +18,7 @@ export const intangibleProductTypeEn = [
     { title: "Test", value: IntangibleProductType.TEST },
     { title: "Website", value: IntangibleProductType.WEBSITE },
     { title: "Audio recording", value: IntangibleProductType.AUDIO_RECORDING },
+    { title: "Musical composition", value: IntangibleProductType.MUSICAL_COMPOSITION },
     { title: "Radio/TV program", value: IntangibleProductType.RADIO_TV_PROGRAM },
     { title: "Video recording", value: IntangibleProductType.VIDEO_RECORDING },
     { title: "Sound design", value: IntangibleProductType.SOUND_DESIGN },
@@ -29,6 +31,7 @@ export const intangibleProductTypeEn = [
 
 export const intangibleProductTypeSr = [
     { title: "Softver", value: IntangibleProductType.SOFTWARE },
+    { title: "Skup podataka", value: IntangibleProductType.DATASET },
     { title: "Model", value: IntangibleProductType.MODEL },
     { title: "Proces", value: IntangibleProductType.PROCESS },
     { title: "Metoda", value: IntangibleProductType.METHOD },
@@ -41,6 +44,7 @@ export const intangibleProductTypeSr = [
     { title: "Test", value: IntangibleProductType.TEST },
     { title: "Veb sajt", value: IntangibleProductType.WEBSITE },
     { title: "Audio-snimak", value: IntangibleProductType.AUDIO_RECORDING },
+    { title: "Muzička kompozicija", value: IntangibleProductType.MUSICAL_COMPOSITION },
     { title: "Radio/TV program", value: IntangibleProductType.RADIO_TV_PROGRAM },
     { title: "Video snimak", value: IntangibleProductType.VIDEO_RECORDING },
     { title: "Dizajn zvuka", value: IntangibleProductType.SOUND_DESIGN },

@@ -55,7 +55,6 @@ export enum PublicationType {
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
     PATENT = "PATENT",
     PROCEEDINGS = "PROCEEDINGS",
-    DATASET = "DATASET",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
@@ -120,6 +119,7 @@ export interface Document {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
@@ -144,6 +144,7 @@ export interface CommonFieldsData {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     city?: MultilingualContent[];
     geoSpaceDescription?: MultilingualContent[];
     chronologicalSpaceDescription?: MultilingualContent[];
@@ -317,11 +318,6 @@ export interface GeneticMaterial extends Document {
     geneticMaterialType: GeneticMaterialType
 }
 
-export interface Dataset extends Document {
-    internalNumber: string;
-    publisherId?: number;
-}
-
 export interface DeduplicationSuggestion {
     id: string;
     leftEntityId: number;
@@ -427,12 +423,14 @@ export enum IntangibleProductType {
     TEST = "TEST",
     WEBSITE = "WEBSITE",
     AUDIO_RECORDING = "AUDIO_RECORDING",
+    MUSICAL_COMPOSITION = "MUSICAL_COMPOSITION",
     RADIO_TV_PROGRAM = "RADIO_TV_PROGRAM",
     VIDEO_RECORDING = "VIDEO_RECORDING",
     SOUND_DESIGN = "SOUND_DESIGN",
     SET_DESIGN = "SET_DESIGN",
     LIGHT_DESIGN = "LIGHT_DESIGN",
     CHOREOGRAPHY = "CHOREOGRAPHY",
+    DATASET = "DATASET",
     STANDARD = "STANDARD"
 }
 

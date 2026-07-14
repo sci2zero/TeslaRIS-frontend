@@ -283,7 +283,6 @@ const publicationTypeSr = [
     { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
     { title: "Patent", value: PublicationType.PATENT },
     { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
-    { title: "Skup podataka", value: PublicationType.DATASET },
     { title: "Nematerijalni proizvod", value: PublicationType.INTANGIBLE_PRODUCT },
     { title: "Monografija", value: PublicationType.MONOGRAPH },
     { title: "Rad u monografiji", value: PublicationType.MONOGRAPH_PUBLICATION },

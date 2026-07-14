@@ -44,7 +44,6 @@ import JournalPublicationSubmissionForm from './JournalPublicationSubmissionForm
 import ProceedingsPublicationSubmissionForm from './ProceedingsPublicationSubmissionForm.vue';
 import PatentSubmissionForm from './PatentSubmissionForm.vue';
 import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
-import DatasetSubmissionForm from './DatasetSubmissionForm.vue';
 import IntangibleProductSubmissionForm from './IntangibleProductSubmissionForm.vue';
 import MonographSubmissionForm from './MonographSubmissionForm.vue';
 import MonographPublicationSubmissionForm from './MonographPublicationSubmissionForm.vue';
@@ -177,8 +176,6 @@ export default defineComponent({
                     return PatentSubmissionForm;
                 case PublicationType.PROCEEDINGS:
                     return ProceedingsSubmissionForm;
-                case PublicationType.DATASET:
-                    return DatasetSubmissionForm;
                 case PublicationType.INTANGIBLE_PRODUCT:
                     return IntangibleProductSubmissionForm;
                 case PublicationType.MONOGRAPH:

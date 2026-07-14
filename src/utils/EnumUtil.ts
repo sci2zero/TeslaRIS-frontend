@@ -30,8 +30,6 @@ export const getDocumentTypeDisplayValue = (documentType: string, publicationTyp
             return i18n.t("patentLabel");
         case "PROCEEDINGS":
             return i18n.t("proceedingsLabel");
-        case "DATASET":
-            return i18n.t("datasetLabel");
         case "INTANGIBLE_PRODUCT":
             return i18n.t("intangibleProductLabel");
         case "MONOGRAPH":

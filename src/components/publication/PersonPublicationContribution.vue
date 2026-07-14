@@ -277,7 +277,7 @@ export default defineComponent({
                 isCorrespondingContributor: false,
                 isBoardPresident: false,
                 employmentTitle: EmploymentTitle.FULL_PROFESSOR,
-                personalTitle: PersonalTitle.DR
+                personalTitle: PersonalTitle.PHD
             });
         };
 
@@ -337,7 +337,7 @@ export default defineComponent({
                 }
 
                 if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.personalTitle) {
-                    input.personalTitle = PersonalTitle.DR;
+                    input.personalTitle = PersonalTitle.PHD;
                     sendContentToParent();
                 }
 
