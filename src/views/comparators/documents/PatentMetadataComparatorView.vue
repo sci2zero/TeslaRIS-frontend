@@ -199,7 +199,12 @@ export default defineComponent({
             
             bulkTransferFields(patent1, patent2, [
                 { fieldName: "number", emptyValue: "" },
-                { fieldName: "publisherId", emptyValue: null, setEmpty: false }
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
+                { fieldName: "type", emptyValue: null, setEmpty: false },
+                { fieldName: "applicationStatus", emptyValue: null, setEmpty: false },
+                { fieldName: "dateRequested", emptyValue: null, setEmpty: false },
+                { fieldName: "dateFilingPriority", emptyValue: null, setEmpty: false },
+                { fieldName: "dateTo", emptyValue: null, setEmpty: false }
             ]);
 
             return [patent1, patent2];
@@ -234,6 +239,11 @@ export default defineComponent({
         const updateLeft = (updatedInfo: Patent) => {
             leftPatent.value!.number = updatedInfo.number;
             leftPatent.value!.publisherId = updatedInfo.publisherId;
+            leftPatent.value!.type = updatedInfo.type;
+            leftPatent.value!.applicationStatus = updatedInfo.applicationStatus;
+            leftPatent.value!.dateRequested = updatedInfo.dateRequested;
+            leftPatent.value!.dateFilingPriority = updatedInfo.dateFilingPriority;
+            leftPatent.value!.dateTo = updatedInfo.dateTo;
 
             updateCommonBasicInfo(leftPatent, updatedInfo);
             
@@ -246,6 +256,11 @@ export default defineComponent({
         const updateRight = (updatedInfo: Patent) => {
             rightPatent.value!.number = updatedInfo.number;
             rightPatent.value!.publisherId = updatedInfo.publisherId;
+            rightPatent.value!.type = updatedInfo.type;
+            rightPatent.value!.applicationStatus = updatedInfo.applicationStatus;
+            rightPatent.value!.dateRequested = updatedInfo.dateRequested;
+            rightPatent.value!.dateFilingPriority = updatedInfo.dateFilingPriority;
+            rightPatent.value!.dateTo = updatedInfo.dateTo;
 
             updateCommonBasicInfo(rightPatent, updatedInfo);
             

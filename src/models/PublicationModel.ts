@@ -1,4 +1,4 @@
-import type { LanguageTagResponse, MultilingualContent } from "./Common";
+import type { FlexibleDate, LanguageTagResponse, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
@@ -291,6 +291,33 @@ export interface Patent extends Document {
     number: string;
     publisherId?: number;
     publisherName?: MultilingualContent[];
+    dateRequested?: FlexibleDate;
+    dateFilingPriority?: FlexibleDate;
+    dateTo?: FlexibleDate;
+    type: IntellectualPropertyType;
+    applicationStatus: IntellectualPropertyApplicationStatus;
+}
+
+export enum IntellectualPropertyType {
+    PATENT = "PATENT",
+    LICENSE = "LICENSE",
+    DISCLOSURE = "DISCLOSURE",
+    REGISTERED_COPYRIGHT = "REGISTERED_COPYRIGHT",
+    TRADEMARK = "TRADEMARK"
+}
+
+export enum IntellectualPropertyApplicationStatus {
+    DISCLOSED = "DISCLOSED",
+    PENDING = "PENDING",
+    IN_NEGOTIATION = "IN_NEGOTIATION",
+    ALLOWED = "ALLOWED",
+    GRANTED_OR_REGISTERED = "GRANTED_OR_REGISTERED",
+    PROTECTED = "PROTECTED",
+    ASSIGNED = "ASSIGNED",
+    FIRST_FIXATION = "FIRST_FIXATION",
+    EXPIRED = "EXPIRED",
+    WITHDRAWN = "WITHDRAWN",
+    ELIMINATED = "ELIMINATED"
 }
 
 export interface IntangibleProduct extends Document {

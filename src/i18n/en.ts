@@ -1471,5 +1471,22 @@ export default {
     noEIssnLabel: "No E-ISSN",
     noPrintIssnLabel: "No Print ISSN",
     languageTagListLabel: "Language tags",
-    dataQualityReportLabel: "Data is incomplete, check the quality report"
+    dataQualityReportLabel: "Data is incomplete, check the quality report",
+    intellectualPropertyTypeLabel: "Intellectual property type",
+    intellectualPropertyApplicationStatusLabel: "Intellectual property application status",
+    dateRequestedLabel: "Date requested",
+    dateFilingPrioritylabel: "Date requested",
+    dateToLabel: "Date to",
+    januaryLabel: "January",
+    februaryLabel: "February",
+    marchLabel: "March",
+    aprilLabel: "April",
+    mayLabel: "May",
+    juneLabel: "June",
+    julyLabel: "July",
+    augustLabel: "August",
+    septemberLabel: "September",
+    octoberLabel: "October",
+    novemberLabel: "November",
+    decemberLabel: "December"
 }

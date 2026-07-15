@@ -16,8 +16,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -31,7 +31,7 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
@@ -43,24 +43,54 @@
                             type="number"
                             :label="$t('yearOfPublicationLabel') + '*'"
                             :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules">
-                        </v-text-field>
+                            :rules="requiredFieldRules"
+                        />
                     </v-col>
                 </v-row>
+
+                <v-row>
+                    <v-col cols="10">
+                        <v-select
+                            v-model="selectedIntellectualPropertyType"
+                            :label="$t('intellectualPropertyTypeLabel') + '*'"
+                            :items="intellectualPropertyTypes"
+                            :rules="requiredSelectionRules"
+                            :disabled="inModal"
+                            return-object
+                        />
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col cols="10">
+                        <v-select
+                            v-model="selectedIntellectualPropertyApplicationStatusType"
+                            :label="$t('intellectualPropertyApplicationStatusLabel')"
+                            :items="intellectualPropertyApplicationStatuses"
+                            :disabled="inModal"
+                            return-object
+                        />
+                    </v-col>
+                </v-row>
+
                 <v-row>
                     <v-col cols="10">
                         <v-text-field
                             v-model="patentNumber"
                             :label="$t('patentNumberLabel')"
-                            :placeholder="$t('patentNumberLabel')">
-                        </v-text-field>
+                            :placeholder="$t('patentNumberLabel')"
+                        />
                     </v-col>
                 </v-row>
 
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
 
@@ -73,8 +103,8 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -83,8 +113,8 @@
                                 ref="descriptionRef"
                                 v-model="description"
                                 is-area
-                                :label="$t('abstractLabel')">
-                            </multilingual-text-input>
+                                :label="$t('abstractLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -93,18 +123,25 @@
                                 ref="keywordsRef"
                                 v-model="keywords"
                                 :label="$t('keywordsLabel')"
-                                is-area>
-                            </multilingual-text-input>
+                                is-area
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input
+                                ref="urisRef"
+                                v-model="uris"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')"></multilingual-text-input>
+                            <multilingual-text-input
+                                ref="placeRef"
+                                v-model="place"
+                                :label="$t('placeLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -112,34 +149,60 @@
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
                                 v-model="selectedPublisher"
-                                allow-author-reprint>
-                            </publisher-autocomplete-search>
+                                allow-author-reprint
+                            />
                         </v-col>
                     </v-row>
+
+                    <v-row>
+                        <v-col cols="10">
+                            <flexible-date-picker
+                                v-model="dateRequested"
+                                :label="$t('dateRequestedLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <flexible-date-picker
+                                v-model="dateFilingPriority"
+                                :label="$t('dateFilingPriorityLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="10">
+                            <flexible-date-picker
+                                v-model="dateTo"
+                                :label="$t('dateToLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+
                     <v-row>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="scopus"
                                 label="Scopus ID"
                                 placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules">
-                            </v-text-field>
+                                :rules="scopusIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
 
@@ -163,7 +226,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick } from 'vue';
+import { computed, defineComponent, nextTick, watch } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -171,10 +234,10 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { type PersonDocumentContribution, PublicationType, type Patent, type CommonFieldsData } from "@/models/PublicationModel";
+import { type PersonDocumentContribution, PublicationType, type Patent, type CommonFieldsData, IntellectualPropertyType, IntellectualPropertyApplicationStatus } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
-import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
 import { useI18n } from 'vue-i18n';
 import Toast from '../core/Toast.vue';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
@@ -182,11 +245,14 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
+import { getIntellectualPropertyTypesForGivenLocale } from '@/i18n/intellectualPropertyType.js';
+import { getIntellectualPropertyApplicationStatusesForGivenLocale, isApplicationStatusApplicable } from '@/i18n/intellectualPropertyApplicationStatus.js';
 
 
 export default defineComponent({
     name: "SubmitPatent",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -232,6 +298,45 @@ export default defineComponent({
         const webOfScienceId = ref("");
         const patentNumber = ref("");
         const uris = ref<string[]>([]);
+        const dateRequested = ref<FlexibleDate>();
+        const dateFilingPriority = ref<FlexibleDate>();
+        const dateTo = ref<FlexibleDate>();
+
+        const intellectualPropertyTypes = getIntellectualPropertyTypesForGivenLocale();
+        const selectedIntellectualPropertyType = ref<{title: string, value: IntellectualPropertyType | null}>(
+            { title: "", value: null }
+        );
+
+        const intellectualPropertyApplicationStatuses = computed(() => {
+            const type = selectedIntellectualPropertyType.value.value;
+
+            if (!type) {
+                return [];
+            }
+
+            return getIntellectualPropertyApplicationStatusesForGivenLocale().filter(status =>
+                isApplicationStatusApplicable(type, status.value)
+            );
+        });
+        const selectedIntellectualPropertyApplicationStatusType = ref<{title: string, value: IntellectualPropertyApplicationStatus | null}>(
+            { title: "", value: null }
+        );
+
+        watch(selectedIntellectualPropertyType, () => {
+            const selected = selectedIntellectualPropertyApplicationStatusType.value.value;
+
+            if (
+                selected &&
+                !intellectualPropertyApplicationStatuses.value.some(
+                    status => status.value === selected
+                )
+            ) {
+                selectedIntellectualPropertyApplicationStatusType.value = {
+                    title: "",
+                    value: null
+                };
+            }
+        });
 
         const commonFieldsRef = ref<typeof DocumentCommonFields>();
         const commonFieldsData = ref<CommonFieldsData>({});
@@ -241,7 +346,8 @@ export default defineComponent({
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
         const submit = () => {
@@ -266,6 +372,11 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: [],
+                type: selectedIntellectualPropertyType.value.value as IntellectualPropertyType,
+                applicationStatus: selectedIntellectualPropertyApplicationStatusType.value.value as IntellectualPropertyApplicationStatus,
+                dateRequested: dateRequested.value,
+                dateFilingPriority: dateFilingPriority.value,
+                dateTo: dateTo.value,
                 ...commonFieldsData.value
             };
 
@@ -288,6 +399,11 @@ export default defineComponent({
                     webOfScienceId.value = "";
                     patentNumber.value = "";
                     scopus.value = "";
+                    dateRequested.value = undefined;
+                    dateFilingPriority.value = undefined;
+                    dateTo.value = undefined;
+                    selectedIntellectualPropertyType.value = { title: "", value: null };
+                    selectedIntellectualPropertyApplicationStatusType.value = { title: "", value: null };
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
                     commonFieldsRef.value?.clearInputs();
@@ -344,10 +460,8 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, 
-            additionalFields,
-            snackbar, error,
-            title, titleRef,
+            isFormValid, additionalFields,
+            snackbar, error, title, titleRef,
             subtitle, subtitleRef,
             publicationYear, doi,
             publisherAutocompleteRef,
@@ -365,7 +479,13 @@ export default defineComponent({
             scopusIdValidationRules,
             deduplicationTableRef,
             commonFieldsRef, commonFieldsData,
-            presetCommonFieldsData
+            presetCommonFieldsData, dateTo,
+            dateRequested, dateFilingPriority,
+            requiredSelectionRules,
+            intellectualPropertyTypes,
+            selectedIntellectualPropertyType,
+            intellectualPropertyApplicationStatuses,
+            selectedIntellectualPropertyApplicationStatusType
         };
     }
 });

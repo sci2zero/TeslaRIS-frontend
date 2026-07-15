@@ -1,3 +1,4 @@
+import { type FlexibleDate } from "@/models/Common";
 import { RecurrenceType } from "@/models/LoadModel";
 import { DateTime } from "luxon";
 
@@ -31,6 +32,28 @@ export const localiseDate = (iso8601DateString: string | undefined) => {
     }
 
     // Serbian standard
+    return `${day}.${month}.${year}.`;
+};
+
+export const localiseFlexibleDate = (date: FlexibleDate | undefined) => {
+    if (!date) {
+        return "";
+    }
+
+    const { year, month, day } = date;
+
+    if (!year) {
+        return "";
+    }
+
+    if (!month) {
+        return `${year}.`;
+    }
+
+    if (!day) {
+        return `${month}.${year}.`;
+    }
+
     return `${day}.${month}.${year}.`;
 };
 

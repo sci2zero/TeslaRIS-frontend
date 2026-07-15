@@ -56,6 +56,36 @@
                         <basic-info-loader v-if="!patent" />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div v-if="patent?.type">
+                                    {{ $t("intellectualPropertyTypeLabel") }}:
+                                </div>
+                                <div v-if="patent?.type" class="response">
+                                    {{ getIntellectualPropertyTypeTitleFromValueAutoLocale(patent.type) }}
+                                </div>
+                                <div v-if="patent?.applicationStatus">
+                                    {{ $t("intellectualPropertyApplicationStatusLabel") }}:
+                                </div>
+                                <div v-if="patent?.applicationStatus" class="response">
+                                    {{ getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(patent.applicationStatus) }}
+                                </div>
+                                <div v-if="patent?.dateRequested">
+                                    {{ $t("dateRequestedLabel") }}:
+                                </div>
+                                <div v-if="patent?.dateRequested" class="response">
+                                    {{ localiseFlexibleDate(patent.dateRequested) }}
+                                </div>
+                                <div v-if="patent?.dateFilingPriority">
+                                    {{ $t("dateFilingPriorityLabel") }}:
+                                </div>
+                                <div v-if="patent?.dateFilingPriority" class="response">
+                                    {{ localiseFlexibleDate(patent.dateFilingPriority) }}
+                                </div>
+                                <div v-if="patent?.dateTo">
+                                    {{ $t("dateToLabel") }}:
+                                </div>
+                                <div v-if="patent?.dateTo" class="response">
+                                    {{ localiseFlexibleDate(patent.dateTo) }}
+                                </div>
                                 <div v-if="patent?.number">
                                     {{ $t("patentNumberLabel") }}:
                                 </div>
@@ -272,6 +302,9 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale } from '@/i18n/intellectualPropertyApplicationStatus';
+import { getIntellectualPropertyTypeTitleFromValueAutoLocale } from '@/i18n/intellectualPropertyType';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -408,6 +441,11 @@ export default defineComponent({
             patent.value!.publisherId = basicInfo.publisherId;
             patent.value!.number = basicInfo.number;
             patent.value!.authorReprint = basicInfo.authorReprint;
+            patent.value!.dateRequested = basicInfo.dateRequested;
+            patent.value!.dateFilingPriority = basicInfo.dateFilingPriority;
+            patent.value!.dateTo = basicInfo.dateTo;
+            patent.value!.type = basicInfo.type;
+            patent.value!.applicationStatus = basicInfo.applicationStatus;
 
             updateCommonBasicInfo(patent, basicInfo);
 
@@ -463,7 +501,9 @@ export default defineComponent({
             createClassification, fetchClassifications, documentClassifications,
             createIndicator, fetchIndicators, fetchValidationStatus,
             PublicationType, updateRemark, displayConfiguration, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
+            getIntellectualPropertyTypeTitleFromValueAutoLocale,
+            getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale
         };
 }})
 

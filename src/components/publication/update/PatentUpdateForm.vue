@@ -49,6 +49,30 @@
                 />
             </v-col>
         </v-row>
+
+        <v-row>
+            <v-col cols="10">
+                <v-select
+                    v-model="selectedIntellectualPropertyType"
+                    :label="$t('intellectualPropertyTypeLabel') + '*'"
+                    :items="intellectualPropertyTypes"
+                    :rules="requiredSelectionRules"
+                    return-object
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="10">
+                <v-select
+                    v-model="selectedIntellectualPropertyApplicationStatusType"
+                    :label="$t('intellectualPropertyApplicationStatusLabel')"
+                    :items="intellectualPropertyApplicationStatuses"
+                    return-object
+                />
+            </v-col>
+        </v-row>
+
         <v-row>
             <v-col>
                 <uri-input ref="urisRef" v-model="uris" />
@@ -63,6 +87,32 @@
                 />
             </v-col>
         </v-row>
+
+        <v-row>
+            <v-col cols="10">
+                <flexible-date-picker
+                    v-model="dateRequested"
+                    :label="$t('dateRequestedLabel')"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
+                <flexible-date-picker
+                    v-model="dateFilingPriority"
+                    :label="$t('dateFilingPriorityLabel')"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="10">
+                <flexible-date-picker
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                />
+            </v-col>
+        </v-row>
+
         <v-row>
             <v-col cols="3">
                 <v-text-field
@@ -107,13 +157,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
-import type { MultilingualContent } from '@/models/Common';
+import type { FlexibleDate, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { CommonFieldsData, Patent } from '@/models/PublicationModel';
+import type { CommonFieldsData, IntellectualPropertyApplicationStatus, IntellectualPropertyType, Patent } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -125,11 +175,14 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import { getIntellectualPropertyApplicationStatusesForGivenLocale, getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale, isApplicationStatusApplicable } from '@/i18n/intellectualPropertyApplicationStatus.js';
+import { getIntellectualPropertyTypesForGivenLocale, getIntellectualPropertyTypeTitleFromValueAutoLocale } from '@/i18n/intellectualPropertyType.js';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "PatentUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetPatent: {
             type: Object as PropType<Patent | undefined>,
@@ -188,6 +241,51 @@ export default defineComponent({
         const patentNumber = ref(props.presetPatent?.number);
         const uris = ref<string[]>(props.presetPatent?.uris as string[]);
         const scopus = ref(props.presetPatent?.scopusId);
+        const dateRequested = ref<FlexibleDate>();
+        const dateFilingPriority = ref<FlexibleDate>();
+        const dateTo = ref<FlexibleDate>();
+
+        const intellectualPropertyTypes = getIntellectualPropertyTypesForGivenLocale();
+        const selectedIntellectualPropertyType = ref<{title: string, value: IntellectualPropertyType | null}>(
+            {
+                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetPatent?.type as IntellectualPropertyType) as string ?? "",
+                value: props.presetPatent?.type as IntellectualPropertyType ?? null
+            }
+        );
+
+        const intellectualPropertyApplicationStatuses = computed(() => {
+            const type = selectedIntellectualPropertyType.value.value;
+
+            if (!type) {
+                return [];
+            }
+
+            return getIntellectualPropertyApplicationStatusesForGivenLocale().filter(status =>
+                isApplicationStatusApplicable(type, status.value)
+            );
+        });
+        const selectedIntellectualPropertyApplicationStatusType = ref<{title: string, value: IntellectualPropertyApplicationStatus | null}>(
+            { 
+                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus) as string ?? "",
+                value: props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus ?? null
+            }
+        );
+
+        watch(selectedIntellectualPropertyType, () => {
+            const selected = selectedIntellectualPropertyApplicationStatusType.value.value;
+
+            if (
+                selected &&
+                !intellectualPropertyApplicationStatuses.value.some(
+                    status => status.value === selected
+                )
+            ) {
+                selectedIntellectualPropertyApplicationStatusType.value = {
+                    title: "",
+                    value: null
+                };
+            }
+        });
 
         const commonFieldsRef = ref<typeof DocumentCommonFields>();
         const commonFieldsData = ref<CommonFieldsData>({});
@@ -197,7 +295,8 @@ export default defineComponent({
             requiredFieldRules, doiValidationRules,
             workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules,
-            scopusIdValidationRules
+            scopusIdValidationRules,
+            requiredSelectionRules
         } = useValidationUtils();
 
         const submit = async () => {
@@ -242,6 +341,11 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
                 proofs: [],
+                type: selectedIntellectualPropertyType.value.value as IntellectualPropertyType,
+                applicationStatus: selectedIntellectualPropertyApplicationStatusType.value.value as IntellectualPropertyApplicationStatus,
+                dateRequested: dateRequested.value,
+                dateFilingPriority: dateFilingPriority.value,
+                dateTo: dateTo.value,
                 ...commonFieldsData.value
             };
 
@@ -266,6 +370,19 @@ export default defineComponent({
             openAlexId.value = props.presetPatent?.openAlexId;
             webOfScienceId.value = props.presetPatent?.webOfScienceId;
             scopus.value = props.presetPatent?.scopusId;
+            dateRequested.value = props.presetPatent?.dateRequested;
+            dateFilingPriority.value = props.presetPatent?.dateFilingPriority;
+            dateTo.value = props.presetPatent?.dateTo;
+
+            selectedIntellectualPropertyType.value = {
+                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetPatent?.type as IntellectualPropertyType) as string,
+                value: props.presetPatent?.type as IntellectualPropertyType
+            };
+
+            selectedIntellectualPropertyApplicationStatusType.value = { 
+                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus) as string,
+                value: props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus
+            };
 
             updateDocumentCommonFields(props.presetPatent, presetCommonFieldsData);
 
@@ -298,7 +415,12 @@ export default defineComponent({
             workOpenAlexIdValidationRules,
             documentWebOfScienceIdValidationRules,
             commonFieldsRef, commonFieldsData,
-            presetCommonFieldsData
+            presetCommonFieldsData, dateTo,
+            dateRequested, dateFilingPriority,
+            intellectualPropertyTypes, requiredSelectionRules,
+            selectedIntellectualPropertyType,
+            intellectualPropertyApplicationStatuses,
+            selectedIntellectualPropertyApplicationStatusType
         };
     }
 });

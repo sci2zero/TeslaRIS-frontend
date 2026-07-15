@@ -405,3 +405,10 @@ export interface Pair<A, B> {
     a: A;
     b: B;
 }
+
+export interface FlexibleDate {
+    year: number;
+    month?: number;
+    day?: number;
+    text?: string;
+}

@@ -1485,5 +1485,22 @@ export default {
     noEIssnLabel: "Nema E-ISSN",
     noPrintIssnLabel: "Nema Print ISSN",
     languageTagListLabel: "Jezičke oznake",
-    dataQualityReportLabel: "Podaci nisu kompletni proverite izvestaj o kvalitetu"
+    dataQualityReportLabel: "Podaci nisu kompletni proverite izvestaj o kvalitetu",
+    intellectualPropertyTypeLabel: "Vrsta intelektualne svojine",
+    intellectualPropertyApplicationStatusLabel: "Status prijave intelektualne svojine",
+    dateRequestedLabel: "Datum podnošenja prijave",
+    dateFilingPriorityLabel: "Datum prava prvenstva",
+    dateToLabel: "Datum važenja do",
+    januaryLabel: "Januar",
+    februaryLabel: "Februar",
+    marchLabel: "Mart",
+    aprilLabel: "April",
+    mayLabel: "Maj",
+    juneLabel: "Jun",
+    julyLabel: "Jul",
+    augustLabel: "Avgust",
+    septemberLabel: "Septembar",
+    octoberLabel: "Oktobar",
+    novemberLabel: "Novembar",
+    decemberLabel: "Decembar"
 }
