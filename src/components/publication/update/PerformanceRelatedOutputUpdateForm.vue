@@ -6,8 +6,8 @@
                     ref="titleRef" v-model="title" 
                     :rules="requiredFieldRules" 
                     :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetPerformanceRelatedOutput?.title, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetPerformanceRelatedOutput?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -22,13 +22,11 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -112,24 +110,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID" 
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
 
@@ -169,11 +167,12 @@ import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import LanguageService from '@/services/LanguageService';
 import { type AxiosResponse } from 'axios';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "PerformanceRelatedOutputUpdateForm",
-    components: { MultilingualTextInput, UriInput, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetPerformanceRelatedOutput: {
             type: Object as PropType<PerformanceRelatedOutput | undefined>,
@@ -237,7 +236,7 @@ export default defineComponent({
         const distributor = ref<any>([]);
         const sourceTitle = ref<any>([]);
         const otherActors = ref<any>([]);
-        const publicationYear = ref(props.presetPerformanceRelatedOutput?.documentDate);
+        const publicationDate = ref(props.presetPerformanceRelatedOutput?.documentDate);
         const doi = ref(props.presetPerformanceRelatedOutput?.doi);
         const openAlexId = ref(props.presetPerformanceRelatedOutput?.openAlexId);
         const webOfScienceId = ref(props.presetPerformanceRelatedOutput?.webOfScienceId);
@@ -299,7 +298,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetPerformanceRelatedOutput?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -342,7 +341,7 @@ export default defineComponent({
             otherActors.value = props.presetPerformanceRelatedOutput?.otherActors as MultilingualContent[];
 
             uris.value = props.presetPerformanceRelatedOutput?.uris as string[];
-            publicationYear.value = props.presetPerformanceRelatedOutput?.documentDate;
+            publicationDate.value = props.presetPerformanceRelatedOutput?.documentDate;
             doi.value = props.presetPerformanceRelatedOutput?.doi;
             openAlexId.value = props.presetPerformanceRelatedOutput?.openAlexId;
             webOfScienceId.value = props.presetPerformanceRelatedOutput?.webOfScienceId;
@@ -369,7 +368,7 @@ export default defineComponent({
 
         return {
             isFormValid, doi, snackbar, message,
-            title, subtitle, publicationYear,
+            title, subtitle, publicationDate,
             uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,
             languageTags, doiValidationRules,

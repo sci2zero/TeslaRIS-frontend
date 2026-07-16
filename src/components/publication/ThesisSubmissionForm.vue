@@ -77,12 +77,11 @@
 
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field
-                            v-model="publicationYear" type="number" 
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                            :placeholder="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                            :rules="(canAddAsNonReference) ? [] : requiredFieldRules">
-                        </v-text-field>
+                            :required="!canAddAsNonReference"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -370,7 +369,7 @@ import { type CommonFieldsData, DocumentContributionType, type PersonDocumentCon
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -388,11 +387,12 @@ import PersonService from '@/services/PersonService';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -559,7 +559,7 @@ export default defineComponent({
         const description = ref([]);
         const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref(props.presetYear ? props.presetYear : "");
+        const publicationDate = ref<FlexibleDate | undefined>(props.presetYear ? {year: Number.parseInt(props.presetYear)} : undefined);
         const doi = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
@@ -634,7 +634,7 @@ export default defineComponent({
                 alternateTitle: alternateTitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
@@ -668,7 +668,7 @@ export default defineComponent({
                     urisRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     ouAutocompleteRef.value?.clearInput();
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
@@ -723,7 +723,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
@@ -779,7 +779,7 @@ export default defineComponent({
         return {
             isFormValid, PublicationType, popuateMetadata,
             additionalFields, snackbar, error, title, titleRef,
-            subtitle, subtitleRef, publicationYear, doi, openAlexId,
+            subtitle, subtitleRef, publicationDate, doi, openAlexId,
             publisherAutocompleteRef, selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef, selectedLanguage,

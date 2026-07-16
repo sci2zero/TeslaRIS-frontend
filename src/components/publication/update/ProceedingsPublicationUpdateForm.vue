@@ -190,6 +190,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil.js';
 
 
 export default defineComponent({
@@ -267,7 +268,7 @@ export default defineComponent({
         const section = ref<any>([]);
         const startPage = ref(props.presetProceedingsPublication?.startPage);
         const endPage = ref(props.presetProceedingsPublication?.endPage);
-        const publicationYear = ref(props.presetProceedingsPublication?.documentDate);
+        const publicationDate = ref(props.presetProceedingsPublication?.documentDate);
         const doi = ref(props.presetProceedingsPublication?.doi);
         const scopus = ref(props.presetProceedingsPublication?.scopusId);
         const openAlexId = ref(props.presetProceedingsPublication?.openAlexId);
@@ -303,7 +304,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
+            const toSelect = {title: `${title} | ${localiseFlexibleDate(proceedings.documentDate)}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };
@@ -323,7 +324,7 @@ export default defineComponent({
                         title = proceedingsResponse.title[0].content;
                     }
 
-                    availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number })
+                    availableProceedings.value.push({title: `${title} | ${localiseFlexibleDate(proceedingsResponse.documentDate)}`, value: proceedingsResponse.id as number })
                 });
             });
         };
@@ -364,7 +365,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetProceedingsPublication?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -399,7 +400,7 @@ export default defineComponent({
             startPage.value = props.presetProceedingsPublication?.startPage;
             endPage.value = props.presetProceedingsPublication?.endPage;
             numberOfPages.value = props.presetProceedingsPublication?.numberOfPages;
-            publicationYear.value = props.presetProceedingsPublication?.documentDate;
+            publicationDate.value = props.presetProceedingsPublication?.documentDate;
             doi.value = props.presetProceedingsPublication?.doi;
             scopus.value = props.presetProceedingsPublication?.scopusId;
             openAlexId.value = props.presetProceedingsPublication?.openAlexId;
@@ -428,7 +429,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle, section,
-            publicationYear, doi, scopus, sectionRef,
+            publicationDate, doi, scopus, sectionRef,
             selectedProceedings, articleNumber,
             uris, numberOfPages, doiValidationRules, openAlexId,
             requiredFieldRules, selectedEvent, titleRef, subtitleRef,

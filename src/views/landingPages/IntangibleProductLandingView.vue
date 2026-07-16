@@ -69,10 +69,10 @@
                                     {{ intangibleProduct.internalNumber }}
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate" class="response">
-                                    {{ intangibleProduct.documentDate }}
+                                    {{ localiseFlexibleDate(intangibleProduct.documentDate) }}
                                 </div>
                                 <div v-if="intangibleProduct?.publisherId || intangibleProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -240,7 +240,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="intangibleProduct?.id"
-                    :can-edit="canClassify && intangibleProduct?.documentDate !== ''"
+                    :can-edit="canClassify && !!intangibleProduct?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -317,6 +317,7 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -529,7 +530,8 @@ export default defineComponent({
             fetchIntangibleProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas,
             getIntangibleProductTypeTitleFromValueAutoLocale,
-            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers
+            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate
         };
 }})
 

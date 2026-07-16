@@ -76,10 +76,10 @@
                                     {{ monographPublication.endPage }}
                                 </div>
                                 <div v-if="monographPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monographPublication?.documentDate" class="response">
-                                    {{ localiseDate(monographPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
                                 </div>
                                 <div v-if="monographPublication?.monographId">
                                     {{ $t("monographLabel") }}:
@@ -234,7 +234,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monographPublication?.id"
-                    :can-edit="canClassify && monographPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!monographPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MONOGRAPH_PUBLICATION]"
                     @create="createClassification"
@@ -281,7 +281,7 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -517,7 +517,7 @@ export default defineComponent({
             fetchClassifications, createClassification, fetchIndicators,
             createIndicator, actionsRef, fetchValidationStatus, PublicationType,
             updateRemark, displayConfiguration, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
         };
 }})
 

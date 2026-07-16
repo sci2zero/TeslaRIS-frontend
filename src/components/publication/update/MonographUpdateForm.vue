@@ -6,18 +6,17 @@
                     v-model="title"
                     :rules="requiredFieldRules"
                     :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetMonograph?.title, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetMonograph?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field
-                    v-model="publicationYear"
-                    :rules="requiredFieldRules"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -231,11 +230,12 @@ import PublisherService from '@/services/PublisherService';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,
@@ -358,7 +358,7 @@ export default defineComponent({
         const eIsbn = ref(props.presetMonograph?.eisbn);
         const printIsbn = ref(props.presetMonograph?.printISBN);
         const numberOfPages = ref(props.presetMonograph?.numberOfPages);
-        const publicationYear = ref(props.presetMonograph?.documentDate);
+        const publicationDate = ref(props.presetMonograph?.documentDate);
         const doi = ref(props.presetMonograph?.doi);
         const scopus = ref(props.presetMonograph?.scopusId);
         const openAlexId = ref(props.presetMonograph?.openAlexId);
@@ -432,7 +432,7 @@ export default defineComponent({
                 title: title.value,
                 uris: uris.value as string[],
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
@@ -475,7 +475,7 @@ export default defineComponent({
             udc.value = props.presetMonograph?.udc;
             printIsbn.value = props.presetMonograph?.printISBN;
             numberOfPages.value = props.presetMonograph?.numberOfPages;
-            publicationYear.value = props.presetMonograph?.documentDate;
+            publicationDate.value = props.presetMonograph?.documentDate;
             doi.value = props.presetMonograph?.doi;
             scopus.value = props.presetMonograph?.scopusId;
             openAlexId.value = props.presetMonograph?.openAlexId;
@@ -503,7 +503,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle,
-            publicationYear, doi, scopus,
+            publicationDate, doi, scopus,
             requiredFieldRules, submit, 
             toMultilingualTextInput, languageTags,
             number, volume, selectedJournal,

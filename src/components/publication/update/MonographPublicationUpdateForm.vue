@@ -236,7 +236,7 @@ export default defineComponent({
         const section = ref<any>([]);
         const startPage = ref(props.presetMonographPublication?.startPage);
         const endPage = ref(props.presetMonographPublication?.endPage);
-        const publicationYear = ref(props.presetMonographPublication?.documentDate);
+        const publicationDate = ref(props.presetMonographPublication?.documentDate);
         const doi = ref(props.presetMonographPublication?.doi);
         const scopus = ref(props.presetMonographPublication?.scopusId);
         const openAlexId = ref(props.presetMonographPublication?.openAlexId);
@@ -296,7 +296,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetMonographPublication?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -331,7 +331,7 @@ export default defineComponent({
             startPage.value = props.presetMonographPublication?.startPage;
             endPage.value = props.presetMonographPublication?.endPage;
             numberOfPages.value = props.presetMonographPublication?.numberOfPages;
-            publicationYear.value = props.presetMonographPublication?.documentDate;
+            publicationDate.value = props.presetMonographPublication?.documentDate;
             doi.value = props.presetMonographPublication?.doi;
             scopus.value = props.presetMonographPublication?.scopusId;
             openAlexId.value = props.presetMonographPublication?.openAlexId;

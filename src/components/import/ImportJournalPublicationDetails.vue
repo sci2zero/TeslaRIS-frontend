@@ -363,7 +363,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: [],
-                documentDate: publicationYear.value,
+                documentDate: { year: Number.parseInt(publicationYear.value) },
                 scopusId: scopus.value,
                 doi: doi.value,
                 webOfScienceId: webOfScienceId.value,

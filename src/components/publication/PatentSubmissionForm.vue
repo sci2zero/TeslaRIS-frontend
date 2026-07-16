@@ -38,12 +38,10 @@
 
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field
-                            v-model="publicationYear"
-                            type="number"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules"
+                            required
                         />
                     </v-col>
                 </v-row>
@@ -291,7 +289,7 @@ export default defineComponent({
         const keywords = ref<any[]>([]);
         const place = ref([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const openAlexId = ref("");
         const scopus = ref("");
@@ -363,7 +361,7 @@ export default defineComponent({
                 subTitle: subtitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
@@ -393,7 +391,7 @@ export default defineComponent({
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
@@ -438,7 +436,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
@@ -463,7 +461,7 @@ export default defineComponent({
             isFormValid, additionalFields,
             snackbar, error, title, titleRef,
             subtitle, subtitleRef,
-            publicationYear, doi,
+            publicationDate, doi,
             publisherAutocompleteRef,
             selectedPublisher, patentNumber,
             description, descriptionRef,

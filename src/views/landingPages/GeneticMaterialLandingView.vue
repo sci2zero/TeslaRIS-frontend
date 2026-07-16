@@ -69,10 +69,10 @@
                                     {{ geneticMaterial.internalNumber }}
                                 </div>
                                 <div v-if="geneticMaterial?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="geneticMaterial?.documentDate" class="response">
-                                    {{ geneticMaterial.documentDate }}
+                                    {{ localiseFlexibleDate(geneticMaterial.documentDate) }}
                                 </div>
                                 <div v-if="geneticMaterial?.publisherId || geneticMaterial?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -205,7 +205,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="geneticMaterial?.id"
-                    :can-edit="canClassify && geneticMaterial?.documentDate !== ''"
+                    :can-edit="canClassify && !!geneticMaterial?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.GENETIC_MATERIAL]"
                     @create="createClassification"
@@ -279,6 +279,7 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -482,7 +483,7 @@ export default defineComponent({
             fetchGeneticMaterial, fetchValidationStatus, updateRemark,
             getGeneticMaterialTypeTitleFromValueAutoLocale,
             GeneticMaterialUpdateForm, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
         };
 }})
 

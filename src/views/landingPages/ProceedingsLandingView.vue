@@ -87,7 +87,7 @@
                                     {{ $t("yearOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="proceedings?.documentDate" class="response">
-                                    {{ localiseDate(proceedings.documentDate) }}
+                                    {{ localiseFlexibleDate(proceedings.documentDate) }}
                                 </div>
                                 <div v-if="proceedings?.publicationSeriesVolume">
                                     {{ $t("publicationSeriesVolumeLabel") }}:
@@ -302,7 +302,7 @@ import BookSeriesService from '@/services/BookSeriesService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsUpdateForm from '@/components/proceedings/update/ProceedingsUpdateForm.vue';
 import StatisticsService from '@/services/StatisticsService';
@@ -576,7 +576,7 @@ export default defineComponent({
             proceedings, icon, fetchIndicators, PublicationType,
             publications, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
-            returnCurrentLocaleContent, localiseDate, fetchIdentifiers,
+            returnCurrentLocaleContent, localiseFlexibleDate, fetchIdentifiers,
             languageMap, publicationSeriesType, displayConfiguration,
             searchKeyword, goToURL, canEdit, documentIdentifiers,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

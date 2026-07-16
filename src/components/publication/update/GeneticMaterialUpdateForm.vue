@@ -6,8 +6,8 @@
                     ref="titleRef" v-model="title" 
                     :rules="requiredFieldRules" 
                     :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetGeneticMaterial?.title, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetGeneticMaterial?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -16,19 +16,17 @@
                     ref="subtitleRef"
                     v-model="subtitle"
                     :label="$t('subtitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetGeneticMaterial?.subTitle, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetGeneticMaterial?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -44,7 +42,7 @@
                     :items="geneticMaterialTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -52,13 +50,13 @@
                 <v-text-field
                     v-model="geneticMaterialNumber"
                     :label="$t('internalNumberLabel')"
-                    :placeholder="$t('internalNumberLabel')">
-                </v-text-field>
+                    :placeholder="$t('internalNumberLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -66,8 +64,8 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -76,24 +74,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID" 
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
 
@@ -134,11 +132,12 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { getGeneticMaterialTypesForGivenLocale, getGeneticMaterialTypeTitleFromValueAutoLocale } from '@/i18n/geneticMaterialType';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "GeneticMaterialUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetGeneticMaterial: {
             type: Object as PropType<GeneticMaterial | undefined>,
@@ -196,7 +195,7 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationYear = ref(props.presetGeneticMaterial?.documentDate);
+        const publicationDate = ref(props.presetGeneticMaterial?.documentDate);
         const doi = ref(props.presetGeneticMaterial?.doi);
         const openAlexId = ref(props.presetGeneticMaterial?.openAlexId);
         const webOfScienceId = ref(props.presetGeneticMaterial?.webOfScienceId);
@@ -257,7 +256,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetGeneticMaterial?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -286,7 +285,7 @@ export default defineComponent({
 
             uris.value = props.presetGeneticMaterial?.uris as string[];
             geneticMaterialNumber.value = props.presetGeneticMaterial?.internalNumber;
-            publicationYear.value = props.presetGeneticMaterial?.documentDate;
+            publicationDate.value = props.presetGeneticMaterial?.documentDate;
             doi.value = props.presetGeneticMaterial?.doi;
             openAlexId.value = props.presetGeneticMaterial?.openAlexId;
             webOfScienceId.value = props.presetGeneticMaterial?.webOfScienceId;
@@ -313,7 +312,7 @@ export default defineComponent({
 
         return {
             isFormValid, doi, snackbar, message,
-            title, subtitle, publicationYear,
+            title, subtitle, publicationDate,
             selectedPublisher, geneticMaterialNumber,
             uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,

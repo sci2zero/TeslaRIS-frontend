@@ -93,10 +93,10 @@
                                     {{ patent.number }}
                                 </div>
                                 <div v-if="patent?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="patent?.documentDate" class="response">
-                                    {{ patent.documentDate }}
+                                    {{ localiseFlexibleDate(patent.documentDate) }}
                                 </div>
                                 <div v-if="patent?.publisherId || patent?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -229,7 +229,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="patent?.id"
-                    :can-edit="canClassify && patent?.documentDate !== ''"
+                    :can-edit="canClassify && !!patent?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.PATENT]"
                     @create="createClassification"

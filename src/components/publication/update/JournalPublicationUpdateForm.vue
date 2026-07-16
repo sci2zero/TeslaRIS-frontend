@@ -50,7 +50,11 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')" />
+                <flexible-date-picker
+                    v-model="publicationDate"
+                    :label="$t('yearOfPublicationLabel') + '*'"
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -166,11 +170,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
@@ -234,7 +239,7 @@ export default defineComponent({
         const issue = ref(props.presetJournalPublication?.issue);
         const startPage = ref(props.presetJournalPublication?.startPage);
         const endPage = ref(props.presetJournalPublication?.endPage);
-        const publicationYear = ref(props.presetJournalPublication?.documentDate);
+        const publicationDate = ref(props.presetJournalPublication?.documentDate);
         const doi = ref(props.presetJournalPublication?.doi);
         const openAlexId = ref(props.presetJournalPublication?.openAlexId);
         const webOfScienceId = ref(props.presetJournalPublication?.webOfScienceId);
@@ -291,7 +296,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetJournalPublication?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -322,7 +327,7 @@ export default defineComponent({
             startPage.value = props.presetJournalPublication?.startPage;
             endPage.value = props.presetJournalPublication?.endPage;
             numberOfPages.value = props.presetJournalPublication?.numberOfPages;
-            publicationYear.value = props.presetJournalPublication?.documentDate;
+            publicationDate.value = props.presetJournalPublication?.documentDate;
             doi.value = props.presetJournalPublication?.doi;
             scopus.value = props.presetJournalPublication?.scopusId;
             openAlexId.value = props.presetJournalPublication?.openAlexId;
@@ -357,7 +362,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle,
-            publicationYear, doi, scopus,
+            publicationDate, doi, scopus,
             selectedJournal, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,

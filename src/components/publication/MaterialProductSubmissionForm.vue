@@ -38,12 +38,10 @@
 
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field
-                            v-model="publicationYear"
-                            type="number"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules"
+                            required
                         />
                     </v-col>
                 </v-row>
@@ -220,7 +218,7 @@ import { PublicationType, type PersonDocumentContribution, type MaterialProduct,
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -229,11 +227,12 @@ import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getMaterialProductTypesForGivenLocale } from '@/i18n/materialProductType';
 import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitMaterialProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -273,7 +272,7 @@ export default defineComponent({
         const keywords = ref<any[]>([]);
         const productUsers = ref<any>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const openAlexId = ref("");
         const scopus = ref("");
@@ -314,7 +313,7 @@ export default defineComponent({
                 subTitle: subtitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
@@ -339,7 +338,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
@@ -383,7 +382,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
@@ -412,7 +411,7 @@ export default defineComponent({
             isFormValid, scopusIdValidationRules,
             additionalFields, snackbar, error,
             title, titleRef, subtitle, subtitleRef,
-            publicationYear, doi, PublicationType,
+            publicationDate, doi, PublicationType,
             publisherAutocompleteRef, popuateMetadata,
             selectedPublisher, materialProductNumber, openAlexId,
             description, descriptionRef, doiValidationRules,

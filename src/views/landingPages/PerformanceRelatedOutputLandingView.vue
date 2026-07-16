@@ -87,10 +87,10 @@
                                     {{ returnCurrentLocaleContent(performanceRelatedOutput?.otherActors) }}
                                 </div>
                                 <div v-if="performanceRelatedOutput?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="performanceRelatedOutput?.documentDate" class="response">
-                                    {{ performanceRelatedOutput.documentDate }}
+                                    {{ localiseFlexibleDate(performanceRelatedOutput.documentDate) }}
                                 </div>
                                 <div v-if="performanceRelatedOutput?.languageTags && performanceRelatedOutput?.languageTags.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -218,7 +218,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="performanceRelatedOutput?.id"
-                    :can-edit="canClassify && performanceRelatedOutput?.documentDate !== ''"
+                    :can-edit="canClassify && !!performanceRelatedOutput?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT]"
                     @create="createClassification"
@@ -289,6 +289,7 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -487,7 +488,8 @@ export default defineComponent({
             fetchPerformanceRelatedOutput, fetchValidationStatus,
             getPerformanceRelatedOutputTypeTitleFromValueAutoLocale,
             PerformanceRelatedOutputUpdateForm, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers, updateRemark
+            fetchIdentifiers, documentIdentifiers, updateRemark,
+            localiseFlexibleDate
         };
 }})
 

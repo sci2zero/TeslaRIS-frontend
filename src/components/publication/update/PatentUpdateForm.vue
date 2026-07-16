@@ -23,12 +23,10 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    required
                 />
             </v-col>
         </v-row>
@@ -234,7 +232,7 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationYear = ref(props.presetPatent?.documentDate);
+        const publicationDate = ref(props.presetPatent?.documentDate);
         const doi = ref(props.presetPatent?.doi);
         const openAlexId = ref(props.presetPatent?.openAlexId);
         const webOfScienceId = ref(props.presetPatent?.webOfScienceId);
@@ -332,7 +330,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetPatent?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -365,7 +363,7 @@ export default defineComponent({
 
             uris.value = props.presetPatent?.uris as string[];
             patentNumber.value = props.presetPatent?.number;
-            publicationYear.value = props.presetPatent?.documentDate;
+            publicationDate.value = props.presetPatent?.documentDate;
             doi.value = props.presetPatent?.doi;
             openAlexId.value = props.presetPatent?.openAlexId;
             webOfScienceId.value = props.presetPatent?.webOfScienceId;
@@ -401,7 +399,7 @@ export default defineComponent({
             isFormValid, title,
             scopusIdValidationRules,
             subtitle, doi, scopus,
-            publicationYear, 
+            publicationDate, 
             selectedPublisher, 
             patentNumber, uris, 
             requiredFieldRules,

@@ -133,7 +133,7 @@
             </v-btn>
         </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="!basic">
         <v-col>
             <date-picker
                 v-model="dateFrom"
@@ -149,7 +149,7 @@
             />
         </v-col>
     </v-row>
-    <div>
+    <div v-if="!basic">
         <h2
             class="mt-5!">
             {{ $t("researchAreasLabel") }}

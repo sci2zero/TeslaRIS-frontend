@@ -63,10 +63,10 @@
                                     {{ getMonographTypeTitleFromValueAutoLocale(monograph.monographType) }}
                                 </div>
                                 <div v-if="monograph?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monograph?.documentDate" class="response">
-                                    {{ monograph.documentDate }}
+                                    {{ localiseFlexibleDate(monograph.documentDate) }}
                                 </div>
                                 <div v-if="monograph?.eisbn">
                                     eISBN:
@@ -381,6 +381,7 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -675,7 +676,7 @@ export default defineComponent({
             updateRemark, displayConfiguration,
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
-            MonographType
+            MonographType, localiseFlexibleDate
         };
 }})
 

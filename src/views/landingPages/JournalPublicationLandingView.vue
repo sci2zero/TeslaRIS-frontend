@@ -87,10 +87,10 @@
                                     {{ journalPublication.endPage }}
                                 </div>
                                 <div>
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.documentDate" class="response">
-                                    {{ localiseDate(journalPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(journalPublication.documentDate) }}
                                 </div>
                                 <div v-else class="response">
                                     {{ $t("notYetSetMessage") }}
@@ -253,7 +253,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="journalPublication?.id"
-                    :can-edit="canClassify && journalPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!journalPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.JOURNAL_PUBLICATION]"
                     @create="createClassification"
@@ -302,7 +302,7 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
@@ -555,7 +555,7 @@ export default defineComponent({
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
             fetchValidationStatus, PublicationType, updateRemark, displayConfiguration,
-            documentIdentifiers, fetchIdentifiers
+            documentIdentifiers, fetchIdentifiers, localiseFlexibleDate
         };
 }})
 

@@ -3,9 +3,12 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetMaterialProduct?.title, languageTags)">
-                </multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetMaterialProduct?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -14,19 +17,17 @@
                     ref="subtitleRef"
                     v-model="subtitle"
                     :label="$t('subtitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetMaterialProduct?.subTitle, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetMaterialProduct?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -35,8 +36,8 @@
                     v-model="doi"
                     label="DOI"
                     placeholder="DOI"
-                    :rules="doiValidationRules">
-                </v-text-field>
+                    :rules="doiValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -47,7 +48,7 @@
                     :items="materialProductTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -55,8 +56,8 @@
                 <v-text-field
                     v-model="materialProductNumber"
                     :label="$t('internalNumberLabel')"
-                    :placeholder="$t('internalNumberLabel')">
-                </v-text-field>
+                    :placeholder="$t('internalNumberLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -69,8 +70,8 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -79,24 +80,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID" 
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -106,7 +107,7 @@
                     type="number"
                     :label="$t('numberProducedLabel')"
                     :placeholder="$t('numberProducedLabel')"
-                ></v-text-field>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -114,8 +115,8 @@
                 <multilingual-text-input
                     ref="usersRef"
                     v-model="productUsers"
-                    :label="$t('productUsersLabel')">
-                </multilingual-text-input>
+                    :label="$t('productUsersLabel')"
+                />
             </v-col>
         </v-row>
         <h2
@@ -173,11 +174,12 @@ import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "MaterialProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetMaterialProduct: {
             type: Object as PropType<MaterialProduct | undefined>,
@@ -239,7 +241,7 @@ export default defineComponent({
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
         const productUsers = ref<any>([]);
-        const publicationYear = ref(props.presetMaterialProduct?.documentDate);
+        const publicationDate = ref(props.presetMaterialProduct?.documentDate);
         const doi = ref(props.presetMaterialProduct?.doi);
         const openAlexId = ref(props.presetMaterialProduct?.openAlexId);
         const webOfScienceId = ref(props.presetMaterialProduct?.webOfScienceId);
@@ -305,7 +307,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetMaterialProduct?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -336,7 +338,7 @@ export default defineComponent({
 
             uris.value = props.presetMaterialProduct?.uris as string[];
             materialProductNumber.value = props.presetMaterialProduct?.internalNumber;
-            publicationYear.value = props.presetMaterialProduct?.documentDate;
+            publicationDate.value = props.presetMaterialProduct?.documentDate;
             doi.value = props.presetMaterialProduct?.doi;
             openAlexId.value = props.presetMaterialProduct?.openAlexId;
             webOfScienceId.value = props.presetMaterialProduct?.webOfScienceId;
@@ -373,7 +375,7 @@ export default defineComponent({
 
         return {
             isFormValid, doi, snackbar, message,
-            title, subtitle, publicationYear,
+            title, subtitle, publicationDate,
             selectedPublisher, materialProductNumber,
             uris, requiredFieldRules, titleRef, usersRef,
             submit, toMultilingualTextInput, requiredSelectionRules,

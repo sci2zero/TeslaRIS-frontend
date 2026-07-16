@@ -216,7 +216,7 @@
                                 <div v-if="organisationUnit?.dateDissolved" class="response">
                                     {{ localiseDate(organisationUnit?.dateDissolved) }}
                                 </div>
-                                <div v-if="organisationUnit?.active">
+                                <div v-if="organisationUnit?.active" class="response">
                                     {{ $t("activeLabel") }}
                                 </div>
                                 <div v-if="organisationUnit?.superInstitutionId">

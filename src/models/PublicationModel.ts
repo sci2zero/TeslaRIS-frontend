@@ -110,7 +110,7 @@ export interface Document {
     keywords: MultilingualContent[];
     contributions?: PersonDocumentContribution[];
     uris: string[];
-    documentDate?: string;
+    documentDate?: FlexibleDate;
     doi?: string;
     scopusId?: string;
     openAlexId?: string;
@@ -217,7 +217,7 @@ export interface ProceedingsPublicationResponse {
     id: number,
     proceedingsTitle: MultilingualContent[];
     title: MultilingualContent[];
-    documentDate: string;
+    documentDate: FlexibleDate;
 }
 
 export interface ProceedingsPublication extends Document {

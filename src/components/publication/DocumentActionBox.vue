@@ -39,7 +39,7 @@
                         {{ $t("validateUploadedFilesLabel") }}
                     </v-btn>
                     <v-btn
-                        v-if="displayArchiveActions && couldArchive && document?.documentDate && (isAdmin || isInstitutionalEditor) && !document?.isArchived"
+                        v-if="displayArchiveActions && couldArchive && document?.documentDate?.year && (isAdmin || isInstitutionalEditor) && !document?.isArchived"
                         class="mb-5 ml-2" color="primary" density="compact"
                         variant="outlined"
                         @click="changeArchiveState(true)">
