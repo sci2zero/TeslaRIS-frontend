@@ -53,7 +53,7 @@ export interface DocumentPublicationIndex {
 export enum PublicationType {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
-    PATENT = "PATENT",
+    INTELLECTUAL_PROPERTY = "INTELLECTUAL_PROPERTY",
     PROCEEDINGS = "PROCEEDINGS",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
@@ -287,7 +287,7 @@ export interface MonographPublication extends Document {
     section?: MultilingualContent[];
 }
 
-export interface Patent extends Document {
+export interface IntellectualProperty extends Document {
     number: string;
     publisherId?: number;
     publisherName?: MultilingualContent[];

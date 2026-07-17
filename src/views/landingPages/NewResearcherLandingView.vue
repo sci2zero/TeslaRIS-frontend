@@ -281,7 +281,7 @@ const isFilterDropdownOpen = ref(false);
 const publicationTypeSr = [
     { title: "Rad u časopisu", value: PublicationType.JOURNAL_PUBLICATION },
     { title: "Rad sa konferencije", value: PublicationType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: PublicationType.PATENT },
+    { title: "Intelektualna Svojina", value: PublicationType.INTELLECTUAL_PROPERTY },
     { title: "Zbornik radova", value: PublicationType.PROCEEDINGS },
     { title: "Nematerijalni proizvod", value: PublicationType.INTANGIBLE_PRODUCT },
     { title: "Monografija", value: PublicationType.MONOGRAPH },

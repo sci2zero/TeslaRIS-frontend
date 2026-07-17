@@ -26,8 +26,8 @@ export const getDocumentTypeDisplayValue = (documentType: string, publicationTyp
             return getJournalPublicationTypeTitle(publicationType);
         case "PROCEEDINGS_PUBLICATION":
             return getProceedingsPublicationTypeTitle(publicationType);
-        case "PATENT":
-            return i18n.t("patentLabel");
+        case "INTELLECTUAL_PROPERTY":
+            return i18n.t("intellectualPropertyLabel");
         case "PROCEEDINGS":
             return i18n.t("proceedingsLabel");
         case "INTANGIBLE_PRODUCT":

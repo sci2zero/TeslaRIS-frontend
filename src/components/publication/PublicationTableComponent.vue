@@ -793,7 +793,7 @@ export default defineComponent({
                     return 'mdi-book-open-page-variant';
                 case 'PROCEEDINGS':
                     return 'mdi-presentation';
-                case 'PATENT':
+                case 'INTELLECTUAL_PROPERTY':
                     return 'mdi-shield-check';
                 case 'INTANGIBLE_PRODUCT':
                     return 'mdi-code-tags';

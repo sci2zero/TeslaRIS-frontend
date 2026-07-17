@@ -8,8 +8,8 @@ export const getMetadataComparisonPageName = (type: PublicationType | string): s
             return "journalPublicationMetadataComparator";
         case "PROCEEDINGS_PUBLICATION":
             return "proceedingsPublicationMetadataComparator";
-        case "PATENT":
-            return "patentMetadataComparator";
+        case "INTELLECTUAL_PROPERTY":
+            return "intellectualPropertyMetadataComparator";
         case "PROCEEDINGS":
             return "proceedingsMetadataComparator";
         case "INTANGIBLE_PRODUCT":
@@ -70,8 +70,8 @@ export const getDocumentLandingPageBasePath = (type: PublicationType | string): 
             return "scientific-results/journal-publication/";
         case "PROCEEDINGS_PUBLICATION":
             return "scientific-results/proceedings-publication/";
-        case "PATENT":
-            return "scientific-results/patent/";
+        case "INTELLECTUAL_PROPERTY":
+            return "scientific-results/intellectual-property/";
         case "PROCEEDINGS":
             return "proceedings/";
         case "INTANGIBLE_PRODUCT":
@@ -113,8 +113,8 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
             return "journalPublicationLandingPage";
         case "PROCEEDINGS_PUBLICATION":
             return "proceedingsPublicationLandingPage";
-        case "PATENT":
-            return "patentLandingPage";
+        case "INTELLECTUAL_PROPERTY":
+            return "intellectualPropertyLandingPage";
         case "PROCEEDINGS":
             return "proceedingsLandingPage";
         case "INTANGIBLE_PRODUCT":
@@ -153,7 +153,7 @@ export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: 
     } else if (assessmentCode.startsWith("M8")) {
         return "scientific-results/material-product/";
     } else if (["M91A", "M91", "M92", "M93", "M94"].includes(assessmentCode)) {
-        return "scientific-results/patent/";
+        return "scientific-results/intellectual-property/";
     } else if (["M95", "M96", "M97", "M98"].includes(assessmentCode)) {
         return "scientific-results/genetic-material/";
     }

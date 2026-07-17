@@ -25,7 +25,7 @@ import SubmitJournalPublicationView from "@/views/SubmitJournalPublicationView.v
 import SubmitProceedingsView from "@/views/SubmitProceedingsView.vue";
 import SubmitProceedingsPublicationView from "@/views/SubmitProceedingsPublicationView.vue";
 import ResetPasswordView from "@/views/ResetPasswordView.vue";
-import SubmitPatentView from "@/views/SubmitPatentView.vue";
+import SubmitIntellectualPropertyView from "@/views/SubmitIntellectualPropertyView.vue";
 import SubmitIntangibleProductView from "@/views/SubmitIntangibleProductView.vue";
 import ExternalRedirect from "@/components/core/ExternalRedirect.vue";
 import ResearcherLandingView from "@/views/landingPages/ResearcherLandingView.vue";
@@ -37,7 +37,7 @@ import BookSeriesLandingView from "@/views/landingPages/BookSeriesLandingView.vu
 import PublisherLandingView from "@/views/landingPages/PublisherLandingView.vue";
 import JournalPublicationLandingView from "@/views/landingPages/JournalPublicationLandingView.vue";
 import IntangibleProductLandingView from "@/views/landingPages/IntangibleProductLandingView.vue";
-import PatentLandingView from "@/views/landingPages/PatentLandingView.vue";
+import IntellectualPropertyLandingView from "@/views/landingPages/IntellectualPropertyLandingView.vue";
 import ProceedingsPublicationsLandingView from "@/views/landingPages/ProceedingsPublicationsLandingView.vue";
 import ProceedingsLandingView from "@/views/landingPages/ProceedingsLandingView.vue";
 import SubmitMonographView from "@/views/SubmitMonographView.vue";
@@ -60,7 +60,7 @@ import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
-import PatentMetadataComparatorView from "@/views/comparators/documents/PatentMetadataComparatorView.vue";
+import IntellectualPropertyMetadataComparatorView from "@/views/comparators/documents/IntellectualPropertyMetadataComparatorView.vue";
 import ProceedingsPublicationComparatorView from "@/views/comparators/documents/ProceedingsPublicationComparatorView.vue";
 import ThesisMetadataComparatorView from "@/views/comparators/documents/ThesisMetadataComparatorView.vue";
 import JournalPublicationMetadataComparatorView from "@/views/comparators/documents/JournalPublicationMetadataComparatorView.vue";
@@ -844,21 +844,21 @@ const router = createRouter({
                             ]
                         },
                         {
-                            path: "patent",
+                            path: "intellectual-property",
                             children: [
                                 {
                                     path: ":id",
-                                    name: "patentLandingPage",
-                                    component: PatentLandingView,
+                                    name: "intellectualPropertyLandingPage",
+                                    component: IntellectualPropertyLandingView,
                                     meta: {
                                         authenticated: false,
                                         authorities: [],
                                     },
                                 },
                                 {
-                                    path: "submit-patent",
-                                    name: "submitPatent",
-                                    component: SubmitPatentView,
+                                    path: "submit-intellectual-property",
+                                    name: "submitIntellectualProperty",
+                                    component: SubmitIntellectualPropertyView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
@@ -866,8 +866,8 @@ const router = createRouter({
                                 },
                                 {
                                     path: 'metadata-comparator/:leftId/:rightId',
-                                    name: "patentMetadataComparator",
-                                    component: PatentMetadataComparatorView,
+                                    name: "intellectualPropertyMetadataComparator",
+                                    component: IntellectualPropertyMetadataComparatorView,
                                     meta: {
                                         authenticated: true,
                                         authorities: [roles.admin, roles.institutionalEditor],

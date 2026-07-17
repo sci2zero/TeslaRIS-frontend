@@ -42,7 +42,7 @@ import ThesisSubmissionForm from './ThesisSubmissionForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import JournalPublicationSubmissionForm from './JournalPublicationSubmissionForm.vue';
 import ProceedingsPublicationSubmissionForm from './ProceedingsPublicationSubmissionForm.vue';
-import PatentSubmissionForm from './PatentSubmissionForm.vue';
+import IntellectualPropertySubmissionForm from './IntellectualPropertySubmissionForm.vue';
 import ProceedingsSubmissionForm from '../proceedings/ProceedingsSubmissionForm.vue';
 import IntangibleProductSubmissionForm from './IntangibleProductSubmissionForm.vue';
 import MonographSubmissionForm from './MonographSubmissionForm.vue';
@@ -172,8 +172,8 @@ export default defineComponent({
                     return JournalPublicationSubmissionForm;
                 case PublicationType.PROCEEDINGS_PUBLICATION:
                     return ProceedingsPublicationSubmissionForm;
-                case PublicationType.PATENT:
-                    return PatentSubmissionForm;
+                case PublicationType.INTELLECTUAL_PROPERTY:
+                    return IntellectualPropertySubmissionForm;
                 case PublicationType.PROCEEDINGS:
                     return ProceedingsSubmissionForm;
                 case PublicationType.INTANGIBLE_PRODUCT:

@@ -7,7 +7,7 @@
                     v-model="title"
                     :rules="requiredFieldRules"
                     :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetPatent?.title, languageTags)"
+                    :initial-value="toMultilingualTextInput(presetIntellectualProperty?.title, languageTags)"
                 />
             </v-col>
         </v-row>
@@ -17,7 +17,7 @@
                     ref="subtitleRef"
                     v-model="subtitle"
                     :label="$t('subtitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetPatent?.subTitle, languageTags)"
+                    :initial-value="toMultilingualTextInput(presetIntellectualProperty?.subTitle, languageTags)"
                 />
             </v-col>
         </v-row>
@@ -41,7 +41,7 @@
             </v-col>
             <v-col cols="5">
                 <v-text-field
-                    v-model="patentNumber"
+                    v-model="intellectualPropertyNumber"
                     :label="$t('internalNumberLabel')"
                     :placeholder="$t('internalNumberLabel')"
                 />
@@ -161,7 +161,7 @@ import { ref } from 'vue';
 import type { FlexibleDate, MultilingualContent } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { CommonFieldsData, IntellectualPropertyApplicationStatus, IntellectualPropertyType, Patent } from '@/models/PublicationModel';
+import type { CommonFieldsData, IntellectualPropertyApplicationStatus, IntellectualPropertyType, IntellectualProperty } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
 import PublisherAutocompleteSearch from '@/components/publisher/PublisherAutocompleteSearch.vue';
 import PublisherService from '@/services/PublisherService';
@@ -179,11 +179,11 @@ import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
-    name: "PatentUpdateForm",
+    name: "IntellectualPropertyUpdateForm",
     components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
-        presetPatent: {
-            type: Object as PropType<Patent | undefined>,
+        presetIntellectualProperty: {
+            type: Object as PropType<IntellectualProperty | undefined>,
             required: true
         },
         inModal: {
@@ -207,18 +207,18 @@ export default defineComponent({
         });
 
         const fetchDetails = () => {
-            if(props.presetPatent?.publisherId) {
-                PublisherService.readPublisher(props.presetPatent.publisherId).then((response) => {
+            if(props.presetIntellectualProperty?.publisherId) {
+                PublisherService.readPublisher(props.presetIntellectualProperty.publisherId).then((response) => {
                     publisher.value = response.data;
                     selectedPublisher.value = {title: returnCurrentLocaleContent(publisher.value.name) as string, value: publisher.value.id as number};
                 });
-            } else if (props.presetPatent?.authorReprint) {
+            } else if (props.presetIntellectualProperty?.authorReprint) {
                 selectedPublisher.value = {title: "", value: -2};
             }
         };
 
-        watch(() => props.presetPatent, () => {
-            if (props.presetPatent) {
+        watch(() => props.presetIntellectualProperty, () => {
+            if (props.presetIntellectualProperty) {
                 refreshForm();
             }
         });
@@ -232,13 +232,13 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationDate = ref(props.presetPatent?.documentDate);
-        const doi = ref(props.presetPatent?.doi);
-        const openAlexId = ref(props.presetPatent?.openAlexId);
-        const webOfScienceId = ref(props.presetPatent?.webOfScienceId);
-        const patentNumber = ref(props.presetPatent?.number);
-        const uris = ref<string[]>(props.presetPatent?.uris as string[]);
-        const scopus = ref(props.presetPatent?.scopusId);
+        const publicationDate = ref(props.presetIntellectualProperty?.documentDate);
+        const doi = ref(props.presetIntellectualProperty?.doi);
+        const openAlexId = ref(props.presetIntellectualProperty?.openAlexId);
+        const webOfScienceId = ref(props.presetIntellectualProperty?.webOfScienceId);
+        const intellectualPropertyNumber = ref(props.presetIntellectualProperty?.number);
+        const uris = ref<string[]>(props.presetIntellectualProperty?.uris as string[]);
+        const scopus = ref(props.presetIntellectualProperty?.scopusId);
         const dateRequested = ref<FlexibleDate>();
         const dateFilingPriority = ref<FlexibleDate>();
         const dateTo = ref<FlexibleDate>();
@@ -246,8 +246,8 @@ export default defineComponent({
         const intellectualPropertyTypes = getIntellectualPropertyTypesForGivenLocale();
         const selectedIntellectualPropertyType = ref<{title: string, value: IntellectualPropertyType | null}>(
             {
-                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetPatent?.type as IntellectualPropertyType) as string ?? "",
-                value: props.presetPatent?.type as IntellectualPropertyType ?? null
+                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetIntellectualProperty?.type as IntellectualPropertyType) as string ?? "",
+                value: props.presetIntellectualProperty?.type as IntellectualPropertyType ?? null
             }
         );
 
@@ -264,8 +264,8 @@ export default defineComponent({
         });
         const selectedIntellectualPropertyApplicationStatusType = ref<{title: string, value: IntellectualPropertyApplicationStatus | null}>(
             { 
-                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus) as string ?? "",
-                value: props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus ?? null
+                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetIntellectualProperty?.applicationStatus as IntellectualPropertyApplicationStatus) as string ?? "",
+                value: props.presetIntellectualProperty?.applicationStatus as IntellectualPropertyApplicationStatus ?? null
             }
         );
 
@@ -313,7 +313,7 @@ export default defineComponent({
                             commonFieldsData.value.nationalId
                         )
                     ],
-                    props.presetPatent?.id as number,
+                    props.presetIntellectualProperty?.id as number,
                     (id, docId) => DocumentPublicationService.checkIdentifierUsage(id, docId)
                 );
 
@@ -322,14 +322,14 @@ export default defineComponent({
                 }
             }
 
-            const updatedPatent: Patent = {
+            const updatedIntellectualProperty: IntellectualProperty = {
                 title: title.value as MultilingualContent[],
-                number: patentNumber.value as string,
-                description: props.presetPatent?.description as MultilingualContent[],
-                keywords: props.presetPatent?.keywords as MultilingualContent[],
+                number: intellectualPropertyNumber.value as string,
+                description: props.presetIntellectualProperty?.description as MultilingualContent[],
+                keywords: props.presetIntellectualProperty?.keywords as MultilingualContent[],
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
-                contributions: props.presetPatent?.contributions,
+                contributions: props.presetIntellectualProperty?.contributions,
                 documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
@@ -347,42 +347,42 @@ export default defineComponent({
                 ...commonFieldsData.value
             };
 
-            emit("update", updatedPatent);
+            emit("update", updatedIntellectualProperty);
         };
 
         const updatePresetCommonFields = () => {
-            updateDocumentCommonFields(props.presetPatent, presetCommonFieldsData);
+            updateDocumentCommonFields(props.presetIntellectualProperty, presetCommonFieldsData);
         };
 
         const refreshForm = () => {
             titleRef.value?.clearInput();
-            title.value = props.presetPatent?.title as MultilingualContent[];
+            title.value = props.presetIntellectualProperty?.title as MultilingualContent[];
 
             subtitleRef.value?.clearInput();
-            subtitle.value = props.presetPatent?.subTitle as MultilingualContent[];
+            subtitle.value = props.presetIntellectualProperty?.subTitle as MultilingualContent[];
 
-            uris.value = props.presetPatent?.uris as string[];
-            patentNumber.value = props.presetPatent?.number;
-            publicationDate.value = props.presetPatent?.documentDate;
-            doi.value = props.presetPatent?.doi;
-            openAlexId.value = props.presetPatent?.openAlexId;
-            webOfScienceId.value = props.presetPatent?.webOfScienceId;
-            scopus.value = props.presetPatent?.scopusId;
-            dateRequested.value = props.presetPatent?.dateRequested;
-            dateFilingPriority.value = props.presetPatent?.dateFilingPriority;
-            dateTo.value = props.presetPatent?.dateTo;
+            uris.value = props.presetIntellectualProperty?.uris as string[];
+            intellectualPropertyNumber.value = props.presetIntellectualProperty?.number;
+            publicationDate.value = props.presetIntellectualProperty?.documentDate;
+            doi.value = props.presetIntellectualProperty?.doi;
+            openAlexId.value = props.presetIntellectualProperty?.openAlexId;
+            webOfScienceId.value = props.presetIntellectualProperty?.webOfScienceId;
+            scopus.value = props.presetIntellectualProperty?.scopusId;
+            dateRequested.value = props.presetIntellectualProperty?.dateRequested;
+            dateFilingPriority.value = props.presetIntellectualProperty?.dateFilingPriority;
+            dateTo.value = props.presetIntellectualProperty?.dateTo;
 
             selectedIntellectualPropertyType.value = {
-                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetPatent?.type as IntellectualPropertyType) as string,
-                value: props.presetPatent?.type as IntellectualPropertyType
+                title: getIntellectualPropertyTypeTitleFromValueAutoLocale(props.presetIntellectualProperty?.type as IntellectualPropertyType) as string,
+                value: props.presetIntellectualProperty?.type as IntellectualPropertyType
             };
 
             selectedIntellectualPropertyApplicationStatusType.value = { 
-                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus) as string,
-                value: props.presetPatent?.applicationStatus as IntellectualPropertyApplicationStatus
+                title: getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(props.presetIntellectualProperty?.applicationStatus as IntellectualPropertyApplicationStatus) as string,
+                value: props.presetIntellectualProperty?.applicationStatus as IntellectualPropertyApplicationStatus
             };
 
-            updateDocumentCommonFields(props.presetPatent, presetCommonFieldsData);
+            updateDocumentCommonFields(props.presetIntellectualProperty, presetCommonFieldsData);
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -401,7 +401,7 @@ export default defineComponent({
             subtitle, doi, scopus,
             publicationDate, 
             selectedPublisher, 
-            patentNumber, uris, 
+            intellectualPropertyNumber, uris, 
             requiredFieldRules,
             submit, message, snackbar,
             toMultilingualTextInput,

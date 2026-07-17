@@ -4,7 +4,7 @@ import type { Journal } from "./JournalModel";
 import type { OrganisationUnitRequest } from "./OrganisationUnitModel";
 import type { PersonalInfo } from "./PersonModel";
 import type { Proceedings } from "./ProceedingsModel";
-import type { GeneticMaterial, JournalPublication, MaterialProduct, Monograph, MonographPublication, Patent, ProceedingsPublication, IntangibleProduct, Thesis, PerformanceRelatedOutput } from "./PublicationModel";
+import type { GeneticMaterial, JournalPublication, MaterialProduct, Monograph, MonographPublication, IntellectualProperty, ProceedingsPublication, IntangibleProduct, Thesis, PerformanceRelatedOutput } from "./PublicationModel";
 import type { Publisher } from "./PublisherModel";
 
 
@@ -79,9 +79,9 @@ export interface MergedGeneticMaterial extends MergedDocuments {
     rightGeneticMaterial: GeneticMaterial;
 }
 
-export interface MergedPatents extends MergedDocuments {
-    leftPatent: Patent;
-    rightPatent: Patent;
+export interface MergedIntellectualProperties extends MergedDocuments {
+    leftIntellectualProperty: IntellectualProperty;
+    rightIntellectualProperty: IntellectualProperty;
 }
 
 export interface MergedProceedingsPublications extends MergedDocuments {

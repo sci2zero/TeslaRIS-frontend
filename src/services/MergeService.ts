@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import {BaseService} from "./BaseService";
-import type { EntityType, MergedBookSeries, MergedConferences, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedPatents, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents, MergedPerformanceRelatedOutputs } from "@/models/MergeModel";
+import type { EntityType, MergedBookSeries, MergedConferences, MergedGeneticMaterial, MergedJournalPublications, MergedJournals, MergedMaterialProduct, MergedMonographPublications, MergedMonographs, MergedOrganisationUnits, MergedIntellectualProperties, MergedPersons, MergedProceedings, MergedProceedingsPublications, MergedPublishers, MergedIntangibleProduct, MergedTheses, MergedExhibitions, MergedCourses, MergedOtherEvents, MergedPerformanceRelatedOutputs } from "@/models/MergeModel";
 import { DocumentContributionType } from "@/models/PublicationModel";
 
 export class MergeService extends BaseService {
@@ -183,8 +183,8 @@ export class MergeService extends BaseService {
         return super.sendRequest(axios.patch, `merge/genetic-material/metadata/${leftGeneticMaterialId}/${rightGeneticMaterialId}`, body);
     }
 
-    async saveMergedPatentsMetadata(leftPatentId: number, rightPatentId: number, body: MergedPatents): Promise<AxiosResponse<void>> {
-        return super.sendRequest(axios.patch, `merge/patent/metadata/${leftPatentId}/${rightPatentId}`, body);
+    async saveMergedIntellectualPropertiesMetadata(leftIntellectualPropertyId: number, rightIntellectualPropertyId: number, body: MergedIntellectualProperties): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `merge/intellectual-property/metadata/${leftIntellectualPropertyId}/${rightIntellectualPropertyId}`, body);
     }
 
     async saveMergedProceedingsPublicationMetadata(leftProceedingsPublicationId: number, rightProceedingsPublicationId: number, body: MergedProceedingsPublications): Promise<AxiosResponse<void>> {

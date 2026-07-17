@@ -1,38 +1,38 @@
 <template>
-    <v-container id="patent">
+    <v-container id="intellectualProperty">
         <!-- Header -->
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
                     <v-card-title class="text-h5 text-center">
                         <v-skeleton-loader
-                            :loading="!patent"
+                            :loading="!intellectualProperty"
                             type="heading"
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(patent?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(intellectualProperty?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(patent?.subTitle) }}
+                        {{ returnCurrentLocaleContent(intellectualProperty?.subTitle) }}
                         <br />
-                        {{ $t("patentLabel") }}
+                        {{ $t("intellectualPropertyLabel") }}
                     </v-card-subtitle>
                 </v-card>
             </v-col>
         </v-row>
 
-        <!-- Patent Info -->
+        <!-- IntellectualProperty Info -->
         <v-row>
             <v-col cols="3" class="text-center">
-                <v-icon v-if="!patent" size="x-large" class="large-patent-icon">
+                <v-icon v-if="!intellectualProperty" size="x-large" class="large-intellectual-property-icon">
                     {{ icon }}
                 </v-icon>
                 <wordcloud
                     v-else
-                    :for-document-id="patent?.id"
-                    :document-type="PublicationType.PATENT"
+                    :for-document-id="intellectualProperty?.id"
+                    :document-type="PublicationType.INTELLECTUAL_PROPERTY"
                     compact-icon
                 />
             </v-col>
@@ -40,12 +40,12 @@
                 <v-card class="pa-3" variant="flat" color="secondary">
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
-                            :form-component="PatentUpdateForm"
-                            :form-props="{ presetPatent: patent }"
-                            entity-name="Patent"
+                            :form-component="IntellectualPropertyUpdateForm"
+                            :form-props="{ presetIntellectualProperty: intellectualProperty }"
+                            entity-name="IntellectualProperty"
                             is-update
                             is-section-update
-                            :read-only="!canEdit || patent?.isArchived"
+                            :read-only="!canEdit || intellectualProperty?.isArchived"
                             @update="updateBasicInfo"
                         />
 
@@ -53,60 +53,60 @@
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
-                        <basic-info-loader v-if="!patent" />
+                        <basic-info-loader v-if="!intellectualProperty" />
                         <v-row v-else>
                             <v-col cols="6">
-                                <div v-if="patent?.type">
+                                <div v-if="intellectualProperty?.type">
                                     {{ $t("intellectualPropertyTypeLabel") }}:
                                 </div>
-                                <div v-if="patent?.type" class="response">
-                                    {{ getIntellectualPropertyTypeTitleFromValueAutoLocale(patent.type) }}
+                                <div v-if="intellectualProperty?.type" class="response">
+                                    {{ getIntellectualPropertyTypeTitleFromValueAutoLocale(intellectualProperty.type) }}
                                 </div>
-                                <div v-if="patent?.applicationStatus">
+                                <div v-if="intellectualProperty?.applicationStatus">
                                     {{ $t("intellectualPropertyApplicationStatusLabel") }}:
                                 </div>
-                                <div v-if="patent?.applicationStatus" class="response">
-                                    {{ getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(patent.applicationStatus) }}
+                                <div v-if="intellectualProperty?.applicationStatus" class="response">
+                                    {{ getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(intellectualProperty.applicationStatus) }}
                                 </div>
-                                <div v-if="patent?.dateRequested">
+                                <div v-if="intellectualProperty?.dateRequested">
                                     {{ $t("dateRequestedLabel") }}:
                                 </div>
-                                <div v-if="patent?.dateRequested" class="response">
-                                    {{ localiseFlexibleDate(patent.dateRequested) }}
+                                <div v-if="intellectualProperty?.dateRequested" class="response">
+                                    {{ localiseFlexibleDate(intellectualProperty.dateRequested) }}
                                 </div>
-                                <div v-if="patent?.dateFilingPriority">
+                                <div v-if="intellectualProperty?.dateFilingPriority">
                                     {{ $t("dateFilingPriorityLabel") }}:
                                 </div>
-                                <div v-if="patent?.dateFilingPriority" class="response">
-                                    {{ localiseFlexibleDate(patent.dateFilingPriority) }}
+                                <div v-if="intellectualProperty?.dateFilingPriority" class="response">
+                                    {{ localiseFlexibleDate(intellectualProperty.dateFilingPriority) }}
                                 </div>
-                                <div v-if="patent?.dateTo">
+                                <div v-if="intellectualProperty?.dateTo">
                                     {{ $t("dateToLabel") }}:
                                 </div>
-                                <div v-if="patent?.dateTo" class="response">
-                                    {{ localiseFlexibleDate(patent.dateTo) }}
+                                <div v-if="intellectualProperty?.dateTo" class="response">
+                                    {{ localiseFlexibleDate(intellectualProperty.dateTo) }}
                                 </div>
-                                <div v-if="patent?.number">
-                                    {{ $t("patentNumberLabel") }}:
+                                <div v-if="intellectualProperty?.number">
+                                    {{ $t("intellectualPropertyNumberLabel") }}:
                                 </div>
-                                <div v-if="patent?.number" class="response">
-                                    {{ patent.number }}
+                                <div v-if="intellectualProperty?.number" class="response">
+                                    {{ intellectualProperty.number }}
                                 </div>
-                                <div v-if="patent?.documentDate">
+                                <div v-if="intellectualProperty?.documentDate">
                                     {{ $t("dateOfPublicationLabel") }}:
                                 </div>
-                                <div v-if="patent?.documentDate" class="response">
-                                    {{ localiseFlexibleDate(patent.documentDate) }}
+                                <div v-if="intellectualProperty?.documentDate" class="response">
+                                    {{ localiseFlexibleDate(intellectualProperty.documentDate) }}
                                 </div>
-                                <div v-if="patent?.publisherId || patent?.authorReprint">
+                                <div v-if="intellectualProperty?.publisherId || intellectualProperty?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="patent?.publisherName?.length ?? 0 > 0" class="response">
-                                    <localized-link :to="'publishers/' + patent?.publisherId">
-                                        {{ returnCurrentLocaleContent(patent?.publisherName) }}
+                                <div v-if="intellectualProperty?.publisherName?.length ?? 0 > 0" class="response">
+                                    <localized-link :to="'publishers/' + intellectualProperty?.publisherId">
+                                        {{ returnCurrentLocaleContent(intellectualProperty?.publisherName) }}
                                     </localized-link>
                                 </div>
-                                <div v-else-if="patent?.authorReprint" class="response">
+                                <div v-else-if="intellectualProperty?.authorReprint" class="response">
                                     <localized-link to="scientific-results/author-reprints">
                                         {{ $t("authorReprintLabel") }}
                                     </localized-link>
@@ -114,10 +114,10 @@
                             </v-col>
                             
                             <document-common-fields-display
-                                :document="patent"
+                                :document="intellectualProperty"
                                 :can-edit="canEdit"
                                 :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                :concrete-entity-type="ApplicableEntityType.PATENT"
+                                :concrete-entity-type="ApplicableEntityType.INTELLECTUAL_PROPERTY"
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
@@ -129,21 +129,21 @@
 
         <document-action-box
             ref="actionsRef"
-            :doi="patent?.doi"
-            :can-edit="canEdit && !patent?.isArchived"
+            :doi="intellectualProperty?.doi"
+            :can-edit="canEdit && !intellectualProperty?.isArchived"
             :could-archive="canEdit"
-            :metadata-valid="patent?.isMetadataValid"
-            :files-valid="patent?.areFilesValid"
+            :metadata-valid="intellectualProperty?.isMetadataValid"
+            :files-valid="intellectualProperty?.areFilesValid"
             :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(patent?.description)"
-            :document="patent"
+            :description="returnCurrentLocaleContent(intellectualProperty?.description)"
+            :document="intellectualProperty"
             :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(patent?.id as number, patent as _Document)"
+            @update="fetchValidationStatus(intellectualProperty?.id as number, intellectualProperty as _Document)"
         />
 
-        <tab-content-loader v-if="!patent" layout="sections" />
+        <tab-content-loader v-if="!intellectualProperty" layout="sections" />
         <v-tabs
-            v-show="patent"
+            v-show="intellectualProperty"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
@@ -169,45 +169,45 @@
         </v-tabs>
 
         <v-tabs-window
-            v-show="patent"
+            v-show="intellectualProperty"
             v-model="currentTab"
         >
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
-                    :document-id="patent?.id"
-                    :contribution-list="patent?.contributions ? patent?.contributions : []"
-                    :read-only="!canEdit || patent?.isArchived"
-                    :document-type="PublicationType.PATENT"
+                    :document-id="intellectualProperty?.id"
+                    :contribution-list="intellectualProperty?.contributions ? intellectualProperty?.contributions : []"
+                    :read-only="!canEdit || intellectualProperty?.isArchived"
+                    :document-type="PublicationType.INTELLECTUAL_PROPERTY"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="documents">
                 <attachment-section
-                    :document="patent"
-                    :can-edit="canEdit && !patent?.isArchived"
-                    :proofs="patent?.proofs"
-                    :file-items="patent?.fileItems">
+                    :document="intellectualProperty"
+                    :can-edit="canEdit && !intellectualProperty?.isArchived"
+                    :proofs="intellectualProperty?.proofs"
+                    :file-items="intellectualProperty?.fileItems">
                 </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
-                    :keywords="patent?.keywords ? patent.keywords : []"
-                    :can-edit="canEdit && !patent?.isArchived"
+                    :keywords="intellectualProperty?.keywords ? intellectualProperty.keywords : []"
+                    :can-edit="canEdit && !intellectualProperty?.isArchived"
                     @search-keyword="searchKeyword($event)"
                     @update="updateKeywords">
                 </keyword-list>
 
                 <!-- Description -->
                 <description-section
-                    :description="patent?.description"
-                    :can-edit="canEdit && !patent?.isArchived"
+                    :description="intellectualProperty?.description"
+                    :can-edit="canEdit && !intellectualProperty?.isArchived"
                     @update="updateDescription">
                 </description-section>
 
                 <description-section
-                    :description="patent?.remark"
-                    :can-edit="canEdit && !patent?.isArchived"
+                    :description="intellectualProperty?.remark"
+                    :can-edit="canEdit && !intellectualProperty?.isArchived"
                     is-remark
                     @update="updateRemark"
                 />
@@ -216,11 +216,11 @@
                 <indicators-section 
                     :indicators="documentIndicators" 
                     :applicable-types="[ApplicableEntityType.DOCUMENT]" 
-                    :entity-id="patent?.id" 
+                    :entity-id="intellectualProperty?.id" 
                     :entity-type="ApplicableEntityType.DOCUMENT" 
                     :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
                     show-statistics
-                    :has-attached-files="patent?.fileItems && patent?.fileItems.length > 0"
+                    :has-attached-files="intellectualProperty?.fileItems && intellectualProperty?.fileItems.length > 0"
                     @create="createIndicator"
                     @updated="fetchIndicators"
                 />
@@ -228,17 +228,17 @@
             <v-tabs-window-item value="assessments">
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
-                    :entity-id="patent?.id"
-                    :can-edit="canClassify && !!patent?.documentDate?.year"
+                    :entity-id="intellectualProperty?.id"
+                    :can-edit="canClassify && !!intellectualProperty?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.PATENT]"
+                    :applicable-types="[ApplicableEntityType.INTELLECTUAL_PROPERTY]"
                     @create="createClassification"
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <document-visualizations
-                    :document-id="(patent?.id as number)"
+                    :document-id="(intellectualProperty?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
@@ -246,10 +246,10 @@
         </v-tabs-window>
 
         <share-buttons
-            v-if="patent && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(patent.title) as string)"
-            :document-id="(patent.id as number)"
-            :document-type="PublicationType.PATENT"
+            v-if="intellectualProperty && isResearcher && canEdit"
+            :title="(returnCurrentLocaleContent(intellectualProperty.title) as string)"
+            :document-id="(intellectualProperty.id as number)"
+            :document-type="PublicationType.INTELLECTUAL_PROPERTY"
         />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -266,7 +266,7 @@ import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { Patent } from '@/models/PublicationModel';
+import type { IntellectualProperty } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import DescriptionSection from '@/components/core/DescriptionSection.vue';
@@ -274,7 +274,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
-import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
+import IntellectualPropertyUpdateForm from '@/components/publication/update/IntellectualPropertyUpdateForm.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -308,7 +308,7 @@ import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
-    name: "PatentLandingPage",
+    name: "IntellectualPropertyLandingPage",
     components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
     setup() {
         const currentTab = ref("contributions");
@@ -319,7 +319,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const patent = ref<Patent>();
+        const intellectualProperty = ref<IntellectualProperty>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const { isResearcher, isAdmin, isCommission } = useUserRole();
@@ -357,7 +357,7 @@ export default defineComponent({
                 fetchClassifications();
             }
 
-            fetchPatent();
+            fetchIntellectualProperty();
             fetchIdentifiers();
             StatisticsService.registerDocumentView(parseInt(currentRoute.params.id as string));
             fetchIndicators();
@@ -367,17 +367,17 @@ export default defineComponent({
             populateData();
         });
 
-        const fetchPatent = () => {
-            DocumentPublicationService.readPatent(
+        const fetchIntellectualProperty = () => {
+            DocumentPublicationService.readIntellectualProperty(
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
-                patent.value = response.data;
+                intellectualProperty.value = response.data;
 
                 injectFairSignposting(response.headers as AxiosResponseHeaders);
 
-                document.title = returnCurrentLocaleContent(patent.value.title) as string;
+                document.title = returnCurrentLocaleContent(intellectualProperty.value.title) as string;
 
-                patent.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+                intellectualProperty.value?.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
     
                 populateData();
             }).catch(() => {
@@ -423,47 +423,47 @@ export default defineComponent({
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
-            patent.value!.keywords = keywords;
+            intellectualProperty.value!.keywords = keywords;
             performUpdate(false);
         };
 
         const updateDescription = (description: MultilingualContent[]) => {
-            patent.value!.description = description;
+            intellectualProperty.value!.description = description;
             performUpdate(false);
         };
 
         const updateContributions = (contributions: PersonDocumentContribution[]) => {
-            patent.value!.contributions = contributions;
+            intellectualProperty.value!.contributions = contributions;
             performUpdate(true);
         };
 
-        const updateBasicInfo = (basicInfo: Patent) => {
-            patent.value!.publisherId = basicInfo.publisherId;
-            patent.value!.number = basicInfo.number;
-            patent.value!.authorReprint = basicInfo.authorReprint;
-            patent.value!.dateRequested = basicInfo.dateRequested;
-            patent.value!.dateFilingPriority = basicInfo.dateFilingPriority;
-            patent.value!.dateTo = basicInfo.dateTo;
-            patent.value!.type = basicInfo.type;
-            patent.value!.applicationStatus = basicInfo.applicationStatus;
+        const updateBasicInfo = (basicInfo: IntellectualProperty) => {
+            intellectualProperty.value!.publisherId = basicInfo.publisherId;
+            intellectualProperty.value!.number = basicInfo.number;
+            intellectualProperty.value!.authorReprint = basicInfo.authorReprint;
+            intellectualProperty.value!.dateRequested = basicInfo.dateRequested;
+            intellectualProperty.value!.dateFilingPriority = basicInfo.dateFilingPriority;
+            intellectualProperty.value!.dateTo = basicInfo.dateTo;
+            intellectualProperty.value!.type = basicInfo.type;
+            intellectualProperty.value!.applicationStatus = basicInfo.applicationStatus;
 
-            updateCommonBasicInfo(patent, basicInfo);
+            updateCommonBasicInfo(intellectualProperty, basicInfo);
 
             performUpdate(true);
         };
 
         const performUpdate = (reload: boolean) => {
-            DocumentPublicationService.updatePatent(patent.value?.id as number, patent.value as Patent).then(() => {
+            DocumentPublicationService.updateIntellectualProperty(intellectualProperty.value?.id as number, intellectualProperty.value as IntellectualProperty).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
                 if(reload) {
-                    fetchPatent();
+                    fetchIntellectualProperty();
                 }
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
                 if(reload) {
-                    fetchPatent();
+                    fetchIntellectualProperty();
                 }
             });
         };
@@ -487,13 +487,13 @@ export default defineComponent({
         const { fetchValidationStatus } = useTrustConfigurationActions();
 
         const updateRemark = (remark: MultilingualContent[]) => {
-            patent.value!.remark = remark;
+            intellectualProperty.value!.remark = remark;
             performUpdate(true);
         };
 
         return {
-            patent, icon, currentTab, ApplicableEntityType,
-            returnCurrentLocaleContent, PatentUpdateForm, canClassify,
+            intellectualProperty, icon, currentTab, ApplicableEntityType,
+            returnCurrentLocaleContent, IntellectualPropertyUpdateForm, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
@@ -510,11 +510,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    #patent .large-patent-icon {
+    #intellectualProperty .large-intellectual-property-icon {
         font-size: 10em;
     }
 
-    #patent .response {
+    #intellectualProperty .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;

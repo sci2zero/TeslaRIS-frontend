@@ -10,7 +10,7 @@ export const applicableEntityTypeSr = [
     { title: "Rad u monografiji", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
     { title: "Rad u časopisu", value: ApplicableEntityType.JOURNAL_PUBLICATION },
     { title: "Rad sa konferencije", value: ApplicableEntityType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: ApplicableEntityType.PATENT },
+    { title: "Intelektualna svojina", value: ApplicableEntityType.INTELLECTUAL_PROPERTY },
     { title: "Materijalni proizvod", value: ApplicableEntityType.MATERIAL_PRODUCT },
     { title: "Genetski materijal", value: ApplicableEntityType.GENETIC_MATERIAL },
     { title: "Rezultat vezan za performans", value: ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT },
@@ -33,7 +33,7 @@ export const applicableEntityTypeEn = [
     { title: "Monograph publication", value: ApplicableEntityType.MONOGRAPH_PUBLICATION },
     { title: "Journal publication", value: ApplicableEntityType.JOURNAL_PUBLICATION },
     { title: "Proceedings publication", value: ApplicableEntityType.PROCEEDINGS_PUBLICATION },
-    { title: "Patent", value: ApplicableEntityType.PATENT },
+    { title: "Intellectual property", value: ApplicableEntityType.INTELLECTUAL_PROPERTY },
     { title: "Material product", value: ApplicableEntityType.MATERIAL_PRODUCT },
     { title: "Genetic material", value: ApplicableEntityType.GENETIC_MATERIAL },
     { title: "Performance related output", value: ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT },
@@ -85,8 +85,8 @@ export const getApplicableEntityTypeForDocumentType = (documentType: Publication
             return ApplicableEntityType.JOURNAL_PUBLICATION;
         case PublicationType.PROCEEDINGS_PUBLICATION:
             return ApplicableEntityType.PROCEEDINGS_PUBLICATION;
-        case PublicationType.PATENT:
-            return ApplicableEntityType.PATENT;
+        case PublicationType.INTELLECTUAL_PROPERTY:
+            return ApplicableEntityType.INTELLECTUAL_PROPERTY;
         case PublicationType.MATERIAL_PRODUCT:
         case PublicationType.INTANGIBLE_PRODUCT:
             return ApplicableEntityType.INTANGIBLE_PRODUCT;

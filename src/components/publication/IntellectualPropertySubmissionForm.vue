@@ -5,7 +5,7 @@
                 <v-row>
                     <v-col cols="11">
                         <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.PATENT"
+                            :document-type="PublicationType.INTELLECTUAL_PROPERTY"
                             @metadata-fetched="popuateMetadata"
                         />
                     </v-col>
@@ -74,9 +74,9 @@
                 <v-row>
                     <v-col cols="10">
                         <v-text-field
-                            v-model="patentNumber"
-                            :label="$t('patentNumberLabel')"
-                            :placeholder="$t('patentNumberLabel')"
+                            v-model="intellectualPropertyNumber"
+                            :label="$t('intellectualPropertyNumberLabel')"
+                            :placeholder="$t('intellectualPropertyNumberLabel')"
                         />
                     </v-col>
                 </v-row>
@@ -232,7 +232,7 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import UriInput from '../core/UriInput.vue';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { type PersonDocumentContribution, PublicationType, type Patent, type CommonFieldsData, IntellectualPropertyType, IntellectualPropertyApplicationStatus } from "@/models/PublicationModel";
+import { type PersonDocumentContribution, PublicationType, type IntellectualProperty, type CommonFieldsData, IntellectualPropertyType, IntellectualPropertyApplicationStatus } from "@/models/PublicationModel";
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
@@ -249,7 +249,7 @@ import { getIntellectualPropertyApplicationStatusesForGivenLocale, isApplication
 
 
 export default defineComponent({
-    name: "SubmitPatent",
+    name: "SubmitIntellectualProperty",
     components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
@@ -294,7 +294,7 @@ export default defineComponent({
         const openAlexId = ref("");
         const scopus = ref("");
         const webOfScienceId = ref("");
-        const patentNumber = ref("");
+        const intellectualPropertyNumber = ref("");
         const uris = ref<string[]>([]);
         const dateRequested = ref<FlexibleDate>();
         const dateFilingPriority = ref<FlexibleDate>();
@@ -349,13 +349,13 @@ export default defineComponent({
         } = useValidationUtils();
 
         const submit = () => {
-            submitPatent(true);
+            submitIntellectualProperty(true);
         };
 
-        const submitPatent = (stayOnPage: boolean) => {
-            const newPatent: Patent = {
+        const submitIntellectualProperty = (stayOnPage: boolean) => {
+            const newIntellectualProperty: IntellectualProperty = {
                 title: title.value,
-                number: patentNumber.value,
+                number: intellectualPropertyNumber.value,
                 description: description.value,
                 keywords: keywords.value,
                 subTitle: subtitle.value,
@@ -378,8 +378,8 @@ export default defineComponent({
                 ...commonFieldsData.value
             };
 
-            DocumentPublicationService.createPatent(
-                newPatent
+            DocumentPublicationService.createIntellectualProperty(
+                newIntellectualProperty
             ).then((response) => {
                 emit("create", response.data);
 
@@ -395,7 +395,7 @@ export default defineComponent({
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
-                    patentNumber.value = "";
+                    intellectualPropertyNumber.value = "";
                     scopus.value = "";
                     dateRequested.value = undefined;
                     dateFilingPriority.value = undefined;
@@ -410,7 +410,7 @@ export default defineComponent({
                     error.value = false;
                     snackbar.value = true;
                 } else {
-                    router.push({ name: "patentLandingPage", params: {id: response.data.id} });
+                    router.push({ name: "intellectualPropertyLandingPage", params: {id: response.data.id} });
                 }
             }).catch((axiosError: AxiosError<ErrorResponse>) => {
                 const message = i18n.t(axiosError.response?.data.message as string);
@@ -431,7 +431,7 @@ export default defineComponent({
                 titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             }
 
-            patentNumber.value = patentNumber.value ? patentNumber.value : metadata.issue;
+            intellectualPropertyNumber.value = intellectualPropertyNumber.value ? intellectualPropertyNumber.value : metadata.issue;
             uris.value.push(metadata.url);
             doi.value = doi.value ? doi.value : metadata.doi;
 
@@ -463,12 +463,12 @@ export default defineComponent({
             subtitle, subtitleRef,
             publicationDate, doi,
             publisherAutocompleteRef,
-            selectedPublisher, patentNumber,
+            selectedPublisher, intellectualPropertyNumber,
             description, descriptionRef,
             keywords, keywordsRef, errorMessage,
             place, placeRef, uris, urisRef,
             contributions, contributionsRef,
-            requiredFieldRules, submitPatent,
+            requiredFieldRules, submitIntellectualProperty,
             doiValidationRules, openAlexId,
             workOpenAlexIdValidationRules,
             PublicationType, popuateMetadata,
