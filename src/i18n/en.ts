@@ -1519,4 +1519,9 @@ export default {
     updateFundingLabel: "Update funding",
     funderLabel: "Funder",
     fundingProgramLabel: "Funding program",
+    fundingsLabel: "Funding",
+    projectsLabel: "Projects",
+    fundingApplicationsLabel: "Funding applications",
+    fundingCallsLabel: "Funding calls",
+    fundingProgramsLabel: "Funding programs",
 }

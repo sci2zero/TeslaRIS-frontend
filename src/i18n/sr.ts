@@ -1533,4 +1533,9 @@ export default {
     updateFundingLabel: "Ažuriraj finansiranje",
     funderLabel: "Finansijer",
     fundingProgramLabel: "Program finansiranja",
+    fundingsLabel: "Finansiranja",
+    projectsLabel: "Projekti",
+    fundingApplicationsLabel: "Zahtevi za finansiranje",
+    fundingCallsLabel: "Pozivi za finansiranje",
+    fundingProgramsLabel: "Programi finansiranja",
 }
