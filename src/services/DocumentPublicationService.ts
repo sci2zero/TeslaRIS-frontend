@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
 import type { Page, SearchFieldsResponse } from "@/models/Common";
-import { DocumentContributionType, PublicationType, type GeneticMaterial, type CitationResponse, type Dataset, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type Patent, type ProceedingsPublication, type ProceedingsPublicationResponse, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse, type PerformanceRelatedOutput } from "@/models/PublicationModel";
+import { DocumentContributionType, PublicationType, type GeneticMaterial, type CitationResponse, type Document, type DocumentAffiliationRequest, type DocumentPublicationIndex, type JournalPublication, type MaterialProduct, type Monograph, type MonographPublication, type IntellectualProperty, type ProceedingsPublication, type ProceedingsPublicationResponse, type IntangibleProduct, type TermFrequency, type Thesis, type ThesisLibraryFormatsResponse, type PerformanceRelatedOutput } from "@/models/PublicationModel";
 import i18n from "@/i18n";
 
 
@@ -56,12 +56,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.get, `genetic-material/${geneticMaterialId}`);
   }
 
-  async readDataset(datasetId: number): Promise<AxiosResponse<Dataset>> {
-    return super.sendRequest(axios.get, `dataset/${datasetId}`);
-  }
-
-  async readPatent(patentId: number): Promise<AxiosResponse<Patent>> {
-    return super.sendRequest(axios.get, `patent/${patentId}`);
+  async readIntellectualProperty(intellectualPropertyId: number): Promise<AxiosResponse<IntellectualProperty>> {
+    return super.sendRequest(axios.get, `intellectual-property/${intellectualPropertyId}`);
   }
 
   async readMonograph(monographId: number): Promise<AxiosResponse<Monograph>> {
@@ -105,8 +101,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.post, "proceedings-publication", body, idempotencyKey ? idempotencyKey : DocumentPublicationService.idempotencyKey);
   }
 
-  async createPatent(body: Patent): Promise<AxiosResponse<Patent>> {
-    return super.sendRequest(axios.post, "patent", body, DocumentPublicationService.idempotencyKey);
+  async createIntellectualProperty(body: IntellectualProperty): Promise<AxiosResponse<IntellectualProperty>> {
+    return super.sendRequest(axios.post, "intellectual-property", body, DocumentPublicationService.idempotencyKey);
   }
 
   async createIntangibleProduct(body: IntangibleProduct): Promise<AxiosResponse<IntangibleProduct>> {
@@ -119,10 +115,6 @@ export class DocumentPublicationService extends BaseService {
 
   async createGeneticMaterial(body: GeneticMaterial): Promise<AxiosResponse<GeneticMaterial>> {
     return super.sendRequest(axios.post, "genetic-material", body, DocumentPublicationService.idempotencyKey);
-  }
-
-  async createDataset(body: Dataset): Promise<AxiosResponse<Dataset>> {
-    return super.sendRequest(axios.post, "dataset", body, DocumentPublicationService.idempotencyKey);
   }
 
   async createMonograph(body: Monograph): Promise<AxiosResponse<Monograph>> {
@@ -178,12 +170,8 @@ export class DocumentPublicationService extends BaseService {
     return super.sendRequest(axios.put, `genetic-material/${geneticMaterialId}`, updatedGeneticMaterial);
   }
 
-  async updateDataset(datasetId: number, updatedDataset: Dataset): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.put, `dataset/${datasetId}`, updatedDataset);
-  }
-
-  async updatePatent(patentId: number, updatedPatent: Patent): Promise<AxiosResponse<void>> {
-    return super.sendRequest(axios.put, `patent/${patentId}`, updatedPatent);
+  async updateIntellectualProperty(intellectualPropertyId: number, updatedIntellectualProperty: IntellectualProperty): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, `intellectual-property/${intellectualPropertyId}`, updatedIntellectualProperty);
   }
 
   async updateMonograph(monographId: number, updatedMonograph: Monograph): Promise<AxiosResponse<void>> {

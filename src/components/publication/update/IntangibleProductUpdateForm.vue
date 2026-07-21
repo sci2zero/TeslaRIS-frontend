@@ -22,13 +22,11 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -156,11 +154,12 @@ import { getIntangibleProductTypesForGivenLocale, getIntangibleProductTypeTitleF
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "IntangibleProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetIntangibleProduct: {
             type: Object as PropType<IntangibleProduct | undefined>,
@@ -218,7 +217,7 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationYear = ref(props.presetIntangibleProduct?.documentDate);
+        const publicationDate = ref(props.presetIntangibleProduct?.documentDate);
         const doi = ref(props.presetIntangibleProduct?.doi);
         const openAlexId = ref(props.presetIntangibleProduct?.openAlexId);
         const webOfScienceId = ref(props.presetIntangibleProduct?.webOfScienceId);
@@ -251,7 +250,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         )
                     ],
                     props.presetIntangibleProduct?.id as number,
@@ -271,7 +271,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetIntangibleProduct?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -302,7 +302,7 @@ export default defineComponent({
 
             uris.value = props.presetIntangibleProduct?.uris as string[];
             intangibleProductNumber.value = props.presetIntangibleProduct?.internalNumber;
-            publicationYear.value = props.presetIntangibleProduct?.documentDate;
+            publicationDate.value = props.presetIntangibleProduct?.documentDate;
             doi.value = props.presetIntangibleProduct?.doi;
             openAlexId.value = props.presetIntangibleProduct?.openAlexId;
             webOfScienceId.value = props.presetIntangibleProduct?.webOfScienceId;
@@ -349,7 +349,7 @@ export default defineComponent({
 
         return {
             isFormValid, doi, snackbar, message,
-            title, subtitle, publicationYear,
+            title, subtitle, publicationDate,
             selectedPublisher, intangibleProductNumber,
             uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,

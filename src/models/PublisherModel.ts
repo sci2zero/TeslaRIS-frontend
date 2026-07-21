@@ -26,5 +26,6 @@ export interface Publisher {
     name: MultilingualContent[];
     place: MultilingualContent[];
     state: MultilingualContent[];
-    countryId?: number
+    countryId?: number;
+    countryName?: MultilingualContent[];
 }

@@ -5,7 +5,7 @@
                 color="primary"
                 :density="compact ? 'compact' : 'default'"
                 v-bind="props">
-                {{ $t("addNewEntityLabel") }}
+                {{ $t("addNewEventLabel") }}
             </v-btn>
         </template>
 
@@ -52,10 +52,10 @@ export default defineComponent({
         };
 
         const i18n = useI18n();
-        const addConferenceEventLabel = computed(() => i18n.t("createNewConferenceLabel"));
-        const addExhibitionEventLabel = computed(() => i18n.t("createNewExhibitionLabel"));
-        const addCourseEventLabel = computed(() => i18n.t("createNewCourseLabel"));
-        const addOtherEventLabel = computed(() => i18n.t("createNewOtherEventLabel"));
+        const addConferenceEventLabel = computed(() => i18n.t("createConferenceLabel"));
+        const addExhibitionEventLabel = computed(() => i18n.t("createExhibitionLabel"));
+        const addCourseEventLabel = computed(() => i18n.t("createCourseLabel"));
+        const addOtherEventLabel = computed(() => i18n.t("createOtherEventLabel"));
 
         const submissionMenuItems = ref([
             { title: addConferenceEventLabel, value: "submitConference" },

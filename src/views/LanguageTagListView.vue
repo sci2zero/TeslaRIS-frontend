@@ -3,11 +3,16 @@
         <h1>{{ $t("languageTagListLabel") }}</h1>
         <br />
         <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
+        <search-bar-component @search="clearSortAndPerformSearch" />
         <br />
         <br />
         <br />
-        <language-tag-table-component ref="tableRef" :language-tags="languageTags" :total-language-tags="totalCountries" @switch-page="switchPage"></language-tag-table-component>
+        <language-tag-table-component
+            ref="tableRef"
+            :language-tags="languageTags"
+            :total-language-tags="totalLanguageTags"
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 
@@ -28,7 +33,7 @@ export default defineComponent({
     setup() {
         const searchParams = ref("tokens=");
         const languageTags = ref<LanguageTagResponse[]>([]);
-        const totalCountries = ref(0);
+        const totalLanguageTags = ref(0);
         const page = ref(0);
         const size = ref(1);
         const sort = ref("");
@@ -55,9 +60,11 @@ export default defineComponent({
 
         const search = (tokenParams: string) => {
             searchParams.value = tokenParams;
-            LanguageService.searchLanguageTags(`${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`).then((response) => {
+            LanguageService.searchLanguageTags(
+                `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+            ).then((response) => {
                 languageTags.value = response.data.content;
-                totalCountries.value = response.data.totalElements;
+                totalLanguageTags.value = response.data.totalElements;
             });
         };
 
@@ -70,7 +77,8 @@ export default defineComponent({
         };
 
         return {
-            search, languageTags, totalCountries, switchPage,
+            search, languageTags,
+            totalLanguageTags, switchPage,
             clearSortAndPerformSearch, tableRef
         };
     }

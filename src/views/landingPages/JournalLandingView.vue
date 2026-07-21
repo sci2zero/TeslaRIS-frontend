@@ -52,6 +52,10 @@
                         <basic-info-loader v-if="!journal" :citation-button="false" />
                         <v-row v-else>
                             <v-col cols="6">
+                                <div>{{ $t("articleCollectionSeriesTypeLabel") }}:</div>
+                                <div class="response">
+                                    {{ getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal?.type) }}
+                                </div>
                                 <div>eISSN:</div>
                                 <div class="response">
                                     {{ journal?.eissn ? journal.eissn : $t("notYetSetMessage") }}
@@ -140,8 +144,9 @@
                     :publication-series-id="journal?.id"
                     :read-only="!canEdit"
                     shows-board-and-reviewers
-                    @update="updateContributions">
-                </person-publication-series-contribution-tabs>
+                    :article-collection-series-type="journal?.type"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -205,6 +210,7 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import { getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType';
 
 
 export default defineComponent({
@@ -336,6 +342,7 @@ export default defineComponent({
             journal.value!.openAlexId = updatedJournal.openAlexId;
             journal.value!.uris = updatedJournal.uris;
             journal.value!.subtitle = updatedJournal.subtitle;
+            journal.value!.type = updatedJournal.type;
 
             performUpdate(false);
         };
@@ -386,6 +393,7 @@ export default defineComponent({
             currentTab, PublicationSeriesUpdateForm,
             journalClassifications, createJournalClassification,
             fetchClassifications, publicationSeriesIdentifiers,
+            getArticleCollectionSeriesTypeTitleFromValueAutoLocale,
             fetchIdentifiers
         };
 }})

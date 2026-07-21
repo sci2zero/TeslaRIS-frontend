@@ -2,7 +2,11 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="11">
-                <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
+                <event-autocomplete-search
+                    ref="eventAutocompleteRef"
+                    v-model="selectedEvent"
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -15,7 +19,7 @@
                     :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
             <v-col class="proceedings-submission">
                 <generic-crud-modal
@@ -32,21 +36,38 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetProceedingsPublication?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetProceedingsPublication?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                <v-text-field
+                    v-model="startPage"
+                    :label="$t('startPageLabel')"
+                    :placeholder="$t('startPageLabel')"
+                />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                <v-text-field
+                    v-model="endPage"
+                    :label="$t('endPageLabel')"
+                    :placeholder="$t('endPageLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field
+                    v-model="doi"
+                    label="DOI"
+                    placeholder="DOI"
+                    :rules="doiValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -56,18 +77,27 @@
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" :initial-value="toMultilingualTextInput(presetProceedingsPublication?.subTitle, languageTags)"></multilingual-text-input>
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                    :initial-value="toMultilingualTextInput(presetProceedingsPublication?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                <v-text-field
+                    v-model="articleNumber"
+                    :label="$t('articleNumberLabel')"
+                    :placeholder="$t('articleNumberLabel')"
+                />
             </v-col>
             <v-col cols="5">
                 <v-text-field
@@ -79,7 +109,17 @@
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <multilingual-text-input
+                    ref="sectionRef"
+                    v-model="section"
+                    :label="$t('sectionLabel')"
+                    :initial-value="toMultilingualTextInput(presetProceedingsPublication?.section, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -88,24 +128,24 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules"
+                />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules"
+                />
             </v-col>
         </v-row>
 
@@ -150,6 +190,7 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil.js';
 
 
 export default defineComponent({
@@ -206,6 +247,7 @@ export default defineComponent({
 
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
+        const sectionRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
 
         const searchPlaceholderProceedings = {title: returnCurrentLocaleContent(proceedings.value?.title) as string, value: proceedings.value?.id as number};
@@ -223,9 +265,10 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
+        const section = ref<any>([]);
         const startPage = ref(props.presetProceedingsPublication?.startPage);
         const endPage = ref(props.presetProceedingsPublication?.endPage);
-        const publicationYear = ref(props.presetProceedingsPublication?.documentDate);
+        const publicationDate = ref(props.presetProceedingsPublication?.documentDate);
         const doi = ref(props.presetProceedingsPublication?.doi);
         const scopus = ref(props.presetProceedingsPublication?.scopusId);
         const openAlexId = ref(props.presetProceedingsPublication?.openAlexId);
@@ -261,7 +304,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
+            const toSelect = {title: `${title} | ${localiseFlexibleDate(proceedings.documentDate)}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };
@@ -281,7 +324,7 @@ export default defineComponent({
                         title = proceedingsResponse.title[0].content;
                     }
 
-                    availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number })
+                    availableProceedings.value.push({title: `${title} | ${localiseFlexibleDate(proceedingsResponse.documentDate)}`, value: proceedingsResponse.id as number })
                 });
             });
         };
@@ -298,7 +341,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         )
                     ],
                     props.presetProceedingsPublication?.id as number,
@@ -321,7 +365,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetProceedingsPublication?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -331,6 +375,7 @@ export default defineComponent({
                 proceedingsId: selectedProceedings.value.value,
                 fileItems: [],
                 proofs: [],
+                section: section.value,
                 ...commonFieldsData.value
             };
 
@@ -348,11 +393,14 @@ export default defineComponent({
             subtitleRef.value?.clearInput();
             subtitle.value = props.presetProceedingsPublication?.subTitle as MultilingualContent[];
 
+            sectionRef.value?.clearInput();
+            section.value = props.presetProceedingsPublication?.section as MultilingualContent[];
+
             uris.value = props.presetProceedingsPublication?.uris as string[];
             startPage.value = props.presetProceedingsPublication?.startPage;
             endPage.value = props.presetProceedingsPublication?.endPage;
             numberOfPages.value = props.presetProceedingsPublication?.numberOfPages;
-            publicationYear.value = props.presetProceedingsPublication?.documentDate;
+            publicationDate.value = props.presetProceedingsPublication?.documentDate;
             doi.value = props.presetProceedingsPublication?.doi;
             scopus.value = props.presetProceedingsPublication?.scopusId;
             openAlexId.value = props.presetProceedingsPublication?.openAlexId;
@@ -369,6 +417,7 @@ export default defineComponent({
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
+            sectionRef.value?.forceRefreshModelValue(toMultilingualTextInput(section.value, languageTags.value));
             urisRef.value?.refreshModelValue(uris.value);
 
             if (commonFieldsRef.value && presetCommonFieldsData.value) {
@@ -379,8 +428,8 @@ export default defineComponent({
         };
 
         return {
-            isFormValid, title, subtitle,
-            publicationYear, doi, scopus,
+            isFormValid, title, subtitle, section,
+            publicationDate, doi, scopus, sectionRef,
             selectedProceedings, articleNumber,
             uris, numberOfPages, doiValidationRules, openAlexId,
             requiredFieldRules, selectedEvent, titleRef, subtitleRef,

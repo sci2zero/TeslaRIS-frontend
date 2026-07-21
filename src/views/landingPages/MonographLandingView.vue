@@ -63,10 +63,10 @@
                                     {{ getMonographTypeTitleFromValueAutoLocale(monograph.monographType) }}
                                 </div>
                                 <div v-if="monograph?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monograph?.documentDate" class="response">
-                                    {{ monograph.documentDate }}
+                                    {{ localiseFlexibleDate(monograph.documentDate) }}
                                 </div>
                                 <div v-if="monograph?.eisbn">
                                     eISBN:
@@ -101,9 +101,9 @@
                                 <div v-if="monograph?.publisherId || monograph?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="monograph?.publisherId" class="response">
+                                <div v-if="monograph?.publisherName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'publishers/' + monograph?.publisherId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(monograph?.publisherName) }}
                                     </localized-link>
                                 </div>
                                 <div v-else-if="monograph?.authorReprint" class="response">
@@ -225,7 +225,8 @@
                     :contribution-list="monograph?.contributions ? monograph?.contributions : []"
                     :read-only="!canEdit || monograph?.isArchived"
                     :shows-board-and-reviewers="monograph?.monographType === MonographType.EDITED_BOOK"
-                    :for-monograph="monograph?.monographType === MonographType.EDITED_BOOK"
+                    :document-type="PublicationType.MONOGRAPH"
+                    :concrete-type="(monograph?.monographType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -374,14 +375,13 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
-import PublisherService from '@/services/PublisherService';
-import { type Publisher } from '@/models/PublisherModel';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
@@ -398,7 +398,6 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
-        const publisher = ref<Publisher>();
 
         const { isResearcher, isAdmin, isCommission } = useUserRole();
         const canEdit = ref(false);
@@ -558,12 +557,6 @@ export default defineComponent({
                     });
                 });
             }
-
-            if(monograph.value?.publisherId) {
-                PublisherService.readPublisher(monograph.value.publisherId).then(response => {
-                    publisher.value = response.data;
-                });
-            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -680,10 +673,10 @@ export default defineComponent({
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
-            publisher, updateRemark, displayConfiguration,
+            updateRemark, displayConfiguration,
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
-            MonographType
+            MonographType, localiseFlexibleDate
         };
 }})
 

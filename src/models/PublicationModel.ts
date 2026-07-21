@@ -1,4 +1,4 @@
-import type { LanguageTagResponse, MultilingualContent } from "./Common";
+import type { FlexibleDate, LanguageTagResponse, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
@@ -53,9 +53,8 @@ export interface DocumentPublicationIndex {
 export enum PublicationType {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
-    PATENT = "PATENT",
+    INTELLECTUAL_PROPERTY = "INTELLECTUAL_PROPERTY",
     PROCEEDINGS = "PROCEEDINGS",
-    DATASET = "DATASET",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
@@ -77,21 +76,22 @@ export enum ThesisType {
 }
   
 export enum JournalPublicationType {
-    REVIEW_ARTICLE,
-    RESEARCH_ARTICLE,
-    PREFACE,
-    COMMENT,
-    CORRECTION,
-    LEXICOGRAPHIC_UNIT,
-    POLEMICS,
-    SCIENTIFIC_CRITIC,
-    EDITORIAL,
-    POSTFACE,
-    BOOK_REVIEW,
-    TRANSLATION,
-    PREPRINT,
-    SHORT_FICTION,
-    ANNOTATION
+    REVIEW_ARTICLE = "REVIEW_ARTICLE",
+    RESEARCH_ARTICLE = "RESEARCH_ARTICLE",
+    PREFACE = "PREFACE",
+    COMMENT = "COMMENT",
+    CORRECTION = "CORRECTION",
+    LEXICOGRAPHIC_UNIT = "LEXICOGRAPHIC_UNIT",
+    POLEMICS = "POLEMICS",
+    SCIENTIFIC_CRITIC = "SCIENTIFIC_CRITIC",
+    EDITORIAL = "EDITORIAL",
+    POSTFACE = "POSTFACE",
+    BOOK_REVIEW = "BOOK_REVIEW",
+    TRANSLATION = "TRANSLATION",
+    PREPRINT = "PREPRINT",
+    CREATIVE_WORK = "CREATIVE_WORK",
+    ANNOTATED_NOTE = "ANNOTATED_NOTE",
+    OTHER = "OTHER"
 }
 
 export enum PublicationStatus {
@@ -110,7 +110,7 @@ export interface Document {
     keywords: MultilingualContent[];
     contributions?: PersonDocumentContribution[];
     uris: string[];
-    documentDate?: string;
+    documentDate?: FlexibleDate;
     doi?: string;
     scopusId?: string;
     openAlexId?: string;
@@ -119,6 +119,7 @@ export interface Document {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
@@ -132,6 +133,10 @@ export interface Document {
     geoSpaceDescription?: MultilingualContent[];
     chronologicalSpaceDescription?: MultilingualContent[];
     city?: MultilingualContent[];
+    edition?: MultilingualContent[];
+    authorReprint?: boolean;
+    publisherName?: MultilingualContent[];
+    eventName?: MultilingualContent[];
 }
 
 export interface CommonFieldsData {
@@ -139,12 +144,14 @@ export interface CommonFieldsData {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     city?: MultilingualContent[];
     geoSpaceDescription?: MultilingualContent[];
     chronologicalSpaceDescription?: MultilingualContent[];
     peerReviewed?: boolean;
     openAccess?: boolean;
     publicationStatus?: PublicationStatus;
+    edition?: MultilingualContent[];
 }
 
 export interface JournalPublication extends Document {
@@ -156,7 +163,8 @@ export interface JournalPublication extends Document {
     volume: string;
     issue: string;
     journalId: number;
-  }
+    section?: MultilingualContent[];
+}
 
 export interface PersonDocumentContribution extends PersonContribution {
     contributionType: DocumentContributionType;
@@ -170,6 +178,8 @@ export interface PersonDocumentContribution extends PersonContribution {
 export enum DocumentContributionType {
     AUTHOR = "AUTHOR",
     EDITOR = "EDITOR",
+    ASSOCIATED_EDITOR = "ASSOCIATED_EDITOR",
+    INVITED_EDITOR = "INVITED_EDITOR",
     REVIEWER = "REVIEWER",
     ADVISOR = "ADVISOR",
     BOARD_MEMBER = "BOARD_MEMBER",
@@ -187,24 +197,27 @@ export interface ProceedingsPublication extends Document {
     numberOfPages: number;
     articleNumber: string;
     proceedingsId: number;
+    section?: MultilingualContent[];
 }
 
 export enum ProceedingsPublicationType {
-    REGULAR_FULL_ARTICLE,
-    INVITED_FULL_ARTICLE,
-    INVITED_ABSTRACT_ARTICLE,
-    REGULAR_ABSTRACT_ARTICLE,
-    PREFACE,
-    LEXICOGRAPHIC_UNIT,
-    POLEMICS,
-    SCIENTIFIC_CRITIC,
+    REGULAR_FULL_ARTICLE = "REGULAR_FULL_ARTICLE",
+    INVITED_FULL_ARTICLE = "INVITED_FULL_ARTICLE",
+    INVITED_ABSTRACT_ARTICLE = "INVITED_ABSTRACT_ARTICLE",
+    REGULAR_ABSTRACT_ARTICLE = "REGULAR_ABSTRACT_ARTICLE",
+    PREFACE = "PREFACE",
+    LEXICOGRAPHIC_UNIT = "LEXICOGRAPHIC_UNIT",
+    POLEMICS = "POLEMICS",
+    SCIENTIFIC_CRITIC = "SCIENTIFIC_CRITIC",
+    POSTFACE = "POSTFACE",
+    BOOK_REVIEW = "BOOK_REVIEW"
 }
 
 export interface ProceedingsPublicationResponse {
     id: number,
     proceedingsTitle: MultilingualContent[];
     title: MultilingualContent[];
-    documentDate: string;
+    documentDate: FlexibleDate;
 }
 
 export interface ProceedingsPublication extends Document {
@@ -231,7 +244,8 @@ export enum MonographType {
     PREPRINT = "PREPRINT",
     MANUAL = "MANUAL",
     DATA_MANAGEMENT_PLAN = "DATA_MANAGEMENT_PLAN",
-    PROCEEDINGS = "PROCEEDINGS"
+    PROCEEDINGS = "PROCEEDINGS",
+    BOOK = "BOOK"
 }
 
 export interface Monograph extends Document {
@@ -246,7 +260,7 @@ export interface Monograph extends Document {
     languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
-    authorReprint?: boolean;
+    publisherName?: MultilingualContent[];
     udc?: string;
 }
 
@@ -269,18 +283,46 @@ export interface MonographPublication extends Document {
     numberOfPages?: number;
     articleNumber?: string;
     monographId?: number;
+    monographName?: MultilingualContent[];
+    section?: MultilingualContent[];
 }
 
-export interface Patent extends Document {
+export interface IntellectualProperty extends Document {
     number: string;
     publisherId?: number;
-    authorReprint?: boolean;
+    publisherName?: MultilingualContent[];
+    dateRequested?: FlexibleDate;
+    dateFilingPriority?: FlexibleDate;
+    dateTo?: FlexibleDate;
+    type: IntellectualPropertyType;
+    applicationStatus: IntellectualPropertyApplicationStatus;
+}
+
+export enum IntellectualPropertyType {
+    PATENT = "PATENT",
+    LICENSE = "LICENSE",
+    DISCLOSURE = "DISCLOSURE",
+    REGISTERED_COPYRIGHT = "REGISTERED_COPYRIGHT",
+    TRADEMARK = "TRADEMARK"
+}
+
+export enum IntellectualPropertyApplicationStatus {
+    DISCLOSED = "DISCLOSED",
+    PENDING = "PENDING",
+    IN_NEGOTIATION = "IN_NEGOTIATION",
+    ALLOWED = "ALLOWED",
+    GRANTED_OR_REGISTERED = "GRANTED_OR_REGISTERED",
+    PROTECTED = "PROTECTED",
+    ASSIGNED = "ASSIGNED",
+    FIRST_FIXATION = "FIRST_FIXATION",
+    EXPIRED = "EXPIRED",
+    WITHDRAWN = "WITHDRAWN",
+    ELIMINATED = "ELIMINATED"
 }
 
 export interface IntangibleProduct extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     intangibleProductType: IntangibleProductType;
     productUsers: MultilingualContent[];
     researchAreasId: number[];
@@ -290,7 +332,6 @@ export interface IntangibleProduct extends Document {
 export interface MaterialProduct extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     numberProduced: number;
     materialProductType: MaterialProductType;
     productUsers: MultilingualContent[];
@@ -301,14 +342,7 @@ export interface MaterialProduct extends Document {
 export interface GeneticMaterial extends Document {
     internalNumber: string;
     publisherId?: number;
-    authorReprint?: boolean;
     geneticMaterialType: GeneticMaterialType
-}
-
-export interface Dataset extends Document {
-    internalNumber: string;
-    publisherId?: number;
-    authorReprint?: boolean;
 }
 
 export interface DeduplicationSuggestion {
@@ -348,7 +382,6 @@ export interface Thesis extends Document {
     scientificArea?: MultilingualContent[];
     scientificSubArea?: MultilingualContent[];
     publisherId?: number;
-    authorReprint?: boolean;
     languageCode?: string;
     preliminaryFiles?: DocumentFileResponse[];
     preliminarySupplements?: DocumentFileResponse[];
@@ -417,12 +450,14 @@ export enum IntangibleProductType {
     TEST = "TEST",
     WEBSITE = "WEBSITE",
     AUDIO_RECORDING = "AUDIO_RECORDING",
+    MUSICAL_COMPOSITION = "MUSICAL_COMPOSITION",
     RADIO_TV_PROGRAM = "RADIO_TV_PROGRAM",
     VIDEO_RECORDING = "VIDEO_RECORDING",
     SOUND_DESIGN = "SOUND_DESIGN",
     SET_DESIGN = "SET_DESIGN",
     LIGHT_DESIGN = "LIGHT_DESIGN",
     CHOREOGRAPHY = "CHOREOGRAPHY",
+    DATASET = "DATASET",
     STANDARD = "STANDARD"
 }
 

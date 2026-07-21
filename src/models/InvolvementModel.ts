@@ -50,7 +50,7 @@ export interface Involvement {
     dateTo?: string;
     proofs?: DocumentFileResponse[];
     involvementType: InvolvementType;
-    affiliationStatement?: MultilingualContent[];
+    displayOrganisationUnit?: MultilingualContent[];
     organisationUnitId?: number;
     organisationUnitName?: MultilingualContent[];
     favorite?: boolean;
@@ -102,9 +102,9 @@ export enum EmploymentTitle {
 }
 
 export enum PersonalTitle {
-    DR = "DR",
+    PHD = "PHD",
     ACADEMIC = "ACADEMIC",
-    DR_ART = "DR_ART",
+    PHD_ART = "PHD_ART",
     MR = "MR",
     NONE = "NONE"
 }

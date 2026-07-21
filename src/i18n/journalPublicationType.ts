@@ -1,5 +1,4 @@
 import { JournalPublicationType } from "@/models/PublicationModel";
-import { getNameFromOrdinal } from "@/utils/EnumUtil";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
@@ -17,8 +16,9 @@ const journalPublicationTypeEn = [
     { title: "Book review", value: JournalPublicationType.BOOK_REVIEW },
     { title: "Translation", value: JournalPublicationType.TRANSLATION },
     { title: "Preprint", value: JournalPublicationType.PREPRINT },
-    { title: "Short fiction", value: JournalPublicationType.SHORT_FICTION },
-    { title: "Annotation", value: JournalPublicationType.ANNOTATION }
+    { title: "Creative work", value: JournalPublicationType.CREATIVE_WORK },
+    { title: "Annotated note", value: JournalPublicationType.ANNOTATED_NOTE },
+    { title: "Other", value: JournalPublicationType.ANNOTATED_NOTE }
 ];
 
 const journalPublicationTypeSr = [
@@ -35,12 +35,13 @@ const journalPublicationTypeSr = [
     { title: "Prikaz knjige", value: JournalPublicationType.BOOK_REVIEW },
     { title: "Prevod", value: JournalPublicationType.TRANSLATION },
     { title: "Preprint", value: JournalPublicationType.PREPRINT },
-    { title: "Kratka proza", value: JournalPublicationType.SHORT_FICTION },
-    { title: "Anotacija", value: JournalPublicationType.ANNOTATION }
+    { title: "Kreativni rad", value: JournalPublicationType.CREATIVE_WORK },
+    { title: "Anotirana beleška", value: JournalPublicationType.ANNOTATED_NOTE },
+    { title: "Ostalo", value: JournalPublicationType.ANNOTATED_NOTE }
 ];
 
 export const getTitleFromValue = (value: JournalPublicationType, journalPublicationTypeArray: {title: string, value: JournalPublicationType}[]) => {
-    return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value.toString()) || {}).title;
+    return (journalPublicationTypeArray.find(item => item.value === value.toString()) || {}).title;
 };
 
 export const getTitleFromValueAutoLocale = (value: JournalPublicationType | string) => {
@@ -53,11 +54,7 @@ export const getTitleFromValueAutoLocale = (value: JournalPublicationType | stri
         journalPublicationTypeArray = transliterateContentToCyrillic(journalPublicationTypeSr);
     }
 
-    if (typeof value === "number") {
-        return (journalPublicationTypeArray.find(item => item.value === value) || {}).title;
-    } else if (typeof value === "string") {
-        return (journalPublicationTypeArray.find(item => getNameFromOrdinal(JournalPublicationType, item.value) === value) || {}).title;
-    }
+    return (journalPublicationTypeArray.find(item => item.value === value) || {}).title;
 };
 
 export const getTypesForGivenLocale = () => {

@@ -12,7 +12,7 @@
                 </v-row>
                 <v-row>
                     <v-col cols="11">
-                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required></event-autocomplete-search>
+                        <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required />
                     </v-col>
                 </v-row>
                 <v-row v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length > 0">
@@ -39,7 +39,7 @@
                             :no-data-text="(selectedEvent && selectedEvent.value === -1) ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
                             :rules="requiredSelectionRules"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                     <v-col>
                         <generic-crud-modal
@@ -61,8 +61,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -76,17 +76,17 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
                 
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -103,7 +103,7 @@
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event" />
                     </v-col>
                 </v-row>
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -112,34 +112,44 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
                                 v-model="numberOfPages" type="number"
                                 :min="0" :label="$t('numberOfPagesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                                :placeholder="$t('numberOfPagesLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <multilingual-text-input
+                                ref="sectionRef"
+                                v-model="section"
+                                :label="$t('sectionLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -156,16 +166,16 @@
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
 
@@ -216,6 +226,7 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil.js';
 
 
 export default defineComponent({
@@ -241,6 +252,7 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const sectionRef = ref<typeof MultilingualTextInput>();
         const placeRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
@@ -257,6 +269,7 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref<any[]>([]);
+        const section = ref([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const availableProceedings = ref<{title: string, value: number}[]>([]);
         const selectedProceedings = ref(searchPlaceholder);
@@ -285,8 +298,14 @@ export default defineComponent({
             optionalNumericZeroOrGreaterFieldRules
         } = useValidationUtils();
 
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType | null }[] => (getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]));
-        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>({title: "", value: null});
+        const publicationTypes = computed(
+            (): { title: string, value: ProceedingsPublicationType | null }[] => (
+                getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]
+            )
+        );
+        const selectedpublicationType = ref<{ title: string, value: ProceedingsPublicationType | null }>(
+            {title: "", value: null}
+        );
 
         const listPublications = (event: { title: string, value: number }) => {
             if (event.value > 0) {
@@ -315,7 +334,7 @@ export default defineComponent({
                     }
 
                     if (proceedingsResponse.documentDate) {
-                        availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number });
+                        availableProceedings.value.push({title: `${title} | ${localiseFlexibleDate(proceedingsResponse.documentDate)}`, value: proceedingsResponse.id as number });
                     } else {
                         availableProceedings.value.push({title: title as string, value: proceedingsResponse.id as number });
                     }
@@ -352,7 +371,7 @@ export default defineComponent({
                 selectedEvent.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
             }
 
-            if (contributions.value.length === 0) {
+            if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
                 contributions.value = metadata.contributions;
                 contributionsRef.value?.fillDummyAuthors(contributions.value.length);
 
@@ -361,7 +380,7 @@ export default defineComponent({
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
 
-            if (keywords.value.length === 0) {
+            if (keywords.value.length === 0 && metadata.keywords.length !== 0) {
                 additionalFields.value = true;
                 await nextTick();
                 
@@ -381,7 +400,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
+            const toSelect = {title: `${title} | ${localiseFlexibleDate(proceedings.documentDate)}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };
@@ -411,6 +430,7 @@ export default defineComponent({
                 eventId: selectedEvent.value.value,
                 fileItems: [],
                 proofs: [],
+                section: section.value,
                 ...commonFieldsData.value
             };
 
@@ -426,6 +446,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     placeRef.value?.clearInput();
                     urisRef.value?.clearInput();
+                    sectionRef.value?.clearInput();
                     eventAutocompleteRef.value!.clearInput();
                     availableProceedings.value = [];
                     selectedProceedings.value = searchPlaceholder;
@@ -475,7 +496,8 @@ export default defineComponent({
             searchPlaceholder, ProceedingsSubmissionForm, workOpenAlexIdValidationRules,
             popuateMetadata, documentWebOfScienceIdValidationRules, webOfScienceId,
             optionalNumericZeroOrGreaterFieldRules, deduplicationTableRef, submit,
-            commonFieldsRef, commonFieldsData, presetCommonFieldsData
+            commonFieldsRef, commonFieldsData, presetCommonFieldsData, section,
+            sectionRef
         };
     }
 });

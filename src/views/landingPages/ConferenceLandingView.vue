@@ -172,6 +172,7 @@
                     :event-id="conference?.id"
                     :contribution-list="conference?.contributions ? conference.contributions : []"
                     :read-only="!canEdit"
+                    :event="conference"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>

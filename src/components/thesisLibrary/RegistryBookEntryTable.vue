@@ -151,7 +151,7 @@ export default defineComponent({
 
         const headers = ref<any[]>([
             { title: fullNameLabel, align: "start", sortable: false, key: "personalInformation.fullName" },
-            { title: institutionNameLabel, align: "start", sortable: false, key: "dissertationInformation.institutionName" },
+            { title: institutionNameLabel, align: "start", sortable: true, key: "dissertationInformation.institutionNameSortable" },
             { title: acquiredTitleLabel, align: "start", sortable: false, key: "previousTitleInformation.acquiredTitle" },
             { title: defenceDateLabel, align: "start", key: "dissertationInformation.defenceDate" },
             { title: diplomaNumberLabel, align: "start", key: "dissertationInformation.diplomaNumber" },

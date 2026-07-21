@@ -87,10 +87,10 @@
                                     {{ journalPublication.endPage }}
                                 </div>
                                 <div>
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="journalPublication?.documentDate" class="response">
-                                    {{ localiseDate(journalPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(journalPublication.documentDate) }}
                                 </div>
                                 <div v-else class="response">
                                     {{ $t("notYetSetMessage") }}
@@ -122,6 +122,12 @@
                                 </div>
                                 <div v-if="journalPublication?.numberOfPages" class="response">
                                     {{ journalPublication.numberOfPages }}
+                                </div>
+                                <div v-if="journalPublication?.section?.length ?? 0 > 0">
+                                    {{ $t("sectionLabel") }}:
+                                </div>
+                                <div v-if="journalPublication?.section?.length ?? 0 > 0" class="response">
+                                    {{ returnCurrentLocaleContent(journalPublication.section) }}
                                 </div>
                             </v-col>
                             <document-common-fields-display
@@ -191,6 +197,8 @@
                     :document-id="journalPublication?.id"
                     :contribution-list="journalPublication?.contributions ? journalPublication?.contributions : []"
                     :read-only="!canEdit || journalPublication?.isArchived"
+                    :document-type="PublicationType.JOURNAL_PUBLICATION"
+                    :concrete-type="(journalPublication?.journalPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -245,7 +253,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="journalPublication?.id"
-                    :can-edit="canClassify && journalPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!journalPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.JOURNAL_PUBLICATION]"
                     @create="createClassification"
@@ -294,7 +302,7 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/journalPublicationType';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import JournalPublicationUpdateForm from '@/components/publication/update/JournalPublicationUpdateForm.vue';
@@ -481,6 +489,7 @@ export default defineComponent({
             journalPublication.value!.numberOfPages = basicInfo.numberOfPages;
             journalPublication.value!.articleNumber = basicInfo.articleNumber;
             journalPublication.value!.journalPublicationType = basicInfo.journalPublicationType;
+            journalPublication.value!.section = basicInfo.section;
 
             updateCommonBasicInfo(journalPublication, basicInfo);
 
@@ -546,7 +555,7 @@ export default defineComponent({
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
             fetchValidationStatus, PublicationType, updateRemark, displayConfiguration,
-            documentIdentifiers, fetchIdentifiers
+            documentIdentifiers, fetchIdentifiers, localiseFlexibleDate
         };
 }})
 

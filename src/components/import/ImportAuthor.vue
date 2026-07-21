@@ -86,8 +86,8 @@
             :ou-for-loading="institution"
             :top-level-institution-id="topLevelInstitutionId"
             :import-as-unmanaged="importAsUnmanaged"
-            @user-action-complete="notifyParentIfAllHandled">
-        </import-affiliation>
+            @user-action-complete="notifyParentIfAllHandled"
+        />
     </v-container>
 </template>
 

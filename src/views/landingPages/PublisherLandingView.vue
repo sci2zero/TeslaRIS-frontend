@@ -9,8 +9,7 @@
                             :loading="!publisher"
                             type="heading"
                             color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
+                            class="d-flex justify-center align-center">
                             <p class="text-h5">
                                 {{ returnCurrentLocaleContent(publisher?.name) }}
                             </p>
@@ -53,8 +52,8 @@
                                 <div v-if="publisher?.countryId">
                                     {{ $t("countryLabel") }}:
                                 </div>
-                                <div v-if="publisher?.countryId" class="response">
-                                    {{ returnCurrentLocaleContent(country?.name) }}
+                                <div v-if="publisher?.countryName?.length ?? 0 > 0" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.countryName) }}
                                 </div>
                                 <div v-if="publisher?.state && publisher?.state.length > 0">
                                     {{ $t("stateLabel") }}:
@@ -88,15 +87,15 @@
             v-else
             :publications="publications"
             :total-publications="totalPublications"
-            @switch-page="switchPage">
-        </publication-table-component>
+            @switch-page="switchPage"
+        />
         
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
 <script lang="ts">
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -110,7 +109,6 @@ import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import CountryService from '@/services/CountryService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
@@ -144,13 +142,14 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
-        const country = ref<Country>();
 
         const loginStore = useLoginStore();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
-                PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                PublisherService.canEdit(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
                     canEdit.value = response.data;
                 });
             }
@@ -168,7 +167,6 @@ export default defineComponent({
 
                 fetchPublications();     
                 populateData();
-                fetchDetails();
             }).catch(() => {
                 router.push({ name: "notFound" });
             });
@@ -177,14 +175,6 @@ export default defineComponent({
         watch(i18n.locale, () => {
             populateData();
         });
-
-        const fetchDetails = () => {
-            if (publisher.value?.countryId) {
-                CountryService.readCountry(publisher.value.countryId as number).then((response) => {
-                    country.value = response.data;
-                });
-            }
-        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -207,7 +197,10 @@ export default defineComponent({
                 return;
             }
 
-            DocumentPublicationService.findPublicationsForPublisher(publisher.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
+            DocumentPublicationService.findPublicationsForPublisher(
+                publisher.value?.id as number,
+                `page=${page.value}&size=${size.value}&sort=${sort.value}`
+            ).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
             })
@@ -219,10 +212,13 @@ export default defineComponent({
             publisher.value!.state = updatedBasicInfo.state;
             publisher.value!.countryId = updatedBasicInfo.countryId;
 
-            PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
+            PublisherService.updatePublisher(
+                publisher.value?.id as number,
+                publisher.value as Publisher
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-                fetchDetails();
+                fetchPublisher();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
@@ -233,7 +229,7 @@ export default defineComponent({
             publisher, icon,
             publications, 
             totalPublications,
-            switchPage, country,
+            switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage

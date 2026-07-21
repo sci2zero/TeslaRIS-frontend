@@ -1,15 +1,15 @@
 <template>
-    <v-container id="patent-publications-comparator">
+    <v-container id="intellectual-property-publications-comparator">
         <v-row class="d-flex flex-row justify-center align-start">
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(leftPatent?.title) }}
+                    {{ returnCurrentLocaleContent(leftIntellectualProperty?.title) }}
                 </h2>
                 <br />
 
-                <patent-update-form
+                <intellectual-property-update-form
                     ref="updateLeftRef"
-                    :preset-patent="leftPatent"
+                    :preset-intellectual-property="leftIntellectualProperty"
                     in-comparator
                     :in-modal="false"
                     @update="updateLeft"
@@ -19,13 +19,13 @@
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
-                    :preset-description-or-biography="(leftPatent?.description as MultilingualContent[])"
+                    :preset-description-or-biography="(leftIntellectualProperty?.description as MultilingualContent[])"
                     @update="updateLeftDescription"
                 />
 
                 <keyword-update-form
                     ref="updateLeftKeywordsRef"
-                    :preset-keywords="(leftPatent?.keywords as MultilingualContent[])"
+                    :preset-keywords="(leftIntellectualProperty?.keywords as MultilingualContent[])"
                     @update="updateRightKeywords"
                 />
 
@@ -39,8 +39,8 @@
                         </div>
 
                         <person-document-contribution-list
-                            :contribution-list="leftPatent?.contributions ? leftPatent.contributions : []"
-                            :document-id="leftPatent?.id"
+                            :contribution-list="leftIntellectualProperty?.contributions ? leftIntellectualProperty.contributions : []"
+                            :document-id="leftIntellectualProperty?.id"
                             :can-reorder="true"
                             in-comparator
                         />
@@ -48,9 +48,9 @@
                 </v-card>
 
                 <attachment-section
-                    :document="leftPatent" 
-                    :proofs="leftPatent?.proofs"
-                    :file-items="leftPatent?.fileItems"
+                    :document="leftIntellectualProperty" 
+                    :proofs="leftIntellectualProperty?.proofs"
+                    :file-items="leftIntellectualProperty?.fileItems"
                     in-comparator
                 />
             </v-col>
@@ -66,14 +66,14 @@
             
             <v-col cols="5">
                 <h2 class="d-flex flex-row justify-center">
-                    {{ returnCurrentLocaleContent(rightPatent?.title) }}
+                    {{ returnCurrentLocaleContent(rightIntellectualProperty?.title) }}
                 </h2>
 
                 <br />
 
-                <patent-update-form
+                <intellectual-property-update-form
                     ref="updateRightRef"
-                    :preset-patent="rightPatent"
+                    :preset-intellectual-property="rightIntellectualProperty"
                     in-comparator
                     :in-modal="false"
                     @update="updateRight"
@@ -83,13 +83,13 @@
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
-                    :preset-description-or-biography="(rightPatent?.description as MultilingualContent[])"
+                    :preset-description-or-biography="(rightIntellectualProperty?.description as MultilingualContent[])"
                     @update="updateRightDescription"
                 />
 
                 <keyword-update-form
                     ref="updateRightKeywordsRef"
-                    :preset-keywords="(rightPatent?.keywords as MultilingualContent[])"
+                    :preset-keywords="(rightIntellectualProperty?.keywords as MultilingualContent[])"
                     @update="updateRightKeywords"
                 />
 
@@ -103,8 +103,8 @@
                         </div>
 
                         <person-document-contribution-list
-                            :contribution-list="rightPatent?.contributions ? rightPatent.contributions : []"
-                            :document-id="rightPatent?.id"
+                            :contribution-list="rightIntellectualProperty?.contributions ? rightIntellectualProperty.contributions : []"
+                            :document-id="rightIntellectualProperty?.id"
                             :can-reorder="true"
                             in-comparator
                         />
@@ -112,17 +112,17 @@
                 </v-card>
 
                 <attachment-section
-                    :document="rightPatent"
-                    :proofs="rightPatent?.proofs"
-                    :file-items="rightPatent?.fileItems"
+                    :document="rightIntellectualProperty"
+                    :proofs="rightIntellectualProperty?.proofs"
+                    :file-items="rightIntellectualProperty?.fileItems"
                 />
             </v-col>
         </v-row>
 
         <comparison-actions
             :is-form-valid="updateLeftRef?.isFormValid && updateRightRef?.isFormValid"
-            :left-id="(leftPatent?.id as number)"
-            :right-id="(rightPatent?.id as number)"
+            :left-id="(leftIntellectualProperty?.id as number)"
+            :right-id="(rightIntellectualProperty?.id as number)"
             :entity-type="EntityType.PUBLICATION"
             @update="updateAll"
             @delete="deleteSide($event)"
@@ -139,10 +139,10 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import type { Patent } from '@/models/PublicationModel';
+import type { IntellectualProperty } from '@/models/PublicationModel';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import PatentUpdateForm from '@/components/publication/update/PatentUpdateForm.vue';
+import IntellectualPropertyUpdateForm from '@/components/publication/update/IntellectualPropertyUpdateForm.vue';
 import type { MultilingualContent } from '@/models/Common';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
@@ -156,8 +156,8 @@ import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocume
 
 
 export default defineComponent({
-    name: "PatentMetadataComparator",
-    components: { PersonDocumentContributionList, Toast, PatentUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    name: "IntellectualPropertyMetadataComparator",
+    components: { PersonDocumentContributionList, Toast, IntellectualPropertyUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -165,11 +165,11 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const leftPatent = ref<Patent>();
-        const rightPatent = ref<Patent>();
+        const leftIntellectualProperty = ref<IntellectualProperty>();
+        const rightIntellectualProperty = ref<IntellectualProperty>();
 
-        const updateLeftRef = ref<typeof PatentUpdateForm>();
-        const updateRightRef = ref<typeof PatentUpdateForm>();
+        const updateLeftRef = ref<typeof IntellectualPropertyUpdateForm>();
+        const updateRightRef = ref<typeof IntellectualPropertyUpdateForm>();
         const updateRightDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
         const updateLeftDescriptionRef = ref<typeof DescriptionOrBiographyUpdateForm>();
         const updateRightKeywordsRef = ref<typeof KeywordUpdateForm>();
@@ -178,32 +178,36 @@ export default defineComponent({
         const i18n = useI18n();
 
         onMounted(() => {
-            document.title = i18n.t("patentMetadataComparatorLabel");
-            fetchPatents();
+            document.title = i18n.t("intellectualPropertyMetadataComparatorLabel");
+            fetchIntellectualProperties();
         });
 
-        const fetchPatents = () => {
-            DocumentPublicationService.readPatent(parseInt(currentRoute.params.leftId as string)).then((response) => {
-                leftPatent.value = response.data;
-                leftPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+        const fetchIntellectualProperties = () => {
+            DocumentPublicationService.readIntellectualProperty(parseInt(currentRoute.params.leftId as string)).then((response) => {
+                leftIntellectualProperty.value = response.data;
+                leftIntellectualProperty.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
 
-            DocumentPublicationService.readPatent(parseInt(currentRoute.params.rightId as string)).then((response) => {
-                rightPatent.value = response.data;
-                rightPatent.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
+            DocumentPublicationService.readIntellectualProperty(parseInt(currentRoute.params.rightId as string)).then((response) => {
+                rightIntellectualProperty.value = response.data;
+                rightIntellectualProperty.value.contributions?.sort((a, b) => a.orderNumber - b.orderNumber);
             });
         };
 
-        const mergePatentMetadata = (patent1: Patent, patent2: Patent) => {
-            mergeCommonMetadata(patent1, patent2);
+        const mergeIntellectualPropertyMetadata = (intellectualProperty1: IntellectualProperty, intellectualProperty2: IntellectualProperty) => {
+            mergeCommonMetadata(intellectualProperty1, intellectualProperty2);
             
-            bulkTransferFields(patent1, patent2, [
+            bulkTransferFields(intellectualProperty1, intellectualProperty2, [
                 { fieldName: "number", emptyValue: "" },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+                { fieldName: "type", emptyValue: null, setEmpty: false },
+                { fieldName: "applicationStatus", emptyValue: null, setEmpty: false },
+                { fieldName: "dateRequested", emptyValue: null, setEmpty: false },
+                { fieldName: "dateFilingPriority", emptyValue: null, setEmpty: false },
+                { fieldName: "dateTo", emptyValue: null, setEmpty: false }
             ]);
 
-            return [patent1, patent2];
+            return [intellectualProperty1, intellectualProperty2];
         };
 
         const moveAll = (fromLeftToRight: boolean) => {
@@ -215,9 +219,9 @@ export default defineComponent({
             updateRightRef.value?.submit();
 
             if (fromLeftToRight) {
-                [rightPatent.value, leftPatent.value] = mergePatentMetadata(rightPatent.value as Patent, leftPatent.value as Patent);
+                [rightIntellectualProperty.value, leftIntellectualProperty.value] = mergeIntellectualPropertyMetadata(rightIntellectualProperty.value as IntellectualProperty, leftIntellectualProperty.value as IntellectualProperty);
             } else {
-                [leftPatent.value, rightPatent.value] = mergePatentMetadata(leftPatent.value as Patent, rightPatent.value as Patent);
+                [leftIntellectualProperty.value, rightIntellectualProperty.value] = mergeIntellectualPropertyMetadata(leftIntellectualProperty.value as IntellectualProperty, rightIntellectualProperty.value as IntellectualProperty);
             }
 
             updateLeftRef.value?.refreshForm();
@@ -232,12 +236,16 @@ export default defineComponent({
         const rightUpdateComplete = ref(false);
         const update = ref(false);
 
-        const updateLeft = (updatedInfo: Patent) => {
-            leftPatent.value!.number = updatedInfo.number;
-            leftPatent.value!.publisherId = updatedInfo.publisherId;
-            leftPatent.value!.authorReprint = updatedInfo.authorReprint;
+        const updateLeft = (updatedInfo: IntellectualProperty) => {
+            leftIntellectualProperty.value!.number = updatedInfo.number;
+            leftIntellectualProperty.value!.publisherId = updatedInfo.publisherId;
+            leftIntellectualProperty.value!.type = updatedInfo.type;
+            leftIntellectualProperty.value!.applicationStatus = updatedInfo.applicationStatus;
+            leftIntellectualProperty.value!.dateRequested = updatedInfo.dateRequested;
+            leftIntellectualProperty.value!.dateFilingPriority = updatedInfo.dateFilingPriority;
+            leftIntellectualProperty.value!.dateTo = updatedInfo.dateTo;
 
-            updateCommonBasicInfo(leftPatent, updatedInfo);
+            updateCommonBasicInfo(leftIntellectualProperty, updatedInfo);
             
             if (update.value) {
                 leftUpdateComplete.value = true;
@@ -245,12 +253,16 @@ export default defineComponent({
             }
         };
 
-        const updateRight = (updatedInfo: Patent) => {
-            rightPatent.value!.number = updatedInfo.number;
-            rightPatent.value!.publisherId = updatedInfo.publisherId;
-            rightPatent.value!.authorReprint = updatedInfo.authorReprint;
+        const updateRight = (updatedInfo: IntellectualProperty) => {
+            rightIntellectualProperty.value!.number = updatedInfo.number;
+            rightIntellectualProperty.value!.publisherId = updatedInfo.publisherId;
+            rightIntellectualProperty.value!.type = updatedInfo.type;
+            rightIntellectualProperty.value!.applicationStatus = updatedInfo.applicationStatus;
+            rightIntellectualProperty.value!.dateRequested = updatedInfo.dateRequested;
+            rightIntellectualProperty.value!.dateFilingPriority = updatedInfo.dateFilingPriority;
+            rightIntellectualProperty.value!.dateTo = updatedInfo.dateTo;
 
-            updateCommonBasicInfo(rightPatent, updatedInfo);
+            updateCommonBasicInfo(rightIntellectualProperty, updatedInfo);
             
             if (update.value) {
                 rightUpdateComplete.value = true;
@@ -274,15 +286,15 @@ export default defineComponent({
                 rightUpdateComplete.value = false;
                 update.value = false;
             
-                MergeService.saveMergedPatentsMetadata(
-                    leftPatent.value?.id as number, rightPatent.value?.id as number,
+                MergeService.saveMergedIntellectualPropertiesMetadata(
+                    leftIntellectualProperty.value?.id as number, rightIntellectualProperty.value?.id as number,
                     {
-                        leftPatent: leftPatent.value as Patent, 
-                        rightPatent: rightPatent.value as Patent,
-                        leftProofs: leftPatent.value?.proofs?.map(file => file.id) as number[],
-                        leftFileItems: leftPatent.value?.fileItems?.map(file => file.id) as number[],
-                        rightProofs: rightPatent.value?.proofs?.map(file => file.id) as number[],
-                        rightFileItems: rightPatent.value?.fileItems?.map(file => file.id) as number[]
+                        leftIntellectualProperty: leftIntellectualProperty.value as IntellectualProperty, 
+                        rightIntellectualProperty: rightIntellectualProperty.value as IntellectualProperty,
+                        leftProofs: leftIntellectualProperty.value?.proofs?.map(file => file.id) as number[],
+                        leftFileItems: leftIntellectualProperty.value?.fileItems?.map(file => file.id) as number[],
+                        rightProofs: rightIntellectualProperty.value?.proofs?.map(file => file.id) as number[],
+                        rightFileItems: rightIntellectualProperty.value?.fileItems?.map(file => file.id) as number[]
                     }
                 )
                 .then(() => {
@@ -297,33 +309,33 @@ export default defineComponent({
         };
 
         const updateLeftDescription = (description: MultilingualContent[]) => {
-            leftPatent.value!.description = description;
+            leftIntellectualProperty.value!.description = description;
         };
 
         const updateRightDescription = (description: MultilingualContent[]) => {
-            rightPatent.value!.description = description;
+            rightIntellectualProperty.value!.description = description;
         };
 
         const updateLeftKeywords = (keywords: MultilingualContent[]) => {
-            leftPatent.value!.keywords = keywords;
+            leftIntellectualProperty.value!.keywords = keywords;
         };
 
         const updateRightKeywords = (keywords: MultilingualContent[]) => {
-            rightPatent.value!.keywords = keywords;
+            rightIntellectualProperty.value!.keywords = keywords;
         };
 
         const deleteSide = async (side: ComparisonSide) => {
-            const id = side === ComparisonSide.LEFT ? leftPatent.value?.id : rightPatent.value?.id;
-            const transferTargetId = side === ComparisonSide.LEFT ? rightPatent.value?.id : leftPatent.value?.id;
+            const id = side === ComparisonSide.LEFT ? leftIntellectualProperty.value?.id : rightIntellectualProperty.value?.id;
+            const transferTargetId = side === ComparisonSide.LEFT ? rightIntellectualProperty.value?.id : leftIntellectualProperty.value?.id;
 
             try {
                 await MergeService.migratePublicationIdentifierHistory(id as number, transferTargetId as number, "publication");
                 await DocumentPublicationService.deleteDocumentPublication(id as number);
                 await MergeService.switchAllIndicatorsToOtherDocument(id as number, transferTargetId as number);
 
-                router.push({ name: "patentLandingPage", params: { id: transferTargetId } });
+                router.push({ name: "intellectualPropertyLandingPage", params: { id: transferTargetId } });
             } catch {
-                const name = side === ComparisonSide.LEFT ? leftPatent.value?.title : rightPatent.value?.title;
+                const name = side === ComparisonSide.LEFT ? leftIntellectualProperty.value?.title : rightIntellectualProperty.value?.title;
                 snackbarMessage.value = i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(name) });
                 snackbar.value = true;
             }
@@ -332,7 +344,7 @@ export default defineComponent({
         return {
             returnCurrentLocaleContent,
             snackbar, snackbarMessage,
-            leftPatent, rightPatent,
+            leftIntellectualProperty, rightIntellectualProperty,
             moveAll, updateAll, updateLeft,
             updateLeftRef, updateRightRef, updateRight,
             updateRightDescriptionRef, updateLeftDescriptionRef,

@@ -135,7 +135,7 @@ import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PersonDocumentContributionList from '@/components/core/PersonDocumentContributionList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -195,6 +195,9 @@ export default defineComponent({
         const mergeMonographMetadata = (monographPublication1: MonographPublication, monographPublication2: MonographPublication) => {
             mergeCommonMetadata(monographPublication1, monographPublication2);
 
+            mergeMultilingualContentField(monographPublication1.section, monographPublication2.section);
+            monographPublication2.section = [];
+
             bulkTransferFields(monographPublication1, monographPublication2, [
                 { fieldName: "numberOfPages", emptyValue: 0 },
                 { fieldName: "articleNumber", emptyValue: "" },
@@ -240,6 +243,7 @@ export default defineComponent({
             leftMonographPublication.value!.monographPublicationType = updatedInfo.monographPublicationType;
             leftMonographPublication.value!.monographId = updatedInfo.monographId;
             leftMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
+            leftMonographPublication.value!.section = updatedInfo.section;
 
             updateCommonBasicInfo(leftMonographPublication, updatedInfo);
             
@@ -256,6 +260,7 @@ export default defineComponent({
             rightMonographPublication.value!.monographPublicationType = updatedInfo.monographPublicationType;
             rightMonographPublication.value!.monographId = updatedInfo.monographId;
             rightMonographPublication.value!.numberOfPages = updatedInfo.numberOfPages;
+            rightMonographPublication.value!.section = updatedInfo.section;
 
             updateCommonBasicInfo(rightMonographPublication, updatedInfo);
             

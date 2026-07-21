@@ -62,7 +62,7 @@ export enum PersonNameType {
 }
   
 export interface PostalAddress {
-    countryId: number;
+    countryId?: number;
     streetAndNumber: MultilingualContent[];
     city: MultilingualContent[];
     state: MultilingualContent[];
@@ -87,6 +87,10 @@ export interface PersonContribution {
     postalAddress?: PostalAddress;
     contact?: Contact;
     displayInstitutionNames?: MultilingualContent[][];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
+    dateFrom?: string;
+    dateTo?: string;
 }
 
 export enum EmploymentPosition {
@@ -172,6 +176,10 @@ export interface ExpertiseOrSkillResponse {
     id: number;
     name: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    favorite: boolean;
+    researchAreasId: number[];
+    researchAreas: ResearchArea[];
     proofs: DocumentFileResponse[];
 }
 
@@ -179,6 +187,9 @@ export interface ExpertiseOrSkill {
     id?: number;
     name: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    favorite: boolean;
+    researchAreasId: number[];
 }
 
 export interface PrizeResponse {

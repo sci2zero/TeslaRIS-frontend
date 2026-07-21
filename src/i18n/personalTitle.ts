@@ -4,17 +4,17 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 
 const personalTitlesEn = [
-    { title: "Doctor", value: PersonalTitle.DR },
+    { title: "Doctor", value: PersonalTitle.PHD },
     { title: "Academic", value: PersonalTitle.ACADEMIC },
-    { title: "Doctor of art", value: PersonalTitle.DR_ART },
+    { title: "Doctor of art", value: PersonalTitle.PHD_ART },
     { title: "Magister", value: PersonalTitle.MR },
     { title: "None", value: PersonalTitle.NONE }
 ];
 
 const personalTitlesSr = [
-    { title: "Doktor", value: PersonalTitle.DR },
+    { title: "Doktor", value: PersonalTitle.PHD },
     { title: "Akademik", value: PersonalTitle.ACADEMIC },
-    { title: "Doktor umetnosti", value: PersonalTitle.DR_ART },
+    { title: "Doktor umetnosti", value: PersonalTitle.PHD_ART },
     { title: "Magistar", value: PersonalTitle.MR },
     { title: "Nema", value: PersonalTitle.NONE }
 ];

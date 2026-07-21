@@ -76,17 +76,17 @@
                                     {{ monographPublication.endPage }}
                                 </div>
                                 <div v-if="monographPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monographPublication?.documentDate" class="response">
-                                    {{ localiseDate(monographPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
                                 </div>
                                 <div v-if="monographPublication?.monographId">
                                     {{ $t("monographLabel") }}:
                                 </div>
-                                <div v-if="monographPublication?.monographId" class="response">
+                                <div v-if="monographPublication?.monographName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'scientific-results/monograph/' + monographPublication?.monographId">
-                                        {{ returnCurrentLocaleContent(monograph?.title) }}
+                                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
                                     </localized-link>
                                 </div>
                                 <div v-if="monographPublication?.eventId">
@@ -108,6 +108,12 @@
                                 </div>
                                 <div v-if="monographPublication?.numberOfPages" class="response">
                                     {{ monographPublication.numberOfPages }}
+                                </div>
+                                <div v-if="monographPublication?.section?.length ?? 0 > 0">
+                                    {{ $t("sectionLabel") }}:
+                                </div>
+                                <div v-if="monographPublication?.section?.length ?? 0 > 0" class="response">
+                                    {{ returnCurrentLocaleContent(monographPublication.section) }}
                                 </div>
                             </v-col>
 
@@ -175,6 +181,8 @@
                     :document-id="monographPublication?.id"
                     :contribution-list="monographPublication?.contributions ? monographPublication?.contributions : []"
                     :read-only="!canEdit || monographPublication?.isArchived"
+                    :document-type="PublicationType.MONOGRAPH_PUBLICATION"
+                    :concrete-type="(monographPublication?.monographPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -226,7 +234,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monographPublication?.id"
-                    :can-edit="canClassify && monographPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!monographPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MONOGRAPH_PUBLICATION]"
                     @create="createClassification"
@@ -273,9 +281,7 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
-import type { Monograph } from '@/models/PublicationModel';
-import MonographService from '@/services/DocumentPublicationService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -325,7 +331,6 @@ export default defineComponent({
         const monographPublication = ref<MonographPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         const event = ref<Conference>();
-        const monograph = ref<Monograph>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -388,10 +393,6 @@ export default defineComponent({
                         event.value = eventResponse.data;
                     })
                 }
-
-                MonographService.readMonograph(monographPublication.value.monographId as number).then(response => {
-                    monograph.value = response.data;
-                });
     
                 populateData();
             }).catch(() => {
@@ -458,6 +459,7 @@ export default defineComponent({
             monographPublication.value!.numberOfPages = basicInfo.numberOfPages;
             monographPublication.value!.articleNumber = basicInfo.articleNumber;
             monographPublication.value!.monographPublicationType = basicInfo.monographPublicationType;
+            monographPublication.value!.section = basicInfo.section;
 
             updateCommonBasicInfo(monographPublication, basicInfo);
 
@@ -506,7 +508,7 @@ export default defineComponent({
         return {
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind, icon,
-            languageTagMap, monograph, MonographPublicationUpdateForm,
+            languageTagMap, MonographPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
@@ -515,7 +517,7 @@ export default defineComponent({
             fetchClassifications, createClassification, fetchIndicators,
             createIndicator, actionsRef, fetchValidationStatus, PublicationType,
             updateRemark, displayConfiguration, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
         };
 }})
 

@@ -63,7 +63,7 @@ export default defineComponent({
             required: true
         },
         lockContributionType: {
-            type: Object as PropType<EventContributionType | undefined>,
+            type: Object as PropType<EventContributionType[] | undefined>,
             default: undefined
         }
     },
@@ -92,7 +92,18 @@ export default defineComponent({
                                     otherName: contribution.personName.otherName, 
                                     lastname: contribution.personName.lastname
                                 },
-                    eventContributionType: contribution.eventContributionType
+                    eventContributionType: contribution.eventContributionType,
+                    caseName: contribution.caseName,
+                    locationJurisdiction: contribution.locationJurisdiction,
+                    numberOfReviewsOrAssessment: contribution.numberOfReviewsOrAssessment,
+                    lectureHoursPerWeek: contribution.lectureHoursPerWeek,
+                    tutorialHoursPerWeek: contribution.tutorialHoursPerWeek,
+                    labHoursPerWeek: contribution.labHoursPerWeek,
+                    otherContactHoursPerWeek: contribution.otherContactHoursPerWeek,
+                    mainArguer: contribution.mainArguer,
+                    dateFrom: contribution.dateFrom,
+                    dateTo: contribution.dateTo,
+                    researchAreasId: contribution.researchAreasId
                 });
 
             });

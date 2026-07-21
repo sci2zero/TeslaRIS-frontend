@@ -93,10 +93,10 @@
                                     {{ getThesisTitleFromValueAutoLocale(thesis.thesisType) }}
                                 </div>
                                 <div v-if="thesis?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="thesis?.documentDate" class="response">
-                                    {{ localiseDate(thesis.documentDate) }}
+                                    {{ localiseFlexibleDate(thesis.documentDate) }}
                                 </div>
                                 <div v-if="thesis?.topicAcceptanceDate">
                                     {{ $t("topicAcceptanceDateLabel") }}:
@@ -430,7 +430,8 @@
                     :read-only="!canEdit || thesis?.isOnPublicReview"
                     board-members-allowed
                     limit-one-author
-                    for-thesis
+                    :document-type="PublicationType.THESIS"
+                    :concrete-type="(thesis?.thesisType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -504,7 +505,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="thesis?.id"
-                    :can-edit="canClassify && !thesis?.isOnPublicReview && thesis?.documentDate !== ''"
+                    :can-edit="canClassify && !thesis?.isOnPublicReview && !!thesis?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.THESIS]"
                     @create="createClassification"
@@ -561,7 +562,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
@@ -1026,7 +1027,7 @@ export default defineComponent({
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
         };
 }})
 

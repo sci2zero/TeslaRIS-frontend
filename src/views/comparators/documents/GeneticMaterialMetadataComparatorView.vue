@@ -200,8 +200,7 @@ export default defineComponent({
             
             bulkTransferFields(geneticMaterial1, geneticMaterial2, [
                 { fieldName: "internalNumber", emptyValue: "" },
-                { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
+                { fieldName: "publisherId", emptyValue: null, setEmpty: false }
             ]);
 
             return [geneticMaterial1, geneticMaterial2];
@@ -238,7 +237,6 @@ export default defineComponent({
         const updateLeft = (updatedInfo: GeneticMaterial) => {
             leftGeneticMaterial.value!.internalNumber = updatedInfo.internalNumber;
             leftGeneticMaterial.value!.publisherId = updatedInfo.publisherId;
-            leftGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             leftGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
 
             updateCommonBasicInfo(leftGeneticMaterial, updatedInfo);
@@ -252,7 +250,6 @@ export default defineComponent({
         const updateRight = (updatedInfo: GeneticMaterial) => {
             rightGeneticMaterial.value!.internalNumber = updatedInfo.internalNumber;
             rightGeneticMaterial.value!.publisherId = updatedInfo.publisherId;
-            rightGeneticMaterial.value!.authorReprint = updatedInfo.authorReprint;
             rightGeneticMaterial.value!.geneticMaterialType = updatedInfo.geneticMaterialType;
 
             updateCommonBasicInfo(rightGeneticMaterial, updatedInfo);

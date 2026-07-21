@@ -6,11 +6,15 @@
                     color="primary"
                     v-bind="props"
                 >
-                    {{ $t("addEmployeeLabel") }}
+                    {{ $t("addNewUserLabel") }}
                 </v-btn>
             </template>
 
             <v-list>
+                <register-researcher-modal
+                    @success="refreshTable(tableOptions)"
+                    @failure="displayFormNotification"
+                />
                 <register-employee-modal
                     :employee-role="UserRole.INSTITUTIONAL_EDITOR"
                     @success="refreshTable(tableOptions)"
@@ -38,10 +42,6 @@
                 />
                 <register-employee-modal
                     :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR"
-                    @success="refreshTable(tableOptions)"
-                    @failure="displayFormNotification"
-                />
-                <register-researcher-modal
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />

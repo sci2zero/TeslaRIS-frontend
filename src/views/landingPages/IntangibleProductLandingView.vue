@@ -69,10 +69,10 @@
                                     {{ intangibleProduct.internalNumber }}
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate" class="response">
-                                    {{ intangibleProduct.documentDate }}
+                                    {{ localiseFlexibleDate(intangibleProduct.documentDate) }}
                                 </div>
                                 <div v-if="intangibleProduct?.publisherId || intangibleProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -102,6 +102,13 @@
                                 :concrete-entity-type="ApplicableEntityType.INTANGIBLE_PRODUCT"
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
+                            />
+                        </v-row>
+
+                        <v-row>
+                            <data-quality-remarks-dialog
+                                :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                                :entity-id="intangibleProduct?.id"
                             />
                         </v-row>
                     </v-card-text>
@@ -158,6 +165,8 @@
                     :document-id="intangibleProduct?.id"
                     :contribution-list="intangibleProduct?.contributions ? intangibleProduct?.contributions : []"
                     :read-only="!canEdit || intangibleProduct?.isArchived"
+                    :document-type="PublicationType.INTANGIBLE_PRODUCT"
+                    :concrete-type="(intangibleProduct?.intangibleProductType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -231,7 +240,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="intangibleProduct?.id"
-                    :can-edit="canClassify && intangibleProduct?.documentDate !== ''"
+                    :can-edit="canClassify && !!intangibleProduct?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -307,11 +316,13 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay, DataQualityRemarksDialog },
     setup() {
         const currentTab = ref("contributions");
 
@@ -519,7 +530,8 @@ export default defineComponent({
             fetchIntangibleProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas,
             getIntangibleProductTypeTitleFromValueAutoLocale,
-            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers
+            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate
         };
 }})
 

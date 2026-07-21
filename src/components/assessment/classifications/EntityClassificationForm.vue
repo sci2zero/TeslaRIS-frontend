@@ -93,11 +93,10 @@ export default defineComponent({
             props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH_PUBLICATION) || 
             props.applicableTypes.includes(ApplicableEntityType.JOURNAL_PUBLICATION) || 
             props.applicableTypes.includes(ApplicableEntityType.PROCEEDINGS_PUBLICATION) || 
-            props.applicableTypes.includes(ApplicableEntityType.PATENT) || 
+            props.applicableTypes.includes(ApplicableEntityType.INTELLECTUAL_PROPERTY) || 
             props.applicableTypes.includes(ApplicableEntityType.MATERIAL_PRODUCT) || 
             props.applicableTypes.includes(ApplicableEntityType.GENETIC_MATERIAL) || 
-            props.applicableTypes.includes(ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT) || 
-            props.applicableTypes.includes(ApplicableEntityType.DATASET) || 
+            props.applicableTypes.includes(ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT) ||
             props.applicableTypes.includes(ApplicableEntityType.THESIS)
         );
 

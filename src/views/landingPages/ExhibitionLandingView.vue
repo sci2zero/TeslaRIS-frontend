@@ -157,8 +157,9 @@
                     :event-id="exhibition?.id"
                     :contribution-list="exhibition?.contributions ? exhibition.contributions : []"
                     :read-only="!canEdit"
-                    @update="updateContributions">
-                </person-event-contribution-tabs>
+                    :event="exhibition"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <keyword-list

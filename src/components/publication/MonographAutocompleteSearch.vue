@@ -183,7 +183,7 @@ export default defineComponent({
             }
 
             const toSelect = {
-                title: `${title} | ${monograph.documentDate}`,
+                title: `${title} | ${monograph.documentDate?.year}`,
                 value: monograph.id as number
             };
 

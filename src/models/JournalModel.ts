@@ -13,4 +13,12 @@ export interface JournalIndex {
 }
 
 export interface Journal extends PublicationSeries {
+    type: ArticleCollectionSeriesType;
+}
+
+export enum ArticleCollectionSeriesType {
+    JOURNAL = "JOURNAL",
+    MAGAZINE = "MAGAZINE",
+    NEWSPAPER = "NEWSPAPER",
+    NEWSLETTER = "NEWSLETTER"
 }

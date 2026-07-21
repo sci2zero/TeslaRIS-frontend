@@ -17,7 +17,18 @@ export enum EventContributionType {
     PANELISTS,
     CHAIR,
     AUDIENCE,
-    DEMONSTRATOR
+    DEMONSTRATOR,
+    ORGANIZER,
+    INVITED_SPEAKER,
+    KEYNOTE_SPEAKER,
+    PERFORMER,
+    PRODUCER,
+    INSTRUCTOR,
+    TEACHER,
+    EXAMINER,
+    WITNESS,
+    ARGUER,
+    OTHER
 }
 
 export interface EventIndex {
@@ -48,9 +59,17 @@ export interface EventIndex {
   
 export interface PersonEventContribution extends PersonContribution {
     eventContributionType: EventContributionType;
+    lectureHoursPerWeek?: string;
+    tutorialHoursPerWeek?: string;
+    labHoursPerWeek?: string;
+    otherContactHoursPerWeek?: string;
+    numberOfReviewsOrAssessment?: number;
+    caseName?: MultilingualContent[];
+    locationJurisdiction?: MultilingualContent[];
+    mainArguer?: boolean;
 }
   
-interface Event {
+export interface Event {
     id?: number;
     name: MultilingualContent[];
     nameAbbreviation: MultilingualContent[];
@@ -64,6 +83,7 @@ interface Event {
     countryId?: number;
     uris: string[];
     displayOrganizer: MultilingualContent[];
+    eventType?: EventType;
 }
 
 export interface Conference extends Event {

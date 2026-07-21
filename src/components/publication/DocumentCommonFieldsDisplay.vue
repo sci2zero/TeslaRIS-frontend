@@ -84,17 +84,24 @@
             {{ returnCurrentLocaleContent(document.chronologicalSpaceDescription) }}
         </div>
 
-        <div v-if="document?.peerReviewed !== undefined">
+        <div v-if="document?.edition && document.edition.length > 0">
+            {{ $t("editionLabel") }}:
+        </div>
+        <div v-if="document?.edition && document.edition.length > 0" class="response">
+            {{ returnCurrentLocaleContent(document.edition) }}
+        </div>
+
+        <div v-if="isAdmin && document?.peerReviewed !== undefined">
             {{ $t("peerReviewedLabel") }}:
         </div>
-        <div v-if="document?.peerReviewed !== undefined" class="response">
+        <div v-if="isAdmin && document?.peerReviewed !== undefined" class="response">
             {{ document.peerReviewed ? $t('yesLabel') : $t('noLabel') }}
         </div>
 
-        <div v-if="document?.openAccess !== undefined">
-            {{ $t("openAccessLabel") }}:
+        <div v-if="isAdmin && document?.openAccess !== undefined">
+            {{ $t("isOpenAccessLabel") }}:
         </div>
-        <div v-if="document?.openAccess !== undefined" class="response">
+        <div v-if="isAdmin && document?.openAccess !== undefined" class="response">
             {{ document.openAccess ? $t('yesLabel') : $t('noLabel') }}
         </div>
 
@@ -128,6 +135,7 @@ import type { Document } from '@/models/PublicationModel';
 import EntityIdentifiersList from '../core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { useUserRole } from '@/composables/useUserRole.js';
 
 
 export default defineComponent({
@@ -165,10 +173,12 @@ export default defineComponent({
             emit("identifiers-updated");
         };
 
+        const { isAdmin } = useUserRole();
+
         return {
             getPublicationStatusTitleFromValueAutoLocale,
             ApplicableEntityType, handleIdentifiersUpdated,
-            returnCurrentLocaleContent
+            returnCurrentLocaleContent, isAdmin
         };
     }
 });

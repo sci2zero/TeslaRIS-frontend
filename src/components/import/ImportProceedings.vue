@@ -288,7 +288,9 @@ export default defineComponent({
                     stateOther: "",
                     stateSrSortable: "",
                     stateOtherSortable: "",
-                    serialEvent: false
+                    serialEvent: false,
+                    dateFrom: "",
+                    dateTo: ""
                 };
 
                 selectedProceedings.value = response.data;

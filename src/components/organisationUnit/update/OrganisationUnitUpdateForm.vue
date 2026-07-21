@@ -89,6 +89,24 @@
                     </v-col>
                 </v-row>
                 <v-row>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="grid" label="GRID" placeholder="GRID" :rules="gridValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="wikidata" label="Wikidata ID" placeholder="Wikidata ID" :rules="wikidataValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="nationalId" :label="$t('nationalIdLabel')" :placeholder="$t('nationalIdLabel')" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" :placeholder="$t('numberOfEmployeesLabel')" />
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="12">
                         <v-text-field
                             v-model="taxNumber"
@@ -361,10 +379,16 @@ export default defineComponent({
         const isni = ref(props.presetOU?.isni);
         const fctId = ref(props.presetOU?.fctId);
         const taxNumber = ref(props.presetOU?.taxNumber);
+        const grid = ref(props.presetOU?.grid);
+        const wikidata = ref(props.presetOU?.wikidata);
+        const nationalId = ref(props.presetOU?.nationalId);
+        const numberOfEmployees = ref(props.presetOU?.numberOfEmployees);
         const uris = ref<string[]>(props.presetOU?.uris as string[]);
 
         const startup = ref(props.presetOU?.startup);
         const dateEstablished = ref(props.presetOU?.dateEstablished);
+        const dateDissolved = ref(props.presetOU?.dateDissolved);
+        const active = ref(props.presetOU?.active);
 
         const clientInstitutionCris = ref(props.presetOU?.clientInstitutionCris);
         const validatingEmailDomainCris = ref(props.presetOU?.validatingEmailDomainCris);
@@ -409,7 +433,8 @@ export default defineComponent({
             requiredFieldRules, scopusAfidValidationRules, rorValidationRules,
             nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
             requiredSelectionRules, ringgoldValidationRules, fundrefValidationRules,
-            isniValidationRules, fctIdValidationRules, taxNumberValidationRules
+            isniValidationRules, fctIdValidationRules, taxNumberValidationRules,
+            gridValidationRules, wikidataValidationRules
         } = useValidationUtils();
 
         const fetchCountries = () => {
@@ -457,6 +482,10 @@ export default defineComponent({
                 fundref: fundref.value,
                 isni: isni.value,
                 fctId: fctId.value,
+                grid: grid.value,
+                wikidata: wikidata.value,
+                nationalId: nationalId.value,
+                numberOfEmployees: numberOfEmployees.value,
                 taxNumber: taxNumber.value,
                 uris: uris.value,
                 allowedThesisTypes: selectedThesisType.value.filter(type => type.value !== null).map(type => type.value) as ThesisType[],
@@ -470,11 +499,13 @@ export default defineComponent({
                 allowingSubdomainsDl: allowingSubdomainsDl.value as boolean,
                 institutionEmailDomainDl: institutionEmailDomainDl.value as string,
                 sector: selectedOuSector.value.value as OrganisationUnitSector,
-                startup: startup.value,
+                startup: startup.value !== null ? startup.value : false,
                 dateEstablished: dateEstablished.value,
+                dateDissolved: dateDissolved.value,
+                active: active.value,
                 postalAddress: {
                     city: city.value,
-                    countryId: selectedCountry.value?.value as number,
+                    countryId: (selectedCountry.value?.value as number > 0)? selectedCountry.value?.value as number : undefined,
                     streetAndNumber: streetAndNumber.value,
                     state: state.value,
                     postalNumber: postalNumber.value as string
@@ -523,12 +554,17 @@ export default defineComponent({
             isni.value = props.presetOU?.isni;
             taxNumber.value = props.presetOU?.taxNumber;
             fctId.value = props.presetOU?.fctId;
+            grid.value = props.presetOU?.grid;
+            wikidata.value = props.presetOU?.wikidata;
+            nationalId.value = props.presetOU?.nationalId;
             selectedOuSector.value = {
                 title: getOUSectorFromValueAutoLocale(props.presetOU?.sector as  OrganisationUnitSector) as string,
                 value: props.presetOU?.sector as OrganisationUnitSector
             };
             startup.value = props.presetOU?.startup;
             dateEstablished.value = props.presetOU?.dateEstablished;
+            dateDissolved.value = props.presetOU?.dateDissolved;
+            active.value = props.presetOU?.active;
             urisRef.value?.refreshModelValue(uris.value);
 
             clientInstitutionCris.value = props.presetOU?.clientInstitutionCris;
@@ -574,8 +610,10 @@ export default defineComponent({
             ringgoldValidationRules, fundrefValidationRules,
             isniValidationRules, fctIdValidationRules,
             city, cityRef, streetAndNumber, streetAndNumberRef,
-            state, stateRef, countries, selectedCountry,
-            postalNumber
+            state, stateRef, countries, selectedCountry, grid,
+            postalNumber, gridValidationRules, wikidataValidationRules,
+            wikidata, nationalId, numberOfEmployees, dateDissolved,
+            active
         };
     }
 });

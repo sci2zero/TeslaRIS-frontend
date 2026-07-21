@@ -24,6 +24,8 @@ export const useValidationUtils = () => {
     const invalidIsniMessage = computed(() => i18n.t("invalidIsniMessage"));
     const invalidFctIdMessage = computed(() => i18n.t("invalidFctIdMessage"));
     const invalidTaxNumberMessage = computed(() => i18n.t("invalidTaxNumberMessage"));
+    const invalidGridMessage = computed(() => i18n.t("invalidGridMessage"));
+    const invalidWikidataMessage = computed(() => i18n.t("invalidWikidataMessage"));
     const invalidScopusIdMessage = computed(() => i18n.t("scopusIdFormatError"));
     const invalidHandleIdMessage = computed(() => i18n.t("handleIdFormatError"));
     const invalidArxivIdMessage = computed(() => i18n.t("handleIdFormatError"));
@@ -346,6 +348,24 @@ export const useValidationUtils = () => {
         }
     ];
 
+    const gridPattern = /^grid\\.\\d{4,6}\\.[0-9a-f]{1,2}$/i;
+    const gridValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (gridPattern.test(value)) return true;
+            return invalidGridMessage.value;
+        }
+    ];
+
+    const wikidataPattern = /^Q[1-9]\d*$/i;
+    const wikidataValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (wikidataPattern.test(value)) return true;
+            return invalidWikidataMessage.value;
+        }
+    ];
+
     const regexValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -501,6 +521,6 @@ export const useValidationUtils = () => {
         ringgoldValidationRules, fundrefValidationRules, isniValidationRules,
         taxNumberValidationRules, fctIdValidationRules, regexValidationRules,
         handleIdValidationRules, arxivIdValidationRules, pubmedIdValidationRules,
-        ssrnIdValidationRules
+        ssrnIdValidationRules, gridValidationRules, wikidataValidationRules
     };
 };

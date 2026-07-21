@@ -41,6 +41,9 @@ export interface OrganisationUnitRequest {
     isni?: string;
     fctId?: string;
     taxNumber?: string;
+    grid?: string;
+    wikidata?: string;
+    nationalId?: string;
     uris: string[];
     allowedThesisTypes: ThesisType[];
     clientInstitutionCris: boolean;
@@ -55,6 +58,9 @@ export interface OrganisationUnitRequest {
     sector?: OrganisationUnitSector;
     startup?: boolean;
     dateEstablished?: string;
+    dateDissolved?: string;
+    active?: boolean;
+    numberOfEmployees?: string;
     postalAddress?: PostalAddress;
 }
 
@@ -83,6 +89,9 @@ export interface OrganisationUnitResponse {
     fundref?: string;
     isni?: string;
     fctId?: string;
+    grid?: string;
+    wikidata?: string;
+    nationalId?: string;
     taxNumber?: string;
     uris: string[];
     logoServerFilename?: string;
@@ -102,6 +111,9 @@ export interface OrganisationUnitResponse {
     sector?: OrganisationUnitSector;
     startup?: boolean;
     dateEstablished?: string;
+    dateDissolved?: string;
+    active?: boolean;
+    numberOfEmployees?: string;
     postalAddress?: PostalAddress;
 }
 

@@ -134,8 +134,9 @@
                 <person-publication-series-contribution-tabs
                     :contribution-list="bookSeries?.contributions ? bookSeries.contributions : []"
                     :publication-series-id="bookSeries?.id"
-                    :read-only="!canEdit" @update="updateContributions">
-                </person-publication-series-contribution-tabs>
+                    :read-only="!canEdit"
+                    @update="updateContributions"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

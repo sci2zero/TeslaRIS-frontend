@@ -50,8 +50,12 @@ export const returnCurrentLocaleContent = (
 export const toMultilingualTextInput = (
     multilingualContentArray: MultilingualContent[] | undefined,
     supportedLanguages: LanguageTagResponse[]
-): { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] => {
-    const presetInput: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] = [];
+): { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[], priority: number }[] => {
+    const presetInput: { 
+        language: {title: string, value: number},
+        text: string,
+        supportedLanguages: {title: string, value: number}[],
+        priority: number }[] = [];
 
     if (!multilingualContentArray) {
         return presetInput;
@@ -62,7 +66,12 @@ export const toMultilingualTextInput = (
     const mappedFilteredLanguages = filteredLanguages.map(language => ({ title: language.languageCode, value: language.id }));
 
     multilingualContentArray.forEach(mc => {
-        presetInput.push({language: {title: mc.languageTag, value: mc.languageTagId}, text: mc.content, supportedLanguages: [...mappedFilteredLanguages]});
+        presetInput.push({
+            language: {title: mc.languageTag, value: mc.languageTagId}, 
+            text: mc.content, 
+            supportedLanguages: [...mappedFilteredLanguages],
+            priority: mc.priority
+        });
     });
 
     return presetInput;

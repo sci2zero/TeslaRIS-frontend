@@ -69,10 +69,10 @@
                                     {{ materialProduct.internalNumber }}
                                 </div>
                                 <div v-if="materialProduct?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="materialProduct?.documentDate" class="response">
-                                    {{ localiseDate(materialProduct.documentDate) }}
+                                    {{ localiseFlexibleDate(materialProduct.documentDate) }}
                                 </div>
                                 <div v-if="materialProduct?.publisherId || materialProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -158,6 +158,8 @@
                     :document-id="materialProduct?.id"
                     :contribution-list="materialProduct?.contributions ? materialProduct?.contributions : []"
                     :read-only="!canEdit || materialProduct?.isArchived"
+                    :document-type="PublicationType.MATERIAL_PRODUCT"
+                    :concrete-type="(materialProduct?.materialProductType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -231,7 +233,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="materialProduct?.id"
-                    :can-edit="canClassify && materialProduct?.documentDate !== ''"
+                    :can-edit="canClassify && !!materialProduct?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -305,7 +307,7 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
@@ -522,7 +524,8 @@ export default defineComponent({
             fetchMaterialProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas, isAdmin,
             getMaterialProductTypeTitleFromValueAutoLocale,
-            documentIdentifiers, fetchIdentifiers, localiseDate
+            documentIdentifiers, fetchIdentifiers, localiseDate,
+            localiseFlexibleDate
         };
 }})
 

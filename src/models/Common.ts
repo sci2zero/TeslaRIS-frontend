@@ -111,12 +111,11 @@ export enum ApplicableEntityType {
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
-    PATENT = "PATENT",
+    INTELLECTUAL_PROPERTY = "INTELLECTUAL_PROPERTY",
     MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
     GENETIC_MATERIAL = "GENETIC_MATERIAL",
     PERFORMANCE_RELATED_OUTPUT = "PERFORMANCE_RELATED_OUTPUT",
     PRIZE = "PRIZE",
-    DATASET = "DATASET",
     THESIS = "THESIS",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     EVENT = "EVENT",
@@ -400,6 +399,18 @@ export interface YearRange {
 export interface MaintenanceInformation {
     startTime: string;
     approximateEndMoment: string;
+}
+
+export interface Pair<A, B> {
+    a: A;
+    b: B;
+}
+
+export interface FlexibleDate {
+    year: number;
+    month?: number;
+    day?: number;
+    text?: string;
 }
 
 export interface Currency {

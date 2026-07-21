@@ -12,7 +12,11 @@
                 </v-row>
                 <v-row>
                     <v-col cols="10">
-                        <journal-autocomplete-search ref="journalAutocompleteRef" v-model="selectedJournal" required></journal-autocomplete-search>
+                        <journal-autocomplete-search
+                            ref="journalAutocompleteRef"
+                            v-model="selectedJournal"
+                            required
+                        />
                     </v-col>
                 </v-row>
 
@@ -22,8 +26,7 @@
                         <p
                             v-for="(publicationIndex, i) in myPublications"
                             :key="i"
-                            :value="publicationIndex"
-                        >
+                            :value="publicationIndex">
                             {{ $i18n.locale.startsWith("sr") ? publicationIndex.titleSr : publicationIndex.titleOther }}
                         </p>
                     </v-col>
@@ -38,8 +41,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -53,41 +56,40 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
 
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')"></v-text-field>
+                        <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')" />
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')"></v-text-field>
+                        <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="5">
-                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')"></v-text-field>
+                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
                     </v-col>
                     <v-col cols="5">
-                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')"></v-text-field>
+                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col v-if="!disableYearInput" cols="8">
-                        <v-text-field
-                            v-model="publicationYear"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules">
-                        </v-text-field>
+                            required
+                        />
                     </v-col>
                     <v-col :cols="disableYearInput ? 10 : 2">
                         <v-checkbox
                             v-model="disableYearInput"
                             :label="$t('yearUnknownLabel')"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -96,8 +98,8 @@
                             v-model="selectedpublicationType"
                             :items="publicationTypes"
                             :label="$t('concretePublicationTypeLabel')"
-                            return-object>
-                        </v-select>
+                            return-object
+                        />
                     </v-col>
                 </v-row>
 
@@ -107,8 +109,8 @@
                         <person-publication-contribution
                             ref="contributionsRef"
                             basic
-                            @set-input="contributions = $event">
-                        </person-publication-contribution>
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
 
@@ -118,29 +120,39 @@
                 <v-container v-if="additionalFields">
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="5">
-                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')"></v-text-field>
+                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
                                 v-model="numberOfPages" type="number"
                                 :min="0" :label="$t('numberOfPagesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                                :placeholder="$t('numberOfPagesLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')"></multilingual-text-input>
+                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area></multilingual-text-input>
+                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="sectionRef"
+                                v-model="section"
+                                :label="$t('sectionLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -208,7 +220,7 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
-import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -217,11 +229,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -242,6 +255,7 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const keywordsRef = ref<typeof MultilingualTextInput>();
+        const sectionRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
         const urisRef = ref<typeof UriInput>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
@@ -259,12 +273,13 @@ export default defineComponent({
         const subtitle = ref([]);
         const description = ref([]);
         const keywords = ref<any[]>([]);
+        const section = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
         const volume = ref("");
         const issue = ref("");
         const startPage = ref("");
         const endPage = ref("");
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const scopus = ref("");
         const openAlexId = ref("");
@@ -290,7 +305,12 @@ export default defineComponent({
         } = useValidationUtils();
 
         const publicationTypes = computed(() => getTypesForGivenLocale());
-        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>({title: getTitleFromValueAutoLocale(JournalPublicationType.RESEARCH_ARTICLE) as string, value: JournalPublicationType.RESEARCH_ARTICLE});
+        const selectedpublicationType = ref<{ title: string, value: JournalPublicationType | null }>(
+            {
+                title: getTitleFromValueAutoLocale(JournalPublicationType.RESEARCH_ARTICLE) as string,
+                value: JournalPublicationType.RESEARCH_ARTICLE
+            }
+        );
 
         const listPublications = (journal: { title: string, value: number }) => {
             if (journal.value > 0) {
@@ -322,14 +342,14 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
             
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
                 selectedJournal.value = {title: metadata.publishedInName, value: metadata.publishEntityId};
             }
 
-            if (contributions.value.length === 0) {
+            if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
                 contributions.value = metadata.contributions;
                 contributionsRef.value?.fillDummyAuthors(contributions.value.length);
 
@@ -338,7 +358,7 @@ export default defineComponent({
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
 
-            if (keywords.value.length === 0) {
+            if (keywords.value.length === 0 && metadata.keywords.length !== 0) {
                 additionalFields.value = true;
                 await nextTick();
                 
@@ -367,13 +387,14 @@ export default defineComponent({
                 uris: uris.value,
                 volume: volume.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: disableYearInput.value ? undefined : publicationDate.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 doi: doi.value,
                 fileItems: [],
                 proofs: [],
+                section: section.value,
                 ...commonFieldsData.value
             };
 
@@ -387,6 +408,7 @@ export default defineComponent({
                     subtitleRef.value?.clearInput();
                     descriptionRef.value?.clearInput();
                     keywordsRef.value?.clearInput();
+                    sectionRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     journalAutocompleteRef.value?.clearInput();
                     selectedpublicationType.value = {title: "", value: null};
@@ -394,7 +416,7 @@ export default defineComponent({
                     issue.value = "";
                     startPage.value = "";
                     endPage.value = "";
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     scopus.value = "";
                     openAlexId.value = "";
@@ -426,7 +448,7 @@ export default defineComponent({
         return {
             isFormValid, subtitleRef, openAlexId, workOpenAlexIdValidationRules,
             additionalFields, snackbar, error, title, titleRef, subtitle,
-            volume, issue, startPage, endPage, publicationYear, doi, scopus,
+            volume, issue, startPage, endPage, publicationDate, doi, scopus,
             articleNumber, numberOfPages, description, descriptionRef,
             keywords, keywordsRef, isResearcher, uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications, submit,
@@ -436,7 +458,7 @@ export default defineComponent({
             popuateMetadata, PublicationType, documentWebOfScienceIdValidationRules,
             webOfScienceId, optionalNumericZeroOrGreaterFieldRules, disableYearInput,
             deduplicationTableRef, commonFieldsData, presetCommonFieldsData,
-            commonFieldsRef
+            commonFieldsRef, section, sectionRef
         };
     }
 });

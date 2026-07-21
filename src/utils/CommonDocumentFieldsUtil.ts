@@ -15,6 +15,7 @@ export const extractCommonFields = <T extends Partial<CommonFieldsData>>(
         arxivId: document.arxivId,
         pubmedId: document.pubmedId,
         ssrnId: document.ssrnId,
+        nationalId: document.nationalId,
         city: document.city,
         geoSpaceDescription: document.geoSpaceDescription,
         chronologicalSpaceDescription: document.chronologicalSpaceDescription,
@@ -52,6 +53,7 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.arxivId = basicInfo.arxivId;
     document.value!.pubmedId = basicInfo.pubmedId;
     document.value!.ssrnId = basicInfo.ssrnId;
+    document.value!.nationalId = basicInfo.nationalId;
     document.value!.peerReviewed = basicInfo.peerReviewed;
     document.value!.openAccess = basicInfo.openAccess;
     document.value!.city = basicInfo.city;
@@ -59,6 +61,8 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.chronologicalSpaceDescription = basicInfo.chronologicalSpaceDescription;
     document.value!.publicationStatus = basicInfo.publicationStatus;
     document.value!.eventId = basicInfo.eventId;
+    document.value!.authorReprint = basicInfo.authorReprint;
+    document.value!.edition = basicInfo.edition;
 };
 
 export const mergeCommonMetadata = (document1: Document, document2: Document) => {
@@ -84,6 +88,9 @@ export const mergeCommonMetadata = (document1: Document, document2: Document) =>
     mergeMultilingualContentField(document1.city, document2.city);
     document2.city = [];
 
+    mergeMultilingualContentField(document1.edition, document2.edition);
+    document2.edition = [];
+
     bulkTransferFields(document1, document2, [
         { fieldName: "doi", emptyValue: "" },
         { fieldName: "scopusId", emptyValue: "" },
@@ -94,10 +101,12 @@ export const mergeCommonMetadata = (document1: Document, document2: Document) =>
         { fieldName: "arxivId", emptyValue: "" },
         { fieldName: "pubmedId", emptyValue: "" },
         { fieldName: "ssrnId", emptyValue: "" },
+        { fieldName: "nationalId", emptyValue: "" },
         { fieldName: "peerReviewed", emptyValue: false },
         { fieldName: "openAccess", emptyValue: false },
         { fieldName: "publicationStatus", emptyValue: null, setEmpty: false },
-        { fieldName: "eventId", emptyValue: null, setEmpty: false }
+        { fieldName: "eventId", emptyValue: null, setEmpty: false },
+        { fieldName: "authorReprint", emptyValue: null, setEmpty: false }
     ]);
 
     document2.uris!.forEach(uri => {
@@ -125,7 +134,8 @@ export const getCommonIdentifiers = (
     handleId: IdentifierValue,
     arxivId: IdentifierValue,
     pubmedId: IdentifierValue,
-    ssrnId: IdentifierValue
+    ssrnId: IdentifierValue,
+    nationalId: IdentifierValue
 ) => [
     { value: getValue(doi), error: "doiExistsError" },
     { value: getValue(scopus), error: "scopusIdExistsError" },
@@ -135,4 +145,5 @@ export const getCommonIdentifiers = (
     { value: getValue(arxivId), error: "arxivIdExistsError" },
     { value: getValue(pubmedId), error: "pubmedIdExistsError" },
     { value: getValue(ssrnId), error: "ssrnIdExistsError" },
+    { value: getValue(nationalId), error: "nationalIdExistsError" }
 ];

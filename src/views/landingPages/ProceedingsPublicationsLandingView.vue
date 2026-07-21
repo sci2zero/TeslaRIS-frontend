@@ -79,10 +79,10 @@
                                     </localized-link>
                                 </div>
                                 <div v-if="proceedingsPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(proceedingsPublication.documentDate) }}
                                 </div>
                                 <div v-if="proceedingsPublication?.startPage">
                                     {{ $t("startPageLabel") }}:
@@ -104,6 +104,12 @@
                                 </div>
                                 <div v-if="proceedingsPublication?.articleNumber" class="response">
                                     {{ proceedingsPublication.articleNumber }}
+                                </div>
+                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0">
+                                    {{ $t("sectionLabel") }}:
+                                </div>
+                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0" class="response">
+                                    {{ returnCurrentLocaleContent(proceedingsPublication.section) }}
                                 </div>
                             </v-col>
 
@@ -195,6 +201,8 @@
                     :document-id="proceedingsPublication?.id"
                     :contribution-list="proceedingsPublication?.contributions ? proceedingsPublication?.contributions : []"
                     :read-only="!canEdit || proceedingsPublication?.isArchived"
+                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    :concrete-type="(proceedingsPublication?.proceedingsPublicationType as string)"
                     @update="updateContributions"
                 />
             </v-tabs-window-item>
@@ -226,7 +234,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="proceedingsPublication?.id"
-                    :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!proceedingsPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.PROCEEDINGS_PUBLICATION]"
                     @create="createClassification"
@@ -275,7 +283,7 @@ import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -459,6 +467,7 @@ export default defineComponent({
             proceedingsPublication.value!.numberOfPages = basicInfo.numberOfPages;
             proceedingsPublication.value!.articleNumber = basicInfo.articleNumber;
             proceedingsPublication.value!.proceedingsPublicationType = basicInfo.proceedingsPublicationType;
+            proceedingsPublication.value!.section = basicInfo.section;
 
             updateCommonBasicInfo(proceedingsPublication, basicInfo);
 
@@ -524,7 +533,8 @@ export default defineComponent({
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
             fetchValidationStatus, PublicationType, updateRemark, isAdmin,
-            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers
+            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate
         };
 }})
 

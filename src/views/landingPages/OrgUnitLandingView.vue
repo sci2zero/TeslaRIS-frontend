@@ -57,6 +57,12 @@
                         />
                         <v-row v-else>
                             <v-col cols="3">
+                                <div v-if="organisationUnit?.numberOfEmployees">
+                                    {{ $t("numberOfEmployeesLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.numberOfEmployees" class="response">
+                                    {{ organisationUnit?.numberOfEmployees }}
+                                </div>
                                 <div>
                                     Scopus AFID:
                                 </div>
@@ -79,7 +85,11 @@
                                     Research Organisation Registry ID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror"></identifier-link>
+                                    <identifier-link
+                                        v-if="organisationUnit?.ror"
+                                        :identifier="organisationUnit.ror"
+                                        type="ror"
+                                    />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -129,6 +139,41 @@
                                     </span>
                                 </div>
                                 <div>
+                                    GRID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.grid">
+                                        {{ organisationUnit.grid }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Wikidata ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link
+                                        v-if="organisationUnit?.wikidata"
+                                        :identifier="organisationUnit.wikidata"
+                                        type="wikidata"
+                                    />
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ $t("nationalIdLabel") }}
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.nationalId">
+                                        {{ organisationUnit.nationalId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
                                     {{ $t("taxNumberLabel") }}
                                 </div>
                                 <div class="response">
@@ -164,6 +209,15 @@
                                 </div>
                                 <div v-if="organisationUnit?.dateEstablished" class="response">
                                     {{ localiseDate(organisationUnit?.dateEstablished) }}
+                                </div>
+                                <div v-if="organisationUnit?.dateDissolved" class="response">
+                                    {{ $t("dateDissolvedLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.dateDissolved" class="response">
+                                    {{ localiseDate(organisationUnit?.dateDissolved) }}
+                                </div>
+                                <div v-if="organisationUnit?.active" class="response">
+                                    {{ $t("activeLabel") }}
                                 </div>
                                 <div v-if="organisationUnit?.superInstitutionId">
                                     {{ $t("superOULabel") }}
@@ -951,6 +1005,9 @@ export default defineComponent({
             organisationUnit.value!.isni = basicInfo.isni;
             organisationUnit.value!.taxNumber = basicInfo.taxNumber;
             organisationUnit.value!.fctId = basicInfo.fctId;
+            organisationUnit.value!.grid = basicInfo.grid;
+            organisationUnit.value!.wikidata = basicInfo.wikidata;
+            organisationUnit.value!.nationalId = basicInfo.nationalId;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
             organisationUnit.value!.clientInstitutionCris = basicInfo.clientInstitutionCris;
@@ -965,6 +1022,9 @@ export default defineComponent({
             organisationUnit.value!.sector = basicInfo.sector;
             organisationUnit.value!.startup = basicInfo.startup;
             organisationUnit.value!.dateEstablished = basicInfo.dateEstablished;
+            organisationUnit.value!.dateDissolved = basicInfo.dateDissolved;
+            organisationUnit.value!.active = basicInfo.active;
+            organisationUnit.value!.numberOfEmployees = basicInfo.numberOfEmployees;
             organisationUnit.value!.postalAddress = basicInfo.postalAddress;
             performUpdate(false);
         };
@@ -1015,6 +1075,9 @@ export default defineComponent({
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
                 fctId: organisationUnit.value?.fctId,
+                grid: organisationUnit.value?.grid,
+                nationalId: organisationUnit.value?.nationalId,
+                wikidata: organisationUnit.value?.wikidata,
                 taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
@@ -1030,6 +1093,9 @@ export default defineComponent({
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
                 dateEstablished: organisationUnit.value?.dateEstablished,
+                dateDissolved: organisationUnit.value?.dateDissolved,
+                active: organisationUnit.value?.active,
+                numberOfEmployees: organisationUnit.value?.numberOfEmployees,
                 postalAddress: organisationUnit.value?.postalAddress
             };
 
@@ -1058,6 +1124,9 @@ export default defineComponent({
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
                 fctId: organisationUnit.value?.fctId,
+                grid: organisationUnit.value?.grid,
+                nationalId: organisationUnit.value?.nationalId,
+                wikidata: organisationUnit.value?.wikidata,
                 taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
@@ -1073,6 +1142,9 @@ export default defineComponent({
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
                 dateEstablished: organisationUnit.value?.dateEstablished,
+                dateDissolved: organisationUnit.value?.dateDissolved,
+                active: organisationUnit.value?.active,
+                numberOfEmployees: organisationUnit.value?.numberOfEmployees,
                 postalAddress: organisationUnit.value?.postalAddress
             };
 

@@ -77,6 +77,7 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import PublicationTypeTransferService from '@/services/PublicationTypeTransferService';
 import { useRouter } from 'vue-router';
 import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil.js';
 
 
 export default defineComponent({
@@ -147,7 +148,7 @@ export default defineComponent({
                     }
 
                     if (proceedingsResponse.documentDate) {
-                        availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number });
+                        availableProceedings.value.push({title: `${title} | ${localiseFlexibleDate(proceedingsResponse.documentDate)}`, value: proceedingsResponse.id as number });
                     } else {
                         availableProceedings.value.push({title: title as string, value: proceedingsResponse.id as number });
                     }
@@ -169,7 +170,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
+            const toSelect = {title: `${title} | ${localiseFlexibleDate(proceedings.documentDate)}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };

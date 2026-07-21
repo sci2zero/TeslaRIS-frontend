@@ -8,7 +8,7 @@
                     :items="publicationTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -41,8 +41,12 @@
         <v-row>
             <v-col>
                 <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetThesis?.title, languageTags)"></multilingual-text-input>
+                    ref="titleRef"
+                    v-model="title"
+                    :rules="requiredFieldRules"
+                    :label="$t('titleLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetThesis?.title, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -51,18 +55,17 @@
                     ref="subtitleRef"
                     v-model="subtitle"
                     :label="$t('subtitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetThesis?.subTitle, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field
-                    v-model="publicationYear" type="number" 
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                    :placeholder="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                    :rules="(canAddAsNonReference) ? [] : requiredFieldRules">
-                </v-text-field>
+                    :required="!canAddAsNonReference"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -71,14 +74,14 @@
                     v-model="topicAcceptanceDate"
                     :label="$t('topicAcceptanceDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
             <v-col v-show="!isOrganisationUnitDLClient || presetThesis?.publicReviewCompleted || isAdmin || isHeadOfLibrary" cols="6">
                 <date-picker
                     v-model="thesisDefenceDate"
                     :label="$t('defenceDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -87,8 +90,8 @@
                     ref="scientificAreaRef"
                     v-model="scientificArea"
                     :label="$t('scientificAreaLabel')"
-                    :initial-value="toMultilingualTextInput(presetThesis?.scientificArea, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetThesis?.scientificArea, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -97,13 +100,18 @@
                     ref="scientificSubAreaRef"
                     v-model="scientificSubArea"
                     :label="$t('scientificSubAreaLabel')"
-                    :initial-value="toMultilingualTextInput(presetThesis?.scientificSubArea, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetThesis?.scientificSubArea, languageTags)"
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field
+                    v-model="doi"
+                    label="DOI"
+                    placeholder="DOI"
+                    :rules="doiValidationRules"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -112,16 +120,16 @@
                     v-model="numberOfPages" type="number"
                     :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfPagesLabel')"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="numberOfChapters" type="number"
                     :label="$t('numberOfChaptersLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfChaptersLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfChaptersLabel')"
+                />
             </v-col>
             <v-col cols="4">
                 <v-text-field
@@ -328,11 +336,12 @@ import { useUserRole } from '@/composables/useUserRole';
 import DatePicker from '@/components/core/DatePicker.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,
@@ -451,7 +460,7 @@ export default defineComponent({
         const title = ref<any>([]);
         const externalOUName = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationYear = ref(props.presetThesis?.documentDate);
+        const publicationDate = ref(props.presetThesis?.documentDate);
         const doi = ref(props.presetThesis?.doi);
         const openAlexId = ref(props.presetThesis?.openAlexId);
         const webOfScienceId = ref(props.presetThesis?.webOfScienceId)
@@ -502,7 +511,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         )
                     ],
                     props.presetThesis?.id as number,
@@ -533,7 +543,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetThesis?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -592,7 +602,7 @@ export default defineComponent({
             numberOfIllustrations.value = props.presetThesis?.numberOfIllustrations as number;
             numberOfGraphs.value = props.presetThesis?.numberOfGraphs as number;
             numberOfAppendices.value = props.presetThesis?.numberOfAppendices as number;
-            publicationYear.value = props.presetThesis?.documentDate;
+            publicationDate.value = props.presetThesis?.documentDate;
             doi.value = props.presetThesis?.doi;
             openAlexId.value = props.presetThesis?.openAlexId;
             webOfScienceId.value = props.presetThesis?.webOfScienceId;
@@ -626,7 +636,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle, urisRef,
-            publicationYear, doi, message, snackbar, isAdmin,
+            publicationDate, doi, message, snackbar, isAdmin,
             numberOfPages, selectedPublisher, languageTagsList,
             uris, requiredFieldRules, requiredSelectionRules,
             submit, toMultilingualTextInput, selectedWritingLanguage,

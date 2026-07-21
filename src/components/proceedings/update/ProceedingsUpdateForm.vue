@@ -25,11 +25,10 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field
-                            v-model="publicationYear"
-                            :rules="requiredFieldRules"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel')"
+                            required
                         />
                     </v-col>
                 </v-row>
@@ -224,11 +223,12 @@ import PublisherService from '@/services/PublisherService';
 import { watch } from 'vue';
 import ProceedingsService from '@/services/ProceedingsService';
 import Toast from '@/components/core/Toast.vue';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "ProceedingsUpdateForm",
-    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast },
+    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, FlexibleDatePicker },
     props: {
         presetProceedings: {
             type: Object as PropType<Proceedings | undefined>,
@@ -322,7 +322,7 @@ export default defineComponent({
         const eIsbn = ref(props.presetProceedings?.eISBN);
         const printIsbn = ref(props.presetProceedings?.printISBN);
         const numberOfPages = ref(props.presetProceedings?.numberOfPages);
-        const publicationYear = ref(props.presetProceedings?.documentDate);
+        const publicationDate = ref(props.presetProceedings?.documentDate);
         const doi = ref(props.presetProceedings?.doi);
         const openAlexId = ref(props.presetProceedings?.openAlexId);
         const webOfScienceId = ref(props.presetProceedings?.webOfScienceId);
@@ -391,7 +391,7 @@ export default defineComponent({
                 title: title.value,
                 uris: uris.value as string[],
                 contributions: props.presetProceedings?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
@@ -428,7 +428,7 @@ export default defineComponent({
             eIsbn.value = props.presetProceedings?.eISBN;
             printIsbn.value = props.presetProceedings?.printISBN;
             numberOfPages.value = props.presetProceedings?.numberOfPages;
-            publicationYear.value = props.presetProceedings?.documentDate;
+            publicationDate.value = props.presetProceedings?.documentDate;
             doi.value = props.presetProceedings?.doi;
             openAlexId.value = props.presetProceedings?.openAlexId;
             webOfScienceId.value = props.presetProceedings?.webOfScienceId;
@@ -446,7 +446,7 @@ export default defineComponent({
             isFormValid, isbnValidationRules, openAlexId,
             title, subtitle, selectedEvent, selectedJournal, uris,
             eIsbn, printIsbn, languageList, selectedLanguages,
-            languageTags, publicationYear, doi, scopus, numberOfPages, acronymRef,
+            languageTags, publicationDate, doi, scopus, numberOfPages, acronymRef,
             toMultilingualTextInput, publicationSeriesVolume, publicationSeriesIssue,
             selectedPublisher, selectedBookSeries, doiValidationRules, acronym,
             requiredFieldRules, validatePublicationSeriesSelection, webOfScienceId,

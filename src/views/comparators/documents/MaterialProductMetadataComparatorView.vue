@@ -231,7 +231,6 @@ export default defineComponent({
             bulkTransferFields(materialProduct1, materialProduct2, [
                 { fieldName: "internalNumber", emptyValue: "" },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "numberProduced", emptyValue: null },
                 { fieldName: "materialProductType", emptyValue: null, setEmpty: false }
             ]);
@@ -274,7 +273,6 @@ export default defineComponent({
         const updateLeft = (updatedInfo: MaterialProduct) => {
             leftMaterialProduct.value!.internalNumber = updatedInfo.internalNumber;
             leftMaterialProduct.value!.publisherId = updatedInfo.publisherId;
-            leftMaterialProduct.value!.authorReprint = updatedInfo.authorReprint;
             leftMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             leftMaterialProduct.value!.productUsers = updatedInfo.productUsers;
             leftMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;
@@ -292,7 +290,6 @@ export default defineComponent({
         const updateRight = (updatedInfo: MaterialProduct) => {
             rightMaterialProduct.value!.internalNumber = updatedInfo.internalNumber;
             rightMaterialProduct.value!.publisherId = updatedInfo.publisherId;
-            rightMaterialProduct.value!.authorReprint = updatedInfo.authorReprint;
             rightMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             rightMaterialProduct.value!.productUsers = updatedInfo.productUsers;
             rightMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;

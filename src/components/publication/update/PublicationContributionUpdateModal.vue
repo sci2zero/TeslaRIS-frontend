@@ -112,7 +112,10 @@ export default defineComponent({
                     isCorrespondingContributor: contribution.isCorrespondingContributor,
                     isBoardPresident: contribution.isBoardPresident ?? false,
                     employmentTitle: contribution.employmentTitle,
-                    personalTitle: contribution.personalTitle
+                    personalTitle: contribution.personalTitle,
+                    dateFrom: contribution.dateFrom,
+                    dateTo: contribution.dateTo,
+                    researchAreasId: contribution.researchAreasId
                 });
 
             });

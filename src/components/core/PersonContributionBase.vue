@@ -133,6 +133,38 @@
             </v-btn>
         </v-col>
     </v-row>
+    <v-row v-if="!basic">
+        <v-col>
+            <date-picker
+                v-model="dateFrom"
+                :label="$t('fromLabel')"
+                color="primary"
+            />
+        </v-col>
+        <v-col>
+            <date-picker
+                v-model="dateTo"
+                :label="$t('toLabel')"
+                color="primary"
+            />
+        </v-col>
+    </v-row>
+    <div v-if="!basic">
+        <h2
+            class="mt-5!">
+            {{ $t("researchAreasLabel") }}
+        </h2>
+        <v-row>
+            <v-col cols="12">
+                <research-areas-selection
+                    ref="researchAreasSelectionRef"
+                    :research-areas-hierarchy="presetResearchAreas"
+                    submit-on-click
+                    @update="saveResearchAreas"
+                />
+            </v-col>
+        </v-row>
+    </div>
     <!-- <v-row>
         <v-col>
             <multilingual-text-input
@@ -171,23 +203,29 @@ import { useRoute } from "vue-router";
 import { type PersonUserResponse } from "@/models/PersonUserModel";
 import { type AxiosResponse } from "axios";
 import PersonPublicationsTooltip from "../person/PersonPublicationsTooltip.vue";
+import { type ResearchArea } from "@/models/OrganisationUnitModel.js";
+import ResearchAreasSelection from "./ResearchAreasSelection.vue";
+import DatePicker from "./DatePicker.vue";
 
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip },
+    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip, ResearchAreasSelection, DatePicker },
     props: {
         basic: {
             type: Boolean,
             default: false
         },
         presetContributionValue: {
-            type: Object as PropType<{personId: number, description: MultilingualContent[], affiliationStatement: MultilingualContent[], selectedOtherName: string[], institutionIds: number[]}>,
+            type: Object as PropType<{personId: number, description: MultilingualContent[], affiliationStatement: MultilingualContent[], selectedOtherName: string[], institutionIds: number[], researchAreas: ResearchArea[], dateFrom: string, dateTo: string}>,
             default: () => ({
                 personId: -1,
                 description: [],
                 affiliationStatement: [],
-                selectedOtherName: []
+                selectedOtherName: [],
+                researchAreas: [],
+                dateFrom: "",
+                dateTo: ""
             })
         },
         allowExternalAssociate: {
@@ -234,6 +272,11 @@ export default defineComponent({
         const firstName = ref("");
         const middleName = ref("");
         const lastName = ref("");
+        const dateFrom = ref("");
+        const dateTo = ref("");
+
+        const presetResearchAreas = ref<ResearchArea[]>([]);
+        const researchAreaIds = ref<number[]>([]);
 
         const descriptionRef = ref<typeof MultilingualTextInput>();
         const affiliationStatementRef = ref<typeof MultilingualTextInput>();
@@ -386,11 +429,19 @@ export default defineComponent({
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
 
+                presetResearchAreas.value = props.presetContributionValue?.researchAreas as ResearchArea[];
+                researchAreaIds.value = props.presetContributionValue?.researchAreas?.map(researchArea => researchArea.id) as number[];
+                dateFrom.value = props.presetContributionValue.dateFrom;
+                dateTo.value = props.presetContributionValue.dateTo;
+
                 if (props.presetContributionValue.affiliationStatement?.length === 0) {
                     enterExternalOU.value = false;
                 }
 
-                const selectedPersonName = props.presetContributionValue.selectedOtherName[0] + (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
+                const selectedPersonName = 
+                    props.presetContributionValue.selectedOtherName[0] + 
+                    (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? 
+                        ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
                 firstName.value = props.presetContributionValue.selectedOtherName[0];
@@ -406,9 +457,19 @@ export default defineComponent({
                         personOtherNames.value = [{title: selectedPerson.value.title, value: personResponse.data.personName}];
                         personResponse.data.personOtherNames.forEach((otherName) => {
                             if (otherName.dateFrom) {
-                                personOtherNames.value.push({title: `${constructDisplayName(otherName)} | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}`, value: otherName as PersonName});
+                                personOtherNames.value.push(
+                                    {
+                                        title: `${constructDisplayName(otherName)} | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}`, 
+                                        value: otherName as PersonName
+                                    }
+                                );
                             } else {
-                                personOtherNames.value.push({title: `${constructDisplayName(otherName)}`, value: otherName as PersonName});
+                                personOtherNames.value.push(
+                                    {
+                                        title: `${constructDisplayName(otherName)}`,
+                                        value: otherName as PersonName
+                                    }
+                                );
                             }
                         });
 
@@ -472,7 +533,12 @@ export default defineComponent({
 
                 selectedOtherName.value = personOtherNames.value[0];
                 response.data.personOtherNames.forEach((otherName) => {
-                    personOtherNames.value.push({title: `${constructDisplayName(otherName)}` + (otherName.dateFrom ? ` | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}` : ""), value: otherName as PersonName})
+                    personOtherNames.value.push(
+                        {
+                            title: `${constructDisplayName(otherName)}` + (otherName.dateFrom ? ` | ${otherName.dateFrom} - ${otherName.dateTo ? otherName.dateTo : "*"}` : ""),
+                            value: otherName as PersonName
+                        }
+                    )
                 });
 
                 sendContentToParent();
@@ -587,14 +653,21 @@ export default defineComponent({
                 description: contributionDescription.value,
                 affiliationStatement: unmangedAffiliations ? affiliationStatement.value : [],
                 selectedOtherName: otherName,
-                institutionIds: unmangedAffiliations ? [] : selectedAffiliations.value.map(affiliation => affiliation.value)
+                institutionIds: unmangedAffiliations ? [] : selectedAffiliations.value.map(affiliation => affiliation.value),
+                dateFrom: dateFrom.value,
+                dateTo: dateTo.value,
+                researchAreasId: researchAreaIds.value
             };
             
             emit("setInput", returnObject);
         };
 
-        watch(contributionDescription, () => sendContentToParent());
-        watch(affiliationStatement, () => sendContentToParent());
+        watch([
+                contributionDescription, affiliationStatement,
+                dateFrom, dateTo
+            ], 
+            () => sendContentToParent()
+        );
 
         watch(selectedPerson, () => {
             if (!selectedPerson.value || selectedPerson.value.value <= 0) {
@@ -656,7 +729,8 @@ export default defineComponent({
                     if(latestAffiliationResponse.data) {
                         selectedAffiliations.value.push(
                             {
-                                title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, value: latestAffiliationResponse.data.organisationUnitId as number
+                                title: returnCurrentLocaleContent(latestAffiliationResponse.data.organisationUnitName) as string, 
+                                value: latestAffiliationResponse.data.organisationUnitId as number
                             }
                         );
                     }
@@ -678,7 +752,10 @@ export default defineComponent({
         };
 
         const selectNewlyAddedPerson = (person: BasicPerson) => {
-            const toSelect = {title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? localiseDate(person.localBirthDate) : i18n.t("unknownBirthdateMessage")}`, value: person.id as number};
+            const toSelect = {
+                title: `${person.personName.firstname} ${person.personName.otherName} ${person.personName.lastname} | ${person.localBirthDate ? localiseDate(person.localBirthDate) : i18n.t("unknownBirthdateMessage")}`, 
+                value: person.id as number
+            };
             persons.value.push(toSelect);
             selectedPerson.value = toSelect;
             personOtherNames.value = [{title: selectedPerson.value.title.split("|")[0], value: -1}];
@@ -781,6 +858,11 @@ export default defineComponent({
             sendContentToParent();
         });
 
+        const saveResearchAreas = (newResearchAreaIds: number[]) => {
+            researchAreaIds.value = newResearchAreaIds;
+            sendContentToParent();
+        };
+
         return {
             firstName, middleName, lastName, selectedPerson, customNameInput,
             searchPersons, filterPersons, persons, requiredFieldRules,
@@ -793,7 +875,8 @@ export default defineComponent({
             PersonSubmissionForm, enterExternalOU, canUserAddPersons,
             constructExternalCollaboratorFromInput, onAutocompleteBlur,
             presetPersonNameForCreation, setContributor, selectExistingSelectedPerson,
-            externalInstitutionSuggestions, returnCurrentLocaleContent
+            externalInstitutionSuggestions, returnCurrentLocaleContent,
+            dateFrom, dateTo, presetResearchAreas, saveResearchAreas
         };
     }
 });

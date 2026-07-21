@@ -97,10 +97,8 @@ export default defineComponent({
                     return "thesisLandingPage";
                 case "INTANGIBLE_PRODUCT":
                     return "intangibleProductLandingPage";
-                case "PATENT":
-                    return "patentLandingPage";
-                case "DATASET":
-                    return "datasetLandingPage";
+                case "INTELLECTUAL_PROPERTY":
+                    return "intellectualPropertyLandingPage";
                 case "MATERIAL_PRODUCT":
                     return "materialProductLandingPage";
                 case "GENETIC_MATERIAL":

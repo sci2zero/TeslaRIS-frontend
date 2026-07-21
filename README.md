@@ -11,3 +11,7 @@ In order to install and run the project simply follow these instructions:
 # Codestyle and formatting
 
 Due to different codestyle and code formatting tool configurations it is possible to have conflicting rule configurations with our eslint configuration. Therefore, it is strongly advised to run `npm run lint-autofix` before pushing or opening a PR in order to avoid the possibility of failing the GitHub Actions pipeline.
+
+## Acknowledgement
+
+This project has received funding from the European Union’s Horizon Europe research and innovation programme under grant agreement No 101094406 (RDA TIGER).

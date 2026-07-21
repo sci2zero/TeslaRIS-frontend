@@ -16,8 +16,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -31,20 +31,18 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
 
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field
-                            v-model="publicationYear"
-                            type="number"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules">
-                        </v-text-field>
+                            required
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -56,7 +54,7 @@
                             :rules="requiredSelectionRules"
                             :disabled="inModal"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -64,15 +62,19 @@
                         <v-text-field
                             v-model="intangibleProductNumber"
                             :label="$t('internalNumberLabel')"
-                            :placeholder="$t('internalNumberLabel')">
-                        </v-text-field>
+                            :placeholder="$t('internalNumberLabel')"
+                        />
                     </v-col>
                 </v-row>
 
                 <v-row>
                     <v-col>
                         <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution ref="contributionsRef" basic @set-input="contributions = $event"></person-publication-contribution>
+                        <person-publication-contribution
+                            ref="contributionsRef"
+                            basic
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
 
@@ -85,8 +87,8 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -95,8 +97,8 @@
                                 ref="descriptionRef"
                                 v-model="description"
                                 is-area
-                                :label="$t('abstractLabel')">
-                            </multilingual-text-input>
+                                :label="$t('abstractLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -105,13 +107,13 @@
                                 ref="keywordsRef"
                                 v-model="keywords"
                                 :label="$t('keywordsLabel')"
-                                is-area>
-                            </multilingual-text-input>
+                                is-area
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -119,8 +121,8 @@
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
                                 v-model="selectedPublisher"
-                                allow-author-reprint>
-                            </publisher-autocomplete-search>
+                                allow-author-reprint
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -137,16 +139,16 @@
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -154,8 +156,8 @@
                             <multilingual-text-input
                                 ref="usersRef"
                                 v-model="productUsers"
-                                :label="$t('productUsersLabel')">
-                            </multilingual-text-input>
+                                :label="$t('productUsersLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <h2 class="mt-5!">
@@ -203,7 +205,7 @@ import { PublicationType, type PersonDocumentContribution, type IntangibleProduc
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
 import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -212,11 +214,12 @@ import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getIntangibleProductTypesForGivenLocale } from '@/i18n/intangibleProductType';
 import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitIntangibleProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -256,7 +259,7 @@ export default defineComponent({
         const keywords = ref<any[]>([]);
         const productUsers = ref<any>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const openAlexId = ref("");
         const scopus = ref("");
@@ -293,7 +296,7 @@ export default defineComponent({
                 subTitle: subtitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
@@ -320,7 +323,7 @@ export default defineComponent({
                     keywordsRef.value?.clearInput();
                     urisRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
@@ -363,10 +366,10 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
-            if (contributions.value.length === 0) {
+            if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
                 contributions.value = metadata.contributions;
                 contributionsRef.value?.fillDummyAuthors(contributions.value.length);
 
@@ -375,7 +378,7 @@ export default defineComponent({
                 contributionsRef.value?.fillInputs(contributions.value, true);
             }
 
-            if (keywords.value.length === 0) {
+            if (keywords.value.length === 0 && metadata.keywords.length !== 0) {
                 additionalFields.value = true;
                 await nextTick();
                 
@@ -392,7 +395,7 @@ export default defineComponent({
             isFormValid, scopusIdValidationRules,
             additionalFields, snackbar, error,
             title, titleRef, subtitle, subtitleRef,
-            publicationYear, doi, PublicationType,
+            publicationDate, doi, PublicationType,
             publisherAutocompleteRef, popuateMetadata,
             selectedPublisher, intangibleProductNumber, openAlexId,
             description, descriptionRef, doiValidationRules,

@@ -224,7 +224,6 @@ export default defineComponent({
                 { fieldName: "documentDate", emptyValue: null, setEmpty: false },
                 { fieldName: "internalNumber", emptyValue: "" },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false },
-                { fieldName: "authorReprint", emptyValue: null, setEmpty: false },
                 { fieldName: "intangibleProductType", emptyValue: null, setEmpty: false }
             ]);
 
@@ -266,7 +265,6 @@ export default defineComponent({
         const updateLeft = (updatedInfo: IntangibleProduct) => {
             leftIntangibleProduct.value!.internalNumber = updatedInfo.internalNumber;
             leftIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
-            leftIntangibleProduct.value!.authorReprint = updatedInfo.authorReprint;
             leftIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             leftIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
             leftIntangibleProduct.value!.researchAreasId =
@@ -283,7 +281,6 @@ export default defineComponent({
         const updateRight = (updatedInfo: IntangibleProduct) => {
             rightIntangibleProduct.value!.internalNumber = updatedInfo.internalNumber;
             rightIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
-            rightIntangibleProduct.value!.authorReprint = updatedInfo.authorReprint;
             rightIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             rightIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
             rightIntangibleProduct.value!.researchAreasId =

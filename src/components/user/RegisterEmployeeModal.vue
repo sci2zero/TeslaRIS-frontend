@@ -21,21 +21,21 @@
                                         v-model="name"
                                         :label="(registeringCommission ? $t('nameLabel') : $t('firstNameLabel')) + '*'"
                                         :rules="requiredFieldRules"
-                                    ></v-text-field>
+                                    />
                                 </v-col>
                                 <v-col v-if="!registeringCommission" cols="12">
                                     <v-text-field
                                         v-model="surname"
                                         :label="$t('surnameLabel') + '*'"
                                         :rules="requiredFieldRules"
-                                    ></v-text-field>
+                                    />
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                         v-model="email"
                                         :label="$t('emailLabel') + '*'"
                                         :rules="emailFieldRules"
-                                    ></v-text-field>
+                                    />
                                 </v-col>
                                 <v-col cols="12">
                                     <v-select
@@ -43,7 +43,7 @@
                                         :label="$t('preferredLanguageLabel') + '*'"
                                         :items="languages"
                                         return-object
-                                    ></v-select>
+                                    />
                                 </v-col>
                                 <v-col cols="12">
                                     <organisation-unit-autocomplete-search
@@ -52,21 +52,21 @@
                                         required
                                         disable-submission
                                         :only-client-institutions-cris="!fetchOnlyDlClients"
-                                        :only-client-institutions-dl="fetchOnlyDlClients">
-                                    </organisation-unit-autocomplete-search>
+                                        :only-client-institutions-dl="fetchOnlyDlClients"
+                                    />
                                 </v-col>
                                 <v-col v-if="registeringCommission" cols="12">
                                     <commission-autocomplete-search
                                         ref="commissionAutocompleteRef"
                                         v-model="selectedCommission"
-                                        required>
-                                    </commission-autocomplete-search>
+                                        required
+                                    />
                                 </v-col>
                                 <v-col cols="12">
                                     <v-textarea
                                         v-model="note"
                                         :label="$t('noteLabel')"
-                                    ></v-textarea>
+                                    />
                                 </v-col>
                             </v-row>
                         </v-form>

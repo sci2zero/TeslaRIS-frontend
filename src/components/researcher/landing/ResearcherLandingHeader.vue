@@ -543,11 +543,11 @@
                                     >
                                         <div class="font-medium text-gray-900">
                                             <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
-                                            {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.affiliationStatement) }}
+                                            {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
                                         </div>
                                     </localized-link>
                                     <div v-else class="font-medium text-gray-900">
-                                        {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.affiliationStatement) }}
+                                        {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
                                     </div>
                                     <div v-if="employment.employmentPosition" class="text-sm text-gray-600">
                                         {{ getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition) }}
