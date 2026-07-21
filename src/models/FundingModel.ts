@@ -52,3 +52,18 @@ export interface FundingPart {
     organisationUnitProjectContributionId?: number;
 }
 
+export interface PrepopulatedFundingMetadata {
+    doi: string;
+    grantAgreementId: string;
+    name: MultilingualContent[];
+    nameAbbreviation: MultilingualContent[];
+    description: MultilingualContent[];
+    uris: string[];
+    dateAwarded: string;
+    dateFrom: string;
+    dateTo: string;
+    monetaryAmount: MonetaryAmount;
+    displayFunder: MultilingualContent[];
+    funderDoi: string;
+}
+

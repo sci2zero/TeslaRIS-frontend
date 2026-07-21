@@ -2,15 +2,11 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="10">
-
-                <!-- DOI -->
                 <v-row>
-                    <v-col cols="10">
-                        <v-text-field
-                            v-model="doi"
-                            label="DOI"
-                            placeholder="DOI"
-                            :rules="doiValidationRules"
+                    <v-col cols="12">
+                        <i-d-f-funding-metadata-prepopulator
+                            @metadata-fetched="populateMetadata"
+                            @update:doi="(value: string) => doi = value"
                         />
                     </v-col>
                 </v-row>
@@ -81,6 +77,7 @@
                     </v-col>
                 </v-row>
 
+                <!-- Monetary Amount -->
                 <monetary-amount-input
                     ref="monetaryAmountRef"
                     v-model="amount"
@@ -192,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import {ref, computed, nextTick} from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
@@ -203,9 +200,10 @@ import FundingService from '@/services/project/FundingService';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
-import type {Funding, FundingType} from "@/models/FundingModel";
+import type {Funding, FundingType, PrepopulatedFundingMetadata} from "@/models/FundingModel";
 import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
 import type { MonetaryAmount } from "@/models/Common";
+import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
 
 const emit = defineEmits(["create"]);
 
@@ -242,6 +240,7 @@ const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const amount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
+const displayFunder = ref<any[]>([]);
 
 const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 
@@ -249,10 +248,57 @@ const fundingTypes = computed(() => getFundingTypesForGivenLocale());
 
 const {
     requiredFieldRules,
-    doiValidationRules,
 } = useValidationUtils();
 
 const requiredSelectionRules = [(v: any[]) => v.length > 0 || i18n.t("requiredFieldMessage")];
+
+
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+
+const { languageTags } = useLanguageTags();
+
+const populateMetadata = async (metadata: PrepopulatedFundingMetadata) => {
+    if (name.value.length === 0 && metadata.name.length > 0) {
+        name.value = metadata.name;
+        nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    }
+
+    if (nameAbbreviation.value.length === 0 && metadata.nameAbbreviation.length > 0) {
+        nameAbbreviation.value = metadata.nameAbbreviation;
+        nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+    }
+
+    doi.value = doi.value ? doi.value : metadata.doi;
+    grantAgreementId.value = grantAgreementId.value ? grantAgreementId.value : metadata.grantAgreementId;
+
+    metadata.uris.forEach(uri => {
+        if (uri && !uris.value.includes(uri)) {
+            uris.value.push(uri);
+        }
+    });
+
+    dateFrom.value = dateFrom.value ? dateFrom.value : (metadata.dateFrom ?? "");
+    dateTo.value = dateTo.value ? dateTo.value : (metadata.dateTo ?? "");
+    dateAwarded.value = dateAwarded.value ? dateAwarded.value : (metadata.dateAwarded ?? "");
+
+    if (!amount.value && metadata.monetaryAmount) {
+        monetaryAmountRef.value?.setValue(metadata.monetaryAmount);
+        amount.value = metadata.monetaryAmount;
+    }
+
+    if (description.value.length === 0 && metadata.description.length > 0) {
+        additionalFields.value = true;
+        await nextTick();
+
+        description.value = metadata.description;
+        descriptionRef.value?.forceRefreshModelValue(toMultilingualTextInput(description.value, languageTags.value));
+    }
+
+    if (displayFunder.value.length === 0 && metadata.displayFunder.length > 0) {
+        displayFunder.value = metadata.displayFunder;
+    }
+};
 
 const submitFunding = (stayOnPage: boolean) => {
     const newFunding: Funding = {

@@ -73,11 +73,17 @@ const clearInput = () => {
     selectedCurrency.value = null;
 };
 
+const setValue = (value: MonetaryAmount | undefined) => {
+    amountInput.value = value?.amount ?? null;
+    selectedCurrency.value = value?.currencyId ?? null;
+    emitValue();
+};
+
 onMounted(() => {
     CurrencyService.getAllCurrencies().then((response) => {
         currencies.value = response.data;
     });
 });
 
-defineExpose({ clearInput });
+defineExpose({ clearInput, setValue });
 </script>
