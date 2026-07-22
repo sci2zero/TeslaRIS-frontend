@@ -6,15 +6,15 @@
                     v-model="doi"
                     label="DOI"
                     placeholder="DOI"
-                    :rules="doiValidationRules">
-                </v-text-field>
+                    :rules="doiValidationRules"
+                />
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="grantAgreementId"
                     :label="$t('grantAgreementIdLabel')"
-                    :placeholder="$t('grantAgreementIdLabel')">
-                </v-text-field>
+                    :placeholder="$t('grantAgreementIdLabel')"
+                />
             </v-col>
         </v-row>
 
@@ -28,8 +28,8 @@
                     item-value="value"
                     multiple
                     chips
-                    closable-chips>
-                </v-select>
+                    closable-chips
+                />
             </v-col>
         </v-row>
 
@@ -38,15 +38,15 @@
                 <date-picker
                     v-model="dateFrom"
                     :label="$t('dateFromLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="dateTo"
                     :label="$t('dateToLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
         </v-row>
 
@@ -55,15 +55,15 @@
                 <date-picker
                     v-model="dateSubmitted"
                     :label="$t('dateSubmittedLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="dateAwarded"
                     :label="$t('dateAwardedLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
         </v-row>
 
@@ -73,8 +73,8 @@
                     ref="displayFunderRef"
                     v-model="displayFunder"
                     :label="$t('funderLabel')"
-                    :initial-value="toMultilingualTextInput(presetFunding?.displayFunder, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayFunder, languageTags)"
+                />
             </v-col>
         </v-row>
 
@@ -84,8 +84,8 @@
                     ref="displayCallRef"
                     v-model="displayCall"
                     :label="$t('fundingCallLabel')"
-                    :initial-value="toMultilingualTextInput(presetFunding?.displayCall, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayCall, languageTags)"
+                />
             </v-col>
         </v-row>
 
@@ -95,8 +95,8 @@
                     ref="displayProgramRef"
                     v-model="displayProgram"
                     :label="$t('fundingProgramLabel')"
-                    :initial-value="toMultilingualTextInput(presetFunding?.displayProgram, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetFunding?.displayProgram, languageTags)"
+                />
             </v-col>
         </v-row>
 
@@ -105,14 +105,14 @@
                 <monetary-amount-input
                     ref="amountRef"
                     :preset-amount="props.presetFunding?.amount"
-                    @update:model-value="amount = $event">
-                </monetary-amount-input>
+                    @update:model-value="amount = $event"
+                />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
 
@@ -122,15 +122,15 @@
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
                     color="primary"
-                    hide-details>
-                </v-switch>
+                    hide-details
+                />
             </v-col>
             <v-col v-if="oaMandated" cols="6">
                 <v-text-field
                     v-model="oaMandateUrl"
                     :label="$t('oaMandateUrlLabel')"
-                    :placeholder="$t('oaMandateUrlLabel')">
-                </v-text-field>
+                    :placeholder="$t('oaMandateUrlLabel')"
+                />
             </v-col>
         </v-row>
 
@@ -140,16 +140,16 @@
                     v-model="competitive"
                     :label="$t('competitiveLabel')"
                     color="primary"
-                    hide-details>
-                </v-switch>
+                    hide-details
+                />
             </v-col>
             <v-col cols="6">
                 <v-switch
                     v-model="renewable"
                     :label="$t('renewableLabel')"
                     color="primary"
-                    hide-details>
-                </v-switch>
+                    hide-details
+                />
             </v-col>
         </v-row>
 

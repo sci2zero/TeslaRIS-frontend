@@ -6,8 +6,8 @@
                 v-model="doi"
                 label="DOI"
                 placeholder="DOI"
-                :rules="doiValidationRules">
-            </v-text-field>
+                :rules="doiValidationRules"
+            />
             <p v-if="errorMessage" class="text-red ml-1">
                 {{ errorMessage }}
             </p>
@@ -17,7 +17,7 @@
                 color="primary"
                 indeterminate
                 class="mt-3"
-            ></v-progress-circular>
+            />
         </v-col>
     </v-row>
 </template>

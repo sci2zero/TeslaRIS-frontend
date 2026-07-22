@@ -30,7 +30,7 @@
                             :label="$t('fundingLabel')"
                             :required="true"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -40,7 +40,7 @@
                             type="number"
                             :label="$t('projectEventLabel')"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -50,7 +50,7 @@
                             type="number"
                             :label="$t('projectDocumentLabel')"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -60,7 +60,7 @@
                             type="number"
                             :label="$t('fundingApplicationLabel')"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -70,7 +70,7 @@
                             type="number"
                             :label="$t('personProjectContributionLabel')"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -80,7 +80,7 @@
                             type="number"
                             :label="$t('organisationUnitProjectContributionLabel')"
                             clearable
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
             </v-col>

@@ -25,7 +25,7 @@
                             color="primary"
                         >
                             <template #prepend>
-                                <v-icon icon="mdi-cash-multiple"></v-icon>
+                                <v-icon icon="mdi-cash-multiple" />
                             </template>
 
                             <v-list-item-title>
@@ -42,7 +42,7 @@
                                         <v-btn
                                             icon variant="outlined" size="x-small" color="primary"
                                             class="inline-action" @click="sendDeleteRequestToParent(fundingPart.id)">
-                                            <v-icon size="x-large" icon="mdi-delete"></v-icon>
+                                            <v-icon size="x-large" icon="mdi-delete" />
                                         </v-btn>
                                     </v-col>
                                     <v-col v-if="!disableUpdates">
