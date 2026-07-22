@@ -4,7 +4,7 @@
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
+                    <v-card-title class="text-h5 text-center edit-pen-container">
                         <v-skeleton-loader
                             :loading="!fundingProgram"
                             type="heading"
@@ -12,6 +12,18 @@
                             class="text-center"
                         >
                             <rich-title-renderer :title="title" />
+                            <div>
+                                <generic-crud-modal
+                                    class="mb-6"
+                                    :form-component="AlternateNameForm"
+                                    :form-props="{ presetName: fundingProgram?.name, presetNameAbbreviation: fundingProgram?.nameAbbreviation }"
+                                    entity-name="Name"
+                                    is-update
+                                    is-section-update
+                                    :read-only="!canEdit"
+                                    @update="updateName"
+                                />
+                            </div>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -30,7 +42,17 @@
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text>
+                    <v-card-text class="edit-pen-container">
+                        <generic-crud-modal
+                            :form-component="FundingProgramUpdateForm"
+                            :form-props="{ presetFundingProgram: fundingProgram }"
+                            entity-name="FundingProgram"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            @update="updateBasicInfo"
+                        />
+
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
@@ -106,7 +128,10 @@
                     <v-col cols="12">
                         <attachment-list
                             :attachments="fundingProgram?.fileItems ? fundingProgram.fileItems : []"
-                            :can-edit="false"
+                            :can-edit="canEdit"
+                            @create="addDocument($event)"
+                            @delete="deleteDocument($event)"
+                            @update="updateDocument($event)"
                         />
                     </v-col>
                 </v-row>
@@ -116,22 +141,34 @@
                 <!-- Keywords -->
                 <keyword-list
                     :keywords="fundingProgram?.keywords ? fundingProgram.keywords : []"
-                    :can-edit="false"
-                    @search-keyword="searchKeyword($event)">
+                    :can-edit="canEdit"
+                    @search-keyword="searchKeyword($event)"
+                    @update="updateKeywords">
                 </keyword-list>
 
                 <!-- Description -->
                 <description-section
                     is-general-description
                     :description="fundingProgram?.description"
-                    :can-edit="false"
+                    :can-edit="canEdit"
+                    @update="updateDescription"
                 />
 
                 <!-- Objectives -->
                 <v-row>
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text>
+                            <v-card-text class="edit-pen-container">
+                                <generic-crud-modal
+                                    :form-component="DescriptionOrBiographyUpdateForm"
+                                    :form-props="{ presetDescriptionOrBiography: fundingProgram?.objectives ? fundingProgram.objectives : [], placeholderLabel: $t('objectivesLabel') }"
+                                    entity-name="Objectives"
+                                    is-update
+                                    is-section-update
+                                    :read-only="!canEdit"
+                                    @update="updateObjectives"
+                                />
+
                                 <div><b>{{ $t("objectivesLabel") }}</b></div>
                                 <strong v-if="!fundingProgram?.objectives || fundingProgram.objectives.length === 0">{{ $t("notYetSetMessage") }}</strong>
                                 <rich-text-editor v-model="objectivesDisplay" :editable="false"></rich-text-editor>
@@ -144,7 +181,13 @@
                 <v-row>
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text>
+                            <v-card-text class="edit-pen-container">
+                                <research-areas-update-modal
+                                    :research-areas-hierarchy="fundingProgram?.researchAreas"
+                                    :read-only="!canEdit"
+                                    @update="updateResearchAreas"
+                                />
+
                                 <div class="mb-2"><b>{{ $t("researchAreasLabel") }}</b></div>
                                 <research-area-hierarchy
                                     :research-areas="fundingProgram?.researchAreas"
@@ -155,6 +198,7 @@
                 </v-row>
             </v-tabs-window-item>
         </v-tabs-window>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
@@ -167,23 +211,42 @@ import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import RichTextEditor from "@/components/core/RichTextEditor.vue";
 import ResearchAreaHierarchy from "@/components/core/ResearchAreaHierarchy.vue";
+import ResearchAreasUpdateModal from "@/components/core/ResearchAreasUpdateModal.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import FundingProgramService from "@/services/project/FundingProgramService";
 import type { FundingProgram, FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
+import Toast from "@/components/core/Toast.vue";
+import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
+import { useLoginStore } from "@/stores/loginStore";
+import { useUploadStore } from "@/stores/uploadStore";
+import type { DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
+import DescriptionOrBiographyUpdateForm from "@/components/core/update/DescriptionOrBiographyUpdateForm.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from "@/utils/DateUtil";
+import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
+import FundingProgramUpdateForm from "@/components/project/FundingProgramUpdateForm.vue";
 
 const route = useRoute();
 const router = useRouter();
+const i18n = useI18n();
 const { locale } = useI18n();
 
 const fundingProgram = ref<FundingProgram>();
 const currentTab = ref("documents");
 const icon = ref("mdi-cash");
+
+const snackbar = ref(false);
+const snackbarMessage = ref("");
+
+const canEdit = ref(false);
+const loginStore = useLoginStore();
+
+const uploadStore = useUploadStore();
 
 const objectivesDisplay = ref("");
 
@@ -207,14 +270,114 @@ const fetchFundingProgram = async () => {
             parseInt(route.params.id as string)
         );
         fundingProgram.value = response.data;
+
+        if (loginStore.userLoggedIn) {
+            checkIfUserCanEdit();
+        }
     } catch (error) {
         console.error("Error fetching funding program:", error);
         await router.push({ name: "notFound" });
     }
 };
 
+const checkIfUserCanEdit = () => {
+    FundingProgramService.canEdit(parseInt(route.params.id as string)).then((response) => {
+        canEdit.value = response.data;
+    }).catch(() => canEdit.value = false);
+};
+
 const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
+};
+
+const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
+    fundingProgram.value!.name = nameInformation.name;
+    fundingProgram.value!.nameAbbreviation = nameInformation.nameAbbreviation;
+    performUpdate(true);
+};
+
+const updateKeywords = (keywords: MultilingualContent[]) => {
+    fundingProgram.value!.keywords = keywords;
+    performUpdate(true);
+};
+
+const updateDescription = (description: MultilingualContent[]) => {
+    fundingProgram.value!.description = description;
+    performUpdate(true);
+};
+
+const updateObjectives = (objectives: MultilingualContent[]) => {
+    fundingProgram.value!.objectives = objectives;
+    performUpdate(true);
+};
+
+const updateResearchAreas = (researchAreaIds: number[]) => {
+    fundingProgram.value!.researchAreasId = researchAreaIds;
+    performUpdate(true);
+};
+
+const updateBasicInfo = (basicInfo: FundingProgram) => {
+    fundingProgram.value = { ...fundingProgram.value, ...basicInfo };
+    performUpdate(true);
+};
+
+const performUpdate = (reload: boolean) => {
+    if (fundingProgram.value?.totalAmount && fundingProgram.value.totalAmount.amount <= 0) {
+        fundingProgram.value.totalAmount = undefined;
+    }
+
+    FundingProgramService.updateFundingProgram(fundingProgram.value?.id as number, fundingProgram.value as FundingProgram).then(() => {
+        snackbarMessage.value = i18n.t("updatedSuccessMessage");
+        snackbar.value = true;
+        if (reload) {
+            fetchFundingProgram();
+        }
+    }).catch(() => {
+        snackbarMessage.value = i18n.t("genericErrorMessage");
+        snackbar.value = true;
+        fetchFundingProgram();
+    });
+};
+
+const addDocument = (attachment: DocumentFile) => {
+    if (uploadStore.isUploading) {
+        return;
+    }
+    uploadStore.uploadProgressRef?.startUpload(attachment.file.name);
+
+    FundingProgramService.addDocument(fundingProgram.value?.id as number, attachment).then((response) => {
+        fundingProgram.value?.fileItems?.push(response.data);
+        uploadStore.uploadProgressRef?.updateProgress(100);
+    }).catch(() => {
+        uploadStore.uploadProgressRef?.cancelUpload(true);
+    });
+};
+
+const deleteDocument = (attachmentId: number) => {
+    FundingProgramService.deleteDocument(fundingProgram.value?.id as number, attachmentId).then(() => {
+        fundingProgram.value!.fileItems = fundingProgram.value?.fileItems?.filter(a => a.id !== attachmentId) ?? [];
+    });
+};
+
+const updateDocument = (attachment: DocumentFile) => {
+    if (uploadStore.isUploading) {
+        return;
+    }
+
+    if ((attachment.file?.size ?? 0) > 0) {
+        uploadStore.uploadProgressRef?.startUpload(attachment.file.name);
+    }
+
+    FundingProgramService.updateDocument(attachment).then((response) => {
+        fundingProgram.value!.fileItems = fundingProgram.value?.fileItems?.filter(a => a.id !== attachment.id) ?? [];
+        fundingProgram.value?.fileItems?.push(response.data);
+
+        if ((attachment.file?.size ?? 0) > 0) {
+            uploadStore.uploadProgressRef?.updateProgress(100);
+        }
+    }).catch(() => {
+        uploadStore.uploadProgressRef?.cancelUpload(true);
+    });
 };
 </script>
 
@@ -227,5 +390,9 @@ const searchKeyword = (keyword: string) => {
     font-size: 1.2rem;
     margin-bottom: 10px;
     font-weight: bold;
+}
+
+.edit-pen-container {
+    position: relative;
 }
 </style>
