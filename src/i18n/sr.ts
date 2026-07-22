@@ -1540,4 +1540,6 @@ export default {
     fundingProgramsLabel: "Programi finansiranja",
     objectivesLabel: "Ciljevi",
     totalAmountLabel: "Ukupan iznos",
+    updateObjectivesLabel: "Ažuriraj ciljeve",
+    updateFundingProgramLabel: "Ažuriraj program finansiranja",
 }
