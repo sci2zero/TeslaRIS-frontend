@@ -5,8 +5,8 @@
                 <organisation-unit-autocomplete-search
                     v-model="selectedFunder"
                     label="funderLabel"
-                    required>
-                </organisation-unit-autocomplete-search>
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -20,8 +20,8 @@
                     item-value="value"
                     multiple
                     chips
-                    closable-chips>
-                </v-select>
+                    closable-chips
+                />
             </v-col>
         </v-row>
 
@@ -30,15 +30,15 @@
                 <date-picker
                     v-model="dateFrom"
                     :label="$t('dateFromLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="dateTo"
                     :label="$t('dateToLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary"
+                />
             </v-col>
         </v-row>
 
@@ -47,14 +47,14 @@
                 <monetary-amount-input
                     ref="totalAmountRef"
                     :preset-amount="props.presetFundingProgram?.totalAmount"
-                    @update:model-value="totalAmount = $event">
-                </monetary-amount-input>
+                    @update:model-value="totalAmount = $event"
+                />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
 
@@ -64,15 +64,15 @@
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
                     color="primary"
-                    hide-details>
-                </v-switch>
+                    hide-details
+                />
             </v-col>
             <v-col v-if="oaMandated" cols="6">
                 <v-text-field
                     v-model="oaMandateUrl"
                     :label="$t('oaMandateUrlLabel')"
-                    :placeholder="$t('oaMandateUrlLabel')">
-                </v-text-field>
+                    :placeholder="$t('oaMandateUrlLabel')"
+                />
             </v-col>
         </v-row>
 

@@ -32,8 +32,8 @@
                             ref="funderRef"
                             v-model="selectedFunder"
                             label="funderLabel"
-                            required>
-                        </organisation-unit-autocomplete-search>
+                            required
+                        />
                     </v-col>
                 </v-row>
 

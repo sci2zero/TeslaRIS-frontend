@@ -143,8 +143,8 @@
                     :keywords="fundingProgram?.keywords ? fundingProgram.keywords : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
@@ -171,7 +171,7 @@
 
                                 <div><b>{{ $t("objectivesLabel") }}</b></div>
                                 <strong v-if="!fundingProgram?.objectives || fundingProgram.objectives.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                                <rich-text-editor v-model="objectivesDisplay" :editable="false"></rich-text-editor>
+                                <rich-text-editor v-model="objectivesDisplay" :editable="false" />
                             </v-card-text>
                         </v-card>
                     </v-col>
