@@ -129,6 +129,7 @@ import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelated
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
 import SubmitFundingView from "@/views/SubmitFundingView.vue";
 import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
+import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
 
 
 const roles = {
@@ -280,6 +281,15 @@ const router = createRouter({
                             path: ":id",
                             name: "fundingProgramLandingPage",
                             component: FundingProgramLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding-program",
+                            name: "submitFundingProgram",
+                            component: SubmitFundingProgramView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],
