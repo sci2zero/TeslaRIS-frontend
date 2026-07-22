@@ -1,5 +1,6 @@
 import type {MonetaryAmount, MultilingualContent} from "@/models/Common";
 import type {DocumentFileResponse} from "@/models/DocumentFileModel";
+import type {ResearchArea} from "@/models/OrganisationUnitModel";
 
 export interface Funding {
     id?: number;
@@ -50,6 +51,27 @@ export interface FundingPart {
     fundingApplicationId?: number;
     personProjectContributionId?: number;
     organisationUnitProjectContributionId?: number;
+}
+
+export interface FundingProgram {
+    id?: number;
+    name: MultilingualContent[];
+    description: MultilingualContent[];
+    objectives: MultilingualContent[];
+    nameAbbreviation: MultilingualContent[];
+    keywords: MultilingualContent[];
+    researchAreasId: number[];
+    funderId: number;
+    fundingTypes: FundingType[];
+    totalAmount?: MonetaryAmount;
+    dateFrom?: string;
+    dateTo?: string;
+    uris: string[];
+    oaMandated?: boolean;
+    oaMandateUrl?: string;
+    fileItems: DocumentFileResponse[];
+    researchAreas: ResearchArea[];
+    funderName: MultilingualContent[];
 }
 
 export interface PrepopulatedFundingMetadata {

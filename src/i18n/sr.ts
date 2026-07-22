@@ -1538,4 +1538,6 @@ export default {
     fundingApplicationsLabel: "Zahtevi za finansiranje",
     fundingCallsLabel: "Pozivi za finansiranje",
     fundingProgramsLabel: "Programi finansiranja",
+    objectivesLabel: "Ciljevi",
+    totalAmountLabel: "Ukupan iznos",
 }

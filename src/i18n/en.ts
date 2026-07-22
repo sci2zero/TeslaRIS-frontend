@@ -1524,4 +1524,6 @@ export default {
     fundingApplicationsLabel: "Funding applications",
     fundingCallsLabel: "Funding calls",
     fundingProgramsLabel: "Funding programs",
+    objectivesLabel: "Objectives",
+    totalAmountLabel: "Total amount",
 }
