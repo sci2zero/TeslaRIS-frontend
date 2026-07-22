@@ -122,6 +122,8 @@ export default {
         performanceRelatedOutputLandingPage: "Performance related output details",
         fundingLandingPage: "Funding Details",
         submitFunding: "Submit Funding",
+        fundingApplicationLandingPage: "Funding Application Details",
+        submitFundingApplication: "Submit Funding Application",
     },
     emailLabel: "Email",
     passwordLabel: "Password",
