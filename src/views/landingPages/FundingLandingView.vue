@@ -313,6 +313,10 @@ const updateBasicInfo = (basicInfo: Funding) => {
 }
 
 const performUpdate = (reload: boolean) => {
+    if (funding.value?.amount && funding.value.amount.amount <= 0) {
+        funding.value.amount = undefined;
+    }
+
     FundingService.updateFunding(funding.value?.id as number, funding.value as Funding).then(() => {
         snackbarMessage.value = i18n.t("updatedSuccessMessage");
         snackbar.value = true;

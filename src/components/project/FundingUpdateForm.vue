@@ -101,23 +101,12 @@
         </v-row>
 
         <v-row>
-            <v-col cols="4">
-                <v-text-field
-                    v-model="amountValue"
-                    type="number"
-                    :label="$t('amountLabel')"
-                    :placeholder="$t('amountLabel')"
-                    :rules="optionalNumericZeroOrGreaterFieldRules">
-                </v-text-field>
-            </v-col>
-            <v-col cols="4">
-                <v-select
-                    v-model="selectedCurrency"
-                    :label="$t('currencyLabel')"
-                    :items="currencyOptions"
-                    item-title="title"
-                    item-value="value">
-                </v-select>
+            <v-col>
+                <monetary-amount-input
+                    ref="amountRef"
+                    :preset-amount="props.presetFunding?.amount"
+                    @update:model-value="amount = $event">
+                </monetary-amount-input>
             </v-col>
         </v-row>
 
@@ -173,43 +162,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type PropType } from 'vue';
+import { ref, computed, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
+import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
-import type { MultilingualContent } from '@/models/Common';
-import type { Funding, FundingType } from '@/models/FundingModel';
+import type { MonetaryAmount, MultilingualContent } from '@/models/Common';
+import type {Funding, FundingType} from '@/models/FundingModel';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
-import CurrencyService from '@/services/CurrencyService';
-import type { Currency } from '@/models/Common';
 
-const props = defineProps({
-    presetFunding: {
-        type: Object as PropType<Funding | undefined>,
-        required: true
-    }
-});
+const props = defineProps<{
+    presetFunding: Funding | undefined;
+}>();
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{
+    (e: "update", payload: any): void;
+}>();
 
 const isFormValid = ref(false);
 const { languageTags } = useLanguageTags();
 
-const {
-    doiValidationRules,
-    optionalNumericZeroOrGreaterFieldRules
-} = useValidationUtils();
+const { doiValidationRules } = useValidationUtils();
 
-// Refs for multilingual inputs
 const displayFunderRef = ref<typeof MultilingualTextInput>();
 const displayCallRef = ref<typeof MultilingualTextInput>();
 const displayProgramRef = ref<typeof MultilingualTextInput>();
 const urisRef = ref<typeof UriInput>();
+const amountRef = ref<typeof MonetaryAmountInput>();
 
-// Simple fields
 const doi = ref(props.presetFunding?.doi);
 const grantAgreementId = ref(props.presetFunding?.grantAgreementId);
 const dateFrom = ref(props.presetFunding?.dateFrom as string);
@@ -222,30 +205,14 @@ const oaMandateUrl = ref(props.presetFunding?.oaMandateUrl);
 const competitive = ref<boolean>(props.presetFunding?.competitive ?? false);
 const renewable = ref<boolean>(props.presetFunding?.renewable ?? false);
 
-// Multilingual fields
 const displayFunder = ref<any>([]);
 const displayCall = ref<any>([]);
 const displayProgram = ref<any>([]);
 
-// Funding types
 const fundingTypeOptions = computed(() => getFundingTypesForGivenLocale());
 const selectedFundingTypes = ref<FundingType[]>(props.presetFunding?.fundingTypes ?? []);
 
-// Amount + currency
-const amountValue = ref<number | undefined>(props.presetFunding?.amount?.amount);
-const selectedCurrency = ref<number | undefined>(props.presetFunding?.amount?.currencyId);
-const currencyOptions = ref<{ title: string, value: number }[]>([]);
-
-const fetchCurrencies = () => {
-    CurrencyService.getAllCurrencies().then((response: { data: Currency[] }) => {
-        currencyOptions.value = response.data.map((currency: Currency) => ({
-            title: `${currency.code} (${currency.symbol})`,
-            value: currency.currencyId
-        }));
-    });
-};
-
-fetchCurrencies();
+const amount = ref<MonetaryAmount | undefined>(props.presetFunding?.amount);
 
 watch(() => props.presetFunding, () => {
     if (props.presetFunding) {
@@ -265,8 +232,7 @@ const refreshForm = () => {
     competitive.value = props.presetFunding?.competitive ?? false;
     renewable.value = props.presetFunding?.renewable ?? false;
     selectedFundingTypes.value = props.presetFunding?.fundingTypes ?? [];
-    amountValue.value = props.presetFunding?.amount?.amount;
-    selectedCurrency.value = props.presetFunding?.amount?.currencyId;
+    amountRef.value?.setValue(props.presetFunding?.amount);
 
     displayFunderRef.value?.clearInput();
     displayFunder.value = props.presetFunding?.displayFunder as MultilingualContent[];
@@ -297,9 +263,7 @@ const submit = () => {
         displayFunder: displayFunder.value,
         displayCall: displayCall.value,
         displayProgram: displayProgram.value,
-        amount: amountValue.value !== undefined && selectedCurrency.value !== undefined
-            ? { amount: amountValue.value, currencyId: selectedCurrency.value }
-            : undefined,
+        amount: amount.value,
         uris: uris.value,
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandated.value ? oaMandateUrl.value : undefined,
