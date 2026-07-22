@@ -16,7 +16,7 @@
                     v-model.number="fundingCallId"
                     type="number"
                     :label="$t('fundingCallLabel') + '*'"
-                    :rules="requiredFieldRules"
+                    :rules="requiredNumericFieldRules"
                     :placeholder="$t('fundingCallLabel')">
                 </v-text-field>
             </v-col>
@@ -146,7 +146,7 @@ const snackbar = ref(false);
 const error = ref(false);
 const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-const { requiredFieldRules } = useValidationUtils();
+const { requiredNumericFieldRules } = useValidationUtils();
 
 const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const responseSummaryRef = ref<InstanceType<typeof MultilingualTextInput>>();
