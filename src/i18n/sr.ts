@@ -123,6 +123,8 @@ export default {
         performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans",
         fundingLandingPage: "Detalji finansiranja",
         submitFunding: "Dodavanje finansiranja",
+        fundingProgramLandingPage: "Detalji programa finansiranja",
+        submitFundingProgram: "Dodavanje programa finansiranja",
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1542,4 +1544,5 @@ export default {
     totalAmountLabel: "Ukupan iznos",
     updateObjectivesLabel: "Ažuriraj ciljeve",
     updateFundingProgramLabel: "Ažuriraj program finansiranja",
+    addFundingProgramLabel: "Program finansiranja",
 }

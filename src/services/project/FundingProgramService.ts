@@ -20,6 +20,10 @@ export class FundingProgramService extends BaseService {
         return super.sendRequest(axios.get, `funding-program/${fundingProgramId}`);
     }
 
+    async createFundingProgram(fundingProgram: FundingProgram): Promise<AxiosResponse<FundingProgram>> {
+        return super.sendRequest(axios.post, "funding-program", fundingProgram, FundingProgramService.idempotencyKey);
+    }
+
     async updateFundingProgram(fundingProgramId: number, body: FundingProgram): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `funding-program/${fundingProgramId}`, body);
     }
