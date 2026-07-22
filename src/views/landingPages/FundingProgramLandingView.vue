@@ -180,7 +180,7 @@
                 <!-- Research Areas -->
                 <v-row>
                     <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                        <v-card class="pa-3 research-areas-card" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
                                 <research-areas-update-modal
                                     :research-areas-hierarchy="fundingProgram?.researchAreas"
@@ -191,6 +191,7 @@
                                 <div class="mb-2"><b>{{ $t("researchAreasLabel") }}</b></div>
                                 <research-area-hierarchy
                                     :research-areas="fundingProgram?.researchAreas"
+                                    in-comparator
                                 />
                             </v-card-text>
                         </v-card>
@@ -395,4 +396,9 @@ const updateDocument = (attachment: DocumentFile) => {
 .edit-pen-container {
     position: relative;
 }
+
+.research-areas-card {
+    padding: 24px 0 10px 0;
+}
+
 </style>
