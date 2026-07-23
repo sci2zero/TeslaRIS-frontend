@@ -123,6 +123,7 @@ export default {
         fundingLandingPage: "Funding Details",
         submitFunding: "Submit Funding",
         fundingCallLandingPage: "Funding Call Details",
+        submitFundingCall: "Submit Funding Call",
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1529,4 +1530,5 @@ export default {
     objectivesLabel: "Objectives",
     updateFundingCallLabel: "Update funding call",
     updateObjectivesLabel: "Update objectives",
+    addFundingCallLabel: "Add Funding Call",
 }

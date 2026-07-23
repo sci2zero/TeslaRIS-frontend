@@ -59,6 +59,7 @@ import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import FundingLandingView from "@/views/landingPages/FundingLandingView.vue";
 import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
+import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
@@ -280,6 +281,15 @@ const router = createRouter({
                             path: ":id",
                             name: "fundingCallLandingPage",
                             component: FundingCallLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding-call",
+                            name: "submitFundingCall",
+                            component: SubmitFundingCallView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],
