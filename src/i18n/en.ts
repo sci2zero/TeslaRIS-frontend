@@ -122,6 +122,7 @@ export default {
         performanceRelatedOutputLandingPage: "Performance related output details",
         fundingLandingPage: "Funding Details",
         submitFunding: "Submit Funding",
+        fundingCallLandingPage: "Funding Call Details",
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1524,4 +1525,8 @@ export default {
     fundingApplicationsLabel: "Funding applications",
     fundingCallsLabel: "Funding calls",
     fundingProgramsLabel: "Funding programs",
+    totalAmountLabel: "Total amount",
+    objectivesLabel: "Objectives",
+    updateFundingCallLabel: "Update funding call",
+    updateObjectivesLabel: "Update objectives",
 }
