@@ -1534,4 +1534,5 @@ export default {
     teamLabel: "Team",
     investigationRoleLabel: "Investigation role",
     otherRoleDescriptionLabel: "Other role description",
+    updateProjectLabel: "Update project",
 }

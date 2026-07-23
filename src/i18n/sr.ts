@@ -1548,4 +1548,5 @@ export default {
     teamLabel: "Tim",
     investigationRoleLabel: "Istraživačka uloga",
     otherRoleDescriptionLabel: "Opis druge uloge",
+    updateProjectLabel: "Ažuriraj projekat",
 }

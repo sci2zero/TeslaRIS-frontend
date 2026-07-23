@@ -11,6 +11,14 @@ export class ProjectService extends BaseService {
 
         return super.sendRequest(axios.get, `project/${projectId}`);
     }
+
+    async updateProject(projectId: number, body: Project): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `project/${projectId}`, body);
+    }
+
+    async canEdit(projectId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `project/${projectId}/can-edit`);
+    }
 }
 
 export default new ProjectService();
