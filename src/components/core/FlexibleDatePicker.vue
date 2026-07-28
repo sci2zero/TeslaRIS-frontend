@@ -103,15 +103,14 @@ export default defineComponent({
 
         const fieldRef = ref<typeof VTextField>();
         const isMenuOpen = ref(false);
-        const pickerDate = ref<Date | undefined>(undefined);
 
         const year = ref<number|undefined>(props.modelValue?.year);
         const month = ref<number|undefined>(props.modelValue?.month);
         const day = ref<number|undefined>(props.modelValue?.day);
 
-        const yearString=computed({
-            get:()=>year.value?.toString() ?? "",
-            set:(v:string)=>{
+        const yearString = computed({
+            get:() => year.value?.toString() ?? "",
+            set:(v:string) => {
                 year.value=v?Number(v):undefined;
             }
         });
@@ -131,7 +130,7 @@ export default defineComponent({
             { title: i18n.t("decemberLabel"), value: 12 }
         ]);
 
-        const days=computed(()=>{
+        const days = computed(() => {
             if(!month.value) {
                 return [];
             }
@@ -154,36 +153,37 @@ export default defineComponent({
 
         const emitValue=()=>{
             if(!year.value){
-                emit("update:modelValue",undefined);
+                emit("update:modelValue", undefined);
                 return;
             }
-            emit("update:modelValue",{
+            emit("update:modelValue", {
                 year:year.value,
                 month:month.value,
                 day:day.value
             });
         };
-
-        watch([year, month, day], ([y, m, d]) => {
-            if (y && m && d) {
-                const date = new Date(y, m - 1, d);
-
-                if (!isNaN(date.getTime())) {
-                    pickerDate.value = date;
+        
+        const pickerDate = computed<Date | undefined>({
+            get: () => {
+                if (year.value && year.value >= 1000 && month.value && day.value) {
+                    const date = new Date(year.value, month.value - 1, day.value);
+                    return isNaN(date.getTime()) ? undefined : date;
                 }
-            }
-
-            if (!m) {
-                day.value = undefined;
+                return undefined;
+            },
+            set: (newDate) => {
+                if (newDate && !isNaN(newDate.getTime())) {
+                    year.value = newDate.getFullYear();
+                    month.value = newDate.getMonth() + 1;
+                    day.value = newDate.getDate();
+                    isMenuOpen.value = false;
+                }
             }
         });
 
-        watch(pickerDate, (newDate) => {
-            if (newDate && !isNaN(newDate.getTime())) {
-                year.value = newDate.getFullYear();
-                month.value = newDate.getMonth() + 1;
-                day.value = newDate.getDate();
-                isMenuOpen.value = false;
+        watch(month, (m) => {
+            if (!m) {
+                day.value = undefined;
             }
         });
 
@@ -191,27 +191,18 @@ export default defineComponent({
             year.value=v?.year;
             month.value=v?.month;
             day.value=v?.day;
-            
-            if (v?.year && v?.month && v?.day) {
-                const date = new Date(v.year, v.month - 1, v.day);
-                if (!isNaN(date.getTime())) {
-                    pickerDate.value = date;
-                }
-            } else {
-                pickerDate.value = undefined;
-            }
-        },{deep:true});
+        }, { deep:true });
 
-        watch([year,month,day],emitValue);
+        watch([year,month,day], emitValue);
 
-        const applyRules=()=>{
-            const rules:any[]=[];
+        const applyRules = () => {
+            const rules:any[] = [];
             
             if(props.required) {
                 rules.push(requiredFieldRules[0]);
             }
 
-            props.additionalRules.forEach(r=>rules.push(r));
+            props.additionalRules.forEach(r => rules.push(r));
             return rules;
         };
 
@@ -221,7 +212,6 @@ export default defineComponent({
             year.value = undefined;
             month.value = undefined;
             day.value = undefined;
-            pickerDate.value = undefined;
             isMenuOpen.value = false;
         };
 

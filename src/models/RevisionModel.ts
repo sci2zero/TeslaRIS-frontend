@@ -9,5 +9,9 @@ export enum IssueSeverity {
 
 export interface QualityReportResponse {
     profileName: string;
+    qualityScore: number;
+    issueCount: number;
+    assessmentDate: string;
+    publicationCandidate: boolean;
     report: Pair<IssueSeverity, MultilingualContent[]>[];
 }

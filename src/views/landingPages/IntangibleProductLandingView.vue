@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!intangibleProduct" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="intangibleProduct?.intangibleProductType">
                                     {{ $t("intangibleProductTypeLabel") }}:
                                 </div>
@@ -103,13 +103,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
-                        </v-row>
 
-                        <v-row>
-                            <data-quality-remarks-dialog
-                                :entity-type="PublicationType.INTANGIBLE_PRODUCT"
-                                :entity-id="intangibleProduct?.id"
-                            />
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                                    :entity-id="intangibleProduct?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
