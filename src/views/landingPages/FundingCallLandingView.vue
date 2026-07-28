@@ -134,6 +134,9 @@
             color="deep-purple-accent-4"
             align-tabs="start"
         >
+            <v-tab value="contributors">
+                {{ $t("contributorsLabel") }}
+            </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
@@ -143,6 +146,18 @@
         </v-tabs>
 
         <v-tabs-window v-show="fundingCall" v-model="currentTab">
+            <v-tabs-window-item value="contributors">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <person-funding-call-contribution-tabs
+                            :contribution-list="fundingCall?.contributors ? fundingCall.contributors : []"
+                            :read-only="!canEdit"
+                            @update="updateContributors"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
             <v-tabs-window-item value="documents">
                 <v-row class="mt-10">
                     <v-col cols="12">
@@ -217,7 +232,7 @@ import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import FundingCallService from "@/services/project/FundingCallService";
-import type { FundingCall } from "@/models/FundingCallModel";
+import type { FundingCall, PersonFundingCallContribution } from "@/models/FundingCallModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
@@ -232,6 +247,7 @@ import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import ObjectivesSection from "@/components/project/ObjectivesSection.vue";
 import ResearchAreasUpdateModal from "@/components/core/ResearchAreasUpdateModal.vue";
 import ResearchAreaHierarchy from "@/components/core/ResearchAreaHierarchy.vue";
+import PersonFundingCallContributionTabs from "@/components/project/PersonFundingCallContributionTabs.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
@@ -243,7 +259,7 @@ const i18n = useI18n();
 const { locale } = useI18n();
 
 const fundingCall = ref<FundingCall>();
-const currentTab = ref("documents");
+const currentTab = ref("contributors");
 const icon = ref("mdi-cash-multiple");
 
 const snackbar = ref(false);
@@ -304,6 +320,11 @@ const updateDescription = (description: MultilingualContent[]) => {
 
 const updateObjectives = (objectives: MultilingualContent[]) => {
     fundingCall.value!.objectives = objectives;
+    performUpdate(true);
+};
+
+const updateContributors = (contributors: PersonFundingCallContribution[]) => {
+    fundingCall.value!.contributors = contributors;
     performUpdate(true);
 };
 

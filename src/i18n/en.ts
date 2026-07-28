@@ -1531,4 +1531,5 @@ export default {
     updateFundingCallLabel: "Update funding call",
     updateObjectivesLabel: "Update objectives",
     addFundingCallLabel: "Add Funding Call",
+    contributorsLabel: "Contributors",
 }

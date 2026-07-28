@@ -1545,4 +1545,5 @@ export default {
     updateFundingCallLabel: "Ažuriraj poziv za finansiranje",
     updateObjectivesLabel: "Ažuriraj ciljeve",
     addFundingCallLabel: "Dodaj poziv za finansiranje",
+    contributorsLabel: "Učesnici",
 }
