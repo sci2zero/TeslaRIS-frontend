@@ -1519,6 +1519,7 @@ export default {
     noFundingPartsMessage: "No Funding Parts Provided.",
     updateNameLabel: "Update name",
     updateFundingLabel: "Update funding",
+    createNewFundingLabel: "Add funding",
     funderLabel: "Funder",
     fundingProgramLabel: "Funding program",
     fundingsLabel: "Funding",

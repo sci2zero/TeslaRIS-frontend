@@ -1533,6 +1533,7 @@ export default {
     noFundingPartsMessage: "Nisu priložene stavke finansiranja.",
     updateNameLabel: "Ažuriraj naziv",
     updateFundingLabel: "Ažuriraj finansiranje",
+    createNewFundingLabel: "Dodaj finansiranje",
     funderLabel: "Finansijer",
     fundingProgramLabel: "Program finansiranja",
     fundingsLabel: "Finansiranja",
