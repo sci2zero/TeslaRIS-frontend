@@ -137,6 +137,9 @@
             <v-tab value="contributors">
                 {{ $t("contributorsLabel") }}
             </v-tab>
+            <v-tab value="fundings">
+                {{ $t("fundingsLabel") }}
+            </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
@@ -153,6 +156,18 @@
                             :contribution-list="fundingCall?.contributors ? fundingCall.contributors : []"
                             :read-only="!canEdit"
                             @update="updateContributors"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundings">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <funding-call-fundings-tab
+                            v-if="fundingCall?.id"
+                            :funding-call-id="fundingCall.id"
+                            :can-edit="canEdit"
                         />
                     </v-col>
                 </v-row>
@@ -248,6 +263,7 @@ import ObjectivesSection from "@/components/project/ObjectivesSection.vue";
 import ResearchAreasUpdateModal from "@/components/core/ResearchAreasUpdateModal.vue";
 import ResearchAreaHierarchy from "@/components/core/ResearchAreaHierarchy.vue";
 import PersonFundingCallContributionTabs from "@/components/project/PersonFundingCallContributionTabs.vue";
+import FundingCallFundingsTab from "@/components/project/FundingCallFundingsTab.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
