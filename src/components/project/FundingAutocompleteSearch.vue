@@ -36,18 +36,18 @@ import type { Funding, FundingIndex } from "@/models/FundingModel";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingSubmissionForm from "@/components/project/FundingSubmissionForm.vue";
 
-defineProps({
-    presetFundingCallId: {
-        type: Number,
-        default: undefined
-    },
-    readonly: {
-        type: Boolean,
-        default: false
-    }
+withDefaults(defineProps<{
+    presetFundingCallId?: number;
+    readonly?: boolean;
+}>(), {
+    presetFundingCallId: undefined,
+    readonly: false
 });
 
-const emit = defineEmits(["selected", "create"]);
+const emit = defineEmits<{
+    (e: "selected", payload: { title: string; value: number }): void;
+    (e: "create", payload: Funding): void;
+}>();
 
 const i18n = useI18n();
 const searchPlaceholder = { title: "", value: -1 };
