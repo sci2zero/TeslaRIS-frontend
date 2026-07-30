@@ -42,27 +42,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, type PropType } from "vue";
+import { ref, computed, onMounted } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/fundingCallContributionType";
 import { FundingCallContributionType, type PersonFundingCallContribution } from "@/models/FundingCallModel";
 
-const props = defineProps({
-    presetContributions: {
-        type: Array as PropType<PersonFundingCallContribution[]>,
-        default: () => []
-    },
-    isUpdate: {
-        type: Boolean,
-        default: false
-    },
-    lockContributionType: {
-        type: Object as PropType<FundingCallContributionType[] | undefined>,
-        default: undefined
-    }
+const props = withDefaults(defineProps<{
+    presetContributions?: PersonFundingCallContribution[];
+    isUpdate?: boolean;
+    lockContributionType?: FundingCallContributionType[];
+}>(), {
+    presetContributions: () => [],
+    isUpdate: false,
+    lockContributionType: undefined
 });
 
-const emit = defineEmits(["setInput"]);
+const emit = defineEmits<{
+  (e: "setInput", payload: any): void;
+}>();
 
 const inputs = ref<any[]>(
     props.presetContributions.length > 0 ? Array.from(

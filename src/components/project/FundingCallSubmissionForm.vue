@@ -188,7 +188,9 @@ import type { ErrorResponse, MonetaryAmount } from '@/models/Common';
 import type { FundingCall } from '@/models/FundingCallModel';
 import { FundingType } from '@/models/FundingModel';
 
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+  (e: "create", payload: any): void;
+}>();
 
 const router = useRouter();
 const i18n = useI18n();

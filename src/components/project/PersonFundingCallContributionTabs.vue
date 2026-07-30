@@ -133,24 +133,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, type PropType } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { FundingCallContributionType, type PersonFundingCallContribution } from '@/models/FundingCallModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/fundingCallContributionType';
 import FundingCallContributionUpdateModal from "@/components/project/FundingCallContributionUpdateModal.vue"
 import PersonFundingCallContributionList from './PersonFundingCallContributionList.vue';
 
-const props = defineProps({
-    contributionList: {
-        type: Array as PropType<PersonFundingCallContribution[]>,
-        required: true
-    },
-    readOnly: {
-        type: Boolean,
-        default: false
-    }
+const props = withDefaults(defineProps<{
+    contributionList: PersonFundingCallContribution[];
+    readOnly?: boolean;
+}>(), {
+    readOnly: false
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{
+  (e: "update", payload: any): void;
+}>();
 
 const currentTab = ref("organizer");
 

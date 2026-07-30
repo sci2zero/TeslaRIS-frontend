@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, type PropType } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -32,18 +32,16 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import RichTextEditor from '@/components/core/RichTextEditor.vue';
 import { useI18n } from 'vue-i18n';
 
-const props = defineProps({
-    canEdit: {
-        type: Boolean,
-        default: false
-    },
-    objectives: {
-        type: Object as PropType<MultilingualContent[] | undefined>,
-        required: true
-    }
+const props = withDefaults(defineProps<{
+    canEdit?: boolean;
+    objectives: MultilingualContent[] | undefined;
+}>(), {
+    canEdit: false
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{
+    (e: "update", payload: MultilingualContent[]): void;
+}>();
 
 const objectivesDisplay = ref("");
 

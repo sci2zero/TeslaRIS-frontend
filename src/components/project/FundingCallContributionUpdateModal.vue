@@ -43,26 +43,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue";
+import { ref } from "vue";
 import type { FundingCallContributionType, PersonFundingCallContribution } from "@/models/FundingCallModel";
 import PersonFundingCallContributionForm from "./PersonFundingCallContributionForm.vue";
 
-defineProps({
-    readOnly: {
-        type: Boolean,
-        default: false
-    },
-    presetFundingCallContributions: {
-        type: Object as PropType<PersonFundingCallContribution[]>,
-        required: true
-    },
-    lockContributionType: {
-        type: Object as PropType<FundingCallContributionType[] | undefined>,
-        default: undefined
-    }
+withDefaults(defineProps<{
+    readOnly?: boolean;
+    presetFundingCallContributions: PersonFundingCallContribution[];
+    lockContributionType?: FundingCallContributionType[];
+}>(), {
+    readOnly: false,
+    lockContributionType: undefined
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{
+  (e: "update", payload: any): void;
+}>();
 
 const isFormValid = ref(false);
 
