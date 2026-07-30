@@ -34,6 +34,20 @@ export interface Funding {
     oaMandateUrl?: string;
 }
 
+export interface FundingIndex {
+    id: string;
+    databaseId: number;
+    nameSr: string;
+    nameOther: string;
+    funderNameSr: string;
+    funderNameOther: string;
+    funderId?: number;
+    projectId?: number;
+    fundingCallId?: number;
+    dateFrom?: string;
+    dateTo?: string;
+}
+
 export enum FundingType {
     GRANT= "GRANT",
     CALL= "CALL",
