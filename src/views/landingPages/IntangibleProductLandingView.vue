@@ -155,6 +155,9 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -254,6 +257,14 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                    :entity-id="intangibleProduct?.id"
+                    @restored="fetchIntangibleProduct"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <share-buttons
@@ -317,12 +328,13 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
 
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay, DataQualityRemarksDialog },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay, DataQualityRemarksDialog, RevisionHistoryTableComponent },
     setup() {
         const currentTab = ref("contributions");
 

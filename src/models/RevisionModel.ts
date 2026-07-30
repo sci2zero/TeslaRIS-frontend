@@ -15,3 +15,20 @@ export interface QualityReportResponse {
     publicationCandidate: boolean;
     report: Pair<IssueSeverity, MultilingualContent[]>[];
 }
+
+export interface DataQualityAssessmentSimple {
+    profileName: string;
+    profileVersion: string;
+    dataQualityScore: number;
+    publicationCandidate: boolean;
+    assessmentDate: string;
+}
+
+export interface Revision {
+    timestamp: string;
+    majorVersion: number;
+    minorVersion: number;
+    versionNote?: string;
+    createdBy?: string;
+    assessments: DataQualityAssessmentSimple[];
+}
