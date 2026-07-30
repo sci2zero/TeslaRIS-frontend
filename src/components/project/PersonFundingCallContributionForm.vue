@@ -41,175 +41,163 @@
     </v-container>
 </template>
 
-<script lang="ts">
-import { ref } from "vue";
-import { defineComponent } from "vue";
-import { computed } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted, type PropType } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
-import type { PropType } from "vue";
-import { onMounted } from "vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/fundingCallContributionType";
 import { FundingCallContributionType, type PersonFundingCallContribution } from "@/models/FundingCallModel";
 
-
-export default defineComponent({
-    name: "PersonFundingCallContributionForm",
-    components: {PersonContributionBase},
-    props: {
-        presetContributions: {
-            type: Array as PropType<PersonFundingCallContribution[]>,
-            default: () => []
-        },
-        isUpdate: {
-            type: Boolean,
-            default: false
-        },
-        lockContributionType: {
-            type: Object as PropType<FundingCallContributionType[] | undefined>,
-            default: undefined
-        }
+const props = defineProps({
+    presetContributions: {
+        type: Array as PropType<PersonFundingCallContribution[]>,
+        default: () => []
     },
-    emits: ["setInput"],
-    setup(props, {emit}) {
-        const inputs = ref<any[]>(
-            props.presetContributions.length > 0 ? Array.from(
-                { length: props.presetContributions.length }, () => ({})) :
-                [
-                    {
-                        contributionType: {
-                            title: getTitleFromValueAutoLocale(
-                                props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER
-                            ),
-                            value: props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER
-                        }
-                    }
-                ]
-            );
-        const baseContributionRef = ref<any>([]);
-
-        onMounted(() => {
-            if(props.presetContributions && props.presetContributions.length > 0) {
-                inputs.value = [];
-                props.presetContributions.forEach(contribution => {
-                    inputs.value.push({
-                        contribution: {
-                            personId: contribution.personId,
-                            description: contribution.contributionDescription,
-                            affiliationStatement: contribution.displayAffiliationStatement,
-                            selectedOtherName: [
-                                        contribution.personName?.firstname,
-                                        contribution.personName?.otherName,
-                                        contribution.personName?.lastname
-                                    ],
-                            institutionIds: contribution.institutionIds,
-                            dateFrom: contribution.dateFrom,
-                            dateTo: contribution.dateTo,
-                            researchAreas: contribution.researchAreas
-                        },
-                    contributionType: {
-                        title: getTitleFromValueAutoLocale(contribution.contributionType),
-                        value: contribution.contributionType
-                    },
-                    id: contribution.id});
-                });
-            }
-        });
-
-        const contributionTypes = computed(() => {
-            const types = getTypesForGivenLocale();
-
-            if (types && props.lockContributionType) {
-                return types.filter(type => props.lockContributionType?.includes(type.value));
-            }
-
-            return types;
-        });
-
-        const addInput = () => {
-            const contributionType =
-                props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER;
-
-            inputs.value.push(
-                {
-                    contributionType: {
-                        title: getTitleFromValueAutoLocale(contributionType),
-                        value: contributionType
-                    }
-                }
-            );
-        };
-
-        const removeInput = (index: number) => {
-            inputs.value.splice(index, 1);
-
-            baseContributionRef.value.filter(
-                (ref: any) => ref
-            ).forEach((ref: typeof PersonContributionBase) => {
-                ref.valueSet = false;
-            });
-
-            inputs.value = [...inputs.value];
-            sendContentToParent();
-        };
-
-        const clearInput = () => {
-            inputs.value = [
-                {
-                    contribution: {},
-                    contributionType: {
-                        title: getTitleFromValueAutoLocale(FundingCallContributionType.ORGANIZER),
-                        value: FundingCallContributionType.ORGANIZER
-                    }
-                }
-            ];
-            baseContributionRef.value
-            .filter((ref: any) => ref)
-            .forEach((ref: typeof PersonContributionBase) => {
-                ref.clearInput();
-            });
-            sendContentToParent();
-        };
-
-        const sendContentToParent = () => {
-            const returnObject: PersonFundingCallContribution[] = [];
-            inputs.value.forEach((input, index) => {
-                if (!input.contribution) {
-                    return;
-                }
-
-                let personName = undefined;
-                if (input.contribution.selectedOtherName) {
-                    personName = {
-                        firstname: input.contribution.selectedOtherName[0],
-                        otherName: input.contribution.selectedOtherName[1],
-                        lastname: input.contribution.selectedOtherName[2],
-                        dateFrom: input.contribution.selectedOtherName[3],
-                        dateTo: input.contribution.selectedOtherName[4]
-                    }
-                }
-
-                returnObject.push({
-                    contributionDescription: input.contribution.description,
-                    personId: input.contribution.personId,
-                    displayAffiliationStatement: input.contribution.affiliationStatement,
-                    orderNumber: index + 1,
-                    personName: personName,
-                    contributionType: input.contributionType.value,
-                    dateFrom: input.contribution.dateFrom,
-                    dateTo: input.contribution.dateTo,
-                    institutionIds: input.contribution.institutionIds,
-                    researchAreasId: input.contribution.researchAreasId
-                });
-            });
-
-            emit("setInput", returnObject);
-        };
-
-        return {
-            inputs, addInput, removeInput,
-            contributionTypes, baseContributionRef,
-            sendContentToParent, clearInput
-        }
+    isUpdate: {
+        type: Boolean,
+        default: false
+    },
+    lockContributionType: {
+        type: Object as PropType<FundingCallContributionType[] | undefined>,
+        default: undefined
     }
 });
+
+const emit = defineEmits(["setInput"]);
+
+const inputs = ref<any[]>(
+    props.presetContributions.length > 0 ? Array.from(
+        { length: props.presetContributions.length }, () => ({})) :
+        [
+            {
+                contributionType: {
+                    title: getTitleFromValueAutoLocale(
+                        props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER
+                    ),
+                    value: props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER
+                }
+            }
+        ]
+    );
+const baseContributionRef = ref<any>([]);
+
+onMounted(() => {
+    if (props.presetContributions && props.presetContributions.length > 0) {
+        inputs.value = [];
+        props.presetContributions.forEach(contribution => {
+            inputs.value.push({
+                contribution: {
+                    personId: contribution.personId,
+                    description: contribution.contributionDescription,
+                    affiliationStatement: contribution.displayAffiliationStatement,
+                    selectedOtherName: [
+                        contribution.personName?.firstname,
+                        contribution.personName?.otherName,
+                        contribution.personName?.lastname
+                    ],
+                    institutionIds: contribution.institutionIds,
+                    dateFrom: contribution.dateFrom,
+                    dateTo: contribution.dateTo,
+                    researchAreas: contribution.researchAreas
+                },
+                contributionType: {
+                    title: getTitleFromValueAutoLocale(contribution.contributionType),
+                    value: contribution.contributionType
+                },
+                id: contribution.id
+            });
+        });
+    }
+});
+
+const contributionTypes = computed(() => {
+    const types = getTypesForGivenLocale();
+
+    if (types && props.lockContributionType) {
+        return types.filter(type => props.lockContributionType?.includes(type.value));
+    }
+
+    return types;
+});
+
+const addInput = () => {
+    const contributionType =
+        props.lockContributionType ? props.lockContributionType[0] : FundingCallContributionType.ORGANIZER;
+
+    inputs.value.push(
+        {
+            contributionType: {
+                title: getTitleFromValueAutoLocale(contributionType),
+                value: contributionType
+            }
+        }
+    );
+};
+
+const removeInput = (index: number) => {
+    inputs.value.splice(index, 1);
+
+    baseContributionRef.value.filter(
+        (ref: any) => ref
+    ).forEach((ref: typeof PersonContributionBase) => {
+        ref.valueSet = false;
+    });
+
+    inputs.value = [...inputs.value];
+    sendContentToParent();
+};
+
+const clearInput = () => {
+    inputs.value = [
+        {
+            contribution: {},
+            contributionType: {
+                title: getTitleFromValueAutoLocale(FundingCallContributionType.ORGANIZER),
+                value: FundingCallContributionType.ORGANIZER
+            }
+        }
+    ];
+    baseContributionRef.value
+        .filter((ref: any) => ref)
+        .forEach((ref: typeof PersonContributionBase) => {
+            ref.clearInput();
+        });
+    sendContentToParent();
+};
+
+const sendContentToParent = () => {
+    const returnObject: PersonFundingCallContribution[] = [];
+    inputs.value.forEach((input, index) => {
+        if (!input.contribution) {
+            return;
+        }
+
+        let personName = undefined;
+        if (input.contribution.selectedOtherName) {
+            personName = {
+                firstname: input.contribution.selectedOtherName[0],
+                otherName: input.contribution.selectedOtherName[1],
+                lastname: input.contribution.selectedOtherName[2],
+                dateFrom: input.contribution.selectedOtherName[3],
+                dateTo: input.contribution.selectedOtherName[4]
+            }
+        }
+
+        returnObject.push({
+            contributionDescription: input.contribution.description,
+            personId: input.contribution.personId,
+            displayAffiliationStatement: input.contribution.affiliationStatement,
+            orderNumber: index + 1,
+            personName: personName,
+            contributionType: input.contributionType.value,
+            dateFrom: input.contribution.dateFrom,
+            dateTo: input.contribution.dateTo,
+            institutionIds: input.contribution.institutionIds,
+            researchAreasId: input.contribution.researchAreasId
+        });
+    });
+
+    emit("setInput", returnObject);
+};
+
+defineExpose({ clearInput });
 </script>

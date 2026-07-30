@@ -42,68 +42,59 @@
     </v-row>
 </template>
 
-<script lang="ts">
-import { ref } from "vue";
-import { defineComponent } from "vue";
-import type { PropType } from "vue";
+<script setup lang="ts">
+import { ref, type PropType } from "vue";
 import type { FundingCallContributionType, PersonFundingCallContribution } from "@/models/FundingCallModel";
 import PersonFundingCallContributionForm from "./PersonFundingCallContributionForm.vue";
 
-
-export default defineComponent({
-    name: "FundingCallContributionUpdateModal",
-    components: { PersonFundingCallContributionForm },
-    props: {
-        readOnly: {
-            type: Boolean,
-            default: false
-        },
-        presetFundingCallContributions: {
-            type: Object as PropType<PersonFundingCallContribution[]>,
-            required: true
-        },
-        lockContributionType: {
-            type: Object as PropType<FundingCallContributionType[] | undefined>,
-            default: undefined
-        }
+defineProps({
+    readOnly: {
+        type: Boolean,
+        default: false
     },
-    emits: ["update"],
-    setup(_, { emit }) {
-        const isFormValid = ref(false);
-
-        const dialog = ref(false);
-
-        const contributions = ref<any[]>([]);
-
-        const updateFormRef = ref<typeof PersonFundingCallContributionForm>();
-
-        const emitToParent = () => {
-            const personFundingCallContributions: PersonFundingCallContribution[] = [];
-
-            contributions.value.forEach(contribution => {
-                personFundingCallContributions.push({
-                    personId: contribution.personId,
-                    contributionDescription: contribution.contributionDescription,
-                    orderNumber: contribution.orderNumber,
-                    institutionIds: contribution.institutionIds,
-                    displayAffiliationStatement: contribution.displayAffiliationStatement,
-                    personName: {
-                                    firstname: contribution.personName.firstname,
-                                    otherName: contribution.personName.otherName,
-                                    lastname: contribution.personName.lastname
-                                },
-                    contributionType: contribution.contributionType,
-                    dateFrom: contribution.dateFrom,
-                    dateTo: contribution.dateTo,
-                    researchAreasId: contribution.researchAreasId
-                });
-
-            });
-            emit("update", personFundingCallContributions);
-            dialog.value = false;
-        };
-
-        return {dialog, updateFormRef, emitToParent, contributions, isFormValid};
+    presetFundingCallContributions: {
+        type: Object as PropType<PersonFundingCallContribution[]>,
+        required: true
+    },
+    lockContributionType: {
+        type: Object as PropType<FundingCallContributionType[] | undefined>,
+        default: undefined
     }
 });
+
+const emit = defineEmits(["update"]);
+
+const isFormValid = ref(false);
+
+const dialog = ref(false);
+
+const contributions = ref<any[]>([]);
+
+const updateFormRef = ref<typeof PersonFundingCallContributionForm>();
+
+const emitToParent = () => {
+    const personFundingCallContributions: PersonFundingCallContribution[] = [];
+
+    contributions.value.forEach(contribution => {
+        personFundingCallContributions.push({
+            personId: contribution.personId,
+            contributionDescription: contribution.contributionDescription,
+            orderNumber: contribution.orderNumber,
+            institutionIds: contribution.institutionIds,
+            displayAffiliationStatement: contribution.displayAffiliationStatement,
+            personName: {
+                firstname: contribution.personName.firstname,
+                otherName: contribution.personName.otherName,
+                lastname: contribution.personName.lastname
+            },
+            contributionType: contribution.contributionType,
+            dateFrom: contribution.dateFrom,
+            dateTo: contribution.dateTo,
+            researchAreasId: contribution.researchAreasId
+        });
+
+    });
+    emit("update", personFundingCallContributions);
+    dialog.value = false;
+};
 </script>

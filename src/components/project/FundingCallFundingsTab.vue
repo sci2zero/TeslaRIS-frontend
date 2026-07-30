@@ -142,8 +142,6 @@ const sortFieldMappings = computed<Map<string, string>>(() => {
     ]);
 });
 
-// A default, deterministic sort keeps the result window stable across refreshes;
-// without it Elasticsearch may return the same set in a different order each time.
 const defaultSortField = computed(() => sortFieldMappings.value.get("name") as string);
 
 const fetchFundings = () => {
@@ -169,9 +167,6 @@ const refreshTable = (event: any) => {
     fetchFundings();
 };
 
-// The list is served from Elasticsearch, which reindexes asynchronously after a
-// DB update, so an immediate refetch would still return the stale rows. For adds
-// we refetch after a short delay; for removes we update the list optimistically.
 const reindexDelayMs = 1200;
 
 const refetchAfterReindex = () => {

@@ -46,55 +46,43 @@
     </strong>
 </template>
 
-<script lang="ts">
-import { defineComponent, type PropType } from 'vue';
+<script setup lang="ts">
+import { type PropType } from 'vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import type { PersonFundingCallContribution } from '@/models/FundingCallModel';
 import { getTitleFromValueAutoLocale } from '@/i18n/fundingCallContributionType';
 import { localiseDate } from '@/utils/DateUtil';
-import { VueDraggableNext } from 'vue-draggable-next'
+import { VueDraggableNext as draggable } from 'vue-draggable-next';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
-
-export default defineComponent({
-    name: "PersonFundingCallContributionList",
-    components: { LocalizedLink, draggable: VueDraggableNext },
-    props: {
-        contributionList: {
-            type: Array as PropType<PersonFundingCallContribution[]>,
-            required: true
-        },
-        inComparator: {
-            type: Boolean,
-            default: false
-        },
-        canReorder: {
-            type: Boolean,
-            default: false
-        }
+const props = defineProps({
+    contributionList: {
+        type: Array as PropType<PersonFundingCallContribution[]>,
+        required: true
     },
-    emits: ["positionsChanged"],
-    setup(props, {emit}) {
-        const reorderContributors = (event: any) => {
-            if(event.moved.newIndex !== event.moved.oldIndex) {
-                emit("positionsChanged");
-            }
-        };
-
-        const displayContributionType = (contribution: PersonFundingCallContribution) => {
-            if (!props.inComparator) {
-                return "";
-            }
-
-            return ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}`;
-        };
-
-        return {
-            getTitleFromValueAutoLocale,
-            localiseDate, reorderContributors,
-            returnCurrentLocaleContent,
-            displayContributionType
-        };
+    inComparator: {
+        type: Boolean,
+        default: false
     },
+    canReorder: {
+        type: Boolean,
+        default: false
+    }
 });
+
+const emit = defineEmits(["positionsChanged"]);
+
+const reorderContributors = (event: any) => {
+    if (event.moved.newIndex !== event.moved.oldIndex) {
+        emit("positionsChanged");
+    }
+};
+
+const displayContributionType = (contribution: PersonFundingCallContribution) => {
+    if (!props.inComparator) {
+        return "";
+    }
+
+    return ` - ${getTitleFromValueAutoLocale(contribution.contributionType)}`;
+};
 </script>

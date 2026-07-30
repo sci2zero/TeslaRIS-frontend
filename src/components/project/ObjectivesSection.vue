@@ -23,8 +23,8 @@
     </v-row>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, ref, watch, type PropType } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref, watch, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -32,52 +32,41 @@ import DescriptionOrBiographyUpdateForm from '@/components/core/update/Descripti
 import RichTextEditor from '@/components/core/RichTextEditor.vue';
 import { useI18n } from 'vue-i18n';
 
-
-export default defineComponent({
-    name: "ObjectivesSection",
-    components: { GenericCrudModal, RichTextEditor },
-    props: {
-        canEdit: {
-            type: Boolean,
-            default: false
-        },
-        objectives: {
-            type: Object as PropType<MultilingualContent[] | undefined>,
-            required: true
-        }
+const props = defineProps({
+    canEdit: {
+        type: Boolean,
+        default: false
     },
-    emits: ["update"],
-    setup(props, { emit }) {
-        const objectivesDisplay = ref("");
+    objectives: {
+        type: Object as PropType<MultilingualContent[] | undefined>,
+        required: true
+    }
+});
 
-        const i18n = useI18n();
+const emit = defineEmits(["update"]);
 
-        const emitToParent = (objectives: MultilingualContent[]) => {
-            emit("update", objectives);
-        };
+const objectivesDisplay = ref("");
 
-        onMounted(() => {
-            displayObjectives();
-        });
+const i18n = useI18n();
 
-        watch([() => props.objectives, i18n.locale], () => {
-            displayObjectives();
-        });
+const emitToParent = (objectives: MultilingualContent[]) => {
+    emit("update", objectives);
+};
 
-        const displayObjectives = () => {
-            if (!props.objectives) {
-                return;
-            }
+const displayObjectives = () => {
+    if (!props.objectives) {
+        return;
+    }
 
-            objectivesDisplay.value = returnCurrentLocaleContent(props.objectives) as string;
-        };
+    objectivesDisplay.value = returnCurrentLocaleContent(props.objectives) as string;
+};
 
-        return {
-            emitToParent, returnCurrentLocaleContent,
-            DescriptionOrBiographyUpdateForm,
-            objectivesDisplay
-        };
-    },
+onMounted(() => {
+    displayObjectives();
+});
+
+watch([() => props.objectives, i18n.locale], () => {
+    displayObjectives();
 });
 </script>
 
