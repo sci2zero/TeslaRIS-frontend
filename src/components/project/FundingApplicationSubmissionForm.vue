@@ -136,7 +136,9 @@ import type { MonetaryAmount } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+  (e: "create", payload: any): void;
+}>();
 
 const router = useRouter();
 const i18n = useI18n();

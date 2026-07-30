@@ -137,26 +137,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type PropType } from 'vue';
+import {computed, ref, watch} from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import PersonAutocompleteSearch from '@/components/person/PersonAutocompleteSearch.vue';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import { useLanguageTags } from '@/composables/useLanguageTags';
-import type { MultilingualContent, MonetaryAmount } from '@/models/Common';
-import { FundingApplicationResult, type FundingApplication } from '@/models/FundingApplicationModel';
-import { getFundingApplicationResultsForGivenLocale } from '@/i18n/fundingApplicationResult';
+import {toMultilingualTextInput} from '@/i18n/MultilingualContentUtil';
+import {useLanguageTags} from '@/composables/useLanguageTags';
+import type {MonetaryAmount, MultilingualContent} from '@/models/Common';
+import {type FundingApplication, FundingApplicationResult} from '@/models/FundingApplicationModel';
+import {getFundingApplicationResultsForGivenLocale} from '@/i18n/fundingApplicationResult';
 import PersonService from '@/services/PersonService';
 
-const props = defineProps({
-    presetFundingApplication: {
-        type: Object as PropType<FundingApplication | undefined>,
-        required: true
-    }
-});
+const props = defineProps<{
+  presetFundingApplication: FundingApplication | undefined;
+}>();
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{
+  (e: "update", payload: any): void;
+}>();
 
 const isFormValid = ref(false);
 const { languageTags } = useLanguageTags();
