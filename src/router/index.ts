@@ -57,6 +57,11 @@ import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationVi
 import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
 import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
+import FundingLandingView from "@/views/landingPages/FundingLandingView.vue";
+import FundingApplicationLandingView from "@/views/landingPages/FundingApplicationLandingView.vue";
+import SubmitFundingApplicationView from "@/views/SubmitFundingApplicationView.vue";
+import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
+import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
@@ -126,6 +131,7 @@ import IdentifiersListView from "@/views/IdentifiersListView.vue";
 import PerformanceRelatedOutputLandingView from "@/views/landingPages/PerformanceRelatedOutputLandingView.vue";
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
+import SubmitFundingView from "@/views/SubmitFundingView.vue";
 
 
 const roles = {
@@ -246,6 +252,75 @@ const router = createRouter({
                         authenticated: true,
                         authorities: [roles.admin],
                     },
+                },
+                {
+                    path: "funding",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingLandingPage",
+                            component: FundingLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding",
+                            name: "submitFunding",
+                            component: SubmitFundingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "funding-call",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingCallLandingPage",
+                            component: FundingCallLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding-call",
+                            name: "submitFundingCall",
+                            component: SubmitFundingCallView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "funding-application",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingApplicationLandingPage",
+                            component: FundingApplicationLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding-application",
+                            name: "submitFundingApplication",
+                            component: SubmitFundingApplicationView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
                 },
                 {
                     path: "events",
