@@ -2,6 +2,15 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="10">
+                <v-row>
+                    <v-col cols="12">
+                        <i-d-f-project-metadata-prepopulator
+                            @metadata-fetched="populateMetadata"
+                            @update:doi="(value: string) => doi = value"
+                        />
+                    </v-col>
+                </v-row>
+
                 <!-- Name* -->
                 <v-row>
                     <v-col>
@@ -25,16 +34,8 @@
                     </v-col>
                 </v-row>
 
-                <!-- DOI / RAiD -->
+                <!-- RAiD -->
                 <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="doi"
-                            label="DOI"
-                            placeholder="DOI"
-                            :rules="doiValidationRules"
-                        />
-                    </v-col>
                     <v-col cols="6">
                         <v-text-field
                             v-model="raid"
@@ -168,7 +169,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
@@ -176,9 +177,12 @@ import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import Toast from '@/components/core/Toast.vue';
+import IDFProjectMetadataPrepopulator from '@/components/project/IDFProjectMetadataPrepopulator.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProjectService from '@/services/project/ProjectService';
-import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project } from '@/models/ProjectModel';
+import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata } from '@/models/ProjectModel';
 import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
@@ -224,11 +228,62 @@ const projectCollaborationTypeOptions = computed(() => getProjectCollaborationTy
 const projectResearchTypeOptions = computed(() => getProjectResearchTypesForGivenLocale());
 
 const {
-    requiredFieldRules,
-    doiValidationRules
+    requiredFieldRules
 } = useValidationUtils();
 
+const { languageTags } = useLanguageTags();
+
 const requiredSelectionValueRules = [(v: any) => (v !== undefined && v !== null) || i18n.t("requiredFieldMessage")];
+
+const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
+    if (name.value.length === 0 && metadata.name.length > 0) {
+        name.value = metadata.name;
+        nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    }
+
+    if (nameAbbreviation.value.length === 0 && metadata.nameAbbreviation.length > 0) {
+        nameAbbreviation.value = metadata.nameAbbreviation;
+        nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+    }
+
+    doi.value = doi.value ? doi.value : metadata.doi;
+
+    metadata.uris.forEach(uri => {
+        if (uri && !uris.value.includes(uri)) {
+            uris.value.push(uri);
+        }
+    });
+
+    dateFrom.value = dateFrom.value ? dateFrom.value : (metadata.dateFrom ?? "");
+    dateTo.value = dateTo.value ? dateTo.value : (metadata.dateTo ?? "");
+
+    status.value = status.value ? status.value : metadata.status;
+
+    if (description.value.length === 0 && metadata.description.length > 0) {
+        additionalFields.value = true;
+        await nextTick();
+
+        description.value = metadata.description;
+        descriptionRef.value?.forceRefreshModelValue(toMultilingualTextInput(description.value, languageTags.value));
+    }
+
+    if (keywords.value.length === 0 && metadata.keywords.length > 0) {
+      additionalFields.value = true;
+      await nextTick();
+
+      keywords.value = metadata.keywords;
+      keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+    }
+
+    if (!costs.value && metadata.costs) {
+        notFunded.value = false;
+        additionalFields.value = true;
+        await nextTick();
+
+        costsRef.value?.setValue(metadata.costs);
+        costs.value = metadata.costs;
+    }
+};
 
 const submitProject = (stayOnPage: boolean) => {
     const newProject: Project = {

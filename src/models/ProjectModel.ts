@@ -26,6 +26,19 @@ export interface Project {
     team: PersonProjectContribution[];
 }
 
+export interface PrepopulatedProjectMetadata {
+    doi: string;
+    name: MultilingualContent[];
+    nameAbbreviation: MultilingualContent[];
+    description: MultilingualContent[];
+    keywords: MultilingualContent[];
+    uris: string[];
+    dateFrom: string;
+    dateTo: string;
+    costs?: MonetaryAmount;
+    status: ProjectStatus;
+}
+
 export interface PersonProjectContribution extends PersonContribution {
     contributionType: PersonProjectContributionType;
     investigationRole: PersonProjectInvestigationRole;

@@ -123,6 +123,7 @@ export default {
         fundingLandingPage: "Funding Details",
         submitFunding: "Submit Funding",
         projectLandingPage: "Project Details",
+        submitProject: "Submit Project",
     },
     emailLabel: "Email",
     passwordLabel: "Password",

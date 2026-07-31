@@ -124,6 +124,7 @@ export default {
         fundingLandingPage: "Detalji finansiranja",
         submitFunding: "Dodavanje finansiranja",
         projectLandingPage: "Detalji projekta",
+        submitProject: "Dodavanje projekta",
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
