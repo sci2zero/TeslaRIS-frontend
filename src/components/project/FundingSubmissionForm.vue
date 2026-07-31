@@ -205,6 +205,13 @@ import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
 import type { MonetaryAmount } from "@/models/Common";
 import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
 
+const props = defineProps({
+    presetFundingCallId: {
+        type: Number,
+        default: undefined
+    }
+});
+
 const emit = defineEmits(["create"]);
 
 const router = useRouter();
@@ -320,6 +327,7 @@ const submitFunding = (stayOnPage: boolean) => {
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandateUrl.value || undefined,
         projectId: 1, // TODO: Project autocomplete
+        fundingCallId: props.presetFundingCallId,
         internalIdentifiers: [],
         oldIds: [],
         mergedIds: [],
@@ -366,5 +374,5 @@ const submitFunding = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitFunding });
+defineExpose({ isFormValid, submit: submitFunding, submitFunding });
 </script>
