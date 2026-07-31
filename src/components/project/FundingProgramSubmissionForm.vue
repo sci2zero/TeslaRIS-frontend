@@ -188,7 +188,9 @@ import type { AxiosError } from 'axios';
 import type { ErrorResponse, MonetaryAmount } from '@/models/Common';
 import type { FundingProgram, FundingType } from '@/models/FundingModel';
 
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+  (e: "create", payload: any): void;
+}>();
 
 const router = useRouter();
 const i18n = useI18n();
