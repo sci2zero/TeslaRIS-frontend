@@ -127,6 +127,8 @@ export default {
         submitFundingCall: "Dodavanje poziva za finansiranje",
         fundingApplicationLandingPage: "Detalji zahteva za finansiranje",
         submitFundingApplication: "Dodavanje zahteva za finansiranje",
+        fundingProgramLandingPage: "Detalji programa finansiranja",
+        submitFundingProgram: "Dodavanje programa finansiranja",
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1564,4 +1566,6 @@ export default {
     updateObjectivesLabel: "Ažuriraj ciljeve",
     addFundingCallLabel: "Dodaj poziv za finansiranje",
     contributorsLabel: "Učesnici",
+    updateFundingProgramLabel: "Ažuriraj program finansiranja",
+    addFundingProgramLabel: "Program finansiranja",
 }

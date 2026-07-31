@@ -323,6 +323,29 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: "funding-program",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingProgramLandingPage",
+                            component: FundingProgramLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-funding-program",
+                            name: "submitFundingProgram",
+                            component: SubmitFundingProgramView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
+                },
+                {
                     path: "events",
                     name: "eventsParent",
                     children: [

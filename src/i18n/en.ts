@@ -126,6 +126,8 @@ export default {
         submitFundingApplication: "Submit Funding Application",
         fundingCallLandingPage: "Funding Call Details",
         submitFundingCall: "Submit Funding Call",
+        fundingProgramLandingPage: "Funding Program Details",
+        submitFundingProgram: "Submit Funding Program",
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1550,4 +1552,6 @@ export default {
     updateObjectivesLabel: "Update objectives",
     addFundingCallLabel: "Add Funding Call",
     contributorsLabel: "Contributors",
+    updateFundingProgramLabel: "Update Funding Program",
+    addFundingProgramLabel: "Funding Program",
 }
