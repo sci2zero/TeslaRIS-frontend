@@ -1,12 +1,17 @@
 import {BaseService} from "@/services/BaseService";
 import axios, {type AxiosResponse} from "axios";
-import type {Funding} from "@/models/FundingModel";
+import type {Funding, FundingIndex} from "@/models/FundingModel";
+import type {Page} from "@/models/Common";
 import {AccessRights, type DocumentFileResponse, ResourceType} from "@/models/DocumentFileModel";
 import {getNameFromOrdinal} from "@/utils/EnumUtil";
 
 export class FundingService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
+
+    async searchFunding(tokens: string, fundingCallId: number | null = null): Promise<AxiosResponse<Page<FundingIndex>>> {
+        return super.sendRequest(axios.get, `funding/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}`);
+    }
 
     async readFunding(fundingId: number): Promise<AxiosResponse<Funding>> {
         if (isNaN(fundingId) || fundingId <= 0) {

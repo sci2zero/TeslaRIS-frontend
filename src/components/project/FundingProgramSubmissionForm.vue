@@ -2,15 +2,6 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="10">
-                <v-row>
-                    <v-col cols="12">
-                        <i-d-f-funding-metadata-prepopulator
-                            @metadata-fetched="populateMetadata"
-                            @update:doi="(value: string) => doi = value"
-                        />
-                    </v-col>
-                </v-row>
-
                 <!-- Name* -->
                 <v-row>
                     <v-col>
@@ -34,25 +25,26 @@
                     </v-col>
                 </v-row>
 
-                <!-- Grant Agreement ID -->
+                <!-- Funder* -->
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field
-                            v-model="grantAgreementId"
-                            :label="$t('grantAgreementIdLabel')"
-                            :placeholder="$t('grantAgreementIdLabel')"
+                        <organisation-unit-autocomplete-search
+                            ref="funderRef"
+                            v-model="selectedFunder"
+                            label="funderLabel"
+                            required
                         />
                     </v-col>
                 </v-row>
 
-                <!-- Funding Types -->
+                <!-- Funding Types* -->
                 <v-row>
                     <v-col cols="10">
                         <v-select
                             v-model="selectedFundingTypes"
                             :items="fundingTypes"
                             :label="$t('fundingTypesLabel') + '*'"
-                            :rules="requiredSelectionRules"
+                            :rules="requiredMultiSelectionRules"
                             multiple
                             return-object
                         />
@@ -79,22 +71,10 @@
 
                 <!-- Monetary Amount -->
                 <monetary-amount-input
-                    ref="monetaryAmountRef"
-                    v-model="amount"
+                    ref="totalAmountRef"
+                    v-model="totalAmount"
                     :required="false"
                 />
-
-                <!-- Funding Call (text) -->
-                <v-row>
-                    <v-col cols="10">
-                        <!-- TODO: Linked entity autocomplete or plain text -->
-                        <v-text-field
-                            v-model="fundingCallText"
-                            :label="$t('fundingCallLabel')"
-                            :placeholder="$t('fundingCallLabel')"
-                        />
-                    </v-col>
-                </v-row>
 
                 <!-- Additional Fields Toggle -->
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -110,6 +90,18 @@
                                 v-model="description"
                                 is-area
                                 :label="$t('descriptionLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+
+                    <!-- Objectives -->
+                    <v-row>
+                        <v-col>
+                            <multilingual-text-input
+                                ref="objectivesRef"
+                                v-model="objectives"
+                                is-area
+                                :label="$t('objectivesLabel')"
                             />
                         </v-col>
                     </v-row>
@@ -133,32 +125,23 @@
                         </v-col>
                     </v-row>
 
-                    <!-- Submitted On / Awarded On -->
+                    <!-- Research Areas -->
                     <v-row>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="dateSubmitted"
-                                :label="$t('dateSubmittedLabel')"
-                                type="date"
-                            />
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="dateAwarded"
-                                :label="$t('dateAwardedLabel')"
-                                type="date"
+                        <v-col>
+                            <div class="mb-2">
+                                <b>{{ $t("researchAreasLabel") }}</b>
+                            </div>
+                            <research-areas-selection
+                                ref="researchAreasSelectionRef"
+                                :research-areas-hierarchy="[]"
+                                submit-on-click
+                                @update="researchAreasId = $event"
                             />
                         </v-col>
                     </v-row>
 
-                    <!-- Boolean flags -->
+                    <!-- OA Mandated -->
                     <v-row>
-                        <v-col cols="4">
-                            <v-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
-                        </v-col>
-                        <v-col cols="4">
-                            <v-checkbox v-model="renewable" :label="$t('renewableLabel')" />
-                        </v-col>
                         <v-col cols="4">
                             <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
                         </v-col>
@@ -189,30 +172,25 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, nextTick} from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import Toast from '@/components/core/Toast.vue';
+import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
+import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import FundingService from '@/services/project/FundingService';
+import FundingProgramService from '@/services/project/FundingProgramService';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
 import type { AxiosError } from 'axios';
-import type { ErrorResponse } from '@/models/Common';
-import type {Funding, FundingType, PrepopulatedFundingMetadata} from "@/models/FundingModel";
-import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
-import type { MonetaryAmount } from "@/models/Common";
-import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
+import type { ErrorResponse, MonetaryAmount } from '@/models/Common';
+import type { FundingProgram, FundingType } from '@/models/FundingModel';
 
-const props = defineProps({
-    presetFundingCallId: {
-        type: Number,
-        default: undefined
-    }
-});
-
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+  (e: "create", payload: any): void;
+}>();
 
 const router = useRouter();
 const i18n = useI18n();
@@ -226,145 +204,78 @@ const errorMessage = ref(i18n.t("genericErrorMessage"));
 const nameRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const nameAbbreviationRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
+const objectivesRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const keywordsRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const urisRef = ref<InstanceType<typeof UriInput>>();
+const totalAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
+const funderRef = ref<InstanceType<typeof OrganisationUnitAutocompleteSearch>>();
+const researchAreasSelectionRef = ref<InstanceType<typeof ResearchAreasSelection>>();
 
 const name = ref<any[]>([]);
 const nameAbbreviation = ref<any[]>([]);
 const description = ref<any[]>([]);
+const objectives = ref<any[]>([]);
 const keywords = ref<any[]>([]);
 const uris = ref<string[]>([]);
-const doi = ref("");
-const grantAgreementId = ref("");
-const fundingCallText = ref("");
 const dateFrom = ref("");
 const dateTo = ref("");
-const dateSubmitted = ref("");
-const dateAwarded = ref("");
-const competitive = ref(false);
-const renewable = ref(false);
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
-const amount = ref<MonetaryAmount | undefined>(undefined);
+const totalAmount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
-const displayFunder = ref<any[]>([]);
-
-const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
+const selectedFunder = ref<{ title: string, value: number } | undefined>(undefined);
+const researchAreasId = ref<number[]>([]);
 
 const fundingTypes = computed(() => getFundingTypesForGivenLocale());
 
-const {
-    requiredFieldRules,
-} = useValidationUtils();
+const { requiredFieldRules, requiredMultiSelectionRules } = useValidationUtils();
 
-const requiredSelectionRules = [(v: any[]) => v.length > 0 || i18n.t("requiredFieldMessage")];
-
-
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import { useLanguageTags } from '@/composables/useLanguageTags';
-
-const { languageTags } = useLanguageTags();
-
-const populateMetadata = async (metadata: PrepopulatedFundingMetadata) => {
-    if (name.value.length === 0 && metadata.name.length > 0) {
-        name.value = metadata.name;
-        nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
-    }
-
-    if (nameAbbreviation.value.length === 0 && metadata.nameAbbreviation.length > 0) {
-        nameAbbreviation.value = metadata.nameAbbreviation;
-        nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
-    }
-
-    doi.value = doi.value ? doi.value : metadata.doi;
-    grantAgreementId.value = grantAgreementId.value ? grantAgreementId.value : metadata.grantAgreementId;
-
-    metadata.uris.forEach(uri => {
-        if (uri && !uris.value.includes(uri)) {
-            uris.value.push(uri);
-        }
-    });
-
-    dateFrom.value = dateFrom.value ? dateFrom.value : (metadata.dateFrom ?? "");
-    dateTo.value = dateTo.value ? dateTo.value : (metadata.dateTo ?? "");
-    dateAwarded.value = dateAwarded.value ? dateAwarded.value : (metadata.dateAwarded ?? "");
-
-    if (!amount.value && metadata.monetaryAmount) {
-        monetaryAmountRef.value?.setValue(metadata.monetaryAmount);
-        amount.value = metadata.monetaryAmount;
-    }
-
-    if (description.value.length === 0 && metadata.description.length > 0) {
-        additionalFields.value = true;
-        await nextTick();
-
-        description.value = metadata.description;
-        descriptionRef.value?.forceRefreshModelValue(toMultilingualTextInput(description.value, languageTags.value));
-    }
-
-    if (displayFunder.value.length === 0 && metadata.displayFunder.length > 0) {
-        displayFunder.value = metadata.displayFunder;
-    }
-};
-
-const submitFunding = (stayOnPage: boolean) => {
-    const newFunding: Funding = {
+const submitFundingProgram = (stayOnPage: boolean) => {
+    const newFundingProgram: FundingProgram = {
         name: name.value,
         nameAbbreviation: nameAbbreviation.value,
         description: description.value,
+        objectives: objectives.value,
         keywords: keywords.value,
         uris: uris.value,
-        doi: doi.value || undefined,
-        grantAgreementId: grantAgreementId.value || undefined,
+        funderId: selectedFunder.value?.value as number,
         fundingTypes: selectedFundingTypes.value.map(t => t.value),
         dateFrom: dateFrom.value || undefined,
         dateTo: dateTo.value || undefined,
-        dateSubmitted: dateSubmitted.value || undefined,
-        dateAwarded: dateAwarded.value || undefined,
-        amount: amount.value,
-        competitive: competitive.value,
-        renewable: renewable.value,
+        totalAmount: totalAmount.value,
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandateUrl.value || undefined,
-        projectId: 1, // TODO: Project autocomplete
-        fundingCallId: props.presetFundingCallId,
-        internalIdentifiers: [],
-        oldIds: [],
-        mergedIds: [],
-        agreements: [],
-        fundingParts: [],
-        researchAreasId: [],
-        displayCall: [],
-        displayProgram: [],
-        displayFunder: [],
+        researchAreasId: researchAreasId.value,
+        fileItems: [],
+        researchAreas: [],
+        funderName: [],
     };
 
-    FundingService.createFunding(newFunding).then((response) => {
+    FundingProgramService.createFundingProgram(newFundingProgram).then((response) => {
         emit("create", response.data);
 
         if (stayOnPage) {
             nameRef.value?.clearInput();
             nameAbbreviationRef.value?.clearInput();
             descriptionRef.value?.clearInput();
+            objectivesRef.value?.clearInput();
             keywordsRef.value?.clearInput();
             urisRef.value?.clearInput();
-            doi.value = "";
-            grantAgreementId.value = "";
-            fundingCallText.value = "";
             dateFrom.value = "";
             dateTo.value = "";
-            dateSubmitted.value = "";
-            dateAwarded.value = "";
-            amount.value = undefined;
-            competitive.value = false;
-            renewable.value = false;
+            totalAmountRef.value?.clearInput();
+            totalAmount.value = undefined;
             oaMandated.value = false;
             oaMandateUrl.value = "";
             selectedFundingTypes.value = [];
+            funderRef.value?.clearInput();
+            selectedFunder.value = { title: "", value: -1 };
+            researchAreasSelectionRef.value?.resetForm();
+            researchAreasId.value = [];
             error.value = false;
             snackbar.value = true;
         } else {
-            router.push({ name: "fundingLandingPage", params: { id: response.data.id } });
+            router.push({ name: "fundingProgramLandingPage", params: { id: response.data.id } });
         }
     }).catch((axiosError: AxiosError<ErrorResponse>) => {
         const message = i18n.t(axiosError.response?.data.message as string);
@@ -374,5 +285,5 @@ const submitFunding = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submit: submitFunding, submitFunding });
+defineExpose({ isFormValid, submitFundingProgram });
 </script>

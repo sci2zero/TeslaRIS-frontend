@@ -1,6 +1,6 @@
-import {BaseService} from "@/services/BaseService";
-import axios, {type AxiosResponse} from "axios";
-import type {Project} from "@/models/ProjectModel";
+import { BaseService } from "@/services/BaseService";
+import axios, { type AxiosResponse } from "axios";
+import type { Project } from "@/models/ProjectModel";
 
 export class ProjectService extends BaseService {
 
