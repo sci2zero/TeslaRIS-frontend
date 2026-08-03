@@ -27,6 +27,17 @@ export interface FundingCall {
     fileItems: DocumentFileResponse[];
 }
 
+export interface FundingCallIndex {
+    id: string;
+    databaseId: number;
+    nameSr: string;
+    nameOther: string;
+    programId?: number;
+    funderId?: number;
+    dateFrom?: string;
+    dateTo?: string;
+}
+
 export enum FundingCallContributionType {
     ORGANIZER = "ORGANIZER",
     COORDINATOR = "COORDINATOR",
