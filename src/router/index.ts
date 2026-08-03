@@ -62,6 +62,8 @@ import FundingApplicationLandingView from "@/views/landingPages/FundingApplicati
 import SubmitFundingApplicationView from "@/views/SubmitFundingApplicationView.vue";
 import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
+import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
+import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
