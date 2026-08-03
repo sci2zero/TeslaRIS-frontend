@@ -1,12 +1,17 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { FundingApplication } from "@/models/FundingApplicationModel";
+import type { FundingApplication, FundingApplicationIndex } from "@/models/FundingApplicationModel";
+import type { Page } from "@/models/Common";
 import { AccessRights, type DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
 
 export class FundingApplicationService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
+
+    async searchFundingApplications(tokens: string, fundingCallId: number | null = null): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
+        return super.sendRequest(axios.get, `funding-application/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}`);
+    }
 
     async readFundingApplication(fundingApplicationId: number): Promise<AxiosResponse<FundingApplication>> {
         if (isNaN(fundingApplicationId) || fundingApplicationId <= 0) {
@@ -22,6 +27,10 @@ export class FundingApplicationService extends BaseService {
 
     async updateFundingApplication(fundingApplicationId: number, body: FundingApplication): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `funding-application/${fundingApplicationId}`, body);
+    }
+
+    async deleteFundingApplication(fundingApplicationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `funding-application/${fundingApplicationId}`);
     }
 
     async canEdit(fundingApplicationId: number): Promise<AxiosResponse<boolean>> {
