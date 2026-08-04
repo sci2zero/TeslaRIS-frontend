@@ -1,9 +1,9 @@
 import {BaseService} from "@/services/BaseService";
 import axios, {type AxiosResponse} from "axios";
 import type {FundingCall, FundingCallIndex} from "@/models/FundingCallModel";
-import type {Page} from "@/models/Common";
 import {AccessRights, type DocumentFileResponse, ResourceType} from "@/models/DocumentFileModel";
 import {getNameFromOrdinal} from "@/utils/EnumUtil";
+import type {Page} from "@/models/Common";
 
 export class FundingCallService extends BaseService {
 

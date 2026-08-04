@@ -64,6 +64,9 @@ import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
 import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
 import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
+import FundingCallListView from "@/views/FundingCallListView.vue";
+import ProjectLandingView from "@/views/landingPages/ProjectLandingView.vue";
+import ProjectListView from "@/views/ProjectListView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
@@ -134,6 +137,8 @@ import PerformanceRelatedOutputLandingView from "@/views/landingPages/Performanc
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
 import SubmitFundingView from "@/views/SubmitFundingView.vue";
+import FundingProgramListView from "@/views/FundingProgramListView.vue";
+import SubmitProjectView from "@/views/SubmitProjectView.vue";
 
 
 const roles = {
@@ -280,7 +285,17 @@ const router = createRouter({
                 },
                 {
                     path: "funding-call",
+                    name: "fundingCallsParent",
                     children: [
+                        {
+                            path: "",
+                            name: "fundingCalls",
+                            component: FundingCallListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                         {
                             path: ":id",
                             name: "fundingCallLandingPage",
@@ -326,7 +341,17 @@ const router = createRouter({
                 },
                 {
                     path: "funding-program",
+                    name: "fundingProgramsParent",
                     children: [
+                        {
+                            path: "",
+                            name: "fundingPrograms",
+                            component: FundingProgramListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                         {
                             path: ":id",
                             name: "fundingProgramLandingPage",
@@ -340,6 +365,39 @@ const router = createRouter({
                             path: "submit-funding-program",
                             name: "submitFundingProgram",
                             component: SubmitFundingProgramView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "project",
+                    name: "projectsParent",
+                    children: [
+                        {
+                            path: "",
+                            name: "projects",
+                            component: ProjectListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "projectLandingPage",
+                            component: ProjectLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-project",
+                            name: "submitProject",
+                            component: SubmitProjectView,
                             meta: {
                                 authenticated: false,
                                 authorities: [],

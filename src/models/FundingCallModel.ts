@@ -54,3 +54,16 @@ export enum FundingCallContributionType {
 export interface PersonFundingCallContribution extends PersonContribution {
     contributionType: FundingCallContributionType;
 }
+
+export interface FundingCallIndex {
+    id: string;
+    databaseId: number;
+    nameSr: string;
+    nameSrSortable: string;
+    nameOther: string;
+    nameOtherSortable: string;
+    programId?: number;
+    funderId?: number;
+    dateFrom?: string;
+    dateTo?: string;
+}
