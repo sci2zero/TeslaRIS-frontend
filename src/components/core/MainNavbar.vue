@@ -272,11 +272,8 @@ watch(() => loginStore.userLoggedIn, () => {
     }
 });
 
-watch(() => loginStore.reloadUserName, () => {
-    if (loginStore.reloadUserName) {
-        populateUserData();
-        loginStore.emitUsernameReloaded();
-    }
+watch(() => loginStore.usernameReloadRequests, () => {
+    populateUserData();
 });
 
 onMounted(() => {

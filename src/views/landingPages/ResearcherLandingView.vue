@@ -357,6 +357,7 @@ import ResearcherFeaturedIndicators from '@/components/researcher/landing/Resear
 import RoCrateService from '@/services/export/RoCrateService';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFieldVisibilityConfigurationForm.vue';
+import UserService from '@/services/UserService';
 
 
 export default defineComponent({
@@ -682,6 +683,9 @@ export default defineComponent({
 
                 fetchPerson();
                 updateSuccess();
+
+                UserService.invalidateCaches();
+                loginStore.emitReloadUsername();
             } catch (_error) {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -692,6 +696,9 @@ export default defineComponent({
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
                 fetchPerson();
                 updateSuccess();
+
+                UserService.invalidateCaches();
+                loginStore.emitReloadUsername();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;

@@ -207,11 +207,8 @@ const populateUserData = () => {
     });
 };
 
-watch(() => loginStore.reloadUserName, () => {
-    if (loginStore.reloadUserName) {
-        populateUserData();
-        loginStore.emitUsernameReloaded();
-    }
+watch(() => loginStore.usernameReloadRequests, () => {
+    populateUserData();
 });
 
 watch(() => loginStore.userLoggedIn, () => {
