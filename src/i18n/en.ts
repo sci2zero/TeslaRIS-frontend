@@ -1360,6 +1360,7 @@ export default {
     scholarIdFormatError: "Invalid Google Scholar ID format.",
     authenticusIdFormatError: "Invalid Google Scholar ID format.",
     lattesIdFormatError: "Invalid Lattes ID format.",
+    handleIdFormatError: "Invalid Handle ID format.",
     favoriteLabel: "Favorite",
     prizeTypeLabel: "Prize type",
     organisationUnitSectorLabel: "Organisation sector",
@@ -1510,5 +1511,6 @@ export default {
     revisionUpdateMessage: "Manual update",
     revisionCreateMessage: "Record creation",
     revisionEnrichmentMessage: "Record enrichment",
+    revisionRestoreMessage: "Record restored from version: {0}",
     dataQualityAssessmentLabel: "Data quality assessment"
 }

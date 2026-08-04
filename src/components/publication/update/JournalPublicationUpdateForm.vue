@@ -49,11 +49,17 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col v-if="!disableYearInput" cols="8">
                 <flexible-date-picker
                     v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
                     required
+                />
+            </v-col>
+            <v-col :cols="disableYearInput ? 10 : 2">
+                <v-checkbox
+                    v-model="disableYearInput"
+                    :label="$t('yearUnknownLabel')"
                 />
             </v-col>
         </v-row>
@@ -240,6 +246,7 @@ export default defineComponent({
         const startPage = ref(props.presetJournalPublication?.startPage);
         const endPage = ref(props.presetJournalPublication?.endPage);
         const publicationDate = ref(props.presetJournalPublication?.documentDate);
+        const disableYearInput = ref(!props.presetJournalPublication?.documentDate?.year);
         const doi = ref(props.presetJournalPublication?.doi);
         const openAlexId = ref(props.presetJournalPublication?.openAlexId);
         const webOfScienceId = ref(props.presetJournalPublication?.webOfScienceId);
@@ -296,7 +303,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetJournalPublication?.contributions,
-                documentDate: publicationDate.value,
+                documentDate: disableYearInput.value ? undefined : publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -328,6 +335,7 @@ export default defineComponent({
             endPage.value = props.presetJournalPublication?.endPage;
             numberOfPages.value = props.presetJournalPublication?.numberOfPages;
             publicationDate.value = props.presetJournalPublication?.documentDate;
+            disableYearInput.value = !props.presetJournalPublication?.documentDate?.year;
             doi.value = props.presetJournalPublication?.doi;
             scopus.value = props.presetJournalPublication?.scopusId;
             openAlexId.value = props.presetJournalPublication?.openAlexId;
@@ -374,7 +382,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules,
             optionalNumericZeroOrGreaterFieldRules,
-            commonFieldsRef, commonFieldsData,
+            disableYearInput, commonFieldsRef, commonFieldsData,
             presetCommonFieldsData, section, sectionRef
         };
     }

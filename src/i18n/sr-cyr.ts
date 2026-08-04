@@ -111,6 +111,7 @@ export default {
     scholarIdFormatError: "Погрешан формат Google Scholar ID-а.",
     authenticusIdFormatError: "Погрешан формат Google Scholar ID-а.",
     lattesIdFormatError: "Погрешан формат Lattes ID-а.",
+    handleIdFormatError: "Погрешан формат Handle ID-а.",
     invalidRorMessage: "Погрешан формат Lattes ID-а.",
     invalidRinggoldMessage: "Погрешан формат Ringgold ID-а.",
     invalidFundrefMessage: "Погрешан формат FundRef ID-а.",

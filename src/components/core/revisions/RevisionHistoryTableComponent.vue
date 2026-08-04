@@ -23,7 +23,7 @@
                 </td>
                 <td>{{ row.item.majorVersion }}.{{ row.item.minorVersion }}</td>
                 <td>{{ localiseDate(row.item.timestamp) }}</td>
-                <td>{{ displayTextOrPlaceholder(row.item.versionNote ? $t(row.item.versionNote + "Message") : row.item.versionNote as string) }}</td>
+                <td>{{ displayTextOrPlaceholder(row.item.versionNote ? $t(row.item.versionNote.split(":")[0] + "Message", [row.item.versionNote.split(":").at(-1)]) : row.item.versionNote as string) }}</td>
                 <td>{{ displayTextOrPlaceholder(row.item.createdBy as string) }}</td>
                 <td>
                     <span
@@ -52,6 +52,7 @@
                         {{ $t("detailedAssessmentLabel") }}
                     </v-btn>
                     <v-btn
+                        v-if="!isLatestRevision(row.item)"
                         density="compact"
                         variant="text"
                         color="primary"
@@ -230,6 +231,10 @@ export default defineComponent({
             }
         };
 
+        // Revisions arrive sorted by timestamp, newest first.
+        const isLatestRevision = (revision: Revision) =>
+            revisions.value.length > 0 && rowKey(revisions.value[0]) === rowKey(revision);
+
         const assessmentsByScore = computed(() => {
             const byRow = new Map<string, DataQualityAssessmentSimple[]>();
 
@@ -320,7 +325,7 @@ export default defineComponent({
         return {
             revisions, pagedRevisions, headers, tableOptions,
             refreshTable, isExpanded, toggleRow, scoreColorClass,
-            sortedAssessments, bestAssessment,
+            sortedAssessments, bestAssessment, isLatestRevision,
             showDetailedAssessment, startRestoreProcess, restoreRevision,
             displayPersistentDialog, revisionToRestore, restoreInProgress,
             notifications, versionLabelFor,

@@ -1370,6 +1370,7 @@ export default {
     scholarIdFormatError: "Pogrešan format Google Scholar ID-a.",
     authenticusIdFormatError: "Pogrešan format Google Scholar ID-a.",
     lattesIdFormatError: "Pogrešan format Lattes ID-a.",
+    handleIdFormatError: "Pogrešan format Handle ID-a",
     favoriteLabel: "Omiljeno",
     professionalAddressLabel: "Adresa radnog mesta",
     privateAddressLabel: "Adresa stanovanja",
@@ -1524,5 +1525,6 @@ export default {
     revisionUpdateMessage: "Ručno ažuriranje",
     revisionCreateMessage: "Kreiran zapis",
     revisionEnrichmentMessage: "Obogaćen zapis",
+    revisionRestoreMessage: "Zapis rekreiran od verzije: {0}",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka"
 }
