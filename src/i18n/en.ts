@@ -1557,7 +1557,6 @@ export default {
     totalAmountLabel: "Total amount",
     objectivesLabel: "Objectives",
     updateFundingCallLabel: "Update funding call",
-    createNewFundingCallLabel: "New funding call",
     updateObjectivesLabel: "Update objectives",
     addFundingCallLabel: "Add Funding Call",
     contributorsLabel: "Contributors",

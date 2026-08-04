@@ -73,7 +73,7 @@ const clearSortAndPerformSearch = (tokenParams: string) => {
 
 const search = (tokenParams: string) => {
     searchParams.value = tokenParams;
-    FundingCallService.searchFundingCalls(
+    FundingCallService.searchFundingCall(
         `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
     ).then((response) => {
         fundingCalls.value = response.data.content;
