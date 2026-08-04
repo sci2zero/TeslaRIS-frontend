@@ -62,6 +62,7 @@ import FundingApplicationLandingView from "@/views/landingPages/FundingApplicati
 import SubmitFundingApplicationView from "@/views/SubmitFundingApplicationView.vue";
 import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
+import FundingCallListView from "@/views/FundingCallListView.vue";
 import ProjectLandingView from "@/views/landingPages/ProjectLandingView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
@@ -283,7 +284,17 @@ const router = createRouter({
                 },
                 {
                     path: "funding-call",
+                    name: "fundingCallsParent",
                     children: [
+                        {
+                            path: "",
+                            name: "fundingCalls",
+                            component: FundingCallListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                         {
                             path: ":id",
                             name: "fundingCallLandingPage",
