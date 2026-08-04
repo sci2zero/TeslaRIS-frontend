@@ -147,6 +147,12 @@
             <v-tab value="team">
                 {{ $t("teamLabel") }}
             </v-tab>
+            <v-tab value="fundings">
+                {{ $t("fundingsLabel") }}
+            </v-tab>
+            <v-tab value="fundingApplications">
+                {{ $t("fundingApplicationsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -174,6 +180,30 @@
                             </div>
                             <v-divider v-if="index < sortedTeam.length - 1" class="mt-10" />
                         </div>
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundings">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-fundings-tab
+                            v-if="project?.id"
+                            :project="project"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundingApplications">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-funding-applications-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
@@ -222,6 +252,8 @@ import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
+import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
+import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
