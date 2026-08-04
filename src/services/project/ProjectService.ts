@@ -1,10 +1,15 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { Project } from "@/models/ProjectModel";
+import type { Project, ProjectIndex } from "@/models/ProjectModel";
+import type { Page } from "@/models/Common";
 
 export class ProjectService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
+
+    async searchProjects(tokens: string): Promise<AxiosResponse<Page<ProjectIndex>>> {
+        return super.sendRequest(axios.get, `project/search?${tokens}`);
+    }
 
     async readProject(projectId: number): Promise<AxiosResponse<Project>> {
         if (isNaN(projectId) || projectId <= 0) {
@@ -20,6 +25,10 @@ export class ProjectService extends BaseService {
 
     async updateProject(projectId: number, body: Project): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `project/${projectId}`, body);
+    }
+
+    async deleteProject(projectId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `project/${projectId}`);
     }
 
     async canEdit(projectId: number): Promise<AxiosResponse<boolean>> {

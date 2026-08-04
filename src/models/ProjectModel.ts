@@ -39,6 +39,17 @@ export interface PrepopulatedProjectMetadata {
     status: ProjectStatus;
 }
 
+export interface ProjectIndex {
+    id: string;
+    databaseId: number;
+    nameSr: string;
+    nameSrSortable: string;
+    nameOther: string;
+    nameOtherSortable: string;
+    dateFrom?: string;
+    dateTo?: string;
+}
+
 export interface PersonProjectContribution extends PersonContribution {
     contributionType: PersonProjectContributionType;
     investigationRole: PersonProjectInvestigationRole;

@@ -64,6 +64,7 @@ import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
 import FundingCallListView from "@/views/FundingCallListView.vue";
 import ProjectLandingView from "@/views/landingPages/ProjectLandingView.vue";
+import ProjectListView from "@/views/ProjectListView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
@@ -373,7 +374,17 @@ const router = createRouter({
                 },
                 {
                     path: "project",
+                    name: "projectsParent",
                     children: [
+                        {
+                            path: "",
+                            name: "projects",
+                            component: ProjectListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
                         {
                             path: ":id",
                             name: "projectLandingPage",
