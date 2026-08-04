@@ -49,6 +49,18 @@ export interface FundingIndex {
     dateTo?: string;
 }
 
+export interface FundingProgramIndex {
+    id: string;
+    databaseId: number;
+    nameSr: string;
+    nameSrSortable: string;
+    nameOther: string;
+    nameOtherSortable: string;
+    funderId?: number;
+    dateFrom?: string;
+    dateTo?: string;
+}
+
 export enum FundingType {
     GRANT= "GRANT",
     CALL= "CALL",
