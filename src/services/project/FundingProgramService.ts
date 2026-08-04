@@ -1,12 +1,17 @@
 import {BaseService} from "@/services/BaseService";
 import axios, {type AxiosResponse} from "axios";
-import type {FundingProgram} from "@/models/FundingModel";
+import type {FundingProgram, FundingProgramIndex} from "@/models/FundingModel";
 import {AccessRights, type DocumentFileResponse, ResourceType} from "@/models/DocumentFileModel";
 import {getNameFromOrdinal} from "@/utils/EnumUtil";
+import type {Page} from "@/models/Common";
 
 export class FundingProgramService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
+
+    async searchFundingPrograms(tokens: string, funderId: number | null = null): Promise<AxiosResponse<Page<FundingProgramIndex>>> {
+        return super.sendRequest(axios.get, `funding-program/search?${tokens}${funderId ? `&funderId=${funderId}` : ""}`);
+    }
 
     async canEdit(fundingProgramId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `funding-program/${fundingProgramId}/can-edit`);
@@ -26,6 +31,10 @@ export class FundingProgramService extends BaseService {
 
     async updateFundingProgram(fundingProgramId: number, body: FundingProgram): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `funding-program/${fundingProgramId}`, body);
+    }
+
+    async deleteFundingProgram(fundingProgramId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `funding-program/${fundingProgramId}`);
     }
 
     async addDocument(fundingProgramId: number, attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
