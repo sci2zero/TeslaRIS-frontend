@@ -1,7 +1,7 @@
 <template>
     <v-col :cols="cols">
         <div v-if="document?.scopusId">
-            {{ $t('scopusIdLabel') }}:
+            Scopus ID:
         </div>
         <div v-if="document?.scopusId" class="response">
             <identifier-link :identifier="document.scopusId" type="scopus" />
