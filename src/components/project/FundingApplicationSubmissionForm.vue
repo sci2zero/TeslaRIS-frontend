@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="6">
+            <v-col v-if="!presetProjectId" cols="6">
                 <!-- TODO: Project autocomplete -->
                 <v-text-field
                     v-model.number="projectId"
@@ -130,8 +130,10 @@ import type { ErrorResponse } from '@/models/Common';
 
 const props = withDefaults(defineProps<{
     presetFundingCallId?: number;
+    presetProjectId?: number;
 }>(), {
-    presetFundingCallId: undefined
+    presetFundingCallId: undefined,
+    presetProjectId: undefined
 });
 
 const emit = defineEmits<{
@@ -152,7 +154,7 @@ const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const responseSummaryRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const requestedAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 
-const projectId = ref<number | undefined>(undefined);
+const projectId = ref<number | undefined>(props.presetProjectId);
 const fundingCallId = ref<number | undefined>(props.presetFundingCallId);
 const revisedFundingApplicationId = ref<number | undefined>(undefined);
 
@@ -194,7 +196,7 @@ const submitFundingApplication = (stayOnPage: boolean) => {
         emit("create", response.data);
 
         if (stayOnPage) {
-            projectId.value = undefined;
+            projectId.value = props.presetProjectId;
             fundingCallId.value = props.presetFundingCallId;
             revisedFundingApplicationId.value = undefined;
             submitter.value = undefined;

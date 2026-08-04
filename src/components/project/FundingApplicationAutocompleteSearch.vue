@@ -16,7 +16,7 @@
             <generic-crud-modal
                 ref="modalRef"
                 :form-component="FundingApplicationSubmissionForm"
-                :form-props="{ presetFundingCallId: presetFundingCallId }"
+                :form-props="{ presetFundingCallId: presetFundingCallId, presetProjectId: presetProjectId }"
                 entity-name="FundingApplication"
                 is-submission
                 wide
@@ -38,9 +38,11 @@ import FundingApplicationSubmissionForm from "@/components/project/FundingApplic
 
 withDefaults(defineProps<{
     presetFundingCallId?: number;
+    presetProjectId?: number;
     readonly?: boolean;
 }>(), {
     presetFundingCallId: undefined,
+    presetProjectId: undefined,
     readonly: false
 });
 
