@@ -9,8 +9,8 @@ export class FundingApplicationService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async searchFundingApplications(tokens: string, fundingCallId: number | null = null): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
-        return super.sendRequest(axios.get, `funding-application/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}`);
+    async searchFundingApplications(tokens: string, fundingCallId: number | null = null, projectId: number | null = null): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
+        return super.sendRequest(axios.get, `funding-application/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}${projectId ? `&projectId=${projectId}` : ""}`);
     }
 
     async readFundingApplication(fundingApplicationId: number): Promise<AxiosResponse<FundingApplication>> {
