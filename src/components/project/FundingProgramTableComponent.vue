@@ -77,11 +77,27 @@
                             {{ row.item.nameOther }}
                         </localized-link>
                     </td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        <localized-link :to="'funding-program/' + row.item.databaseId">
+                          {{ row.item.funderNameSr }}
+                        </localized-link>
+                    </td>
+                    <td v-else>
+                        <localized-link :to="'funding-program/' + row.item.databaseId">
+                          {{ row.item.funderNameOther }}
+                        </localized-link>
+                    </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                    <td class="text-right">
+                        <span class="amount-cell">
+                            <span class="amount-value">{{ formatAmount(row.item.totalAmount, locale) }}</span>
+                            <span class="amount-currency">{{ row.item.currencySymbol }}</span>
+                        </span>
                     </td>
                 </tr>
             </template>
@@ -118,6 +134,7 @@ import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import {formatAmount} from "@/utils/MonetaryUtil";
 
 
 defineProps<{
@@ -133,29 +150,43 @@ const selectedFundingPrograms = ref<FundingProgramIndex[]>([]);
 
 const i18n = useI18n();
 
+const { locale } = useI18n();
+
 const notifications = ref<Map<string, string>>(new Map());
 
 const nameLabel = computed(() => i18n.t("nameLabel"));
+const funderNameLabel = computed(() => i18n.t("funderLabel"));
 const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
 const dateToLabel = computed(() => i18n.t("dateToLabel"));
+const totalAmountLabel = computed(() => i18n.t("totalAmountLabel"));
 
 const { isAdmin } = useUserRole();
 
 const nameColumn = computed(() => i18n.t("nameColumn"));
+const funderNameColumn = computed(() => i18n.t("funderNameColumn"));
 
-const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+const tableOptions = ref<any>({
+  initialCustomConfiguration: true,
+  page: 1,
+  itemsPerPage: 10,
+  sortBy:[{key: nameColumn, order: "asc"}]});
 
-const headers = [
+const headers = ref<any>([
     { title: nameLabel, align: "start", sortable: true, key: nameColumn},
+    { title: funderNameLabel, align: "start", sortable: true, key: funderNameColumn},
     { title: dateFromLabel, align: "start", sortable: true, key: "dateFrom"},
-    { title: dateToLabel, align: "start", sortable: true, key: "dateTo"}
-];
+    { title: dateToLabel, align: "start", sortable: true, key: "dateTo"},
+    { title: totalAmountLabel, align: "start", sortable: true, key: "totalAmount"}
+]);
 
 const headersSortableMappings: Map<string, string> = new Map([
     ["nameSr", "name_sr_sortable"],
     ["nameOther", "name_other_sortable"],
+    ["funderNameSr", "funder_name_sr_sortable"],
+    ["funderNameOther", "funder_name_other_sortable"],
     ["dateFrom", "date_from"],
-    ["dateTo", "date_to"]
+    ["dateTo", "date_to"],
+    ["totalAmount", "total_amount"]
 ]);
 
 const refreshTable = (event: any) => {
@@ -240,6 +271,24 @@ defineExpose({
 </script>
 
 <style scoped>
+
+.amount-cell {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.amount-value {
+  text-align: right;
+}
+
+.amount-currency {
+  flex: none;
+  min-width: 3ch;
+  text-align: left;
+}
+
 .action-menu-container {
     display: flex;
     justify-content: flex-start;

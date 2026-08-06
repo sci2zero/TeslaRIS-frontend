@@ -199,6 +199,7 @@ export default {
     researchAreasLabel: "Research Areas",
     researchAreaLabel: "Research Area",
     nameColumn: "nameOther",
+    funderNameColumn: "funderNameOther",
     keywordsColumn: "keywordsOther",
     researchAreasColumn: "researchAreasOther",
     addInstitutionEditorLabel: "Institutional editor",
