@@ -1588,4 +1588,5 @@ export default {
     updateProjectLabel: "Ažuriraj projekat",
     addProjectLabel: "Projekat",
     showOnlyActiveLabel: "Prikaži samo aktivne",
+    showOnlyMyLabel: "Prikaži samo moje",
 }

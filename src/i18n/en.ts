@@ -1574,4 +1574,5 @@ export default {
     updateProjectLabel: "Update project",
     addProjectLabel: "Project",
     showOnlyActiveLabel: "Show only active",
+    showOnlyMyLabel: "Show only mine",
 }
