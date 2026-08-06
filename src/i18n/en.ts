@@ -200,6 +200,7 @@ export default {
     researchAreaLabel: "Research Area",
     nameColumn: "nameOther",
     funderNameColumn: "funderNameOther",
+    programNameColumn: "programNameOther",
     keywordsColumn: "keywordsOther",
     researchAreasColumn: "researchAreasOther",
     addInstitutionEditorLabel: "Institutional editor",

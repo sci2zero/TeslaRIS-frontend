@@ -62,6 +62,7 @@ export interface FundingProgramIndex {
     dateFrom?: string;
     dateTo?: string;
     totalAmount: number;
+    currencySymbol: string;
 }
 
 export enum FundingType {

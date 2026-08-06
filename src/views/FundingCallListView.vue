@@ -24,16 +24,43 @@
                 />
             </template>
             <template #actions>
-                <v-btn color="primary" @click="addFundingCall">
-                    {{ $t("createNewFundingCallLabel") }}
-                </v-btn>
+                <div class="flex items-center gap-2">
+                    <v-menu>
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                color="white"
+                                prepend-icon="mdi-dots-vertical"
+                                class="action-menu-trigger"
+                            >
+                                {{ $t("optionsLabel") }}
+                            </v-btn>
+                        </template>
+                        <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                            <v-checkbox
+                                v-model="returnOnlyActiveFundingCalls"
+                                :label="$t('showOnlyActiveLabel')"
+                                hide-details
+                            />
+<!--                            TODO: Uncomment when the Funder role is added -->
+<!--                            <v-checkbox-->
+<!--                                v-model="returnOnlyMyFundingPrograms"-->
+<!--                                :label="$t('showOnlyMyLabel')"-->
+<!--                                hide-details-->
+<!--                            />-->
+                        </div>
+                    </v-menu>
+                    <v-btn color="primary" @click="addFundingCall">
+                        {{ $t("createNewFundingCallLabel") }}
+                    </v-btn>
+                </div>
             </template>
         </funding-call-table-component>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import FundingCallService from '@/services/project/FundingCallService';
 import FundingCallTableComponent from '@/components/project/FundingCallTableComponent.vue';
@@ -53,6 +80,11 @@ const size = ref(1);
 const sort = ref("");
 const direction = ref("");
 
+const returnOnlyActiveFundingCalls = ref(false);
+// TODO: Implement the remainder of the functionality when Funder role is added
+const returnOnlyMyFundingPrograms = ref(false);
+const initialLoad = ref(true);
+
 const i18n = useI18n();
 const router = useRouter();
 const tableRef = ref<InstanceType<typeof FundingCallTableComponent>>();
@@ -61,6 +93,12 @@ onMounted(() => {
     document.title = i18n.t("fundingCallsLabel");
     loading.value = true;
     search(searchParams.value);
+});
+
+watch(returnOnlyActiveFundingCalls, () => {
+    if (!initialLoad.value) {
+        search(searchParams.value);
+    }
 });
 
 const clearSortAndPerformSearch = (tokenParams: string) => {
@@ -74,13 +112,16 @@ const clearSortAndPerformSearch = (tokenParams: string) => {
 const search = (tokenParams: string) => {
     searchParams.value = tokenParams;
     FundingCallService.searchFundingCalls(
-        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`
+        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
+        null,
+        returnOnlyActiveFundingCalls.value
     ).then((response) => {
         fundingCalls.value = response.data.content;
         totalFundingCalls.value = response.data.totalElements;
     })
     .finally(() => {
         loading.value = false;
+        initialLoad.value = false;
     });
 };
 

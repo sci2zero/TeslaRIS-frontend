@@ -51,8 +51,13 @@ export interface FundingCallIndex {
     nameSrSortable: string;
     nameOther: string;
     nameOtherSortable: string;
+    programNameSr: string;
+    programNameOther: string;
     programId?: number;
     funderId?: number;
     dateFrom?: string;
     dateTo?: string;
+    amount: number;
+    currencySymbol: string;
+    types: string;
 }

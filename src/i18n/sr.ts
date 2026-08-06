@@ -202,6 +202,7 @@ export default {
     researchAreaLabel: "Oblast Istraživanja",
     nameColumn: "nameSr",
     funderNameColumn: "funderNameSr",
+    programNameColumn: "programNameSr",
     keywordsColumn: "keywordsSr",
     researchAreasColumn: "researchAreasSr",
     addInstitutionEditorLabel: "Institucioni urednik",
