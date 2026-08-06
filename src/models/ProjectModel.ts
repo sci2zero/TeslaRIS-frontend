@@ -14,7 +14,6 @@ export interface Project {
     nameAbbreviation: MultilingualContent[];
     keywords: MultilingualContent[];
     researchAreasId: number[];
-    consortiumIds: number[];
     uris: string[];
     dateFrom?: string;
     dateTo?: string;
@@ -23,7 +22,8 @@ export interface Project {
     researchType: ProjectResearchType;
     notFunded?: boolean;
     costs?: MonetaryAmount;
-    team: PersonProjectContribution[];
+    persons: PersonProjectContribution[];
+    consortium: OrganisationUnitProjectContribution[];
 }
 
 export interface PrepopulatedProjectMetadata {
@@ -55,6 +55,21 @@ export interface PersonProjectContribution extends PersonContribution {
     investigationRole: PersonProjectInvestigationRole;
     otherRoleDescription: MultilingualContent[];
     fundingParts: FundingPart[];
+}
+
+export interface OrganisationUnitProjectContribution {
+    id?: number;
+    organisationUnitId?: number;
+    organisationUnitName?: MultilingualContent[];
+    displayOrganisationUnit: MultilingualContent[];
+    contributionDescription: MultilingualContent[];
+    contributionType: OrganisationUnitProjectContributionType;
+    orderNumber: number;
+    dateFrom?: string;
+    dateTo?: string;
+    uris?: string[];
+    isMainContributor?: boolean;
+    fundingParts?: FundingPart[];
 }
 
 export enum ProjectStatus {
@@ -91,6 +106,15 @@ export enum PersonProjectContributionType {
     INKIND_CONTRIBUTOR = "INKIND_CONTRIBUTOR",
     CONTRACTOR = "CONTRACTOR",
     PARTICIPATION = "PARTICIPATION"
+}
+
+export enum OrganisationUnitProjectContributionType {
+    COORDINATOR = "COORDINATOR",
+    PARTNER = "PARTNER",
+    CONSORTIUM_MEMBER = "CONSORTIUM_MEMBER",
+    INKIND_CONTRIBUTOR = "INKIND_CONTRIBUTOR",
+    CONTRACTOR = "CONTRACTOR",
+    BENEFICIARY = "BENEFICIARY"
 }
 
 export enum PersonProjectInvestigationRole {

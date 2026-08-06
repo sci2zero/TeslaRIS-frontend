@@ -147,6 +147,9 @@
             <v-tab value="team">
                 {{ $t("teamLabel") }}
             </v-tab>
+            <v-tab value="consortium">
+                {{ $t("consortiumLabel") }}
+            </v-tab>
             <v-tab value="fundings">
                 {{ $t("fundingsLabel") }}
             </v-tab>
@@ -162,24 +165,25 @@
             <v-tabs-window-item value="team">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <strong v-if="!project?.team || project.team.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <div v-for="(contribution, index) in sortedTeam" :key="contribution.id ?? index" class="py-5">
-                            <h4>
-                                <strong>
-                                    {{ contribution.personName?.firstname }}
-                                    {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
-                                    {{ ' ' + contribution.personName?.lastname }}
-                                    - {{ getPersonProjectContributionTypeTitleFromValueAutoLocale(contribution.contributionType) }}
-                                </strong>
-                            </h4>
-                            <div>
-                                {{ $t("investigationRoleLabel") }}: {{ getPersonProjectInvestigationRoleTitleFromValueAutoLocale(contribution.investigationRole) }}
-                            </div>
-                            <div v-if="contribution.otherRoleDescription && contribution.otherRoleDescription.length > 0">
-                                {{ $t("otherRoleDescriptionLabel") }}: {{ returnCurrentLocaleContent(contribution.otherRoleDescription) }}
-                            </div>
-                            <v-divider v-if="index < sortedTeam.length - 1" class="mt-10" />
-                        </div>
+                        <project-team-tab
+                            v-if="project"
+                            :team="project.persons ?? []"
+                            :can-edit="canEdit"
+                            @update="updateTeam"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="consortium">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-consortium-tab
+                            v-if="project"
+                            :consortium="project.consortium ?? []"
+                            :can-edit="canEdit"
+                            @update="updateConsortium"
+                        />
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
@@ -239,12 +243,10 @@ import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
-import type { Project } from "@/models/ProjectModel";
+import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project } from "@/models/ProjectModel";
 import { getProjectStatusTitleFromValueAutoLocale } from "@/i18n/projectStatus";
 import { getProjectCollaborationTypeTitleFromValueAutoLocale } from "@/i18n/projectCollaborationType";
 import { getProjectResearchTypeTitleFromValueAutoLocale } from "@/i18n/projectResearchType";
-import { getPersonProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/personProjectContributionType";
-import { getPersonProjectInvestigationRoleTitleFromValueAutoLocale } from "@/i18n/personProjectInvestigationRole";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
@@ -254,6 +256,8 @@ import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
 import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
 import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
+import ProjectTeamTab from "@/components/project/ProjectTeamTab.vue";
+import ProjectConsortiumTab from "@/components/project/ProjectConsortiumTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
@@ -277,10 +281,6 @@ const title = computed(() => {
     const name = returnCurrentLocaleContent(project.value?.name) ?? "";
     const abbr = returnCurrentLocaleContent(project.value?.nameAbbreviation);
     return abbr ? `${name} (${abbr})` : name;
-});
-
-const sortedTeam = computed(() => {
-    return [...(project.value?.team ?? [])].sort((a, b) => a.orderNumber - b.orderNumber);
 });
 
 onMounted(() => {
@@ -329,18 +329,23 @@ const updateDescription = (description: MultilingualContent[]) => {
     performUpdate(true);
 };
 
+const updateTeam = (team: PersonProjectContribution[]) => {
+    project.value!.persons = team;
+    performUpdate(true);
+};
+
+const updateConsortium = (consortium: OrganisationUnitProjectContribution[]) => {
+    project.value!.consortium = consortium;
+    performUpdate(true);
+};
+
 const updateBasicInfo = (basicInfo: Project) => {
     project.value = { ...project.value, ...basicInfo };
     performUpdate(true);
 };
 
 const performUpdate = (reload: boolean) => {
-    const updatePayload: Project = {
-        ...(project.value as Project),
-        team: project.value?.team?.map(contribution => ({ ...contribution, fundingParts: [] })) ?? []
-    };
-
-    ProjectService.updateProject(project.value?.id as number, updatePayload).then(() => {
+    ProjectService.updateProject(project.value?.id as number, project.value as Project).then(() => {
         snackbarMessage.value = i18n.t("updatedSuccessMessage");
         snackbar.value = true;
         if (reload) {
