@@ -78,12 +78,12 @@
                         </localized-link>
                     </td>
                     <td v-if="$i18n.locale.startsWith('sr')">
-                        <localized-link :to="'funding-program/' + row.item.databaseId">
+                        <localized-link :to="'organisation-units/' + row.item.funderId">
                           {{ row.item.funderNameSr }}
                         </localized-link>
                     </td>
                     <td v-else>
-                        <localized-link :to="'funding-program/' + row.item.databaseId">
+                        <localized-link :to="'organisation-units/' + row.item.funderId">
                           {{ row.item.funderNameOther }}
                         </localized-link>
                     </td>
