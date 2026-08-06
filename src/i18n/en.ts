@@ -1573,4 +1573,5 @@ export default {
     otherRoleDescriptionLabel: "Other role description",
     updateProjectLabel: "Update project",
     addProjectLabel: "Project",
+    showOnlyActiveLabel: "Show only active",
 }

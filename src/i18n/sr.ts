@@ -1587,4 +1587,5 @@ export default {
     otherRoleDescriptionLabel: "Opis druge uloge",
     updateProjectLabel: "Ažuriraj projekat",
     addProjectLabel: "Projekat",
+    showOnlyActiveLabel: "Prikaži samo aktivne",
 }
