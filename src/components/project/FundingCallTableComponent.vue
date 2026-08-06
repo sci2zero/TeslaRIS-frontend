@@ -108,7 +108,19 @@
                         <span v-else>{{ displayTextOrPlaceholder(row.item.programNameOther) }}</span>
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder(formatFundingTypes(row.item.types)) }}
+                        <div v-if="row.item.types?.length" class="flex flex-wrap gap-1">
+                            <v-chip
+                                v-for="fundingType in row.item.types"
+                                :key="fundingType"
+                                size="small"
+                                color="primary"
+                                variant="flat"
+                                :prepend-icon="getFundingTypeIcon(fundingType)"
+                            >
+                                {{ getFundingTypeTitleFromValueAutoLocale(fundingType) }}
+                            </v-chip>
+                        </div>
+                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
@@ -215,14 +227,15 @@ const headersSortableMappings: Map<string, string> = new Map([
     ["amount", "amount"]
 ]);
 
-const formatFundingTypes = (types: FundingType[] | undefined): string => {
-    if (!types || types.length === 0) {
-        return "";
+const getFundingTypeIcon = (type: FundingType) => {
+    switch (type) {
+        case FundingType.GRANT:
+            return "mdi-cash-multiple";
+        case FundingType.CALL:
+            return "mdi-bullhorn";
+        default:
+            return "mdi-file-document";
     }
-
-    return types
-        .map(type => getFundingTypeTitleFromValueAutoLocale(type) ?? type)
-        .join(", ");
 };
 
 const refreshTable = (event: any) => {
