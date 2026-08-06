@@ -1570,6 +1570,9 @@ export default {
     teamLabel: "Team",
     investigationRoleLabel: "Investigation role",
     otherRoleDescriptionLabel: "Other role description",
+    consortiumLabel: "Consortium",
+    addTeamMemberLabel: "Add team member",
+    addInstitutionLabel: "Add institution",
     updateProjectLabel: "Update project",
     addProjectLabel: "Project",
 }

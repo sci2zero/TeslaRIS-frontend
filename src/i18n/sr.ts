@@ -1584,6 +1584,9 @@ export default {
     teamLabel: "Tim",
     investigationRoleLabel: "Istraživačka uloga",
     otherRoleDescriptionLabel: "Opis druge uloge",
+    consortiumLabel: "Konzorcijum",
+    addTeamMemberLabel: "Dodaj člana tima",
+    addInstitutionLabel: "Dodaj instituciju",
     updateProjectLabel: "Ažuriraj projekat",
     addProjectLabel: "Projekat",
 }
