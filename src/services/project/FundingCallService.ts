@@ -1,6 +1,7 @@
 import {BaseService} from "@/services/BaseService";
 import axios, {type AxiosResponse} from "axios";
 import type {FundingCall, FundingCallIndex} from "@/models/FundingCallModel";
+import type {FundingType} from "@/models/FundingModel";
 import {AccessRights, type DocumentFileResponse, ResourceType} from "@/models/DocumentFileModel";
 import {getNameFromOrdinal} from "@/utils/EnumUtil";
 import type {Page} from "@/models/Common";
@@ -12,7 +13,8 @@ export class FundingCallService extends BaseService {
     async searchFundingCalls(
         tokens: string,
         programId: number | null = null,
-        onlyActive: boolean = false
+        onlyActive: boolean = false,
+        allowedTypes: FundingType[] = []
     ): Promise<AxiosResponse<Page<FundingCallIndex>>> {
         let url = `funding-call/search?${tokens}`;
         if (programId) {
@@ -21,6 +23,9 @@ export class FundingCallService extends BaseService {
         if (onlyActive) {
             url += "&onlyActive=true";
         }
+        allowedTypes.forEach(allowedType => {
+            url += `&allowedTypes=${allowedType}`;
+        });
         return super.sendRequest(axios.get, url);
     }
 

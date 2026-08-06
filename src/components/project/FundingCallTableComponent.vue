@@ -57,6 +57,24 @@
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
+            <template #[`header.types`]="{ column }">
+                <div class="group flex items-center gap-2">
+                    <span>{{ column.title }}</span>
+                    <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-icon
+                                v-bind="props"
+                                :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                                :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                                icon="mdi-filter"
+                            ></v-icon>
+                        </template>
+                        <div class="p-3 bg-white rounded-lg shadow-lg">
+                            <slot name="type-filter-menu" :column="column"></slot>
+                        </div>
+                    </v-menu>
+                </div>
+            </template>
             <template #item="row">
                 <tr>
                     <td v-if="isAdmin">
@@ -144,10 +162,13 @@ import { getFundingTypeTitleFromValueAutoLocale } from '@/i18n/fundingType';
 import { FundingType } from '@/models/FundingModel';
 
 
-defineProps<{
+withDefaults(defineProps<{
     fundingCalls: FundingCallIndex[];
     totalFundingCalls: number;
-}>();
+    hasActiveTypeFilters?: boolean;
+}>(), {
+    hasActiveTypeFilters: false
+});
 
 const emit = defineEmits<{
     (e: "switchPage", page: number, size: number, sort: string | undefined, direction: string | undefined): void;
@@ -194,16 +215,13 @@ const headersSortableMappings: Map<string, string> = new Map([
     ["amount", "amount"]
 ]);
 
-const formatFundingTypes = (types: string | undefined): string => {
-    if (!types) {
+const formatFundingTypes = (types: FundingType[] | undefined): string => {
+    if (!types || types.length === 0) {
         return "";
     }
 
     return types
-        .split(",")
-        .map(token => token.trim())
-        .filter(Boolean)
-        .map(token => getFundingTypeTitleFromValueAutoLocale(token as FundingType) ?? token)
+        .map(type => getFundingTypeTitleFromValueAutoLocale(type) ?? type)
         .join(", ");
 };
 

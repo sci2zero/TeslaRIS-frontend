@@ -59,5 +59,5 @@ export interface FundingCallIndex {
     dateTo?: string;
     amount: number;
     currencySymbol: string;
-    types: string;
+    types: FundingType[];
 }
