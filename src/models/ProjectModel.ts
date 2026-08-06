@@ -46,8 +46,12 @@ export interface ProjectIndex {
     nameSrSortable: string;
     nameOther: string;
     nameOtherSortable: string;
+    coordinatorNameSr: string;
+    coordinatorNameOther: string;
+    coordinatorId?: number;
     dateFrom?: string;
     dateTo?: string;
+    status?: ProjectStatus;
 }
 
 export interface PersonProjectContribution extends PersonContribution {
