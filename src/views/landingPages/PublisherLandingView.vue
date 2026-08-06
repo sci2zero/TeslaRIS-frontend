@@ -76,6 +76,15 @@
             </v-col>
         </v-row>
 
+        <v-row v-if="publisher">
+            <v-col cols="3">
+                <data-quality-remarks-dialog
+                    :entity-type="EntityType.PUBLISHER"
+                    :entity-id="publisher?.id"
+                />
+            </v-col>
+        </v-row>
+
         <!-- Publication Table -->
         <br />
         <tab-content-loader
@@ -90,6 +99,18 @@
             @switch-page="switchPage"
         />
         
+        <!-- Revision History -->
+        <template v-if="isAdmin && publisher">
+            <h2 class="mt-8 mb-2">
+                {{ $t("revisionHistoryLabel") }}
+            </h2>
+            <revision-history-table-component
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
+                @restored="fetchPublisher"
+            />
+        </template>
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -115,12 +136,18 @@ import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog },
     setup() {
+        const { isAdmin } = useUserRole();
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -232,7 +259,8 @@ export default defineComponent({
             switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
-            updateBasicInfo, snackbar, snackbarMessage
+            updateBasicInfo, snackbar, snackbarMessage,
+            isAdmin, EntityType, fetchPublisher
         };
 }})
 

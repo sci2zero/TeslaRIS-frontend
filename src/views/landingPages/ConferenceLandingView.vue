@@ -119,6 +119,12 @@
                                     />
                                 </div>
                             </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.CONFERENCE"
+                                    :entity-id="conference?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -146,6 +152,9 @@
             </v-tab>
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
+            </v-tab>
+            <v-tab v-show="isAdmin" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -228,6 +237,14 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.CONFERENCE"
+                    :entity-id="conference?.id"
+                    @restored="fetchConference"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -271,12 +288,18 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog },
     setup() {
+        const { isAdmin } = useUserRole();
+
         const currentTab = ref("contributions");
 
         const snackbar = ref(false);
@@ -464,7 +487,8 @@ export default defineComponent({
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, ExportableEndpointType,
-            fetchIdentifiers, eventIdentifiers
+            fetchIdentifiers, eventIdentifiers,
+            isAdmin, EntityType, fetchConference
         };
 }})
 

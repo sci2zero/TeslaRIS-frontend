@@ -84,6 +84,15 @@
             :person-id="(person?.id as number)"
         />
 
+        <v-row v-if="person">
+            <v-col cols="12" md="3">
+                <data-quality-remarks-dialog
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
+                />
+            </v-col>
+        </v-row>
+
         <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
         <v-tabs
             v-if="person"
@@ -105,6 +114,9 @@
             </v-tab>
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="isAdmin" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -287,6 +299,14 @@
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
+                    @restored="fetchPerson"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <persistent-question-dialog
@@ -358,11 +378,14 @@ import RoCrateService from '@/services/export/RoCrateService';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFieldVisibilityConfigurationForm.vue';
 import UserService from '@/services/UserService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityRemarksDialog },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -767,7 +790,8 @@ export default defineComponent({
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
-            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate
+            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
+            EntityType
         };
 }});
 </script>

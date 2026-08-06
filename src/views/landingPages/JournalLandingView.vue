@@ -95,6 +95,12 @@
                                     />
                                 </div>
                             </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.JOURNAL"
+                                    :entity-id="journal?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -120,6 +126,9 @@
             </v-tab>
             <v-tab v-if="canClassify || (journalClassifications && journalClassifications.length > 0)" value="classifications">
                 {{ $t("classificationsLabel") }}
+            </v-tab>
+            <v-tab v-show="isAdmin" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -169,6 +178,14 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.JOURNAL"
+                    :entity-id="journal?.id"
+                    @restored="() => fetchJournal(false)"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -211,12 +228,18 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import { getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog },
     setup() {
+        const { isAdmin } = useUserRole();
+
         const currentTab = ref("contributions");
 
         const snackbar = ref(false);
@@ -394,7 +417,8 @@ export default defineComponent({
             journalClassifications, createJournalClassification,
             fetchClassifications, publicationSeriesIdentifiers,
             getArticleCollectionSeriesTypeTitleFromValueAutoLocale,
-            fetchIdentifiers
+            fetchIdentifiers,
+            isAdmin, EntityType, fetchJournal
         };
 }})
 

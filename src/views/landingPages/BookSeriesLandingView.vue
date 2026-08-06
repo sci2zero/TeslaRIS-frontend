@@ -91,6 +91,12 @@
                                     />
                                 </div>
                             </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.BOOK_SERIES"
+                                    :entity-id="bookSeries?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -113,6 +119,9 @@
             </v-tab>
             <v-tab v-if="bookSeriesIndicators && bookSeriesIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-show="isAdmin" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -146,6 +155,14 @@
                     :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
                     :can-edit="false"
                     show-statistics
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.BOOK_SERIES"
+                    :entity-id="bookSeries?.id"
+                    @restored="() => fetchBookSeries(false)"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -185,12 +202,18 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog },
     setup() {
+        const { isAdmin } = useUserRole();
+
         const currentTab = ref("contributions");
 
         const snackbar = ref(false);
@@ -348,7 +371,8 @@ export default defineComponent({
             snackbarMessage, updateContributions,
             PublicationSeriesUpdateForm,
             ApplicableEntityType,
-            bookSeriesIndicators
+            bookSeriesIndicators,
+            isAdmin, EntityType, fetchBookSeries
         };
 }})
 
