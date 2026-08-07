@@ -72,6 +72,25 @@ export interface OrganisationUnitProjectContribution {
     fundingParts?: FundingPart[];
 }
 
+export interface ProjectDocument {
+    id?: number;
+    projectId: number;
+    documentId?: number;
+    documentTitleSr?: string;
+    documentTitleOther?: string;
+    documentType?: string;
+    textualDescription: MultilingualContent[];
+    relationType: ProjectDocumentType;
+    fundingParts?: FundingPart[];
+}
+
+export enum ProjectDocumentType {
+    REPORT = "REPORT",
+    RESULT = "RESULT",
+    USED = "USED",
+    INTERNAL = "INTERNAL"
+}
+
 export enum ProjectStatus {
     SUBMITTED = "SUBMITTED",
     UNDER_EVALUATION = "UNDER_EVALUATION",
