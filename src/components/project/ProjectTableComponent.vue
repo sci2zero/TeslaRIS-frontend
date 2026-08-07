@@ -159,8 +159,7 @@ import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
-import { getProjectStatusTitleFromValueAutoLocale } from '@/i18n/projectStatus';
-import { ProjectStatus } from '@/models/ProjectModel';
+import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from '@/i18n/projectStatus';
 
 
 withDefaults(defineProps<{
@@ -211,23 +210,6 @@ const headersSortableMappings: Map<string, string> = new Map([
     ["dateTo", "date_to"],
     ["status", "status"]
 ]);
-
-const getProjectStatusColor = (status: ProjectStatus) => {
-    switch (status) {
-        case ProjectStatus.SUBMITTED:
-            return "info";
-        case ProjectStatus.UNDER_EVALUATION:
-            return "warning";
-        case ProjectStatus.ONGOING:
-            return "primary";
-        case ProjectStatus.CANCELLED:
-            return "error";
-        case ProjectStatus.CONCLUDED:
-            return "success";
-        default:
-            return "primary";
-    }
-};
 
 const refreshTable = (event: any) => {
     if (tableOptions.value.initialCustomConfiguration) {
