@@ -1590,6 +1590,10 @@ export default {
     addDocumentLabel: "Dodaj dokument",
     enterExternalDocumentLabel: "Unesi dokument koji nije u listi",
     externalDocumentDescriptionLabel: "Opis eksternog dokumenta",
+    eventLabel: "Događaj",
+    addEventLabel: "Dodaj događaj",
+    enterExternalEventLabel: "Unesi događaj koji nije u listi",
+    externalEventDescriptionLabel: "Opis eksternog događaja",
     updateProjectLabel: "Ažuriraj projekat",
     addProjectLabel: "Projekat",
 }

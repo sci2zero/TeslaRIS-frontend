@@ -1576,6 +1576,10 @@ export default {
     addDocumentLabel: "Add document",
     enterExternalDocumentLabel: "Enter document that is not in list",
     externalDocumentDescriptionLabel: "External document description",
+    eventLabel: "Event",
+    addEventLabel: "Add event",
+    enterExternalEventLabel: "Enter event that is not in list",
+    externalEventDescriptionLabel: "External event description",
     updateProjectLabel: "Update project",
     addProjectLabel: "Project",
 }

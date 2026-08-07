@@ -159,6 +159,9 @@
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
+            <v-tab value="events">
+                {{ $t("eventListLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -227,6 +230,18 @@
                 </v-row>
             </v-tabs-window-item>
 
+            <v-tabs-window-item value="events">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-events-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -274,6 +289,7 @@ import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingAp
 import ProjectTeamTab from "@/components/project/ProjectTeamTab.vue";
 import ProjectConsortiumTab from "@/components/project/ProjectConsortiumTab.vue";
 import ProjectDocumentsTab from "@/components/project/ProjectDocumentsTab.vue";
+import ProjectEventsTab from "@/components/project/ProjectEventsTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
