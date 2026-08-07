@@ -112,6 +112,7 @@ watch(selectedFundingProgram, () => {
     if (selectedFundingProgram.value && selectedFundingProgram.value.value === 0) {
         modalRef.value!.dialog = true;
         selectedFundingProgram.value = { ...searchPlaceholder };
+        sendContentToParent();
     }
 });
 
@@ -120,6 +121,10 @@ watch(() => props.modelValue, () => {
 });
 
 const sendContentToParent = () => {
+    if (selectedFundingProgram.value?.value === 0) {
+        return;
+    }
+
     emit("update:modelValue", selectedFundingProgram.value);
 };
 

@@ -84,8 +84,6 @@ onMounted(() => {
     }
 });
 
-// Funding applications have no name of their own - they are identified by the call
-// they answer to, the project they belong to and the person who submitted them.
 const composeTitle = (nameParts: (string | undefined)[], databaseId: number): string => {
     const title = nameParts.filter(namePart => namePart).join(" | ");
     return title.length > 0 ? title : `#${databaseId}`;
@@ -139,6 +137,7 @@ watch(selectedFundingApplication, () => {
     if (selectedFundingApplication.value && selectedFundingApplication.value.value === 0) {
         modalRef.value!.dialog = true;
         selectedFundingApplication.value = { ...searchPlaceholder };
+        sendContentToParent();
     }
 });
 
@@ -147,6 +146,10 @@ watch(() => props.modelValue, () => {
 });
 
 const sendContentToParent = () => {
+    if (selectedFundingApplication.value?.value === 0) {
+        return;
+    }
+
     emit("update:modelValue", selectedFundingApplication.value);
 };
 

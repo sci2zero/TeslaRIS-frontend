@@ -125,6 +125,7 @@ watch(selectedFundingCall, () => {
     if (selectedFundingCall.value && selectedFundingCall.value.value === 0) {
         modalRef.value!.dialog = true;
         selectedFundingCall.value = { ...searchPlaceholder };
+        sendContentToParent();
     }
 });
 
@@ -133,6 +134,10 @@ watch(() => props.modelValue, () => {
 });
 
 const sendContentToParent = () => {
+    if (selectedFundingCall.value?.value === 0) {
+        return;
+    }
+
     emit("update:modelValue", selectedFundingCall.value);
 };
 

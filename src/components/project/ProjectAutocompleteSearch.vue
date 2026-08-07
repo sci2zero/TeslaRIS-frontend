@@ -144,6 +144,7 @@ watch(selectedProject, () => {
     if (selectedProject.value && selectedProject.value.value === 0) {
         modalRef.value!.dialog = true;
         selectedProject.value = { ...searchPlaceholder };
+        sendContentToParent();
     }
 });
 
@@ -152,6 +153,10 @@ watch(() => props.modelValue, () => {
 });
 
 const sendContentToParent = () => {
+    if (selectedProject.value?.value === 0) {
+        return;
+    }
+
     emit("update:modelValue", selectedProject.value);
 };
 
