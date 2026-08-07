@@ -32,9 +32,6 @@ import { defineAsyncComponent, onMounted, ref, watch } from "vue";
 import lodash from "lodash";
 import { useI18n } from "vue-i18n";
 import FundingApplicationService from "@/services/project/FundingApplicationService";
-import FundingCallService from "@/services/project/FundingCallService";
-import ProjectService from "@/services/project/ProjectService";
-import PersonService from "@/services/PersonService";
 import type { FundingApplication, FundingApplicationIndex } from "@/models/FundingApplicationModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -110,12 +107,14 @@ const searchFundingApplications = lodash.debounce((input: string) => {
             const listOfFundingApplications: { title: string; value: number; }[] = [];
             response.data.content.forEach((fundingApplication: FundingApplicationIndex) => {
                 const isSerbian = i18n.locale.value.startsWith("sr");
+                const description = isSerbian ? fundingApplication.descriptionSr : fundingApplication.descriptionOther;
 
                 listOfFundingApplications.push({
-                    title: composeTitle([
+                    // Description is not in the ES index yet, so fall back to the names
+                    // of the call and the project until it is.
+                    title: description ?? composeTitle([
                         isSerbian ? fundingApplication.fundingCallNameSr : fundingApplication.fundingCallNameOther,
-                        isSerbian ? fundingApplication.projectNameSr : fundingApplication.projectNameOther,
-                        isSerbian ? fundingApplication.submitterNameSr : fundingApplication.submitterNameOther
+                        isSerbian ? fundingApplication.projectNameSr : fundingApplication.projectNameOther
                     ], fundingApplication.databaseId),
                     value: fundingApplication.databaseId
                 });
@@ -154,26 +153,12 @@ const sendContentToParent = () => {
 };
 
 const selectNewlyAddedFundingApplication = (fundingApplication: FundingApplication) => {
-    Promise.all([
-        fundingApplication.fundingCallId ? FundingCallService.readFundingCall(fundingApplication.fundingCallId) : undefined,
-        fundingApplication.projectId ? ProjectService.readProject(fundingApplication.projectId) : undefined,
-        fundingApplication.submitterId ? PersonService.readPerson(fundingApplication.submitterId) : undefined
-    ]).then(([fundingCallResponse, projectResponse, submitterResponse]) => {
-        const submitterName = submitterResponse
-            ? `${submitterResponse.data.personName.firstname} ${submitterResponse.data.personName.lastname}`
-            : "";
-
-        const toSelect = {
-            title: composeTitle([
-                returnCurrentLocaleContent(fundingCallResponse?.data.name) ?? "",
-                returnCurrentLocaleContent(projectResponse?.data.name) ?? "",
-                submitterName
-            ], fundingApplication.id as number),
-            value: fundingApplication.id as number
-        };
-        fundingApplications.value.push(toSelect);
-        selectedFundingApplication.value = toSelect;
-        sendContentToParent();
-    });
+    const toSelect = {
+        title: returnCurrentLocaleContent(fundingApplication.description) ?? `#${fundingApplication.id}`,
+        value: fundingApplication.id as number
+    };
+    fundingApplications.value.push(toSelect);
+    selectedFundingApplication.value = toSelect;
+    sendContentToParent();
 };
 </script>

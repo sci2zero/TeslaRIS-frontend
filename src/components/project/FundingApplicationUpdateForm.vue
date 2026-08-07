@@ -1,21 +1,17 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="6">
-                <v-text-field
-                    v-model.number="projectId"
-                    type="number"
-                    :label="$t('projectLabel')"
-                    :placeholder="$t('projectLabel')">
-                </v-text-field>
+            <v-col>
+                <project-autocomplete-search v-model="selectedProject" />
             </v-col>
-            <v-col cols="6">
-                <v-text-field
-                    v-model.number="fundingCallId"
-                    type="number"
-                    :label="$t('fundingCallLabel')"
-                    :placeholder="$t('fundingCallLabel')">
-                </v-text-field>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <funding-call-autocomplete-search
+                    v-model="selectedFundingCall"
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -118,13 +114,11 @@
         </v-row>
 
         <v-row>
-            <v-col cols="6">
-                <v-text-field
-                    v-model.number="revisedFundingApplicationId"
-                    type="number"
-                    :label="$t('revisedFundingApplicationLabel')"
-                    :placeholder="$t('revisedFundingApplicationLabel')">
-                </v-text-field>
+            <v-col>
+                <funding-application-autocomplete-search
+                    v-model="selectedRevisedFundingApplication"
+                    label="revisedFundingApplicationLabel"
+                />
             </v-col>
         </v-row>
 
@@ -142,12 +136,18 @@ import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import PersonAutocompleteSearch from '@/components/person/PersonAutocompleteSearch.vue';
-import {toMultilingualTextInput} from '@/i18n/MultilingualContentUtil';
+import ProjectAutocompleteSearch from '@/components/project/ProjectAutocompleteSearch.vue';
+import FundingCallAutocompleteSearch from '@/components/project/FundingCallAutocompleteSearch.vue';
+import FundingApplicationAutocompleteSearch from '@/components/project/FundingApplicationAutocompleteSearch.vue';
+import {returnCurrentLocaleContent, toMultilingualTextInput} from '@/i18n/MultilingualContentUtil';
 import {useLanguageTags} from '@/composables/useLanguageTags';
 import type {MonetaryAmount, MultilingualContent} from '@/models/Common';
 import {type FundingApplication, FundingApplicationResult} from '@/models/FundingApplicationModel';
 import {getFundingApplicationResultsForGivenLocale} from '@/i18n/fundingApplicationResult';
 import PersonService from '@/services/PersonService';
+import ProjectService from '@/services/project/ProjectService';
+import FundingCallService from '@/services/project/FundingCallService';
+import FundingApplicationService from '@/services/project/FundingApplicationService';
 
 const props = defineProps<{
   presetFundingApplication: FundingApplication | undefined;
@@ -164,9 +164,11 @@ const requestedAmountRef = ref<typeof MonetaryAmountInput>();
 const descriptionRef = ref<typeof MultilingualTextInput>();
 const responseSummaryRef = ref<typeof MultilingualTextInput>();
 
-const projectId = ref<number | undefined>(props.presetFundingApplication?.projectId);
-const fundingCallId = ref<number | undefined>(props.presetFundingApplication?.fundingCallId);
-const revisedFundingApplicationId = ref<number | undefined>(props.presetFundingApplication?.revisedFundingApplicationId);
+const searchPlaceholder = { title: "", value: -1 };
+
+const selectedProject = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFundingCall = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedRevisedFundingApplication = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 
 const submitter = ref<{ title: string, value: number } | undefined>(undefined);
 const submitterId = ref<number | undefined>(props.presetFundingApplication?.submitterId);
@@ -193,6 +195,37 @@ if (props.presetFundingApplication?.submitterId) {
     });
 }
 
+const resolvePresetSelections = () => {
+    const projectId = props.presetFundingApplication?.projectId;
+    selectedProject.value = { ...searchPlaceholder };
+    if (projectId) {
+        ProjectService.readProject(projectId).then((response) => {
+            selectedProject.value = { title: returnCurrentLocaleContent(response.data.name) as string, value: projectId };
+        });
+    }
+
+    const fundingCallId = props.presetFundingApplication?.fundingCallId;
+    selectedFundingCall.value = { ...searchPlaceholder };
+    if (fundingCallId) {
+        FundingCallService.readFundingCall(fundingCallId).then((response) => {
+            selectedFundingCall.value = { title: returnCurrentLocaleContent(response.data.name) as string, value: fundingCallId };
+        });
+    }
+
+    const revisedFundingApplicationId = props.presetFundingApplication?.revisedFundingApplicationId;
+    selectedRevisedFundingApplication.value = { ...searchPlaceholder };
+    if (revisedFundingApplicationId) {
+        FundingApplicationService.readFundingApplication(revisedFundingApplicationId).then((response) => {
+            selectedRevisedFundingApplication.value = {
+                title: returnCurrentLocaleContent(response.data.description) ?? `#${revisedFundingApplicationId}`,
+                value: revisedFundingApplicationId
+            };
+        });
+    }
+};
+
+resolvePresetSelections();
+
 watch(submitter, () => {
     submitterId.value = submitter.value?.value;
 });
@@ -204,9 +237,7 @@ watch(() => props.presetFundingApplication, () => {
 });
 
 const refreshForm = () => {
-    projectId.value = props.presetFundingApplication?.projectId;
-    fundingCallId.value = props.presetFundingApplication?.fundingCallId;
-    revisedFundingApplicationId.value = props.presetFundingApplication?.revisedFundingApplicationId;
+    resolvePresetSelections();
     submitterId.value = props.presetFundingApplication?.submitterId;
 
     submissionDate.value = props.presetFundingApplication?.submissionDate as string;
@@ -240,9 +271,9 @@ const refreshForm = () => {
 
 const submit = () => {
     const updatedFundingApplication = {
-        projectId: projectId.value,
-        fundingCallId: fundingCallId.value,
-        revisedFundingApplicationId: revisedFundingApplicationId.value,
+        projectId: selectedProject.value.value > 0 ? selectedProject.value.value : undefined,
+        fundingCallId: selectedFundingCall.value.value,
+        revisedFundingApplicationId: selectedRevisedFundingApplication.value.value > 0 ? selectedRevisedFundingApplication.value.value : undefined,
         submitterId: submitterId.value,
         requestedAmount: requestedAmount.value,
         description: description.value,
