@@ -73,14 +73,8 @@
 
                 <!-- Funding Program -->
                 <v-row>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model.number="fundingProgramId"
-                            type="number"
-                            :min="1"
-                            :label="$t('fundingProgramLabel')"
-                            :placeholder="$t('fundingProgramLabel')"
-                        />
+                    <v-col cols="10">
+                        <funding-program-autocomplete-search v-model="selectedFundingProgram" />
                     </v-col>
                 </v-row>
 
@@ -179,6 +173,7 @@ import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import FundingProgramAutocompleteSearch from '@/components/project/FundingProgramAutocompleteSearch.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import FundingCallService from '@/services/project/FundingCallService';
@@ -219,7 +214,7 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
-const fundingProgramId = ref<number | undefined>(undefined);
+const selectedFundingProgram = ref<{ title: string, value: number }>({ title: "", value: -1 });
 const monetaryAmount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<FundingType[]>([]);
 const selectedFunder = ref<{ title: string, value: number }>({ title: "", value: -1 });
@@ -244,7 +239,7 @@ const submitFundingCall = (stayOnPage: boolean) => {
         dateFrom: dateFrom.value || undefined,
         dateTo: dateTo.value || undefined,
         funderId: selectedFunder.value.value > 0 ? selectedFunder.value.value : undefined,
-        fundingProgramId: fundingProgramId.value,
+        fundingProgramId: selectedFundingProgram.value.value > 0 ? selectedFundingProgram.value.value : undefined,
         fundingProgramName: [],
         monetaryAmount: monetaryAmount.value,
         oaMandated: oaMandated.value,
@@ -267,7 +262,7 @@ const submitFundingCall = (stayOnPage: boolean) => {
             dateTo.value = "";
             oaMandated.value = false;
             oaMandateUrl.value = "";
-            fundingProgramId.value = undefined;
+            selectedFundingProgram.value = { title: "", value: -1 };
             monetaryAmountRef.value?.clearInput();
             selectedFundingTypes.value = [];
             selectedFunder.value = { title: "", value: -1 };

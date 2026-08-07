@@ -34,6 +34,7 @@ import { useI18n } from "vue-i18n";
 import FundingProgramService from "@/services/project/FundingProgramService";
 import type { FundingProgram, FundingProgramIndex } from "@/models/FundingModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import { formatAmount } from "@/utils/MonetaryUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingProgramSubmissionForm from "@/components/project/FundingProgramSubmissionForm.vue";
@@ -74,6 +75,12 @@ onMounted(() => {
     }
 });
 
+const joinParts = (parts: (string | undefined)[]): string => parts.filter(part => part).join(" | ");
+
+const composeAmount = (amount: number | undefined, currencySymbol: string | undefined): string => {
+    return amount ? `${formatAmount(amount, i18n.locale.value)} ${currencySymbol ?? ""}`.trim() : "";
+};
+
 const searchFundingPrograms = lodash.debounce((input: string) => {
     if (input.includes("|")) {
         return;
@@ -91,7 +98,10 @@ const searchFundingPrograms = lodash.debounce((input: string) => {
             const listOfFundingPrograms: { title: string; value: number; }[] = [];
             response.data.content.forEach((fundingProgram: FundingProgramIndex) => {
                 listOfFundingPrograms.push({
-                    title: i18n.locale.value.startsWith("sr") ? fundingProgram.nameSr : fundingProgram.nameOther,
+                    title: joinParts([
+                        i18n.locale.value.startsWith("sr") ? fundingProgram.nameSr : fundingProgram.nameOther,
+                        composeAmount(fundingProgram.totalAmount, fundingProgram.currencySymbol)
+                    ]),
                     value: fundingProgram.databaseId
                 });
             });
@@ -130,7 +140,10 @@ const sendContentToParent = () => {
 
 const selectNewlyAddedFundingProgram = (fundingProgram: FundingProgram) => {
     const toSelect = {
-        title: returnCurrentLocaleContent(fundingProgram.name) as string,
+        title: joinParts([
+            returnCurrentLocaleContent(fundingProgram.name) ?? "",
+            composeAmount(fundingProgram.totalAmount?.amount, fundingProgram.totalAmount?.currencySymbol)
+        ]),
         value: fundingProgram.id as number
     };
     fundingPrograms.value.push(toSelect);
