@@ -28,3 +28,27 @@ export interface FundingApplication {
     documents: DocumentFileResponse[];
     submitterId?: number;
 }
+
+export interface FundingApplicationIndex {
+    id: string;
+    databaseId: number;
+    fundingCallId?: number;
+    projectId?: number;
+    funderId?: number;
+    projectNameSr: string;
+    projectNameSrSortable: string;
+    projectNameOther: string;
+    projectNameOtherSortable: string;
+    fundingCallNameSr: string;
+    fundingCallNameSrSortable: string;
+    fundingCallNameOther: string;
+    fundingCallNameOtherSortable: string;
+    funderNameSr: string;
+    funderNameOther: string;
+    // Not indexed by the backend yet - see FundingApplicationIndex.java
+    submitterNameSr?: string;
+    submitterNameOther?: string;
+    submissionDate?: string;
+    decisionDate?: string;
+    result?: FundingApplicationResult;
+}

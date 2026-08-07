@@ -1,24 +1,17 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="6">
-                <!-- TODO: Project autocomplete -->
-                <v-text-field
-                    v-model.number="projectId"
-                    type="number"
-                    :label="$t('projectLabel')"
-                    :placeholder="$t('projectLabel')">
-                </v-text-field>
+            <v-col>
+                <project-autocomplete-search v-model="selectedProject" />
             </v-col>
-            <v-col cols="6">
-                <!-- TODO: FundingCall autocomplete -->
-                <v-text-field
-                    v-model.number="fundingCallId"
-                    type="number"
-                    :label="$t('fundingCallLabel') + '*'"
-                    :rules="requiredNumericFieldRules"
-                    :placeholder="$t('fundingCallLabel')">
-                </v-text-field>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <funding-call-autocomplete-search
+                    v-model="selectedFundingCall"
+                    required
+                />
             </v-col>
         </v-row>
 
@@ -27,8 +20,8 @@
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
-                    :required="false">
-                </person-autocomplete-search>
+                    :required="false"
+                />
             </v-col>
         </v-row>
 
@@ -37,8 +30,8 @@
                 <monetary-amount-input
                     ref="requestedAmountRef"
                     v-model="requestedAmount"
-                    :required="false">
-                </monetary-amount-input>
+                    :required="false"
+                />
             </v-col>
         </v-row>
 
@@ -48,8 +41,8 @@
                     ref="descriptionRef"
                     v-model="description"
                     is-area
-                    :label="$t('descriptionLabel')">
-                </multilingual-text-input>
+                    :label="$t('descriptionLabel')"
+                />
             </v-col>
         </v-row>
 
@@ -59,8 +52,8 @@
                     ref="responseSummaryRef"
                     v-model="responseSummary"
                     is-area
-                    :label="$t('responseSummaryLabel')">
-                </multilingual-text-input>
+                    :label="$t('responseSummaryLabel')"
+                />
             </v-col>
         </v-row>
 
@@ -93,20 +86,17 @@
                     :items="resultOptions"
                     item-title="title"
                     item-value="value"
-                    clearable>
-                </v-select>
+                    clearable
+                />
             </v-col>
         </v-row>
 
         <v-row>
-            <v-col cols="6">
-                <!-- TODO: FundingApplication autocomplete -->
-                <v-text-field
-                    v-model.number="revisedFundingApplicationId"
-                    type="number"
-                    :label="$t('revisedFundingApplicationLabel')"
-                    :placeholder="$t('revisedFundingApplicationLabel')">
-                </v-text-field>
+            <v-col>
+                <funding-application-autocomplete-search
+                    v-model="selectedRevisedFundingApplication"
+                    label="revisedFundingApplicationLabel"
+                />
             </v-col>
         </v-row>
 
@@ -127,8 +117,10 @@ import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import PersonAutocompleteSearch from '@/components/person/PersonAutocompleteSearch.vue';
+import ProjectAutocompleteSearch from '@/components/project/ProjectAutocompleteSearch.vue';
+import FundingCallAutocompleteSearch from '@/components/project/FundingCallAutocompleteSearch.vue';
+import FundingApplicationAutocompleteSearch from '@/components/project/FundingApplicationAutocompleteSearch.vue';
 import Toast from '@/components/core/Toast.vue';
-import { useValidationUtils } from '@/utils/ValidationUtils';
 import FundingApplicationService from '@/services/project/FundingApplicationService';
 import { FundingApplicationResult, type FundingApplication } from '@/models/FundingApplicationModel';
 import { getFundingApplicationResultsForGivenLocale } from '@/i18n/fundingApplicationResult';
@@ -148,15 +140,15 @@ const snackbar = ref(false);
 const error = ref(false);
 const errorMessage = ref(i18n.t("genericErrorMessage"));
 
-const { requiredNumericFieldRules } = useValidationUtils();
-
 const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const responseSummaryRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const requestedAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 
-const projectId = ref<number | undefined>(undefined);
-const fundingCallId = ref<number | undefined>(undefined);
-const revisedFundingApplicationId = ref<number | undefined>(undefined);
+const searchPlaceholder = { title: "", value: -1 };
+
+const selectedProject = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFundingCall = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedRevisedFundingApplication = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 
 const submitter = ref<{ title: string, value: number } | undefined>(undefined);
 
@@ -175,9 +167,9 @@ const resultOptions = computed(() => getFundingApplicationResultsForGivenLocale(
 
 const submitFundingApplication = (stayOnPage: boolean) => {
     const newFundingApplication: FundingApplication = {
-        projectId: projectId.value,
-        fundingCallId: fundingCallId.value as number,
-        revisedFundingApplicationId: revisedFundingApplicationId.value,
+        projectId: selectedProject.value.value > 0 ? selectedProject.value.value : undefined,
+        fundingCallId: selectedFundingCall.value.value,
+        revisedFundingApplicationId: selectedRevisedFundingApplication.value.value > 0 ? selectedRevisedFundingApplication.value.value : undefined,
         submitterId: submitter.value?.value,
         requestedAmount: requestedAmount.value,
         description: description.value,
@@ -196,9 +188,9 @@ const submitFundingApplication = (stayOnPage: boolean) => {
         emit("create", response.data);
 
         if (stayOnPage) {
-            projectId.value = undefined;
-            fundingCallId.value = undefined;
-            revisedFundingApplicationId.value = undefined;
+            selectedProject.value = { ...searchPlaceholder };
+            selectedFundingCall.value = { ...searchPlaceholder };
+            selectedRevisedFundingApplication.value = { ...searchPlaceholder };
             submitter.value = undefined;
             requestedAmountRef.value?.clearInput();
             requestedAmount.value = undefined;
@@ -223,5 +215,5 @@ const submitFundingApplication = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitFundingApplication });
+defineExpose({ isFormValid, submit: submitFundingApplication, submitFundingApplication });
 </script>
