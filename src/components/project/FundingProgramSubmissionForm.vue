@@ -285,5 +285,5 @@ const submitFundingProgram = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitFundingProgram });
+defineExpose({ isFormValid, submit: submitFundingProgram, submitFundingProgram });
 </script>

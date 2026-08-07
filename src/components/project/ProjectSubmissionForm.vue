@@ -341,5 +341,5 @@ const submitProject = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitProject });
+defineExpose({ isFormValid, submit: submitProject, submitProject });
 </script>
