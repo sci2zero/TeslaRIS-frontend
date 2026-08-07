@@ -1,14 +1,25 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { Project, ProjectDocument, ProjectEvent, ProjectIndex } from "@/models/ProjectModel";
+import type { Project, ProjectDocument, ProjectEvent, ProjectIndex, ProjectStatus } from "@/models/ProjectModel";
 import type { Page } from "@/models/Common";
 
 export class ProjectService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async searchProjects(tokens: string): Promise<AxiosResponse<Page<ProjectIndex>>> {
-        return super.sendRequest(axios.get, `project/search?${tokens}`);
+    async searchProjects(
+        tokens: string,
+        onlyActive: boolean = false,
+        allowedStatuses: ProjectStatus[] = []
+    ): Promise<AxiosResponse<Page<ProjectIndex>>> {
+        let url = `project/search?${tokens}`;
+        if (onlyActive) {
+            url += "&onlyActive=true";
+        }
+        allowedStatuses.forEach(allowedStatus => {
+            url += `&allowedStatuses=${allowedStatus}`;
+        });
+        return super.sendRequest(axios.get, url);
     }
 
     async readProject(projectId: number): Promise<AxiosResponse<Project>> {

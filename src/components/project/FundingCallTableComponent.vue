@@ -57,6 +57,24 @@
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
+            <template #[`header.types`]="{ column }">
+                <div class="group flex items-center gap-2">
+                    <span>{{ column.title }}</span>
+                    <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-icon
+                                v-bind="props"
+                                :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                                :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                                icon="mdi-filter"
+                            ></v-icon>
+                        </template>
+                        <div class="p-3 bg-white rounded-lg shadow-lg">
+                            <slot name="type-filter-menu" :column="column"></slot>
+                        </div>
+                    </v-menu>
+                </div>
+            </template>
             <template #item="row">
                 <tr>
                     <td v-if="isAdmin">
@@ -77,11 +95,44 @@
                             {{ row.item.nameOther }}
                         </localized-link>
                     </td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        <localized-link v-if="row.item.programId" :to="'funding-program/' + row.item.programId">
+                            {{ row.item.programNameSr }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.programNameSr) }}</span>
+                    </td>
+                    <td v-else>
+                        <localized-link v-if="row.item.programId" :to="'funding-program/' + row.item.programId">
+                            {{ row.item.programNameOther }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.programNameOther) }}</span>
+                    </td>
+                    <td>
+                        <div v-if="row.item.types?.length" class="flex flex-wrap gap-1">
+                            <v-chip
+                                v-for="fundingType in row.item.types"
+                                :key="fundingType"
+                                size="small"
+                                color="primary"
+                                variant="flat"
+                                :prepend-icon="getFundingTypeIcon(fundingType)"
+                            >
+                                {{ getFundingTypeTitleFromValueAutoLocale(fundingType) }}
+                            </v-chip>
+                        </div>
+                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
+                    </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                    <td class="text-right">
+                        <span class="amount-cell">
+                            <span class="amount-value">{{ formatAmount(row.item.amount, locale) }}</span>
+                            <span class="amount-currency">{{ row.item.currencySymbol }}</span>
+                        </span>
                     </td>
                 </tr>
             </template>
@@ -118,12 +169,18 @@ import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { formatAmount } from '@/utils/MonetaryUtil';
+import { getFundingTypeTitleFromValueAutoLocale } from '@/i18n/fundingType';
+import { FundingType } from '@/models/FundingModel';
 
 
-defineProps<{
+withDefaults(defineProps<{
     fundingCalls: FundingCallIndex[];
     totalFundingCalls: number;
-}>();
+    hasActiveTypeFilters?: boolean;
+}>(), {
+    hasActiveTypeFilters: false
+});
 
 const emit = defineEmits<{
     (e: "switchPage", page: number, size: number, sort: string | undefined, direction: string | undefined): void;
@@ -133,30 +190,53 @@ const selectedFundingCalls = ref<FundingCallIndex[]>([]);
 
 const i18n = useI18n();
 
+const { locale } = useI18n();
+
 const notifications = ref<Map<string, string>>(new Map());
 
 const nameLabel = computed(() => i18n.t("nameLabel"));
+const programNameLabel = computed(() => i18n.t("fundingProgramLabel"));
 const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
 const dateToLabel = computed(() => i18n.t("dateToLabel"));
+const totalAmountLabel = computed(() => i18n.t("totalAmountLabel"));
+const fundingTypesLabel = computed(() => i18n.t("fundingTypesLabel"));
 
 const { isAdmin } = useUserRole();
 
 const nameColumn = computed(() => i18n.t("nameColumn"));
+const programNameColumn = computed(() => i18n.t("programNameColumn"));
 
 const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
-const headers = [
+const headers = ref<any>([
     { title: nameLabel, align: "start", sortable: true, key: nameColumn},
+    { title: programNameLabel, align: "start", sortable: true, key: programNameColumn},
+    { title: fundingTypesLabel, align: "start", sortable: false, key: "types"},
     { title: dateFromLabel, align: "start", sortable: true, key: "dateFrom"},
-    { title: dateToLabel, align: "start", sortable: true, key: "dateTo"}
-];
+    { title: dateToLabel, align: "start", sortable: true, key: "dateTo"},
+    { title: totalAmountLabel, align: "start", sortable: true, key: "amount"}
+]);
 
 const headersSortableMappings: Map<string, string> = new Map([
     ["nameSr", "name_sr_sortable"],
     ["nameOther", "name_other_sortable"],
+    ["programNameSr", "program_name_sr_sortable"],
+    ["programNameOther", "program_name_other_sortable"],
     ["dateFrom", "date_from"],
-    ["dateTo", "date_to"]
+    ["dateTo", "date_to"],
+    ["amount", "amount"]
 ]);
+
+const getFundingTypeIcon = (type: FundingType) => {
+    switch (type) {
+        case FundingType.GRANT:
+            return "mdi-cash-multiple";
+        case FundingType.CALL:
+            return "mdi-bullhorn";
+        default:
+            return "mdi-file-document";
+    }
+};
 
 const refreshTable = (event: any) => {
     if (tableOptions.value.initialCustomConfiguration) {
@@ -240,6 +320,23 @@ defineExpose({
 </script>
 
 <style scoped>
+.amount-cell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.amount-value {
+    text-align: right;
+}
+
+.amount-currency {
+    flex: none;
+    min-width: 3ch;
+    text-align: left;
+}
+
 .action-menu-container {
     display: flex;
     justify-content: flex-start;

@@ -1,6 +1,7 @@
 import {BaseService} from "@/services/BaseService";
 import axios, {type AxiosResponse} from "axios";
 import type {FundingCall, FundingCallIndex} from "@/models/FundingCallModel";
+import type {FundingType} from "@/models/FundingModel";
 import {AccessRights, type DocumentFileResponse, ResourceType} from "@/models/DocumentFileModel";
 import {getNameFromOrdinal} from "@/utils/EnumUtil";
 import type {Page} from "@/models/Common";
@@ -9,8 +10,23 @@ export class FundingCallService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async searchFundingCall(tokens: string, programId: number | null = null): Promise<AxiosResponse<Page<FundingCallIndex>>> {
-        return super.sendRequest(axios.get, `funding-call/search?${tokens}${programId ? `&programId=${programId}` : ""}`);
+    async searchFundingCalls(
+        tokens: string,
+        programId: number | null = null,
+        onlyActive: boolean = false,
+        allowedTypes: FundingType[] = []
+    ): Promise<AxiosResponse<Page<FundingCallIndex>>> {
+        let url = `funding-call/search?${tokens}`;
+        if (programId) {
+            url += `&programId=${programId}`;
+        }
+        if (onlyActive) {
+            url += "&onlyActive=true";
+        }
+        allowedTypes.forEach(allowedType => {
+            url += `&allowedTypes=${allowedType}`;
+        });
+        return super.sendRequest(axios.get, url);
     }
 
     async readFundingCall(fundingCallId: number): Promise<AxiosResponse<FundingCall>> {
