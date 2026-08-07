@@ -65,14 +65,8 @@
         </v-row>
 
         <v-row>
-            <v-col cols="6">
-                <v-text-field
-                    v-model.number="fundingProgramId"
-                    type="number"
-                    :min="1"
-                    :label="$t('fundingProgramLabel')"
-                    :placeholder="$t('fundingProgramLabel')"
-                />
+            <v-col>
+                <funding-program-autocomplete-search v-model="selectedFundingProgram" />
             </v-col>
         </v-row>
 
@@ -125,6 +119,7 @@ import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import FundingProgramAutocompleteSearch from '@/components/project/FundingProgramAutocompleteSearch.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -157,7 +152,14 @@ const dateTo = ref(props.presetFundingCall?.dateTo as string);
 const uris = ref<string[]>(props.presetFundingCall?.uris as string[] ?? []);
 const oaMandated = ref<boolean>(props.presetFundingCall?.oaMandated ?? false);
 const oaMandateUrl = ref(props.presetFundingCall?.oaMandateUrl);
-const fundingProgramId = ref<number | undefined>(props.presetFundingCall?.fundingProgramId);
+// The preset already carries the program name, so no extra read is needed here.
+const toFundingProgramSelection = (fundingCall: FundingCall | undefined) => {
+    return fundingCall?.fundingProgramId
+        ? { title: returnCurrentLocaleContent(fundingCall.fundingProgramName) ?? "", value: fundingCall.fundingProgramId }
+        : { title: "", value: -1 };
+};
+
+const selectedFundingProgram = ref<{ title: string, value: number }>(toFundingProgramSelection(props.presetFundingCall));
 
 const name = ref<any>([]);
 const nameAbbreviation = ref<any>([]);
@@ -186,7 +188,7 @@ const refreshForm = () => {
     dateTo.value = props.presetFundingCall?.dateTo as string;
     oaMandated.value = props.presetFundingCall?.oaMandated ?? false;
     oaMandateUrl.value = props.presetFundingCall?.oaMandateUrl;
-    fundingProgramId.value = props.presetFundingCall?.fundingProgramId;
+    selectedFundingProgram.value = toFundingProgramSelection(props.presetFundingCall);
     selectedFundingTypes.value = props.presetFundingCall?.fundingTypes ?? [];
     monetaryAmountRef.value?.setValue(props.presetFundingCall?.monetaryAmount);
 
@@ -219,7 +221,7 @@ const submit = () => {
         dateFrom: dateFrom.value,
         dateTo: dateTo.value,
         funderId: selectedFunder.value.value > 0 ? selectedFunder.value.value : undefined,
-        fundingProgramId: fundingProgramId.value,
+        fundingProgramId: selectedFundingProgram.value.value > 0 ? selectedFundingProgram.value.value : undefined,
         monetaryAmount: monetaryAmount.value,
         uris: uris.value,
         oaMandated: oaMandated.value,
