@@ -56,9 +56,13 @@ export interface FundingProgramIndex {
     nameSrSortable: string;
     nameOther: string;
     nameOtherSortable: string;
+    funderNameSr: string;
+    funderNameOther: string;
     funderId?: number;
     dateFrom?: string;
     dateTo?: string;
+    totalAmount: number;
+    currencySymbol: string;
 }
 
 export enum FundingType {

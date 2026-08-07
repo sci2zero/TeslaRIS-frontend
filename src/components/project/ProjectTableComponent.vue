@@ -57,6 +57,24 @@
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
+            <template #[`header.status`]="{ column }">
+                <div class="group flex items-center gap-2">
+                    <span>{{ column.title }}</span>
+                    <v-menu v-if="$slots['status-filter-menu']" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-icon
+                                v-bind="props"
+                                :title="hasActiveStatusFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                                :class="hasActiveStatusFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                                icon="mdi-filter"
+                            ></v-icon>
+                        </template>
+                        <div class="p-3 bg-white rounded-lg shadow-lg">
+                            <slot name="status-filter-menu" :column="column"></slot>
+                        </div>
+                    </v-menu>
+                </div>
+            </template>
             <template #item="row">
                 <tr>
                     <td v-if="isAdmin">
@@ -76,6 +94,29 @@
                         <localized-link :to="'project/' + row.item.databaseId">
                             {{ row.item.nameOther }}
                         </localized-link>
+                    </td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
+                            {{ row.item.coordinatorNameSr }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameSr) }}</span>
+                    </td>
+                    <td v-else>
+                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
+                            {{ row.item.coordinatorNameOther }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameOther) }}</span>
+                    </td>
+                    <td>
+                        <v-chip
+                            v-if="row.item.status"
+                            size="small"
+                            :color="getProjectStatusColor(row.item.status)"
+                            variant="flat"
+                        >
+                            {{ getProjectStatusTitleFromValueAutoLocale(row.item.status) }}
+                        </v-chip>
+                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
@@ -118,12 +159,17 @@ import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { getProjectStatusTitleFromValueAutoLocale } from '@/i18n/projectStatus';
+import { ProjectStatus } from '@/models/ProjectModel';
 
 
-defineProps<{
+withDefaults(defineProps<{
     projects: ProjectIndex[];
     totalProjects: number;
-}>();
+    hasActiveStatusFilters?: boolean;
+}>(), {
+    hasActiveStatusFilters: false
+});
 
 const emit = defineEmits<{
     (e: "switchPage", page: number, size: number, sort: string | undefined, direction: string | undefined): void;
@@ -136,27 +182,52 @@ const i18n = useI18n();
 const notifications = ref<Map<string, string>>(new Map());
 
 const nameLabel = computed(() => i18n.t("nameLabel"));
+const coordinatorLabel = computed(() => i18n.t("coordinatorLabel"));
+const statusLabel = computed(() => i18n.t("statusLabel"));
 const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
 const dateToLabel = computed(() => i18n.t("dateToLabel"));
 
 const { isAdmin } = useUserRole();
 
 const nameColumn = computed(() => i18n.t("nameColumn"));
+const coordinatorNameColumn = computed(() => i18n.t("coordinatorNameColumn"));
 
 const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
 
-const headers = [
+const headers = ref<any>([
     { title: nameLabel, align: "start", sortable: true, key: nameColumn},
+    { title: coordinatorLabel, align: "start", sortable: true, key: coordinatorNameColumn},
+    { title: statusLabel, align: "start", sortable: true, key: "status"},
     { title: dateFromLabel, align: "start", sortable: true, key: "dateFrom"},
     { title: dateToLabel, align: "start", sortable: true, key: "dateTo"}
-];
+]);
 
 const headersSortableMappings: Map<string, string> = new Map([
     ["nameSr", "name_sr_sortable"],
     ["nameOther", "name_other_sortable"],
+    ["coordinatorNameSr", "coordinator_name_sr_sortable"],
+    ["coordinatorNameOther", "coordinator_name_other_sortable"],
     ["dateFrom", "date_from"],
-    ["dateTo", "date_to"]
+    ["dateTo", "date_to"],
+    ["status", "status"]
 ]);
+
+const getProjectStatusColor = (status: ProjectStatus) => {
+    switch (status) {
+        case ProjectStatus.SUBMITTED:
+            return "info";
+        case ProjectStatus.UNDER_EVALUATION:
+            return "warning";
+        case ProjectStatus.ONGOING:
+            return "primary";
+        case ProjectStatus.CANCELLED:
+            return "error";
+        case ProjectStatus.CONCLUDED:
+            return "success";
+        default:
+            return "primary";
+    }
+};
 
 const refreshTable = (event: any) => {
     if (tableOptions.value.initialCustomConfiguration) {
