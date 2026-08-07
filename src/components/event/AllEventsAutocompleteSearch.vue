@@ -64,9 +64,7 @@ const searchEvents = lodash.debounce((input: string) => {
     }
 
     const params = "tokens=" + input.split(" ").join("&tokens=") + "&page=0&size=5";
-
-    // an empty type list intentionally returns all event types - conferences,
-    // exhibitions, courses and other events can all be linked to a project
+  
     EventService.searchEvents(
         params, true, false, false, false, null, null, [], false
     ).then((response) => {
