@@ -91,6 +91,24 @@ export enum ProjectDocumentType {
     INTERNAL = "INTERNAL"
 }
 
+export interface ProjectEvent {
+    id?: number;
+    projectId: number;
+    eventId?: number;
+    eventNameSr?: string;
+    eventNameOther?: string;
+    eventType?: string;
+    textualDescription: MultilingualContent[];
+    relationType: ProjectEventType;
+    fundingParts?: FundingPart[];
+}
+
+export enum ProjectEventType {
+    MEETING = "MEETING",
+    PROJECT_RESULTS_PRESENTED_AT = "PROJECT_RESULTS_PRESENTED_AT",
+    PUBLIC_EVENT_ORGANIZED_BY_PROJECT = "PUBLIC_EVENT_ORGANIZED_BY_PROJECT"
+}
+
 export enum ProjectStatus {
     SUBMITTED = "SUBMITTED",
     UNDER_EVALUATION = "UNDER_EVALUATION",
