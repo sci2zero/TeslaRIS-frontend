@@ -16,7 +16,7 @@
             <generic-crud-modal
                 ref="modalRef"
                 :form-component="FundingSubmissionForm"
-                :form-props="{ presetFundingCallId: presetFundingCallId }"
+                :form-props="{ presetFundingCallId: presetFundingCallId, presetProject: presetProject }"
                 entity-name="Funding"
                 is-submission
                 wide
@@ -33,14 +33,17 @@ import lodash from "lodash";
 import { useI18n } from "vue-i18n";
 import FundingService from "@/services/project/FundingService";
 import type { Funding, FundingIndex } from "@/models/FundingModel";
+import type { Project } from "@/models/ProjectModel";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingSubmissionForm from "@/components/project/FundingSubmissionForm.vue";
 
 withDefaults(defineProps<{
     presetFundingCallId?: number;
+    presetProject?: Project;
     readonly?: boolean;
 }>(), {
     presetFundingCallId: undefined,
+    presetProject: undefined,
     readonly: false
 });
 

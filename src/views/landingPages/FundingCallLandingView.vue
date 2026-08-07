@@ -140,6 +140,9 @@
             <v-tab value="fundings">
                 {{ $t("fundingsLabel") }}
             </v-tab>
+            <v-tab value="fundingApplications">
+                {{ $t("fundingApplicationsLabel") }}
+            </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
@@ -165,6 +168,18 @@
                 <v-row class="mt-10">
                     <v-col cols="12">
                         <funding-call-fundings-tab
+                            v-if="fundingCall?.id"
+                            :funding-call-id="fundingCall.id"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundingApplications">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <funding-call-applications-tab
                             v-if="fundingCall?.id"
                             :funding-call-id="fundingCall.id"
                             :can-edit="canEdit"
@@ -264,6 +279,7 @@ import ResearchAreasUpdateModal from "@/components/core/ResearchAreasUpdateModal
 import ResearchAreaHierarchy from "@/components/core/ResearchAreaHierarchy.vue";
 import PersonFundingCallContributionTabs from "@/components/project/PersonFundingCallContributionTabs.vue";
 import FundingCallFundingsTab from "@/components/project/FundingCallFundingsTab.vue";
+import FundingCallApplicationsTab from "@/components/project/FundingCallApplicationsTab.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";

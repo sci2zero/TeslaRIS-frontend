@@ -28,3 +28,20 @@ export interface FundingApplication {
     documents: DocumentFileResponse[];
     submitterId?: number;
 }
+
+export interface FundingApplicationIndex {
+    id: string;
+    databaseId: number;
+    fundingCallId?: number;
+    projectId?: number;
+    funderId?: number;
+    projectNameSr: string;
+    projectNameOther: string;
+    fundingCallNameSr: string;
+    fundingCallNameOther: string;
+    funderNameSr: string;
+    funderNameOther: string;
+    submissionDate?: string;
+    decisionDate?: string;
+    result?: string;
+}

@@ -1,6 +1,6 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { Project, ProjectIndex, ProjectStatus } from "@/models/ProjectModel";
+import type { Project, ProjectDocument, ProjectEvent, ProjectIndex, ProjectStatus } from "@/models/ProjectModel";
 import type { Page } from "@/models/Common";
 
 export class ProjectService extends BaseService {
@@ -44,6 +44,30 @@ export class ProjectService extends BaseService {
 
     async canEdit(projectId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `project/${projectId}/can-edit`);
+    }
+
+    async readProjectDocuments(projectId: number): Promise<AxiosResponse<ProjectDocument[]>> {
+        return super.sendRequest(axios.get, `project/${projectId}/documents`);
+    }
+
+    async addProjectDocument(projectDocument: ProjectDocument): Promise<AxiosResponse<ProjectDocument>> {
+        return super.sendRequest(axios.post, "project/add-document", projectDocument, ProjectService.idempotencyKey);
+    }
+
+    async removeProjectDocument(projectDocumentId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `project/remove-document/${projectDocumentId}`);
+    }
+
+    async readProjectEvents(projectId: number): Promise<AxiosResponse<ProjectEvent[]>> {
+        return super.sendRequest(axios.get, `project/${projectId}/events`);
+    }
+
+    async addProjectEvent(projectEvent: ProjectEvent): Promise<AxiosResponse<ProjectEvent>> {
+        return super.sendRequest(axios.post, "project/add-event", projectEvent, ProjectService.idempotencyKey);
+    }
+
+    async removeProjectEvent(projectEventId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `project/remove-event/${projectEventId}`);
     }
 }
 

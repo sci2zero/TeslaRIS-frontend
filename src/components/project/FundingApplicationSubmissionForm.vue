@@ -1,24 +1,22 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="6">
+            <v-col v-if="!presetProjectId" cols="6">
                 <!-- TODO: Project autocomplete -->
                 <v-text-field
                     v-model.number="projectId"
                     type="number"
                     :label="$t('projectLabel')"
-                    :placeholder="$t('projectLabel')">
-                </v-text-field>
+                    :placeholder="$t('projectLabel')" />
             </v-col>
-            <v-col cols="6">
+            <v-col v-if="!presetFundingCallId" cols="6">
                 <!-- TODO: FundingCall autocomplete -->
                 <v-text-field
                     v-model.number="fundingCallId"
                     type="number"
                     :label="$t('fundingCallLabel') + '*'"
                     :rules="requiredNumericFieldRules"
-                    :placeholder="$t('fundingCallLabel')">
-                </v-text-field>
+                    :placeholder="$t('fundingCallLabel')" />
             </v-col>
         </v-row>
 
@@ -27,8 +25,7 @@
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
-                    :required="false">
-                </person-autocomplete-search>
+                    :required="false" />
             </v-col>
         </v-row>
 
@@ -37,8 +34,7 @@
                 <monetary-amount-input
                     ref="requestedAmountRef"
                     v-model="requestedAmount"
-                    :required="false">
-                </monetary-amount-input>
+                    :required="false" />
             </v-col>
         </v-row>
 
@@ -48,8 +44,7 @@
                     ref="descriptionRef"
                     v-model="description"
                     is-area
-                    :label="$t('descriptionLabel')">
-                </multilingual-text-input>
+                    :label="$t('descriptionLabel')" />
             </v-col>
         </v-row>
 
@@ -59,8 +54,7 @@
                     ref="responseSummaryRef"
                     v-model="responseSummary"
                     is-area
-                    :label="$t('responseSummaryLabel')">
-                </multilingual-text-input>
+                    :label="$t('responseSummaryLabel')" />
             </v-col>
         </v-row>
 
@@ -93,8 +87,7 @@
                     :items="resultOptions"
                     item-title="title"
                     item-value="value"
-                    clearable>
-                </v-select>
+                    clearable />
             </v-col>
         </v-row>
 
@@ -105,8 +98,7 @@
                     v-model.number="revisedFundingApplicationId"
                     type="number"
                     :label="$t('revisedFundingApplicationLabel')"
-                    :placeholder="$t('revisedFundingApplicationLabel')">
-                </v-text-field>
+                    :placeholder="$t('revisedFundingApplicationLabel')" />
             </v-col>
         </v-row>
 
@@ -136,6 +128,14 @@ import type { MonetaryAmount } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 
+const props = withDefaults(defineProps<{
+    presetFundingCallId?: number;
+    presetProjectId?: number;
+}>(), {
+    presetFundingCallId: undefined,
+    presetProjectId: undefined
+});
+
 const emit = defineEmits<{
   (e: "create", payload: any): void;
 }>();
@@ -154,8 +154,8 @@ const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const responseSummaryRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const requestedAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 
-const projectId = ref<number | undefined>(undefined);
-const fundingCallId = ref<number | undefined>(undefined);
+const projectId = ref<number | undefined>(props.presetProjectId);
+const fundingCallId = ref<number | undefined>(props.presetFundingCallId);
 const revisedFundingApplicationId = ref<number | undefined>(undefined);
 
 const submitter = ref<{ title: string, value: number } | undefined>(undefined);
@@ -196,8 +196,8 @@ const submitFundingApplication = (stayOnPage: boolean) => {
         emit("create", response.data);
 
         if (stayOnPage) {
-            projectId.value = undefined;
-            fundingCallId.value = undefined;
+            projectId.value = props.presetProjectId;
+            fundingCallId.value = props.presetFundingCallId;
             revisedFundingApplicationId.value = undefined;
             submitter.value = undefined;
             requestedAmountRef.value?.clearInput();
@@ -223,5 +223,5 @@ const submitFundingApplication = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitFundingApplication });
+defineExpose({ isFormValid, submit: submitFundingApplication, submitFundingApplication });
 </script>

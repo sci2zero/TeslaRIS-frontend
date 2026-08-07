@@ -9,8 +9,8 @@ export class FundingService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async searchFunding(tokens: string, fundingCallId: number | null = null): Promise<AxiosResponse<Page<FundingIndex>>> {
-        return super.sendRequest(axios.get, `funding/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}`);
+    async searchFunding(tokens: string, fundingCallId: number | null = null, projectId: number | null = null): Promise<AxiosResponse<Page<FundingIndex>>> {
+        return super.sendRequest(axios.get, `funding/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}${projectId ? `&projectId=${projectId}` : ""}`);
     }
 
     async readFunding(fundingId: number): Promise<AxiosResponse<Funding>> {
@@ -27,6 +27,10 @@ export class FundingService extends BaseService {
 
     async updateFunding(fundingId: number, body: Funding): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `funding/${fundingId}`, body);
+    }
+
+    async deleteFunding(fundingId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `funding/${fundingId}`);
     }
 
     async canEdit(fundingId: number): Promise<AxiosResponse<boolean>> {

@@ -305,8 +305,8 @@ const submitProject = (stayOnPage: boolean) => {
         oldIds: [],
         mergedIds: [],
         researchAreasId: [],
-        consortiumIds: [],
-        team: [],
+        persons: [],
+        consortium: [],
     };
 
     ProjectService.createProject(newProject).then((response) => {
