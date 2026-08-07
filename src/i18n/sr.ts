@@ -1526,5 +1526,16 @@ export default {
     revisionCreateMessage: "Kreiran zapis",
     revisionEnrichmentMessage: "Obogaćen zapis",
     revisionRestoreMessage: "Zapis rekreiran od verzije: {0}",
+    restorationWarningsLabel: "Upozorenja pri rekreiranju",
+    restorationWarningsCountLabel: "{count} upozorenja",
+    restorationWarningsExplanationMessage: "Pojedine reference iz rekreirane verzije više ne postoje i nisu mogle biti obnovljene. Sve ostalo je rekreirano onako kako je zabeleženo.",
+    referenceDroppedLabel: "Nije postavljeno",
+    referenceDegradedLabel: "Delimično zadržano",
+    restoreContributorUnmanagedMessage: "Saradnik \"{0}\" (ID {1}) više ne postoji i zadržan je samo po imenu, bez veze sa profilom istraživača.",
+    restoreContributionInstitutionMissingMessage: "Ustanova saradnika (ID {0}) više ne postoji i nije postavljena.",
+    restoreCountryMissingMessage: "Država (ID {0}) više ne postoji i nije postavljena.",
+    restoreEventMissingMessage: "Događaj (ID {0}) više ne postoji i nije postavljen.",
+    restorePublisherMissingMessage: "Izdavač (ID {0}) više ne postoji i nije postavljen.",
+    restoreResearchAreaMissingMessage: "Oblast istraživanja (ID {0}) više ne postoji i nije postavljena.",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka"
 }

@@ -24,6 +24,18 @@ export interface DataQualityAssessmentSimple {
     assessmentDate: string;
 }
 
+export enum DegradationOutcome {
+    DROPPED = "DROPPED",
+    DEGRADED = "DEGRADED"
+}
+
+export interface DegradedReference {
+    messageKey: string;
+    fieldPath: string;
+    parameters: string[];
+    outcome: DegradationOutcome;
+}
+
 export interface Revision {
     timestamp: string;
     majorVersion: number;
@@ -31,4 +43,5 @@ export interface Revision {
     versionNote?: string;
     createdBy?: string;
     assessments: DataQualityAssessmentSimple[];
+    restorationWarnings: DegradedReference[];
 }

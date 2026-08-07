@@ -15,7 +15,7 @@
                 <td>
                     <v-btn
                         :icon="isExpanded(row.item) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                        :disabled="row.item.assessments.length === 0"
+                        :disabled="!isExpandable(row.item)"
                         density="compact"
                         variant="text"
                         @click="toggleRow(row.item)"
@@ -23,7 +23,19 @@
                 </td>
                 <td>{{ row.item.majorVersion }}.{{ row.item.minorVersion }}</td>
                 <td>{{ localiseDate(row.item.timestamp) }}</td>
-                <td>{{ displayTextOrPlaceholder(row.item.versionNote ? $t(row.item.versionNote.split(":")[0] + "Message", [row.item.versionNote.split(":").at(-1)]) : row.item.versionNote as string) }}</td>
+                <td>
+                    {{ displayTextOrPlaceholder(row.item.versionNote ? $t(row.item.versionNote.split(":")[0] + "Message", [row.item.versionNote.split(":").at(-1)]) : row.item.versionNote as string) }}
+                    <v-chip
+                        v-if="restorationWarnings(row.item).length > 0"
+                        class="ml-2"
+                        color="warning"
+                        variant="tonal"
+                        size="x-small"
+                        prepend-icon="mdi-alert-outline"
+                        @click="toggleRow(row.item)">
+                        {{ $t("restorationWarningsCountLabel", { count: restorationWarnings(row.item).length }) }}
+                    </v-chip>
+                </td>
                 <td>{{ displayTextOrPlaceholder(row.item.createdBy as string) }}</td>
                 <td>
                     <span
@@ -64,7 +76,48 @@
             </tr>
             <tr v-if="isExpanded(row.item)">
                 <td :colspan="headers.length" class="assessment-panel">
-                    <v-table density="compact">
+                    <template v-if="restorationWarnings(row.item).length > 0">
+                        <div class="panel-title">
+                            {{ $t("restorationWarningsLabel") }}
+                        </div>
+                        <div class="text-medium-emphasis mb-2 text-caption">
+                            {{ $t("restorationWarningsExplanationMessage") }}
+                        </div>
+                        <v-table density="compact" class="mb-4">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t("statusLabel") }}</th>
+                                    <th>{{ $t("descriptionLabel") }}</th>
+                                    <th>{{ $t("fieldLabel") }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(warning, warningIndex) in restorationWarnings(row.item)"
+                                    :key="`${warning.fieldPath}-${warningIndex}`">
+                                    <td>
+                                        <v-chip
+                                            :color="warning.outcome === DegradationOutcome.DEGRADED ? 'warning' : 'error'"
+                                            variant="tonal"
+                                            size="small">
+                                            {{ warning.outcome === DegradationOutcome.DEGRADED
+                                                ? $t("referenceDegradedLabel")
+                                                : $t("referenceDroppedLabel") }}
+                                        </v-chip>
+                                    </td>
+                                    <td>{{ $t(warning.messageKey, warning.parameters) }}</td>
+                                    <td class="text-medium-emphasis">
+                                        {{ warning.fieldPath }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </template>
+
+                    <div v-if="row.item.assessments.length > 0" class="panel-title">
+                        {{ $t("dataQualityAssessmentLabel") }}
+                    </div>
+                    <v-table v-if="row.item.assessments.length > 0" density="compact">
                         <thead>
                             <tr>
                                 <th>{{ $t("qualityProfileLabel") }}</th>
@@ -135,7 +188,7 @@
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import { useI18n } from "vue-i18n";
-import type { DataQualityAssessmentSimple, Revision } from "@/models/RevisionModel";
+import { DegradationOutcome, type DataQualityAssessmentSimple, type DegradedReference, type Revision } from "@/models/RevisionModel";
 import RevisionService from "@/services/revision/RevisionService";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
@@ -230,6 +283,12 @@ export default defineComponent({
                 expandedRows.value.add(key);
             }
         };
+
+        const restorationWarnings = (revision: Revision): DegradedReference[] =>
+            revision.restorationWarnings ?? [];
+
+        const isExpandable = (revision: Revision) =>
+            revision.assessments.length > 0 || restorationWarnings(revision).length > 0;
 
         // Revisions arrive sorted by timestamp, newest first.
         const isLatestRevision = (revision: Revision) =>
@@ -326,6 +385,7 @@ export default defineComponent({
             revisions, pagedRevisions, headers, tableOptions,
             refreshTable, isExpanded, toggleRow, scoreColorClass,
             sortedAssessments, bestAssessment, isLatestRevision,
+            restorationWarnings, isExpandable, DegradationOutcome,
             showDetailedAssessment, startRestoreProcess, restoreRevision,
             displayPersistentDialog, revisionToRestore, restoreInProgress,
             notifications, versionLabelFor,
@@ -339,5 +399,10 @@ export default defineComponent({
 .assessment-panel {
     padding: 8px 16px 16px 48px;
     background-color: rgb(var(--v-theme-surface-light));
+}
+
+.panel-title {
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 </style>

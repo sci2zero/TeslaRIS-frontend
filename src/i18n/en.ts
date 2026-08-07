@@ -1512,5 +1512,16 @@ export default {
     revisionCreateMessage: "Record creation",
     revisionEnrichmentMessage: "Record enrichment",
     revisionRestoreMessage: "Record restored from version: {0}",
+    restorationWarningsLabel: "Restoration warnings",
+    restorationWarningsCountLabel: "{count} warning(s)",
+    restorationWarningsExplanationMessage: "Some references from the restored version no longer existed and could not be restored. Everything else was restored as recorded.",
+    referenceDroppedLabel: "Not set",
+    referenceDegradedLabel: "Kept partially",
+    restoreContributorUnmanagedMessage: "Contributor \"{0}\" (ID {1}) no longer exists and was kept by name only, without a link to a researcher profile.",
+    restoreContributionInstitutionMissingMessage: "Contributor institution (ID {0}) no longer exists and was not set.",
+    restoreCountryMissingMessage: "Country (ID {0}) no longer exists and was not set.",
+    restoreEventMissingMessage: "Event (ID {0}) no longer exists and was not set.",
+    restorePublisherMissingMessage: "Publisher (ID {0}) no longer exists and was not set.",
+    restoreResearchAreaMissingMessage: "Research area (ID {0}) no longer exists and was not set.",
     dataQualityAssessmentLabel: "Data quality assessment"
 }
