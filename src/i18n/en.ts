@@ -1573,6 +1573,9 @@ export default {
     consortiumLabel: "Consortium",
     addTeamMemberLabel: "Add team member",
     addInstitutionLabel: "Add institution",
+    addDocumentLabel: "Add document",
+    enterExternalDocumentLabel: "Enter document that is not in list",
+    externalDocumentDescriptionLabel: "External document description",
     updateProjectLabel: "Update project",
     addProjectLabel: "Project",
 }

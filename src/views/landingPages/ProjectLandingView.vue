@@ -156,6 +156,9 @@
             <v-tab value="fundingApplications">
                 {{ $t("fundingApplicationsLabel") }}
             </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -212,6 +215,18 @@
                 </v-row>
             </v-tabs-window-item>
 
+            <v-tabs-window-item value="documents">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-documents-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
                 <keyword-list
@@ -258,6 +273,7 @@ import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
 import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
 import ProjectTeamTab from "@/components/project/ProjectTeamTab.vue";
 import ProjectConsortiumTab from "@/components/project/ProjectConsortiumTab.vue";
+import ProjectDocumentsTab from "@/components/project/ProjectDocumentsTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";

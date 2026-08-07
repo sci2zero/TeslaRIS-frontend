@@ -1587,6 +1587,9 @@ export default {
     consortiumLabel: "Konzorcijum",
     addTeamMemberLabel: "Dodaj člana tima",
     addInstitutionLabel: "Dodaj instituciju",
+    addDocumentLabel: "Dodaj dokument",
+    enterExternalDocumentLabel: "Unesi dokument koji nije u listi",
+    externalDocumentDescriptionLabel: "Opis eksternog dokumenta",
     updateProjectLabel: "Ažuriraj projekat",
     addProjectLabel: "Projekat",
 }
