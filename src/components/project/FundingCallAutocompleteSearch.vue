@@ -88,7 +88,7 @@ const searchFundingCalls = lodash.debounce((input: string) => {
         });
         params += "page=0&size=5";
 
-        FundingCallService.searchFundingCall(params).then((response) => {
+        FundingCallService.searchFundingCalls(params).then((response) => {
             const listOfFundingCalls: { title: string; value: number; }[] = [];
             response.data.content.forEach((fundingCall: FundingCallIndex) => {
                 listOfFundingCalls.push({
