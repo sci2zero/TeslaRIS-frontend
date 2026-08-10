@@ -1,12 +1,16 @@
 <template>
-    <template v-if="remarksPresent">
+    <template v-if="isAdmin && remarksPresent">
         <v-card
             v-for="(profile, index) in reports"
             :key="profile.profileName"
             class="quality-summary-card mb-3"
+            :class="{
+                'quality-summary-card--prominent': prominent,
+                'quality-summary-card--clickable': hasRemarks(profile)
+            }"
             variant="flat"
-            color="grey-lighten-4"
-            @click="openDialog(index)">
+            :color="prominent ? 'blue-grey-lighten-5' : 'grey-lighten-4'"
+            @click="openDialog(index, profile)">
             <v-card-text>
                 <div class="quality-summary-title">
                     {{ $t("dataQualitySummaryTitleLabel") }}
@@ -103,6 +107,7 @@ import { IssueSeverity, type QualityReportResponse } from "@/models/RevisionMode
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import DataQualityService from "@/services/revision/DataQualityService";
 import { localiseDate } from "@/utils/DateUtil";
+import { useUserRole } from "@/composables/useUserRole";
 
 
 export default defineComponent({
@@ -115,6 +120,10 @@ export default defineComponent({
         entityId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        prominent: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {
@@ -137,7 +146,7 @@ export default defineComponent({
         };
 
         const getContent = () => {
-            if (!props.entityId) {
+            if (!props.entityId || !isAdmin.value) {
                 reports.value = [];
                 remarksPresent.value = false;
                 return;
@@ -153,7 +162,14 @@ export default defineComponent({
             });
         };
 
-        const openDialog = (index: number) => {
+        const hasRemarks = (profile: QualityReportResponse) =>
+            (profile.report?.length ?? 0) > 0;
+
+        const openDialog = (index: number, profile: QualityReportResponse) => {
+            if (!hasRemarks(profile)) {
+                return;
+            }
+
             selectedTab.value = index;
             dialog.value = true;
         };
@@ -177,13 +193,15 @@ export default defineComponent({
             getContent
         );
 
+        const { isAdmin } = useUserRole();
+
         return {
             dialog, remarksPresent,
             reports, selectedTab,
             severityIcons, severityColors,
             returnCurrentLocaleContent,
-            openDialog, scoreColorClass,
-            localiseDate
+            openDialog, scoreColorClass, hasRemarks,
+            localiseDate, isAdmin
         };
     }
 });
@@ -191,12 +209,24 @@ export default defineComponent({
 
 <style scoped>
 .quality-summary-card {
-    cursor: pointer;
     transition: box-shadow 0.2s ease;
 }
 
-.quality-summary-card:hover {
+.quality-summary-card--clickable {
+    cursor: pointer;
+}
+
+.quality-summary-card--clickable:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.quality-summary-card--prominent {
+    border: 1px solid rgba(var(--v-theme-primary), 0.25);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10);
+}
+
+.quality-summary-card--prominent.quality-summary-card--clickable:hover {
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.16);
 }
 
 .quality-summary-title {

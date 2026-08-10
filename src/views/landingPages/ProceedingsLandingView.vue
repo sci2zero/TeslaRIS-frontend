@@ -53,7 +53,7 @@
                         </div>
                         <basic-info-loader v-if="!proceedings" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="proceedings?.eventId">
                                     {{ $t("conferenceLabel") }}:
                                 </div>

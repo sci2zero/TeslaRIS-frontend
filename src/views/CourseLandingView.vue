@@ -49,7 +49,7 @@
                         </div>
                         <basic-info-loader v-if="!course" :citation-button="false" />
                         <v-row>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="!course?.serialEvent">
                                     {{ $t("eventDateLabel") }}:
                                 </div>

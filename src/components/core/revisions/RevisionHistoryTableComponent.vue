@@ -255,8 +255,7 @@ export default defineComponent({
             }
 
             RevisionService.getRevisionHistory(
-                props.entityType,
-                props.entityId
+                props.entityType, props.entityId
             ).then(response => {
                 revisions.value = response.data;
                 tableOptions.value.page = 1;
@@ -359,8 +358,18 @@ export default defineComponent({
 
                 emit("restored");
                 getContent();
-            }).catch(() => {
-                addNotification(i18n.t("genericErrorMessage"));
+            }).catch((error) => {
+                const message = error.response?.data?.message;
+
+                if (message?.startsWith("cantRestoreVersionMessage")) {
+                    const params = message.split(":");
+
+                    addNotification(
+                        i18n.t("cantRestoreVersionMessage", [params[1], params[2]])
+                    );
+                } else {
+                    addNotification(i18n.t("genericErrorMessage"));
+                }
             }).finally(() => {
                 restoreInProgress.value = false;
                 revisionToRestore.value = undefined;
@@ -371,7 +380,7 @@ export default defineComponent({
             const notificationId = self.crypto.randomUUID();
 
             notifications.value.set(notificationId, message);
-            setTimeout(() => notifications.value.delete(notificationId), 2000);
+            setTimeout(() => notifications.value.delete(notificationId), 4000);
         };
 
         onMounted(() => getContent());

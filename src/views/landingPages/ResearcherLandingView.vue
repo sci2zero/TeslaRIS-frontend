@@ -84,15 +84,6 @@
             :person-id="(person?.id as number)"
         />
 
-        <v-row v-if="person">
-            <v-col cols="12" md="3">
-                <data-quality-remarks-dialog
-                    :entity-type="EntityType.PERSON"
-                    :entity-id="person?.id"
-                />
-            </v-col>
-        </v-row>
-
         <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
         <v-tabs
             v-if="person"
@@ -379,13 +370,12 @@ import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFieldVisibilityConfigurationForm.vue';
 import UserService from '@/services/UserService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent },
     setup() {
         const currentTab = ref("additionalInfo");
 

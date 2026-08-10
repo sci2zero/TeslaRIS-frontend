@@ -1537,5 +1537,10 @@ export default {
     restoreEventMissingMessage: "Događaj (ID {0}) više ne postoji i nije postavljen.",
     restorePublisherMissingMessage: "Izdavač (ID {0}) više ne postoji i nije postavljen.",
     restoreResearchAreaMissingMessage: "Oblast istraživanja (ID {0}) više ne postoji i nije postavljena.",
-    dataQualityAssessmentLabel: "Procena kvaliteta podataka"
+    restoreLanguageMissingMessage: "Jezik (ID {0}) više ne postoji i nije postavljen.",
+    restoreLanguageTagMissingMessage: "Jezički tag (ID {0}) više ne postoji, pa taj prevod nije obnovljen.",
+    restorePublicationSeriesMissingMessage: "Serijska publikacija (ID {0}) više ne postoji i nije postavljena.",
+    restoreThesisInstitutionExternalMessage: "Ustanova (ID {0}) više ne postoji, pa je teza zadržana samo sa nazivom spoljne ustanove.",
+    dataQualityAssessmentLabel: "Procena kvaliteta podataka",
+    cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji."
 }

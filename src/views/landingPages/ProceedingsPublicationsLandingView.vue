@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!proceedingsPublication" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
                                     {{ $t("concretePublicationTypeLabel") }}:
                                 </div>

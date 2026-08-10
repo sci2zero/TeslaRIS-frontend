@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!materialProduct" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="materialProduct?.materialProductType">
                                     {{ $t("materialProductTypeLabel") }}:
                                 </div>

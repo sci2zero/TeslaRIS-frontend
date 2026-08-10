@@ -48,7 +48,7 @@
                         </div>
                         <basic-info-loader v-if="!publisher" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.countryId">
                                     {{ $t("countryLabel") }}:
                                 </div>
@@ -62,7 +62,7 @@
                                     {{ returnCurrentLocaleContent(publisher?.state) }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.place && publisher?.place.length > 0">
                                     {{ $t("placeLabel") }}:
                                 </div>
@@ -70,18 +70,15 @@
                                     {{ returnCurrentLocaleContent(publisher?.place) }}
                                 </div>
                             </v-col>
+                            <v-col v-if="isAdmin" cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.PUBLISHER"
+                                    :entity-id="publisher?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
-            </v-col>
-        </v-row>
-
-        <v-row v-if="publisher">
-            <v-col cols="3">
-                <data-quality-remarks-dialog
-                    :entity-type="EntityType.PUBLISHER"
-                    :entity-id="publisher?.id"
-                />
             </v-col>
         </v-row>
 

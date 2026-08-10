@@ -51,7 +51,7 @@
                         </div>
                         <basic-info-loader v-if="!journal" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div>{{ $t("articleCollectionSeriesTypeLabel") }}:</div>
                                 <div class="response">
                                     {{ getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal?.type) }}

@@ -125,5 +125,6 @@ export default {
     invalidGridMessage: "Погрешан формат GRID-а.",
     invalidWikidataMessage: "Погрешан формат Wikidata ID-а.",
     noEIssnLabel: "Нема E-ISSN",
-    noPrintIssnLabel: "Нема Print ISSN"
+    noPrintIssnLabel: "Нема Print ISSN",
+    cantRestoreVersionMessage: "Није могуће вратити ову верзију: референцира се \"{0}\" са ID-ем {1}, који више не постоји."
 };

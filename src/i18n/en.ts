@@ -1523,5 +1523,10 @@ export default {
     restoreEventMissingMessage: "Event (ID {0}) no longer exists and was not set.",
     restorePublisherMissingMessage: "Publisher (ID {0}) no longer exists and was not set.",
     restoreResearchAreaMissingMessage: "Research area (ID {0}) no longer exists and was not set.",
-    dataQualityAssessmentLabel: "Data quality assessment"
+    restoreLanguageMissingMessage: "Language (ID {0}) no longer exists and was not set.",
+    restoreLanguageTagMissingMessage: "Language tag (ID {0}) no longer exists, so that translation was not restored.",
+    restorePublicationSeriesMissingMessage: "Publication series (ID {0}) no longer exists and was not set.",
+    restoreThesisInstitutionExternalMessage: "Institution (ID {0}) no longer exists, so the thesis was kept with its external institution name only.",
+    dataQualityAssessmentLabel: "Data quality assessment",
+    cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists."
 }

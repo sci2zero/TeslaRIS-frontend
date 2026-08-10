@@ -51,7 +51,7 @@
                         </div>
                         <basic-info-loader v-if="!bookSeries" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div>eISSN:</div>
                                 <div class="response">
                                     {{ bookSeries?.eissn ? bookSeries.eissn : $t("notYetSetMessage") }}

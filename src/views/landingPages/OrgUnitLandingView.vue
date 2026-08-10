@@ -274,12 +274,12 @@
                                         :show-input="false">
                                     </open-layers-map>
                                 </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.ORGANISATION_UNIT"
-                                    :entity-id="organisationUnit?.id"
-                                />
+                                <div class="mt-5">
+                                    <data-quality-remarks-dialog
+                                        :entity-type="EntityType.ORGANISATION_UNIT"
+                                        :entity-id="organisationUnit?.id"
+                                    />
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card-text>

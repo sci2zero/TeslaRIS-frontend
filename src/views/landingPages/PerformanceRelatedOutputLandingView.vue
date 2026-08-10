@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!performanceRelatedOutput" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="performanceRelatedOutput?.type">
                                     {{ $t("performanceRelatedOutputTypeLabel") }}:
                                 </div>

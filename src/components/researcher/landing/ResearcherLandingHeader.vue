@@ -148,6 +148,17 @@
 
                 <slot name="actions"></slot>
             </div>
+
+            <!-- Data Quality -->
+            <div
+                v-if="person?.id"
+                class="w-full lg:w-72 flex-shrink-0 mt-8 lg:mt-0 lg:ml-12">
+                <data-quality-remarks-dialog
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
+                    prominent
+                />
+            </div>
         </div>
 
         <!-- Expandable Details Section -->
@@ -582,6 +593,8 @@ import { ApplicableEntityType } from '@/models/Common';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
 
 
 interface Props {
