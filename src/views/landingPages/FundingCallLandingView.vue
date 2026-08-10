@@ -15,14 +15,13 @@
                             <div>
                                 <generic-crud-modal
                                     class="mb-6"
-                                    :form-component="FundingCallUpdateForm"
-                                    :form-props="{ presetFundingCall: fundingCall }"
-                                    entity-name="FundingCall"
+                                    :form-component="AlternateNameForm"
+                                    :form-props="{ presetName: fundingCall?.name, presetNameAbbreviation: fundingCall?.nameAbbreviation }"
+                                    entity-name="Name"
                                     is-update
                                     is-section-update
                                     :read-only="!canEdit"
-                                    wide
-                                    @update="updateFundingCall"
+                                    @update="updateName"
                                 />
                             </div>
                         </v-skeleton-loader>
@@ -43,84 +42,96 @@
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text>
+                    <v-card-text class="edit-pen-container">
+                        <generic-crud-modal
+                            :form-component="FundingCallUpdateForm"
+                            :form-props="{ presetFundingCall: fundingCall }"
+                            entity-name="FundingCall"
+                            is-update
+                            is-section-update
+                            :read-only="!canEdit"
+                            wide
+                            @update="updateFundingCall"
+                        />
+
                         <div class="mb-5">
                             <b>{{ $t("basicInfoLabel") }}</b>
                         </div>
 
                         <basic-info-loader v-if="!fundingCall" />
-                        <v-row v-else>
-                            <!-- Left column -->
-                            <v-col cols="6">
-                                <div v-if="fundingCall.dateFrom">
-                                    {{ $t("dateFromLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.dateFrom" class="response">
+                        <div v-else class="info-columns">
+                            <div v-if="fundingCall.dateFrom" class="info-item">
+                                <div>{{ $t("dateFromLabel") }}:</div>
+                                <div class="response">
                                     {{ localiseDate(fundingCall.dateFrom) }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingCall.dateTo">
-                                    {{ $t("dateToLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.dateTo" class="response">
+                            <div v-if="fundingCall.dateTo" class="info-item">
+                                <div>{{ $t("dateToLabel") }}:</div>
+                                <div class="response">
                                     {{ localiseDate(fundingCall.dateTo) }}
                                 </div>
+                            </div>
 
-                                <div v-if="funderName">
-                                    {{ $t("funderLabel") }}:
+                            <div v-if="funderName.length > 0" class="info-item">
+                                <div>{{ $t("funderLabel") }}:</div>
+                                <div class="response">
+                                    <localized-link :to="'organisation-units/' + fundingCall.funderId">
+                                        {{ returnCurrentLocaleContent(funderName) }}
+                                    </localized-link>
                                 </div>
-                                <div v-if="funderName" class="response">
-                                    {{ funderName }}
-                                </div>
+                            </div>
 
-                                <div v-if="fundingCall.fundingTypes && fundingCall.fundingTypes.length > 0">
-                                    {{ $t("fundingTypesLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.fundingTypes && fundingCall.fundingTypes.length > 0" class="response">
+                            <div v-if="fundingCall.fundingTypes && fundingCall.fundingTypes.length > 0" class="info-item">
+                                <div>{{ $t("fundingTypesLabel") }}:</div>
+                                <div class="response">
                                     {{ fundingCall.fundingTypes.map((t : FundingType) => getFundingTypeTitleFromValueAutoLocale(t)).join(", ") }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingCall.fundingProgramName && fundingCall.fundingProgramName.length > 0">
-                                    {{ $t("fundingProgramLabel") }}:
+                            <div v-if="fundingCall.fundingProgramName && fundingCall.fundingProgramName.length > 0" class="info-item">
+                                <div>{{ $t("fundingProgramLabel") }}:</div>
+                                <div class="response">
+                                    <localized-link v-if="fundingCall.fundingProgramId" :to="'funding-program/' + fundingCall.fundingProgramId">
+                                        {{ returnCurrentLocaleContent(fundingCall.fundingProgramName) }}
+                                    </localized-link>
+                                    <span v-else>
+                                        {{ returnCurrentLocaleContent(fundingCall.fundingProgramName) }}
+                                    </span>
                                 </div>
-                                <div v-if="fundingCall.fundingProgramName && fundingCall.fundingProgramName.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(fundingCall.fundingProgramName) }}
-                                </div>
-                            </v-col>
+                            </div>
 
-                            <!-- Right column -->
-                            <v-col cols="6">
-                                <div v-if="fundingCall.monetaryAmount">
-                                    {{ $t("totalAmountLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.monetaryAmount" class="response">
+                            <div v-if="fundingCall.monetaryAmount" class="info-item">
+                                <div>{{ $t("totalAmountLabel") }}:</div>
+                                <div class="response">
                                     {{ formatAmount(fundingCall.monetaryAmount.amount, locale) }} {{ fundingCall.monetaryAmount.currencyCode }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingCall.uris && fundingCall.uris.length > 0">
-                                    {{ $t("urisLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.uris && fundingCall.uris.length > 0" class="response">
+                            <div v-if="fundingCall.uris && fundingCall.uris.length > 0" class="info-item">
+                                <div>{{ $t("urisLabel") }}:</div>
+                                <div class="response">
                                     <div v-for="uri in fundingCall.uris" :key="uri">
                                         <a :href="uri" target="_blank">{{ uri }}</a>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div v-if="fundingCall.oaMandated !== undefined && fundingCall.oaMandated !== null">
-                                    {{ $t("oaMandatedLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.oaMandated !== undefined && fundingCall.oaMandated !== null" class="response">
+                            <div v-if="fundingCall.oaMandated !== undefined && fundingCall.oaMandated !== null" class="info-item">
+                                <div>{{ $t("oaMandatedLabel") }}:</div>
+                                <div class="response">
                                     {{ fundingCall.oaMandated ? $t("yesLabel") : $t("noLabel") }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingCall.oaMandateUrl">
-                                    {{ $t("oaMandateUrlLabel") }}:
-                                </div>
-                                <div v-if="fundingCall.oaMandateUrl" class="response">
+                            <div v-if="fundingCall.oaMandateUrl" class="info-item">
+                                <div>{{ $t("oaMandateUrlLabel") }}:</div>
+                                <div class="response">
                                     <a :href="fundingCall.oaMandateUrl" target="_blank">{{ fundingCall.oaMandateUrl }}</a>
                                 </div>
-                            </v-col>
-                        </v-row>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -269,7 +280,7 @@ import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useUploadStore } from "@/stores/uploadStore";
-import { useUserRole } from "@/composables/useUserRole";
+import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import type { DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
@@ -284,6 +295,8 @@ import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingCallUpdateForm from "@/components/project/FundingCallUpdateForm.vue";
+import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
+import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -297,10 +310,10 @@ const icon = ref("mdi-cash-multiple");
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 
-const funderName = ref("");
+const funderName = ref<MultilingualContent[]>([]);
 
-const { isAdmin, isResearcher } = useUserRole();
-const canEdit = computed(() => isAdmin.value || isResearcher.value);
+const canEdit = ref(false);
+const loginStore = useLoginStore();
 
 const uploadStore = useUploadStore();
 
@@ -321,8 +334,13 @@ const fetchFundingCall = async () => {
         );
         fundingCall.value = response.data;
 
+        funderName.value = [];
         if (fundingCall.value.funderId) {
             fetchFunderName(fundingCall.value.funderId);
+        }
+
+        if (loginStore.userLoggedIn) {
+            checkIfUserCanEdit();
         }
     } catch (error) {
         console.error("Error fetching funding call:", error);
@@ -330,9 +348,15 @@ const fetchFundingCall = async () => {
     }
 };
 
+const checkIfUserCanEdit = () => {
+    FundingCallService.canEdit(parseInt(route.params.id as string)).then((response) => {
+        canEdit.value = response.data;
+    }).catch(() => canEdit.value = false);
+};
+
 const fetchFunderName = (funderId: number) => {
     OrganisationUnitService.readOU(funderId).then((response) => {
-        funderName.value = returnCurrentLocaleContent(response.data.name) as string;
+        funderName.value = response.data.name;
     });
 };
 
@@ -362,6 +386,12 @@ const updateContributors = (contributors: PersonFundingCallContribution[]) => {
 
 const updateResearchAreas = (researchAreaIds: number[]) => {
     fundingCall.value!.researchAreasId = researchAreaIds;
+    performUpdate(true);
+};
+
+const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
+    fundingCall.value!.name = nameInformation.name;
+    fundingCall.value!.nameAbbreviation = nameInformation.nameAbbreviation;
     performUpdate(true);
 };
 
@@ -440,6 +470,21 @@ const updateCallDocument = (attachment: DocumentFile) => {
     font-size: 1.2rem;
     margin-bottom: 10px;
     font-weight: bold;
+}
+
+#fundingCall .info-columns {
+    columns: 2;
+    column-gap: 40px;
+}
+
+#fundingCall .info-item {
+    break-inside: avoid;
+}
+
+@media (max-width: 959px) {
+    #fundingCall .info-columns {
+        columns: 1;
+    }
 }
 
 .edit-pen-container {
