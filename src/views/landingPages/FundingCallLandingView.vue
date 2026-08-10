@@ -280,7 +280,7 @@ import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useUploadStore } from "@/stores/uploadStore";
-import { useUserRole } from "@/composables/useUserRole";
+import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import type { DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
@@ -312,8 +312,8 @@ const snackbarMessage = ref("");
 
 const funderName = ref<MultilingualContent[]>([]);
 
-const { isAdmin, isResearcher } = useUserRole();
-const canEdit = computed(() => isAdmin.value || isResearcher.value);
+const canEdit = ref(false);
+const loginStore = useLoginStore();
 
 const uploadStore = useUploadStore();
 
@@ -338,10 +338,20 @@ const fetchFundingCall = async () => {
         if (fundingCall.value.funderId) {
             fetchFunderName(fundingCall.value.funderId);
         }
+
+        if (loginStore.userLoggedIn) {
+            checkIfUserCanEdit();
+        }
     } catch (error) {
         console.error("Error fetching funding call:", error);
         await router.push({ name: "notFound" });
     }
+};
+
+const checkIfUserCanEdit = () => {
+    FundingCallService.canEdit(parseInt(route.params.id as string)).then((response) => {
+        canEdit.value = response.data;
+    }).catch(() => canEdit.value = false);
 };
 
 const fetchFunderName = (funderId: number) => {
