@@ -58,71 +58,70 @@
                         </div>
 
                         <basic-info-loader v-if="!fundingProgram" />
-                        <v-row v-else>
-                            <!-- Left column -->
-                            <v-col cols="6">
-                                <div v-if="fundingProgram.funderName && fundingProgram.funderName.length > 0">
-                                    {{ $t("funderLabel") }}:
+                        <div v-else class="info-columns">
+                            <div v-if="fundingProgram.funderName && fundingProgram.funderName.length > 0" class="info-item">
+                                <div>{{ $t("funderLabel") }}:</div>
+                                <div class="response">
+                                    <localized-link v-if="fundingProgram.funderId" :to="'organisation-units/' + fundingProgram.funderId">
+                                        {{ returnCurrentLocaleContent(fundingProgram.funderName) }}
+                                    </localized-link>
+                                    <span v-else>
+                                        {{ returnCurrentLocaleContent(fundingProgram.funderName) }}
+                                    </span>
                                 </div>
-                                <div v-if="fundingProgram.funderName && fundingProgram.funderName.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(fundingProgram.funderName) }}
-                                </div>
+                            </div>
 
-                                <div v-if="fundingProgram.fundingTypes && fundingProgram.fundingTypes.length > 0">
-                                    {{ $t("fundingTypesLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.fundingTypes && fundingProgram.fundingTypes.length > 0" class="response">
+                            <div v-if="fundingProgram.fundingTypes && fundingProgram.fundingTypes.length > 0" class="info-item">
+                                <div>{{ $t("fundingTypesLabel") }}:</div>
+                                <div class="response">
                                     {{ fundingProgram.fundingTypes.map((t: FundingType) => getFundingTypeTitleFromValueAutoLocale(t)).join(", ") }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingProgram.dateFrom">
-                                    {{ $t("dateFromLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.dateFrom" class="response">
+                            <div v-if="fundingProgram.dateFrom" class="info-item">
+                                <div>{{ $t("dateFromLabel") }}:</div>
+                                <div class="response">
                                     {{ localiseDate(fundingProgram.dateFrom) }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingProgram.dateTo">
-                                    {{ $t("dateToLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.dateTo" class="response">
+                            <div v-if="fundingProgram.dateTo" class="info-item">
+                                <div>{{ $t("dateToLabel") }}:</div>
+                                <div class="response">
                                     {{ localiseDate(fundingProgram.dateTo) }}
                                 </div>
-                            </v-col>
+                            </div>
 
-                            <!-- Right column -->
-                            <v-col cols="6">
-                                <div v-if="fundingProgram.totalAmount">
-                                    {{ $t("totalAmountLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.totalAmount" class="response">
+                            <div v-if="fundingProgram.totalAmount" class="info-item">
+                                <div>{{ $t("totalAmountLabel") }}:</div>
+                                <div class="response">
                                     {{ formatAmount(fundingProgram.totalAmount.amount, locale) }} {{ fundingProgram.totalAmount.currencyCode }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingProgram.uris && fundingProgram.uris.length > 0">
-                                    {{ $t("urisLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.uris && fundingProgram.uris.length > 0" class="response">
+                            <div v-if="fundingProgram.uris && fundingProgram.uris.length > 0" class="info-item">
+                                <div>{{ $t("urisLabel") }}:</div>
+                                <div class="response">
                                     <div v-for="uri in fundingProgram.uris" :key="uri">
                                         <a :href="uri" target="_blank">{{ uri }}</a>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div v-if="fundingProgram.oaMandated !== undefined && fundingProgram.oaMandated !== null">
-                                    {{ $t("oaMandatedLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.oaMandated !== undefined && fundingProgram.oaMandated !== null" class="response">
+                            <div v-if="fundingProgram.oaMandated !== undefined && fundingProgram.oaMandated !== null" class="info-item">
+                                <div>{{ $t("oaMandatedLabel") }}:</div>
+                                <div class="response">
                                     {{ fundingProgram.oaMandated ? $t("yesLabel") : $t("noLabel") }}
                                 </div>
+                            </div>
 
-                                <div v-if="fundingProgram.oaMandateUrl">
-                                    {{ $t("oaMandateUrlLabel") }}:
-                                </div>
-                                <div v-if="fundingProgram.oaMandateUrl" class="response">
+                            <div v-if="fundingProgram.oaMandateUrl" class="info-item">
+                                <div>{{ $t("oaMandateUrlLabel") }}:</div>
+                                <div class="response">
                                     <a :href="fundingProgram.oaMandateUrl" target="_blank">{{ fundingProgram.oaMandateUrl }}</a>
                                 </div>
-                            </v-col>
-                        </v-row>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -274,6 +273,7 @@ import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import FundingProgramUpdateForm from "@/components/project/FundingProgramUpdateForm.vue";
 import FundingProgramCallsTab from "@/components/project/FundingProgramCallsTab.vue";
+import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -434,6 +434,21 @@ const updateDocument = (attachment: DocumentFile) => {
     font-size: 1.2rem;
     margin-bottom: 10px;
     font-weight: bold;
+}
+
+#funding-program .info-columns {
+    columns: 2;
+    column-gap: 40px;
+}
+
+#funding-program .info-item {
+    break-inside: avoid;
+}
+
+@media (max-width: 959px) {
+    #funding-program .info-columns {
+        columns: 1;
+    }
 }
 
 .edit-pen-container {
