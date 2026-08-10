@@ -154,6 +154,21 @@
                             />
                         </v-col>
                     </v-row>
+
+                    <!-- Related Projects -->
+                    <v-row>
+                        <v-col>
+                            <h2>{{ $t("relatedProjectsLabel") }}</h2>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <projects-relation-form
+                                ref="relationsRef"
+                                @set-input="relations = $event"
+                            />
+                        </v-col>
+                    </v-row>
                 </v-container>
             </v-col>
         </v-row>
@@ -178,11 +193,12 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import Toast from '@/components/core/Toast.vue';
 import IDFProjectMetadataPrepopulator from '@/components/project/IDFProjectMetadataPrepopulator.vue';
+import ProjectsRelationForm from '@/components/project/ProjectsRelationForm.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProjectService from '@/services/project/ProjectService';
-import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata } from '@/models/ProjectModel';
+import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata, type ProjectsRelation } from '@/models/ProjectModel';
 import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
@@ -206,6 +222,7 @@ const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const keywordsRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const urisRef = ref<InstanceType<typeof UriInput>>();
 const costsRef = ref<InstanceType<typeof MonetaryAmountInput>>();
+const relationsRef = ref<InstanceType<typeof ProjectsRelationForm>>();
 
 const name = ref<MultilingualContent[]>([]);
 const nameAbbreviation = ref<MultilingualContent[]>([]);
@@ -218,6 +235,7 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const notFunded = ref(false);
 const costs = ref<MonetaryAmount | undefined>(undefined);
+const relations = ref<ProjectsRelation[]>([]);
 
 const status = ref<ProjectStatus>();
 const collaborationType = ref<ProjectCollaborationType>();
@@ -305,8 +323,9 @@ const submitProject = (stayOnPage: boolean) => {
         oldIds: [],
         mergedIds: [],
         researchAreasId: [],
-        consortiumIds: [],
-        team: [],
+        organisationIds: [],
+        persons: [],
+        relations: relations.value,
     };
 
     ProjectService.createProject(newProject).then((response) => {
@@ -325,6 +344,8 @@ const submitProject = (stayOnPage: boolean) => {
             notFunded.value = false;
             costs.value = undefined;
             costsRef.value?.clearInput();
+            relations.value = [];
+            relationsRef.value?.clearInput();
             status.value = undefined;
             collaborationType.value = undefined;
             researchType.value = undefined;

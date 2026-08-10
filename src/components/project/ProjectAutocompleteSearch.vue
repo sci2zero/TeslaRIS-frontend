@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { defineAsyncComponent, onMounted, ref, watch } from "vue";
 import lodash from "lodash";
 import { useI18n } from "vue-i18n";
 import ProjectService from "@/services/project/ProjectService";
@@ -52,7 +52,12 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from "@/i18n/projectStatus";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
-import ProjectSubmissionForm from "@/components/project/ProjectSubmissionForm.vue";
+
+// Loaded asynchronously because ProjectSubmissionForm uses this component
+// for its related projects section - a static import would be circular.
+const ProjectSubmissionForm = defineAsyncComponent(
+    () => import("@/components/project/ProjectSubmissionForm.vue")
+);
 
 const props = withDefaults(defineProps<{
     modelValue?: { title: string; value: number };
@@ -81,13 +86,13 @@ const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
 
 type ProjectSearchItem = {
     title: string;
-    listTitle: string;
+    listTitle?: string;
     value: number;
     status?: ProjectStatus;
 };
 
 const projects = ref<ProjectSearchItem[]>([]);
-const selectedProject = ref<{ title: string; value: number; }>(props.modelValue ?? { ...searchPlaceholder });
+const selectedProject = ref<ProjectSearchItem>(props.modelValue ?? { ...searchPlaceholder });
 
 onMounted(() => {
     if (props.modelValue) {

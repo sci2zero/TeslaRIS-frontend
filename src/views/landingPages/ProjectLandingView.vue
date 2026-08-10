@@ -156,7 +156,7 @@
             <v-tabs-window-item value="team">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <strong v-if="!project?.team || project.team.length === 0">{{ $t("notYetSetMessage") }}</strong>
+                        <strong v-if="!project?.persons || project.persons.length === 0">{{ $t("notYetSetMessage") }}</strong>
                         <div v-for="(contribution, index) in sortedTeam" :key="contribution.id ?? index" class="py-5">
                             <h4>
                                 <strong>
@@ -248,7 +248,7 @@ const title = computed(() => {
 });
 
 const sortedTeam = computed(() => {
-    return [...(project.value?.team ?? [])].sort((a, b) => a.orderNumber - b.orderNumber);
+    return [...(project.value?.persons ?? [])].sort((a, b) => a.orderNumber - b.orderNumber);
 });
 
 onMounted(() => {
@@ -305,7 +305,7 @@ const updateBasicInfo = (basicInfo: Project) => {
 const performUpdate = (reload: boolean) => {
     const updatePayload: Project = {
         ...(project.value as Project),
-        team: project.value?.team?.map(contribution => ({ ...contribution, fundingParts: [] })) ?? []
+        persons: project.value?.persons?.map(contribution => ({ ...contribution, fundingParts: [] })) ?? []
     };
 
     ProjectService.updateProject(project.value?.id as number, updatePayload).then(() => {

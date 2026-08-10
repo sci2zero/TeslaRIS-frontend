@@ -1578,4 +1578,8 @@ export default {
     addProjectLabel: "Project",
     showOnlyActiveLabel: "Show only active",
     showOnlyMyLabel: "Show only mine",
+    relatedProjectsLabel: "Related projects",
+    targetProjectLabel: "Related project",
+    sourceProjectDescriptionLabel: "Source project description",
+    targetProjectDescriptionLabel: "Target project description",
 }

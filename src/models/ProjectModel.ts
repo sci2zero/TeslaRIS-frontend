@@ -9,12 +9,13 @@ export interface Project {
     mergedIds: string[];
     doi?: string;
     raid?: string;
+    nationalId?: string;
     name: MultilingualContent[];
     description: MultilingualContent[];
     nameAbbreviation: MultilingualContent[];
     keywords: MultilingualContent[];
     researchAreasId: number[];
-    consortiumIds: number[];
+    organisationIds: number[];
     uris: string[];
     dateFrom?: string;
     dateTo?: string;
@@ -23,7 +24,24 @@ export interface Project {
     researchType: ProjectResearchType;
     notFunded?: boolean;
     costs?: MonetaryAmount;
-    team: PersonProjectContribution[];
+    persons: PersonProjectContribution[];
+    relations: ProjectsRelation[];
+}
+
+export enum ProjectsRelationType {
+    PART_OF = "PART_OF",
+    PREDECESSOR = "PREDECESSOR"
+}
+
+export interface ProjectsRelation {
+    id?: number;
+    sourceProjectDescription: MultilingualContent[];
+    targetProjectDescription: MultilingualContent[];
+    relationType: ProjectsRelationType;
+    dateFrom: string;
+    dateTo: string;
+    sourceProjectId?: number;
+    targetProjectId?: number;
 }
 
 export interface PrepopulatedProjectMetadata {
@@ -59,6 +77,7 @@ export interface PersonProjectContribution extends PersonContribution {
     investigationRole: PersonProjectInvestigationRole;
     otherRoleDescription: MultilingualContent[];
     fundingParts: FundingPart[];
+    displayProject?: MultilingualContent[];
 }
 
 export enum ProjectStatus {

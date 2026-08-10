@@ -19,7 +19,6 @@
                 :form-props="{ presetFundingCallId: presetFundingCallId }"
                 entity-name="Funding"
                 is-submission
-                wide
                 :read-only="false"
                 @create="onFundingCreated"
             />
