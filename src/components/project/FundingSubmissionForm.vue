@@ -157,13 +157,16 @@
 
                     <!-- Boolean flags -->
                     <v-row>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
                         </v-col>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-checkbox v-model="renewable" :label="$t('renewableLabel')" />
                         </v-col>
-                        <v-col cols="4">
+                        <v-col cols="3">
+                            <v-checkbox v-model="internalInvestment" :label="$t('internalInvestmentLabel')" />
+                        </v-col>
+                        <v-col cols="3">
                             <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
                         </v-col>
                     </v-row>
@@ -255,6 +258,7 @@ const dateSubmitted = ref("");
 const dateAwarded = ref("");
 const competitive = ref(false);
 const renewable = ref(false);
+const internalInvestment = ref(false);
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const amount = ref<MonetaryAmount | undefined>(undefined);
@@ -336,6 +340,7 @@ const submitFunding = (stayOnPage: boolean) => {
         amount: amount.value,
         competitive: competitive.value,
         renewable: renewable.value,
+        internalInvestment: internalInvestment.value,
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandateUrl.value || undefined,
         projectId: props.presetProject?.id ?? 1, // TODO: Project autocomplete when not preset
@@ -370,6 +375,7 @@ const submitFunding = (stayOnPage: boolean) => {
             amount.value = undefined;
             competitive.value = false;
             renewable.value = false;
+            internalInvestment.value = false;
             oaMandated.value = false;
             oaMandateUrl.value = "";
             selectedFundingTypes.value = [];

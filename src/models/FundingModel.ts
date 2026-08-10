@@ -33,6 +33,7 @@ export interface Funding {
     dateTo?: string;
     oaMandated?: boolean;
     oaMandateUrl?: string;
+    internalInvestment?: boolean;
 }
 
 export interface FundingIndex {
