@@ -293,11 +293,9 @@ const thesisLibraryMenu = ref<MenuItem[]>([
 ]);
 
 const projectsMenu = ref<MenuItem[]>([
-    { key: 'project', label: computed(() => i18n.t('projectsLabel')), to: '/funding', icon: 'mdi-cash' },
-    { key: 'funding', label: computed(() => i18n.t('fundingsLabel')), to: '/funding', icon: 'mdi-cash' },
-    { key: 'funding-application', label: computed(() => i18n.t('fundingApplicationsLabel')), to: '/funding', icon: 'mdi-cash' },
-    { key: 'funding-program', label: computed(() => i18n.t('fundingProgramsLabel')), to: '/funding', icon: 'mdi-cash' },
-    { key: 'funding-call', label: computed(() => i18n.t('fundingCallsLabel')), to: '/funding', icon: 'mdi-cash' },
+  { key: 'funding-program', label: computed(() => i18n.t('fundingProgramsLabel')), to: '/funding-program', icon: 'mdi-file-tree' },
+  { key: 'funding-call', label: computed(() => i18n.t('fundingCallsLabel')), to: '/funding-call', icon: 'mdi-bullhorn' },
+  { key: 'project', label: computed(() => i18n.t('projectsLabel')), to: '/project', icon: 'mdi-folder-star' },
 ]);
 
 const menuItems = ref<MenuItem[]>([
@@ -363,15 +361,14 @@ const menuItems = ref<MenuItem[]>([
     { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
     { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
-    // TODO: Uncomment when projects section is completed
-    // {
-    //     key: 'projects',
-    //     label: computed(() => i18n.t('projectsLabel')),
-    //     to: '/projects',
-    //     icon: 'mdi-folder-star',
-    //     subItems: projectsMenu.value,
-    //     condition: computed(() => loginStore.userLoggedIn)
-    // },
+    {
+      key: 'projects',
+      label: computed(() => i18n.t('projectsLabel')),
+      to: '/project',
+      icon: 'mdi-folder-star',
+      subItems: projectsMenu.value,
+      condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
+    },
 ]);
 
 const filteredMenuItems = computed(() => {
