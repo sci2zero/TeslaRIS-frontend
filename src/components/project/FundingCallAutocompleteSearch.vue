@@ -18,6 +18,12 @@
             <generic-crud-modal
                 ref="modalRef"
                 :form-component="FundingCallSubmissionForm"
+                :form-props="{
+                    presetFundingProgramId: presetFundingProgramId,
+                    presetKeywords: presetKeywords,
+                    presetDateFrom: presetDateFrom,
+                    presetDateTo: presetDateTo
+                }"
                 entity-name="FundingCall"
                 is-submission
                 :read-only="false"
@@ -33,6 +39,7 @@ import lodash from "lodash";
 import { useI18n } from "vue-i18n";
 import FundingCallService from "@/services/project/FundingCallService";
 import type { FundingCall, FundingCallIndex } from "@/models/FundingCallModel";
+import type { MultilingualContent } from "@/models/Common";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -42,14 +49,22 @@ import FundingCallSubmissionForm from "@/components/project/FundingCallSubmissio
 const props = withDefaults(defineProps<{
     modelValue?: { title: string; value: number };
     label?: string;
-    programId?: number;
+    // Prefill the "add new" form only - deliberately NOT a search filter, since the
+    // callers use this to attach a call that is not linked to them yet.
+    presetFundingProgramId?: number;
+    presetKeywords?: MultilingualContent[];
+    presetDateFrom?: string;
+    presetDateTo?: string;
     required?: boolean;
     readOnly?: boolean;
     disableSubmission?: boolean;
 }>(), {
     modelValue: undefined,
     label: "",
-    programId: undefined,
+    presetFundingProgramId: undefined,
+    presetKeywords: () => [],
+    presetDateFrom: "",
+    presetDateTo: "",
     required: false,
     readOnly: false,
     disableSubmission: false
@@ -57,6 +72,8 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
     (e: "update:modelValue", payload: { title: string; value: number }): void;
+    (e: "selected", payload: { title: string; value: number }): void;
+    (e: "create", payload: FundingCall): void;
 }>();
 
 const i18n = useI18n();
@@ -94,7 +111,7 @@ const searchFundingCalls = lodash.debounce((input: string) => {
         });
         params += "page=0&size=5";
 
-        FundingCallService.searchFundingCalls(params, props.programId ?? null).then((response) => {
+        FundingCallService.searchFundingCalls(params).then((response) => {
             const listOfFundingCalls: { title: string; value: number; }[] = [];
             response.data.content.forEach((fundingCall: FundingCallIndex) => {
                 const isSerbian = i18n.locale.value.startsWith("sr");
@@ -139,6 +156,10 @@ const sendContentToParent = () => {
     }
 
     emit("update:modelValue", selectedFundingCall.value);
+
+    if ((selectedFundingCall.value?.value ?? 0) > 0) {
+        emit("selected", selectedFundingCall.value);
+    }
 };
 
 const selectNewlyAddedFundingCall = (fundingCall: FundingCall) => {
@@ -152,6 +173,10 @@ const selectNewlyAddedFundingCall = (fundingCall: FundingCall) => {
     };
     fundingCalls.value.push(toSelect);
     selectedFundingCall.value = toSelect;
-    sendContentToParent();
+
+    // Deliberately not routed through sendContentToParent: a freshly created entity
+    // must not also fire "selected", or listeners would treat it as a link-existing.
+    emit("update:modelValue", toSelect);
+    emit("create", fundingCall);
 };
 </script>

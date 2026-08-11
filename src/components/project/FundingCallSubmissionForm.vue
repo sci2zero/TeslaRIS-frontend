@@ -72,7 +72,7 @@
                 </v-row>
 
                 <!-- Funding Program -->
-                <v-row>
+                <v-row v-if="!presetFundingProgramId">
                     <v-col cols="10">
                         <funding-program-autocomplete-search v-model="selectedFundingProgram" />
                     </v-col>
@@ -122,6 +122,7 @@
                                 v-model="keywords"
                                 is-area
                                 :label="$t('keywordsLabel')"
+                                :initial-value="toMultilingualTextInput(presetKeywords, languageTags)"
                             />
                         </v-col>
                     </v-row>
@@ -181,11 +182,28 @@ import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse, MonetaryAmount } from '@/models/Common';
 import type { FundingCall } from '@/models/FundingCallModel';
+import type { MultilingualContent } from '@/models/Common';
 import { FundingType } from '@/models/FundingModel';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+
+const props = withDefaults(defineProps<{
+    presetFundingProgramId?: number;
+    presetKeywords?: MultilingualContent[];
+    presetDateFrom?: string;
+    presetDateTo?: string;
+}>(), {
+    presetFundingProgramId: undefined,
+    presetKeywords: () => [],
+    presetDateFrom: "",
+    presetDateTo: ""
+});
 
 const emit = defineEmits<{
   (e: "create", payload: any): void;
 }>();
+
+const { languageTags } = useLanguageTags();
 
 const router = useRouter();
 const i18n = useI18n();
@@ -208,10 +226,10 @@ const name = ref<any[]>([]);
 const nameAbbreviation = ref<any[]>([]);
 const description = ref<any[]>([]);
 const objectives = ref<any[]>([]);
-const keywords = ref<any[]>([]);
+const keywords = ref<any[]>(props.presetKeywords);
 const uris = ref<string[]>([]);
-const dateFrom = ref("");
-const dateTo = ref("");
+const dateFrom = ref(props.presetDateFrom);
+const dateTo = ref(props.presetDateTo);
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const selectedFundingProgram = ref<{ title: string, value: number }>({ title: "", value: -1 });
@@ -239,7 +257,7 @@ const submitFundingCall = (stayOnPage: boolean) => {
         dateFrom: dateFrom.value || undefined,
         dateTo: dateTo.value || undefined,
         funderId: selectedFunder.value.value > 0 ? selectedFunder.value.value : undefined,
-        fundingProgramId: selectedFundingProgram.value.value > 0 ? selectedFundingProgram.value.value : undefined,
+        fundingProgramId: props.presetFundingProgramId ?? (selectedFundingProgram.value.value > 0 ? selectedFundingProgram.value.value : undefined),
         fundingProgramName: [],
         monetaryAmount: monetaryAmount.value,
         oaMandated: oaMandated.value,
@@ -257,9 +275,10 @@ const submitFundingCall = (stayOnPage: boolean) => {
             descriptionRef.value?.clearInput();
             objectivesRef.value?.clearInput();
             keywordsRef.value?.clearInput();
+            keywords.value = props.presetKeywords;
             urisRef.value?.clearInput();
-            dateFrom.value = "";
-            dateTo.value = "";
+            dateFrom.value = props.presetDateFrom;
+            dateTo.value = props.presetDateTo;
             oaMandated.value = false;
             oaMandateUrl.value = "";
             selectedFundingProgram.value = { title: "", value: -1 };

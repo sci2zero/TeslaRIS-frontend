@@ -15,7 +15,6 @@ export interface Project {
     nameAbbreviation: MultilingualContent[];
     keywords: MultilingualContent[];
     researchAreasId: number[];
-    organisationIds: number[];
     uris: string[];
     dateFrom?: string;
     dateTo?: string;
@@ -25,6 +24,7 @@ export interface Project {
     notFunded?: boolean;
     costs?: MonetaryAmount;
     persons: PersonProjectContribution[];
+    consortium: OrganisationUnitProjectContribution[];
     relations: ProjectsRelation[];
 }
 
@@ -80,6 +80,58 @@ export interface PersonProjectContribution extends PersonContribution {
     displayProject?: MultilingualContent[];
 }
 
+export interface OrganisationUnitProjectContribution {
+    id?: number;
+    organisationUnitId?: number;
+    organisationUnitName?: MultilingualContent[];
+    displayOrganisationUnit: MultilingualContent[];
+    contributionDescription: MultilingualContent[];
+    contributionType: OrganisationUnitProjectContributionType;
+    orderNumber: number;
+    dateFrom?: string;
+    dateTo?: string;
+    uris?: string[];
+    isMainContributor?: boolean;
+    fundingParts?: FundingPart[];
+}
+
+export interface ProjectDocument {
+    id?: number;
+    projectId: number;
+    documentId?: number;
+    documentTitleSr?: string;
+    documentTitleOther?: string;
+    documentType?: string;
+    textualDescription: MultilingualContent[];
+    relationType: ProjectDocumentType;
+    fundingParts?: FundingPart[];
+}
+
+export enum ProjectDocumentType {
+    REPORT = "REPORT",
+    RESULT = "RESULT",
+    USED = "USED",
+    INTERNAL = "INTERNAL"
+}
+
+export interface ProjectEvent {
+    id?: number;
+    projectId: number;
+    eventId?: number;
+    eventNameSr?: string;
+    eventNameOther?: string;
+    eventType?: string;
+    textualDescription: MultilingualContent[];
+    relationType: ProjectEventType;
+    fundingParts?: FundingPart[];
+}
+
+export enum ProjectEventType {
+    MEETING = "MEETING",
+    PROJECT_RESULTS_PRESENTED_AT = "PROJECT_RESULTS_PRESENTED_AT",
+    PUBLIC_EVENT_ORGANIZED_BY_PROJECT = "PUBLIC_EVENT_ORGANIZED_BY_PROJECT"
+}
+
 export enum ProjectStatus {
     SUBMITTED = "SUBMITTED",
     UNDER_EVALUATION = "UNDER_EVALUATION",
@@ -114,6 +166,15 @@ export enum PersonProjectContributionType {
     INKIND_CONTRIBUTOR = "INKIND_CONTRIBUTOR",
     CONTRACTOR = "CONTRACTOR",
     PARTICIPATION = "PARTICIPATION"
+}
+
+export enum OrganisationUnitProjectContributionType {
+    COORDINATOR = "COORDINATOR",
+    PARTNER = "PARTNER",
+    CONSORTIUM_MEMBER = "CONSORTIUM_MEMBER",
+    INKIND_CONTRIBUTOR = "INKIND_CONTRIBUTOR",
+    CONTRACTOR = "CONTRACTOR",
+    BENEFICIARY = "BENEFICIARY"
 }
 
 export enum PersonProjectInvestigationRole {

@@ -323,7 +323,7 @@ const submitProject = (stayOnPage: boolean) => {
         oldIds: [],
         mergedIds: [],
         researchAreasId: [],
-        organisationIds: [],
+        consortium: [],
         persons: [],
         relations: relations.value,
     };

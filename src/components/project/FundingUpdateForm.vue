@@ -154,6 +154,17 @@
         </v-row>
 
         <v-row>
+            <v-col cols="6">
+                <v-switch
+                    v-model="internalInvestment"
+                    :label="$t('internalInvestmentLabel')"
+                    color="primary"
+                    hide-details
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <p class="required-fields-message">
                 {{ $t("requiredFieldsMessage") }}
             </p>
@@ -204,6 +215,7 @@ const oaMandated = ref<boolean>(props.presetFunding?.oaMandated ?? false);
 const oaMandateUrl = ref(props.presetFunding?.oaMandateUrl);
 const competitive = ref<boolean>(props.presetFunding?.competitive ?? false);
 const renewable = ref<boolean>(props.presetFunding?.renewable ?? false);
+const internalInvestment = ref<boolean>(props.presetFunding?.internalInvestment ?? false);
 
 const displayFunder = ref<any>([]);
 const displayCall = ref<any>([]);
@@ -231,6 +243,7 @@ const refreshForm = () => {
     oaMandateUrl.value = props.presetFunding?.oaMandateUrl;
     competitive.value = props.presetFunding?.competitive ?? false;
     renewable.value = props.presetFunding?.renewable ?? false;
+    internalInvestment.value = props.presetFunding?.internalInvestment ?? false;
     selectedFundingTypes.value = props.presetFunding?.fundingTypes ?? [];
     amountRef.value?.setValue(props.presetFunding?.amount);
 
@@ -268,7 +281,8 @@ const submit = () => {
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandated.value ? oaMandateUrl.value : undefined,
         competitive: competitive.value,
-        renewable: renewable.value
+        renewable: renewable.value,
+        internalInvestment: internalInvestment.value
     };
 
     emit("update", updatedFunding);

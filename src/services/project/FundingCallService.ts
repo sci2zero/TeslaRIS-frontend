@@ -37,6 +37,10 @@ export class FundingCallService extends BaseService {
         return super.sendRequest(axios.get, `funding-call/${fundingCallId}`);
     }
 
+    async canEdit(fundingCallId: number): Promise<AxiosResponse<boolean>> {
+        return super.sendRequest(axios.get, `funding-call/${fundingCallId}/can-edit`);
+    }
+
     async createFundingCall(fundingCall: FundingCall): Promise<AxiosResponse<FundingCall>> {
         return super.sendRequest(axios.post, "funding-call", fundingCall, FundingCallService.idempotencyKey);
     }

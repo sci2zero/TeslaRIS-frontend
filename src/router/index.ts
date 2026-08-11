@@ -62,6 +62,8 @@ import FundingApplicationLandingView from "@/views/landingPages/FundingApplicati
 import SubmitFundingApplicationView from "@/views/SubmitFundingApplicationView.vue";
 import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
+import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
+import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
 import FundingCallListView from "@/views/FundingCallListView.vue";
 import ProjectLandingView from "@/views/landingPages/ProjectLandingView.vue";
 import ProjectListView from "@/views/ProjectListView.vue";
@@ -135,10 +137,8 @@ import PerformanceRelatedOutputLandingView from "@/views/landingPages/Performanc
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
 import SubmitFundingView from "@/views/SubmitFundingView.vue";
-import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
 import FundingProgramListView from "@/views/FundingProgramListView.vue";
 import SubmitProjectView from "@/views/SubmitProjectView.vue";
-import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
 
 
 const roles = {

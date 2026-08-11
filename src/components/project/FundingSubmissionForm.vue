@@ -19,6 +19,7 @@
                             v-model="name"
                             :rules="requiredFieldRules"
                             :label="$t('nameLabel') + '*'"
+                            :initial-value="toMultilingualTextInput(presetProject?.name, languageTags)"
                         />
                     </v-col>
                 </v-row>
@@ -30,6 +31,7 @@
                             ref="nameAbbreviationRef"
                             v-model="nameAbbreviation"
                             :label="$t('nameAbbreviationLabel')"
+                            :initial-value="toMultilingualTextInput(presetProject?.nameAbbreviation, languageTags)"
                         />
                     </v-col>
                 </v-row>
@@ -110,6 +112,7 @@
                                 v-model="description"
                                 is-area
                                 :label="$t('descriptionLabel')"
+                                :initial-value="toMultilingualTextInput(presetProject?.description, languageTags)"
                             />
                         </v-col>
                     </v-row>
@@ -122,6 +125,7 @@
                                 v-model="keywords"
                                 is-area
                                 :label="$t('keywordsLabel')"
+                                :initial-value="toMultilingualTextInput(presetProject?.keywords, languageTags)"
                             />
                         </v-col>
                     </v-row>
@@ -153,13 +157,16 @@
 
                     <!-- Boolean flags -->
                     <v-row>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
                         </v-col>
-                        <v-col cols="4">
+                        <v-col cols="3">
                             <v-checkbox v-model="renewable" :label="$t('renewableLabel')" />
                         </v-col>
-                        <v-col cols="4">
+                        <v-col cols="3">
+                            <v-checkbox v-model="internalInvestment" :label="$t('internalInvestmentLabel')" />
+                        </v-col>
+                        <v-col cols="3">
                             <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
                         </v-col>
                     </v-row>
@@ -189,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, nextTick} from 'vue';
+import {ref, computed, nextTick, type PropType} from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
@@ -204,10 +211,15 @@ import type {Funding, FundingType, PrepopulatedFundingMetadata} from "@/models/F
 import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
 import type { MonetaryAmount } from "@/models/Common";
 import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
+import type { Project } from "@/models/ProjectModel";
 
 const props = defineProps({
     presetFundingCallId: {
         type: Number,
+        default: undefined
+    },
+    presetProject: {
+        type: Object as PropType<Project>,
         default: undefined
     }
 });
@@ -218,7 +230,10 @@ const router = useRouter();
 const i18n = useI18n();
 
 const isFormValid = ref(false);
-const additionalFields = ref(false);
+const additionalFields = ref(
+    (props.presetProject?.description?.length ?? 0) > 0 ||
+    (props.presetProject?.keywords?.length ?? 0) > 0
+);
 const snackbar = ref(false);
 const error = ref(false);
 const errorMessage = ref(i18n.t("genericErrorMessage"));
@@ -237,12 +252,13 @@ const uris = ref<string[]>([]);
 const doi = ref("");
 const grantAgreementId = ref("");
 const fundingCallText = ref("");
-const dateFrom = ref("");
-const dateTo = ref("");
+const dateFrom = ref(props.presetProject?.dateFrom ?? "");
+const dateTo = ref(props.presetProject?.dateTo ?? "");
 const dateSubmitted = ref("");
 const dateAwarded = ref("");
 const competitive = ref(false);
 const renewable = ref(false);
+const internalInvestment = ref(false);
 const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const amount = ref<MonetaryAmount | undefined>(undefined);
@@ -324,9 +340,10 @@ const submitFunding = (stayOnPage: boolean) => {
         amount: amount.value,
         competitive: competitive.value,
         renewable: renewable.value,
+        internalInvestment: internalInvestment.value,
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandateUrl.value || undefined,
-        projectId: 1, // TODO: Project autocomplete
+        projectId: props.presetProject?.id ?? 1, // TODO: Project autocomplete when not preset
         fundingCallId: props.presetFundingCallId,
         internalIdentifiers: [],
         oldIds: [],
@@ -351,13 +368,14 @@ const submitFunding = (stayOnPage: boolean) => {
             doi.value = "";
             grantAgreementId.value = "";
             fundingCallText.value = "";
-            dateFrom.value = "";
-            dateTo.value = "";
+            dateFrom.value = props.presetProject?.dateFrom ?? "";
+            dateTo.value = props.presetProject?.dateTo ?? "";
             dateSubmitted.value = "";
             dateAwarded.value = "";
             amount.value = undefined;
             competitive.value = false;
             renewable.value = false;
+            internalInvestment.value = false;
             oaMandated.value = false;
             oaMandateUrl.value = "";
             selectedFundingTypes.value = [];

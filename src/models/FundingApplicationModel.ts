@@ -36,18 +36,11 @@ export interface FundingApplicationIndex {
     projectId?: number;
     funderId?: number;
     projectNameSr: string;
-    projectNameSrSortable: string;
     projectNameOther: string;
-    projectNameOtherSortable: string;
     fundingCallNameSr: string;
-    fundingCallNameSrSortable: string;
     fundingCallNameOther: string;
-    fundingCallNameOtherSortable: string;
     funderNameSr: string;
     funderNameOther: string;
-    // Not indexed by the backend yet - see FundingApplicationIndex.java
-    descriptionSr?: string;
-    descriptionOther?: string;
     submissionDate?: string;
     decisionDate?: string;
     result?: FundingApplicationResult;

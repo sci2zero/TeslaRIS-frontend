@@ -58,79 +58,109 @@
                         </div>
 
                         <basic-info-loader v-if="!project" />
-                        <v-row v-else>
-                            <!-- Left column -->
-                            <v-col cols="6">
-                                <div v-if="project.doi">
-                                    DOI:
-                                </div>
-                                <div v-if="project.doi" class="response">
+                        <div v-else class="info-columns">
+                            <div v-if="project.doi" class="info-item">
+                                <div>DOI:</div>
+                                <div class="response">
                                     {{ project.doi }}
                                 </div>
+                            </div>
 
-                                <div v-if="project.raid">
-                                    {{ $t("raidLabel") }}:
-                                </div>
-                                <div v-if="project.raid" class="response">
+                            <div v-if="project.raid" class="info-item">
+                                <div>{{ $t("raidLabel") }}:</div>
+                                <div class="response">
                                     {{ project.raid }}
                                 </div>
+                            </div>
 
+                            <div v-if="project.dateFrom" class="info-item">
+                                <div>{{ $t("dateFromLabel") }}:</div>
+                                <div class="response">
+                                    {{ localiseDate(project.dateFrom) }}
+                                </div>
+                            </div>
+
+                            <div v-if="project.dateTo" class="info-item">
+                                <div>{{ $t("dateToLabel") }}:</div>
+                                <div class="response">
+                                    {{ localiseDate(project.dateTo) }}
+                                </div>
+                            </div>
+
+                            <div v-if="principleInvestigators.length > 0" class="info-item">
+                                <div>{{ $t("principleInvestigatorLabel") }}:</div>
+                                <div class="response">
+                                    <div v-for="investigator in principleInvestigators" :key="investigator.id">
+                                        <localized-link v-if="investigator.personId" :to="'persons/' + investigator.personId">
+                                            {{ personName(investigator) }}
+                                        </localized-link>
+                                        <span v-else>
+                                            {{ personName(investigator) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="institutionCoordinators.length > 0" class="info-item">
+                                <div>{{ $t("institutionCoordinatorLabel") }}:</div>
+                                <div class="response">
+                                    <div v-for="coordinator in institutionCoordinators" :key="coordinator.id">
+                                        <localized-link
+                                            v-if="coordinator.organisationUnitId"
+                                            :to="'organisation-units/' + coordinator.organisationUnitId">
+                                            {{ institutionName(coordinator) }}
+                                        </localized-link>
+                                        <span v-else>
+                                            {{ institutionName(coordinator) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
                                 <div>{{ $t("statusLabel") }}:</div>
                                 <div class="response">
                                     {{ getProjectStatusTitleFromValueAutoLocale(project.status) }}
                                 </div>
+                            </div>
 
+                            <div class="info-item">
                                 <div>{{ $t("collaborationTypeLabel") }}:</div>
                                 <div class="response">
                                     {{ getProjectCollaborationTypeTitleFromValueAutoLocale(project.collaborationType) }}
                                 </div>
+                            </div>
 
+                            <div class="info-item">
                                 <div>{{ $t("researchTypeLabel") }}:</div>
                                 <div class="response">
                                     {{ getProjectResearchTypeTitleFromValueAutoLocale(project.researchType) }}
                                 </div>
-                            </v-col>
+                            </div>
 
-                            <!-- Right column -->
-                            <v-col cols="6">
-                                <div v-if="project.dateFrom">
-                                    {{ $t("dateFromLabel") }}:
-                                </div>
-                                <div v-if="project.dateFrom" class="response">
-                                    {{ localiseDate(project.dateFrom) }}
-                                </div>
-
-                                <div v-if="project.dateTo">
-                                    {{ $t("dateToLabel") }}:
-                                </div>
-                                <div v-if="project.dateTo" class="response">
-                                    {{ localiseDate(project.dateTo) }}
-                                </div>
-
-                                <div v-if="project.costs">
-                                    {{ $t("costsLabel") }}:
-                                </div>
-                                <div v-if="project.costs" class="response">
-                                    {{ formatAmount(project.costs.amount, locale) }} {{ project.costs.currencyCode }}
-                                </div>
-
-                                <div v-if="project.notFunded !== undefined && project.notFunded !== null">
-                                    {{ $t("notFundedLabel") }}:
-                                </div>
-                                <div v-if="project.notFunded !== undefined && project.notFunded !== null" class="response">
+                            <div v-if="project.notFunded !== undefined && project.notFunded !== null" class="info-item">
+                                <div>{{ $t("notFundedLabel") }}:</div>
+                                <div class="response">
                                     {{ project.notFunded ? $t("yesLabel") : $t("noLabel") }}
                                 </div>
+                            </div>
 
-                                <div v-if="project.uris && project.uris.length > 0">
-                                    {{ $t("urisLabel") }}:
+                            <div v-if="project.costs" class="info-item">
+                                <div>{{ $t("costsLabel") }}:</div>
+                                <div class="response">
+                                    {{ formatAmount(project.costs.amount, locale) }} {{ project.costs.currencyCode }}
                                 </div>
-                                <div v-if="project.uris && project.uris.length > 0" class="response">
+                            </div>
+
+                            <div v-if="project.uris && project.uris.length > 0" class="info-item">
+                                <div>{{ $t("urisLabel") }}:</div>
+                                <div class="response">
                                     <div v-for="uri in project.uris" :key="uri">
                                         <a :href="uri" target="_blank">{{ uri }}</a>
                                     </div>
                                 </div>
-                            </v-col>
-                        </v-row>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -147,6 +177,21 @@
             <v-tab value="team">
                 {{ $t("teamLabel") }}
             </v-tab>
+            <v-tab value="consortium">
+                {{ $t("consortiumLabel") }}
+            </v-tab>
+            <v-tab value="fundings">
+                {{ $t("fundingsLabel") }}
+            </v-tab>
+            <v-tab value="fundingApplications">
+                {{ $t("fundingApplicationsLabel") }}
+            </v-tab>
+            <v-tab value="documents">
+                {{ $t("documentsLabel") }}
+            </v-tab>
+            <v-tab value="events">
+                {{ $t("eventListLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -156,24 +201,73 @@
             <v-tabs-window-item value="team">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <strong v-if="!project?.persons || project.persons.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <div v-for="(contribution, index) in sortedTeam" :key="contribution.id ?? index" class="py-5">
-                            <h4>
-                                <strong>
-                                    {{ contribution.personName?.firstname }}
-                                    {{ contribution.personName?.otherName ? ' ' + contribution.personName.otherName : '' }}
-                                    {{ ' ' + contribution.personName?.lastname }}
-                                    - {{ getPersonProjectContributionTypeTitleFromValueAutoLocale(contribution.contributionType) }}
-                                </strong>
-                            </h4>
-                            <div>
-                                {{ $t("investigationRoleLabel") }}: {{ getPersonProjectInvestigationRoleTitleFromValueAutoLocale(contribution.investigationRole) }}
-                            </div>
-                            <div v-if="contribution.otherRoleDescription && contribution.otherRoleDescription.length > 0">
-                                {{ $t("otherRoleDescriptionLabel") }}: {{ returnCurrentLocaleContent(contribution.otherRoleDescription) }}
-                            </div>
-                            <v-divider v-if="index < sortedTeam.length - 1" class="mt-10" />
-                        </div>
+                        <project-team-tab
+                            v-if="project"
+                            :team="project.persons ?? []"
+                            :can-edit="canEdit"
+                            @update="updateTeam"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="consortium">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-consortium-tab
+                            v-if="project"
+                            :consortium="project.consortium ?? []"
+                            :can-edit="canEdit"
+                            @update="updateConsortium"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundings">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-fundings-tab
+                            v-if="project?.id"
+                            :project="project"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="fundingApplications">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-funding-applications-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="documents">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-documents-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
+                    </v-col>
+                </v-row>
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="events">
+                <v-row class="mt-10">
+                    <v-col cols="12">
+                        <project-events-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :can-edit="canEdit"
+                        />
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
@@ -209,12 +303,12 @@ import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
-import type { Project } from "@/models/ProjectModel";
+import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project } from "@/models/ProjectModel";
+import { OrganisationUnitProjectContributionType, PersonProjectContributionType } from "@/models/ProjectModel";
+import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import { getProjectStatusTitleFromValueAutoLocale } from "@/i18n/projectStatus";
 import { getProjectCollaborationTypeTitleFromValueAutoLocale } from "@/i18n/projectCollaborationType";
 import { getProjectResearchTypeTitleFromValueAutoLocale } from "@/i18n/projectResearchType";
-import { getPersonProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/personProjectContributionType";
-import { getPersonProjectInvestigationRoleTitleFromValueAutoLocale } from "@/i18n/personProjectInvestigationRole";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
@@ -222,6 +316,12 @@ import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
+import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
+import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
+import ProjectTeamTab from "@/components/project/ProjectTeamTab.vue";
+import ProjectConsortiumTab from "@/components/project/ProjectConsortiumTab.vue";
+import ProjectDocumentsTab from "@/components/project/ProjectDocumentsTab.vue";
+import ProjectEventsTab from "@/components/project/ProjectEventsTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
@@ -247,9 +347,31 @@ const title = computed(() => {
     return abbr ? `${name} (${abbr})` : name;
 });
 
-const sortedTeam = computed(() => {
-    return [...(project.value?.persons ?? [])].sort((a, b) => a.orderNumber - b.orderNumber);
-});
+const principleInvestigators = computed(() =>
+    project.value?.persons?.filter(
+        person => person.contributionType === PersonProjectContributionType.PRINCIPLE_INVESTIGATOR
+    ) ?? []
+);
+
+const institutionCoordinators = computed(() =>
+    project.value?.consortium?.filter(
+        institution => institution.contributionType === OrganisationUnitProjectContributionType.COORDINATOR
+    ) ?? []
+);
+
+const personName = (person: PersonProjectContribution) => {
+    return [
+        person.personName?.firstname,
+        person.personName?.otherName,
+        person.personName?.lastname
+    ].filter(namePart => namePart && namePart.length > 0).join(" ");
+};
+
+const institutionName = (institution: OrganisationUnitProjectContribution) => {
+    return institution.organisationUnitId ?
+        returnCurrentLocaleContent(institution.organisationUnitName) :
+        returnCurrentLocaleContent(institution.displayOrganisationUnit);
+};
 
 onMounted(() => {
     fetchProject();
@@ -297,18 +419,23 @@ const updateDescription = (description: MultilingualContent[]) => {
     performUpdate(true);
 };
 
+const updateTeam = (team: PersonProjectContribution[]) => {
+    project.value!.persons = team;
+    performUpdate(true);
+};
+
+const updateConsortium = (consortium: OrganisationUnitProjectContribution[]) => {
+    project.value!.consortium = consortium;
+    performUpdate(true);
+};
+
 const updateBasicInfo = (basicInfo: Project) => {
     project.value = { ...project.value, ...basicInfo };
     performUpdate(true);
 };
 
 const performUpdate = (reload: boolean) => {
-    const updatePayload: Project = {
-        ...(project.value as Project),
-        persons: project.value?.persons?.map(contribution => ({ ...contribution, fundingParts: [] })) ?? []
-    };
-
-    ProjectService.updateProject(project.value?.id as number, updatePayload).then(() => {
+    ProjectService.updateProject(project.value?.id as number, project.value as Project).then(() => {
         snackbarMessage.value = i18n.t("updatedSuccessMessage");
         snackbar.value = true;
         if (reload) {
@@ -331,6 +458,21 @@ const performUpdate = (reload: boolean) => {
     font-size: 1.2rem;
     margin-bottom: 10px;
     font-weight: bold;
+}
+
+#project .info-columns {
+    columns: 2;
+    column-gap: 40px;
+}
+
+#project .info-item {
+    break-inside: avoid;
+}
+
+@media (max-width: 959px) {
+    #project .info-columns {
+        columns: 1;
+    }
 }
 
 .edit-pen-container {

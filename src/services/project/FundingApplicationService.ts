@@ -48,6 +48,10 @@ export class FundingApplicationService extends BaseService {
         return super.sendRequest(axios.put, `funding-application/${fundingApplicationId}`, body);
     }
 
+    async deleteFundingApplication(fundingApplicationId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `funding-application/${fundingApplicationId}`);
+    }
+
     async canEdit(fundingApplicationId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `funding-application/${fundingApplicationId}/can-edit`);
     }

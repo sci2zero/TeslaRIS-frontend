@@ -18,6 +18,7 @@
             <generic-crud-modal
                 ref="modalRef"
                 :form-component="FundingApplicationSubmissionForm"
+                :form-props="{ presetFundingCallId: presetFundingCallId, presetProjectId: presetProjectId }"
                 entity-name="FundingApplication"
                 is-submission
                 :read-only="false"
@@ -46,16 +47,18 @@ const FundingApplicationSubmissionForm = defineAsyncComponent(
 const props = withDefaults(defineProps<{
     modelValue?: { title: string; value: number };
     label?: string;
-    projectId?: number;
-    fundingCallId?: number;
+    // Prefill the "add new" form only - deliberately NOT a search filter, since the
+    // callers use this to attach an application that is not linked to them yet.
+    presetProjectId?: number;
+    presetFundingCallId?: number;
     required?: boolean;
     readOnly?: boolean;
     disableSubmission?: boolean;
 }>(), {
     modelValue: undefined,
     label: "",
-    projectId: undefined,
-    fundingCallId: undefined,
+    presetProjectId: undefined,
+    presetFundingCallId: undefined,
     required: false,
     readOnly: false,
     disableSubmission: false
@@ -63,6 +66,8 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
     (e: "update:modelValue", payload: { title: string; value: number }): void;
+    (e: "selected", payload: { title: string; value: number }): void;
+    (e: "create", payload: FundingApplication): void;
 }>();
 
 const i18n = useI18n();
@@ -99,11 +104,7 @@ const searchFundingApplications = lodash.debounce((input: string) => {
         });
         params += "page=0&size=5";
 
-        FundingApplicationService.searchFundingApplications(
-            params,
-            props.projectId ?? null,
-            props.fundingCallId ?? null
-        ).then((response) => {
+        FundingApplicationService.searchFundingApplications(params).then((response) => {
             const listOfFundingApplications: { title: string; value: number; }[] = [];
             response.data.content.forEach((fundingApplication: FundingApplicationIndex) => {
                 const isSerbian = i18n.locale.value.startsWith("sr");
@@ -150,6 +151,10 @@ const sendContentToParent = () => {
     }
 
     emit("update:modelValue", selectedFundingApplication.value);
+
+    if ((selectedFundingApplication.value?.value ?? 0) > 0) {
+        emit("selected", selectedFundingApplication.value);
+    }
 };
 
 const selectNewlyAddedFundingApplication = (fundingApplication: FundingApplication) => {
@@ -159,6 +164,10 @@ const selectNewlyAddedFundingApplication = (fundingApplication: FundingApplicati
     };
     fundingApplications.value.push(toSelect);
     selectedFundingApplication.value = toSelect;
-    sendContentToParent();
+
+    // Deliberately not routed through sendContentToParent: a freshly created entity
+    // must not also fire "selected", or listeners would treat it as a link-existing.
+    emit("update:modelValue", toSelect);
+    emit("create", fundingApplication);
 };
 </script>

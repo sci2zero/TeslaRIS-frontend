@@ -1,12 +1,12 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
+        <v-row v-if="!presetProjectId">
             <v-col>
                 <project-autocomplete-search v-model="selectedProject" />
             </v-col>
         </v-row>
 
-        <v-row>
+        <v-row v-if="!presetFundingCallId">
             <v-col>
                 <funding-call-autocomplete-search
                     v-model="selectedFundingCall"
@@ -128,6 +128,14 @@ import type { MonetaryAmount } from '@/models/Common';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
 
+const props = withDefaults(defineProps<{
+    presetFundingCallId?: number;
+    presetProjectId?: number;
+}>(), {
+    presetFundingCallId: undefined,
+    presetProjectId: undefined
+});
+
 const emit = defineEmits<{
   (e: "create", payload: any): void;
 }>();
@@ -167,8 +175,8 @@ const resultOptions = computed(() => getFundingApplicationResultsForGivenLocale(
 
 const submitFundingApplication = (stayOnPage: boolean) => {
     const newFundingApplication: FundingApplication = {
-        projectId: selectedProject.value.value > 0 ? selectedProject.value.value : undefined,
-        fundingCallId: selectedFundingCall.value.value,
+        projectId: props.presetProjectId ?? (selectedProject.value.value > 0 ? selectedProject.value.value : undefined),
+        fundingCallId: props.presetFundingCallId ?? selectedFundingCall.value.value,
         revisedFundingApplicationId: selectedRevisedFundingApplication.value.value > 0 ? selectedRevisedFundingApplication.value.value : undefined,
         submitterId: submitter.value?.value,
         requestedAmount: requestedAmount.value,
