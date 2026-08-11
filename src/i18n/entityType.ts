@@ -11,7 +11,12 @@ export const entityTypeSr = [
     { title: "Serije knjiga", value: EntityType.BOOK_SERIES },
     { title: "Izdavači", value: EntityType.PUBLISHER },
     { title: "Korisnički nalozi", value: EntityType.USER_ACCOUNT },
-    { title: "Poeni sa vrednovanja", value: EntityType.ASSESSMENT_POINTS }
+    { title: "Poeni sa vrednovanja", value: EntityType.ASSESSMENT_POINTS },
+    { title: "Projekti", value: EntityType.PROJECT },
+    { title: "Finansiranja", value: EntityType.FUNDING },
+    { title: "Prijave na konkurs", value: EntityType.FUNDING_APPLICATION },
+    { title: "Programi finansiranja", value: EntityType.FUNDING_PROGRAM },
+    { title: "Konkursi", value: EntityType.FUNDING_CALL }
 ];
 
 export const entityTypeEn = [
@@ -23,7 +28,12 @@ export const entityTypeEn = [
     { title: "Book series", value: EntityType.BOOK_SERIES },
     { title: "Publishers", value: EntityType.PUBLISHER },
     { title: "User accounts", value: EntityType.USER_ACCOUNT },
-    { title: "Assessment points", value: EntityType.ASSESSMENT_POINTS }
+    { title: "Assessment points", value: EntityType.ASSESSMENT_POINTS },
+    { title: "Projects", value: EntityType.PROJECT },
+    { title: "Fundings", value: EntityType.FUNDING },
+    { title: "Funding applications", value: EntityType.FUNDING_APPLICATION },
+    { title: "Funding programs", value: EntityType.FUNDING_PROGRAM },
+    { title: "Funding calls", value: EntityType.FUNDING_CALL }
 ];
 
 export const getEntityTypeTitleFromValueAutoLocale = (value: EntityType) => {
