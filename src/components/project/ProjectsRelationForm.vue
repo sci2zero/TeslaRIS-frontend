@@ -38,7 +38,7 @@
             <v-col cols="6">
                 <date-picker
                     v-model="input.dateFrom"
-                    :label="$t('dateFromLabel')"
+                    :label="$t('fromLabel') + '*'"
                     color="primary"
                     :required="!isEmptyRow(input)"
                     @update:model-value="sendContentToParent"
@@ -47,7 +47,7 @@
             <v-col cols="6">
                 <date-picker
                     v-model="input.dateTo"
-                    :label="$t('dateToLabel')"
+                    :label="$t('toLabel') + '*'"
                     color="primary"
                     :required="!isEmptyRow(input)"
                     @update:model-value="sendContentToParent"
@@ -107,9 +107,6 @@ const emit = defineEmits<{
 
 type RelationInput = {
     id?: number;
-    // The selection object only drives the autocomplete's label - the id is kept
-    // separately so a preset relation never loses its target while the label is
-    // still being read back asynchronously.
     targetProject?: { title: string; value: number };
     targetProjectId?: number;
     relationType: ProjectsRelationType;
@@ -165,8 +162,6 @@ const populateInputs = () => {
 
     sendContentToParent();
 
-    // Preset relations only carry the target project id, so the display label
-    // has to be read back the same way FundingCallUpdateForm does for its funder.
     props.presetRelations.forEach((relation, index) => {
         if (!relation.targetProjectId) {
             return;
@@ -230,8 +225,8 @@ const sendContentToParent = () => {
             sourceProjectDescription: input.sourceProjectDescription,
             targetProjectDescription: input.targetProjectDescription,
             relationType: input.relationType,
-            dateFrom: input.dateFrom,
-            dateTo: input.dateTo,
+            dateFrom: input.dateFrom || undefined,
+            dateTo: input.dateTo || undefined,
             targetProjectId: input.targetProjectId
         });
     });

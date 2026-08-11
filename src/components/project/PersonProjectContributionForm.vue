@@ -5,6 +5,7 @@
                 <person-contribution-base
                     :ref="(el) => (baseContributionRef[index] = el)"
                     :basic="false"
+                    :required="false"
                     :allow-external-associate="allowExternalAssociate"
                     is-update
                     :preset-contribution-value="input.contribution"
@@ -243,8 +244,8 @@ const sendContentToParent = () => {
                 input.investigationRole.value === PersonProjectInvestigationRole.OTHER ?
                     input.otherRoleDescription : [],
             fundingParts: [],
-            dateFrom: input.contribution.dateFrom,
-            dateTo: input.contribution.dateTo,
+            dateFrom: input.contribution.dateFrom || undefined,
+            dateTo: input.contribution.dateTo || undefined,
             institutionIds: input.contribution.institutionIds,
             researchAreasId: input.contribution.researchAreasId
         });
