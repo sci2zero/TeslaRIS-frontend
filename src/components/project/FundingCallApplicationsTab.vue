@@ -172,7 +172,7 @@ const fetchFundingApplications = () => {
     const sortField = sort.value || defaultSortField.value;
     const sortDir = sort.value ? direction.value : "ASC";
     const params = `tokens=*&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
-    FundingApplicationService.searchFundingApplications(params, props.fundingCallId).then((response) => {
+    FundingApplicationService.searchFundingApplications(params, null, props.fundingCallId).then((response) => {
         fundingApplications.value = response.data.content;
         totalApplications.value = response.data.totalElements;
     });

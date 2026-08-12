@@ -43,5 +43,5 @@ export interface FundingApplicationIndex {
     funderNameOther: string;
     submissionDate?: string;
     decisionDate?: string;
-    result?: string;
+    result?: FundingApplicationResult;
 }

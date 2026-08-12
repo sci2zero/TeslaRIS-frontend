@@ -97,6 +97,51 @@
                     </v-col>
                 </v-row>
 
+                <!-- Team -->
+                <v-row>
+                    <v-col>
+                        <h2>{{ $t("teamLabel") }}</h2>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <person-project-contribution-form
+                            ref="personsRef"
+                            @set-input="persons = $event"
+                        />
+                    </v-col>
+                </v-row>
+
+                <!-- Consortium -->
+                <v-row>
+                    <v-col>
+                        <h2>{{ $t("consortiumLabel") }}</h2>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <organisation-unit-project-contribution-form
+                            ref="consortiumRef"
+                            @set-input="consortium = $event"
+                        />
+                    </v-col>
+                </v-row>
+
+                <!-- Related Projects -->
+                <v-row>
+                    <v-col>
+                        <h2>{{ $t("relatedProjectsLabel") }}</h2>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <projects-relation-form
+                            ref="relationsRef"
+                            @set-input="relations = $event"
+                        />
+                    </v-col>
+                </v-row>
+
                 <!-- Additional Fields Toggle -->
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
@@ -178,11 +223,14 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import Toast from '@/components/core/Toast.vue';
 import IDFProjectMetadataPrepopulator from '@/components/project/IDFProjectMetadataPrepopulator.vue';
+import ProjectsRelationForm from '@/components/project/ProjectsRelationForm.vue';
+import PersonProjectContributionForm from '@/components/project/PersonProjectContributionForm.vue';
+import OrganisationUnitProjectContributionForm from '@/components/project/OrganisationUnitProjectContributionForm.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProjectService from '@/services/project/ProjectService';
-import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata } from '@/models/ProjectModel';
+import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata, type ProjectsRelation, type PersonProjectContribution, type OrganisationUnitProjectContribution } from '@/models/ProjectModel';
 import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
@@ -206,6 +254,9 @@ const descriptionRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const keywordsRef = ref<InstanceType<typeof MultilingualTextInput>>();
 const urisRef = ref<InstanceType<typeof UriInput>>();
 const costsRef = ref<InstanceType<typeof MonetaryAmountInput>>();
+const relationsRef = ref<InstanceType<typeof ProjectsRelationForm>>();
+const personsRef = ref<InstanceType<typeof PersonProjectContributionForm>>();
+const consortiumRef = ref<InstanceType<typeof OrganisationUnitProjectContributionForm>>();
 
 const name = ref<MultilingualContent[]>([]);
 const nameAbbreviation = ref<MultilingualContent[]>([]);
@@ -218,6 +269,9 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const notFunded = ref(false);
 const costs = ref<MonetaryAmount | undefined>(undefined);
+const relations = ref<ProjectsRelation[]>([]);
+const persons = ref<PersonProjectContribution[]>([]);
+const consortium = ref<OrganisationUnitProjectContribution[]>([]);
 
 const status = ref<ProjectStatus>();
 const collaborationType = ref<ProjectCollaborationType>();
@@ -286,6 +340,13 @@ const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
 };
 
 const submitProject = (stayOnPage: boolean) => {
+    if (relations.value.some(relation => !relation.dateFrom || !relation.dateTo)) {
+        errorMessage.value = i18n.t("requiredFieldsMessage");
+        error.value = true;
+        snackbar.value = true;
+        return;
+    }
+
     const newProject: Project = {
         name: name.value,
         nameAbbreviation: nameAbbreviation.value,
@@ -305,8 +366,9 @@ const submitProject = (stayOnPage: boolean) => {
         oldIds: [],
         mergedIds: [],
         researchAreasId: [],
-        persons: [],
-        consortium: [],
+        consortium: consortium.value,
+        persons: persons.value,
+        relations: relations.value,
     };
 
     ProjectService.createProject(newProject).then((response) => {
@@ -325,6 +387,12 @@ const submitProject = (stayOnPage: boolean) => {
             notFunded.value = false;
             costs.value = undefined;
             costsRef.value?.clearInput();
+            relations.value = [];
+            relationsRef.value?.clearInput();
+            persons.value = [];
+            personsRef.value?.clearInput();
+            consortium.value = [];
+            consortiumRef.value?.clearInput();
             status.value = undefined;
             collaborationType.value = undefined;
             researchType.value = undefined;
@@ -341,5 +409,5 @@ const submitProject = (stayOnPage: boolean) => {
     });
 };
 
-defineExpose({ isFormValid, submitProject });
+defineExpose({ isFormValid, submit: submitProject, submitProject });
 </script>

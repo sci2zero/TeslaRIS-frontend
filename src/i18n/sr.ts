@@ -1506,7 +1506,7 @@ export default {
     intellectualPropertyApplicationStatusLabel: "Status prijave intelektualne svojine",
     dateRequestedLabel: "Datum podnošenja prijave",
     dateFilingPriorityLabel: "Datum prava prvenstva",
-    dateToLabel: "Datum važenja do",
+    dateToLabel: "Datum završetka",
     januaryLabel: "Januar",
     februaryLabel: "Februar",
     marchLabel: "Mart",
@@ -1605,4 +1605,8 @@ export default {
     addProjectLabel: "Projekat",
     showOnlyActiveLabel: "Prikaži samo aktivne",
     showOnlyMyLabel: "Prikaži samo moje",
+    relatedProjectsLabel: "Povezani projekti",
+    targetProjectLabel: "Povezani projekat",
+    sourceProjectDescriptionLabel: "Opis izvornog projekta",
+    targetProjectDescriptionLabel: "Opis ciljnog projekta",
 }

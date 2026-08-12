@@ -1,16 +1,35 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { FundingApplication, FundingApplicationIndex } from "@/models/FundingApplicationModel";
-import type { Page } from "@/models/Common";
+import type { FundingApplication, FundingApplicationIndex, FundingApplicationResult } from "@/models/FundingApplicationModel";
 import { AccessRights, type DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import { getNameFromOrdinal } from "@/utils/EnumUtil";
+import type { Page } from "@/models/Common";
 
 export class FundingApplicationService extends BaseService {
 
     private static idempotencyKey: string = super.generateIdempotencyKey();
 
-    async searchFundingApplications(tokens: string, fundingCallId: number | null = null, projectId: number | null = null): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
-        return super.sendRequest(axios.get, `funding-application/search?${tokens}${fundingCallId ? `&fundingCallId=${fundingCallId}` : ""}${projectId ? `&projectId=${projectId}` : ""}`);
+    async searchFundingApplications(
+        tokens: string,
+        projectId: number | null = null,
+        fundingCallId: number | null = null,
+        funderId: number | null = null,
+        result: FundingApplicationResult | null = null
+    ): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
+        let url = `funding-application/search?${tokens}`;
+        if (projectId) {
+            url += `&projectId=${projectId}`;
+        }
+        if (fundingCallId) {
+            url += `&fundingCallId=${fundingCallId}`;
+        }
+        if (funderId) {
+            url += `&funderId=${funderId}`;
+        }
+        if (result) {
+            url += `&result=${result}`;
+        }
+        return super.sendRequest(axios.get, url);
     }
 
     async readFundingApplication(fundingApplicationId: number): Promise<AxiosResponse<FundingApplication>> {

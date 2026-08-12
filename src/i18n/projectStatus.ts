@@ -31,6 +31,23 @@ export const getProjectStatusTitleFromValueAutoLocale = (value: ProjectStatus) =
     return (projectStatusArray.find(item => item.value === value) || {}).title;
 };
 
+export const getProjectStatusColor = (status: ProjectStatus) => {
+    switch (status) {
+        case ProjectStatus.SUBMITTED:
+            return "info";
+        case ProjectStatus.UNDER_EVALUATION:
+            return "warning";
+        case ProjectStatus.ONGOING:
+            return "primary";
+        case ProjectStatus.CANCELLED:
+            return "error";
+        case ProjectStatus.CONCLUDED:
+            return "success";
+        default:
+            return "primary";
+    }
+};
+
 export const getProjectStatusesForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":
