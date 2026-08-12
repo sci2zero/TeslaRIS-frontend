@@ -268,8 +268,8 @@ const router = createRouter({
                             name: "fundingLandingPage",
                             component: FundingLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                         {
@@ -277,8 +277,8 @@ const router = createRouter({
                             name: "submitFunding",
                             component: SubmitFundingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                     ]
@@ -301,8 +301,8 @@ const router = createRouter({
                             name: "fundingCallLandingPage",
                             component: FundingCallLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                         {
@@ -310,8 +310,8 @@ const router = createRouter({
                             name: "submitFundingCall",
                             component: SubmitFundingCallView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                     ]
@@ -324,8 +324,8 @@ const router = createRouter({
                             name: "fundingApplicationLandingPage",
                             component: FundingApplicationLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                         {
@@ -333,8 +333,8 @@ const router = createRouter({
                             name: "submitFundingApplication",
                             component: SubmitFundingApplicationView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                     ]
@@ -357,8 +357,8 @@ const router = createRouter({
                             name: "fundingProgramLandingPage",
                             component: FundingProgramLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                         {
@@ -366,8 +366,8 @@ const router = createRouter({
                             name: "submitFundingProgram",
                             component: SubmitFundingProgramView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                     ]
@@ -390,8 +390,8 @@ const router = createRouter({
                             name: "projectLandingPage",
                             component: ProjectLandingView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                         {
@@ -399,8 +399,8 @@ const router = createRouter({
                             name: "submitProject",
                             component: SubmitProjectView,
                             meta: {
-                                authenticated: false,
-                                authorities: [],
+                                authenticated: true,
+                                authorities: [roles.admin],
                             },
                         },
                     ]
