@@ -1,12 +1,38 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="12">
                 <v-row>
                     <v-col cols="12">
                         <i-d-f-funding-metadata-prepopulator
                             @metadata-fetched="populateMetadata"
                             @update:doi="(value: string) => doi = value"
+                        />
+                    </v-col>
+                </v-row>
+
+                <!-- Project* -->
+                <v-row v-if="!presetProject">
+                    <v-col cols="12">
+                        <project-autocomplete-search v-model="selectedProject" required />
+                    </v-col>
+                </v-row>
+
+                <!-- Funding Call -->
+                <v-row v-if="!presetFundingCallId">
+                    <v-col cols="12">
+                        <funding-call-autocomplete-search v-model="selectedFundingCall" />
+                    </v-col>
+                </v-row>
+
+                <!-- Funder -->
+                <v-row>
+                    <v-col cols="12">
+                        <organisation-unit-autocomplete-search
+                            ref="funderRef"
+                            v-model="selectedFunder"
+                            label="funderLabel"
+                            allow-manual-clearing
                         />
                     </v-col>
                 </v-row>
@@ -38,7 +64,7 @@
 
                 <!-- Grant Agreement ID -->
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-text-field
                             v-model="grantAgreementId"
                             :label="$t('grantAgreementIdLabel')"
@@ -49,7 +75,7 @@
 
                 <!-- Funding Types -->
                 <v-row>
-                    <v-col cols="10">
+                    <v-col cols="12">
                         <v-select
                             v-model="selectedFundingTypes"
                             :items="fundingTypes"
@@ -63,14 +89,14 @@
 
                 <!-- Start Date / End Date -->
                 <v-row>
-                    <v-col cols="5">
+                    <v-col cols="12" sm="6">
                         <v-text-field
                             v-model="dateFrom"
                             :label="$t('dateFromLabel')"
                             type="date"
                         />
                     </v-col>
-                    <v-col cols="5">
+                    <v-col cols="12" sm="6">
                         <v-text-field
                             v-model="dateTo"
                             :label="$t('dateToLabel')"
@@ -85,18 +111,6 @@
                     v-model="amount"
                     :required="false"
                 />
-
-                <!-- Funding Call (text) -->
-                <v-row>
-                    <v-col cols="10">
-                        <!-- TODO: Linked entity autocomplete or plain text -->
-                        <v-text-field
-                            v-model="fundingCallText"
-                            :label="$t('fundingCallLabel')"
-                            :placeholder="$t('fundingCallLabel')"
-                        />
-                    </v-col>
-                </v-row>
 
                 <!-- Additional Fields Toggle -->
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
@@ -139,14 +153,14 @@
 
                     <!-- Submitted On / Awarded On -->
                     <v-row>
-                        <v-col cols="5">
+                        <v-col cols="12" sm="6">
                             <v-text-field
                                 v-model="dateSubmitted"
                                 :label="$t('dateSubmittedLabel')"
                                 type="date"
                             />
                         </v-col>
-                        <v-col cols="5">
+                        <v-col cols="12" sm="6">
                             <v-text-field
                                 v-model="dateAwarded"
                                 :label="$t('dateAwardedLabel')"
@@ -157,23 +171,23 @@
 
                     <!-- Boolean flags -->
                     <v-row>
-                        <v-col cols="3">
+                        <v-col cols="12" sm="6" md="3">
                             <v-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="12" sm="6" md="3">
                             <v-checkbox v-model="renewable" :label="$t('renewableLabel')" />
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="12" sm="6" md="3">
                             <v-checkbox v-model="internalInvestment" :label="$t('internalInvestmentLabel')" />
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="12" sm="6" md="3">
                             <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
                         </v-col>
                     </v-row>
 
                     <!-- OA Mandate URL -->
                     <v-row v-if="oaMandated">
-                        <v-col cols="10">
+                        <v-col cols="12">
                             <v-text-field
                                 v-model="oaMandateUrl"
                                 :label="$t('oaMandateUrlLabel')"
@@ -211,6 +225,9 @@ import type {Funding, FundingType, PrepopulatedFundingMetadata} from "@/models/F
 import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
 import type { MonetaryAmount } from "@/models/Common";
 import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
+import ProjectAutocompleteSearch from "@/components/project/ProjectAutocompleteSearch.vue";
+import FundingCallAutocompleteSearch from "@/components/project/FundingCallAutocompleteSearch.vue";
+import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import type { Project } from "@/models/ProjectModel";
 
 const props = defineProps({
@@ -251,7 +268,10 @@ const keywords = ref<any[]>([]);
 const uris = ref<string[]>([]);
 const doi = ref("");
 const grantAgreementId = ref("");
-const fundingCallText = ref("");
+const searchPlaceholder = { title: "", value: -1 };
+const selectedProject = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFundingCall = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFunder = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 const dateFrom = ref(props.presetProject?.dateFrom ?? "");
 const dateTo = ref(props.presetProject?.dateTo ?? "");
 const dateSubmitted = ref("");
@@ -266,6 +286,7 @@ const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
 const displayFunder = ref<any[]>([]);
 
 const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
+const funderRef = ref<InstanceType<typeof OrganisationUnitAutocompleteSearch>>();
 
 const fundingTypes = computed(() => getFundingTypesForGivenLocale());
 
@@ -343,8 +364,9 @@ const submitFunding = (stayOnPage: boolean) => {
         internalInvestment: internalInvestment.value,
         oaMandated: oaMandated.value,
         oaMandateUrl: oaMandateUrl.value || undefined,
-        projectId: props.presetProject?.id ?? 1, // TODO: Project autocomplete when not preset
-        fundingCallId: props.presetFundingCallId,
+        projectId: props.presetProject?.id ?? selectedProject.value.value,
+        fundingCallId: props.presetFundingCallId ?? (selectedFundingCall.value.value > 0 ? selectedFundingCall.value.value : undefined),
+        funderId: selectedFunder.value.value > 0 ? selectedFunder.value.value : undefined,
         internalIdentifiers: [],
         oldIds: [],
         mergedIds: [],
@@ -353,7 +375,7 @@ const submitFunding = (stayOnPage: boolean) => {
         researchAreasId: [],
         displayCall: [],
         displayProgram: [],
-        displayFunder: [],
+        displayFunder: displayFunder.value,
     };
 
     FundingService.createFunding(newFunding).then((response) => {
@@ -367,7 +389,11 @@ const submitFunding = (stayOnPage: boolean) => {
             urisRef.value?.clearInput();
             doi.value = "";
             grantAgreementId.value = "";
-            fundingCallText.value = "";
+            selectedProject.value = { ...searchPlaceholder };
+            selectedFundingCall.value = { ...searchPlaceholder };
+            funderRef.value?.clearInput();
+            selectedFunder.value = { ...searchPlaceholder };
+            displayFunder.value = [];
             dateFrom.value = props.presetProject?.dateFrom ?? "";
             dateTo.value = props.presetProject?.dateTo ?? "";
             dateSubmitted.value = "";
