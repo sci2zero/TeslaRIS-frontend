@@ -109,6 +109,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -296,6 +299,15 @@
                     :entity-type="EntityType.PERSON"
                     :entity-id="person?.id"
                     @restored="fetchPerson"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -315,7 +327,7 @@
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import CountryService from '@/services/CountryService';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -371,13 +383,24 @@ import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFi
 import UserService from '@/services/UserService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { EntityType } from '@/models/MergeModel';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("additionalInfo");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const dialogRef = ref<typeof PersistentQuestionDialog>();
         const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
@@ -781,7 +804,8 @@ export default defineComponent({
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
             PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
-            EntityType
+            EntityType,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }});
 </script>

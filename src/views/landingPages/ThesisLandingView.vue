@@ -427,6 +427,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -535,6 +538,15 @@
                     :entity-type="PublicationType.THESIS"
                     :entity-id="thesis?.id"
                     @restored="fetchThesis"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.THESIS"
+                    :entity-id="thesis?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -561,7 +573,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type LanguageResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -621,13 +633,24 @@ import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommon
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -1047,7 +1070,8 @@ export default defineComponent({
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,
-            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

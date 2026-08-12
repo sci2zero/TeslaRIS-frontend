@@ -152,6 +152,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -235,6 +238,15 @@
                     :entity-type="PublicationType.GENETIC_MATERIAL"
                     :entity-id="geneticMaterial?.id"
                     @restored="fetchGeneticMaterial"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.GENETIC_MATERIAL"
+                    :entity-id="geneticMaterial?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -252,7 +264,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -300,13 +312,24 @@ import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "GeneticMaterialLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -503,7 +526,8 @@ export default defineComponent({
             fetchGeneticMaterial, fetchValidationStatus, updateRemark,
             getGeneticMaterialTypeTitleFromValueAutoLocale,
             GeneticMaterialUpdateForm, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

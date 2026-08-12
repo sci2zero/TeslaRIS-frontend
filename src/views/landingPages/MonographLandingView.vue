@@ -213,6 +213,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -330,6 +333,14 @@
                     @restored="() => fetchMonograph(false)"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.MONOGRAPH"
+                    :entity-id="monograph?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -345,7 +356,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -402,13 +413,24 @@ import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -697,7 +719,8 @@ export default defineComponent({
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
             MonographType, localiseFlexibleDate,
-            fetchMonograph
+            fetchMonograph,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

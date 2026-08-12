@@ -208,7 +208,7 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ["restored"],
+    emits: ["restored", "showAssessmentDetails"],
     setup(props, { emit }) {
         const revisions = ref<Revision[]>([]);
         const expandedRows = ref<Set<string>>(new Set());
@@ -326,9 +326,11 @@ export default defineComponent({
             return "text-success";
         };
 
-        // TODO: not wired to an action yet.
         const showDetailedAssessment = (revision: Revision) => {
-            console.log("Detailed assessment requested for revision", revision.timestamp);
+            emit("showAssessmentDetails", {
+                majorVersion: revision.majorVersion,
+                minorVersion: revision.minorVersion
+            });
         };
 
         const versionLabelFor = (revision: Revision) =>

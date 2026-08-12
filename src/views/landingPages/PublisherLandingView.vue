@@ -105,6 +105,16 @@
                 :entity-type="EntityType.PUBLISHER"
                 :entity-id="publisher?.id"
                 @restored="fetchPublisher"
+                @show-assessment-details="showAssessmentDetails"
+            />
+
+            <h2 class="mt-8 mb-2">
+                {{ $t("dataQualityLabel") }}
+            </h2>
+            <data-quality-tabs-component
+                ref="dataQualityTabsRef"
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
             />
         </template>
 
@@ -135,15 +145,23 @@ import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const { isAdmin } = useUserRole();
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            dataQualityTabsRef.value?.selectVersion(version.majorVersion, version.minorVersion);
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -257,7 +275,8 @@ export default defineComponent({
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage,
-            isAdmin, EntityType, fetchPublisher
+            isAdmin, EntityType, fetchPublisher,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

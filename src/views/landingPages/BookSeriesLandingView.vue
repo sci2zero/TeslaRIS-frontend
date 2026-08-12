@@ -123,6 +123,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -165,6 +168,14 @@
                     @restored="() => fetchBookSeries(false)"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.BOOK_SERIES"
+                    :entity-id="bookSeries?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -173,7 +184,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageResponse } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -206,15 +217,26 @@ import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionH
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const { isAdmin } = useUserRole();
 
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -372,7 +394,8 @@ export default defineComponent({
             PublicationSeriesUpdateForm,
             ApplicableEntityType,
             bookSeriesIndicators,
-            isAdmin, EntityType, fetchBookSeries
+            isAdmin, EntityType, fetchBookSeries,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

@@ -438,6 +438,9 @@
             <v-tab v-show="isAdmin" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
+            <v-tab v-show="isAdmin" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -642,6 +645,14 @@
                     @restored="() => fetchOU(false)"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.ORGANISATION_UNIT"
+                    :entity-id="organisationUnit?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -658,7 +669,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, watch, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -727,13 +738,24 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("relations");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
         const displayPersistentDialog = ref(false);
 
         const snackbar = ref(false);
@@ -1277,7 +1299,8 @@ export default defineComponent({
             startMetadataEnrichment, updateDescription,
             getOUSectorFromValueAutoLocale, localiseDate,
             organisationUnitIdentifiers, fetchIdentifiers,
-            EntityType, fetchOU
+            EntityType, fetchOU,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

@@ -45,3 +45,55 @@ export interface Revision {
     assessments: DataQualityAssessmentSimple[];
     restorationWarnings: DegradedReference[];
 }
+
+export enum QualityDimension {
+    COMPLETENESS = "COMPLETENESS",
+    VALIDITY = "VALIDITY",
+    UNIQUENESS = "UNIQUENESS",
+    CONSISTENCY = "CONSISTENCY",
+    TIMELINESS = "TIMELINESS",
+    ACCURACY = "ACCURACY",
+    CONFORMITY = "CONFORMITY",
+    INTEGRITY = "INTEGRITY"
+}
+
+export interface DimensionScore {
+    achievedPoints: number;
+    totalPoints: number;
+    percentage: number;
+}
+
+export interface DataQualityRuleResult {
+    key: string;
+    target: string;
+    dimension: QualityDimension;
+    severity: IssueSeverity;
+    blocking: boolean;
+    points: number;
+    passed: boolean;
+    title: MultilingualContent[];
+    message: MultilingualContent[];
+    actualValue?: string;
+}
+
+export interface DataQualityAssessment {
+    assessmentId: number;
+    profileName: string;
+    profileVersion: string;
+    engineVersion: string;
+    startedAt: string;
+    finishedAt: string;
+    valid: boolean;
+    qualityScore: number;
+    qualityScoreFair: number;
+    totalPoints: number;
+    totalPointsFair: number;
+    achievedPoints: number;
+    achievedFairPoints: number;
+    passedRules: number;
+    warningFailedRules: number;
+    errorFailedRules: number;
+    dimensionScores: Record<QualityDimension, DimensionScore>;
+    passedRulesList: DataQualityRuleResult[];
+    failedRulesList: DataQualityRuleResult[];
+}
