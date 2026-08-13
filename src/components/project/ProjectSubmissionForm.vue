@@ -121,8 +121,8 @@
                 <v-row>
                     <v-col>
                         <organisation-unit-project-contribution-form
-                            ref="consortiumRef"
-                            @set-input="consortium = $event"
+                            ref="organisationsRef"
+                            @set-input="organisations = $event"
                         />
                     </v-col>
                 </v-row>
@@ -256,7 +256,7 @@ const urisRef = ref<InstanceType<typeof UriInput>>();
 const costsRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 const relationsRef = ref<InstanceType<typeof ProjectsRelationForm>>();
 const personsRef = ref<InstanceType<typeof PersonProjectContributionForm>>();
-const consortiumRef = ref<InstanceType<typeof OrganisationUnitProjectContributionForm>>();
+const organisationsRef = ref<InstanceType<typeof OrganisationUnitProjectContributionForm>>();
 
 const name = ref<MultilingualContent[]>([]);
 const nameAbbreviation = ref<MultilingualContent[]>([]);
@@ -271,7 +271,7 @@ const notFunded = ref(false);
 const costs = ref<MonetaryAmount | undefined>(undefined);
 const relations = ref<ProjectsRelation[]>([]);
 const persons = ref<PersonProjectContribution[]>([]);
-const consortium = ref<OrganisationUnitProjectContribution[]>([]);
+const organisations = ref<OrganisationUnitProjectContribution[]>([]);
 
 const status = ref<ProjectStatus>();
 const collaborationType = ref<ProjectCollaborationType>();
@@ -366,7 +366,7 @@ const submitProject = (stayOnPage: boolean) => {
         oldIds: [],
         mergedIds: [],
         researchAreasId: [],
-        consortium: consortium.value,
+        organisations: organisations.value,
         persons: persons.value,
         relations: relations.value,
     };
@@ -391,8 +391,8 @@ const submitProject = (stayOnPage: boolean) => {
             relationsRef.value?.clearInput();
             persons.value = [];
             personsRef.value?.clearInput();
-            consortium.value = [];
-            consortiumRef.value?.clearInput();
+            organisations.value = [];
+            organisationsRef.value?.clearInput();
             status.value = undefined;
             collaborationType.value = undefined;
             researchType.value = undefined;

@@ -1,6 +1,6 @@
 import { BaseService } from "@/services/BaseService";
 import axios, { type AxiosResponse } from "axios";
-import type { Project, ProjectDocument, ProjectEvent, ProjectIndex, ProjectStatus } from "@/models/ProjectModel";
+import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project, ProjectDocument, ProjectEvent, ProjectIndex, ProjectStatus } from "@/models/ProjectModel";
 import type { Page } from "@/models/Common";
 
 export class ProjectService extends BaseService {
@@ -44,6 +44,22 @@ export class ProjectService extends BaseService {
 
     async canEdit(projectId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `project/${projectId}/can-edit`);
+    }
+
+    async addProjectPerson(projectId: number, personContribution: PersonProjectContribution): Promise<AxiosResponse<PersonProjectContribution>> {
+        return super.sendRequest(axios.post, `project/${projectId}/add-person`, personContribution, ProjectService.idempotencyKey);
+    }
+
+    async removeProjectPerson(projectId: number, personContributionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `project/${projectId}/remove-person/${personContributionId}`);
+    }
+
+    async addProjectOrganisation(projectId: number, organisationContribution: OrganisationUnitProjectContribution): Promise<AxiosResponse<OrganisationUnitProjectContribution>> {
+        return super.sendRequest(axios.post, `project/${projectId}/add-organisation`, organisationContribution, ProjectService.idempotencyKey);
+    }
+
+    async removeProjectOrganisation(projectId: number, organisationContributionId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, `project/${projectId}/remove-organisation/${organisationContributionId}`);
     }
 
     async readProjectDocuments(projectId: number): Promise<AxiosResponse<ProjectDocument[]>> {
