@@ -53,7 +53,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? row.item.funderNameSr : row.item.funderNameOther) }}
+                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}

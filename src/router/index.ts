@@ -59,7 +59,6 @@ import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
 import FundingLandingView from "@/views/landingPages/FundingLandingView.vue";
 import FundingApplicationLandingView from "@/views/landingPages/FundingApplicationLandingView.vue";
-import SubmitFundingApplicationView from "@/views/SubmitFundingApplicationView.vue";
 import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
 import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
 import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
@@ -136,7 +135,6 @@ import IdentifiersListView from "@/views/IdentifiersListView.vue";
 import PerformanceRelatedOutputLandingView from "@/views/landingPages/PerformanceRelatedOutputLandingView.vue";
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
-import SubmitFundingView from "@/views/SubmitFundingView.vue";
 import FundingProgramListView from "@/views/FundingProgramListView.vue";
 import SubmitProjectView from "@/views/SubmitProjectView.vue";
 
@@ -272,15 +270,6 @@ const router = createRouter({
                                 authorities: [roles.admin],
                             },
                         },
-                        {
-                            path: "submit-funding",
-                            name: "submitFunding",
-                            component: SubmitFundingView,
-                            meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
-                            },
-                        },
                     ]
                 },
                 {
@@ -323,15 +312,6 @@ const router = createRouter({
                             path: ":id",
                             name: "fundingApplicationLandingPage",
                             component: FundingApplicationLandingView,
-                            meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
-                            },
-                        },
-                        {
-                            path: "submit-funding-application",
-                            name: "submitFundingApplication",
-                            component: SubmitFundingApplicationView,
                             meta: {
                                 authenticated: true,
                                 authorities: [roles.admin],

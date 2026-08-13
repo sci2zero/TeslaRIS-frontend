@@ -29,6 +29,21 @@ export const getFundingApplicationResultTitleFromValueAutoLocale = (value: Fundi
     return (fundingApplicationResultArray.find(item => item.value === value) || {}).title;
 };
 
+export const getFundingApplicationResultColor = (result: FundingApplicationResult) => {
+    switch (result) {
+        case FundingApplicationResult.AWARDED:
+            return "success";
+        case FundingApplicationResult.REJECTED:
+            return "error";
+        case FundingApplicationResult.CHANGES_REQUESTED:
+            return "warning";
+        case FundingApplicationResult.ACCEPTED_FOR_NEXT_ROUND:
+            return "info";
+        default:
+            return "primary";
+    }
+};
+
 export const getFundingApplicationResultsForGivenLocale = () => {
     switch(i18n.vueI18n.global.locale) {
         case "sr":

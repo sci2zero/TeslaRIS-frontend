@@ -53,7 +53,7 @@
                     </localized-link>
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? row.item.funderNameSr : row.item.funderNameOther) }}
+                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
                 </td>
                 <td>
                     {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
@@ -62,7 +62,15 @@
                     {{ displayTextOrPlaceholder(localiseDate(row.item.decisionDate)) }}
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.result ? getFundingApplicationResultTitleFromValueAutoLocale(row.item.result) : "") }}
+                    <v-chip
+                        v-if="row.item.result"
+                        size="small"
+                        :color="getFundingApplicationResultColor(row.item.result)"
+                        variant="flat"
+                    >
+                        {{ getFundingApplicationResultTitleFromValueAutoLocale(row.item.result) }}
+                    </v-chip>
+                    <span v-else>{{ displayTextOrPlaceholder("") }}</span>
                 </td>
             </tr>
         </template>
@@ -104,7 +112,7 @@ import FundingApplicationAutocompleteSearch from "@/components/project/FundingAp
 import Toast from "@/components/core/Toast.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
-import { getFundingApplicationResultTitleFromValueAutoLocale } from "@/i18n/fundingApplicationResult";
+import { getFundingApplicationResultColor, getFundingApplicationResultTitleFromValueAutoLocale } from "@/i18n/fundingApplicationResult";
 
 const props = defineProps({
     projectId: {
