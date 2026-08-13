@@ -56,10 +56,10 @@
                     {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.dateFrom) }}
+                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.dateTo) }}
+                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
                 </td>
             </tr>
         </template>
@@ -98,6 +98,7 @@ import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingAutocompleteSearch from "@/components/project/FundingAutocompleteSearch.vue";
 import Toast from "@/components/core/Toast.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
+import { localiseDate } from "@/utils/DateUtil";
 
 const props = defineProps({
     fundingCallId: {
