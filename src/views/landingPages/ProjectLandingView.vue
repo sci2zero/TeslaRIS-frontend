@@ -201,11 +201,12 @@
             <v-tabs-window-item value="team">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-team-tab
-                            v-if="project"
-                            :team="project.persons ?? []"
+                        <project-persons-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :persons="project.persons ?? []"
                             :can-edit="canEdit"
-                            @update="updateTeam"
+                            @refresh="fetchProject"
                         />
                     </v-col>
                 </v-row>
@@ -214,11 +215,12 @@
             <v-tabs-window-item value="consortium">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-consortium-tab
-                            v-if="project"
-                            :consortium="project.consortium ?? []"
+                        <project-organisations-tab
+                            v-if="project?.id"
+                            :project-id="project.id"
+                            :organisations="project.organisations ?? []"
                             :can-edit="canEdit"
-                            @update="updateConsortium"
+                            @refresh="fetchProject"
                         />
                     </v-col>
                 </v-row>
@@ -318,8 +320,8 @@ import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
 import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
 import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
-import ProjectTeamTab from "@/components/project/ProjectTeamTab.vue";
-import ProjectConsortiumTab from "@/components/project/ProjectConsortiumTab.vue";
+import ProjectPersonsTab from "@/components/project/ProjectPersonsTab.vue";
+import ProjectOrganisationsTab from "@/components/project/ProjectOrganisationsTab.vue";
 import ProjectDocumentsTab from "@/components/project/ProjectDocumentsTab.vue";
 import ProjectEventsTab from "@/components/project/ProjectEventsTab.vue";
 import Toast from "@/components/core/Toast.vue";
@@ -354,7 +356,7 @@ const principleInvestigators = computed(() =>
 );
 
 const institutionCoordinators = computed(() =>
-    project.value?.consortium?.filter(
+    project.value?.organisations?.filter(
         institution => institution.contributionType === OrganisationUnitProjectContributionType.COORDINATOR
     ) ?? []
 );
@@ -416,16 +418,6 @@ const updateKeywords = (keywords: MultilingualContent[]) => {
 
 const updateDescription = (description: MultilingualContent[]) => {
     project.value!.description = description;
-    performUpdate(true);
-};
-
-const updateTeam = (team: PersonProjectContribution[]) => {
-    project.value!.persons = team;
-    performUpdate(true);
-};
-
-const updateConsortium = (consortium: OrganisationUnitProjectContribution[]) => {
-    project.value!.consortium = consortium;
     performUpdate(true);
 };
 

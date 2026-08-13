@@ -24,7 +24,7 @@ export interface Project {
     notFunded?: boolean;
     costs?: MonetaryAmount;
     persons: PersonProjectContribution[];
-    consortium: OrganisationUnitProjectContribution[];
+    organisations: OrganisationUnitProjectContribution[];
     relations: ProjectsRelation[];
 }
 
