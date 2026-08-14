@@ -1542,6 +1542,16 @@ export default {
     messageLabel: "Message",
     noFailedConstraintsMessage: "All constraints passed for this version.",
     downloadFullAssessmentReportLabel: "Download full assessment report",
+    linkedRecordsLabel: "Linked entities",
+    affectedRecordsLabel: "Affected entities",
+    openIssuesLabel: "Open issues",
+    averageScoreLabel: "Average score",
+    outputsLabel: "Outputs",
+    projectsLabel: "Projects",
+    activitiesLabel: "Activities",
+    fundingsLabel: "Fundings",
+    relatedQualityExplanationMessage: "Quality status of the records linked to this entity.",
+    relatedQualityOnlyForLatestVersionMessage: "Related quality is shown only for the latest version of this record.",
     dataQualityAssessmentLabel: "Data quality assessment",
     cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists."
 }

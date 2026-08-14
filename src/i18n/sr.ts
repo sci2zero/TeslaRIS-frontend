@@ -1556,6 +1556,16 @@ export default {
     messageLabel: "Poruka",
     noFailedConstraintsMessage: "Sva ograničenja su zadovoljena za ovu verziju.",
     downloadFullAssessmentReportLabel: "Preuzmi kompletan izveštaj procene",
+    linkedRecordsLabel: "Povezani entiteti",
+    affectedRecordsLabel: "Zahvaćeni entitieti",
+    openIssuesLabel: "Otvoreni problemi",
+    averageScoreLabel: "Prosečna ocena",
+    outputsLabel: "Publikacije",
+    projectsLabel: "Projekti",
+    activitiesLabel: "Aktivnosti",
+    fundingsLabel: "Finansiranja",
+    relatedQualityExplanationMessage: "Status kvaliteta zapisa povezanih sa ovim entitetom.",
+    relatedQualityOnlyForLatestVersionMessage: "Povezani kvalitet se prikazuje samo za najnoviju verziju ovog zapisa.",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka",
     cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji."
 }

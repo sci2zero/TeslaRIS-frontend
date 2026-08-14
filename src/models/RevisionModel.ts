@@ -97,3 +97,26 @@ export interface DataQualityAssessment {
     passedRulesList: DataQualityRuleResult[];
     failedRulesList: DataQualityRuleResult[];
 }
+
+export enum RelatedEntityType {
+    OUTPUTS = "OUTPUTS",
+    PROJECTS = "PROJECTS",
+    ACTIVITIES = "ACTIVITIES",
+    FUNDINGS = "FUNDINGS"
+}
+
+export interface ProfileRelatedQuality {
+    profileName: string;
+    profileVersion: string;
+    assessmentDate?: string;
+    relatedQuality: RelatedQuality[];
+}
+
+export interface RelatedQuality {
+    entityType: RelatedEntityType;
+    linkedRecords: number;
+    affectedRecords: number;
+    openIssues: number;
+    averageScore?: number;
+    supported: boolean;
+}

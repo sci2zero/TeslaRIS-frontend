@@ -23,12 +23,13 @@
                     <v-card-text>
                         <v-row align="center">
                             <v-col cols="12" md="3">
-                                <div class="context-label">
-                                    {{ $t("qualityProfileLabel") }}
-                                </div>
-                                <div class="context-value">
-                                    {{ selectedAssessment.profileName }}
-                                </div>
+                                <v-select
+                                    v-model="selectedProfileName"
+                                    :items="profileNames"
+                                    :label="$t('qualityProfileLabel')"
+                                    density="compact"
+                                    hide-details
+                                />
                             </v-col>
                             <v-col cols="6" md="2">
                                 <div class="context-label">
@@ -50,6 +51,7 @@
                                 <v-select
                                     v-model="selectedVersion"
                                     :items="versionItems"
+                                    item-title="title"
                                     :label="$t('recordVersionLabel')"
                                     density="compact"
                                     hide-details
@@ -75,20 +77,6 @@
                 <h3 class="assessment-title">
                     {{ $t("assessmentForVersionLabel", [versionLabelFor(selectedVersion)]) }}
                 </h3>
-
-                <v-tabs
-                    v-if="assessments.length > 1"
-                    v-model="selectedProfileIndex"
-                    color="primary"
-                    density="compact"
-                    class="mb-3">
-                    <v-tab
-                        v-for="(assessment, index) in assessments"
-                        :key="assessment.assessmentId"
-                        :value="index">
-                        {{ assessment.profileName }}
-                    </v-tab>
-                </v-tabs>
 
                 <v-row class="mb-1">
                     <v-col cols="12" sm="6" md="3">
@@ -206,10 +194,103 @@
                 {{ $t("noAssessmentsLabel") }}
             </div>
         </v-tabs-window-item>
-
+        
         <v-tabs-window-item v-if="supportsRelatedQuality" value="relatedQuality">
-            <div class="text-medium-emphasis mt-5">
-                {{ $t("notYetSetMessage") }}
+            <template v-if="selectedRelatedProfile">
+                <v-card class="dq-card mt-5 mb-5" variant="flat">
+                    <v-card-text>
+                        <v-row align="center">
+                            <v-col cols="12" md="3">
+                                <v-select
+                                    v-model="selectedRelatedProfileName"
+                                    :items="relatedProfileNames"
+                                    :label="$t('qualityProfileLabel')"
+                                    density="compact"
+                                    hide-details
+                                />
+                            </v-col>
+                            <v-col cols="6" md="3">
+                                <div class="context-label">
+                                    {{ $t("versionLabel") }}
+                                </div>
+                                <div class="context-value">
+                                    {{ selectedRelatedProfile.profileVersion }}
+                                </div>
+                            </v-col>
+                            <v-col cols="6" md="3">
+                                <div class="context-label">
+                                    {{ $t("assessmentDateLabel") }}
+                                </div>
+                                <div class="context-value">
+                                    {{ localiseDate(selectedRelatedProfile.assessmentDate) }}
+                                </div>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <div class="context-label">
+                                    {{ $t("recordVersionLabel") }}
+                                </div>
+                                <div class="context-value">
+                                    {{ versionLabelFor(latestVersion) }}
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+
+                <h3 class="assessment-title">
+                    {{ $t("relatedQualityLabel") }}
+                </h3>
+                <div class="text-medium-emphasis mb-3 text-caption">
+                    {{ $t("relatedQualityExplanationMessage") }}
+                </div>
+
+                <v-card variant="flat" class="dq-card">
+                    <v-card-text>
+                        <v-table density="compact">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t("entityTypeLabel") }}</th>
+                                    <th>{{ $t("linkedRecordsLabel") }}</th>
+                                    <th>{{ $t("affectedRecordsLabel") }}</th>
+                                    <th>{{ $t("openIssuesLabel") }}</th>
+                                    <th>{{ $t("averageScoreLabel") }}</th>
+                                    <th>{{ $t("actionLabel") }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="row in relatedQualityRows" :key="row.entityType">
+                                    <td class="context-value">
+                                        {{ $t(relatedEntityTypeLabels[row.entityType]) }}
+                                    </td>
+                                    <td>{{ row.supported ? row.linkedRecords : "-" }}</td>
+                                    <td>{{ row.supported ? row.affectedRecords : "-" }}</td>
+                                    <td>{{ row.supported ? row.openIssues : "-" }}</td>
+                                    <td
+                                        class="font-weight-bold"
+                                        :class="scoreColorClass(row.averageScore)">
+                                        {{ row.averageScore !== null && row.averageScore !== undefined
+                                            ? `${row.averageScore.toFixed(1)}%` : "-" }}
+                                    </td>
+                                    <td>
+                                        <v-btn
+                                            :disabled="!row.supported || row.openIssues === 0"
+                                            density="compact"
+                                            variant="text"
+                                            color="primary"
+                                            append-icon="mdi-arrow-right"
+                                            @click="openRelatedIssues(row)">
+                                            {{ $t("openIssuesLabel") }}
+                                        </v-btn>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-card-text>
+                </v-card>
+            </template>
+
+            <div v-else class="text-medium-emphasis mt-5">
+                {{ $t("noAssessmentsLabel") }}
             </div>
         </v-tabs-window-item>
 
@@ -226,8 +307,11 @@ import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import {
     IssueSeverity,
+    RelatedEntityType,
     type DataQualityAssessment,
     type DataQualityRuleResult,
+    type ProfileRelatedQuality,
+    type RelatedQuality,
     type Revision
 } from "@/models/RevisionModel";
 import { EntityType } from "@/models/MergeModel";
@@ -263,14 +347,23 @@ export default defineComponent({
         const loading = ref(false);
 
         const revisions = ref<Revision[]>([]);
+        const relatedQuality = ref<ProfileRelatedQuality[]>([]);
         const assessments = ref<DataQualityAssessment[]>([]);
-        const selectedProfileIndex = ref(0);
+        const selectedProfileName = ref<string | undefined>(undefined);
+        const selectedRelatedProfileName = ref<string | undefined>(undefined);
         const selectedVersion = ref<VersionItem | undefined>(undefined);
 
         const severityColors = {
             [IssueSeverity.ERROR]: "error",
             [IssueSeverity.WARNING]: "warning",
             [IssueSeverity.INFO]: "info"
+        };
+
+        const relatedEntityTypeLabels: Record<RelatedEntityType, string> = {
+            [RelatedEntityType.OUTPUTS]: "outputsLabel",
+            [RelatedEntityType.PROJECTS]: "projectsLabel",
+            [RelatedEntityType.ACTIVITIES]: "activitiesLabel",
+            [RelatedEntityType.FUNDINGS]: "fundingsLabel"
         };
 
         const supportsRelatedQuality = computed(() =>
@@ -286,9 +379,6 @@ export default defineComponent({
                 minorVersion: revision.minorVersion
             })));
 
-        const selectedAssessment = computed<DataQualityAssessment | undefined>(() =>
-            assessments.value[selectedProfileIndex.value]);
-
         const failedRules = computed(() => selectedAssessment.value?.failedRulesList ?? []);
 
         const totalRules = computed(() =>
@@ -300,6 +390,52 @@ export default defineComponent({
 
         // TODO: per-constraint drill-down is not implemented yet.
         const showConstraintDetails = (_rule: DataQualityRuleResult) => {
+        };
+
+        const profileNames = computed(() =>
+            assessments.value.map(assessment => assessment.profileName));
+
+        const selectedAssessment = computed<DataQualityAssessment | undefined>(() =>
+            assessments.value.find(
+                assessment => assessment.profileName === selectedProfileName.value));
+
+        const relatedProfileNames = computed(() =>
+            relatedQuality.value.map(profile => profile.profileName));
+
+        const latestVersion = computed<VersionItem | undefined>(() => versionItems.value[0]);
+
+        const selectedRelatedProfile = computed<ProfileRelatedQuality | undefined>(() =>
+            relatedQuality.value.find(
+                profile => profile.profileName === selectedRelatedProfileName.value));
+
+        const relatedQualityRows = computed(() =>
+            selectedRelatedProfile.value?.relatedQuality ?? []);
+
+
+        const fetchRelatedQuality = () => {
+            if (!props.entityId || !supportsRelatedQuality.value) {
+                relatedQuality.value = [];
+                return;
+            }
+
+            DataQualityService.getRelatedQuality(
+                props.entityType,
+                props.entityId
+            ).then(response => {
+                relatedQuality.value = response.data;
+
+                if (!relatedProfileNames.value.includes(
+                    selectedRelatedProfileName.value as string)) {
+                    selectedRelatedProfileName.value = relatedProfileNames.value[0];
+                }
+            }).catch(() => {
+                relatedQuality.value = [];
+                selectedRelatedProfileName.value = undefined;
+            });
+        };
+
+        // TODO: navigation to the issues of a related entity type is not implemented yet.
+        const openRelatedIssues = (_row: RelatedQuality) => {
         };
 
         const versionLabelFor = (version: VersionItem | undefined) =>
@@ -324,6 +460,7 @@ export default defineComponent({
         const fetchAssessments = () => {
             if (!props.entityId || !selectedVersion.value) {
                 assessments.value = [];
+                selectedProfileName.value = undefined;
                 return;
             }
 
@@ -336,9 +473,13 @@ export default defineComponent({
                 selectedVersion.value.minorVersion
             ).then(response => {
                 assessments.value = response.data;
-                selectedProfileIndex.value = 0;
+
+                if (!profileNames.value.includes(selectedProfileName.value as string)) {
+                    selectedProfileName.value = profileNames.value[0];
+                }
             }).catch(() => {
                 assessments.value = [];
+                selectedProfileName.value = undefined;
             }).finally(() => {
                 loading.value = false;
             });
@@ -372,17 +513,27 @@ export default defineComponent({
             }
         };
 
-        onMounted(() => fetchVersions());
+        onMounted(() => {
+            fetchVersions();
+            fetchRelatedQuality();
+        });
 
-        watch(() => [props.entityId, props.entityType], fetchVersions);
+        watch(() => [props.entityId, props.entityType], () => {
+            fetchVersions();
+            fetchRelatedQuality();
+        });
         watch(selectedVersion, fetchAssessments);
 
         return {
-            currentSubTab, loading, assessments, selectedProfileIndex,
+            currentSubTab, loading, assessments,
             selectedVersion, versionItems, selectedAssessment,
+            selectedProfileName, profileNames,
             failedRules, totalRules, severityColors,
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
+            relatedQuality, relatedEntityTypeLabels, openRelatedIssues,
+            selectedRelatedProfile, relatedQualityRows,
+            selectedRelatedProfileName, relatedProfileNames, latestVersion,
             downloadFullReport, showConstraintDetails,
             returnCurrentLocaleContent, displayTextOrPlaceholder, localiseDate
         };
