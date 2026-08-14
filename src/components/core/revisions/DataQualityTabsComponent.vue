@@ -295,9 +295,171 @@
         </v-tabs-window-item>
 
         <v-tabs-window-item v-if="supportsQualityIssues" value="qualityIssues">
-            <div class="text-medium-emphasis mt-5">
-                {{ $t("notYetSetMessage") }}
-            </div>
+            <v-card v-if="selectedIssueProfileName" class="dq-card mt-5 mb-5" variant="flat">
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="3">
+                            <v-select
+                                v-model="selectedIssueProfileName"
+                                :items="profileNames"
+                                :label="$t('qualityProfileLabel')"
+                                density="compact"
+                                hide-details
+                            />
+                        </v-col>
+                        <v-col cols="6" md="3">
+                            <div class="context-label">
+                                {{ $t("versionLabel") }}
+                            </div>
+                            <div class="context-value">
+                                {{ issueProfileVersion }}
+                            </div>
+                        </v-col>
+                        <v-col cols="6" md="3">
+                            <div class="context-label">
+                                {{ $t("assessmentDateLabel") }}
+                            </div>
+                            <div class="context-value">
+                                {{ localiseDate(issueAssessmentDate) }}
+                            </div>
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <div class="context-label">
+                                {{ $t("recordVersionLabel") }}
+                            </div>
+                            <div class="context-value">
+                                {{ versionLabelFor(latestVersion) }}
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
+            <h3 class="assessment-title">
+                {{ $t("dataQualityIssuesLabel") }}
+            </h3>
+
+            <v-card variant="flat" class="dq-card mb-5">
+                <v-card-text>
+                    <v-row align="center">
+                        <v-col cols="12" md="2">
+                            <v-select
+                                v-model="issueFilters.target"
+                                :items="targetOptions"
+                                :label="$t('targetEntityTypeLabel')"
+                                density="compact"
+                                clearable
+                                hide-details
+                            />
+                        </v-col>
+                        <v-col cols="12" md="2">
+                            <v-select
+                                v-model="issueFilters.dimension"
+                                :items="dimensionOptions"
+                                :label="$t('dimensionLabel')"
+                                density="compact"
+                                clearable
+                                hide-details
+                            />
+                        </v-col>
+                        <v-col cols="12" md="2">
+                            <v-select
+                                v-model="issueFilters.severity"
+                                :items="severityOptions"
+                                :label="$t('severityLabel')"
+                                density="compact"
+                                clearable
+                                hide-details
+                            />
+                        </v-col>
+                        <v-col cols="12" md="3">
+                            <v-select
+                                v-model="issueFilters.constraintKey"
+                                :items="constraintOptions"
+                                :label="$t('constraintLabel')"
+                                density="compact"
+                                clearable
+                                hide-details
+                            />
+                        </v-col>
+                        <v-col cols="12" md="3" class="d-flex gap-2">
+                            <v-btn color="primary" variant="outlined" @click="clearIssueFilters">
+                                {{ $t("clearLabel") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+
+            <tab-content-loader v-if="issuesLoading" :button-header="false" layout="table" />
+
+            <v-card v-else variant="flat" class="dq-card">
+                <v-card-text>
+                    <div v-if="issues.length === 0" class="text-medium-emphasis">
+                        {{ $t("noFailedConstraintsMessage") }}
+                    </div>
+
+                    <template v-else>
+                        <v-table density="compact">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t("affectedRecordLabel") }}</th>
+                                    <th>{{ $t("targetEntityTypeLabel") }}</th>
+                                    <th>{{ $t("constraintLabel") }}</th>
+                                    <th>{{ $t("dimensionLabel") }}</th>
+                                    <th>{{ $t("severityLabel") }}</th>
+                                    <th>{{ $t("actionLabel") }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="issue in issues"
+                                    :key="`${issue.assessmentId}-${issue.ruleKey}`">
+                                    <td class="context-value">
+                                        {{ issue.entityType }} #{{ issue.entityId }}
+                                        <span class="text-medium-emphasis">
+                                            ({{ issue.recordMajorVersion }}.{{ issue.recordMinorVersion }})
+                                        </span>
+                                    </td>
+                                    <td>{{ issue.target }}</td>
+                                    <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(issue.title) as string) }}</td>
+                                    <td>{{ issue.dimension }}</td>
+                                    <td>
+                                        <v-chip
+                                            :color="severityColors[issue.severity]"
+                                            variant="tonal"
+                                            size="small">
+                                            {{ issue.severity }}
+                                        </v-chip>
+                                    </td>
+                                    <td>
+                                        <v-btn
+                                            density="compact"
+                                            variant="text"
+                                            color="primary"
+                                            append-icon="mdi-arrow-right"
+                                            @click="showIssueDetails(issue)">
+                                            {{ $t("viewDetailsLabel") }}
+                                        </v-btn>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+
+                        <div class="d-flex align-center justify-space-between mt-4">
+                            <span class="text-medium-emphasis text-caption">
+                                {{ $t("totalIssuesLabel", { count: totalIssues }) }}
+                            </span>
+                            <v-pagination
+                                v-model="issuePage"
+                                :length="issuePageCount"
+                                :total-visible="5"
+                                density="compact"
+                            />
+                        </div>
+                    </template>
+                </v-card-text>
+            </v-card>
         </v-tabs-window-item>
     </v-tabs-window>
 </template>
@@ -307,8 +469,11 @@ import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import {
     IssueSeverity,
+    QualityDimension,
     RelatedEntityType,
     type DataQualityAssessment,
+    type DataQualityIssue,
+    type DataQualityProfile,
     type DataQualityRuleResult,
     type ProfileRelatedQuality,
     type RelatedQuality,
@@ -322,6 +487,29 @@ import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 
+
+interface IssueFilters {
+    target?: string;
+    dimension?: QualityDimension;
+    severity?: IssueSeverity;
+    constraintKey?: string;
+}
+
+const EMPTY_ISSUE_FILTERS: IssueFilters = {
+    target: undefined,
+    dimension: undefined,
+    severity: undefined,
+    constraintKey: undefined
+};
+
+const ISSUE_PAGE_SIZE = 10;
+
+const RELATED_ENTITY_TARGETS: Record<RelatedEntityType, string> = {
+    [RelatedEntityType.OUTPUTS]: "Document",
+    [RelatedEntityType.PROJECTS]: "Project",
+    [RelatedEntityType.ACTIVITIES]: "Activity",
+    [RelatedEntityType.FUNDINGS]: "Funding"
+};
 
 interface VersionItem {
     title: string;
@@ -348,6 +536,13 @@ export default defineComponent({
 
         const revisions = ref<Revision[]>([]);
         const relatedQuality = ref<ProfileRelatedQuality[]>([]);
+        const selectedIssueProfileName = ref<string | undefined>(undefined);
+        const issues = ref<DataQualityIssue[]>([]);
+        const issuesLoading = ref(false);
+        const issuePage = ref(1);
+        const totalIssues = ref(0);
+        const profiles = ref<DataQualityProfile[]>([]);
+        const issueFilters = ref<IssueFilters>({ ...EMPTY_ISSUE_FILTERS });
         const assessments = ref<DataQualityAssessment[]>([]);
         const selectedProfileName = ref<string | undefined>(undefined);
         const selectedRelatedProfileName = ref<string | undefined>(undefined);
@@ -358,6 +553,8 @@ export default defineComponent({
             [IssueSeverity.WARNING]: "warning",
             [IssueSeverity.INFO]: "info"
         };
+
+        const targetOptions = Object.entries(RELATED_ENTITY_TARGETS).map(([, target]) => target);
 
         const relatedEntityTypeLabels: Record<RelatedEntityType, string> = {
             [RelatedEntityType.OUTPUTS]: "outputsLabel",
@@ -408,6 +605,37 @@ export default defineComponent({
             relatedQuality.value.find(
                 profile => profile.profileName === selectedRelatedProfileName.value));
 
+        const issueProfile = computed(() =>
+            profiles.value.find(profile => profile.profileName === selectedIssueProfileName.value));
+
+        const issueProfileVersion = computed(() =>
+            assessments.value.find(
+                assessment => assessment.profileName === selectedIssueProfileName.value
+            )?.profileVersion ?? issueProfile.value?.version);
+
+        const issueAssessmentDate = computed(() =>
+            assessments.value.find(
+                assessment => assessment.profileName === selectedIssueProfileName.value
+            )?.finishedAt);
+
+        const issuePageCount = computed(() =>
+            Math.max(1, Math.ceil(totalIssues.value / ISSUE_PAGE_SIZE)));
+
+        const dimensionOptions = computed(() => Object.values(QualityDimension));
+
+        const severityOptions = computed(() => Object.values(IssueSeverity));
+
+        const constraintOptions = computed(() =>
+            Object.entries(issueProfile.value?.dataQualityRemarks ?? {})
+                .filter(([, remark]) => !issueFilters.value.target ||
+                    remark.target?.startsWith(issueFilters.value.target))
+                .map(([key, remark]) => ({
+                    title: displayTextOrPlaceholder(
+                        returnCurrentLocaleContent(remark.title) as string),
+                    value: key
+                }))
+                .sort((first, second) => first.title.localeCompare(second.title)));
+
         const relatedQualityRows = computed(() =>
             selectedRelatedProfile.value?.relatedQuality ?? []);
 
@@ -434,8 +662,78 @@ export default defineComponent({
             });
         };
 
-        // TODO: navigation to the issues of a related entity type is not implemented yet.
-        const openRelatedIssues = (_row: RelatedQuality) => {
+        const resetPageAndFetchIssues = () => {
+            if (issuePage.value !== 1) {
+                issuePage.value = 1;
+                return;
+            }
+
+            fetchIssues();
+        };
+
+        const openRelatedIssues = (row: RelatedQuality) => {
+            const target = RELATED_ENTITY_TARGETS[row.entityType];
+            const alreadyFiltered = issueFilters.value.target === target &&
+                !issueFilters.value.dimension && !issueFilters.value.severity &&
+                !issueFilters.value.constraintKey;
+
+            issueFilters.value = { ...EMPTY_ISSUE_FILTERS, target };
+            currentSubTab.value = "qualityIssues";
+
+            if (alreadyFiltered) {
+                resetPageAndFetchIssues();
+            }
+        };
+
+        const clearIssueFilters = () => {
+            issueFilters.value = { ...EMPTY_ISSUE_FILTERS };
+        };
+
+        // TODO: the issue detail modal is not implemented yet.
+        const showIssueDetails = (_issue: DataQualityIssue) => {
+        };
+
+        const fetchIssues = () => {
+            if (!props.entityId || !selectedIssueProfileName.value ||
+                !supportsQualityIssues.value) {
+                issues.value = [];
+                totalIssues.value = 0;
+                return;
+            }
+
+            issuesLoading.value = true;
+
+            DataQualityService.getIssuesForEntity(
+                props.entityType,
+                props.entityId,
+                selectedIssueProfileName.value,
+                issueFilters.value.target,
+                issueFilters.value.dimension,
+                issueFilters.value.severity,
+                issueFilters.value.constraintKey,
+                issuePage.value - 1,
+                ISSUE_PAGE_SIZE
+            ).then(response => {
+                issues.value = response.data.content;
+                totalIssues.value = response.data.totalElements;
+            }).catch(() => {
+                issues.value = [];
+                totalIssues.value = 0;
+            }).finally(() => {
+                issuesLoading.value = false;
+            });
+        };
+
+        const fetchProfiles = () => {
+            if (!supportsQualityIssues.value) {
+                return;
+            }
+
+            DataQualityService.listProfiles().then(response => {
+                profiles.value = response.data;
+            }).catch(() => {
+                profiles.value = [];
+            });
         };
 
         const versionLabelFor = (version: VersionItem | undefined) =>
@@ -477,6 +775,11 @@ export default defineComponent({
                 if (!profileNames.value.includes(selectedProfileName.value as string)) {
                     selectedProfileName.value = profileNames.value[0];
                 }
+
+                if (!profileNames.value.includes(selectedIssueProfileName.value as string)) {
+                    selectedIssueProfileName.value = profileNames.value[0];
+                    fetchIssues();
+                }
             }).catch(() => {
                 assessments.value = [];
                 selectedProfileName.value = undefined;
@@ -516,26 +819,46 @@ export default defineComponent({
         onMounted(() => {
             fetchVersions();
             fetchRelatedQuality();
+            fetchProfiles();
         });
 
         watch(() => [props.entityId, props.entityType], () => {
             fetchVersions();
             fetchRelatedQuality();
+            fetchProfiles();
         });
+
+        watch(selectedIssueProfileName, resetPageAndFetchIssues);
+
+        watch(issuePage, fetchIssues);
+
+        watch(issueFilters, () => {
+            const constraintKey = issueFilters.value.constraintKey;
+
+            if (constraintKey &&
+                !constraintOptions.value.some(option => option.value === constraintKey)) {
+                issueFilters.value.constraintKey = undefined;
+                return;
+            }
+
+            resetPageAndFetchIssues();
+        }, { deep: true });
         watch(selectedVersion, fetchAssessments);
 
         return {
             currentSubTab, loading, assessments,
             selectedVersion, versionItems, selectedAssessment,
-            selectedProfileName, profileNames,
-            failedRules, totalRules, severityColors,
+            selectedProfileName, profileNames, failedRules,
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
             relatedQuality, relatedEntityTypeLabels, openRelatedIssues,
-            selectedRelatedProfile, relatedQualityRows,
-            selectedRelatedProfileName, relatedProfileNames, latestVersion,
-            downloadFullReport, showConstraintDetails,
-            returnCurrentLocaleContent, displayTextOrPlaceholder, localiseDate
+            selectedRelatedProfile, relatedQualityRows, displayTextOrPlaceholder,
+            selectedIssueProfileName, issues, issuesLoading, issuePage, issuePageCount,
+            totalIssues, issueFilters, issueProfileVersion, issueAssessmentDate,
+            targetOptions, dimensionOptions, severityOptions, constraintOptions,
+            clearIssueFilters, showIssueDetails, selectedRelatedProfileName, 
+            relatedProfileNames, latestVersion, downloadFullReport, showConstraintDetails,
+            returnCurrentLocaleContent, localiseDate, totalRules, severityColors
         };
     }
 });

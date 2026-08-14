@@ -1552,6 +1552,10 @@ export default {
     fundingsLabel: "Fundings",
     relatedQualityExplanationMessage: "Quality status of the records linked to this entity.",
     relatedQualityOnlyForLatestVersionMessage: "Related quality is shown only for the latest version of this record.",
+    targetEntityTypeLabel: "Target entity type",
+    affectedRecordLabel: "Affected record",
+    clearLabel: "Clear",
+    totalIssuesLabel: "{count} open issue(s)",
     dataQualityAssessmentLabel: "Data quality assessment",
     cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists."
 }

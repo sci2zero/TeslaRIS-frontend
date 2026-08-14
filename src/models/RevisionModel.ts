@@ -120,3 +120,37 @@ export interface RelatedQuality {
     averageScore?: number;
     supported: boolean;
 }
+
+export interface DataQualityIssue {
+    assessmentId: number;
+    entityType: string;
+    entityId: number;
+    target: string;
+    recordMajorVersion: number;
+    recordMinorVersion: number;
+    assessmentDate: string;
+    ruleKey: string;
+    dimension: QualityDimension;
+    severity: IssueSeverity;
+    blocking: boolean;
+    title: MultilingualContent[];
+    message: MultilingualContent[];
+}
+
+export interface DataQualityRemark {
+    title: MultilingualContent[];
+    message: MultilingualContent[];
+    target: string;
+    targetWeight: number;
+    severity: IssueSeverity;
+    dimension: QualityDimension;
+    blocking: boolean;
+    points: number;
+    usedForFairCompliance: boolean;
+}
+
+export interface DataQualityProfile {
+    profileName: string;
+    version: string;
+    dataQualityRemarks: Record<string, DataQualityRemark>;
+}

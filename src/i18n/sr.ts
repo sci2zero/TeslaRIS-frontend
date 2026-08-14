@@ -1566,6 +1566,10 @@ export default {
     fundingsLabel: "Finansiranja",
     relatedQualityExplanationMessage: "Status kvaliteta zapisa povezanih sa ovim entitetom.",
     relatedQualityOnlyForLatestVersionMessage: "Povezani kvalitet se prikazuje samo za najnoviju verziju ovog zapisa.",
+    targetEntityTypeLabel: "Tip ciljnog entiteta",
+    affectedRecordLabel: "Zahvaćeni zapis",
+    clearLabel: "Poništi",
+    totalIssuesLabel: "{count} otvorenih problema",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka",
     cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji."
 }
