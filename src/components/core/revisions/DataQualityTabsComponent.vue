@@ -416,10 +416,9 @@
                                     v-for="issue in issues"
                                     :key="`${issue.assessmentId}-${issue.ruleKey}`">
                                     <td class="context-value">
-                                        {{ issue.entityType }} #{{ issue.entityId }}
-                                        <span class="text-medium-emphasis">
-                                            ({{ issue.recordMajorVersion }}.{{ issue.recordMinorVersion }})
-                                        </span>
+                                        <localized-link :to="getLandingPageBasePath(issue.entityType) + issue.entityId">
+                                            {{ $i18n.locale.startsWith('sr') ? issue.entityNameSr : issue.entityNameOther }}
+                                        </localized-link>
                                     </td>
                                     <td>{{ issue.target }}</td>
                                     <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(issue.title) as string) }}</td>
@@ -486,6 +485,8 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
+import LocalizedLink from "@/components/localization/LocalizedLink.vue";
+import { getLandingPageBasePath } from "@/utils/PathResolutionUtil";
 
 
 interface IssueFilters {
@@ -519,7 +520,7 @@ interface VersionItem {
 
 export default defineComponent({
     name: "DataQualityTabsComponent",
-    components: { TabContentLoader },
+    components: { TabContentLoader, LocalizedLink },
     props: {
         entityType: {
             type: String,
@@ -846,7 +847,7 @@ export default defineComponent({
         watch(selectedVersion, fetchAssessments);
 
         return {
-            currentSubTab, loading, assessments,
+            currentSubTab, loading, assessments, getLandingPageBasePath,
             selectedVersion, versionItems, selectedAssessment,
             selectedProfileName, profileNames, failedRules,
             supportsRelatedQuality, supportsQualityIssues,

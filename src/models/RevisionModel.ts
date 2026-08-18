@@ -135,6 +135,8 @@ export interface DataQualityIssue {
     blocking: boolean;
     title: MultilingualContent[];
     message: MultilingualContent[];
+    entityNameSr: string;
+    entityNameOther: string;
 }
 
 export interface DataQualityRemark {

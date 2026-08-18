@@ -135,6 +135,35 @@ export const getDocumentLandingPageName = (type: PublicationType | string): stri
     return "";
 };
 
+export const getLandingPageBasePath = (entityType: string): string => {
+    const documentBasePath = getDocumentLandingPageBasePath(entityType);
+
+    if (documentBasePath) {
+        return documentBasePath;
+    }
+
+    const eventBasePath = getEventLandingPageBasePath(entityType);
+
+    if (eventBasePath) {
+        return eventBasePath;
+    }
+
+    switch (entityType) {
+        case "PERSON":
+            return "persons/";
+        case "ORGANISATION_UNIT":
+            return "organisation-units/";
+        case "JOURNAL":
+            return "journals/";
+        case "BOOK_SERIES":
+            return "book-series/";
+        case "PUBLISHER":
+            return "publishers/";
+    }
+
+    return "";
+};
+
 export const getDocumentLandingPageBasePathBasedOnAssessment = (assessmentCode: string): string => {
     if (assessmentCode.startsWith("M1")) {
         return "scientific-results/monograph/";
