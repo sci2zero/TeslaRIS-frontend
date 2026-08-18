@@ -1127,6 +1127,8 @@ export default {
     citationCountLeaderboardLabel: "Citations",
     assessmentPointsLeaderboardLabel: "Assessment points",
     reharvestCitationIndicatorsLabel: "Reharvest citation indicators",
+    backfillTargetTypeLabel: "Indexes to process",
+    rewriteExistingAssessmentsLabel: "Rewrite existing assessments",
     mostCitedResearchersLabel: "Most cited researchers (by Open Alex)",
     mostCitedInstitutionsLabel: "Most cited org. units (by Open Alex)",
     mostCitedPublicationsLabel: "Most cited publications (by Open Alex)",
@@ -1557,5 +1559,6 @@ export default {
     clearLabel: "Clear",
     totalIssuesLabel: "{count} open issue(s)",
     dataQualityAssessmentLabel: "Data quality assessment",
-    cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists."
+    cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists.",
+    revisionBackfillMessage: "Automatic entity revisioning"
 }

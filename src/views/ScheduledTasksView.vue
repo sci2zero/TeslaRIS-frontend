@@ -15,7 +15,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment && !qualityAssessmentBackfill"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -53,6 +53,23 @@
                     class="mt-2"
                     :label="$t('reharvestCitationIndicatorsLabel')"
                 ></v-checkbox>
+            </v-col>
+            <v-col v-if="qualityAssessmentBackfill" cols="8" md="4">
+                <v-select
+                    v-model="selectedBackfillTargets"
+                    :items="backfillTargets"
+                    :label="$t('backfillTargetTypeLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
+                    return-object
+                    multiple
+                />
+            </v-col>
+            <v-col v-if="qualityAssessmentBackfill" cols="4" md="2">
+                <v-checkbox
+                    v-model="rewriteExistingAssessments"
+                    class="mt-2"
+                    :label="$t('rewriteExistingAssessmentsLabel')"
+                />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="10" md="6">
                 <v-select
@@ -155,13 +172,13 @@
                     disable-submission
                 />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment" cols="12" md="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || qualityAssessmentBackfill" cols="12" md="3">
                 <person-autocomplete-search
                     v-model="selectedPersons"
                     multiple disable-submission
                 />
             </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || metadataEnrichment || isTopLevelReport()" cols="12" md="3">
+            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || metadataEnrichment || qualityAssessmentBackfill || isTopLevelReport()" cols="12" md="3">
                 <organisation-unit-autocomplete-search
                     v-model="selectedOUs" :multiple="!isTopLevelReport() || metadataEnrichment"
                     disable-submission :required="isTopLevelReport() || metadataEnrichment"
@@ -246,7 +263,7 @@
                 <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
             </v-col>
             <v-col
-                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck"
+                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck || qualityAssessmentBackfill"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedRecurrenceType"
@@ -306,6 +323,8 @@ import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
 import { getPublicationTypesForGivenLocale } from "@/i18n/publicationType";
 import ApplicationConfigurationService from "@/services/ApplicationConfigurationService";
 import MonographAutocompleteSearch from "@/components/publication/MonographAutocompleteSearch.vue";
+import { QualityAssessmentTarget } from "@/models/RevisionModel";
+import { getQualityAssessmentTargetsForGivenLocale } from "@/i18n/qualityAssessmentTarget";
 
 
 export default defineComponent({
@@ -362,6 +381,7 @@ export default defineComponent({
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
         const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
         const metadataEnrichment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.METADATA_ENRICHMENT);
+        const qualityAssessmentBackfill = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.QUALITY_ASSESSMENT_BACKFILL);
 
         const approximateEndMoment = ref<string>("");
 
@@ -398,6 +418,10 @@ export default defineComponent({
         );
 
         const reharvestCitationIndicators = ref(false);
+
+        const backfillTargets = ref<{ title: string; value: QualityAssessmentTarget; }[]>(getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[]);
+        const selectedBackfillTargets = ref<{ title: string, value: QualityAssessmentTarget }[]>([]);
+        const rewriteExistingAssessments = ref(false);
 
         const calculateIF5Rank = ref(true);
         const calculateJCIRank = ref(false);
@@ -450,6 +474,7 @@ export default defineComponent({
             scheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
             reportTypes.value = getReportTypesForGivenLocale();
             entityTypes.value = getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[];
+            backfillTargets.value = getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[];
             applicableTypes.value = (getApplicableEntityTypesForGivenLocale() as { title: string, value: ApplicableEntityType }[]).filter(item => item.value === ApplicableEntityType.PUBLICATION_SERIES);
             indicatorSources.value = (getIndicatorSourceForGivenLocale() as { title: string, value: EntityIndicatorSource }[]).filter(item => item.value !== EntityIndicatorSource.MANUAL);
         };
@@ -623,6 +648,19 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.QUALITY_ASSESSMENT_BACKFILL:
+                    scheduleTask(() =>
+                        TaskManagerService.scheduleQualityAssessmentBackfill(
+                            timestamp,
+                            selectedBackfillTargets.value.map(target => target.value),
+                            selectedPersons.value.map(person => person.value),
+                            (selectedOUs.value as { title: string; value: number; }[]).map(ou => ou.value),
+                            rewriteExistingAssessments.value,
+                            selectedRecurrenceType.value.value
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -707,7 +745,9 @@ export default defineComponent({
             calculateIF5Rank, calculateJCIRank, thesesAssessment,
             monographPublicationsAssessment, selectedMonographs,
             metadataEnrichment, autoload, shortenedReviewPeriod,
-            isScientificProductionReport, startYear
+            isScientificProductionReport, startYear,
+            qualityAssessmentBackfill, backfillTargets,
+            selectedBackfillTargets, rewriteExistingAssessments
         };
     },
 });

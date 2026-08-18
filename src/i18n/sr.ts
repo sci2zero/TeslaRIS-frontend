@@ -1134,6 +1134,8 @@ export default {
     citationCountLeaderboardLabel: "Citiranost",
     assessmentPointsLeaderboardLabel: "M-poeni",
     reharvestCitationIndicatorsLabel: "Ponovo učitaj podatke o citiranosti",
+    backfillTargetTypeLabel: "Indeksi za obradu",
+    rewriteExistingAssessmentsLabel: "Prepiši postojeća vrednovanja",
     mostCitedResearchersLabel: "Najviše citirani istraživači (po Open Alex-u)",
     mostCitedInstitutionsLabel: "Najviše citirane org. jedinice (po Open Alex-u)",
     mostCitedPublicationsLabel: "Najviše citirane publikacije (po Open Alex-u)",
@@ -1571,5 +1573,6 @@ export default {
     clearLabel: "Poništi",
     totalIssuesLabel: "{count} otvorenih problema",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka",
-    cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji."
+    cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji.",
+    revisionBackfillMessage: "Automatsko revizionisanje entiteta"
 }

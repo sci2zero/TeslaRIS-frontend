@@ -156,3 +156,13 @@ export interface DataQualityProfile {
     version: string;
     dataQualityRemarks: Record<string, DataQualityRemark>;
 }
+
+export enum QualityAssessmentTarget {
+    PERSON = "PERSON",
+    ORGANISATION_UNIT = "ORGANISATION_UNIT",
+    EVENT = "EVENT",
+    DOCUMENT = "DOCUMENT",
+    JOURNAL = "JOURNAL",
+    BOOK_SERIES = "BOOK_SERIES",
+    PUBLISHER = "PUBLISHER"
+}
