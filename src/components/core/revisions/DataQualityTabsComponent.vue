@@ -169,8 +169,10 @@
                                     </td>
                                     <td>
                                         {{ displayTextOrPlaceholder(returnCurrentLocaleContent(rule.message) as string) }}
-                                        <div v-if="rule.actualValue" class="text-medium-emphasis text-caption">
-                                            {{ rule.actualValue }}
+                                        <div
+                                            v-if="rule.actualValue && rule.actualValue.length < 100"
+                                            class="text-medium-emphasis text-caption">
+                                            ({{ rule.actualValue }})
                                         </div>
                                     </td>
                                     <td>
@@ -179,7 +181,7 @@
                                             variant="text"
                                             color="primary"
                                             append-icon="mdi-arrow-right"
-                                            @click="showConstraintDetails(rule)">
+                                            @click="showRuleDetails(rule)">
                                             {{ $t("viewDetailsLabel") }}
                                         </v-btn>
                                     </td>
@@ -461,6 +463,16 @@
             </v-card>
         </v-tabs-window-item>
     </v-tabs-window>
+
+    <data-quality-issue-details-modal
+        v-model="issueDetailsDialog"
+        :assessment-id="detailsAssessmentId"
+        :rule-key="detailsRuleKey"
+        :record-name-sr="detailsRecordNameSr"
+        :record-name-other="detailsRecordNameOther"
+        :current-entity-type="entityType"
+        :current-entity-id="entityId"
+    />
 </template>
 
 <script lang="ts">
@@ -486,6 +498,7 @@ import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
+import DataQualityIssueDetailsModal from "@/components/core/revisions/DataQualityIssueDetailsModal.vue";
 import { getLandingPageBasePath } from "@/utils/PathResolutionUtil";
 
 
@@ -520,7 +533,7 @@ interface VersionItem {
 
 export default defineComponent({
     name: "DataQualityTabsComponent",
-    components: { TabContentLoader, LocalizedLink },
+    components: { TabContentLoader, LocalizedLink, DataQualityIssueDetailsModal },
     props: {
         entityType: {
             type: String,
@@ -584,10 +597,6 @@ export default defineComponent({
 
         // TODO: report generation is not implemented yet.
         const downloadFullReport = () => {
-        };
-
-        // TODO: per-constraint drill-down is not implemented yet.
-        const showConstraintDetails = (_rule: DataQualityRuleResult) => {
         };
 
         const profileNames = computed(() =>
@@ -690,8 +699,30 @@ export default defineComponent({
             issueFilters.value = { ...EMPTY_ISSUE_FILTERS };
         };
 
-        // TODO: the issue detail modal is not implemented yet.
-        const showIssueDetails = (_issue: DataQualityIssue) => {
+        const issueDetailsDialog = ref(false);
+        const detailsAssessmentId = ref<number | undefined>(undefined);
+        const detailsRuleKey = ref<string | undefined>(undefined);
+        const detailsRecordNameSr = ref("");
+        const detailsRecordNameOther = ref("");
+
+        const showIssueDetails = (issue: DataQualityIssue) => {
+            detailsAssessmentId.value = issue.assessmentId;
+            detailsRuleKey.value = issue.ruleKey;
+            detailsRecordNameSr.value = issue.entityNameSr;
+            detailsRecordNameOther.value = issue.entityNameOther;
+            issueDetailsDialog.value = true;
+        };
+
+        const showRuleDetails = (rule: DataQualityRuleResult) => {
+            if (!selectedAssessment.value) {
+                return;
+            }
+
+            detailsAssessmentId.value = selectedAssessment.value.assessmentId;
+            detailsRuleKey.value = rule.key;
+            detailsRecordNameSr.value = "";
+            detailsRecordNameOther.value = "";
+            issueDetailsDialog.value = true;
         };
 
         const fetchIssues = () => {
@@ -858,8 +889,10 @@ export default defineComponent({
             totalIssues, issueFilters, issueProfileVersion, issueAssessmentDate,
             targetOptions, dimensionOptions, severityOptions, constraintOptions,
             clearIssueFilters, showIssueDetails, selectedRelatedProfileName, 
-            relatedProfileNames, latestVersion, downloadFullReport, showConstraintDetails,
-            returnCurrentLocaleContent, localiseDate, totalRules, severityColors
+            relatedProfileNames, latestVersion, downloadFullReport,
+            returnCurrentLocaleContent, localiseDate, totalRules, severityColors,
+            issueDetailsDialog, detailsAssessmentId, detailsRuleKey,
+            detailsRecordNameSr, detailsRecordNameOther, showRuleDetails
         };
     }
 });

@@ -157,6 +157,35 @@ export interface DataQualityProfile {
     dataQualityRemarks: Record<string, DataQualityRemark>;
 }
 
+export interface DataQualityIssueOccurrence {
+    actualValue: string[];
+    message: MultilingualContent[];
+}
+
+export interface DataQualityIssueDetails {
+    assessmentId: number;
+    ruleKey: string;
+    entityType: string;
+    entityId: number;
+    recordMajorVersion: number;
+    recordMinorVersion: number;
+    assessmentDate: string;
+    score: number;
+    maximumScore: number;
+    occurrences: DataQualityIssueOccurrence[];
+    title: MultilingualContent[];
+    severity: IssueSeverity;
+    targetEntityType: string;
+    targetObject: string;
+    constraintWeight: number;
+    fairRelated: boolean;
+    blocking: boolean;
+    policy: string;
+    policyVersion: string;
+    dimension: QualityDimension;
+    dimensionDefinition: MultilingualContent[];
+}
+
 export enum QualityAssessmentTarget {
     PERSON = "PERSON",
     ORGANISATION_UNIT = "ORGANISATION_UNIT",
