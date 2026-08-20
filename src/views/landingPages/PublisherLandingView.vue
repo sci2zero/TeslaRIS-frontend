@@ -97,7 +97,7 @@
         />
         
         <!-- Revision History -->
-        <template v-if="isAdmin && publisher">
+        <template v-if="(isAdmin || isViceDeanForScience) && publisher">
             <h2 class="mt-8 mb-2">
                 {{ $t("revisionHistoryLabel") }}
             </h2>
@@ -154,7 +154,7 @@ export default defineComponent({
     name: "PublisherSeriesLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience } = useUserRole();
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -268,15 +268,14 @@ export default defineComponent({
         };
 
         return {
-            publisher, icon,
-            publications, 
-            totalPublications,
-            switchPage,
+            publisher, icon, publications, 
+            totalPublications, switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage,
             isAdmin, EntityType, fetchPublisher,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            isViceDeanForScience
         };
 }})
 

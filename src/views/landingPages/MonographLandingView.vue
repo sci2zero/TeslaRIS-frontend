@@ -333,7 +333,7 @@
                     @restored="() => fetchMonograph(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -441,7 +441,7 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const { isResearcher, isAdmin, isCommission, isViceDeanForScience } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -719,7 +719,7 @@ export default defineComponent({
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
             MonographType, localiseFlexibleDate,
-            fetchMonograph,
+            fetchMonograph, isViceDeanForScience,
             dataQualityTabsRef, showAssessmentDetails
         };
 }})

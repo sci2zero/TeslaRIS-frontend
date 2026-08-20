@@ -541,7 +541,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -670,7 +670,13 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission } = useUserRole();
+        const {
+            isAdmin, isResearcher,
+            isInstitutionalLibrarian,
+            isHeadOfLibrary, isCommission,
+            isViceDeanForScience
+        } = useUserRole();
+        
         const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
         const canEdit = ref(false);
         const canClassify = ref(false);
@@ -1071,7 +1077,7 @@ export default defineComponent({
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,
             fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience
         };
 }})
 

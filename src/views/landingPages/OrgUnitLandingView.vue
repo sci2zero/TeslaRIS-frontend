@@ -645,7 +645,7 @@
                     @restored="() => fetchOU(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -817,7 +817,7 @@ export default defineComponent({
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
             loggedInUser, userInstitutionid,
-            isLibrarianUser
+            isLibrarianUser, isViceDeanForScience
         } = useUserRole();
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
@@ -1299,7 +1299,7 @@ export default defineComponent({
             startMetadataEnrichment, updateDescription,
             getOUSectorFromValueAutoLocale, localiseDate,
             organisationUnitIdentifiers, fetchIdentifiers,
-            EntityType, fetchOU,
+            EntityType, fetchOU, isViceDeanForScience,
             dataQualityTabsRef, showAssessmentDetails
         };
 }})

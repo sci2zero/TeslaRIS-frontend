@@ -287,7 +287,7 @@
                     @restored="() => fetchProceedings(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -383,7 +383,8 @@ export default defineComponent({
 
         const {
             isResearcher, isAdmin,
-            isCommission, isInstitutionalEditor
+            isCommission, isInstitutionalEditor,
+            isViceDeanForScience
         } = useUserRole();
         const canEdit = ref(false);
 
@@ -626,8 +627,8 @@ export default defineComponent({
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType, currentRoute, updateRemark,
             isAdmin, isCommission, ExportableEndpointType, isInstitutionalEditor,
-            fetchProceedings,
-            dataQualityTabsRef, showAssessmentDetails
+            fetchProceedings, isViceDeanForScience, dataQualityTabsRef,
+            showAssessmentDetails
         };
 }})
 

@@ -234,7 +234,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -291,7 +291,7 @@ export default defineComponent({
     name: "CourseLandingPage",
     components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience } = useUserRole();
 
         const currentTab = ref("contributions");
 
@@ -462,7 +462,7 @@ export default defineComponent({
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, fetchIdentifiers,
-            eventIdentifiers,
+            eventIdentifiers, isViceDeanForScience,
             isAdmin, EntityType, fetchCourse,
             dataQualityTabsRef, showAssessmentDetails
         };

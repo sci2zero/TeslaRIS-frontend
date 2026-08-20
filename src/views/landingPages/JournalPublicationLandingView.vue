@@ -289,7 +289,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -389,7 +389,7 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const { isResearcher, isAdmin, isCommission, isViceDeanForScience } = useUserRole();
         const canEdit = ref(false);
         const canClassify = ref(false);
 
@@ -599,7 +599,7 @@ export default defineComponent({
             createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,
             fetchValidationStatus, PublicationType, updateRemark, displayConfiguration,
             documentIdentifiers, fetchIdentifiers, localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience
         };
 }})
 

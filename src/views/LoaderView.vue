@@ -119,8 +119,8 @@
                         :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
                         :metadata-enrichment="(enrichmentMetadata as JournalPublication[])"
                         :display-enrichment-set-index="displayEnrichmentSetIndex"
-                        @update="updateRecord">
-                    </import-journal-publication-details>
+                        @update="updateRecord"
+                    />
                     
                     <import-proceedings-publication-details
                         v-if="loadingProceedingsPublication"
@@ -128,8 +128,8 @@
                         :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
                         :metadata-enrichment="(enrichmentMetadata as ProceedingsPublication[])"
                         :display-enrichment-set-index="displayEnrichmentSetIndex"
-                        @update="updateRecord">
-                    </import-proceedings-publication-details>
+                        @update="updateRecord"
+                    />
 
                     <div
                         v-if="!fetchingForSingleRecord && !currentLoadRecord?.isEnrichment"

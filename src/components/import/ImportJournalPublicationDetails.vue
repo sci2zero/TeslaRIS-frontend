@@ -350,7 +350,7 @@ export default defineComponent({
         const selectedpublicationType = ref<{ title: string, value: JournalPublicationType }>({title: props.presetMetadata?.journalPublicationType ? getTitleFromValueAutoLocale(props.presetMetadata?.journalPublicationType as JournalPublicationType) as string : "", value: props.presetMetadata?.journalPublicationType as JournalPublicationType});
 
         const updateJournalPublication = () => {
-            const updatedJournalPublication: JournalPublication = {
+            const updatedJournalPublication: JournalPublicationLoad = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
                 endPage: endPage.value as string,
@@ -363,16 +363,19 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: [],
-                documentDate: { year: Number.parseInt(publicationYear.value) },
+                documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 webOfScienceId: webOfScienceId.value,
                 openAlexId: openAlexId.value,
-                journalId: -1,
                 eventId: -1,
                 journalPublicationType: selectedpublicationType.value.value as JournalPublicationType,
-                fileItems: [],
-                proofs: [],
+                internalIdentifiers: [],
+                journalEIssn: "",
+                journalPrintIssn: "", 
+                journalOpenAlexId: "", 
+                journalName: [], 
+                isEnrichment: false
             };
 
             emit("update", updatedJournalPublication);

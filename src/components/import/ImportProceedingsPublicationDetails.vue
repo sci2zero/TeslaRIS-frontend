@@ -329,7 +329,7 @@ export default defineComponent({
             );
 
         const updateProceedingsPublication = () => {
-            const updatedProceeedingsPublication: ProceedingsPublication = {
+            const updatedProceeedingsPublication: ProceedingsPublicationLoad = {
                 title: title.value as MultilingualContent[],
                 startPage: startPage.value as string,
                 endPage: endPage.value as string,
@@ -340,14 +340,23 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: [],
-                documentDate: { year: Number.parseInt(publicationYear.value) },
+                documentDate: publicationYear.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 eventId: -1,
-                proceedingsId: -1,
                 proceedingsPublicationType: selectedpublicationType.value.value as ProceedingsPublicationType,
-                fileItems: [],
-                proofs: [],
+                eIssn: "", 
+                printIssn: "", 
+                isbn: "", 
+                proceedingsName: [], 
+                conferenceName: [], 
+                eventDateFrom: "", 
+                eventDateTo: "", 
+                confId: "",
+                openAlexId: openAlexId.value, 
+                webOfScienceId: webOfScienceId.value, 
+                internalIdentifiers: [], 
+                isEnrichment: false
             };
 
             emit("update", updatedProceeedingsPublication);

@@ -302,7 +302,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -428,7 +428,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalEditor, isViceDeanForScience } = useUserRole();
 
         const researcherName = ref("");
 
@@ -804,8 +804,7 @@ export default defineComponent({
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
             PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
-            EntityType,
-            dataQualityTabsRef, showAssessmentDetails
+            EntityType, isViceDeanForScience, dataQualityTabsRef, showAssessmentDetails
         };
 }});
 </script>
