@@ -97,7 +97,7 @@
         />
         
         <!-- Revision History -->
-        <template v-if="(isAdmin || isViceDeanForScience) && publisher">
+        <template v-if="canReviewDataQuality && canAssessDataQuality && publisher">
             <h2 class="mt-8 mb-2">
                 {{ $t("revisionHistoryLabel") }}
             </h2>
@@ -132,6 +132,7 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
@@ -154,7 +155,7 @@ export default defineComponent({
     name: "PublisherSeriesLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
-        const { isAdmin, isViceDeanForScience } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -184,11 +185,19 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PUBLISHER,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PublisherService.canEdit(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -268,6 +277,7 @@ export default defineComponent({
         };
 
         return {
+            canReviewDataQuality, canAssessDataQuality,
             publisher, icon, publications, 
             totalPublications, switchPage,
             returnCurrentLocaleContent,

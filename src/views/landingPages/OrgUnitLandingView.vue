@@ -435,10 +435,10 @@
             <v-tab v-show="displaySettings.shouldDisplayLeaderboards()" value="leaderboards">
                 {{ $t("leaderboardsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
@@ -637,7 +637,7 @@
                     :is-digital-library-client="organisationUnit?.clientInstitutionDl"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.ORGANISATION_UNIT"
@@ -645,7 +645,7 @@
                     @restored="() => fetchOU(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -679,6 +679,7 @@ import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
@@ -800,6 +801,7 @@ export default defineComponent({
         const subUnitsDirection = ref("");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canEditDefaultSubmissionContent = ref(false);
 
         const i18n = useI18n();
@@ -817,8 +819,7 @@ export default defineComponent({
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
             loggedInUser, userInstitutionid,
-            isLibrarianUser, isViceDeanForScience
-        } = useUserRole();
+            isLibrarianUser, isViceDeanForScience, canReviewDataQuality } = useUserRole();
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
@@ -837,6 +838,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.ORGANISATION_UNIT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -1265,6 +1273,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             organisationUnit, currentTab, isHeadOfLibrary,
             publications, totalPublications, userInstitutionid,
             employees, totalEmployees, publicationsRef,

@@ -192,10 +192,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
@@ -279,7 +279,7 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.PROCEEDINGS"
@@ -287,7 +287,7 @@
                     @restored="() => fetchProceedings(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -316,6 +316,7 @@ import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
@@ -384,9 +385,9 @@ export default defineComponent({
         const {
             isResearcher, isAdmin,
             isCommission, isInstitutionalEditor,
-            isViceDeanForScience
-        } = useUserRole();
+            isViceDeanForScience, canReviewDataQuality } = useUserRole();
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const proceedings = ref<Proceedings>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
@@ -418,6 +419,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PROCEEDINGS,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -616,6 +624,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             proceedings, icon, fetchIndicators, PublicationType,
             publications, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,

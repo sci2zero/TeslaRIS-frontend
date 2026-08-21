@@ -120,10 +120,10 @@
             <v-tab v-if="bookSeriesIndicators && bookSeriesIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
@@ -160,7 +160,7 @@
                     show-statistics
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.BOOK_SERIES"
@@ -168,7 +168,7 @@
                     @restored="() => fetchBookSeries(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -193,6 +193,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -224,7 +225,7 @@ export default defineComponent({
     name: "BookSeriesLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
-        const { isAdmin, isViceDeanForScience } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("contributions");
 
@@ -258,6 +259,7 @@ export default defineComponent({
         const icon = ref("mdi-bookshelf");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
         const router = useRouter();
@@ -267,6 +269,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.BOOK_SERIES,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
@@ -383,6 +392,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             bookSeries, icon, publications, 
             fetchIdentifiers, totalPublications,
             publicationSeriesIdentifiers,

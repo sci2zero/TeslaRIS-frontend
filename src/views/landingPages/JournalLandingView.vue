@@ -127,10 +127,10 @@
             <v-tab v-if="canClassify || (journalClassifications && journalClassifications.length > 0)" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
@@ -181,7 +181,7 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.JOURNAL"
@@ -189,7 +189,7 @@
                     @restored="() => fetchJournal(false)"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -214,6 +214,7 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import DataQualityService from '@/services/revision/DataQualityService';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
@@ -250,7 +251,7 @@ export default defineComponent({
     name: "JournalLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
-        const { isAdmin, isViceDeanForScience } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("contributions");
 
@@ -285,6 +286,7 @@ export default defineComponent({
         const icon = ref("mdi-book-open-blank-variant");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const journalIndicators = ref<EntityIndicatorResponse[]>();
@@ -295,6 +297,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.JOURNAL,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
@@ -430,6 +439,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             journal, icon, publications, totalPublications,
             switchPage, canEdit, returnCurrentLocaleContent,
             languageMap, updateBasicInfo, canClassify,

@@ -18,6 +18,9 @@ export function useUserRole() {
     const isHeadOfLibrary = computed(() => Boolean(userRole.value && userRole.value === "HEAD_OF_LIBRARY"));
     const isPromotionRegistryAdministrator = computed(() => Boolean(userRole.value && userRole.value === "PROMOTION_REGISTRY_ADMINISTRATOR"));
 
+    const canReviewDataQuality = computed(() =>
+        isAdmin.value || isViceDeanForScience.value || isInstitutionalEditor.value);
+
     const canUserAddPersons = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
     const canAddSerialEvents = computed(() => isAdmin.value || isInstitutionalEditor.value);
 
@@ -70,6 +73,7 @@ export function useUserRole() {
         isInstitutionalLibrarian, isHeadOfLibrary,
         isPromotionRegistryAdministrator,
         canUserAddPersons, canAddSerialEvents,
+        canReviewDataQuality,
         isUserLoggedIn, loggedResearcherId,
         isLibrarianUser, userInstitutionid
     };

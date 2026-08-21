@@ -7,6 +7,10 @@ import type { Page } from "@/models/Common";
 
 export class DataQualityService extends BaseService {
 
+  async canAssessDataQuality(entityType: string, entityId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `data-quality/${entityType}/${entityId}/can-assess`);
+  }
+  
   async getQualityReportForEntity(entityType: string, entityId: number): Promise<AxiosResponse<QualityReportResponse[]>> {
     return super.sendRequest(axios.get, `data-quality/report/${entityType}/${entityId}`);
   }

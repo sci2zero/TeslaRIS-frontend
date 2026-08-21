@@ -85,7 +85,7 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.post, `import-common/schedule/metadata-enrichment?timestamp=${toUtcLocalDateTimeString(timestamp)}${institutionIdsParam}&autoload=${autoload}&recurrence=${recurrence}`, {}, TaskSchedulingService.idempotencyKey);
     }
 
-    async scheduleQualityAssessmentBackfill(timestamp: string, entityTypes: string[], personIds: number[], organisationUnitIds: number[], rewriteExistingAssessments: boolean, recurrence: string): Promise<AxiosResponse<void>> {
+    async scheduleQualityAssessmentBackfill(timestamp: string, entityTypes: string[], personIds: number[], organisationUnitIds: number[], profileName: string, rewriteExistingAssessments: boolean, recurrence: string): Promise<AxiosResponse<void>> {
         let entityTypesParam = "";
         entityTypes.forEach(entityType => {
             entityTypesParam += `&entityTypes=${entityType}`;
@@ -93,7 +93,7 @@ export class TaskSchedulingService extends BaseService {
 
         return super.sendRequest(
             axios.post,
-            `quality-assessment-backfill/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}${entityTypesParam}${this.createNumericalParameter("personIds", personIds)}${this.createNumericalParameter("organisationUnitIds", organisationUnitIds)}&rewriteExistingAssessments=${rewriteExistingAssessments}&recurrence=${recurrence}`,
+            `quality-assessment-backfill/schedule?timestamp=${toUtcLocalDateTimeString(timestamp)}${entityTypesParam}${this.createNumericalParameter("personIds", personIds)}${this.createNumericalParameter("organisationUnitIds", organisationUnitIds)}&profileName=${profileName}&rewriteExistingAssessments=${rewriteExistingAssessments}&recurrence=${recurrence}`,
             {},
             TaskSchedulingService.idempotencyKey
         );

@@ -106,10 +106,10 @@
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
@@ -293,7 +293,7 @@
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.PERSON"
@@ -302,7 +302,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin || isViceDeanForScience" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -326,6 +326,7 @@
 <script lang="ts">
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -428,7 +429,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const { isAdmin, isResearcher, isInstitutionalEditor, isViceDeanForScience } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalEditor, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const researcherName = ref("");
 
@@ -443,6 +444,7 @@ export default defineComponent({
         const memberships = ref<Membership[]>([]);
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const personIndicators = ref<EntityIndicatorResponse[]>();
 
@@ -468,6 +470,13 @@ export default defineComponent({
             }
 
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PERSON,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -790,6 +799,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
