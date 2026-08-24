@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
+import { type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
 import type { Page } from "@/models/Common";
 
 
@@ -47,6 +47,10 @@ export class DataQualityService extends BaseService {
 
   async getIssueDetails(assessmentId: number, ruleKey: string): Promise<AxiosResponse<DataQualityIssueDetails>> {
     return super.sendRequest(axios.get, `data-quality/issue/${assessmentId}/${ruleKey}`);
+  }
+
+  async listProfileNames(): Promise<AxiosResponse<DataQualityProfileSummary[]>> {
+    return super.sendRequest(axios.get, "data-quality/profiles/names");
   }
 
   async listProfiles(): Promise<AxiosResponse<DataQualityProfile[]>> {

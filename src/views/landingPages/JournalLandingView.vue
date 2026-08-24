@@ -187,6 +187,7 @@
                     :entity-type="EntityType.JOURNAL"
                     :entity-id="journal?.id"
                     @restored="() => fetchJournal(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">

@@ -484,7 +484,7 @@ import {
     RelatedEntityType,
     type DataQualityAssessment,
     type DataQualityIssue,
-    type DataQualityProfile,
+    type DataQualityProfileSummary,
     type DataQualityRuleResult,
     type ProfileRelatedQuality,
     type RelatedQuality,
@@ -555,7 +555,7 @@ export default defineComponent({
         const issuesLoading = ref(false);
         const issuePage = ref(1);
         const totalIssues = ref(0);
-        const profiles = ref<DataQualityProfile[]>([]);
+        const profiles = ref<DataQualityProfileSummary[]>([]);
         const issueFilters = ref<IssueFilters>({ ...EMPTY_ISSUE_FILTERS });
         const assessments = ref<DataQualityAssessment[]>([]);
         const selectedProfileName = ref<string | undefined>(undefined);
@@ -761,7 +761,7 @@ export default defineComponent({
                 return;
             }
 
-            DataQualityService.listProfiles().then(response => {
+            DataQualityService.listProfileNames().then(response => {
                 profiles.value = response.data;
             }).catch(() => {
                 profiles.value = [];

@@ -285,6 +285,7 @@
                     :entity-type="PublicationType.PROCEEDINGS"
                     :entity-id="proceedings?.id"
                     @restored="() => fetchProceedings(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">

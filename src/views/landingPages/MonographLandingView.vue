@@ -331,6 +331,7 @@
                     :entity-type="PublicationType.MONOGRAPH"
                     :entity-id="monograph?.id"
                     @restored="() => fetchMonograph(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">

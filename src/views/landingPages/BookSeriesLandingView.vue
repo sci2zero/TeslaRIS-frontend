@@ -166,6 +166,7 @@
                     :entity-type="EntityType.BOOK_SERIES"
                     :entity-id="bookSeries?.id"
                     @restored="() => fetchBookSeries(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">

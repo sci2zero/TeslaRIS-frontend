@@ -485,7 +485,7 @@ export default defineComponent({
         });
 
         const fetchQualityProfiles = () => {
-            DataQualityService.listProfiles().then(response => {
+            DataQualityService.listProfileNames().then(response => {
                 qualityProfiles.value = [
                     ...new Set(response.data.map(profile => profile.profileName))
                 ];

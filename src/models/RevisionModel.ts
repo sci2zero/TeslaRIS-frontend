@@ -151,6 +151,11 @@ export interface DataQualityRemark {
     usedForFairCompliance: boolean;
 }
 
+export interface DataQualityProfileSummary {
+    profileName: string;
+    version: string;
+}
+
 export interface DataQualityProfile {
     profileName: string;
     version: string;
@@ -194,4 +199,23 @@ export enum QualityAssessmentTarget {
     JOURNAL = "JOURNAL",
     BOOK_SERIES = "BOOK_SERIES",
     PUBLISHER = "PUBLISHER"
+}
+
+export enum RepositoryEntityType {
+    PERSONS = "PERSONS",
+    ORGANISATION_UNITS = "ORGANISATION_UNITS",
+    OUTPUTS = "OUTPUTS",
+    ACTIVITIES = "ACTIVITIES",
+    PROJECTS = "PROJECTS",
+    FUNDINGS = "FUNDINGS"
+}
+
+export interface EntityTypeQuality {
+    entityType: RepositoryEntityType;
+    records: number;
+    affectedRecords: number;
+    openIssues: number;
+    averageScore: number | null;
+    publicationCandidatePercentage: number | null;
+    supported: boolean;
 }

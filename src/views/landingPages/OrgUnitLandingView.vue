@@ -643,6 +643,7 @@
                     :entity-type="EntityType.ORGANISATION_UNIT"
                     :entity-id="organisationUnit?.id"
                     @restored="() => fetchOU(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">

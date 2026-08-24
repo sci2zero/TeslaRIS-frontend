@@ -126,6 +126,7 @@ import IdentifiersListView from "@/views/IdentifiersListView.vue";
 import PerformanceRelatedOutputLandingView from "@/views/landingPages/PerformanceRelatedOutputLandingView.vue";
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
+import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
 
 
 const roles = {
@@ -1412,6 +1413,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "repository-analytics",
+                    name: "repositoryAnalytics",
+                    component: RepositoryAnalyticsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
                     },
                 }
             ]
