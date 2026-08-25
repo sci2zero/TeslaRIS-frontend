@@ -21,6 +21,8 @@ export class ReportingService extends BaseService {
             return;
         }
 
+        downloadStore.downloadProgressRef?.startDownload(reportFileName);
+
         const response = await super.sendRequest(axios.get, `assessment/report/download/${reportFileName}/${commissionId}`, {
             responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
@@ -32,7 +34,14 @@ export class ReportingService extends BaseService {
                     downloadStore.downloadProgressRef?.updateProgress(percent);
                 }
             }
+        }).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
         });
+
+        // A response without a content length never reports progress, so the bar is closed
+        // explicitly rather than left spinning.
+        downloadStore.downloadProgressRef?.updateProgress(100);
         
         this.initialzeDownload(response, reportFileName, reportFileName.split(".")[1]);
     }

@@ -151,6 +151,11 @@ export interface DataQualityRemark {
     usedForFairCompliance: boolean;
 }
 
+export interface ConstraintSummary {
+    key: string;
+    title: MultilingualContent[];
+}
+
 export interface DataQualityProfileSummary {
     profileName: string;
     version: string;
@@ -218,4 +223,11 @@ export interface EntityTypeQuality {
     averageScore: number | null;
     publicationCandidatePercentage: number | null;
     supported: boolean;
+}
+
+export interface DimensionQuality {
+    dimension: QualityDimension;
+    averageScore: number | null;
+    openIssues: number;
+    affectedRecords: number;
 }

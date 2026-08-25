@@ -51,6 +51,9 @@ export class ThesisLibraryReportingService extends BaseService {
             return;
         }
 
+        const fileName = "report.docx";
+        downloadStore.downloadProgressRef?.startDownload(fileName);
+
         const response = await axios.post(this.basePath + `thesis-library/report/download/${lang}`, body, {
             responseType: "blob",
             onDownloadProgress: (progressEvent: any) => {
@@ -62,9 +65,16 @@ export class ThesisLibraryReportingService extends BaseService {
                     downloadStore.downloadProgressRef?.updateProgress(percent);
                 }
             }
+        }).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
         });
-        
-        this.initialzeDownload(response, "report.docx", "");
+
+        // A response without a content length never reports progress, so the bar is closed
+        // explicitly rather than left spinning.
+        downloadStore.downloadProgressRef?.updateProgress(100);
+
+        this.initialzeDownload(response, fileName, "");
     }
 
     async fetchPublicReviewDissertations(institutionId: number | null, year: number | null, notDefendedOnly: boolean, pageable: string, forMyInstitution: boolean, publicReviewType: string | null): Promise<AxiosResponse<Page<ThesisPublicReviewResponse>>> {

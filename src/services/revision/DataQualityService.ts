@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
+import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
 import type { Page } from "@/models/Common";
 
 
@@ -51,6 +51,10 @@ export class DataQualityService extends BaseService {
 
   async listProfileNames(): Promise<AxiosResponse<DataQualityProfileSummary[]>> {
     return super.sendRequest(axios.get, "data-quality/profiles/names");
+  }
+
+  async listProfileConstraints(profileName: string, target: string | undefined): Promise<AxiosResponse<ConstraintSummary[]>> {
+    return super.sendRequest(axios.get, `data-quality/profiles/${profileName}/constraints${target ? `?target=${target}` : ""}`);
   }
 
   async listProfiles(): Promise<AxiosResponse<DataQualityProfile[]>> {

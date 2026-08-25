@@ -138,8 +138,13 @@ export default defineComponent({
             emit("openIssues", row.entityType);
         };
 
-        // TODO: report generation is not implemented yet.
         const downloadReport = () => {
+            if (!props.profileName) {
+                return;
+            }
+
+            RepositoryAnalyticsService.downloadQualityByEntityType(
+                props.profileName, props.assessmentDate, i18n.locale.value);
         };
 
         watch(() => [props.profileName, props.assessmentDate], fetchRows, { immediate: true });

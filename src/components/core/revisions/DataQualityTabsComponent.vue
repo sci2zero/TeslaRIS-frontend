@@ -375,11 +375,13 @@
                             />
                         </v-col>
                         <v-col cols="12" md="3">
-                            <v-select
+                            <v-autocomplete
                                 v-model="issueFilters.constraintKey"
                                 :items="constraintOptions"
                                 :label="$t('constraintLabel')"
+                                :no-data-text="$t('noMatchingConstraintsMessage')"
                                 density="compact"
+                                auto-select-first
                                 clearable
                                 hide-details
                             />
@@ -482,6 +484,7 @@ import {
     IssueSeverity,
     QualityDimension,
     RelatedEntityType,
+    type ConstraintSummary,
     type DataQualityAssessment,
     type DataQualityIssue,
     type DataQualityProfileSummary,
@@ -635,16 +638,33 @@ export default defineComponent({
 
         const severityOptions = computed(() => Object.values(IssueSeverity));
 
+        // The constraints of a profile are configuration, not assessment data, so they are fetched
+        // on their own rather than carried along with every rule of the profile.
+        const constraints = ref<ConstraintSummary[]>([]);
+
         const constraintOptions = computed(() =>
-            Object.entries(issueProfile.value?.dataQualityRemarks ?? {})
-                .filter(([, remark]) => !issueFilters.value.target ||
-                    remark.target?.startsWith(issueFilters.value.target))
-                .map(([key, remark]) => ({
+            constraints.value
+                .map(constraint => ({
                     title: displayTextOrPlaceholder(
-                        returnCurrentLocaleContent(remark.title) as string),
-                    value: key
+                        returnCurrentLocaleContent(constraint.title) as string),
+                    value: constraint.key
                 }))
                 .sort((first, second) => first.title.localeCompare(second.title)));
+
+        const fetchConstraints = () => {
+            if (!selectedIssueProfileName.value) {
+                constraints.value = [];
+                return;
+            }
+
+            DataQualityService.listProfileConstraints(
+                selectedIssueProfileName.value, issueFilters.value.target
+            ).then(response => {
+                constraints.value = response.data;
+            }).catch(() => {
+                constraints.value = [];
+            });
+        };
 
         const relatedQualityRows = computed(() =>
             selectedRelatedProfile.value?.relatedQuality ?? []);
@@ -860,9 +880,14 @@ export default defineComponent({
             fetchProfiles();
         });
 
-        watch(selectedIssueProfileName, resetPageAndFetchIssues);
+        watch(selectedIssueProfileName, () => {
+            fetchConstraints();
+            resetPageAndFetchIssues();
+        });
 
         watch(issuePage, fetchIssues);
+
+        watch(() => issueFilters.value.target, fetchConstraints);
 
         watch(issueFilters, () => {
             const constraintKey = issueFilters.value.constraintKey;

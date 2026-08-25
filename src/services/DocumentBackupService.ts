@@ -21,6 +21,8 @@ export class DocumentBackupService extends BaseService {
             return;
         }
 
+        downloadStore.downloadProgressRef?.startDownload(backupFileName);
+
         const accessTokenResponse = 
             await super.sendRequest(axios.get, `document/backup/access-token`);
         if (!accessTokenResponse.data) {

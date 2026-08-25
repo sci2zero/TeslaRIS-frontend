@@ -1,6 +1,6 @@
 <template>
     <div class="not-implemented">
-        <h1>{{ $t("notImplementedYetLabel") }}</h1>
+        <h1>Not implemented.</h1>
     </div>
 </template>
 
