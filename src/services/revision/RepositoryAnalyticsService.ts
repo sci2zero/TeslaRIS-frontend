@@ -1,11 +1,15 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type DimensionQuality, type EntityTypeQuality } from "@/models/RevisionModel";
+import { type DimensionQuality, type EntityTypeQuality, type RepositoryOverview } from "@/models/RevisionModel";
 import { useDownloadStore } from "@/stores/downloadStore";
 
 
 export class RepositoryAnalyticsService extends BaseService {
+
+  async getOverview(profileName: string, assessmentDate: string | undefined): Promise<AxiosResponse<RepositoryOverview>> {
+    return super.sendRequest(axios.get, `repository-analytics/overview?${this.analyticsParams(profileName, assessmentDate)}`);
+  }
 
   async getQualityByEntityType(profileName: string, assessmentDate: string | undefined): Promise<AxiosResponse<EntityTypeQuality[]>> {
     return super.sendRequest(axios.get, `repository-analytics/entity-types?${this.analyticsParams(profileName, assessmentDate)}`);
@@ -13,6 +17,10 @@ export class RepositoryAnalyticsService extends BaseService {
 
   async getQualityByDimension(profileName: string, assessmentDate: string | undefined): Promise<AxiosResponse<DimensionQuality[]>> {
     return super.sendRequest(axios.get, `repository-analytics/dimensions?${this.analyticsParams(profileName, assessmentDate)}`);
+  }
+
+  async downloadOverview(profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {
+    return this.downloadReport("overview", "repository-quality-overview", profileName, assessmentDate, language);
   }
 
   async downloadQualityByEntityType(profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {

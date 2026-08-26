@@ -231,3 +231,19 @@ export interface DimensionQuality {
     openIssues: number;
     affectedRecords: number;
 }
+
+export interface PrevalentIssue {
+    entityType: RepositoryEntityType;
+    ruleKey: string | null;
+    title: MultilingualContent[];
+    occurrences: number;
+}
+
+export interface RepositoryOverview {
+    averageScore: number | null;
+    publicationCandidatePercentage: number | null;
+    openIssues: number;
+    recordsAssessed: number;
+    qualityByEntityType: EntityTypeQuality[];
+    issuesRequiringAttention: PrevalentIssue[];
+}

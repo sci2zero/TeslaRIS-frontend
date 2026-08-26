@@ -122,7 +122,7 @@ export default defineComponent({
         RepositoryIssueStatisticsTab
     },
     setup() {
-        const currentTab = ref("entityTypes");
+        const currentTab = ref("overview");
         const profileNames = ref<string[]>([]);
         const selectedProfileName = ref<string | undefined>(undefined);
 
