@@ -247,3 +247,13 @@ export interface RepositoryOverview {
     qualityByEntityType: EntityTypeQuality[];
     issuesRequiringAttention: PrevalentIssue[];
 }
+
+export interface PublicationCandidateAnalysis {
+    publicationCandidates: number;
+    notPublicationCandidates: number;
+    candidateRate: number | null;
+    blockingConstraints: number;
+    blockingIssues: number;
+    candidateRateByEntityType: EntityTypeQuality[];
+    mostCommonBlockingConstraints: PrevalentIssue[];
+}
