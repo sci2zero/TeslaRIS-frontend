@@ -78,7 +78,7 @@
                                             :key="index"
                                             class="issue-details-occurrence">
                                             <div class="issue-details-value">
-                                                {{ occurrence.actualValue.length > 0
+                                                {{ (occurrence.actualValue.length > 0 && details.targetEntityType !== "Activity")
                                                     ? occurrence.actualValue.join(", ")
                                                     : "-" }}
                                             </div>

@@ -168,7 +168,10 @@
                                         </v-chip>
                                     </td>
                                     <td>
-                                        {{ displayTextOrPlaceholder(returnCurrentLocaleContent(rule.message) as string) }}
+                                        <div class="issue-message">
+                                            {{ displayTextOrPlaceholder(
+                                                returnCurrentLocaleContent(rule.message) as string) }}
+                                        </div>
                                         <div
                                             v-if="rule.actualValue && rule.actualValue.length < 100"
                                             class="text-medium-emphasis text-caption">
@@ -976,5 +979,11 @@ export default defineComponent({
     font-weight: 700;
     color: rgb(var(--v-theme-primary));
     margin-bottom: 12px;
+}
+
+/* A rule that fails more than once per record has its messages merged with blank lines between
+   them, and HTML would otherwise collapse those into single spaces. */
+.issue-message {
+    white-space: pre-line;
 }
 </style>
