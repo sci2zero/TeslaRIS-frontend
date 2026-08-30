@@ -22,6 +22,10 @@ export class ProjectService extends BaseService {
         return super.sendRequest(axios.get, url);
     }
 
+    async getProjectCount(): Promise<AxiosResponse<number>> {
+        return super.sendRequest(axios.get, "project/count");
+    }
+
     async readProject(projectId: number): Promise<AxiosResponse<Project>> {
         if (isNaN(projectId) || projectId <= 0) {
             throw new Error(`Invalid project ID: ${projectId}. Must be a positive integer.`);

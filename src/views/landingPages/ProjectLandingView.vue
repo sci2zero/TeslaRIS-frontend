@@ -180,10 +180,10 @@
             <v-tab value="consortium">
                 {{ $t("consortiumLabel") }}
             </v-tab>
-            <v-tab value="fundings">
+            <v-tab v-if="isAdmin" value="fundings">
                 {{ $t("fundingsLabel") }}
             </v-tab>
-            <v-tab value="fundingApplications">
+            <v-tab v-if="isAdmin" value="fundingApplications">
                 {{ $t("fundingApplicationsLabel") }}
             </v-tab>
             <v-tab value="documents">
@@ -226,7 +226,7 @@
                 </v-row>
             </v-tabs-window-item>
 
-            <v-tabs-window-item value="fundings">
+            <v-tabs-window-item v-if="isAdmin" value="fundings">
                 <v-row class="mt-10">
                     <v-col cols="12">
                         <project-fundings-tab
@@ -238,7 +238,7 @@
                 </v-row>
             </v-tabs-window-item>
 
-            <v-tabs-window-item value="fundingApplications">
+            <v-tabs-window-item v-if="isAdmin" value="fundingApplications">
                 <v-row class="mt-10">
                     <v-col cols="12">
                         <project-funding-applications-tab
@@ -327,6 +327,7 @@ import ProjectEventsTab from "@/components/project/ProjectEventsTab.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
+import { useUserRole } from "@/composables/useUserRole";
 
 const route = useRoute();
 const router = useRouter();
@@ -339,6 +340,7 @@ const icon = ref("mdi-folder-star");
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
+const { isAdmin } = useUserRole();
 
 const snackbar = ref(false);
 const snackbarMessage = ref("");

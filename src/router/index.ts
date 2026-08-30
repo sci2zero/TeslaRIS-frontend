@@ -361,8 +361,8 @@ const router = createRouter({
                             name: "projects",
                             component: ProjectListView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
@@ -370,8 +370,8 @@ const router = createRouter({
                             name: "projectLandingPage",
                             component: ProjectLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                         {
