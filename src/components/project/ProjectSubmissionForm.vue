@@ -11,6 +11,17 @@
                     </v-col>
                 </v-row>
 
+                <!-- RAiD -->
+                <v-row>
+                    <v-col cols="11">
+                        <v-text-field
+                            v-model="raid"
+                            :label="$t('raidLabel')"
+                            :placeholder="$t('raidLabel')"
+                        />
+                    </v-col>
+                </v-row>
+
                 <!-- Name* -->
                 <v-row>
                     <v-col>
@@ -34,16 +45,7 @@
                     </v-col>
                 </v-row>
 
-                <!-- RAiD -->
-                <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="raid"
-                            :label="$t('raidLabel')"
-                            :placeholder="$t('raidLabel')"
-                        />
-                    </v-col>
-                </v-row>
+
 
                 <!-- Status* / CollaborationType* / ResearchType* -->
                 <v-row>
