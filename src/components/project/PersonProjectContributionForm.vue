@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, nextTick, onMounted } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import MultilingualTextInput from "../core/MultilingualTextInput.vue";
 import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
@@ -79,7 +79,8 @@ import {
 import {
     PersonProjectContributionType,
     PersonProjectInvestigationRole,
-    type PersonProjectContribution
+    type PersonProjectContribution,
+    type PrepopulatedPerson
 } from "@/models/ProjectModel";
 
 const props = withDefaults(defineProps<{
@@ -213,6 +214,70 @@ const isEmptyRow = (input: any) => {
     return !hasPerson && !hasTypedName;
 };
 
+// Seeds rows from DOI-harvested metadata. Persons the backend matched against an existing
+// person come back with an id and are linked, the rest become external associates.
+const seedFromMetadata = async (items: PrepopulatedPerson[]) => {
+    if (!items?.length || inputs.value.some(input => input.contribution && !isEmptyRow(input))) {
+        return;
+    }
+
+    const seeded: any[] = [];
+
+    for (const item of items) {
+        if (!item.givenName?.trim() && !item.familyName?.trim()) {
+            continue;
+        }
+
+        const row = blankInput();
+
+        // Harvested lead investigators come back as PRINCIPLE_INVESTIGATOR, the rest as TEAM_MEMBER.
+        // A locked form keeps its own type, and the investigation role stays on the default since
+        // neither source says anything about it.
+        if (item.contributionType && !props.lockContributionType) {
+            row.contributionType = {
+                title: getPersonProjectContributionTypeTitleFromValueAutoLocale(item.contributionType),
+                value: item.contributionType
+            };
+        }
+
+        seeded.push({
+            ...row,
+            contribution: {
+                // Left undefined when unmatched: PersonContributionBase branches on truthiness, so a
+                // falsy id is what drops the row into external-associate mode.
+                personId: item.personId,
+                description: [],
+                // Only for an unmatched person: on a linked one, a non-empty statement would push
+                // the base into free-text mode and wipe the institution it resolves from employments.
+                affiliationStatement: item.personId ? [] : item.affiliationName,
+                selectedOtherName: [item.givenName, "", item.familyName],
+                institutionIds: [],
+                dateFrom: "",
+                dateTo: "",
+                researchAreas: []
+            }
+        });
+    }
+
+    if (seeded.length === 0) {
+        return;
+    }
+
+    inputs.value = [];
+    baseContributionRef.value = [];
+    otherRoleDescriptionRef.value = [];
+    await nextTick();
+
+    inputs.value = seeded.map(row => ({ ...row, contribution: undefined }));
+    await nextTick();
+
+    seeded.forEach((row, index) => {
+        inputs.value[index].contribution = row.contribution;
+    });
+
+    sendContentToParent();
+};
+
 const sendContentToParent = () => {
     const returnObject: PersonProjectContribution[] = [];
 
@@ -234,7 +299,7 @@ const sendContentToParent = () => {
 
         returnObject.push({
             contributionDescription: input.contribution.description,
-            personId: input.contribution.personId !== -1 ? input.contribution.personId : undefined,
+            personId: input.contribution.personId > 0 ? input.contribution.personId : undefined,
             displayAffiliationStatement: input.contribution.affiliationStatement,
             orderNumber: index + 1,
             personName: personName,
@@ -254,5 +319,5 @@ const sendContentToParent = () => {
     emit("setInput", returnObject);
 };
 
-defineExpose({ clearInput });
+defineExpose({ clearInput, seedFromMetadata });
 </script>

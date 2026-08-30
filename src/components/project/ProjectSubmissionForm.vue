@@ -337,6 +337,14 @@ const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
         costsRef.value?.setValue(metadata.costs);
         costs.value = metadata.costs;
     }
+
+    if (persons.value.length === 0) {
+        await personsRef.value?.seedFromMetadata(metadata.persons);
+    }
+
+    if (organisations.value.length === 0) {
+        await organisationsRef.value?.seedFromMetadata(metadata.organisations);
+    }
 };
 
 const submitProject = (stayOnPage: boolean) => {

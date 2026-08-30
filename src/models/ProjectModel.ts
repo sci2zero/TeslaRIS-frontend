@@ -51,6 +51,7 @@ export interface PrepopulatedPerson {
     orcid: string;
     affiliationName: MultilingualContent[];
     affiliationRor: string;
+    contributionType: PersonProjectContributionType;
 }
 
 export interface PrepopulatedOrganisation {
