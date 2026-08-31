@@ -20,8 +20,7 @@
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
-                    :required="false">
-                </person-autocomplete-search>
+                    :required="false" />
             </v-col>
         </v-row>
 
@@ -30,8 +29,7 @@
                 <monetary-amount-input
                     ref="requestedAmountRef"
                     :preset-amount="presetFundingApplication?.requestedAmount"
-                    @update:model-value="requestedAmount = $event">
-                </monetary-amount-input>
+                    @update:model-value="requestedAmount = $event" />
             </v-col>
         </v-row>
 
@@ -42,8 +40,7 @@
                     v-model="description"
                     :label="$t('descriptionLabel')"
                     is-area
-                    :initial-value="toMultilingualTextInput(presetFundingApplication?.description, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetFundingApplication?.description, languageTags)" />
             </v-col>
         </v-row>
 
@@ -54,8 +51,7 @@
                     v-model="responseSummary"
                     :label="$t('responseSummaryLabel')"
                     is-area
-                    :initial-value="toMultilingualTextInput(presetFundingApplication?.responseSummary, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetFundingApplication?.responseSummary, languageTags)" />
             </v-col>
         </v-row>
 
@@ -64,15 +60,13 @@
                 <date-picker
                     v-model="submissionDate"
                     :label="$t('submissionDateLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary" />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="decisionDate"
                     :label="$t('dateOfDecisionLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary" />
             </v-col>
         </v-row>
 
@@ -81,15 +75,13 @@
                 <date-picker
                     v-model="reviewDateFrom"
                     :label="$t('reviewStartedLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary" />
             </v-col>
             <v-col cols="6">
                 <date-picker
                     v-model="reviewDateTo"
                     :label="$t('reviewEndedLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary" />
             </v-col>
         </v-row>
 
@@ -98,8 +90,7 @@
                 <date-picker
                     v-model="revisedProposalOrNextRoundDeadlineDate"
                     :label="$t('deadlineForRequestedChangesLabel')"
-                    color="primary">
-                </date-picker>
+                    color="primary" />
             </v-col>
             <v-col cols="6">
                 <v-select
@@ -108,8 +99,7 @@
                     :items="resultOptions"
                     item-title="title"
                     item-value="value"
-                    clearable>
-                </v-select>
+                    clearable />
             </v-col>
         </v-row>
 

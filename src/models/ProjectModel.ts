@@ -44,6 +44,24 @@ export interface ProjectsRelation {
     targetProjectId?: number;
 }
 
+export interface PrepopulatedPerson {
+    personId?: number;
+    givenName: string;
+    familyName: string;
+    orcid: string;
+    affiliationName: MultilingualContent[];
+    affiliationRor: string;
+    contributionType: PersonProjectContributionType;
+}
+
+export interface PrepopulatedOrganisation {
+    organisationId?: number;
+    organisationName: MultilingualContent[];
+    country: string;
+    netContribution?: MonetaryAmount;
+    contributionType: OrganisationUnitProjectContributionType;
+}
+
 export interface PrepopulatedProjectMetadata {
     doi: string;
     name: MultilingualContent[];
@@ -55,6 +73,8 @@ export interface PrepopulatedProjectMetadata {
     dateTo: string;
     costs?: MonetaryAmount;
     status: ProjectStatus;
+    persons: PrepopulatedPerson[];
+    organisations: PrepopulatedOrganisation[];
 }
 
 export interface ProjectIndex {

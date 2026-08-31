@@ -11,6 +11,17 @@
                     </v-col>
                 </v-row>
 
+                <!-- RAiD -->
+                <v-row>
+                    <v-col cols="11">
+                        <v-text-field
+                            v-model="raid"
+                            :label="$t('raidLabel')"
+                            :placeholder="$t('raidLabel')"
+                        />
+                    </v-col>
+                </v-row>
+
                 <!-- Name* -->
                 <v-row>
                     <v-col>
@@ -34,16 +45,7 @@
                     </v-col>
                 </v-row>
 
-                <!-- RAiD -->
-                <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="raid"
-                            :label="$t('raidLabel')"
-                            :placeholder="$t('raidLabel')"
-                        />
-                    </v-col>
-                </v-row>
+
 
                 <!-- Status* / CollaborationType* / ResearchType* -->
                 <v-row>
@@ -336,6 +338,14 @@ const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
 
         costsRef.value?.setValue(metadata.costs);
         costs.value = metadata.costs;
+    }
+
+    if (persons.value.length === 0) {
+        await personsRef.value?.seedFromMetadata(metadata.persons);
+    }
+
+    if (organisations.value.length === 0) {
+        await organisationsRef.value?.seedFromMetadata(metadata.organisations);
     }
 };
 
