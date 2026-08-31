@@ -98,17 +98,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
 import UriInput from "@/components/core/UriInput.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
-import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
+import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import { getOrganisationUnitProjectContributionTypesForGivenLocale } from "@/i18n/organisationUnitProjectContributionType";
 import { useLanguageTags } from "@/composables/useLanguageTags";
 import {
     OrganisationUnitProjectContributionType,
-    type OrganisationUnitProjectContribution
+    type OrganisationUnitProjectContribution,
+    type PrepopulatedOrganisation
 } from "@/models/ProjectModel";
 import type { MultilingualContent } from "@/models/Common";
 
@@ -200,6 +201,59 @@ const clearInput = () => {
 const isEmptyRow = (input: ConsortiumInput) =>
     !input.organisationUnitId && input.displayOrganisationUnit.length === 0;
 
+const seedFromMetadata = async (items: PrepopulatedOrganisation[]) => {
+    if (!items?.length || inputs.value.some(input => !isEmptyRow(input))) {
+        return;
+    }
+
+    const seeded: ConsortiumInput[] = [];
+
+    for (const item of items) {
+        if (!item.organisationName?.length) {
+            continue;
+        }
+
+        const matched = !!item.organisationId;
+
+        seeded.push({
+            ...blankInput(),
+            organisationUnit: matched ?
+                {
+                    title: returnCurrentLocaleContent(item.organisationName) as string,
+                    value: item.organisationId as number
+                } :
+                { ...searchPlaceholder },
+            organisationUnitId: matched ? item.organisationId : undefined,
+            enterExternalOU: !matched,
+            displayOrganisationUnit: matched ? [] : item.organisationName,
+            contributionType: item.contributionType ?? OrganisationUnitProjectContributionType.PARTNER
+        });
+    }
+
+    if (seeded.length === 0) {
+        return;
+    }
+
+    inputs.value = [];
+    externalNameRefs.value = [];
+    descriptionRefs.value = [];
+    urisRefs.value = [];
+    await nextTick();
+
+    inputs.value = seeded;
+    await nextTick();
+
+    inputs.value.forEach((input, index) => {
+        if (input.enterExternalOU) {
+            externalNameRefs.value[index]?.forceRefreshModelValue(
+                toMultilingualTextInput(input.displayOrganisationUnit, languageTags.value)
+            );
+        }
+    });
+
+    sendContentToParent();
+};
+
 const sendContentToParent = () => {
     const consortium: OrganisationUnitProjectContribution[] = [];
 
@@ -225,6 +279,7 @@ const sendContentToParent = () => {
 };
 
 defineExpose({
-    clearInput
+    clearInput,
+    seedFromMetadata
 });
 </script>

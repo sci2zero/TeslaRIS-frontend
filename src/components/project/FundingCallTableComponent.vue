@@ -67,10 +67,10 @@
                                 :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
                                 :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                                 icon="mdi-filter"
-                            ></v-icon>
+                            />
                         </template>
                         <div class="p-3 bg-white rounded-lg shadow-lg">
-                            <slot name="type-filter-menu" :column="column"></slot>
+                            <slot name="type-filter-menu" :column="column" />
                         </div>
                     </v-menu>
                 </div>
