@@ -266,8 +266,8 @@ const router = createRouter({
                             name: "fundingLandingPage",
                             component: FundingLandingView,
                             meta: {
-                                authenticated: true,
-                                authorities: [roles.admin],
+                                authenticated: false,
+                                authorities: [],
                             },
                         },
                     ]
