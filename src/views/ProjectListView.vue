@@ -45,7 +45,7 @@
                             />
                         </div>
                     </v-menu>
-                    <v-btn color="primary" @click="addProject">
+                    <v-btn v-if="isAdmin" color="primary" @click="addProject">
                         {{ $t("createNewProjectLabel") }}
                     </v-btn>
                 </div>
@@ -89,10 +89,10 @@ import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import { useUserRole } from '@/composables/useUserRole';
 
-
+const { isAdmin } = useUserRole();
 const loading = ref(false);
-
 const searchParams = ref("tokens=");
 const projects = ref<ProjectIndex[]>([]);
 const totalProjects = ref(0);

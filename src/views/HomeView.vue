@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="max-w-5xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 py-8 pb-12 px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 py-8 pb-12 px-8">
                     <!-- Cards -->
                     <div v-for="(item, index) in cardsData" :key="index" class="">
                         <div
@@ -77,6 +77,7 @@ import PersonService from "@/services/PersonService";
 import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import ProjectService from "@/services/project/ProjectService";
 import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import Navbar from "@/components/core/MainNavbar.vue";
@@ -100,10 +101,12 @@ export default defineComponent({
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
         const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
+        const projectsLabel = computed(() => i18n.t("projectsLabel"));
 
         const researcherCount = ref(0);
         const ouCount = ref(0);
         const publicationCount = ref(0);
+        const projectCount = ref(0);
         const isLoadingCounts = ref(true);
 
         onMounted(() => {
@@ -115,7 +118,8 @@ export default defineComponent({
             Promise.all([
                 PersonService.getResearcherCount().then((response) => researcherCount.value = response.data),
                 OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data),
-                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data)
+                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data),
+                ProjectService.getProjectCount().then((response) => projectCount.value = response.data)
             ]).finally(() => {
                 isLoadingCounts.value = false;
             });
@@ -131,6 +135,7 @@ export default defineComponent({
             {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, path:'persons', icon: 'mdi-account-group'},
             {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain'},
             {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple'},
+            {name: projectsLabel, value: projectCount, path:'project', icon: 'mdi-folder-star'},
         ]);
 
         const search = (tokenParams: string) => {
