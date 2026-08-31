@@ -794,8 +794,11 @@ export default defineComponent({
         const versionLabelFor = (version: VersionItem | undefined) =>
             version ? `${version.majorVersion}.${version.minorVersion}` : "";
 
-        const scoreColorClass = (score: number | undefined) => {
-            if (score === undefined) {
+        // A missing score is not a bad one: unsupported rows, and activities on a record where
+        // none were assessed, come back as null. Comparing that against the thresholds coerces it
+        // to 0 and paints the "-" red.
+        const scoreColorClass = (score: number | null | undefined) => {
+            if (score === null || score === undefined) {
                 return "";
             }
 

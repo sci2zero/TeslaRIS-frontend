@@ -117,7 +117,7 @@ export interface RelatedQuality {
     linkedRecords: number;
     affectedRecords: number;
     openIssues: number;
-    averageScore?: number;
+    averageScore: number | null;
     supported: boolean;
 }
 
