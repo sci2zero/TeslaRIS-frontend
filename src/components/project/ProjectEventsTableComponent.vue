@@ -1,66 +1,73 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("eventListLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('eventListLabel')"
+        :selected-count="selectedEvents.length"
+        :can-act="canEdit"
+    >
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="displayPersistentDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-calendar-plus"
                 @click="addDialog = true">
                 {{ $t("addEventLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedEvents.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table
-        v-model="selectedEvents"
-        :items="events"
-        :headers="headers"
-        item-value="id"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedEvents"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link
-                        v-if="row.item.eventId && eventLandingPagePath(row.item)"
-                        :to="eventLandingPagePath(row.item) + row.item.eventId">
-                        {{ eventName(row.item) }}
-                    </localized-link>
-                    <span v-else>
-                        {{ eventName(row.item) }}
-                    </span>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(getProjectEventTypeTitleFromValueAutoLocale(row.item.relationType)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table
+            v-model="selectedEvents"
+            :items="events"
+            :headers="headers"
+            item-value="id"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedEvents"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link
+                            v-if="row.item.eventId && eventLandingPagePath(row.item)"
+                            :to="eventLandingPagePath(row.item) + row.item.eventId">
+                            {{ eventName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ eventName(row.item) }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(getProjectEventTypeTitleFromValueAutoLocale(row.item.relationType)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -146,6 +153,7 @@ import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
 import AllEventsAutocompleteSearch from "@/components/event/AllEventsAutocompleteSearch.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
 import {
     getProjectEventTypeTitleFromValueAutoLocale,
     getProjectEventTypesForGivenLocale
@@ -183,7 +191,10 @@ const textualDescription = ref<MultilingualContent[]>([]);
 const selectedRelationType = ref<{ title: string | undefined, value: ProjectEventType }>();
 
 const headers = computed(() => [
-    { title: i18n.t("eventLabel"), align: "start", sortable: true, key: "event" },
+    {
+        title: i18n.t("eventLabel"), align: "start", sortable: true, key: "event",
+        value: (projectEvent: ProjectEvent) => eventName(projectEvent)
+    },
     { title: i18n.t("relationTypeLabel"), align: "start", sortable: false, key: "relationType" }
 ]);
 

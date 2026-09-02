@@ -150,7 +150,7 @@
             <v-tabs-window-item value="fundingCalls">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <funding-program-calls-tab
+                        <funding-program-calls-table-component
                             v-if="fundingProgram?.id"
                             :funding-program-id="fundingProgram.id"
                             :preset-keywords="fundingProgram.keywords"
@@ -272,7 +272,7 @@ import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import FundingProgramUpdateForm from "@/components/project/FundingProgramUpdateForm.vue";
-import FundingProgramCallsTab from "@/components/project/FundingProgramCallsTab.vue";
+import FundingProgramCallsTableComponent from "@/components/project/FundingProgramCallsTableComponent.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 
 const route = useRoute();

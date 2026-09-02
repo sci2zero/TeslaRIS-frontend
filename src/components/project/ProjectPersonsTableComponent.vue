@@ -1,70 +1,77 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("teamLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('teamLabel')"
+        :selected-count="selectedMembers.length"
+        :can-act="canEdit"
+    >
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="displayPersistentDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-account-plus"
                 @click="addDialog = true">
                 {{ $t("addTeamMemberLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedMembers.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table
-        v-model="selectedMembers"
-        :items="sortedMembers"
-        :headers="headers"
-        item-value="id"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedMembers"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link v-if="row.item.personId" :to="'persons/' + row.item.personId">
-                        {{ memberName(row.item) }}
-                    </localized-link>
-                    <span v-else>
-                        {{ memberName(row.item) }}
-                    </span>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(row.item.investigationRole)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.otherRoleDescription)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table
+            v-model="selectedMembers"
+            :items="sortedMembers"
+            :headers="headers"
+            item-value="id"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedMembers"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link v-if="row.item.personId" :to="'persons/' + row.item.personId">
+                            {{ memberName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ memberName(row.item) }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(row.item.investigationRole)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.otherRoleDescription)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="800">
         <v-card>
@@ -137,6 +144,7 @@ import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
 import {
     getPersonProjectContributionTypeTitleFromValueAutoLocale,
     getPersonProjectContributionTypesForGivenLocale
@@ -178,7 +186,10 @@ const selectedContributionType = ref<{ title: string | undefined, value: PersonP
 const selectedInvestigationRole = ref<{ title: string | undefined, value: PersonProjectInvestigationRole }>();
 
 const headers = computed(() => [
-    { title: i18n.t("nameLabel"), align: "start", sortable: true, key: "name" },
+    {
+        title: i18n.t("fullNameLabel"), align: "start", sortable: true, key: "name",
+        value: (member: PersonProjectContribution) => memberName(member)
+    },
     { title: i18n.t("contributionTypeLabel"), align: "start", sortable: false, key: "contributionType" },
     { title: i18n.t("investigationRoleLabel"), align: "start", sortable: false, key: "investigationRole" },
     { title: i18n.t("otherRoleDescriptionLabel"), align: "start", sortable: false, key: "otherRoleDescription" }

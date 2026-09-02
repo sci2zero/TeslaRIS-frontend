@@ -1,72 +1,80 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("consortiumLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('consortiumLabel')"
+        :selected-count="selectedMembers.length"
+        :can-act="canEdit"
+    >
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="displayPersistentDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-domain-plus"
                 @click="addDialog = true">
                 {{ $t("addInstitutionLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedMembers.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table
-        v-model="selectedMembers"
-        :items="sortedMembers"
-        :headers="headers"
-        item-value="id"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedMembers"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link
-                        v-if="row.item.organisationUnitId"
-                        :to="'organisation-units/' + row.item.organisationUnitId">
-                        {{ institutionName(row.item) }}
-                    </localized-link>
-                    <span v-else>
-                        {{ institutionName(row.item) }}
-                    </span>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table
+            v-model="selectedMembers"
+            v-model:sort-by="sortBy"
+            :items="sortedMembers"
+            :headers="headers"
+            item-value="id"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedMembers"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link
+                            v-if="row.item.organisationUnitId"
+                            :to="'organisation-units/' + row.item.organisationUnitId">
+                            {{ institutionName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ institutionName(row.item) }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -187,6 +195,7 @@ import UriInput from "@/components/core/UriInput.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
 import {
     getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale,
     getOrganisationUnitProjectContributionTypesForGivenLocale
@@ -232,12 +241,36 @@ const dateFrom = ref("");
 const dateTo = ref("");
 const uris = ref<string[]>([]);
 
-const headers = computed(() => [
-    { title: i18n.t("institutionLabel"), align: "start", sortable: true, key: "name" },
-    { title: i18n.t("contributionTypeLabel"), align: "start", sortable: false, key: "contributionType" },
-    { title: i18n.t("dateFromLabel"), align: "start", sortable: true, key: "dateFrom" },
-    { title: i18n.t("dateToLabel"), align: "start", sortable: true, key: "dateTo" }
-]);
+const sortBy = ref<{ key: string, order?: boolean | "asc" | "desc" }[]>([]);
+
+// Rows with no date always belong at the bottom, whichever direction is active. A custom comparator
+// cannot do that: for descending order Vuetify swaps the comparator's arguments instead of negating
+// its result, so the comparator never learns the direction. What works is sorting on a stand-in
+// value -- a date later than any real one while ascending, earlier than any while descending -- so
+// the empty rows sink either way. The cell itself still renders the raw value.
+const emptyDateSortValue = (key: string) =>
+    sortBy.value.find(entry => entry.key === key)?.order === "desc" ? "0000-01-01" : "9999-12-31";
+
+const headers = computed(() => {
+    const emptyDateFrom = emptyDateSortValue("dateFrom");
+    const emptyDateTo = emptyDateSortValue("dateTo");
+
+    return [
+        {
+            title: i18n.t("institutionLabel"), align: "start", sortable: true, key: "name",
+            value: (member: OrganisationUnitProjectContribution) => institutionName(member)
+        },
+        { title: i18n.t("contributionTypeLabel"), align: "start", sortable: false, key: "contributionType" },
+        {
+            title: i18n.t("dateFromLabel"), align: "start", sortable: true, key: "dateFrom",
+            value: (member: OrganisationUnitProjectContribution) => member.dateFrom || emptyDateFrom
+        },
+        {
+            title: i18n.t("dateToLabel"), align: "start", sortable: true, key: "dateTo",
+            value: (member: OrganisationUnitProjectContribution) => member.dateTo || emptyDateTo
+        }
+    ];
+});
 
 const contributionTypes = computed(() => getOrganisationUnitProjectContributionTypesForGivenLocale());
 

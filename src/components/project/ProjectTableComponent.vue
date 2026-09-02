@@ -1,46 +1,27 @@
 <template>
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
-            <div v-if="isAdmin && selectedProjects.length > 0" class="action-menu-container">
-                <v-menu offset-y>
-                    <template #activator="{ props }">
-                        <v-btn
-                            v-bind="props"
-                            color="white"
-                            variant="elevated"
-                            height="48"
-                            prepend-icon="mdi-dots-vertical"
-                            class="action-menu-trigger"
-                        >
-                            {{ $t("actions") }} ({{ selectedProjects.length }})
-                        </v-btn>
-                    </template>
-
-                    <v-list class="action-menu-list" density="compact">
-                        <v-list-item
-                            class="action-menu-item"
-                            @click="startDeletionProcess"
-                        >
-                            <template #prepend>
-                                <v-icon color="error" size="18">
-                                    mdi-delete
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("deleteLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </div>
-            <div :class="[selectedProjects.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
-                <slot name="top-left" />
-            </div>
-        </div>
-        <div class="flex items-center gap-2">
+    <table-toolbar :selected-count="selectedProjects.length" :can-act="isAdmin">
+        <template #top-left>
+            <slot name="top-left" />
+        </template>
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="startDeletionProcess"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("deleteLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <slot name="actions" />
-        </div>
-    </div>
+        </template>
+    </table-toolbar>
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <v-data-table-server
@@ -154,6 +135,7 @@ import { useI18n } from 'vue-i18n';
 import type { ProjectIndex } from '@/models/ProjectModel';
 import ProjectService from '@/services/project/ProjectService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import TableToolbar from '@/components/core/TableToolbar.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
@@ -293,29 +275,4 @@ defineExpose({
 </script>
 
 <style scoped>
-.action-menu-container {
-    display: flex;
-    justify-content: flex-start;
-}
-
-.action-menu-trigger {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
-}
-
-.action-menu-list {
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.action-menu-item {
-    border-radius: 6px;
-    margin: 2px 4px;
-    transition: all 0.2s ease;
-}
-
-.action-menu-item:hover {
-    background-color: rgba(25, 118, 210, 0.08);
-}
 </style>

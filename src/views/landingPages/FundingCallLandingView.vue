@@ -178,7 +178,7 @@
             <v-tabs-window-item value="fundings">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <funding-call-fundings-tab
+                        <funding-call-fundings-table-component
                             v-if="fundingCall?.id"
                             :funding-call-id="fundingCall.id"
                             :can-edit="canEdit"
@@ -190,7 +190,7 @@
             <v-tabs-window-item value="fundingApplications">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <funding-call-applications-tab
+                        <funding-call-applications-table-component
                             v-if="fundingCall?.id"
                             :funding-call-id="fundingCall.id"
                             :can-edit="canEdit"
@@ -289,8 +289,8 @@ import ObjectivesSection from "@/components/project/ObjectivesSection.vue";
 import ResearchAreasUpdateModal from "@/components/core/ResearchAreasUpdateModal.vue";
 import ResearchAreaHierarchy from "@/components/core/ResearchAreaHierarchy.vue";
 import PersonFundingCallContributionTabs from "@/components/project/PersonFundingCallContributionTabs.vue";
-import FundingCallFundingsTab from "@/components/project/FundingCallFundingsTab.vue";
-import FundingCallApplicationsTab from "@/components/project/FundingCallApplicationsTab.vue";
+import FundingCallFundingsTableComponent from "@/components/project/FundingCallFundingsTableComponent.vue";
+import FundingCallApplicationsTableComponent from "@/components/project/FundingCallApplicationsTableComponent.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
