@@ -486,8 +486,6 @@ const addFundingPart = (fundingPart: FundingPart) => {
     if (funding.value === undefined || funding.value.id === undefined) {
         return;
     }
-    // TODO: Remove this when FundingApplication is connected to the Funding
-    fundingPart.fundingApplicationId = 1;
 
     fundingPart.fundingId = funding.value.id;
 
@@ -497,9 +495,6 @@ const addFundingPart = (fundingPart: FundingPart) => {
 };
 
 const updateFundingPart = (fundingPart: FundingPart) => {
-    // TODO: Remove this when FundingApplication is connected to the Funding
-    fundingPart.fundingApplicationId = 1;
-
     FundingPartService.updateFundingPart(fundingPart.id as number, fundingPart).then(() => {
         funding.value!.fundingParts = funding.value?.fundingParts?.filter(fp => fp.id !== fundingPart.id) ?? [];
         funding.value?.fundingParts?.push(fundingPart);
