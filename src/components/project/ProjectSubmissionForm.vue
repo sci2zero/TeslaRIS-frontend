@@ -186,7 +186,7 @@
                         <v-col cols="6">
                             <v-checkbox
                                 v-model="notFunded"
-                                :label="$t('notFundedLabel')"
+                                :label="$t('noCostsLabel')"
                             />
                         </v-col>
                     </v-row>
@@ -196,6 +196,7 @@
                             <monetary-amount-input
                                 ref="costsRef"
                                 v-model="costs"
+                                :amount-label="$t('costsLabel')"
                             />
                         </v-col>
                     </v-row>

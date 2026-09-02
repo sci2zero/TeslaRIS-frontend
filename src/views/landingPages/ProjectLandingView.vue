@@ -138,13 +138,6 @@
                                 </div>
                             </div>
 
-                            <div v-if="project.notFunded !== undefined && project.notFunded !== null" class="info-item">
-                                <div>{{ $t("notFundedLabel") }}:</div>
-                                <div class="response">
-                                    {{ project.notFunded ? $t("yesLabel") : $t("noLabel") }}
-                                </div>
-                            </div>
-
                             <div v-if="project.costs" class="info-item">
                                 <div>{{ $t("costsLabel") }}:</div>
                                 <div class="response">

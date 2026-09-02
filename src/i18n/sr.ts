@@ -1582,7 +1582,7 @@ export default {
     coordinatorLabel: "Koordinator",
     researchTypeLabel: "Tip istraživanja",
     costsLabel: "Troškovi",
-    notFundedLabel: "Nije finansiran",
+    noCostsLabel: "Nema troškova",
     raidLabel: "RAiD",
     principleInvestigatorLabel: "Glavni istraživač",
     institutionCoordinatorLabel: "Institucija koordinator",

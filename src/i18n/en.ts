@@ -1568,7 +1568,7 @@ export default {
     coordinatorLabel: "Coordinator",
     researchTypeLabel: "Research type",
     costsLabel: "Costs",
-    notFundedLabel: "Not funded",
+    noCostsLabel: "No costs",
     raidLabel: "RAiD",
     principleInvestigatorLabel: "Principle investigator",
     institutionCoordinatorLabel: "Institution coordinator",

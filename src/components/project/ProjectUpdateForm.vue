@@ -75,7 +75,7 @@
             <v-col cols="6">
                 <v-checkbox
                     v-model="notFunded"
-                    :label="$t('notFundedLabel')"
+                    :label="$t('noCostsLabel')"
                 />
             </v-col>
         </v-row>
@@ -84,6 +84,7 @@
             <v-col>
                 <monetary-amount-input
                     ref="costsRef"
+                    :amount-label="$t('costsLabel')"
                     :preset-amount="props.presetProject?.costs"
                     @update:model-value="costs = $event"
                 />
