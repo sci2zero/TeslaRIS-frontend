@@ -62,7 +62,9 @@
                         <div v-else class="info-columns">
                             <div v-if="funding.doi" class="info-item">
                                 <div>DOI:</div>
-                                <div class="response">{{ funding.doi }}</div>
+                                <div class="response">
+                                    <identifier-link :identifier="funding.doi" type="doi" />
+                                </div>
                             </div>
 
                             <div v-if="funding.grantAgreementId" class="info-item">
@@ -250,8 +252,7 @@
                     :keywords="funding?.keywords ? funding.keywords : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <div>
@@ -281,6 +282,7 @@ import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";

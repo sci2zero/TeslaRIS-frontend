@@ -60,11 +60,9 @@
 
         <v-row>
             <v-col cols="6">
-                <v-switch
+                <v-checkbox
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
-                    color="primary"
-                    hide-details
                 />
             </v-col>
             <v-col v-if="oaMandated" cols="6">

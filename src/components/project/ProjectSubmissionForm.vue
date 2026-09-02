@@ -184,11 +184,9 @@
                     <!-- Not Funded / Costs -->
                     <v-row>
                         <v-col cols="6">
-                            <v-switch
+                            <v-checkbox
                                 v-model="notFunded"
                                 :label="$t('notFundedLabel')"
-                                color="primary"
-                                hide-details
                             />
                         </v-col>
                     </v-row>

@@ -62,14 +62,14 @@
                             <div v-if="project.doi" class="info-item">
                                 <div>DOI:</div>
                                 <div class="response">
-                                    {{ project.doi }}
+                                    <identifier-link :identifier="project.doi" type="doi" />
                                 </div>
                             </div>
 
                             <div v-if="project.raid" class="info-item">
                                 <div>{{ $t("raidLabel") }}:</div>
                                 <div class="response">
-                                    {{ project.raid }}
+                                    <identifier-link :identifier="project.raid" type="raid" />
                                 </div>
                             </div>
 
@@ -303,6 +303,7 @@ import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
 import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
 import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project } from "@/models/ProjectModel";
