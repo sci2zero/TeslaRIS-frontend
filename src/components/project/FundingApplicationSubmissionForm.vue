@@ -17,6 +17,15 @@
 
         <v-row>
             <v-col>
+                <funding-autocomplete-search
+                    v-model="selectedFunding"
+                    :preset-funding-call-id="presetFundingCallId"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
@@ -119,6 +128,7 @@ import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import PersonAutocompleteSearch from '@/components/person/PersonAutocompleteSearch.vue';
 import ProjectAutocompleteSearch from '@/components/project/ProjectAutocompleteSearch.vue';
 import FundingCallAutocompleteSearch from '@/components/project/FundingCallAutocompleteSearch.vue';
+import FundingAutocompleteSearch from '@/components/project/FundingAutocompleteSearch.vue';
 import FundingApplicationAutocompleteSearch from '@/components/project/FundingApplicationAutocompleteSearch.vue';
 import Toast from '@/components/core/Toast.vue';
 import FundingApplicationService from '@/services/project/FundingApplicationService';
@@ -156,6 +166,7 @@ const searchPlaceholder = { title: "", value: -1 };
 
 const selectedProject = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 const selectedFundingCall = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFunding = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 const selectedRevisedFundingApplication = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 
 const submitter = ref<{ title: string, value: number } | undefined>(undefined);
@@ -178,6 +189,7 @@ const submitFundingApplication = (stayOnPage: boolean) => {
         projectId: props.presetProjectId ?? (selectedProject.value.value > 0 ? selectedProject.value.value : undefined),
         fundingCallId: props.presetFundingCallId ?? selectedFundingCall.value.value,
         revisedFundingApplicationId: selectedRevisedFundingApplication.value.value > 0 ? selectedRevisedFundingApplication.value.value : undefined,
+        fundingId: selectedFunding.value.value > 0 ? selectedFunding.value.value : undefined,
         submitterId: submitter.value?.value,
         requestedAmount: requestedAmount.value,
         description: description.value,
@@ -198,6 +210,7 @@ const submitFundingApplication = (stayOnPage: boolean) => {
         if (stayOnPage) {
             selectedProject.value = { ...searchPlaceholder };
             selectedFundingCall.value = { ...searchPlaceholder };
+            selectedFunding.value = { ...searchPlaceholder };
             selectedRevisedFundingApplication.value = { ...searchPlaceholder };
             submitter.value = undefined;
             requestedAmountRef.value?.clearInput();
