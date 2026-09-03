@@ -81,81 +81,13 @@
             <v-card-title>
                 <span class="text-h5">{{ $t("addInstitutionLabel") }}</span>
             </v-card-title>
-            <v-card-text>
+            <v-card-text class="dialog-content">
                 <v-form v-model="isFormValid" @submit.prevent>
-                    <v-row v-if="!enterExternalOU">
-                        <v-col cols="12">
-                            <organisation-unit-autocomplete-search
-                                v-model="selectedOrganisationUnit"
-                                only-independent-institutions
-                                required
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="enterExternalOU">
-                        <v-col cols="12">
-                            <multilingual-text-input
-                                ref="externalOUNameRef"
-                                v-model="externalOUName"
-                                :rules="requiredFieldRules"
-                                :label="$t('externalOUNameLabel') + '*'"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-btn
-                                color="blue darken-1"
-                                compact
-                                @click="toggleExternalOU">
-                                {{ enterExternalOU ? $t("searchInSystemLabel") : $t("enterExternalOULabel") }}
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <v-select
-                                v-model="selectedContributionType"
-                                :items="contributionTypes"
-                                :label="$t('contributionTypeLabel') + '*'"
-                                :rules="requiredSelectionRules"
-                                return-object
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <date-picker
-                                v-model="dateFrom"
-                                :label="$t('fromLabel')"
-                                color="primary"
-                                persistent
-                            />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <date-picker
-                                v-model="dateTo"
-                                :label="$t('toLabel')"
-                                color="primary"
-                                persistent
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <multilingual-text-input
-                                ref="contributionDescriptionRef"
-                                v-model="contributionDescription"
-                                :label="$t('descriptionLabel')"
-                                is-area
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <uri-input v-model="uris" />
-                        </v-col>
-                    </v-row>
+                    <organisation-unit-project-contribution-form
+                        :key="formKey"
+                        single
+                        @set-input="pendingOrganisation = $event[0]"
+                    />
                 </v-form>
             </v-card-text>
             <v-card-actions>
@@ -163,7 +95,7 @@
                 <v-btn color="blue darken-1" @click="closeAddDialog">
                     {{ $t("closeLabel") }}
                 </v-btn>
-                <v-btn color="blue darken-1" :disabled="!isFormValid" @click="addInstitution">
+                <v-btn color="blue darken-1" :disabled="!pendingOrganisation || isFormValid === false" @click="addInstitution">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-card-actions>
@@ -184,26 +116,18 @@
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AxiosError } from "axios";
-import type { ErrorResponse, MultilingualContent } from "@/models/Common";
+import type { ErrorResponse } from "@/models/Common";
 import type { OrganisationUnitProjectContribution } from "@/models/ProjectModel";
-import { OrganisationUnitProjectContributionType } from "@/models/ProjectModel";
 import ProjectService from "@/services/project/ProjectService";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
-import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
-import DatePicker from "@/components/core/DatePicker.vue";
-import UriInput from "@/components/core/UriInput.vue";
-import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import OrganisationUnitProjectContributionForm from "@/components/project/OrganisationUnitProjectContributionForm.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
 import TableToolbar from "@/components/core/TableToolbar.vue";
-import {
-    getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale,
-    getOrganisationUnitProjectContributionTypesForGivenLocale
-} from "@/i18n/organisationUnitProjectContributionType";
+import { getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/organisationUnitProjectContributionType";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
-import { useValidationUtils } from "@/utils/ValidationUtils";
 
 const props = withDefaults(defineProps<{
     projectId: number;
@@ -218,36 +142,20 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
-const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
 const selectedMembers = ref<OrganisationUnitProjectContribution[]>([]);
 
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);
-const isFormValid = ref(false);
+const isFormValid = ref<boolean | null>(null);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 
-const externalOUNameRef = ref<typeof MultilingualTextInput>();
-const contributionDescriptionRef = ref<typeof MultilingualTextInput>();
-
-const searchPlaceholder = { title: "", value: -1 };
-const enterExternalOU = ref(false);
-const selectedOrganisationUnit = ref<{ title: string, value: number }>(searchPlaceholder);
-const externalOUName = ref<MultilingualContent[]>([]);
-const selectedContributionType = ref<{ title: string | undefined, value: OrganisationUnitProjectContributionType }>();
-const contributionDescription = ref<MultilingualContent[]>([]);
-const dateFrom = ref("");
-const dateTo = ref("");
-const uris = ref<string[]>([]);
+const pendingOrganisation = ref<OrganisationUnitProjectContribution | undefined>();
+const formKey = ref(0);
 
 const sortBy = ref<{ key: string, order?: boolean | "asc" | "desc" }[]>([]);
 
-// Rows with no date always belong at the bottom, whichever direction is active. A custom comparator
-// cannot do that: for descending order Vuetify swaps the comparator's arguments instead of negating
-// its result, so the comparator never learns the direction. What works is sorting on a stand-in
-// value -- a date later than any real one while ascending, earlier than any while descending -- so
-// the empty rows sink either way. The cell itself still renders the raw value.
 const emptyDateSortValue = (key: string) =>
     sortBy.value.find(entry => entry.key === key)?.order === "desc" ? "0000-01-01" : "9999-12-31";
 
@@ -272,8 +180,6 @@ const headers = computed(() => {
     ];
 });
 
-const contributionTypes = computed(() => getOrganisationUnitProjectContributionTypesForGivenLocale());
-
 const sortedMembers = computed(() =>
     [...props.organisations].sort((a, b) => a.orderNumber - b.orderNumber)
 );
@@ -290,45 +196,23 @@ const institutionName = (member: OrganisationUnitProjectContribution) => {
     return displayTextOrPlaceholder(name);
 };
 
-const toggleExternalOU = () => {
-    enterExternalOU.value = !enterExternalOU.value;
-    selectedOrganisationUnit.value = searchPlaceholder;
-    externalOUName.value = [];
-    externalOUNameRef.value?.clearInput();
-};
-
 const closeAddDialog = () => {
     addDialog.value = false;
-    enterExternalOU.value = false;
-    selectedOrganisationUnit.value = searchPlaceholder;
-    externalOUName.value = [];
-    selectedContributionType.value = undefined;
-    contributionDescription.value = [];
-    dateFrom.value = "";
-    dateTo.value = "";
-    uris.value = [];
-    externalOUNameRef.value?.clearInput();
-    contributionDescriptionRef.value?.clearInput();
+    pendingOrganisation.value = undefined;
+    formKey.value++;
 };
 
 const nextOrderNumber = () =>
     props.organisations.reduce((highest, member) => Math.max(highest, member.orderNumber ?? 0), 0) + 1;
 
 const addInstitution = () => {
-    if (!enterExternalOU.value && selectedOrganisationUnit.value.value <= 0) {
+    if (!pendingOrganisation.value) {
         return;
     }
 
     const newMember: OrganisationUnitProjectContribution = {
-        organisationUnitId: enterExternalOU.value ? undefined : selectedOrganisationUnit.value.value,
-        displayOrganisationUnit: enterExternalOU.value ? externalOUName.value : [],
-        contributionDescription: contributionDescription.value,
-        contributionType: selectedContributionType.value?.value as OrganisationUnitProjectContributionType,
-        orderNumber: nextOrderNumber(),
-        dateFrom: dateFrom.value ? dateFrom.value : undefined,
-        dateTo: dateTo.value ? dateTo.value : undefined,
-        uris: uris.value,
-        fundingParts: []
+        ...pendingOrganisation.value,
+        orderNumber: nextOrderNumber()
     };
 
     ProjectService.addProjectOrganisation(props.projectId, newMember).then(() => {
@@ -369,3 +253,12 @@ const notifyError = (error: AxiosError<ErrorResponse>) => {
     notify(translated && translated !== backendMessage ? translated : i18n.t("genericErrorMessage"));
 };
 </script>
+
+<style scoped>
+
+.dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+</style>

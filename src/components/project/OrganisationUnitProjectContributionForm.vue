@@ -1,7 +1,7 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer section-box">
+    <v-container v-for="(input, index) in inputs" :key="index" :class="['bottom-spacer', { 'section-box': !single }]">
         <v-row>
-            <v-col cols="10">
+            <v-col :cols="single ? 12 : 10">
                 <organisation-unit-autocomplete-search
                     v-if="!input.enterExternalOU"
                     v-model="input.organisationUnit"
@@ -17,7 +17,7 @@
                     @update="sendContentToParent"
                 />
             </v-col>
-            <v-col cols="2">
+            <v-col v-if="!single" cols="2">
                 <v-btn
                     v-show="inputs.length > 1"
                     icon
@@ -85,15 +85,16 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols="12">
-                <uri-input
-                    :ref="(el) => (urisRefs[index] = el)"
-                    v-model="input.uris"
-                    @update:model-value="sendContentToParent"
-                />
-            </v-col>
-        </v-row>
+        <!--      Hidden temporarily - requested by Dragan -->
+        <!--        <v-row>-->
+        <!--            <v-col cols="12">-->
+        <!--                <uri-input-->
+        <!--                    :ref="(el) => (urisRefs[index] = el)"-->
+        <!--                    v-model="input.uris"-->
+        <!--                    @update:model-value="sendContentToParent"-->
+        <!--                />-->
+        <!--            </v-col>-->
+        <!--        </v-row>-->
     </v-container>
 </template>
 
@@ -101,7 +102,6 @@
 import { computed, nextTick, ref } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
-import UriInput from "@/components/core/UriInput.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import { returnCurrentLocaleContent, toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import { getOrganisationUnitProjectContributionTypesForGivenLocale } from "@/i18n/organisationUnitProjectContributionType";
@@ -112,6 +112,12 @@ import {
     type PrepopulatedOrganisation
 } from "@/models/ProjectModel";
 import type { MultilingualContent } from "@/models/Common";
+
+withDefaults(defineProps<{
+    single?: boolean;
+}>(), {
+    single: false
+});
 
 const emit = defineEmits<{
     (e: "setInput", payload: OrganisationUnitProjectContribution[]): void;
