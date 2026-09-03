@@ -1525,7 +1525,7 @@ export default {
     amountLabel: "Količina novca",
     urisLabel: "Linkovi",
     oaMandatedLabel: "Obaveza otvorenog pristupa (OA obaveza)",
-    oaMandateUrlLabel: "OA URL",
+    oaMandateUrlLabel: "OA Mandate URL",
     competitiveLabel: "Kompetetivno",
     renewableLabel: "Obnovljivo",
     internalInvestmentLabel: "Interno ulaganje",

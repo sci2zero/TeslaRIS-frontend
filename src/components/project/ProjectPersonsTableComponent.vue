@@ -73,41 +73,19 @@
         </v-data-table>
     </div>
 
-    <v-dialog v-model="addDialog" persistent max-width="800">
+    <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
             <v-card-title>
                 <span class="text-h5">{{ $t("addTeamMemberLabel") }}</span>
             </v-card-title>
-            <v-card-text>
+            <v-card-text class="dialog-content">
                 <v-form v-model="isFormValid" @submit.prevent>
-                    <v-row>
-                        <v-col>
-                            <person-autocomplete-search
-                                v-model="selectedPerson"
-                                required
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <v-select
-                                v-model="selectedContributionType"
-                                :items="contributionTypes"
-                                :label="$t('contributionTypeLabel') + '*'"
-                                :rules="requiredSelectionRules"
-                                return-object
-                            />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-select
-                                v-model="selectedInvestigationRole"
-                                :items="investigationRoles"
-                                :label="$t('investigationRoleLabel') + '*'"
-                                :rules="requiredSelectionRules"
-                                return-object
-                            />
-                        </v-col>
-                    </v-row>
+                    <person-project-contribution-form
+                        :key="formKey"
+                        single
+                        allow-external-associate
+                        @set-input="pendingMember = $event[0]"
+                    />
                 </v-form>
             </v-card-text>
             <v-card-actions>
@@ -115,7 +93,7 @@
                 <v-btn color="blue darken-1" @click="closeAddDialog">
                     {{ $t("closeLabel") }}
                 </v-btn>
-                <v-btn color="blue darken-1" :disabled="!isFormValid" @click="addTeamMember">
+                <v-btn color="blue darken-1" :disabled="!pendingMember || isFormValid === false" @click="addTeamMember">
                     {{ $t("saveLabel") }}
                 </v-btn>
             </v-card-actions>
@@ -137,25 +115,17 @@ import { computed, ref, watch } from "vue";
 import type { AxiosError } from "axios";
 import type { ErrorResponse } from "@/models/Common";
 import type { PersonProjectContribution } from "@/models/ProjectModel";
-import { PersonProjectContributionType, PersonProjectInvestigationRole } from "@/models/ProjectModel";
 import { useI18n } from "vue-i18n";
 import ProjectService from "@/services/project/ProjectService";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
-import PersonAutocompleteSearch from "@/components/person/PersonAutocompleteSearch.vue";
+import PersonProjectContributionForm from "@/components/project/PersonProjectContributionForm.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
 import TableToolbar from "@/components/core/TableToolbar.vue";
-import {
-    getPersonProjectContributionTypeTitleFromValueAutoLocale,
-    getPersonProjectContributionTypesForGivenLocale
-} from "@/i18n/personProjectContributionType";
-import {
-    getPersonProjectInvestigationRoleTitleFromValueAutoLocale,
-    getPersonProjectInvestigationRolesForGivenLocale
-} from "@/i18n/personProjectInvestigationRole";
+import { getPersonProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/personProjectContributionType";
+import { getPersonProjectInvestigationRoleTitleFromValueAutoLocale } from "@/i18n/personProjectInvestigationRole";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
-import { useValidationUtils } from "@/utils/ValidationUtils";
 
 const props = withDefaults(defineProps<{
     projectId: number;
@@ -170,20 +140,17 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
-const { requiredSelectionRules } = useValidationUtils();
 
 const selectedMembers = ref<PersonProjectContribution[]>([]);
 
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);
-const isFormValid = ref(false);
+const isFormValid = ref<boolean | null>(null);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 
-const searchPlaceholder = { title: "", value: -1 };
-const selectedPerson = ref<{ title: string, value: number }>(searchPlaceholder);
-const selectedContributionType = ref<{ title: string | undefined, value: PersonProjectContributionType }>();
-const selectedInvestigationRole = ref<{ title: string | undefined, value: PersonProjectInvestigationRole }>();
+const pendingMember = ref<PersonProjectContribution | undefined>();
+const formKey = ref(0);
 
 const headers = computed(() => [
     {
@@ -194,9 +161,6 @@ const headers = computed(() => [
     { title: i18n.t("investigationRoleLabel"), align: "start", sortable: false, key: "investigationRole" },
     { title: i18n.t("otherRoleDescriptionLabel"), align: "start", sortable: false, key: "otherRoleDescription" }
 ]);
-
-const contributionTypes = computed(() => getPersonProjectContributionTypesForGivenLocale());
-const investigationRoles = computed(() => getPersonProjectInvestigationRolesForGivenLocale());
 
 const sortedMembers = computed(() =>
     [...props.persons].sort((a, b) => a.orderNumber - b.orderNumber)
@@ -218,29 +182,21 @@ const memberName = (member: PersonProjectContribution) => {
 
 const closeAddDialog = () => {
     addDialog.value = false;
-    selectedPerson.value = searchPlaceholder;
-    selectedContributionType.value = undefined;
-    selectedInvestigationRole.value = undefined;
+    pendingMember.value = undefined;
+    formKey.value++;
 };
 
 const nextOrderNumber = () =>
     props.persons.reduce((highest, member) => Math.max(highest, member.orderNumber ?? 0), 0) + 1;
 
 const addTeamMember = () => {
-    if (selectedPerson.value.value <= 0) {
+    if (!pendingMember.value) {
         return;
     }
 
     const newMember: PersonProjectContribution = {
-        personId: selectedPerson.value.value,
-        contributionDescription: [],
-        displayAffiliationStatement: [],
-        orderNumber: nextOrderNumber(),
-        contributionType: selectedContributionType.value?.value as PersonProjectContributionType,
-        investigationRole: selectedInvestigationRole.value?.value as PersonProjectInvestigationRole,
-        otherRoleDescription: [],
-        fundingParts: [],
-        researchAreasId: []
+        ...pendingMember.value,
+        orderNumber: nextOrderNumber()
     };
 
     ProjectService.addProjectPerson(props.projectId, newMember).then(() => {
@@ -281,3 +237,12 @@ const notifyError = (error: AxiosError<ErrorResponse>) => {
     notify(translated && translated !== backendMessage ? translated : i18n.t("genericErrorMessage"));
 };
 </script>
+
+<style scoped>
+
+.dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+</style>
