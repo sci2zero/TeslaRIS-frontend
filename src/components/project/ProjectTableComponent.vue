@@ -1,10 +1,11 @@
 <template>
-    <table-toolbar :selected-count="selectedProjects.length" :can-act="isAdmin">
+    <table-toolbar :selected-count="selectedProjects.length" :can-act="allowBulkActions">
         <template #top-left>
             <slot name="top-left" />
         </template>
         <template #action-items>
             <v-list-item
+                v-if="allowBulkActions"
                 class="action-menu-item"
                 @click="startDeletionProcess"
             >
@@ -31,7 +32,7 @@
             :headers="headers"
             item-value="row"
             :items-length="totalProjects"
-            :show-select="isAdmin"
+            :show-select="allowBulkActions"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
@@ -58,7 +59,7 @@
             </template>
             <template #item="row">
                 <tr>
-                    <td v-if="isAdmin">
+                    <td v-if="allowBulkActions">
                         <v-checkbox
                             v-model="selectedProjects"
                             :value="row.item"
@@ -144,12 +145,14 @@ import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDial
 import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from '@/i18n/projectStatus';
 
 
-withDefaults(defineProps<{
+const tableProps = withDefaults(defineProps<{
     projects: ProjectIndex[];
     totalProjects: number;
     hasActiveStatusFilters?: boolean;
+    hideBulkActions?: boolean;
 }>(), {
-    hasActiveStatusFilters: false
+    hasActiveStatusFilters: false,
+    hideBulkActions: false
 });
 
 const emit = defineEmits<{
@@ -169,6 +172,8 @@ const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
 const dateToLabel = computed(() => i18n.t("dateToLabel"));
 
 const { isAdmin } = useUserRole();
+
+const allowBulkActions = computed(() => isAdmin.value && !tableProps.hideBulkActions);
 
 const nameColumn = computed(() => i18n.t("nameColumn"));
 const coordinatorNameColumn = computed(() => i18n.t("coordinatorNameColumn"));

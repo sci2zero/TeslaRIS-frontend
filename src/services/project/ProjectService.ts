@@ -26,6 +26,39 @@ export class ProjectService extends BaseService {
         return super.sendRequest(axios.get, url);
     }
 
+    async findProjectsForResearcher(
+        personId: number,
+        tokens: string,
+        onlyActive: boolean = false,
+        allowedStatuses: ProjectStatus[] = []
+    ): Promise<AxiosResponse<Page<ProjectIndex>>> {
+        return super.sendRequest(
+            axios.get,
+            `project/for-researcher/${personId}?${tokens}${this.buildFilterParams(onlyActive, allowedStatuses)}`
+        );
+    }
+
+    async findProjectsForOrganisationUnit(
+        organisationUnitId: number,
+        tokens: string,
+        onlyActive: boolean = false,
+        allowedStatuses: ProjectStatus[] = []
+    ): Promise<AxiosResponse<Page<ProjectIndex>>> {
+        return super.sendRequest(
+            axios.get,
+            `project/for-organisation-unit/${organisationUnitId}?${tokens}${this.buildFilterParams(onlyActive, allowedStatuses)}`
+        );
+    }
+
+    private buildFilterParams(onlyActive: boolean, allowedStatuses: ProjectStatus[]): string {
+        let params = onlyActive ? "&onlyActive=true" : "";
+        allowedStatuses.forEach(allowedStatus => {
+            params += `&allowedStatuses=${allowedStatus}`;
+        });
+
+        return params;
+    }
+
     async getProjectCount(): Promise<AxiosResponse<number>> {
         return super.sendRequest(axios.get, "project/count");
     }
