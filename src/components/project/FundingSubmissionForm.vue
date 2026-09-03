@@ -217,6 +217,7 @@ import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { sanitizeUri } from '@/utils/StringUtil';
 import FundingService from '@/services/project/FundingService';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
 import type { AxiosError } from 'axios';
@@ -292,6 +293,7 @@ const fundingTypes = computed(() => getFundingTypesForGivenLocale());
 
 const {
     requiredFieldRules,
+    uriValidationRules
 } = useValidationUtils();
 
 const requiredSelectionRules = [(v: any[]) => v.length > 0 || i18n.t("requiredFieldMessage")];
@@ -316,9 +318,16 @@ const populateMetadata = async (metadata: PrepopulatedFundingMetadata) => {
     doi.value = doi.value ? doi.value : metadata.doi;
     grantAgreementId.value = grantAgreementId.value ? grantAgreementId.value : metadata.grantAgreementId;
 
+    // Harvested metadata carries unencoded URLs (Crossref hands out landing pages with spaces and
+    // quotes in the query), and an invalid one silently blocks the whole form - Vuetify validates it
+    // on mount without rendering the message. Repair what can be repaired, drop the rest.
     metadata.uris.forEach(uri => {
-        if (uri && !uris.value.includes(uri)) {
-            uris.value.push(uri);
+        const sanitizedUri = sanitizeUri(uri);
+        if (
+            sanitizedUri && uriValidationRules[0](sanitizedUri) === true &&
+            !uris.value.includes(sanitizedUri)
+        ) {
+            uris.value.push(sanitizedUri);
         }
     });
 

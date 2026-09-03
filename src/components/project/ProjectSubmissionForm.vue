@@ -228,6 +228,7 @@ import ProjectsRelationForm from '@/components/project/ProjectsRelationForm.vue'
 import PersonProjectContributionForm from '@/components/project/PersonProjectContributionForm.vue';
 import OrganisationUnitProjectContributionForm from '@/components/project/OrganisationUnitProjectContributionForm.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
+import { sanitizeUri } from '@/utils/StringUtil';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProjectService from '@/services/project/ProjectService';
@@ -283,7 +284,8 @@ const projectCollaborationTypeOptions = computed(() => getProjectCollaborationTy
 const projectResearchTypeOptions = computed(() => getProjectResearchTypesForGivenLocale());
 
 const {
-    requiredFieldRules
+    requiredFieldRules,
+    uriValidationRules
 } = useValidationUtils();
 
 const { languageTags } = useLanguageTags();
@@ -303,9 +305,16 @@ const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
 
     doi.value = doi.value ? doi.value : metadata.doi;
 
+    // Harvested metadata carries unencoded URLs (Crossref hands out landing pages with spaces and
+    // quotes in the query), and an invalid one silently blocks the whole form - Vuetify validates it
+    // on mount without rendering the message. Repair what can be repaired, drop the rest.
     metadata.uris.forEach(uri => {
-        if (uri && !uris.value.includes(uri)) {
-            uris.value.push(uri);
+        const sanitizedUri = sanitizeUri(uri);
+        if (
+            sanitizedUri && uriValidationRules[0](sanitizedUri) === true &&
+            !uris.value.includes(sanitizedUri)
+        ) {
+            uris.value.push(sanitizedUri);
         }
     });
 
