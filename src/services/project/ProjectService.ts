@@ -10,11 +10,15 @@ export class ProjectService extends BaseService {
     async searchProjects(
         tokens: string,
         onlyActive: boolean = false,
+        onlyWithoutContributions: boolean = false,
         allowedStatuses: ProjectStatus[] = []
     ): Promise<AxiosResponse<Page<ProjectIndex>>> {
         let url = `project/search?${tokens}`;
         if (onlyActive) {
             url += "&onlyActive=true";
+        }
+        if (onlyWithoutContributions) {
+            url += "&onlyWithoutContributions=true";
         }
         allowedStatuses.forEach(allowedStatus => {
             url += `&allowedStatuses=${allowedStatus}`;
