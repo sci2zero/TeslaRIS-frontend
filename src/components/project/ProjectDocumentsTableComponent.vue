@@ -1,66 +1,73 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("documentsLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('documentsLabel')"
+        :selected-count="selectedDocuments.length"
+        :can-act="canEdit"
+    >
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="displayPersistentDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-file-plus"
                 @click="addDialog = true">
                 {{ $t("addDocumentLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedDocuments.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table
-        v-model="selectedDocuments"
-        :items="documents"
-        :headers="headers"
-        item-value="id"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedDocuments"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link
-                        v-if="row.item.documentId && documentLandingPagePath(row.item)"
-                        :to="documentLandingPagePath(row.item) + row.item.documentId">
-                        {{ documentTitle(row.item) }}
-                    </localized-link>
-                    <span v-else>
-                        {{ documentTitle(row.item) }}
-                    </span>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(getProjectDocumentTypeTitleFromValueAutoLocale(row.item.relationType)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table
+            v-model="selectedDocuments"
+            :items="documents"
+            :headers="headers"
+            item-value="id"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedDocuments"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link
+                            v-if="row.item.documentId && documentLandingPagePath(row.item)"
+                            :to="documentLandingPagePath(row.item) + row.item.documentId">
+                            {{ documentTitle(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ documentTitle(row.item) }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(getProjectDocumentTypeTitleFromValueAutoLocale(row.item.relationType)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -146,6 +153,7 @@ import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
 import PublicationAutocompleteSearch from "@/components/publication/PublicationAutocompleteSearch.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
 import {
     getProjectDocumentTypeTitleFromValueAutoLocale,
     getProjectDocumentTypesForGivenLocale
@@ -183,7 +191,10 @@ const textualDescription = ref<MultilingualContent[]>([]);
 const selectedRelationType = ref<{ title: string | undefined, value: ProjectDocumentType }>();
 
 const headers = computed(() => [
-    { title: i18n.t("documentLabel"), align: "start", sortable: true, key: "document" },
+    {
+        title: i18n.t("documentLabel"), align: "start", sortable: true, key: "document",
+        value: (projectDocument: ProjectDocument) => documentTitle(projectDocument)
+    },
     { title: i18n.t("relationTypeLabel"), align: "start", sortable: false, key: "relationType" }
 ]);
 

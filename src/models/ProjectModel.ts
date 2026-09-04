@@ -1,6 +1,6 @@
 import type { MonetaryAmount, MultilingualContent } from "@/models/Common";
 import type { PersonContribution } from "@/models/PersonModel";
-import type { FundingPart } from "@/models/FundingModel";
+import type { Funding, FundingPart, PrepopulatedFundingMetadata } from "@/models/FundingModel";
 
 export interface Project {
     id?: number;
@@ -26,6 +26,8 @@ export interface Project {
     persons: PersonProjectContribution[];
     organisations: OrganisationUnitProjectContribution[];
     relations: ProjectsRelation[];
+    // only used for DOI metadata prepopulation
+    funding?: Funding;
 }
 
 export enum ProjectsRelationType {
@@ -75,6 +77,7 @@ export interface PrepopulatedProjectMetadata {
     status: ProjectStatus;
     persons: PrepopulatedPerson[];
     organisations: PrepopulatedOrganisation[];
+    funding?: PrepopulatedFundingMetadata;
 }
 
 export interface ProjectIndex {
@@ -113,6 +116,7 @@ export interface OrganisationUnitProjectContribution {
     uris?: string[];
     isMainContributor?: boolean;
     fundingParts?: FundingPart[];
+    netContribution?: MonetaryAmount;
 }
 
 export interface ProjectDocument {

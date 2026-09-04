@@ -31,6 +31,7 @@
                             :always-open-access="alwaysOpenAccess"
                             :allow-licence-selection="allowLicenceSelection"
                             :disable-resource-type-selection="disableResourceTypeSelection"
+                            :allowed-resource-types="allowedResourceTypes"
                             :can-be-archived="canBeArchived"
                             @create="emitCreateToParent"
                             @update="emitUpdateToParent"
@@ -55,7 +56,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import DocumentFileSubmissionForm from "./DocumentFileSubmissionForm.vue";
-import type { DocumentFile, DocumentFileResponse } from "@/models/DocumentFileModel";
+import type { DocumentFile, DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from "vue";
 
 
@@ -94,6 +95,10 @@ export default defineComponent({
         canBeArchived: {
             type: Boolean,
             default: false
+        },
+        allowedResourceTypes: {
+            type: Array as PropType<ResourceType[]>,
+            default: undefined
         }
     },
     emits: ["create", "update"],

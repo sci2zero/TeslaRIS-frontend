@@ -48,10 +48,12 @@ export class FundingService extends BaseService {
     }
 
     async updateAgreementDocument(attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
-        console.log("attachment before conversion:", JSON.stringify(attachment, null, 2));
-
-        attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
-
+        if (typeof attachment.accessRights === "number") {
+            attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
+        }
+        if (typeof attachment.resourceType === "number") {
+            attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
+        }
         return super.sendMultipartFormDataRequest(axios.patch, `funding/update-agreement`, attachment, FundingService.idempotencyKey);
     }
 }

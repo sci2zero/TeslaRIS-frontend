@@ -1,69 +1,84 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("fundingsLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('fundingsLabel')"
+        :selected-count="selectedFundings.length"
+        :can-act="canEdit"
+    >
+        <template #top-left>
+            <search-bar-component
+                :transparent="false"
+                size="small"
+                @search="onSearch"
+            />
+        </template>
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="unlinkSelected"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-link-off
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-plus"
                 @click="addDialog = true">
                 {{ $t("addFundingLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedFundings.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table-server
-        v-model="selectedFundings"
-        :items="fundings"
-        :headers="headers"
-        item-value="row"
-        :items-length="totalFundings"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedFundings"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link :to="'funding/' + row.item.databaseId">
-                        {{ $i18n.locale.startsWith("sr") ? row.item.nameSr : row.item.nameOther }}
-                    </localized-link>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table-server>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table-server
+            v-model="selectedFundings"
+            :items="fundings"
+            :headers="headers"
+            item-value="row"
+            :items-length="totalFundings"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="page + 1"
+            @update:options="refreshTable">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedFundings"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link :to="'funding/' + row.item.databaseId">
+                            {{ $i18n.locale.startsWith("sr") ? row.item.nameSr : row.item.nameOther }}
+                        </localized-link>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -72,7 +87,7 @@
             </v-card-title>
             <v-card-text>
                 <funding-autocomplete-search
-                    :preset-project="project"
+                    :preset-funding-call-id="fundingCallId"
                     @selected="linkExistingFunding($event)"
                     @create="onFundingCreated"
                 />
@@ -86,34 +101,25 @@
         </v-card>
     </v-dialog>
 
-    <persistent-question-dialog
-        v-model="displayPersistentDialog"
-        :title="$t('areYouSureLabel')"
-        :message="$t('confirmDeletionMessage')"
-        :entity-names="selectedFundings.map(funding => fundingTitle(funding))"
-        @continue="deleteSelected" />
-
     <toast v-model="snackbar" :message="snackbarMessage" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import type { AxiosError } from "axios";
 import FundingService from "@/services/project/FundingService";
 import type { FundingIndex } from "@/models/FundingModel";
-import type { Project } from "@/models/ProjectModel";
-import type { ErrorResponse } from "@/models/Common";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingAutocompleteSearch from "@/components/project/FundingAutocompleteSearch.vue";
-import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
+import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 
 const props = defineProps({
-    project: {
-        type: Object as PropType<Project>,
+    fundingCallId: {
+        type: Number,
         required: true
     },
     canEdit: {
@@ -129,7 +135,6 @@ const totalFundings = ref(0);
 const selectedFundings = ref<FundingIndex[]>([]);
 
 const addDialog = ref(false);
-const displayPersistentDialog = ref(false);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 
@@ -157,16 +162,21 @@ const sortFieldMappings = computed<Map<string, string>>(() => {
 
 const defaultSortField = computed(() => sortFieldMappings.value.get("name") as string);
 
-const fundingTitle = (funding: FundingIndex) => {
-    const name = i18n.locale.value.startsWith("sr") ? funding.nameSr : funding.nameOther;
-    return name || `#${funding.databaseId}`;
+// An empty search box emits an empty string, so fall back to "*" -- otherwise the query
+// would go out without a single tokens parameter.
+const searchParams = ref("tokens=*");
+
+const onSearch = (tokens: string) => {
+    searchParams.value = tokens ? tokens : "tokens=*";
+    page.value = 0;
+    fetchFundings();
 };
 
 const fetchFundings = () => {
     const sortField = sort.value || defaultSortField.value;
     const sortDir = sort.value ? direction.value : "ASC";
-    const params = `tokens=*&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
-    FundingService.searchFunding(params, null, props.project.id).then((response) => {
+    const params = `${searchParams.value}&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
+    FundingService.searchFunding(params, props.fundingCallId).then((response) => {
         fundings.value = response.data.content;
         totalFundings.value = response.data.totalElements;
     });
@@ -195,13 +205,13 @@ const linkExistingFunding = (selected: { title: string; value: number; }) => {
     addDialog.value = false;
     FundingService.readFunding(selected.value).then((response) => {
         const funding = response.data;
-        funding.projectId = props.project.id as number;
+        funding.fundingCallId = props.fundingCallId;
         return FundingService.updateFunding(selected.value, funding);
     }).then(() => {
         notify(i18n.t("updatedSuccessMessage"));
         refetchAfterReindex();
-    }).catch((error: AxiosError<ErrorResponse>) => {
-        notifyError(error);
+    }).catch(() => {
+        notify(i18n.t("genericErrorMessage"));
     });
 };
 
@@ -211,30 +221,30 @@ const onFundingCreated = () => {
     refetchAfterReindex();
 };
 
-const deleteSelected = () => {
+const unlinkFunding = (fundingId: number) => {
+    return FundingService.readFunding(fundingId).then((response) => {
+        const funding = response.data;
+        funding.fundingCallId = undefined;
+        return FundingService.updateFunding(fundingId, funding);
+    });
+};
+
+const unlinkSelected = () => {
     const removedIds = selectedFundings.value.map((funding) => funding.databaseId);
-    const removedNames = selectedFundings.value.map((funding) => fundingTitle(funding)).join(", ");
-    Promise.all(removedIds.map((fundingId) => FundingService.deleteFunding(fundingId)))
+    Promise.all(removedIds.map((fundingId) => unlinkFunding(fundingId)))
         .then(() => {
             fundings.value = fundings.value.filter((funding) => !removedIds.includes(funding.databaseId));
             totalFundings.value = Math.max(0, totalFundings.value - removedIds.length);
             selectedFundings.value = [];
-            notify(i18n.t("deleteSuccessNotification", { name: removedNames }));
+            notify(i18n.t("updatedSuccessMessage"));
         })
-        .catch((error: AxiosError<ErrorResponse>) => {
-            notifyError(error);
-            fetchFundings();
+        .catch(() => {
+            notify(i18n.t("genericErrorMessage"));
         });
 };
 
 const notify = (message: string) => {
     snackbarMessage.value = message;
     snackbar.value = true;
-};
-
-const notifyError = (error: AxiosError<ErrorResponse>) => {
-    const backendMessage = error.response?.data.message as string;
-    const translated = backendMessage ? i18n.t(backendMessage) : "";
-    notify(translated && translated !== backendMessage ? translated : i18n.t("genericErrorMessage"));
 };
 </script>

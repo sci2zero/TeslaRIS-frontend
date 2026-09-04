@@ -94,6 +94,9 @@
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
+            <v-tab value="projects">
+                {{ $t("projectsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -130,7 +133,7 @@
                             return-object
                             class="max-w-xs mt-5"
                             multiple
-                        ></v-select>
+                        />
                     </div>
                     <div class="mb-5 mt-5">
                         <add-publication-menu
@@ -161,8 +164,47 @@
                             commissionId: null
                         }"
                     :allow-researcher-unbinding="canEdit && isResearcher"
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="projects">
+                <project-table-component
+                    ref="projectsRef"
+                    hide-bulk-actions
+                    :projects="projects"
+                    :total-projects="totalProjects"
+                    :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    @switch-page="switchProjectsPage">
+                    <template #top-left>
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformProjectSearch($event)"
+                        />
+                    </template>
+                    <template #actions>
+                        <v-menu>
+                            <template #activator="{ props: optionsProps }">
+                                <v-btn
+                                    v-bind="optionsProps"
+                                    color="white"
+                                    prepend-icon="mdi-dots-vertical"
+                                >
+                                    {{ $t("optionsLabel") }}
+                                </v-btn>
+                            </template>
+                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                <v-checkbox
+                                    v-model="returnOnlyActiveProjects"
+                                    :label="$t('showOnlyActiveLabel')"
+                                    hide-details
+                                />
+                            </div>
+                        </v-menu>
+                    </template>
+                    <template #status-filter-menu>
+                        <project-status-filter v-model="selectedProjectStatuses" />
+                    </template>
+                </project-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -170,16 +212,14 @@
                     :keywords="keywords"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Biography -->
                 <description-section
                     :description="biography"
                     :can-edit="canEdit"
                     is-biography
-                    @update="updateBiography">
-                </description-section>
+                    @update="updateBiography" />
 
                 <v-row>
                     <v-col cols="6">
@@ -188,18 +228,16 @@
                             :expertise-or-skills="person?.expertisesOrSkills"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </expertise-or-skill-list>
+                            @crud="fetchPerson" />
                         
-                        <br />
+                        <br>
 
                         <!-- Prizes -->
                         <prize-list
                             :prizes="person?.prizes"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </prize-list>
+                            @crud="fetchPerson" />
                     </v-col>
 
 
@@ -215,37 +253,34 @@
 
                                 <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                                 <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                                <br />
+                                <br>
                                 <div v-if="employments.length > 0">
                                     <h3>{{ $t("employmentsLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="employments"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                                 <div v-if="education.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                                    <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="education"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                                 <div v-if="memberships.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                                    <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="memberships"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -274,8 +309,7 @@
                 <person-assessments-view
                     :assessments="personAssessments"
                     :is-loading="assessmentsLoading"
-                    @fetch="fetchAssessment">
-                </person-assessments-view>
+                    @fetch="fetchAssessment" />
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <person-visualizations
@@ -293,8 +327,7 @@
             ref="dialogRef"
             :title="$t('areYouSureLabel')"
             :message="dialogMessage"
-            @continue="performMigrationToUnmanaged">
-        </persistent-question-dialog>
+            @continue="performMigrationToUnmanaged" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </div>
@@ -311,6 +344,10 @@ import { useRoute, useRouter } from 'vue-router';
 import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
+import ProjectService from '@/services/project/ProjectService';
+import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import InvolvementService from '@/services/InvolvementService';
@@ -361,7 +398,7 @@ import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFi
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -388,6 +425,17 @@ export default defineComponent({
         const publicationsRef = ref<typeof PublicationTableComponent>();
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
+
+        const projects = ref<ProjectIndex[]>([]);
+        const totalProjects = ref<number>(0);
+        const projectsPage = ref(0);
+        const projectsSize = ref(10);
+        const projectsSort = ref("");
+        const projectsDirection = ref("");
+        const projectSearchParams = ref("tokens=*");
+        const selectedProjectStatuses = ref<ProjectStatus[]>([]);
+        const returnOnlyActiveProjects = ref(false);
+        const projectsRef = ref<typeof ProjectTableComponent>();
 
         const i18n = useI18n();
 
@@ -518,7 +566,8 @@ export default defineComponent({
                     });
                 });
 
-                fetchPublications(switchTab);                
+                fetchPublications(switchTab);
+                fetchProjects();
                 populateData();
             }).catch(() => {
                 router.push({ name: "notFound" });
@@ -588,6 +637,45 @@ export default defineComponent({
                     }
                 }
             );
+        };
+
+        const switchProjectsPage = (nextPage: number, pageSize: number, sortField?: string, sortDir?: string) => {
+            projectsPage.value = nextPage;
+            projectsSize.value = pageSize;
+            projectsSort.value = sortField ?? "";
+            projectsDirection.value = sortDir ?? "";
+            fetchProjects();
+        };
+
+        const fetchProjects = () => {
+            if (!person.value?.id) {
+                return;
+            }
+
+            ProjectService.findProjectsForResearcher(
+                person.value.id as number,
+                `${projectSearchParams.value}&page=${projectsPage.value}&size=${projectsSize.value}&sort=${projectsSort.value},${projectsDirection.value}`,
+                returnOnlyActiveProjects.value,
+                selectedProjectStatuses.value
+            ).then((response) => {
+                projects.value = response.data.content;
+                totalProjects.value = response.data.totalElements;
+            });
+        };
+
+        watch([selectedProjectStatuses, returnOnlyActiveProjects], () => {
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            fetchProjects();
+        });
+
+        const clearSortAndPerformProjectSearch = (tokenParams: string) => {
+            projectSearchParams.value = tokenParams;
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            projectsSort.value = "";
+            projectsDirection.value = "";
+            fetchProjects();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -760,7 +848,9 @@ export default defineComponent({
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
-            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate
+            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
+            projects, totalProjects, projectsRef, switchProjectsPage,
+            selectedProjectStatuses, returnOnlyActiveProjects, clearSortAndPerformProjectSearch
         };
 }});
 </script>

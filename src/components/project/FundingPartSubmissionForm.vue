@@ -22,67 +22,6 @@
                         />
                     </v-col>
                 </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="fundingId"
-                            type="number"
-                            :label="$t('fundingLabel')"
-                            :required="true"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="projectEventId"
-                            type="number"
-                            :label="$t('projectEventLabel')"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="projectDocumentId"
-                            type="number"
-                            :label="$t('projectDocumentLabel')"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="fundingApplicationId"
-                            type="number"
-                            :label="$t('fundingApplicationLabel')"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="personProjectContributionId"
-                            type="number"
-                            :label="$t('personProjectContributionLabel')"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            v-model.number="organisationUnitProjectContributionId"
-                            type="number"
-                            :label="$t('organisationUnitProjectContributionLabel')"
-                            clearable
-                        />
-                    </v-col>
-                </v-row>
             </v-col>
         </v-row>
 
@@ -123,6 +62,8 @@ const descriptionRef = ref<typeof MultilingualTextInput>();
 const amount = ref<MonetaryAmount>({ currencyId: 0, amount: 0 });
 const monetaryAmountRef = ref<typeof MonetaryAmountInput>();
 
+// No inputs for these - they are used to keep the state of the FundingPart, by keeping the value of each relation
+// (BE) update clears all fields and sets their value based on the DTO sent from the FE
 const fundingId = ref<number>();
 const projectEventId = ref<number>();
 const projectDocumentId = ref<number>();

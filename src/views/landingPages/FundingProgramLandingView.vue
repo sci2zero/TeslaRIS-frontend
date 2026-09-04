@@ -150,7 +150,7 @@
             <v-tabs-window-item value="fundingCalls">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <funding-program-calls-tab
+                        <funding-program-calls-table-component
                             v-if="fundingProgram?.id"
                             :funding-program-id="fundingProgram.id"
                             :preset-keywords="fundingProgram.keywords"
@@ -168,6 +168,7 @@
                         <attachment-list
                             :attachments="fundingProgram?.fileItems ? fundingProgram.fileItems : []"
                             :can-edit="canEdit"
+                            :allowed-resource-types="[ResourceType.PROGRAM_DESCRIPTION, ResourceType.OTHER]"
                             @create="addDocument($event)"
                             @delete="deleteDocument($event)"
                             @update="updateDocument($event)"
@@ -263,7 +264,7 @@ import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
-import type { DocumentFile } from "@/models/DocumentFileModel";
+import { ResourceType, type DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import DescriptionOrBiographyUpdateForm from "@/components/core/update/DescriptionOrBiographyUpdateForm.vue";
@@ -272,7 +273,7 @@ import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import FundingProgramUpdateForm from "@/components/project/FundingProgramUpdateForm.vue";
-import FundingProgramCallsTab from "@/components/project/FundingProgramCallsTab.vue";
+import FundingProgramCallsTableComponent from "@/components/project/FundingProgramCallsTableComponent.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 
 const route = useRoute();

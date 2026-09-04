@@ -62,7 +62,9 @@
                         <div v-else class="info-columns">
                             <div v-if="funding.doi" class="info-item">
                                 <div>DOI:</div>
-                                <div class="response">{{ funding.doi }}</div>
+                                <div class="response">
+                                    <identifier-link :identifier="funding.doi" type="doi" />
+                                </div>
                             </div>
 
                             <div v-if="funding.grantAgreementId" class="info-item">
@@ -236,6 +238,7 @@
                         <attachment-list
                             :attachments="funding?.agreements ? funding.agreements : []"
                             :can-edit="canEdit"
+                            :allowed-resource-types="[ResourceType.CONTRACT, ResourceType.REPORTING_TEMPLATE, ResourceType.OTHER]"
                             @create="addAgreement($event)"
                             @delete="deleteAgreement($event)"
                             @update="updateAgreement($event)"
@@ -250,8 +253,7 @@
                     :keywords="funding?.keywords ? funding.keywords : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <div>
@@ -281,10 +283,11 @@ import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
-import type { DocumentFile } from "@/models/DocumentFileModel";
+import { ResourceType, type DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import FundingPartList from "@/components/project/FundingPartList.vue";
@@ -484,8 +487,6 @@ const addFundingPart = (fundingPart: FundingPart) => {
     if (funding.value === undefined || funding.value.id === undefined) {
         return;
     }
-    // TODO: Remove this when FundingApplication is connected to the Funding
-    fundingPart.fundingApplicationId = 1;
 
     fundingPart.fundingId = funding.value.id;
 
@@ -495,9 +496,6 @@ const addFundingPart = (fundingPart: FundingPart) => {
 };
 
 const updateFundingPart = (fundingPart: FundingPart) => {
-    // TODO: Remove this when FundingApplication is connected to the Funding
-    fundingPart.fundingApplicationId = 1;
-
     FundingPartService.updateFundingPart(fundingPart.id as number, fundingPart).then(() => {
         funding.value!.fundingParts = funding.value?.fundingParts?.filter(fp => fp.id !== fundingPart.id) ?? [];
         funding.value?.fundingParts?.push(fundingPart);
