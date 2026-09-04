@@ -233,6 +233,7 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import ProjectService from '@/services/project/ProjectService';
 import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project, type PrepopulatedProjectMetadata, type ProjectsRelation, type PersonProjectContribution, type OrganisationUnitProjectContribution } from '@/models/ProjectModel';
+import { FundingType, type Funding, type PrepopulatedFundingMetadata } from '@/models/FundingModel';
 import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
@@ -274,6 +275,7 @@ const costs = ref<MonetaryAmount | undefined>(undefined);
 const relations = ref<ProjectsRelation[]>([]);
 const persons = ref<PersonProjectContribution[]>([]);
 const organisations = ref<OrganisationUnitProjectContribution[]>([]);
+const harvestedFunding = ref<Funding>();
 
 const status = ref<ProjectStatus>();
 const collaborationType = ref<ProjectCollaborationType>();
@@ -291,6 +293,42 @@ const {
 const { languageTags } = useLanguageTags();
 
 const requiredSelectionValueRules = [(v: any) => (v !== undefined && v !== null) || i18n.t("requiredFieldMessage")];
+
+const buildFundingFromMetadata = (metadata: PrepopulatedFundingMetadata): Funding => {
+    const uris: string[] = [];
+    metadata.uris.forEach(uri => {
+        const sanitizedUri = sanitizeUri(uri);
+        if (sanitizedUri && uriValidationRules[0](sanitizedUri) === true && !uris.includes(sanitizedUri)) {
+            uris.push(sanitizedUri);
+        }
+    });
+
+    const invertedRange = !!metadata.dateFrom && !!metadata.dateTo && metadata.dateTo < metadata.dateFrom;
+
+    return {
+        name: metadata.name,
+        nameAbbreviation: metadata.nameAbbreviation,
+        description: metadata.description,
+        keywords: metadata.keywords,
+        uris: uris,
+        doi: metadata.doi || undefined,
+        grantAgreementId: metadata.grantAgreementId || undefined,
+        fundingTypes: [FundingType.GRANT],
+        dateFrom: invertedRange ? undefined : (metadata.dateFrom || undefined),
+        dateTo: invertedRange ? undefined : (metadata.dateTo || undefined),
+        dateAwarded: metadata.dateAwarded || undefined,
+        amount: metadata.monetaryAmount,
+        displayCall: metadata.displayCall,
+        displayProgram: metadata.displayProgram,
+        displayFunder: metadata.displayFunder,
+        internalIdentifiers: [],
+        oldIds: [],
+        mergedIds: [],
+        agreements: [],
+        fundingParts: [],
+        researchAreasId: []
+    };
+};
 
 const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
     if (name.value.length === 0 && metadata.name.length > 0) {
@@ -348,6 +386,10 @@ const populateMetadata = async (metadata: PrepopulatedProjectMetadata) => {
         costs.value = metadata.costs;
     }
 
+    if (!harvestedFunding.value && metadata.funding) {
+        harvestedFunding.value = buildFundingFromMetadata(metadata.funding);
+    }
+
     if (persons.value.length === 0) {
         await personsRef.value?.seedFromMetadata(metadata.persons);
     }
@@ -387,6 +429,7 @@ const submitProject = (stayOnPage: boolean) => {
         organisations: organisations.value,
         persons: persons.value,
         relations: relations.value,
+        funding: harvestedFunding.value,
     };
 
     ProjectService.createProject(newProject).then((response) => {
@@ -411,6 +454,7 @@ const submitProject = (stayOnPage: boolean) => {
             personsRef.value?.clearInput();
             organisations.value = [];
             organisationsRef.value?.clearInput();
+            harvestedFunding.value = undefined;
             status.value = undefined;
             collaborationType.value = undefined;
             researchType.value = undefined;

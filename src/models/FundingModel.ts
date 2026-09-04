@@ -9,7 +9,7 @@ export interface Funding {
     mergedIds: number[];
     doi?: string;
     grantAgreementId?: string;
-    projectId: number;
+    projectId?: number;
     agreements: DocumentFileResponse[];
     fundingParts: FundingPart[];
     name: MultilingualContent[];
@@ -74,7 +74,7 @@ export enum FundingType {
 
 export interface FundingPart {
     id?: number;
-    fundingId?: number;
+    fundingId: number;
     description: MultilingualContent[];
     amount: MonetaryAmount;
     projectEventId?: number;

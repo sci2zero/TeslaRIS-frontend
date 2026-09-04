@@ -111,7 +111,7 @@ import {
     type OrganisationUnitProjectContribution,
     type PrepopulatedOrganisation
 } from "@/models/ProjectModel";
-import type { MultilingualContent } from "@/models/Common";
+import type { MonetaryAmount, MultilingualContent } from "@/models/Common";
 
 withDefaults(defineProps<{
     single?: boolean;
@@ -133,6 +133,7 @@ type ConsortiumInput = {
     dateFrom: string;
     dateTo: string;
     uris: string[];
+    netContribution?: MonetaryAmount;
 };
 
 const { languageTags } = useLanguageTags();
@@ -154,13 +155,15 @@ const blankInput = (): ConsortiumInput => ({
     contributionType: OrganisationUnitProjectContributionType.PARTNER,
     dateFrom: "",
     dateTo: "",
-    uris: []
+    uris: [],
+    netContribution: undefined
 });
 
 const inputs = ref<ConsortiumInput[]>([blankInput()]);
 
 const selectOrganisationUnit = (input: ConsortiumInput, selection: { title: string; value: number } | undefined) => {
     input.organisationUnitId = selection?.value && selection.value > 0 ? selection.value : undefined;
+    input.netContribution = undefined;
     sendContentToParent();
 };
 
@@ -173,6 +176,8 @@ const toggleExternalOU = (input: ConsortiumInput) => {
     } else {
         input.displayOrganisationUnit = [];
     }
+
+    input.netContribution = undefined;
 
     sendContentToParent();
 };
@@ -232,7 +237,10 @@ const seedFromMetadata = async (items: PrepopulatedOrganisation[]) => {
             organisationUnitId: matched ? item.organisationId : undefined,
             enterExternalOU: !matched,
             displayOrganisationUnit: matched ? [] : item.organisationName,
-            contributionType: item.contributionType ?? OrganisationUnitProjectContributionType.PARTNER
+            contributionType: item.contributionType ?? OrganisationUnitProjectContributionType.PARTNER,
+            netContribution: (item.netContribution && item.netContribution.amount > 0) ?
+                item.netContribution :
+                undefined
         });
     }
 
@@ -277,7 +285,8 @@ const sendContentToParent = () => {
             dateFrom: input.dateFrom || undefined,
             dateTo: input.dateTo || undefined,
             uris: input.uris,
-            fundingParts: []
+            fundingParts: [],
+            netContribution: input.netContribution
         });
     });
 
