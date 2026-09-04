@@ -74,7 +74,7 @@ export enum FundingType {
 
 export interface FundingPart {
     id?: number;
-    fundingId: number;
+    fundingId?: number;
     description: MultilingualContent[];
     amount: MonetaryAmount;
     projectEventId?: number;
@@ -111,11 +111,14 @@ export interface PrepopulatedFundingMetadata {
     name: MultilingualContent[];
     nameAbbreviation: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
     uris: string[];
     dateAwarded: string;
     dateFrom: string;
     dateTo: string;
     monetaryAmount: MonetaryAmount;
+    displayCall: MultilingualContent[];
+    displayProgram: MultilingualContent[];
     displayFunder: MultilingualContent[];
     funderDoi: string;
 }

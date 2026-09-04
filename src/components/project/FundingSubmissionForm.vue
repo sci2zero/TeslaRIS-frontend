@@ -284,6 +284,8 @@ const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const amount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
+const displayCall = ref<any[]>([]);
+const displayProgram = ref<any[]>([]);
 const displayFunder = ref<any[]>([]);
 
 const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
@@ -348,6 +350,22 @@ const populateMetadata = async (metadata: PrepopulatedFundingMetadata) => {
         descriptionRef.value?.forceRefreshModelValue(toMultilingualTextInput(description.value, languageTags.value));
     }
 
+    if (keywords.value.length === 0 && (metadata.keywords?.length ?? 0) > 0) {
+        additionalFields.value = true;
+        await nextTick();
+
+        keywords.value = metadata.keywords;
+        keywordsRef.value?.forceRefreshModelValue(toMultilingualTextInput(keywords.value, languageTags.value));
+    }
+
+    if (displayCall.value.length === 0 && (metadata.displayCall?.length ?? 0) > 0) {
+        displayCall.value = metadata.displayCall;
+    }
+
+    if (displayProgram.value.length === 0 && (metadata.displayProgram?.length ?? 0) > 0) {
+        displayProgram.value = metadata.displayProgram;
+    }
+
     if (displayFunder.value.length === 0 && metadata.displayFunder.length > 0) {
         displayFunder.value = metadata.displayFunder;
     }
@@ -382,8 +400,8 @@ const submitFunding = (stayOnPage: boolean) => {
         agreements: [],
         fundingParts: [],
         researchAreasId: [],
-        displayCall: [],
-        displayProgram: [],
+        displayCall: displayCall.value,
+        displayProgram: displayProgram.value,
         displayFunder: displayFunder.value,
     };
 
@@ -402,6 +420,8 @@ const submitFunding = (stayOnPage: boolean) => {
             selectedFundingCall.value = { ...searchPlaceholder };
             funderRef.value?.clearInput();
             selectedFunder.value = { ...searchPlaceholder };
+            displayCall.value = [];
+            displayProgram.value = [];
             displayFunder.value = [];
             dateFrom.value = props.presetProject?.dateFrom ?? "";
             dateTo.value = props.presetProject?.dateTo ?? "";
