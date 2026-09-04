@@ -168,6 +168,7 @@
                         <attachment-list
                             :attachments="fundingProgram?.fileItems ? fundingProgram.fileItems : []"
                             :can-edit="canEdit"
+                            :allowed-resource-types="[ResourceType.PROGRAM_DESCRIPTION, ResourceType.OTHER]"
                             @create="addDocument($event)"
                             @delete="deleteDocument($event)"
                             @update="updateDocument($event)"
@@ -263,7 +264,7 @@ import type { MultilingualContent } from "@/models/Common";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
-import type { DocumentFile } from "@/models/DocumentFileModel";
+import { ResourceType, type DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import DescriptionOrBiographyUpdateForm from "@/components/core/update/DescriptionOrBiographyUpdateForm.vue";

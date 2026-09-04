@@ -238,6 +238,7 @@
                         <attachment-list
                             :attachments="funding?.agreements ? funding.agreements : []"
                             :can-edit="canEdit"
+                            :allowed-resource-types="[ResourceType.CONTRACT, ResourceType.REPORTING_TEMPLATE, ResourceType.OTHER]"
                             @create="addAgreement($event)"
                             @delete="deleteAgreement($event)"
                             @update="updateAgreement($event)"
@@ -286,7 +287,7 @@ import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
-import type { DocumentFile } from "@/models/DocumentFileModel";
+import { ResourceType, type DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import FundingPartList from "@/components/project/FundingPartList.vue";

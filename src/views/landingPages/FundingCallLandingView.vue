@@ -205,6 +205,7 @@
                         <attachment-list
                             :attachments="fundingCall?.fileItems ? fundingCall.fileItems : []"
                             :can-edit="canEdit"
+                            :allowed-resource-types="[ResourceType.CALL_TEXT, ResourceType.APPLICATION_TEMPLATE, ResourceType.OTHER]"
                             @create="addCallDocument($event)"
                             @delete="deleteCallDocument($event)"
                             @update="updateCallDocument($event)"
@@ -282,7 +283,7 @@ import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useUploadStore } from "@/stores/uploadStore";
 import { useLoginStore } from "@/stores/loginStore";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
-import type { DocumentFile } from "@/models/DocumentFileModel";
+import { ResourceType, type DocumentFile } from "@/models/DocumentFileModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import ObjectivesSection from "@/components/project/ObjectivesSection.vue";

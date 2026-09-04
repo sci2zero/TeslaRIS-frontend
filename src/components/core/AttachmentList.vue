@@ -7,6 +7,7 @@
                 :allow-licence-selection="allowLicenceSelection"
                 :always-open-access="alwaysOpenAccess"
                 :disable-resource-type-selection="disableResourceTypeSelection"
+                :allowed-resource-types="allowedResourceTypes"
                 @create="sendDataToParent"
             />
 
@@ -56,6 +57,7 @@
                                             :is-proof="isProof" edit :preset-document-file="attachment"
                                             :allow-licence-selection="allowLicenceSelection"
                                             :disable-resource-type-selection="disableResourceTypeSelection"
+                                            :allowed-resource-types="allowedResourceTypes"
                                             :can-be-archived="canBeArchived"
                                             @update="sendUpdateRequestToParent($event, attachment.id)"
                                         />
@@ -83,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { License, type DocumentFile, type DocumentFileResponse } from '@/models/DocumentFileModel';
+import { License, type DocumentFile, type DocumentFileResponse, type ResourceType } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
 import { defineComponent, type PropType } from 'vue';
 import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
@@ -142,6 +144,10 @@ export default defineComponent({
         canBeArchived: {
             type: Boolean,
             default: false
+        },
+        allowedResourceTypes: {
+            type: Array as PropType<ResourceType[]>,
+            default: undefined
         }
     },
     emits: ["create", "delete", "update", "made-official"],
