@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type DimensionQuality, type EntityTypeQuality, type PublicationCandidateAnalysis, type RepositoryOverview } from "@/models/RevisionModel";
+import { type DimensionQuality, type EntityTypeQuality, type IssueStatistics, type PublicationCandidateAnalysis, type RepositoryOverview } from "@/models/RevisionModel";
 import { useDownloadStore } from "@/stores/downloadStore";
 
 
@@ -23,6 +23,10 @@ export class RepositoryAnalyticsService extends BaseService {
     return super.sendRequest(axios.get, `repository-analytics/dimensions?${this.analyticsParams(profileName, assessmentDate)}`);
   }
 
+  async getIssueStatistics(profileName: string, assessmentDate: string | undefined): Promise<AxiosResponse<IssueStatistics>> {
+    return super.sendRequest(axios.get, `repository-analytics/issue-statistics?${this.analyticsParams(profileName, assessmentDate)}`);
+  }
+
   async downloadPublicationCandidateAnalysis(profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {
     return this.downloadReport("publication-candidates", "publication-candidate-analysis", profileName, assessmentDate, language);
   }
@@ -37,6 +41,10 @@ export class RepositoryAnalyticsService extends BaseService {
 
   async downloadQualityByDimension(profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {
     return this.downloadReport("dimensions", "quality-by-dimension", profileName, assessmentDate, language);
+  }
+
+  async downloadIssueStatistics(profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {
+    return this.downloadReport("issue-statistics", "issue-statistics", profileName, assessmentDate, language);
   }
 
   private async downloadReport(report: string, fileName: string, profileName: string, assessmentDate: string | undefined, language: string): Promise<void> {

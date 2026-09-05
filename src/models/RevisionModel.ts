@@ -257,3 +257,30 @@ export interface PublicationCandidateAnalysis {
     candidateRateByEntityType: EntityTypeQuality[];
     mostCommonBlockingConstraints: PrevalentIssue[];
 }
+
+export interface SeverityBreakdown {
+    entityType: RepositoryEntityType;
+    errorIssues: number;
+    warningIssues: number;
+    infoIssues: number;
+    supported: boolean;
+}
+
+/**
+ * A rule counted across the whole repository rather than for one entity type, so unlike
+ * PrevalentIssue it carries no entity type to render or drill down by.
+ */
+export interface RecurringConstraint {
+    ruleKey: string | null;
+    title: MultilingualContent[];
+    occurrences: number;
+}
+
+export interface IssueStatistics {
+    openIssues: number;
+    errorIssues: number;
+    warningIssues: number;
+    infoIssues: number;
+    issuesBySeverityAndEntityType: SeverityBreakdown[];
+    topRecurringConstraints: RecurringConstraint[];
+}
