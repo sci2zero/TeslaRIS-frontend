@@ -41,12 +41,14 @@
             <upload-progress
                 ref="uploadProgressRef"
             />
+
+            <tutorial-overlay />
         </v-main>
     </v-app>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import axios from "axios";
 import AuthenticationService from "./services/AuthenticationService";
 import { useRoute, useRouter } from "vue-router";
@@ -63,13 +65,15 @@ import UploadProgress from "./components/core/UploadProgress.vue";
 import Navbar from "@/components/core/MainNavbar.vue";
 import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";
+import TutorialOverlay from "@/components/core/TutorialOverlay.vue";
 import { useSidebarStore } from "@/stores/sidebarStore";
+import { useTutorialStore } from "@/stores/tutorialStore";
 import { useGlobalLoading } from "./composables/useGlobalLoading";
 
 
 export default defineComponent({
     name: "App",
-    components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar },
+    components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar, TutorialOverlay },
     setup() {
         const route = useRoute();
 
@@ -91,6 +95,17 @@ export default defineComponent({
             return route.name === "home";
         });
         const sidebarStore = useSidebarStore();
+        const tutorialStore = useTutorialStore();
+        const loginStore = useLoginStore();
+        loginStore.initialize();
+
+        watch(
+            () => [route.name, loginStore.userLoggedIn],
+            () => {
+                tutorialStore.maybeStartForRoute(route.name)
+            },
+            { immediate: true },
+        )
 
         onMounted(async () => {
             try {

@@ -88,6 +88,7 @@
                             class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20"
                             :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                             :aria-label="item.label"
+                            :data-tutorial="item.key === 'persons' || item.key === 'organisation-units' ? `nav-${item.key}` : undefined"
                         >
                             <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
                             <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>

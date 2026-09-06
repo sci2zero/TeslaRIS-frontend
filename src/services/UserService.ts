@@ -1,4 +1,4 @@
-import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest, UserAccountIndex, UserUpdateRequest, ConfirmEmailUpdateRequest } from "@/models/UserModel";
+import type { TakeRoleOfUserRequest, UserResponse, ActivateAccountRequest, UserAccountIndex, UserUpdateRequest, ConfirmEmailUpdateRequest, TutorialProgressUpdateRequest } from "@/models/UserModel";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BaseService } from "./BaseService";
@@ -61,6 +61,14 @@ export class UserService extends BaseService {
 
   async updateUser(body: UserUpdateRequest): Promise<AxiosResponse<AuthenticationResponse>> {
     return super.sendRequest(axios.put, "user", body);
+  }
+
+  async updateTutorialProgress(body: TutorialProgressUpdateRequest): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.put, "user/tutorial-progress", body);
+  }
+
+  async resetTutorialProgress(): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.delete, "user/tutorial-progress");
   }
 
   async takeRoleOfAccount(body: TakeRoleOfUserRequest): Promise<AxiosResponse<AuthenticationResponse>> {

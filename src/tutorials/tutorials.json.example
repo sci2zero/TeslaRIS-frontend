@@ -1,0 +1,79 @@
+{
+    "tutorials": {
+        "onboarding": {
+            "label": "tutorial.onboardingLabel",
+            "triggerRouteNames": ["home"],
+            "persist": "local",
+            "requiresAuth": false,
+            "includes": ["organisationUnits"]
+        },
+        "admin-onboarding": {
+            "label": "tutorial.adminOnboardingLabel",
+            "triggerRouteNames": ["home"],
+            "persist": "backend",
+            "requiresAuth": true,
+            "roles": ["ADMIN"],
+            "includes": ["persons", "organisationUnits"]
+        },
+        "persons": {
+            "label": "tutorial.personsLabel",
+            "triggerRouteNames": ["persons"],
+            "persist": "local",
+            "requiresAuth": true,
+            "roles": ["ADMIN"],
+            "steps": [
+                {
+                    "id": "nav-persons",
+                    "selector": "[data-tutorial=\"nav-persons\"]",
+                    "title": "tutorial.personsNavTitle",
+                    "description": "tutorial.personsNavDescription",
+                    "action": "navigate",
+                    "targetRouteName": "persons"
+                },
+                {
+                    "id": "persons-table",
+                    "selector": "[data-tutorial=\"persons-table\"]",
+                    "title": "tutorial.personsTableTitle",
+                    "description": "tutorial.personsTableDescription",
+                    "action": "next",
+                    "requiredRouteName": "persons",
+                    "focusPadding": 12
+                },
+                {
+                    "id": "add-person",
+                    "selector": "[data-tutorial=\"add-person\"]",
+                    "title": "tutorial.personsAddTitle",
+                    "description": "tutorial.personsAddDescription",
+                    "action": "click",
+                    "requiredRouteName": "persons"
+                }
+            ]
+        },
+        "organisationUnits": {
+            "label": "tutorial.organisationUnitsLabel",
+            "triggerRouteNames": ["organisationUnits"],
+            "persist": "local",
+            "requiresAuth": true,
+            "roles": ["ADMIN"],
+            "steps": [
+                {
+                    "id": "nav-organisation-units",
+                    "selector": "[data-tutorial=\"nav-organisation-units\"]",
+                    "title": "tutorial.organisationUnitsNavTitle",
+                    "description": "tutorial.organisationUnitsNavDescription",
+                    "action": "navigate",
+                    "targetRouteName": "organisationUnits"
+                },
+                {
+                    "id": "organisation-units-table",
+                    "selector": "[data-tutorial=\"organisation-units-table\"]",
+                    "title": "tutorial.organisationUnitsTableTitle",
+                    "description": "tutorial.organisationUnitsTableDescription",
+                    "action": "next",
+                    "requiredRouteName": "organisationUnits",
+                    "focusPadding": 12
+                }
+            ]
+        }
+    }
+}
