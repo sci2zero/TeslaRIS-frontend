@@ -62,14 +62,14 @@
                             <div v-if="project.doi" class="info-item">
                                 <div>DOI:</div>
                                 <div class="response">
-                                    {{ project.doi }}
+                                    <identifier-link :identifier="project.doi" type="doi" />
                                 </div>
                             </div>
 
                             <div v-if="project.raid" class="info-item">
                                 <div>{{ $t("raidLabel") }}:</div>
                                 <div class="response">
-                                    {{ project.raid }}
+                                    <identifier-link :identifier="project.raid" type="raid" />
                                 </div>
                             </div>
 
@@ -138,13 +138,6 @@
                                 </div>
                             </div>
 
-                            <div v-if="project.notFunded !== undefined && project.notFunded !== null" class="info-item">
-                                <div>{{ $t("notFundedLabel") }}:</div>
-                                <div class="response">
-                                    {{ project.notFunded ? $t("yesLabel") : $t("noLabel") }}
-                                </div>
-                            </div>
-
                             <div v-if="project.costs" class="info-item">
                                 <div>{{ $t("costsLabel") }}:</div>
                                 <div class="response">
@@ -201,7 +194,7 @@
             <v-tabs-window-item value="team">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-persons-tab
+                        <project-persons-table-component
                             v-if="project?.id"
                             :project-id="project.id"
                             :persons="project.persons ?? []"
@@ -215,7 +208,7 @@
             <v-tabs-window-item value="consortium">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-organisations-tab
+                        <project-organisations-table-component
                             v-if="project?.id"
                             :project-id="project.id"
                             :organisations="project.organisations ?? []"
@@ -229,7 +222,7 @@
             <v-tabs-window-item value="fundings">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-fundings-tab
+                        <project-fundings-table-component
                             v-if="project?.id"
                             :project="project"
                             :can-edit="canEdit"
@@ -241,7 +234,7 @@
             <v-tabs-window-item value="fundingApplications">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-funding-applications-tab
+                        <project-funding-applications-table-component
                             v-if="project?.id"
                             :project-id="project.id"
                             :can-edit="canEdit"
@@ -253,7 +246,7 @@
             <v-tabs-window-item value="documents">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-documents-tab
+                        <project-documents-table-component
                             v-if="project?.id"
                             :project-id="project.id"
                             :can-edit="canEdit"
@@ -265,7 +258,7 @@
             <v-tabs-window-item value="events">
                 <v-row class="mt-10">
                     <v-col cols="12">
-                        <project-events-tab
+                        <project-events-table-component
                             v-if="project?.id"
                             :project-id="project.id"
                             :can-edit="canEdit"
@@ -303,6 +296,7 @@ import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
 import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
 import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project } from "@/models/ProjectModel";
@@ -318,12 +312,12 @@ import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
-import ProjectFundingsTab from "@/components/project/ProjectFundingsTab.vue";
-import ProjectFundingApplicationsTab from "@/components/project/ProjectFundingApplicationsTab.vue";
-import ProjectPersonsTab from "@/components/project/ProjectPersonsTab.vue";
-import ProjectOrganisationsTab from "@/components/project/ProjectOrganisationsTab.vue";
-import ProjectDocumentsTab from "@/components/project/ProjectDocumentsTab.vue";
-import ProjectEventsTab from "@/components/project/ProjectEventsTab.vue";
+import ProjectFundingsTableComponent from "@/components/project/ProjectFundingsTableComponent.vue";
+import ProjectFundingApplicationsTableComponent from "@/components/project/ProjectFundingApplicationsTableComponent.vue";
+import ProjectPersonsTableComponent from "@/components/project/ProjectPersonsTableComponent.vue";
+import ProjectOrganisationsTableComponent from "@/components/project/ProjectOrganisationsTableComponent.vue";
+import ProjectDocumentsTableComponent from "@/components/project/ProjectDocumentsTableComponent.vue";
+import ProjectEventsTableComponent from "@/components/project/ProjectEventsTableComponent.vue";
 import Toast from "@/components/core/Toast.vue";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";

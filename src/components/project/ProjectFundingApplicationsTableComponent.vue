@@ -1,80 +1,95 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("fundingApplicationsLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('fundingApplicationsLabel')"
+        :selected-count="selectedApplications.length"
+        :can-act="canEdit"
+    >
+        <template #top-left>
+            <search-bar-component
+                :transparent="false"
+                size="small"
+                @search="onSearch"
+            />
+        </template>
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="unlinkSelected"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-link-off
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-plus"
                 @click="addDialog = true">
                 {{ $t("addFundingApplicationLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-delete"
-                :disabled="selectedApplications.length === 0"
-                @click="displayPersistentDialog = true">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table-server
-        v-model="selectedApplications"
-        :items="fundingApplications"
-        :headers="headers"
-        item-value="row"
-        :items-length="totalApplications"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedApplications"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link :to="'funding-application/' + row.item.databaseId">
-                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? row.item.projectNameSr : row.item.projectNameOther) }}
-                    </localized-link>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.decisionDate)) }}
-                </td>
-                <td>
-                    <v-chip
-                        v-if="row.item.result"
-                        size="small"
-                        :color="getFundingApplicationResultColor(row.item.result)"
-                        variant="flat"
-                    >
-                        {{ getFundingApplicationResultTitleFromValueAutoLocale(row.item.result) }}
-                    </v-chip>
-                    <span v-else>{{ displayTextOrPlaceholder("") }}</span>
-                </td>
-            </tr>
         </template>
-    </v-data-table-server>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table-server
+            v-model="selectedApplications"
+            :items="fundingApplications"
+            :headers="headers"
+            item-value="row"
+            :items-length="totalApplications"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="page + 1"
+            @update:options="refreshTable">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedApplications"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link :to="'funding-application/' + row.item.databaseId">
+                            {{ applicationTitle(row.item) }}
+                        </localized-link>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.decisionDate)) }}
+                    </td>
+                    <td>
+                        <v-chip
+                            v-if="row.item.result"
+                            size="small"
+                            :color="getFundingApplicationResultColor(row.item.result)"
+                            variant="flat"
+                        >
+                            {{ getFundingApplicationResultTitleFromValueAutoLocale(row.item.result) }}
+                        </v-chip>
+                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -83,7 +98,7 @@
             </v-card-title>
             <v-card-text>
                 <funding-application-autocomplete-search
-                    :preset-funding-call-id="fundingCallId"
+                    :preset-project-id="projectId"
                     @selected="linkExistingApplication($event)"
                     @create="onApplicationCreated"
                 />
@@ -97,13 +112,6 @@
         </v-card>
     </v-dialog>
 
-    <persistent-question-dialog
-        v-model="displayPersistentDialog"
-        :title="$t('areYouSureLabel')"
-        :message="$t('confirmDeletionMessage')"
-        :entity-names="selectedApplications.map(application => applicationTitle(application))"
-        @continue="deleteSelected" />
-
     <toast v-model="snackbar" :message="snackbarMessage" />
 </template>
 
@@ -116,14 +124,15 @@ import type { FundingApplicationIndex } from "@/models/FundingApplicationModel";
 import type { ErrorResponse } from "@/models/Common";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingApplicationAutocompleteSearch from "@/components/project/FundingApplicationAutocompleteSearch.vue";
-import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
+import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import { getFundingApplicationResultColor, getFundingApplicationResultTitleFromValueAutoLocale } from "@/i18n/fundingApplicationResult";
 
 const props = defineProps({
-    fundingCallId: {
+    projectId: {
         type: Number,
         required: true
     },
@@ -140,7 +149,6 @@ const totalApplications = ref(0);
 const selectedApplications = ref<FundingApplicationIndex[]>([]);
 
 const addDialog = ref(false);
-const displayPersistentDialog = ref(false);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 
@@ -150,7 +158,7 @@ const sort = ref("");
 const direction = ref("");
 
 const headers = computed(() => [
-    { title: i18n.t("projectLabel"), align: "start", sortable: true, key: "project" },
+    { title: i18n.t("fundingCallLabel"), align: "start", sortable: true, key: "fundingCall" },
     { title: i18n.t("funderLabel"), align: "start", sortable: false, key: "funder" },
     { title: i18n.t("submissionDateLabel"), align: "start", sortable: true, key: "submissionDate" },
     { title: i18n.t("dateOfDecisionLabel"), align: "start", sortable: true, key: "decisionDate" },
@@ -160,27 +168,35 @@ const headers = computed(() => [
 const sortFieldMappings = computed<Map<string, string>>(() => {
     const isSr = i18n.locale.value.startsWith("sr");
     return new Map([
-        ["project", isSr ? "project_name_sr_sortable" : "project_name_other_sortable"],
+        ["fundingCall", isSr ? "funding_call_name_sr_sortable" : "funding_call_name_other_sortable"],
         ["submissionDate", "submission_date"],
         ["decisionDate", "decision_date"]
     ]);
 });
 
-const defaultSortField = computed(() => sortFieldMappings.value.get("project") as string);
+const defaultSortField = computed(() => sortFieldMappings.value.get("fundingCall") as string);
 
 const applicationTitle = (application: FundingApplicationIndex) => {
     const isSr = i18n.locale.value.startsWith("sr");
-    const projectName = isSr ? application.projectNameSr : application.projectNameOther;
     const callName = isSr ? application.fundingCallNameSr : application.fundingCallNameOther;
-    const combined = [projectName, callName].filter(part => part).join(" — ");
-    return combined || `#${application.databaseId}`;
+    return callName || `#${application.databaseId}`;
+};
+
+// An empty search box emits an empty string, so fall back to "*" -- otherwise the query
+// would go out without a single tokens parameter.
+const searchParams = ref("tokens=*");
+
+const onSearch = (tokens: string) => {
+    searchParams.value = tokens ? tokens : "tokens=*";
+    page.value = 0;
+    fetchFundingApplications();
 };
 
 const fetchFundingApplications = () => {
     const sortField = sort.value || defaultSortField.value;
     const sortDir = sort.value ? direction.value : "ASC";
-    const params = `tokens=*&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
-    FundingApplicationService.searchFundingApplications(params, null, props.fundingCallId).then((response) => {
+    const params = `${searchParams.value}&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
+    FundingApplicationService.searchFundingApplications(params, props.projectId).then((response) => {
         fundingApplications.value = response.data.content;
         totalApplications.value = response.data.totalElements;
     });
@@ -209,7 +225,7 @@ const linkExistingApplication = (selected: { title: string; value: number; }) =>
     addDialog.value = false;
     FundingApplicationService.readFundingApplication(selected.value).then((response) => {
         const fundingApplication = response.data;
-        fundingApplication.fundingCallId = props.fundingCallId;
+        fundingApplication.projectId = props.projectId;
         return FundingApplicationService.updateFundingApplication(selected.value, fundingApplication);
     }).then(() => {
         notify(i18n.t("updatedSuccessMessage"));
@@ -225,15 +241,22 @@ const onApplicationCreated = () => {
     refetchAfterReindex();
 };
 
-const deleteSelected = () => {
+const unlinkApplication = (applicationId: number) => {
+    return FundingApplicationService.readFundingApplication(applicationId).then((response) => {
+        const fundingApplication = response.data;
+        fundingApplication.projectId = undefined;
+        return FundingApplicationService.updateFundingApplication(applicationId, fundingApplication);
+    });
+};
+
+const unlinkSelected = () => {
     const removedIds = selectedApplications.value.map((application) => application.databaseId);
-    const removedNames = selectedApplications.value.map((application) => applicationTitle(application)).join(", ");
-    Promise.all(removedIds.map((applicationId) => FundingApplicationService.deleteFundingApplication(applicationId)))
+    Promise.all(removedIds.map((applicationId) => unlinkApplication(applicationId)))
         .then(() => {
             fundingApplications.value = fundingApplications.value.filter((application) => !removedIds.includes(application.databaseId));
             totalApplications.value = Math.max(0, totalApplications.value - removedIds.length);
             selectedApplications.value = [];
-            notify(i18n.t("deleteSuccessNotification", { name: removedNames }));
+            notify(i18n.t("updatedSuccessMessage"));
         })
         .catch((error: AxiosError<ErrorResponse>) => {
             notifyError(error);

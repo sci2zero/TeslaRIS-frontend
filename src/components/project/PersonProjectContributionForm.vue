@@ -1,7 +1,7 @@
 <template>
-    <v-container v-for="(input, index) in inputs" :key="index" class="bottom-spacer section-box">
+    <v-container v-for="(input, index) in inputs" :key="index" :class="['bottom-spacer', { 'section-box': !single }]">
         <v-row>
-            <v-col cols="10">
+            <v-col :cols="single ? 12 : 10">
                 <person-contribution-base
                     :ref="(el) => (baseContributionRef[index] = el)"
                     :basic="false"
@@ -12,7 +12,7 @@
                     @set-input="input.contribution = $event; sendContentToParent();"
                 />
             </v-col>
-            <v-col cols="2">
+            <v-col v-if="!single" cols="2">
                 <v-col>
                     <v-btn
                         v-show="inputs.length > ((presetContributions && presetContributions.length > 0) ? 0 : 1)"
@@ -88,11 +88,13 @@ const props = withDefaults(defineProps<{
     isUpdate?: boolean;
     lockContributionType?: PersonProjectContributionType[];
     allowExternalAssociate?: boolean;
+    single?: boolean;
 }>(), {
     presetContributions: () => [],
     isUpdate: false,
     lockContributionType: undefined,
-    allowExternalAssociate: false
+    allowExternalAssociate: false,
+    single: false
 });
 
 const emit = defineEmits<{

@@ -118,11 +118,9 @@
 
         <v-row>
             <v-col cols="6">
-                <v-switch
+                <v-checkbox
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
-                    color="primary"
-                    hide-details
                 />
             </v-col>
             <v-col v-if="oaMandated" cols="6">
@@ -136,30 +134,24 @@
 
         <v-row>
             <v-col cols="6">
-                <v-switch
+                <v-checkbox
                     v-model="competitive"
                     :label="$t('competitiveLabel')"
-                    color="primary"
-                    hide-details
                 />
             </v-col>
             <v-col cols="6">
-                <v-switch
+                <v-checkbox
                     v-model="renewable"
                     :label="$t('renewableLabel')"
-                    color="primary"
-                    hide-details
                 />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col cols="6">
-                <v-switch
+                <v-checkbox
                     v-model="internalInvestment"
                     :label="$t('internalInvestmentLabel')"
-                    color="primary"
-                    hide-details
                 />
             </v-col>
         </v-row>

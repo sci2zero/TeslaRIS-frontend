@@ -43,6 +43,11 @@
                                 :label="$t('showOnlyActiveLabel')"
                                 hide-details
                             />
+                            <v-checkbox
+                                v-model="returnOnlyWithoutContributions"
+                                :label="$t('showOnlyWithoutContributions')"
+                                hide-details
+                            />
                         </div>
                     </v-menu>
                     <v-btn v-if="isAdmin" color="primary" @click="addProject">
@@ -105,6 +110,7 @@ const projectStatuses = computed(() => getProjectStatusesForGivenLocale() ?? [])
 const selectedStatuses = ref<{ title: string, value: ProjectStatus }[]>([]);
 
 const returnOnlyActiveProjects = ref(false);
+const returnOnlyWithoutContributions = ref(false);
 const initialLoad = ref(true);
 
 const i18n = useI18n();
@@ -123,6 +129,12 @@ watch(returnOnlyActiveProjects, () => {
     }
 });
 
+watch(returnOnlyWithoutContributions, () => {
+  if (!initialLoad.value) {
+    search(searchParams.value);
+  }
+});
+
 const clearSortAndPerformSearch = (tokenParams: string) => {
     tableRef.value?.setSortAndPageOption([], 1);
     page.value = 0;
@@ -136,6 +148,7 @@ const search = (tokenParams: string) => {
     ProjectService.searchProjects(
         `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
         returnOnlyActiveProjects.value,
+        returnOnlyWithoutContributions.value,
         selectedStatuses.value.map(status => status.value)
     ).then((response) => {
         projects.value = response.data.content;

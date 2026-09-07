@@ -28,8 +28,7 @@
                     :filename="organisationUnit?.logoServerFilename"
                     :background-color-hex="organisationUnit?.logoBackgroundHex"
                     :org-unit-id="organisationUnit?.id"
-                    :can-edit="canEdit">
-                </organisation-unit-logo>
+                    :can-edit="canEdit" />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -67,7 +66,7 @@
                                     Scopus AFID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -76,7 +75,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -237,7 +236,7 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -252,7 +251,7 @@
                                     {{ $t("websiteLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
+                                    <uri-list :uris="organisationUnit?.uris" />
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -271,8 +270,7 @@
                                         ref="mapRef" height="250px"
                                         :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
                                         :read-only="true"
-                                        :show-input="false">
-                                    </open-layers-map>
+                                        :show-input="false" />
                                 </div>
                             </v-col>
                         </v-row>
@@ -400,7 +398,7 @@
                 </v-btn>
             </div>
         </div>
-        <br />
+        <br>
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
             v-if="organisationUnit"
@@ -413,6 +411,9 @@
             </v-tab>
             <v-tab value="employees">
                 {{ $t("employeesLabel") }}
+            </v-tab>
+            <v-tab value="projects">
+                {{ $t("projectsLabel") }}
             </v-tab>
             <v-tab value="relations">
                 {{ $t("relationsLabel") }}
@@ -450,13 +451,13 @@
                             return-object
                             class="publication-type-select"
                             multiple
-                        ></v-select>
+                        />
                         <v-checkbox
                             v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
                             v-model="returnOnlyNonArchived"
                             :label="$t('showNonArchivedLabel')"
                             class="mt-2"
-                        ></v-checkbox>
+                        />
                     </div>
                     <div
                         v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
@@ -485,8 +486,7 @@
                             commissionId: null
                         }"
                     :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
-                    @switch-page="switchPublicationsPage">
-                </publication-table-component>
+                    @switch-page="switchPublicationsPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
@@ -504,8 +504,7 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true); fetchEmployees(false);">
-                </person-table-component>
+                    @delete="fetchEmployees(true); fetchEmployees(false);" />
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
@@ -517,9 +516,48 @@
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                         :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
-                        @switch-page="switchAlumniPage">
-                    </person-table-component>
+                        @switch-page="switchAlumniPage" />
                 </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="projects">
+                <project-table-component
+                    ref="projectsRef"
+                    hide-bulk-actions
+                    :projects="projects"
+                    :total-projects="totalProjects"
+                    :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    @switch-page="switchProjectsPage">
+                    <template #top-left>
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformProjectSearch($event)"
+                        />
+                    </template>
+                    <template #actions>
+                        <v-menu>
+                            <template #activator="{ props: optionsProps }">
+                                <v-btn
+                                    v-bind="optionsProps"
+                                    color="white"
+                                    prepend-icon="mdi-dots-vertical"
+                                >
+                                    {{ $t("optionsLabel") }}
+                                </v-btn>
+                            </template>
+                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                <v-checkbox
+                                    v-model="returnOnlyActiveProjects"
+                                    :label="$t('showOnlyActiveLabel')"
+                                    hide-details
+                                />
+                            </div>
+                        </v-menu>
+                    </template>
+                    <template #status-filter-menu>
+                        <project-status-filter v-model="selectedProjectStatuses" />
+                    </template>
+                </project-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->
@@ -527,10 +565,10 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations" />
 
                                 <h2>{{ $t("relationsLabel") }}</h2>
-                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
+                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links" />
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -547,8 +585,7 @@
                                 :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
                                 :endpoint-token-parameters="['*', String(organisationUnit.id)]"
                                 :top-level-institution-id="organisationUnit.id"
-                                @switch-page="switchSubUnitsPage">
-                            </organisation-unit-table-component>
+                                @switch-page="switchSubUnitsPage" />
                         </v-col>
                     </v-row>
                 </div>
@@ -559,16 +596,14 @@
                     :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="organisationUnit?.description ? organisationUnit.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <!-- Research Area -->
                 <v-row>
@@ -578,8 +613,7 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="organisationUnit?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas" />
 
                                 <h3 class="mb-1">
                                     {{ $t("researchAreasLabel") }}
@@ -656,6 +690,10 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
 import { ApplicableEntityType, ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
+import ProjectService from '@/services/project/ProjectService';
+import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -711,7 +749,7 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("relations");
         const displayPersistentDialog = ref(false);
@@ -751,6 +789,17 @@ export default defineComponent({
         const alumniSort = ref("");
         const alumniDirection = ref("");
         const personSearchParams = ref("tokens=*");
+
+        const projects = ref<ProjectIndex[]>([]);
+        const totalProjects = ref<number>(0);
+        const projectsPage = ref(0);
+        const projectsSize = ref(10);
+        const projectsSort = ref("");
+        const projectsDirection = ref("");
+        const projectSearchParams = ref("tokens=*");
+        const selectedProjectStatuses = ref<ProjectStatus[]>([]);
+        const returnOnlyActiveProjects = ref(false);
+        const projectsRef = ref<typeof ProjectTableComponent>();
 
         const subUnitsPage = ref(0);
         const subUnitsSize = ref(10);
@@ -844,7 +893,8 @@ export default defineComponent({
                     document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                     
                     if(uponStartup) {
-                        const operations = [fetchEmployees(false), fetchEmployees(true)];
+                        const operations =
+                            [fetchEmployees(false), fetchEmployees(true), fetchProjects()];
                         if (showOutputs.value) {
                             operations.push(fetchPublications());
                         }
@@ -950,6 +1000,41 @@ export default defineComponent({
                     totalEmployees.value = response.data.totalElements;
                 }
             });
+        };
+
+        const switchProjectsPage = (nextPage: number, pageSize: number, sortField?: string, sortDir?: string) => {
+            projectsPage.value = nextPage;
+            projectsSize.value = pageSize;
+            projectsSort.value = sortField ?? "";
+            projectsDirection.value = sortDir ?? "";
+            fetchProjects();
+        };
+
+        const fetchProjects = () => {
+            return ProjectService.findProjectsForOrganisationUnit(
+                parseInt(currentRoute.params.id as string),
+                `${projectSearchParams.value}&page=${projectsPage.value}&size=${projectsSize.value}&sort=${projectsSort.value},${projectsDirection.value}`,
+                returnOnlyActiveProjects.value,
+                selectedProjectStatuses.value
+            ).then((response) => {
+                projects.value = response.data.content;
+                totalProjects.value = response.data.totalElements;
+            });
+        };
+
+        watch([selectedProjectStatuses, returnOnlyActiveProjects], () => {
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            fetchProjects();
+        });
+
+        const clearSortAndPerformProjectSearch = (tokenParams: string) => {
+            projectSearchParams.value = tokenParams;
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            projectsSort.value = "";
+            projectsDirection.value = "";
+            fetchProjects();
         };
 
         const clearSortAndPerformPersonSearch = (tokenParams: string) => {
@@ -1256,7 +1341,10 @@ export default defineComponent({
             openMetadataEnrichmentDialog, displayPersistentDialog,
             startMetadataEnrichment, updateDescription,
             getOUSectorFromValueAutoLocale, localiseDate,
-            organisationUnitIdentifiers, fetchIdentifiers
+            organisationUnitIdentifiers, fetchIdentifiers,
+            projects, totalProjects, projectsRef, switchProjectsPage,
+            selectedProjectStatuses, returnOnlyActiveProjects,
+            clearSortAndPerformProjectSearch
         };
 }})
 

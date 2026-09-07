@@ -64,7 +64,12 @@ export class FundingCallService extends BaseService {
     }
 
     async updateCallDocument(attachment: any): Promise<AxiosResponse<DocumentFileResponse>> {
-        attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
+        if (typeof attachment.accessRights === "number") {
+            attachment.accessRights = getNameFromOrdinal(AccessRights, attachment.accessRights);
+        }
+        if (typeof attachment.resourceType === "number") {
+            attachment.resourceType = getNameFromOrdinal(ResourceType, attachment.resourceType);
+        }
         return super.sendMultipartFormDataRequest(axios.patch, `funding-call/update-call`, attachment, FundingCallService.idempotencyKey);
     }
 }

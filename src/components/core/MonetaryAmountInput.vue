@@ -3,7 +3,8 @@
         <v-col cols="7">
             <v-text-field
                 v-model="amountInput"
-                :label="$t('amountLabel')"
+                :label="resolvedAmountLabel"
+                :placeholder="resolvedAmountLabel"
                 type="number"
                 :min="0"
                 :rules="rules"
@@ -25,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import type { Currency, MonetaryAmount } from "@/models/Common";
 import CurrencyService from "@/services/CurrencyService";
@@ -33,10 +34,14 @@ import CurrencyService from "@/services/CurrencyService";
 interface Props {
     presetAmount?: MonetaryAmount;
     required?: boolean;
+    // What the amount actually stands for varies by caller -- costs, requested amount, total.
+    // Left empty it falls back to the generic "Amount".
+    amountLabel?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    required: false
+    required: false,
+    amountLabel: ""
 });
 
 const emit = defineEmits<{
@@ -44,6 +49,8 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
+
+const resolvedAmountLabel = computed(() => props.amountLabel ? props.amountLabel : i18n.t("amountLabel"));
 
 const currencies = ref<Currency[]>([]);
 const amountInput = ref<number | null>(props.presetAmount?.amount ?? null);

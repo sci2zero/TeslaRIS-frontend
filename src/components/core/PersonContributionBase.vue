@@ -61,7 +61,7 @@
                 :no-data-text="$t('noDataMessage')"
                 return-object
                 @update:model-value="sendContentToParent"
-            ></v-select>
+            />
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="4">
             <v-text-field
@@ -75,12 +75,12 @@
             />
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
-            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent"></v-text-field>
+            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent" />
         </v-col>
         <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
             <v-text-field
                 v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"
-                @update:model-value="sendContentToParent"></v-text-field>
+                @update:model-value="sendContentToParent" />
         </v-col>
         <v-col v-if="!selectExternalAssociate" cols="2" class="custom-label">
             <v-btn color="primary" class="text-body-2" @click="customNameInput = !customNameInput">
@@ -106,7 +106,7 @@
                 return-object
                 multiple
                 @update:model-value="sendContentToParent"
-            ></v-select>
+            />
         </v-col>
     </v-row>
     <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
@@ -448,7 +448,7 @@ export default defineComponent({
                 middleName.value = props.presetContributionValue.selectedOtherName[1];
                 lastName.value = props.presetContributionValue.selectedOtherName[2];
 
-                if(props.presetContributionValue.personId && !isNaN(props.presetContributionValue.personId)) {
+                if(props.presetContributionValue.personId > 0) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
                         personPrimaryName.value = personResponse.data.personName;
                         
@@ -490,7 +490,10 @@ export default defineComponent({
 
                         sendContentToParent();
                     });
-                } else {
+                } else if (!props.presetContributionValue.personId) {
+                    // A missing id means a non-managed contributor. The -1 placeholder only means
+                    // "nothing picked yet", so it must neither flip the row into external mode nor
+                    // reach readPerson(-1).
                     customNameInput.value = true;
                     selectExternalAssociate.value = true;
                 }

@@ -17,6 +17,12 @@
 
         <v-row>
             <v-col>
+                <funding-autocomplete-search v-model="selectedFunding" />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
@@ -128,6 +134,7 @@ import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import PersonAutocompleteSearch from '@/components/person/PersonAutocompleteSearch.vue';
 import ProjectAutocompleteSearch from '@/components/project/ProjectAutocompleteSearch.vue';
 import FundingCallAutocompleteSearch from '@/components/project/FundingCallAutocompleteSearch.vue';
+import FundingAutocompleteSearch from '@/components/project/FundingAutocompleteSearch.vue';
 import FundingApplicationAutocompleteSearch from '@/components/project/FundingApplicationAutocompleteSearch.vue';
 import {returnCurrentLocaleContent, toMultilingualTextInput} from '@/i18n/MultilingualContentUtil';
 import {useLanguageTags} from '@/composables/useLanguageTags';
@@ -137,6 +144,7 @@ import {getFundingApplicationResultsForGivenLocale} from '@/i18n/fundingApplicat
 import PersonService from '@/services/PersonService';
 import ProjectService from '@/services/project/ProjectService';
 import FundingCallService from '@/services/project/FundingCallService';
+import FundingService from '@/services/project/FundingService';
 import FundingApplicationService from '@/services/project/FundingApplicationService';
 
 const props = defineProps<{
@@ -158,6 +166,7 @@ const searchPlaceholder = { title: "", value: -1 };
 
 const selectedProject = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 const selectedFundingCall = ref<{ title: string, value: number }>({ ...searchPlaceholder });
+const selectedFunding = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 const selectedRevisedFundingApplication = ref<{ title: string, value: number }>({ ...searchPlaceholder });
 
 const submitter = ref<{ title: string, value: number } | undefined>(undefined);
@@ -199,6 +208,17 @@ const resolvePresetSelections = () => {
     if (fundingCallId) {
         FundingCallService.readFundingCall(fundingCallId).then((response) => {
             selectedFundingCall.value = { title: returnCurrentLocaleContent(response.data.name) as string, value: fundingCallId };
+        });
+    }
+
+    const fundingId = props.presetFundingApplication?.fundingId;
+    selectedFunding.value = { ...searchPlaceholder };
+    if (fundingId) {
+        FundingService.readFunding(fundingId).then((response) => {
+            selectedFunding.value = {
+                title: returnCurrentLocaleContent(response.data.name) ?? `#${fundingId}`,
+                value: fundingId
+            };
         });
     }
 
@@ -264,6 +284,7 @@ const submit = () => {
         projectId: selectedProject.value.value > 0 ? selectedProject.value.value : undefined,
         fundingCallId: selectedFundingCall.value.value,
         revisedFundingApplicationId: selectedRevisedFundingApplication.value.value > 0 ? selectedRevisedFundingApplication.value.value : undefined,
+        fundingId: selectedFunding.value.value > 0 ? selectedFunding.value.value : undefined,
         submitterId: submitterId.value,
         requestedAmount: requestedAmount.value,
         description: description.value,

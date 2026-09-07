@@ -1,66 +1,81 @@
 <template>
-    <v-row class="mt-5 align-center">
-        <v-col cols="auto">
-            <h2>{{ $t("fundingCallsLabel") }}</h2>
-        </v-col>
-        <v-spacer />
-        <v-col v-if="canEdit" cols="auto">
+    <table-toolbar
+        :title="$t('fundingCallsLabel')"
+        :selected-count="selectedFundingCalls.length"
+        :can-act="canEdit"
+    >
+        <template #top-left>
+            <search-bar-component
+                :transparent="false"
+                size="small"
+                @search="onSearch"
+            />
+        </template>
+        <template #action-items>
+            <v-list-item
+                class="action-menu-item"
+                @click="unlinkSelected"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-link-off
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
             <v-btn
-                density="comfortable"
+                v-if="canEdit"
                 color="primary"
                 prepend-icon="mdi-plus"
                 @click="addDialog = true">
                 {{ $t("addFundingCallLabel") }}
             </v-btn>
-            <v-btn
-                density="comfortable"
-                class="ml-2"
-                color="error"
-                variant="outlined"
-                prepend-icon="mdi-link-off"
-                :disabled="selectedFundingCalls.length === 0"
-                @click="unlinkSelected">
-                {{ $t("removeLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-
-    <v-data-table-server
-        v-model="selectedFundingCalls"
-        :items="fundingCalls"
-        :headers="headers"
-        item-value="row"
-        :items-length="totalFundingCalls"
-        :show-select="canEdit"
-        return-object
-        :items-per-page-text="$t('itemsPerPageLabel')"
-        :items-per-page-options="[5, 10, 25, 50]"
-        :no-data-text="$t('noDataInTableMessage')"
-        @update:options="refreshTable">
-        <template #item="row">
-            <tr>
-                <td v-if="canEdit">
-                    <v-checkbox
-                        v-model="selectedFundingCalls"
-                        :value="row.item"
-                        class="table-checkbox"
-                        hide-details
-                    />
-                </td>
-                <td>
-                    <localized-link :to="'funding-call/' + row.item.databaseId">
-                        {{ $i18n.locale.startsWith("sr") ? row.item.nameSr : row.item.nameOther }}
-                    </localized-link>
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
-                </td>
-                <td>
-                    {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
-                </td>
-            </tr>
         </template>
-    </v-data-table-server>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table-server
+            v-model="selectedFundingCalls"
+            :items="fundingCalls"
+            :headers="headers"
+            item-value="row"
+            :items-length="totalFundingCalls"
+            :show-select="canEdit"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="page + 1"
+            @update:options="refreshTable">
+            <template #item="row">
+                <tr>
+                    <td v-if="canEdit">
+                        <v-checkbox
+                            v-model="selectedFundingCalls"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td>
+                        <localized-link :to="'funding-call/' + row.item.databaseId">
+                            {{ $i18n.locale.startsWith("sr") ? row.item.nameSr : row.item.nameOther }}
+                        </localized-link>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </div>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -99,6 +114,8 @@ import type { ErrorResponse, MultilingualContent } from "@/models/Common";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingCallAutocompleteSearch from "@/components/project/FundingCallAutocompleteSearch.vue";
 import Toast from "@/components/core/Toast.vue";
+import TableToolbar from "@/components/core/TableToolbar.vue";
+import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 
@@ -147,10 +164,20 @@ const sortFieldMappings = computed<Map<string, string>>(() => {
 
 const defaultSortField = computed(() => sortFieldMappings.value.get("name") as string);
 
+// An empty search box emits an empty string, so fall back to "*" -- otherwise the query
+// would go out without a single tokens parameter.
+const searchParams = ref("tokens=*");
+
+const onSearch = (tokens: string) => {
+    searchParams.value = tokens ? tokens : "tokens=*";
+    page.value = 0;
+    fetchFundingCalls();
+};
+
 const fetchFundingCalls = () => {
     const sortField = sort.value || defaultSortField.value;
     const sortDir = sort.value ? direction.value : "ASC";
-    const params = `tokens=*&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
+    const params = `${searchParams.value}&page=${page.value}&size=${size.value}&sort=${sortField},${sortDir}`;
     FundingCallService.searchFundingCalls(params, props.fundingProgramId).then((response) => {
         fundingCalls.value = response.data.content;
         totalFundingCalls.value = response.data.totalElements;

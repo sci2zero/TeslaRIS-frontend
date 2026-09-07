@@ -3,10 +3,12 @@
         <v-col cols="11">
             <v-autocomplete
                 v-model="selectedFunding"
-                :label="$t('fundingLabel')"
-                :items="readonly ? [] : fundings"
+                :label="(label ? $t(label) : $t('fundingLabel')) + (required ? '*' : '')"
+                :items="readOnly ? [] : fundings"
                 :custom-filter="(() => true)"
+                :rules="required ? requiredSelectionRules : []"
                 :no-data-text="$t('noDataMessage')"
+                :readonly="readOnly"
                 return-object
                 @update:search="searchFundings($event)"
                 @update:model-value="sendContentToParent"
@@ -35,29 +37,40 @@ import type { Funding, FundingIndex } from "@/models/FundingModel";
 import type { Project } from "@/models/ProjectModel";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingSubmissionForm from "@/components/project/FundingSubmissionForm.vue";
+import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import { useValidationUtils } from "@/utils/ValidationUtils";
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
+    modelValue?: { title: string; value: number };
+    label?: string;
     presetFundingCallId?: number;
     presetProject?: Project;
-    readonly?: boolean;
+    required?: boolean;
+    readOnly?: boolean;
 }>(), {
+    modelValue: undefined,
+    label: "",
     presetFundingCallId: undefined,
     presetProject: undefined,
-    readonly: false
+    required: false,
+    readOnly: false
 });
 
 const emit = defineEmits<{
+    (e: "update:modelValue", payload: { title: string; value: number }): void;
     (e: "selected", payload: { title: string; value: number }): void;
     (e: "create", payload: Funding): void;
 }>();
 
 const i18n = useI18n();
+const { requiredSelectionRules } = useValidationUtils();
+
 const searchPlaceholder = { title: "", value: -1 };
 
 const modalRef = ref<InstanceType<typeof GenericCrudModal> | null>(null);
 
 const fundings = ref<{ title: string; value: number; }[]>([]);
-const selectedFunding = ref<{ title: string; value: number; }>(searchPlaceholder);
+const selectedFunding = ref<{ title: string; value: number; }>(props.modelValue ?? { ...searchPlaceholder });
 
 const lastSearchInput = ref("");
 
@@ -106,13 +119,31 @@ watch(selectedFunding, () => {
     }
 });
 
+watch(() => props.modelValue, () => {
+    selectedFunding.value = props.modelValue ?? { ...searchPlaceholder };
+});
+
 const sendContentToParent = () => {
-    if (selectedFunding.value && selectedFunding.value.value > 0) {
+    if (selectedFunding.value?.value === 0) {
+        return;
+    }
+
+    emit("update:modelValue", selectedFunding.value);
+
+    if ((selectedFunding.value?.value ?? 0) > 0) {
         emit("selected", selectedFunding.value);
     }
 };
 
 const onFundingCreated = (funding: Funding) => {
+    const toSelect = {
+        title: returnCurrentLocaleContent(funding.name) ?? `#${funding.id}`,
+        value: funding.id as number
+    };
+    fundings.value.push(toSelect);
+    selectedFunding.value = toSelect;
+
+    emit("update:modelValue", toSelect);
     emit("create", funding);
 };
 </script>

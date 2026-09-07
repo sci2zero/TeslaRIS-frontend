@@ -9,7 +9,7 @@ export interface Funding {
     mergedIds: number[];
     doi?: string;
     grantAgreementId?: string;
-    projectId: number;
+    projectId?: number;
     agreements: DocumentFileResponse[];
     fundingParts: FundingPart[];
     name: MultilingualContent[];
@@ -111,11 +111,14 @@ export interface PrepopulatedFundingMetadata {
     name: MultilingualContent[];
     nameAbbreviation: MultilingualContent[];
     description: MultilingualContent[];
+    keywords: MultilingualContent[];
     uris: string[];
     dateAwarded: string;
     dateFrom: string;
     dateTo: string;
     monetaryAmount: MonetaryAmount;
+    displayCall: MultilingualContent[];
+    displayProgram: MultilingualContent[];
     displayFunder: MultilingualContent[];
     funderDoi: string;
 }
