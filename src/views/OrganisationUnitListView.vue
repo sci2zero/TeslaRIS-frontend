@@ -19,25 +19,32 @@
             tab-number-by-role
             layout="table"
         />
-        <organisation-unit-table-component
-            v-else
-            ref="tableRef"
-            :organisation-units="organisationUnits"
-            :total-o-us="totalOUs"
-            enable-export
-            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
-            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
-            :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
-            @switch-page="switchPage">
-            <template #top-left>
-                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
-            </template>
-            <template #actions>
-                <v-btn v-if="isAdmin" color="primary" prepend-icon="mdi-plus" @click="addOU">
-                    {{ $t("createNewOULabel") }}
-                </v-btn>
-            </template>
-        </organisation-unit-table-component>
+        <div v-else data-tutorial="organisation-units-table">
+            <organisation-unit-table-component
+                ref="tableRef"
+                :organisation-units="organisationUnits"
+                :total-o-us="totalOUs"
+                enable-export
+                :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
+                :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
+                :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
+                @switch-page="switchPage">
+                <template #top-left>
+                    <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                </template>
+                <template #actions>
+                    <v-btn
+                        v-if="isAdmin"
+                        data-tutorial="add-organisation-unit"
+                        color="primary"
+                        prepend-icon="mdi-plus"
+                        @click="addOU"
+                    >
+                        {{ $t("createNewOULabel") }}
+                    </v-btn>
+                </template>
+            </organisation-unit-table-component>
+        </div>
     </div>
 </template>
 

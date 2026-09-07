@@ -31,25 +31,32 @@
             tab-number-by-role
             layout="table"
         />
-        <person-table-component
-            v-else
-            ref="tableRef"
-            :persons="persons"
-            :total-persons="totalPersons"
-            enable-export
-            :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
-            :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
-            @switch-page="switchPage">
-            <template #top-left>
-                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
-            </template>
-            <template #actions>
-                <v-btn v-if="isAdmin || isInstitutionalEditor" color="primary" prepend-icon="mdi-plus" @click="addPerson">
-                    {{ $t("createNewPersonLabel") }}
-                </v-btn>
-            </template>
-        </person-table-component>
+        <div v-else data-tutorial="persons-table">
+            <person-table-component
+                ref="tableRef"
+                :persons="persons"
+                :total-persons="totalPersons"
+                enable-export
+                :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
+                :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
+                :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+                @switch-page="switchPage">
+                <template #top-left>
+                    <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
+                </template>
+                <template #actions>
+                    <v-btn
+                        v-if="isAdmin || isInstitutionalEditor"
+                        data-tutorial="add-person"
+                        color="primary"
+                        prepend-icon="mdi-plus"
+                        @click="addPerson"
+                    >
+                        {{ $t("createNewPersonLabel") }}
+                    </v-btn>
+                </template>
+            </person-table-component>
+        </div>
     </div>
 </template>
 

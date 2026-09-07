@@ -81,9 +81,65 @@
                 />
             </v-col>
         </v-row>
-        <v-btn color="blue darken-1" @click="changePassword = !changePassword">
-            {{ $t("changePasswordLabel") }} {{ changePassword ? "▲" : "▼" }}
-        </v-btn>
+        <div class="d-flex flex-wrap align-center ga-2">
+            <v-btn color="blue darken-1" @click="changePassword = !changePassword">
+                {{ $t("changePasswordLabel") }} {{ changePassword ? "▲" : "▼" }}
+            </v-btn>
+            <v-menu location="bottom start">
+                <template #activator="{ props: menuProps }">
+                    <v-btn
+                        v-bind="menuProps"
+                        color="blue darken-1"
+                        variant="outlined"
+                        append-icon="mdi-chevron-down"
+                    >
+                        {{ $t("advancedOptionsLabel") }}
+                    </v-btn>
+                </template>
+                <v-list density="compact">
+                    <v-menu location="end" open-on-hover open-on-click :open-delay="100">
+                        <template #activator="{ props: submenuProps }">
+                            <v-list-item
+                                v-bind="submenuProps"
+                                append-icon="mdi-chevron-right"
+                            >
+                                <template #prepend>
+                                    <v-icon icon="mdi-map-marker-path"></v-icon>
+                                </template>
+                                <v-list-item-title>{{ $t("tutorialOptionsLabel") }}</v-list-item-title>
+                            </v-list-item>
+                        </template>
+                        <v-list density="compact" min-width="280">
+                            <template v-if="isAdmin">
+                                <v-list-item
+                                    v-for="tutorial in tutorialStore.availableTutorials"
+                                    :key="tutorial.key"
+                                    @click="startTutorial(tutorial.key)"
+                                >
+                                    <template #prepend>
+                                        <v-icon
+                                            :icon="tutorialStore.isCompleted(tutorial.key) ? 'mdi-check-circle' : 'mdi-play-circle-outline'"
+                                            :color="tutorialStore.isCompleted(tutorial.key) ? 'success' : undefined"
+                                        ></v-icon>
+                                    </template>
+                                    <v-list-item-title>{{ $t(tutorial.label) }}</v-list-item-title>
+                                    <template v-if="tutorialStore.isCompleted(tutorial.key)" #append>
+                                        <v-icon icon="mdi-check" color="success" size="small"></v-icon>
+                                    </template>
+                                </v-list-item>
+                                <v-divider class="my-1"></v-divider>
+                            </template>
+                            <v-list-item @click="resetTutorialHistory">
+                                <template #prepend>
+                                    <v-icon icon="mdi-delete-outline" color="error"></v-icon>
+                                </template>
+                                <v-list-item-title>{{ $t("resetTutorialHistoryLabel") }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-list>
+            </v-menu>
+        </div>
 
         <transition name="fade-slide">
             <v-container v-if="changePassword">
@@ -141,6 +197,7 @@ import { getNotificationPeriodForGivenLocale, getTitleFromValueAutoLocale } from
 import { useRouter } from "vue-router";
 import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
+import { useTutorialStore, type TutorialKey } from "@/stores/tutorialStore";
 import { useUserRole } from "@/composables/useUserRole";
 
 
@@ -154,6 +211,7 @@ export default defineComponent({
 
         const router = useRouter();
         const loginStore = useLoginStore();
+        const tutorialStore = useTutorialStore();
 
         const changePassword = ref(false);
         const isFormValid = ref(false);
@@ -231,6 +289,8 @@ export default defineComponent({
                 }
 
                 researcherId.value = response.data.personId;
+
+                tutorialStore.syncFromProgress(response.data.tutorialProgress);
                 
                 populateLanguageData(response.data.preferredUILanguage, response.data.preferredReferenceCataloguingLanguage);
             });
@@ -325,6 +385,22 @@ export default defineComponent({
             router.push({name: "researcherLandingPage", params: {id: researcherId.value}});
         };
 
+        const resetTutorialHistory = () => {
+            UserService.resetTutorialProgress().then(() => {
+                tutorialStore.resetHistory();
+                snackbarText.value = i18n.t("tutorialHistoryResetMessage");
+                snackbar.value = true;
+            }).catch((error: AxiosError<any, any>) => {
+                snackbarText.value = i18n.t(error.response?.data?.message ?? "genericErrorMessage");
+                snackbar.value = true;
+            });
+        };
+
+        const startTutorial = (tutorialKey: TutorialKey) => {
+            tutorialStore.stop();
+            tutorialStore.start(tutorialKey, true);
+        };
+
         return {
             changePassword, name, surname, selectedReferenceLanguage,
             organisationUnits, selectedOrganisationUnit, 
@@ -336,7 +412,8 @@ export default defineComponent({
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
             isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,
-            isPromotionRegistryAdministrator, uiLanguages, onlyNewNotifications
+            isPromotionRegistryAdministrator, uiLanguages, onlyNewNotifications,
+            resetTutorialHistory, startTutorial, tutorialStore
         };
     }
 });
