@@ -43,19 +43,21 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Test tenant config access
-        env:
-          GH_TOKEN: ${{ secrets.TENANT_CONFIG_TOKEN }}
-        run: |
-          gh api repos/sci2zero/tenant-configurations
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: sci2zero
 
       - name: Checkout tenant configurations
         uses: actions/checkout@v4
         with:
           repository: sci2zero/tenant-configurations
           path: tenant-configurations
-          token: ${{ secrets.TENANT_CONFIG_TOKEN }}
           ref: main
+          token: ${{ steps.app-token.outputs.token }}
           sparse-checkout: ${{ env.TENANT }}/frontend
           sparse-checkout-cone-mode: true
 
