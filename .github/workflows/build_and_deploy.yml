@@ -3,10 +3,6 @@ name: TeslaRIS Frontend Deploy
 on:
   workflow_dispatch:
     inputs:
-      api_url:
-        description: 'Backend API URL (https://testcris.uns.ac.rs/api/)'
-        default: ''
-        required: false
       version:
         description: 'Version tag (e.g., v1.0.0)'
         default: ''
@@ -28,24 +24,45 @@ on:
       - main
     tags:
       - 'v*' # Trigger on version tags (e.g., v1.0.0)
-  
-
-env:
-  VITE_BASE_URL: ${{ inputs.api_url || vars.API_URL  }} # Set the default value to the environment variable or a fallback value
-  VITE_RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY  }}
-  VITE_APP_VERSION: ${{ inputs.version }}
-  VITE_UNPAYWALL_EMAIL: ${{ vars.UNPAYWALL_EMAIL }}
-  VITE_SERVER_TIMEZONE: ${{ vars.SERVER_TIMEZONE }}
-  VITE_COMMON_SURNAME_SUFFIXES: ${{ vars.COMMON_SURNAME_SUFFIXES }}
 
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment || 'demo' }}
     env:
       REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+      TENANT: ${{ vars.TENANT || inputs.environment || 'demo' }}
+      VITE_BASE_URL: ${{ vars.API_URL }}
+      VITE_RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
+      VITE_APP_VERSION: ${{ inputs.version }}
+      VITE_UNPAYWALL_EMAIL: ${{ vars.UNPAYWALL_EMAIL }}
+      VITE_SERVER_TIMEZONE: ${{ vars.SERVER_TIMEZONE }}
+      VITE_COMMON_SURNAME_SUFFIXES: ${{ vars.COMMON_SURNAME_SUFFIXES }}
     steps:
-    
+
       - uses: actions/checkout@v4
+
+      - name: Checkout tenant configurations
+        uses: actions/checkout@v4
+        with:
+          repository: sci2zero/tenant-configurations
+          path: tenant-configurations
+          token: ${{ secrets.TENANT_CONFIG_TOKEN || github.token }}
+          sparse-checkout: ${{ env.TENANT }}/frontend
+          sparse-checkout-cone-mode: true
+
+      - name: Overlay tenant frontend files
+        run: |
+          TENANT_DIR="tenant-configurations/${TENANT}/frontend"
+          if [ ! -d "$TENANT_DIR" ]; then
+            echo "No overlay directory at $TENANT_DIR; skipping"
+            rm -rf tenant-configurations
+            exit 0
+          fi
+          echo "Merging $TENANT_DIR into the frontend tree"
+          rsync -a "$TENANT_DIR/" ./
+          rm -rf tenant-configurations
 
       - name: Set custom environment variables (commit SHA and ref)
         run: |
@@ -83,7 +100,7 @@ jobs:
 
   deploy-frontend:
     runs-on: ubuntu-latest
-    if : ${{ !inputs.without_deploy }}
+    if: ${{ !inputs.without_deploy }}
     needs: build-frontend
     environment:
       name: ${{ inputs.environment || 'test' }}
@@ -116,7 +133,7 @@ jobs:
 
   start-new-frontend:
     runs-on: ubuntu-latest
-    if : ${{ !inputs.without_deploy }}
+    if: ${{ !inputs.without_deploy }}
 
     needs: deploy-frontend
     environment:
