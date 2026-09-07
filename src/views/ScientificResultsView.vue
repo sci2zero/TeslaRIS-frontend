@@ -16,8 +16,7 @@
         </v-tabs> -->
 
         <v-tabs-window v-model="currentTab">
-            <v-tabs-window-item value="simpleSearch">                
-            </v-tabs-window-item>
+            <v-tabs-window-item value="simpleSearch" />
             <v-tabs-window-item value="advancedSearch">
                 <v-btn
                     variant="text"
@@ -30,8 +29,7 @@
                     :search-fields="searchFields"
                     class="mb-4"
                     @search="clearSortAndPerformSearch($event)"
-                    @reset="resetFiltersAndSearch">
-                </query-input-component>
+                    @reset="resetFiltersAndSearch" />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -96,28 +94,28 @@
                                     v-model="returnOnlyInstitutionRelatedEntities"
                                     :label="$t('showEntitiesForMyInstitutionLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
 
                                 <v-checkbox
                                     v-if="isCommission"
                                     v-model="returnOnlyUnassessedEntities"
                                     :label="$t('showUnassessedLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
 
                                 <v-checkbox
                                     v-if="isAdmin"
                                     v-model="returnOnlyUnmanagedPublications"
                                     :label="$t('showOnlyUnmanagedLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
 
                                 <v-checkbox
                                     v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
                                     v-model="returnOnlyNonArchived"
                                     :label="$t('showNonArchivedLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
                             </span>
 
                             <span class="flex align-center flex-row gap-2">
@@ -126,14 +124,14 @@
                                     v-model="showProceedingsOnly"
                                     :label="$t('showProceedingsOnlyLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
 
                                 <v-checkbox
                                     v-if="isAdmin && showProceedingsOnly"
                                     v-model="emptyProceedingsOnly"
                                     :label="$t('emptyProceedingsOnlyLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
                             </span>
 
                             <span>
@@ -142,7 +140,7 @@
                                     v-model="noContributionsProceedingsOnly"
                                     :label="$t('noContributionsProceedingsOnlyLabel')"
                                     class=""
-                                ></v-checkbox>
+                                />
                             </span>
 
                             <div class="flex items-center gap-2">
@@ -175,7 +173,7 @@
                     <div class="filter-header">
                         <span class="filter-title">{{ $t('typeOfPublicationLabel') }}</span>
                     </div>
-                    <v-divider class="my-2"></v-divider>
+                    <v-divider class="my-2" />
                     <div class="checkbox-grid">
                         <div 
                             v-for="type in publicationTypes"

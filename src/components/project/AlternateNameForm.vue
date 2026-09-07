@@ -36,7 +36,7 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import type { MultilingualContent } from '@/models/Common';
 
-const props = defineProps<{
+defineProps<{
     presetName: MultilingualContent[];
     presetNameAbbreviation: MultilingualContent[];
 }>();

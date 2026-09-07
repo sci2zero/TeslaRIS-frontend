@@ -78,7 +78,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div v-if="conference?.openAlexId" class="response">
-                                    <identifier-link :identifier="conference.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link :identifier="conference.openAlexId" type="open_alex" />
                                 </div>
                                 <div v-if="conference?.number">
                                     {{ $t("conferenceNumberLabel") }}:
@@ -102,9 +102,9 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="conference?.uris"></uri-list>
+                                    <uri-list :uris="conference?.uris" />
                                 </div>
-                                <br />
+                                <br>
                                 <div v-if="conference?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
@@ -191,7 +191,7 @@
             
                 <!-- Proceedings List -->
                 <div v-if="!conference?.serialEvent">
-                    <br />
+                    <br>
                     <proceedings-list
                         :preset-event="conference"
                         :readonly="!canEdit"

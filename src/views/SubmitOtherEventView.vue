@@ -3,8 +3,8 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewOtherEventLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
+        <br>
+        <br>
         <otherEvent-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">

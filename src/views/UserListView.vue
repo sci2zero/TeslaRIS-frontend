@@ -1,14 +1,14 @@
 <template>
     <v-container>
         <h1>{{ $t("userListLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <div class="flex flex-row justify-center">
             <search-bar-component @search="clearSortAndPerformSearch" />
         </div>
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header
@@ -20,8 +20,7 @@
             ref="tableRef"
             :users="users"
             :total-users="totalUsers"
-            @switch-page="switchPage">
-        </user-table-component>
+            @switch-page="switchPage" />
     </v-container>
 </template>
 

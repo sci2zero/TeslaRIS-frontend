@@ -121,14 +121,12 @@
                                         v-if="row.item.userRole === 'COMMISSION' || row.item.userRole === 'RESEARCHER'"
                                         :migrate-from-id="row.item.databaseId"
                                         :allowed-roles="[row.item.userRole]"
-                                        @migrate="notifyUserAboutMigration">
-                                    </user-migration-selection-modal>
+                                        @migrate="notifyUserAboutMigration" />
                                     <user-email-change-modal
                                         :user-id="row.item.databaseId"
                                         :preset-email="row.item.email"
                                         :read-only="row.item.active"
-                                        @update="notifyEmailChanged">
-                                    </user-email-change-modal>
+                                        @update="notifyEmailChanged" />
                                     <v-list-item
                                         v-if="!row.item.active"
                                         @click="resendActivationEmail(row.item.databaseId)">

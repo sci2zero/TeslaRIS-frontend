@@ -7,8 +7,7 @@
         <div class="institution-search">
             <organisation-unit-autocomplete-search
                 v-model="selectedOU" disable-submission required
-                :label="$t('organisationUnitLabel')" :for-person-id="currentPersonId">
-            </organisation-unit-autocomplete-search>
+                :label="$t('organisationUnitLabel')" :for-person-id="currentPersonId" />
         </div>
     </div>
 
@@ -41,7 +40,7 @@
             <v-col cols="12" lg="10">
                 <publication-table-component
                     :publications="publications" :total-publications="totalPublications" allow-selection @switch-page="switchPage"
-                    @selection-updated="updateSelection"></publication-table-component>
+                    @selection-updated="updateSelection" />
             </v-col>
         </v-row>
     </div>

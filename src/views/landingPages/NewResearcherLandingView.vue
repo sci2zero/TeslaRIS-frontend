@@ -22,24 +22,24 @@
                                         variant="text"
                                         size="small"
                                         class="text-slate-600 hover:text-slate-800"
-                                    ></v-btn>
+                                    />
                                 </template>
                                 <v-list>
                                     <v-list-item>
                                         <v-list-item-title>
-                                            <span class="mdi mdi-pencil mr-2"></span>
+                                            <span class="mdi mdi-pencil mr-2" />
                                             Uredi biografiju
                                         </v-list-item-title>
                                     </v-list-item>
                                     <v-list-item>
                                         <v-list-item-title>
-                                            <span class="mdi mdi-download mr-2"></span>
+                                            <span class="mdi mdi-download mr-2" />
                                             Izvezi podatke
                                         </v-list-item-title>
                                     </v-list-item>
                                     <v-list-item>
                                         <v-list-item-title>
-                                            <span class="mdi mdi-share-variant mr-2"></span>
+                                            <span class="mdi mdi-share-variant mr-2" />
                                             Podeli profil
                                         </v-list-item-title>
                                     </v-list-item>
@@ -55,7 +55,7 @@
                         
                         <button class="mt-6 text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center gap-2 transition-colors">
                             <span>Vidi još</span>
-                            <span class="mdi mdi-arrow-right text-base"></span>
+                            <span class="mdi mdi-arrow-right text-base" />
                         </button>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                                 variant="text"
                                 size="small"
                                 class="text-slate-600 hover:text-slate-800"
-                            ></v-btn>
+                            />
                         </div>
 
                         <div class="flex flex-wrap gap-2">
@@ -95,7 +95,7 @@
                         Naučni Rezultati
                     </h3>
                     <button class="flex items-center gap-3 px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        <span class="mdi mdi-plus text-lg"></span>
+                        <span class="mdi mdi-plus text-lg" />
                         Dodaj publikaciju
                     </button>
                 </div>
@@ -108,11 +108,11 @@
                                 class="flex items-center gap-3 px-4 py-2.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md min-w-[200px]"
                                 @click="toggleFilterDropdown"
                             >
-                                <span class="mdi mdi-filter-variant text-lg text-slate-500"></span>
+                                <span class="mdi mdi-filter-variant text-lg text-slate-500" />
                                 <span class="text-sm font-medium flex-1 text-left">
                                     {{ selectedPublicationTypes.length === 0 ? 'Svi tipovi publikacija' : `${selectedPublicationTypes.length} tip odabran` }}
                                 </span>
-                                <span class="mdi mdi-chevron-down text-sm text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': isFilterDropdownOpen }"></span>
+                                <span class="mdi mdi-chevron-down text-sm text-slate-500 transition-transform duration-200" :class="{ 'rotate-180': isFilterDropdownOpen }" />
                             </button>
                             
                             <!-- Dropdown Menu -->
@@ -150,7 +150,7 @@
                                                     type="checkbox"
                                                     :value="type"
                                                     class="w-4 h-4 text-blue-600 border-2 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 transition-colors duration-200"
-                                                />
+                                                >
                                             </div>
                                             <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 flex-1">{{ type.title }}</span>
                                         </label>
@@ -174,14 +174,14 @@
                             :key="type.value"
                             class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200"
                         >
-                            <span class="mdi mdi-check-circle text-sm"></span>
+                            <span class="mdi mdi-check-circle text-sm" />
                             {{ type.title }}
                             <button 
                                 class="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors duration-200 group"
                                 title="Ukloni filter"
                                 @click="removePublicationType(type.value)"
                             >
-                                <span class="mdi mdi-close text-xs group-hover:text-blue-800"></span>
+                                <span class="mdi mdi-close text-xs group-hover:text-blue-800" />
                             </button>
                         </span>
                     </div>
@@ -195,9 +195,9 @@
                             placeholder="Pretraži publikacije..."
                             class="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
                             @input="handleSearch"
-                        />
+                        >
                         <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                            <span class="mdi mdi-magnify text-xl"></span>
+                            <span class="mdi mdi-magnify text-xl" />
                         </span>
                     </div>
                 </div>
@@ -219,14 +219,13 @@
                                 personId: person?.id || 0,
                                 commissionId: null
                             }"
-                        @switch-page="switchPage">
-                    </publication-table-component>
+                        @switch-page="switchPage" />
                 </div>
 
                 <!-- Empty State -->
                 <div v-else class="text-center py-12">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="mdi mdi-file-document text-2xl text-slate-400"></span>
+                        <span class="mdi mdi-file-document text-2xl text-slate-400" />
                     </div>
                     <h4 class="text-lg font-medium text-slate-600 mb-2">
                         Nema publikacija

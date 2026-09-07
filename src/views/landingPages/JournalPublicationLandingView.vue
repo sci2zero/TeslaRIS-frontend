@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(journalPublication?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(journalPublication?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(journalPublication?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("journalPublicationLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -207,8 +207,7 @@
                     :document="journalPublication"
                     :can-edit="canEdit && !journalPublication?.isArchived"
                     :proofs="journalPublication?.proofs"
-                    :file-items="journalPublication?.fileItems">
-                </attachment-section>
+                    :file-items="journalPublication?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -216,15 +215,13 @@
                     :keywords="journalPublication?.keywords ? journalPublication.keywords : []"
                     :can-edit="canEdit && !journalPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="journalPublication?.description"
                     :can-edit="canEdit && !journalPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="journalPublication?.remark"

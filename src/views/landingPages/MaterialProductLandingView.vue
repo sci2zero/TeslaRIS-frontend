@@ -16,7 +16,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(materialProduct?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("materialProductLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -168,8 +168,7 @@
                     :document="materialProduct"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     :proofs="materialProduct?.proofs"
-                    :file-items="materialProduct?.fileItems">
-                </attachment-section>
+                    :file-items="materialProduct?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -177,8 +176,7 @@
                     :keywords="materialProduct?.keywords ? materialProduct.keywords : []"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Research Area -->
                 <v-row>
@@ -188,8 +186,7 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="materialProduct?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas" />
 
                                 <h4 class="mt-5 mb-7">
                                     <strong>{{ $t("researchAreasLabel") }}</strong>
@@ -206,8 +203,7 @@
                 <description-section
                     :description="materialProduct?.description"
                     :can-edit="canEdit && !materialProduct?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="materialProduct?.remark"

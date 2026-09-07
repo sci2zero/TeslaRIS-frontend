@@ -10,7 +10,7 @@
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
         </span>
 
         <tab-content-loader
@@ -30,7 +30,7 @@
             :endpoint-token-parameters="[searchParams, returnOnlyInstitutionRelatedEntities ? String(loggedInUser?.organisationUnitId) : 'null']"
             @switch-page="switchPage">
             <template #top-left>
-                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)"></search-bar-component>
+                <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
             </template>
             <template #actions>
                 <v-btn v-if="isAdmin" color="primary" prepend-icon="mdi-plus" @click="addOU">

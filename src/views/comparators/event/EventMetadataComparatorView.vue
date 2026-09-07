@@ -5,28 +5,26 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftConference?.name) }}
                 </h2>
-                <br />
+                <br>
 
                 <event-update-form
                     ref="updateLeftRef" :preset-event="leftConference" in-comparator :in-modal="false"
-                    @update="updateLeft"></event-update-form>
+                    @update="updateLeft" />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
                     :preset-description-or-biography="(leftConference?.description as MultilingualContent[])"
                     :placeholder-label="$t('eventDescriptionLabel')"
-                    @update="updateLeftDescription">
-                </description-or-biography-update-form>
+                    @update="updateLeftDescription" />
 
                 <keyword-update-form
                     ref="updateLeftKeywordsRef"
                     :preset-keywords="(leftConference?.keywords as MultilingualContent[])"
-                    @update="updateRightKeywords">
-                </keyword-update-form>
+                    @update="updateRightKeywords" />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -39,8 +37,7 @@
                             :contribution-list="leftConference?.contributions ? leftConference.contributions : []"
                             :event-id="leftConference?.id"
                             in-comparator
-                            :can-reorder="true">
-                        </person-event-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -59,28 +56,26 @@
                     {{ returnCurrentLocaleContent(rightConference?.name) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <event-update-form
                     ref="updateRightRef" :preset-event="rightConference" in-comparator :in-modal="false"
-                    @update="updateRight"></event-update-form>
+                    @update="updateRight" />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
                     :preset-description-or-biography="(rightConference?.description as MultilingualContent[])"
                     :placeholder-label="$t('eventDescriptionLabel')"
-                    @update="updateRightDescription">
-                </description-or-biography-update-form>
+                    @update="updateRightDescription" />
 
                 <keyword-update-form
                     ref="updateRightKeywordsRef"
                     :preset-keywords="(rightConference?.keywords as MultilingualContent[])"
-                    @update="updateRightKeywords">
-                </keyword-update-form>
+                    @update="updateRightKeywords" />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -93,8 +88,7 @@
                             :contribution-list="rightConference?.contributions ? rightConference.contributions : []"
                             :event-id="rightConference?.id"
                             in-comparator
-                            :can-reorder="true">
-                        </person-event-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -108,12 +102,11 @@
             :right-id="(rightConference?.id as number)"
             :entity-type="EntityType.EVENT"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsMetadataMessage')"></persistent-stop-dialog>
+        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsMetadataMessage')" />
     </v-container>
 </template>
 

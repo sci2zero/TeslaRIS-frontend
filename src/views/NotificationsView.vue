@@ -2,7 +2,7 @@
     <v-container>
         <h1>{{ $t("notificationsLabel") }}</h1>
 
-        <notification-list @performed-action="notifyUser($event)"></notification-list>
+        <notification-list @performed-action="notifyUser($event)" />
     
         <toast v-model="snackbar" :message="message" />
     </v-container>

@@ -7,7 +7,7 @@
         {{ $t("removeFromPublicationLabel") }}
     </v-btn>
 
-    <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="$t('researcherUnbindWarning')" @continue="performUnbinding"></persistent-question-dialog>
+    <persistent-question-dialog ref="dialogRef" :title="$t('areYouSureLabel')" :message="$t('researcherUnbindWarning')" @continue="performUnbinding" />
 </template>
 
 <script lang="ts">

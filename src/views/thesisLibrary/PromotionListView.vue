@@ -1,8 +1,8 @@
 <template>
     <v-container>
         <h1>{{ $t("promotionListLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <div>
             <v-checkbox
                 v-model="onlyNonFinished"
@@ -13,8 +13,7 @@
             ref="tableRef"
             :promotions="promotions"
             :total-promotions="totalPromotions"
-            @switch-page="switchPage">
-        </promotion-table>
+            @switch-page="switchPage" />
     </v-container>
 </template>
 

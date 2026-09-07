@@ -5,9 +5,9 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftEvent?.name) }}
                 </h2>
-                <br />
+                <br>
                 <!-- Left Proceedings List -->
-                <proceedings-list :preset-event="leftEvent" in-comparator :readonly="false" @dragged="handleDrag"></proceedings-list>
+                <proceedings-list :preset-event="leftEvent" in-comparator :readonly="false" @dragged="handleDrag" />
             </v-col>
 
             <v-col cols="1">
@@ -24,9 +24,9 @@
                     {{ returnCurrentLocaleContent(rightEvent?.name) }}
                 </h2>
 
-                <br />
+                <br>
                 <!-- Right Proceedings List -->
-                <proceedings-list :preset-event="rightEvent" in-comparator :readonly="false"></proceedings-list>
+                <proceedings-list :preset-event="rightEvent" in-comparator :readonly="false" />
             </v-col>
         </v-row>
 
@@ -36,7 +36,7 @@
                 :width="7"
                 color="blue"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-row>
 
         <v-row class="d-flex flex-row justify-center mt-10">
@@ -47,7 +47,7 @@
 
         <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsProceedingsMessage')"></persistent-stop-dialog>
+        <persistent-stop-dialog v-if="showStopDialog" :text="$t('cantCompareSerialEventsProceedingsMessage')" />
     </v-container>
 </template>
 

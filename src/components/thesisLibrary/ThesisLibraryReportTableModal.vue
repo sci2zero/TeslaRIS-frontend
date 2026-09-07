@@ -23,7 +23,7 @@
                                 :size="40"
                                 :width="3"
                                 indeterminate
-                            ></v-progress-circular>
+                            />
                         </div>
                         <div v-show="!isLoading">
                             <publication-table-component
@@ -31,13 +31,12 @@
                                 :total-publications="totalPublications"
                                 shows-research-outputs
                                 allow-selection
-                                @switch-page="switchPage">
-                            </publication-table-component>
+                                @switch-page="switchPage" />
                         </div>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

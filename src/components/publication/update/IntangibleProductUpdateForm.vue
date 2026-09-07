@@ -31,7 +31,7 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -42,17 +42,17 @@
                     :items="intangibleProductTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="intangibleProductNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                <v-text-field v-model="intangibleProductNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -60,8 +60,7 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint />
             </v-col>
         </v-row>
         <v-row>
@@ -70,24 +69,21 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID" 
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -95,8 +91,7 @@
                 <multilingual-text-input
                     ref="usersRef"
                     v-model="productUsers"
-                    :label="$t('productUsersLabel')">
-                </multilingual-text-input>
+                    :label="$t('productUsersLabel')" />
             </v-col>
         </v-row>
         <h2

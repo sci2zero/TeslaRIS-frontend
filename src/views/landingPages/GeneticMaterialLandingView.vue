@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(geneticMaterial?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(geneticMaterial?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(geneticMaterial?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("geneticMaterialLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -162,8 +162,7 @@
                     :document="geneticMaterial"
                     :can-edit="canEdit && !geneticMaterial?.isArchived"
                     :proofs="geneticMaterial?.proofs"
-                    :file-items="geneticMaterial?.fileItems">
-                </attachment-section>
+                    :file-items="geneticMaterial?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -171,15 +170,13 @@
                     :keywords="geneticMaterial?.keywords ? geneticMaterial.keywords : []"
                     :can-edit="canEdit && !geneticMaterial?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="geneticMaterial?.description"
                     :can-edit="canEdit && !geneticMaterial?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="geneticMaterial?.remark"

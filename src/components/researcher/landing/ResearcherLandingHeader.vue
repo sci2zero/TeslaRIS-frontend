@@ -118,7 +118,7 @@
                         <!-- Email -->
                         <div v-if="props.person?.personalInfo.contact?.contactEmail" class="flex items-center justify-start space-x-3">
                             <div class="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center shadow-md">
-                                <span class="mdi mdi-email text-white text-sm"></span>
+                                <span class="mdi mdi-email text-white text-sm" />
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Email</span>
@@ -137,7 +137,7 @@
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                     <button class="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5" @click="showDetails = !showDetails">
-                        <span class="mdi mr-2" :class="showDetails ? 'mdi-chevron-up' : 'mdi-account-details'"></span>
+                        <span class="mdi mr-2" :class="showDetails ? 'mdi-chevron-up' : 'mdi-account-details'" />
                         {{ showDetails ? t('hideDetailsLabel') : t('allDetailsLabel') }}
                     </button>
                     <!-- <button class="border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-medium hover:bg-slate-50 transition-all duration-200 shadow-sm hover:shadow-md">
@@ -146,7 +146,7 @@
                     </button> -->
                 </div>
 
-                <slot name="actions"></slot>
+                <slot name="actions" />
             </div>
         </div>
 
@@ -191,7 +191,7 @@
                                     class="w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 >
                                     <span>{{ tabs.find(tab => tab.id === activeTab)?.name }}</span>
-                                    <span class="mdi mdi-chevron-down text-gray-400"></span>
+                                    <span class="mdi mdi-chevron-down text-gray-400" />
                                 </button>
                             </template>
                             <v-list>
@@ -215,7 +215,7 @@
                     <div v-if="activeTab === 'personal'" class="space-y-6">
                         <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-account-circle mr-2 text-blue-600"></span>
+                                <span class="mdi mdi-account-circle mr-2 text-blue-600" />
                                 {{ t('personalInfoLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -256,7 +256,7 @@
                         <!-- Address Information -->
                         <div v-if="props.person?.personalInfo?.postalAddress" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
+                                <span class="mdi mdi-map-marker mr-2 text-red-600" />
                                 {{ t('professionalAddressLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,7 +295,7 @@
 
                         <div v-if="props.person?.personalInfo?.privatePostalAddress" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
+                                <span class="mdi mdi-map-marker mr-2 text-red-600" />
                                 {{ t('privateAddressLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -335,7 +335,7 @@
                         <!-- Contact Information -->
                         <div v-if="props.person?.personalInfo?.contact" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-phone mr-2 text-green-600"></span>
+                                <span class="mdi mdi-phone mr-2 text-green-600" />
                                 {{ t('professionalContactLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -368,7 +368,7 @@
 
                         <div v-if="props.person?.personalInfo?.privateContact" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-phone mr-2 text-green-600"></span>
+                                <span class="mdi mdi-phone mr-2 text-green-600" />
                                 {{ t('privateContactLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -402,7 +402,7 @@
                         <!-- Research Area -->
                         <div v-if="researchArea" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-domain mr-2 text-purple-600"></span>
+                                <span class="mdi mdi-domain mr-2 text-purple-600" />
                                 {{ t('researchAreaLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 gap-4">
@@ -418,7 +418,7 @@
                         <!-- Academic Identifiers -->
                         <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-identifier mr-2 text-indigo-600"></span>
+                                <span class="mdi mdi-identifier mr-2 text-indigo-600" />
                                 {{ t('identifiersLabel') }}
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -431,7 +431,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">eCRIS-ID</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
@@ -450,7 +450,7 @@
                                 <div v-if="props.person?.personalInfo?.orcid">
                                     <label class="block text-sm font-medium text-gray-700">ORCID</label>
                                     <div v-if="person?.personalInfo.orcid" class="response">
-                                        <identifier-link :identifier="person?.personalInfo.orcid" type="orcid"></identifier-link>
+                                        <identifier-link :identifier="person?.personalInfo.orcid" type="orcid" />
                                     </div>
                                     <div v-else class="response">
                                         -
@@ -459,42 +459,42 @@
                                 <div v-if="props.person?.personalInfo?.scopusAuthorId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('Scopus Author ID') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.openAlexId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('OpenAlex ID') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div v-if="props.person?.personalInfo?.webOfScienceResearcherId">
                                     <label class="block text-sm font-medium text-gray-700">{{ t('ResearcherID (WoS)') }}</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Google Scholar ID</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Authenticus ID</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Lattes ID</label>
                                     <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes"></identifier-link>
+                                        <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes" />
                                         <span v-else>-</span>
                                     </p>
                                 </div>
@@ -514,12 +514,12 @@
                         <!-- Website URIs -->
                         <div v-if="props.person?.personalInfo?.uris && props.person.personalInfo.uris.length > 0" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-web mr-2 text-blue-600"></span>
+                                <span class="mdi mdi-web mr-2 text-blue-600" />
                                 {{ t('websiteLabel') }}
                             </h3>
                             <div class="space-y-2">
                                 <div v-for="uri in props.person.personalInfo.uris" :key="uri" class="flex items-center">
-                                    <span class="mdi mdi-link text-gray-400 mr-2"></span>
+                                    <span class="mdi mdi-link text-gray-400 mr-2" />
                                     <a :href="uri" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline">
                                         {{ uri }}
                                     </a>
@@ -531,7 +531,7 @@
                         <!-- Employments -->
                         <div v-if="activeEmployments && activeEmployments.length > 0" class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-office-building mr-2 text-orange-600"></span>
+                                <span class="mdi mdi-office-building mr-2 text-orange-600" />
                                 {{ t('employmentsLabel') }}
                             </h3>
                             <div class="space-y-3">
@@ -542,7 +542,7 @@
                                         class="font-medium text-gray-900 underline"
                                     >
                                         <div class="font-medium text-gray-900">
-                                            <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
+                                            <v-icon icon="mdi-domain" size="16" class="mr-1" />
                                             {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
                                         </div>
                                     </localized-link>

@@ -2,12 +2,12 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <v-text-field v-model="display" :label="$t('displayLabel') + '*'" :placeholder="$t('displayLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="display" :label="$t('displayLabel') + '*'" :placeholder="$t('displayLabel') + '*'" :rules="requiredFieldRules" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="code" :label="$t('codeLabel') + '*'" :placeholder="$t('codeLabel') + '*'" :rules="requiredFieldRules" />
             </v-col>
         </v-row>
 

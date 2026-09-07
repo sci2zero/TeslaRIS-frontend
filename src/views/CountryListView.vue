@@ -1,12 +1,12 @@
 <template>
     <v-container>
         <h1>{{ $t("countryListLabel") }}</h1>
-        <br />
-        <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <search-bar-component @search="clearSortAndPerformSearch" />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header
@@ -18,8 +18,7 @@
             ref="tableRef"
             :countries="countries"
             :total-countrys="totalCountries"
-            @switch-page="switchPage">
-        </country-table-component>
+            @switch-page="switchPage" />
     </v-container>
 </template>
 

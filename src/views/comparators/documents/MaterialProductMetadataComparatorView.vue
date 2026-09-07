@@ -6,7 +6,7 @@
                     {{ returnCurrentLocaleContent(leftMaterialProduct?.title) }}
                 </h2>
                 
-                <br />
+                <br>
 
                 <material-product-update-form
                     ref="updateLeftRef"
@@ -16,7 +16,7 @@
                     @update="updateLeft"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
@@ -30,7 +30,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -48,7 +48,7 @@
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
@@ -82,7 +82,7 @@
                     {{ returnCurrentLocaleContent(rightMaterialProduct?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <material-product-update-form
                     ref="updateRightRef"
@@ -92,7 +92,7 @@
                     @update="updateRight"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
@@ -106,7 +106,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -124,7 +124,7 @@
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">

@@ -64,7 +64,7 @@
                     v-model="validateEveryStep"
                     class="mr-2"
                     :label="$t('validateEveryStepLabel')"
-                ></v-checkbox>
+                />
             </div>
         </template>
     </v-stepper>
@@ -74,7 +74,7 @@
         color="primary"
         class="d-flex flex-row justify-center align-center"
         indeterminate
-    ></v-progress-circular>
+    />
 
     <toast v-model="snackbar" :message="message" />
 </template>  

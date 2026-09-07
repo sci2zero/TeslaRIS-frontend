@@ -10,12 +10,12 @@
                 v-bind="props"
                 variant="solo"
                 :hide-details="additionalRules.length == 0"
-            ></v-text-field>
+            />
         </template>
         <v-date-picker
             v-model="selectedDate" hide-actions title="" :color="color"
             @click.stop>
-            <template #header></template>
+            <template #header />
             <template #actions>
                 <v-btn
                     v-if="allowDeletion"

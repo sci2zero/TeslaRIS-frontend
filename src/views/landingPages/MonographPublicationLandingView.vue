@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monographPublication?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("monographPublicationLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -191,8 +191,7 @@
                     :document="monographPublication"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     :proofs="monographPublication?.proofs"
-                    :file-items="monographPublication?.fileItems">
-                </attachment-section>
+                    :file-items="monographPublication?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -200,15 +199,13 @@
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="monographPublication?.description"
                     :can-edit="canEdit && !monographPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="monographPublication?.remark"

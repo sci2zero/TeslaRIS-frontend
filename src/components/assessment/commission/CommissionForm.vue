@@ -36,8 +36,7 @@
                     :items="ruleEngines"
                     :label="$t('formalDescriptionOfRuleLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>
@@ -66,8 +65,7 @@
                     :label="$t('researchAreasLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     multiple
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>

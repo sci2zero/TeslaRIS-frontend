@@ -5,7 +5,7 @@
                 <v-checkbox
                     v-model="showAltmetric"
                     label="Altmetric"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -13,7 +13,7 @@
                 <v-checkbox
                     v-model="showDimensions"
                     label="Dimensions"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -21,7 +21,7 @@
                 <v-checkbox
                     v-model="showOpenCitations"
                     label="Open Citations"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -29,7 +29,7 @@
                 <v-checkbox
                     v-model="showPlumX"
                     label="PlumX"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -37,7 +37,7 @@
                 <v-checkbox
                     v-model="showUnpaywall"
                     label="Unpaywall"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
     </v-form>

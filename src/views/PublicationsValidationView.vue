@@ -21,20 +21,20 @@
                 return-object
                 class="entity-select mt-3"
                 multiple
-            ></v-select>
+            />
 
             <span class="d-flex align-center">
                 <v-checkbox
                     v-model="nonValidMetadata"
                     :label="$t('showNonValidatedMetadataLabel')"
                     class="ml-4 mt-3"
-                ></v-checkbox>
+                />
 
                 <v-checkbox
                     v-model="nonValidFiles"
                     :label="$t('showNonValidatedFilesLabel')"
                     class="ml-4 mt-3"
-                ></v-checkbox>
+                />
             </span>
 
             <publication-table-component
@@ -44,8 +44,7 @@
                 :allow-comparison="isInstitutionalEditor"
                 validation-view
                 allow-selection
-                @switch-page="switchPage">
-            </publication-table-component>
+                @switch-page="switchPage" />
         </div>
     </v-container>
 </template>

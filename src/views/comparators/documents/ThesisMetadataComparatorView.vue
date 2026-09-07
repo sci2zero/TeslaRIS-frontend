@@ -5,7 +5,7 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftThesis?.title) }}
                 </h2>
-                <br />
+                <br>
 
                 <thesis-update-form
                     ref="updateLeftRef"
@@ -15,7 +15,7 @@
                     @update="updateLeft"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
@@ -29,7 +29,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -73,7 +73,7 @@
                     {{ returnCurrentLocaleContent(rightThesis?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <thesis-update-form
                     ref="updateRightRef"
@@ -83,7 +83,7 @@
                     @update="updateRight"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
@@ -97,7 +97,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">

@@ -147,25 +147,25 @@
                     <v-checkbox
                         v-model="legalEntity"
                         :label="$t('legalEntityLabel')"
-                    ></v-checkbox>
+                    />
                 </v-row>
                 <v-container class="section-box">
                     <v-row v-if="isAdmin">
                         <v-checkbox
                             v-model="clientInstitutionCris"
                             :label="$t('clientInstitutionCrisLabel')"
-                        ></v-checkbox>
+                        />
                     </v-row>
                     <v-row v-if="clientInstitutionCris">
                         <v-checkbox
                             v-model="validatingEmailDomainCris"
                             :label="$t('validatingEmailDomainLabel')"
-                        ></v-checkbox>
+                        />
                         <v-checkbox
                             v-if="validatingEmailDomainCris"
                             v-model="allowingSubdomainsCris"
                             :label="$t('allowingSubdomainsLabel')"
-                        ></v-checkbox>
+                        />
                     </v-row>
                     <v-row v-if="clientInstitutionCris && validatingEmailDomainCris">
                         <v-col cols="12">
@@ -173,8 +173,7 @@
                                 v-model="institutionEmailDomainCris"
                                 :label="$t('institutionEmailDomainLabel') + '*'"
                                 :placeholder="$t('institutionEmailDomainLabel') + '*'"
-                                :rules="requiredFieldRules">
-                            </v-text-field>
+                                :rules="requiredFieldRules" />
                         </v-col>
                     </v-row>
                 </v-container>
@@ -184,7 +183,7 @@
                             <v-checkbox
                                 v-model="clientInstitutionDl"
                                 :label="$t('clientInstitutionDlLabel')"
-                            ></v-checkbox>
+                            />
                         </v-col>
                     </v-row>
                     <v-row v-if="isAdmin && clientInstitutionDl">
@@ -192,14 +191,14 @@
                             <v-checkbox
                                 v-model="validatingEmailDomainDl"
                                 :label="$t('validatingEmailDomainLabel')"
-                            ></v-checkbox>
+                            />
                         </v-col>
                         <v-col>
                             <v-checkbox
                                 v-if="validatingEmailDomainDl"
                                 v-model="allowingSubdomainsDl"
                                 :label="$t('allowingSubdomainsLabel')"
-                            ></v-checkbox>
+                            />
                         </v-col>
                     </v-row>
                     <v-row v-if="isAdmin && clientInstitutionDl && validatingEmailDomainDl">
@@ -208,14 +207,13 @@
                                 v-model="institutionEmailDomainDl"
                                 :label="$t('institutionEmailDomainLabel') + '*'"
                                 :placeholder="$t('institutionEmailDomainLabel') + '*'"
-                                :rules="requiredFieldRules">
-                            </v-text-field>
+                                :rules="requiredFieldRules" />
                         </v-col>
                     </v-row>
                 </v-container>
                 <v-row>
                     <v-col>
-                        <uri-input ref="urisRef" v-model="uris" is-website></uri-input>
+                        <uri-input ref="urisRef" v-model="uris" is-website />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -227,7 +225,7 @@
                             :rules="requiredSelectionRules"
                             multiple
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 
@@ -289,8 +287,7 @@
                             ref="mapRef"
                             :read-only="false"
                             :init-address="presetOU?.location?.address"
-                            :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]">
-                        </open-layers-map>
+                            :init-coordinates="[presetOU?.location?.longitude as number, presetOU?.location?.latitude as number]" />
                     </v-col>
                 </v-row>
             </v-col>

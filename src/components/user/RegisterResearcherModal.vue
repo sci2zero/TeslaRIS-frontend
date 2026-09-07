@@ -17,8 +17,7 @@
                         <person-autocomplete-search
                             v-model="selectedPerson"
                             required
-                            :disable-submission="!newResearcherCreationAllowed">
-                        </person-autocomplete-search>
+                            :disable-submission="!newResearcherCreationAllowed" />
                         <registration-second-step
                             v-if="proceedToSecondStep"
                             ref="formRef"
@@ -34,7 +33,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

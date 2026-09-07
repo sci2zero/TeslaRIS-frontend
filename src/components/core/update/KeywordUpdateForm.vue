@@ -6,7 +6,7 @@
                     <v-col cols="12">
                         <multilingual-text-input
                             ref="keywordsRef" v-model="keywords" :initial-value="toMultilingualTextInput(presetKeywords, languageTags)" :label="$t('keywordsLabel')"
-                            is-area></multilingual-text-input>
+                            is-area />
                     </v-col>
                 </v-row>
             </v-col>

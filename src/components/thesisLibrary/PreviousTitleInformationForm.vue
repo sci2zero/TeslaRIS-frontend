@@ -47,7 +47,7 @@
                         v-model="localForm.graduationDate"
                         :label="$t('graduationDateLabel')"
                         color="primary"
-                    ></date-picker>
+                    />
                 </v-col>
             </v-row>
         </div>

@@ -10,19 +10,19 @@
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-checkbox
                 v-if="isAdmin"
                 v-model="withNoInvolvements"
                 :label="$t('showPersonsWithNoInvolvementsLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-checkbox
                 v-if="isAdmin"
                 v-model="withNoContributions"
                 :label="$t('showPersonsWithNoContributionsLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
         </span>
 
         <tab-content-loader

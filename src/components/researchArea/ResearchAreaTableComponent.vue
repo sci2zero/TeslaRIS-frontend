@@ -13,8 +13,7 @@
         <v-col cols="auto">
             <research-area-modal
                 :preset-research-area="undefined"
-                @submit="createNewResearchArea">
-            </research-area-modal>
+                @submit="createNewResearchArea" />
             <generic-crud-modal
                 :form-component="ResearchAreaForm"
                 :form-props="{ presetResearchArea: undefined }"
@@ -53,8 +52,7 @@
                     <rich-text-editor
                         v-model="row.item.displayDescription"
                         :editable="false"
-                        :limit-display="100">
-                    </rich-text-editor>
+                        :limit-display="100" />
                 </td>
                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.superResearchAreaName) as string) }}</td>
                 <td>
@@ -88,8 +86,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedResearchAreas.map(entity => returnCurrentLocaleContent(entity.name) as string)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

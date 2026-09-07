@@ -7,8 +7,7 @@
                     :items="contributionTypes"
                     class="contribution-type-select"
                     :label="$t('contributionTypeLabel')"
-                    return-object>
-                </v-select>
+                    return-object />
             </span>
         </v-col>
     </v-row>
@@ -19,11 +18,11 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ `${leftPerson?.personName.firstname} ${leftPerson?.personName.lastname}` }}
                 </h2>
-                <br />
+                <br>
                 <!-- Left Publication Table -->
                 <publication-table-component
                     :publications="leftPublications" :total-publications="leftTotalPublications" in-comparator @switch-page="switchPageLeft"
-                    @dragged="handleDrag"></publication-table-component>
+                    @dragged="handleDrag" />
             </v-col>
 
             <v-col cols="1">
@@ -40,9 +39,9 @@
                     {{ `${rightPerson?.personName.firstname} ${rightPerson?.personName.lastname}` }}
                 </h2>
 
-                <br />
+                <br>
                 <!-- Right Publication Table -->
-                <publication-table-component :publications="rightPublications" :total-publications="rightTotalPublications" in-comparator @switch-page="switchPageRight"></publication-table-component>
+                <publication-table-component :publications="rightPublications" :total-publications="rightTotalPublications" in-comparator @switch-page="switchPageRight" />
             </v-col>
         </v-row>
 
@@ -52,7 +51,7 @@
                 :width="7"
                 color="blue"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-row>
 
         <v-row class="d-flex flex-row justify-center mt-10">

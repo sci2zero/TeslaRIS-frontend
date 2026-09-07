@@ -72,7 +72,9 @@
 
                             <div v-if="fundingApplication.submissionDate" class="info-item">
                                 <div>{{ $t("submissionDateLabel") }}:</div>
-                                <div class="response">{{ localiseDate(fundingApplication.submissionDate) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(fundingApplication.submissionDate) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.responseSummary && fundingApplication.responseSummary.length > 0" class="info-item">
@@ -84,27 +86,37 @@
 
                             <div v-if="fundingApplication.reviewDateFrom" class="info-item">
                                 <div>{{ $t("reviewStartedLabel") }}:</div>
-                                <div class="response">{{ localiseDate(fundingApplication.reviewDateFrom) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(fundingApplication.reviewDateFrom) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.reviewDateTo" class="info-item">
                                 <div>{{ $t("reviewEndedLabel") }}:</div>
-                                <div class="response">{{ localiseDate(fundingApplication.reviewDateTo) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(fundingApplication.reviewDateTo) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.decisionDate" class="info-item">
                                 <div>{{ $t("dateOfDecisionLabel") }}:</div>
-                                <div class="response">{{ localiseDate(fundingApplication.decisionDate) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(fundingApplication.decisionDate) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.result" class="info-item">
                                 <div>{{ $t("resultLabel") }}:</div>
-                                <div class="response">{{ getFundingApplicationResultTitleFromValueAutoLocale(fundingApplication.result) }}</div>
+                                <div class="response">
+                                    {{ getFundingApplicationResultTitleFromValueAutoLocale(fundingApplication.result) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.revisedProposalOrNextRoundDeadlineDate" class="info-item">
                                 <div>{{ $t("deadlineForRequestedChangesLabel") }}:</div>
-                                <div class="response">{{ localiseDate(fundingApplication.revisedProposalOrNextRoundDeadlineDate) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(fundingApplication.revisedProposalOrNextRoundDeadlineDate) }}
+                                </div>
                             </div>
 
                             <div v-if="fundingApplication.revisedFundingApplicationId" class="info-item">

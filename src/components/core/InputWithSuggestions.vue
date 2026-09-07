@@ -1,7 +1,7 @@
 <template>
     <div class="input-with-suggestions">
         <!-- INPUT SLOT -->
-        <slot></slot>
+        <slot />
 
         <!-- SUGGESTIONS -->
         <div

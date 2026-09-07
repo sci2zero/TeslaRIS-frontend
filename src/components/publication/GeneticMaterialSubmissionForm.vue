@@ -16,8 +16,7 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'" />
                     </v-col>
                 </v-row>
 
@@ -31,7 +30,7 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
@@ -53,7 +52,7 @@
                             :items="geneticMaterialTypes"
                             :rules="requiredSelectionRules"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -61,8 +60,7 @@
                         <v-text-field
                             v-model="geneticMaterialNumber"
                             :label="$t('internalNumberLabel')"
-                            :placeholder="$t('internalNumberLabel')">
-                        </v-text-field>
+                            :placeholder="$t('internalNumberLabel')" />
                     </v-col>
                 </v-row>
 
@@ -86,8 +84,7 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -96,8 +93,7 @@
                                 ref="descriptionRef"
                                 v-model="description"
                                 is-area
-                                :label="$t('abstractLabel')">
-                            </multilingual-text-input>
+                                :label="$t('abstractLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -106,13 +102,12 @@
                                 ref="keywordsRef"
                                 v-model="keywords"
                                 :label="$t('keywordsLabel')"
-                                is-area>
-                            </multilingual-text-input>
+                                is-area />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -120,8 +115,7 @@
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
                                 v-model="selectedPublisher"
-                                allow-author-reprint>
-                            </publisher-autocomplete-search>
+                                allow-author-reprint />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -138,16 +132,14 @@
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules" />
                         </v-col>
                     </v-row>
 

@@ -6,13 +6,13 @@
                 :label="$t('firstNameLabel')"
                 :rules="requiredFieldRules"
                 @input="updatedFirstName"
-            ></v-text-field>
+            />
             <v-text-field
                 v-model="lastName"
                 :label="$t('surnameLabel')"
                 :rules="requiredFieldRules"
                 @input="updatedLastName"
-            ></v-text-field>
+            />
         </div>
 
 
@@ -30,7 +30,7 @@
                         :subtitle="personSuggestion.employmentsSr"
                         link
                         @click="personClick(personSuggestion)"
-                    ></v-card>
+                    />
                 </div>
 
                 <v-card
@@ -40,7 +40,7 @@
                     :subtitle="newFirstNameTitle"
                     link
                     @click="registrationNextStep"
-                ></v-card>
+                />
             </div>
         </template>
 

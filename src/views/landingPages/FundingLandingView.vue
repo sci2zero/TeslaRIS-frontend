@@ -69,7 +69,9 @@
 
                             <div v-if="funding.grantAgreementId" class="info-item">
                                 <div>{{ $t("grantAgreementIdLabel") }}:</div>
-                                <div class="response">{{ funding.grantAgreementId }}</div>
+                                <div class="response">
+                                    {{ funding.grantAgreementId }}
+                                </div>
                             </div>
 
                             <div v-if="funding.fundingTypes && funding.fundingTypes.length > 0" class="info-item">
@@ -81,22 +83,30 @@
 
                             <div v-if="funding.dateFrom" class="info-item">
                                 <div>{{ $t("dateFromLabel") }}:</div>
-                                <div class="response">{{ localiseDate(funding.dateFrom) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(funding.dateFrom) }}
+                                </div>
                             </div>
 
                             <div v-if="funding.dateTo" class="info-item">
                                 <div>{{ $t("dateToLabel") }}:</div>
-                                <div class="response">{{ localiseDate(funding.dateTo) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(funding.dateTo) }}
+                                </div>
                             </div>
 
                             <div v-if="funding.dateSubmitted" class="info-item">
                                 <div>{{ $t("dateSubmittedLabel") }}:</div>
-                                <div class="response">{{ localiseDate(funding.dateSubmitted) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(funding.dateSubmitted) }}
+                                </div>
                             </div>
 
                             <div v-if="funding.dateAwarded" class="info-item">
                                 <div>{{ $t("dateAwardedLabel") }}:</div>
-                                <div class="response">{{ localiseDate(funding.dateAwarded) }}</div>
+                                <div class="response">
+                                    {{ localiseDate(funding.dateAwarded) }}
+                                </div>
                             </div>
 
                             <div v-if="projectName.length > 0" class="info-item">
@@ -146,7 +156,9 @@
 
                             <div v-if="funding.amount" class="info-item">
                                 <div>{{ $t("amountLabel") }}:</div>
-                                <div class="response">{{ formatAmount(funding.amount.amount, locale) }} {{ funding.amount.currencyCode }}</div>
+                                <div class="response">
+                                    {{ formatAmount(funding.amount.amount, locale) }} {{ funding.amount.currencyCode }}
+                                </div>
                             </div>
 
                             <div v-if="funding.uris && funding.uris.length > 0" class="info-item">

@@ -10,7 +10,7 @@
             color="primary"
         >
             <template #prepend>
-                <v-icon icon="mdi-file-document-outline"></v-icon>
+                <v-icon icon="mdi-file-document-outline" />
             </template>
 
             <v-list-item-title @click="download(attachment)">
@@ -28,7 +28,7 @@
                         <v-btn
                             icon variant="outlined" size="x-small" color="primary"
                             class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
-                            <v-icon size="x-large" icon="mdi-delete"></v-icon>
+                            <v-icon size="x-large" icon="mdi-delete" />
                         </v-btn>
                     </v-col>
                     <v-col>
@@ -36,8 +36,7 @@
                             :is-proof="true"
                             edit
                             :preset-document-file="attachment"
-                            @update="sendUpdateRequestToParent($event, attachment.id)">
-                        </document-file-submission-modal>
+                            @update="sendUpdateRequestToParent($event, attachment.id)" />
                     </v-col>
                 </v-row>
             </template>

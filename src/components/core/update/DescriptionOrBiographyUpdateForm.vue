@@ -10,8 +10,7 @@
                             :initial-value="toMultilingualTextInput(presetDescriptionOrBiography, languageTags)"
                             :label="$t('abstractLabel')"
                             :placeholder-label="placeholderLabel ? placeholderLabel : $t('abstractLabel')"
-                            is-rich>
-                        </multilingual-text-input>
+                            is-rich />
                     </v-col>
                 </v-row>
             </v-col>

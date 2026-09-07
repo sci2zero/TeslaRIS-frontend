@@ -6,36 +6,34 @@
                 :label="$t('firstNameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
-            ></v-text-field>
+            />
             <v-text-field
                 v-model="lastName"
                 :label="$t('surnameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
-            ></v-text-field>
+            />
             <organisation-unit-autocomplete-search
                 ref="ouAutocompleteRef"
                 v-model="selectedOrganisationUnit"
                 :disabled="isPersonSelected()"
                 required
-                only-client-institutions-cris>
-            </organisation-unit-autocomplete-search>
+                only-client-institutions-cris />
             <v-select
                 v-model="selectedLanguage"
                 :label="$t('preferredLanguageLabel') + '*'"
                 :items="languages"
-            ></v-select>
+            />
             <v-text-field
                 v-model="email"
                 :label="$t('emailLabel') + '*'"
                 :rules="emailFieldRules"
-            ></v-text-field>
+            />
             <password-input-with-meter
                 v-if="!inModal"
                 :label="$t('newPasswordLabel') + '*'"
                 @password-change="setNewPassword($event)"
-                @show-repeated-password="true">
-            </password-input-with-meter>
+                @show-repeated-password="true" />
         </v-form>
 
         <v-btn

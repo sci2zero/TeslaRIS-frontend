@@ -51,11 +51,15 @@ import { ref } from "vue";
 import FundingPartSubmissionForm from "@/components/project/FundingPartSubmissionForm.vue";
 import type { FundingPart } from "@/models/FundingModel";
 
-const props = defineProps<{
+withDefaults(defineProps<{
     edit?: boolean;
     readOnly?: boolean;
     presetFundingPart?: FundingPart;
-}>();
+}>(), {
+    edit: false,
+    readOnly: false,
+    presetFundingPart: undefined
+});
 
 const emit = defineEmits<{
     (e: "create", fundingPart: FundingPart): void;

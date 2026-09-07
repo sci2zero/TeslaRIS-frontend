@@ -10,7 +10,7 @@
             :title="$t('actionNotAllowedLabel')"
         >
             <template #actions>
-                <v-spacer></v-spacer>
+                <v-spacer />
                 <v-btn @click="goBack">
                     {{ $t("goBackLabel") }}
                 </v-btn>

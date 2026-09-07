@@ -4,7 +4,7 @@
         v-if="sidebarStore.isMobile && sidebarStore.isVisible"
         class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 cursor-pointer"
         @click="sidebarStore.close()"
-    ></div>
+    />
     
     <aside
         :class="[
@@ -22,7 +22,7 @@
             </router-link>
         </div>
 
-        <div class="mt-3 h-px w-12 bg-gray-800"></div>
+        <div class="mt-3 h-px w-12 bg-gray-800" />
 
         <!-- Scroll up button -->
         <button
@@ -31,7 +31,7 @@
             aria-label="Scroll up"
             @click="scrollUp"
         >
-            <span class="mdi mdi-chevron-up text-sm"></span>
+            <span class="mdi mdi-chevron-up text-sm" />
         </button>
 
         <!-- Menu with scrollable container -->
@@ -59,7 +59,7 @@
                                     :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                                     :aria-label="item.label"
                                 >
-                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
+                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
                                     <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
                                 </div>
                             </template>
@@ -73,7 +73,7 @@
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
-                                        <v-icon :icon="subItem.icon" class="text-gray-300"></v-icon>
+                                        <v-icon :icon="subItem.icon" class="text-gray-300" />
                                     </template>
                                     <v-list-item-title class="text-sm">
                                         {{ subItem.label }}
@@ -89,7 +89,7 @@
                             :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                             :aria-label="item.label"
                         >
-                            <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
+                            <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
                             <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
                         </router-link>
                     </template>
@@ -104,7 +104,7 @@
             aria-label="Scroll down"
             @click="scrollDown"
         >
-            <span class="mdi mdi-chevron-down text-sm"></span>
+            <span class="mdi mdi-chevron-down text-sm" />
         </button>
     </aside>
 </template>

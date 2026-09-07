@@ -23,19 +23,19 @@
                             src="@/assets/gold-trophy.png" 
                             alt="Gold Trophy" 
                             class="trophy-icon"
-                        />
+                        >
                         <img 
                             v-else-if="index === 1" 
                             src="@/assets/silver-trophy.png" 
                             alt="Silver Trophy" 
                             class="trophy-icon"
-                        />
+                        >
                         <img 
                             v-else-if="index === 2" 
                             src="@/assets/bronze-trophy.png" 
                             alt="Bronze Trophy" 
                             class="trophy-icon"
-                        />
+                        >
                         <span v-else class="ordinal-number">{{ index + 1 }}</span>
                     </div>
         

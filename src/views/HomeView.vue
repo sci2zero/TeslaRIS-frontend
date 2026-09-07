@@ -19,7 +19,7 @@
                         <div class="text-center">
                             <!-- Search bar -->
                             <div class="flex justify-center">
-                                <search-bar-component :dark="true" :search-when-typing="false" @search="search"></search-bar-component>
+                                <search-bar-component :dark="true" :search-when-typing="false" @search="search" />
                             </div>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                             @click="item.path !== undefined ? $router.push('/' + $i18n.locale + '/' + item.path) : undefined">
                             <div class="text-center mb-3 sm:mb-4">
                                 <div class="icon-wrapper">
-                                    <v-icon :icon="item.icon" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" :size="$vuetify.display.xs ? '32' : $vuetify.display.sm ? '40' : '48'"></v-icon>
+                                    <v-icon :icon="item.icon" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" :size="$vuetify.display.xs ? '32' : $vuetify.display.sm ? '40' : '48'" />
                                 </div>
                             </div>
                             <h3 class="text-center text-sm sm:text-base font-medium mb-2 sm:mb-3 text-white px-2">
@@ -47,7 +47,7 @@
                                         color="white"
                                         :size="40"
                                         :width="3"
-                                    ></v-progress-circular>
+                                    />
                                 </div>
                                 <div v-else>
                                     <span class="frosted-number text-lg sm:text-xl md:text-2xl">

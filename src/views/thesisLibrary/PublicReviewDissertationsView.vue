@@ -42,7 +42,7 @@
                 v-model="returnOnlyInstitutionRelatedTheses"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-3"
-            ></v-checkbox>
+            />
         </v-row>
         <v-row v-if="showingNotDefended">
             <v-col>
@@ -84,8 +84,7 @@
                     :total-theses="totalTheses"
                     :show-review-end-date="!showingNotDefended"
                     :shows-current-public-review="!selectedYear"
-                    @switch-page="switchPage">
-                </thesis-table-component>
+                    @switch-page="switchPage" />
             </v-col>
         </v-row>
 

@@ -8,8 +8,7 @@
                             ref="placeOfKeepRef"
                             v-model="placeOfKeep"
                             :label="$t('placeOfKeepLabel')"
-                            :initial-value="toMultilingualTextInput(oldContent?.placeOfKeep, languageTags)">
-                        </multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(oldContent?.placeOfKeep, languageTags)" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -18,8 +17,7 @@
                             ref="typeOfTitleRef"
                             v-model="typeOfTitle"
                             :label="$t('typeOfTitleLabel')"
-                            :initial-value="toMultilingualTextInput(oldContent?.typeOfTitle, languageTags)">
-                        </multilingual-text-input>
+                            :initial-value="toMultilingualTextInput(oldContent?.typeOfTitle, languageTags)" />
                     </v-col>
                 </v-row>
             </v-col>

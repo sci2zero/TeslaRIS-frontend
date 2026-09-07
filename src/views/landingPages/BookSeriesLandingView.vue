@@ -18,7 +18,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(bookSeries?.subtitle) }}
-                        <br v-if="bookSeries?.subtitle && bookSeries.subtitle.length > 0" />
+                        <br v-if="bookSeries?.subtitle && bookSeries.subtitle.length > 0">
                         {{ $t("bookSeriesLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -64,7 +64,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div v-if="bookSeries?.openAlexId" class="response">
-                                    <identifier-link :identifier="bookSeries.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link :identifier="bookSeries.openAlexId" type="open_alex" />
                                 </div>
                                 <div v-if="bookSeries?.languageIds && bookSeries?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -78,7 +78,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="bookSeries?.uris"></uri-list>
+                                    <uri-list :uris="bookSeries?.uris" />
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -97,7 +97,7 @@
             </v-col>
         </v-row>
 
-        <br />
+        <br>
         <tab-content-loader v-if="!bookSeries" :tab-number="3" layout="list" />
         <v-tabs
             v-show="bookSeries"
@@ -127,8 +127,7 @@
                     :publications="publications"
                     :total-publications="totalPublications"
                     in-comparator
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs

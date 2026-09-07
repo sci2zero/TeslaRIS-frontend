@@ -7,13 +7,12 @@
                     :items="resultCalculationMethods"
                     :label="$t('classificationsLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <commission-autocomplete-search v-model="selectedCommissions" required multiple></commission-autocomplete-search>
+                <commission-autocomplete-search v-model="selectedCommissions" required multiple />
             </v-col>
         </v-row>
 

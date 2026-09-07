@@ -76,8 +76,7 @@
                             :items="publicationTypes"
                             :label="$t('concretePublicationTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -138,24 +137,21 @@
                                 v-model="scopus"
                                 label="Scopus ID"
                                 placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules">
-                            </v-text-field>
+                                :rules="scopusIdValidationRules" />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules" />
                         </v-col>
                     </v-row>
 

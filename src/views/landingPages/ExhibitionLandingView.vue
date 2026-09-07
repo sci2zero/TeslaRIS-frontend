@@ -90,9 +90,9 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="exhibition?.uris"></uri-list>
+                                    <uri-list :uris="exhibition?.uris" />
                                 </div>
-                                <br />
+                                <br>
                                 <div v-if="exhibition?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
@@ -165,14 +165,12 @@
                 <keyword-list
                     :keywords="exhibition?.keywords ? exhibition?.keywords : []"
                     :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
                 <description-section
                     :description="exhibition?.description ? exhibition.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <div class="mt-10">
                     <events-relation-list

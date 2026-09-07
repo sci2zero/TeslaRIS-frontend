@@ -88,8 +88,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedPublishers.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

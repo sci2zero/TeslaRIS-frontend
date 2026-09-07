@@ -6,7 +6,7 @@
                 :label="$t('fileLabel') + '*'"
                 accept="image/*"
                 @change="handleFileChange"
-            ></v-file-input>
+            />
         </v-row>
         <v-row>
             <VuePictureCropper

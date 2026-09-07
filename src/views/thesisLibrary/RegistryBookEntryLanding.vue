@@ -316,8 +316,7 @@
             v-model="displayPersistentDialog"
             :title="$t('areYouSureLabel')"
             :message="$t('removeOneFromPromotionMessage')"
-            @continue="removeFromPromotion">
-        </persistent-question-dialog>
+            @continue="removeFromPromotion" />
     </v-container>
 </template>
 

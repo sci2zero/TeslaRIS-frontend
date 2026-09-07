@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("updateBrandingInformationLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <branding-information-form ref="formRef" :preset-information="savedBrandingInformation" @update="updateBrandingInfo"></branding-information-form>
+        <br>
+        <br>
+        <branding-information-form ref="formRef" :preset-information="savedBrandingInformation" @update="updateBrandingInfo" />
         <v-row justify="center">
             <v-col>
                 <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">

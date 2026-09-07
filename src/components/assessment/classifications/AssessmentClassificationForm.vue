@@ -17,8 +17,7 @@
                     v-model="code"
                     :label="$t('codeLabel') + '*'"
                     :placeholder="$t('codeLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -27,8 +26,7 @@
                     v-model="formalDescriptionOfRule"
                     :label="$t('classificationRuleLabel') + '*'"
                     :placeholder="$t('classificationRuleLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -39,8 +37,7 @@
                     :label="$t('applicableTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     return-object
-                    multiple>
-                </v-select>
+                    multiple />
             </v-col>
         </v-row>
 

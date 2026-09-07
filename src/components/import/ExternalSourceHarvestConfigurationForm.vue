@@ -5,8 +5,7 @@
                 v-model="selectedSource"
                 :items="sources"
                 :label="$t(endpointType + 'SourceLabel') + '*'"
-                :rules="requiredSelectionRules">
-            </v-select>
+                :rules="requiredSelectionRules" />
         </v-col>
     </v-row>
     <v-row
@@ -16,16 +15,14 @@
             <v-text-field
                 v-model="authorIdentifier"
                 :label="$t('contributorIdentifierLabel')"
-                :placeholder="$t('contributorIdentifierLabel')">
-            </v-text-field>
+                :placeholder="$t('contributorIdentifierLabel')" />
         </v-col>
 
         <v-col cols="12" sm="4">
             <v-text-field
                 v-model="institutionIdentifier"
                 :label="$t('institutionIdentifierLabel')"
-                :placeholder="$t('institutionIdentifierLabel')">
-            </v-text-field>
+                :placeholder="$t('institutionIdentifierLabel')" />
         </v-col>
     </v-row>
     <v-row class="d-flex flex-row justify-center">
@@ -35,7 +32,7 @@
                 :label="$t('startDateLabel')"
                 color="primary"
                 :required="isFocused"
-            ></date-picker-split>
+            />
         </v-col>
         <v-col cols="12" sm="4">
             <date-picker-split
@@ -43,7 +40,7 @@
                 :label="$t('endDateLabel')"
                 color="primary"
                 :required="isFocused"
-            ></date-picker-split>
+            />
         </v-col>
     </v-row>
     <v-row class="d-flex flex-row justify-center">

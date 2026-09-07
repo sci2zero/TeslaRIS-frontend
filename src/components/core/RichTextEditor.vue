@@ -23,8 +23,7 @@
             <div
                 v-show="isTruncated"
                 class="truncated-content"
-                v-html="truncatedHtml">
-            </div>
+                v-html="truncatedHtml" />
             <!-- eslint-enable vue/no-v-html -->
             <editor-content
                 v-if="!isTruncated"

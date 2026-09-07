@@ -16,7 +16,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(intellectualProperty?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("intellectualPropertyLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -186,8 +186,7 @@
                     :document="intellectualProperty"
                     :can-edit="canEdit && !intellectualProperty?.isArchived"
                     :proofs="intellectualProperty?.proofs"
-                    :file-items="intellectualProperty?.fileItems">
-                </attachment-section>
+                    :file-items="intellectualProperty?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -195,15 +194,13 @@
                     :keywords="intellectualProperty?.keywords ? intellectualProperty.keywords : []"
                     :can-edit="canEdit && !intellectualProperty?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="intellectualProperty?.description"
                     :can-edit="canEdit && !intellectualProperty?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="intellectualProperty?.remark"

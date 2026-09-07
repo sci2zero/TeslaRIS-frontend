@@ -40,6 +40,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    presetAmount: undefined,
     required: false,
     amountLabel: ""
 });

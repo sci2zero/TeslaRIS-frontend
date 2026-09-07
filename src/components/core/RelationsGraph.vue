@@ -1,5 +1,5 @@
 <template>
-    <div ref="svgContainer"></div>
+    <div ref="svgContainer" />
 </template>
   
 <script lang="ts">

@@ -4,12 +4,12 @@
             <v-col>
                 <multilingual-text-input
                     ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetCountry?.name, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetCountry?.name, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field v-model="code" :label="$t('countryCodeLabel') + '*'" :placeholder="$t('countryCodeLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                <v-text-field v-model="code" :label="$t('countryCodeLabel') + '*'" :placeholder="$t('countryCodeLabel') + '*'" :rules="requiredFieldRules" />
             </v-col>
         </v-row>
 

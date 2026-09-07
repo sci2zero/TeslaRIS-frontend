@@ -26,7 +26,7 @@
                 is-commission-researchers-table
                 @switch-page="(page, itemsPerPage, sortField, sortDir) => switchPage(page, itemsPerPage, sortField, sortDir, area)"
                 @delete="removePersonsFromConsideration"
-            ></person-table-component>
+            />
         </v-tabs-window-item>
     </v-tabs-window>
 </template>

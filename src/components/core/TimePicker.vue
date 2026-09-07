@@ -9,10 +9,10 @@
                 v-bind="props"
                 variant="solo"
                 hide-details
-            ></v-text-field>
+            />
         </template>
         <v-time-picker v-model="selectedTime" hide-actions format="24hr" :color="color">
-            <template #header></template>
+            <template #header />
             <template #actions>
                 <v-btn @click="clearTime">
                     {{ $t("deleteLabel") }}

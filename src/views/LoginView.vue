@@ -7,12 +7,12 @@
                 </h2>
                 <v-form v-if="!forgotPasswordSubmissionSent" v-model="isFormValid" @submit.prevent>
                     <div v-if="!forgotPasswordForm">
-                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')" />
                         <v-text-field
                             v-model="password" :rules="passwordFieldRules" name="password" type="password"
-                            :label="$t('passwordLabel')"></v-text-field>
+                            :label="$t('passwordLabel')" />
 
-                        <br />
+                        <br>
                         <v-btn
                             class="login-submit" block type="submit" :disabled="!isFormValid"
                             @click="login">
@@ -24,17 +24,17 @@
                         <a href="#" class="forgot-password-link" @click="forgotPasswordForm = true;">{{ $t("forgotPasswordLabel") }}</a>
                     </div>
                     <div v-else>
-                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')"></v-text-field>
-                        <br />
+                        <v-text-field v-model="email" :rules="emailFieldRules" name="email" :label="$t('emailLabel')" />
+                        <br>
                         <v-btn
                             class="login-submit" block type="submit" :disabled="!isFormValid"
                             @click="forgotPassword">
                             {{ $t('resetPasswordLabel') }}
                         </v-btn>
-                        <br />
+                        <br>
                         <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
                     </div>
-                    <br />
+                    <br>
                     <localized-link to="register">
                         {{ $t("registerFromLoginLabel") }}
                     </localized-link>
@@ -50,7 +50,7 @@
                             </v-btn>
                         </v-col>
                         <v-col cols="2" class="progress">
-                            <v-progress-circular v-if="cooldown" :model-value="progress"></v-progress-circular>
+                            <v-progress-circular v-if="cooldown" :model-value="progress" />
                         </v-col>
                     </v-row>
                 </div>

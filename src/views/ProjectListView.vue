@@ -60,7 +60,7 @@
                     <div class="filter-header">
                         <span class="filter-title">{{ $t('statusLabel') }}</span>
                     </div>
-                    <v-divider class="my-2"></v-divider>
+                    <v-divider class="my-2" />
                     <div class="checkbox-grid">
                         <div
                             v-for="status in projectStatuses"

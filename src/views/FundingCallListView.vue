@@ -43,12 +43,12 @@
                                 :label="$t('showOnlyActiveLabel')"
                                 hide-details
                             />
-<!--                            TODO: Uncomment when the Funder role is added -->
-<!--                            <v-checkbox-->
-<!--                                v-model="returnOnlyMyFundingPrograms"-->
-<!--                                :label="$t('showOnlyMyLabel')"-->
-<!--                                hide-details-->
-<!--                            />-->
+                            <!--                            TODO: Uncomment when the Funder role is added -->
+                            <!--                            <v-checkbox-->
+                            <!--                                v-model="returnOnlyMyFundingPrograms"-->
+                            <!--                                :label="$t('showOnlyMyLabel')"-->
+                            <!--                                hide-details-->
+                            <!--                            />-->
                         </div>
                     </v-menu>
                     <v-btn color="primary" @click="addFundingCall">
@@ -61,7 +61,7 @@
                     <div class="filter-header">
                         <span class="filter-title">{{ $t('fundingTypesLabel') }}</span>
                     </div>
-                    <v-divider class="my-2"></v-divider>
+                    <v-divider class="my-2" />
                     <div class="checkbox-grid">
                         <div
                             v-for="type in fundingTypes"
@@ -113,7 +113,7 @@ const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
 
 const returnOnlyActiveFundingCalls = ref(false);
 // TODO: Implement the remainder of the functionality when Funder role is added
-const returnOnlyMyFundingPrograms = ref(false);
+// const returnOnlyMyFundingPrograms = ref(false);
 const initialLoad = ref(true);
 
 const i18n = useI18n();

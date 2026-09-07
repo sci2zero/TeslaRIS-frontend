@@ -8,8 +8,7 @@
                 v-model="selectedScheduledTaskType"
                 :items="scheduledTaskTypes"
                 :label="$t('scheduledTaskTypeLabel')"
-                :readonly="false">
-            </v-select>
+                :readonly="false" />
         </v-col>
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
@@ -24,8 +23,7 @@
                     :rules="requiredSelectionRules"
                     :class="taskClassificationComputation ? 'comfortable' : ''"
                     return-object
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <v-col v-if="reportGeneration" cols="12" sm="3" md="2">
                 <v-select
@@ -34,8 +32,7 @@
                     :label="$t('reportTypeLabel') + '*'"
                     :class="isSummaryReport() ? 'comfortable' : ''"
                     :rules="requiredSelectionRules"
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <v-col v-if="taskReindexing" cols="8" md="4">
                 <v-select
@@ -44,15 +41,14 @@
                     :label="$t('entityTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     return-object
-                    multiple>
-                </v-select>
+                    multiple />
             </v-col>
             <v-col v-if="taskReindexing" cols="4" md="2">
                 <v-checkbox
                     v-model="reharvestCitationIndicators"
                     class="mt-2"
                     :label="$t('reharvestCitationIndicatorsLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="10" md="6">
                 <v-select
@@ -60,8 +56,7 @@
                     :items="thesisTypes"
                     :label="$t('thesisTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
-                    multiple>
-                </v-select>
+                    multiple />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="3" md="2">
                 <v-text-field
@@ -71,14 +66,14 @@
                     :label="$t('publicReviewLengthLabel') + '*'"
                     :placeholder="$t('publicReviewLengthLabel') + '*'"
                     :rules="requiredNumericGreaterThanZeroFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="4" md="2">
                 <v-checkbox
                     v-model="shortenedReviewPeriod"
                     class="mt-3"
                     :label="$t('shortenedReviewPeriodLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
@@ -87,8 +82,7 @@
                     :label="$t('sourceLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <!-- <v-col v-if="taskClassificationLoad" cols="2">
                 <v-select
@@ -132,8 +126,7 @@
                     :label="(reportGeneration ? $t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') : $t('yearsLabel')) + '*'"
                     :rules="requiredMultiSelectionRules"
                     :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
-                    :multiple="!reportGeneration">
-                </v-select>
+                    :multiple="!reportGeneration" />
             </v-col>
             <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
                 <journal-autocomplete-search
@@ -174,7 +167,7 @@
                     v-model="autoload"
                     class="mt-2"
                     :label="$t('automaticLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col v-if="maintenance" cols="12" md="4">
                 <v-text-field
@@ -182,8 +175,7 @@
                     :label="$t('approximateEndMomentLabel') + '*'"
                     :placeholder="$t('approximateEndMomentLabel')"
                     outlined
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules" />
             </v-col>
         </v-row>
         <v-row 
@@ -194,14 +186,14 @@
                     v-model="calculateIF5Rank"
                     class="mt-2"
                     :label="$t('calculateIf5RankLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col cols="2" md="2">
                 <v-checkbox
                     v-model="calculateJCIRank"
                     class="mt-2"
                     :label="$t('calculateJciRankLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row
@@ -218,8 +210,7 @@
                     :items="publicationTypes"
                     :label="$t('typeOfPublicationLabel')"
                     clearable
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
@@ -243,7 +234,7 @@
                 />
             </v-col>
             <v-col cols="12" sm="3" md="1">
-                <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
+                <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required />
             </v-col>
             <v-col
                 v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck"
@@ -253,8 +244,7 @@
                     :items="recurrenceTypes"
                     :label="$t('recurrenceTypeLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
             <v-col cols="12" sm="3" md="1">
                 <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
@@ -267,8 +257,7 @@
     <scheduled-tasks-list
         class="mt-10! mb-5!"
         :scheduled-tasks="scheduledTasks"
-        @delete="deleteScheduledLoadTask">
-    </scheduled-tasks-list>
+        @delete="deleteScheduledLoadTask" />
 
     <toast v-model="snackbar" :message="message" />
 </template>

@@ -3,8 +3,8 @@
         <v-sheet class="text-center">
             <h1>{{ $t("addIntangibleProductLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
+        <br>
+        <br>
         <intangible-product-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">

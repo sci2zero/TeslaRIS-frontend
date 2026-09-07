@@ -5,7 +5,7 @@
                 <v-checkbox
                     v-model="phoneNumberVisible"
                     :label="$t('phoneNumberVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -13,7 +13,7 @@
                 <v-checkbox
                     v-model="contactEmailVisible"
                     :label="$t('contactEmailVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -21,7 +21,7 @@
                 <v-checkbox
                     v-model="dateOfBirthVisible"
                     :label="$t('dateOfBirthVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -29,7 +29,7 @@
                 <v-checkbox
                     v-model="birthplaceVisible"
                     :label="$t('birthplaceVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -37,7 +37,7 @@
                 <v-checkbox
                     v-model="sexVisible"
                     :label="$t('sexVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -45,7 +45,7 @@
                 <v-checkbox
                     v-model="biographyVisible"
                     :label="$t('biographyVisibleLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
     </v-form>

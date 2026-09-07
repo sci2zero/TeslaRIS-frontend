@@ -29,26 +29,26 @@
 
                     <v-tabs-window v-model="currentTab">
                         <v-tabs-window-item value="citationFormats">
-                            <citation-formats :citation="citation"></citation-formats>
+                            <citation-formats :citation="citation" />
                         </v-tabs-window-item>
                         <v-tabs-window-item class="text-left" value="libraryFormats">
                             <h3 class="mt-5">
                                 ETD-MS
                             </h3>
-                            <code-viewer :code-content="(libraryFormats?.etdMs as string)"></code-viewer>
+                            <code-viewer :code-content="(libraryFormats?.etdMs as string)" />
                             <h3 class="mt-10">
                                 Dublin Core
                             </h3>
-                            <code-viewer :code-content="(libraryFormats?.dublinCore as string)"></code-viewer>
+                            <code-viewer :code-content="(libraryFormats?.dublinCore as string)" />
                             <h3 class="mt-10">
                                 MARC21
                             </h3>
-                            <code-viewer :code-content="(libraryFormats?.marc21 as string)"></code-viewer>
+                            <code-viewer :code-content="(libraryFormats?.marc21 as string)" />
                         </v-tabs-window-item>
                     </v-tabs-window>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

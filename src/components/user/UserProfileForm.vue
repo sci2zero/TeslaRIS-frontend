@@ -13,7 +13,7 @@
                     :label="isCommission ? $t('nameLabel') : $t('firstNameLabel')"
                     :rules="requiredFieldRules"
                     :readonly="isResearcher"
-                ></v-text-field>
+                />
             </v-col>
             <v-col v-if="!isCommission" cols="6">
                 <v-text-field
@@ -21,7 +21,7 @@
                     :label="$t('surnameLabel')"
                     :rules="requiredFieldRules"
                     :readonly="isResearcher"
-                ></v-text-field>
+                />
             </v-col>
         </v-row>
         <v-btn v-if="isResearcher" color="blue darken-1" class="update-researcher" @click="navigateToResearcherPage()">
@@ -33,7 +33,7 @@
                     v-model="email"
                     :label="$t('emailLabel')"
                     :rules="emailFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col v-if="!isAdmin && !isResearcher" cols="12" md="6">
                 <v-autocomplete
@@ -45,7 +45,7 @@
                     :readonly="true"
                     :no-data-text="$t('noDataMessage')"
                     return-object
-                ></v-autocomplete>
+                />
             </v-col>
             <v-col v-else cols="0" md="6" />
             <v-col cols="12" md="6">
@@ -54,7 +54,7 @@
                     :label="$t('preferredLanguageLabel')"
                     :items="uiLanguages"
                     return-object
-                ></v-select>
+                />
             </v-col>
             <v-col cols="12" md="6">
                 <v-select
@@ -62,7 +62,7 @@
                     :label="$t('preferredReferenceLanguageLabel')"
                     :items="languages"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -71,8 +71,7 @@
                     v-model="selectedNotificationPeriod"
                     :items="notificationPeriods"
                     :label="$t('notificationPeriodLabel')"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
             <v-col cols="12" md="6">
                 <v-checkbox
@@ -97,7 +96,7 @@
                             :append-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
                             :type="showOldPassword ? 'text' : 'password'"
                             @click:append="showOldPassword = !showOldPassword"
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -105,8 +104,7 @@
                         <password-input-with-meter
                             :label="$t('newPasswordLabel')"
                             repeat-password
-                            @password-change="setNewPassword($event)">
-                        </password-input-with-meter>
+                            @password-change="setNewPassword($event)" />
                     </v-col>
                 </v-row>
             </v-container>

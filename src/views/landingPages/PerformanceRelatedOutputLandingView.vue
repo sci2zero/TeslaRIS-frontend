@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(performanceRelatedOutput?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("performanceRelatedOutputLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -175,8 +175,7 @@
                     :document="performanceRelatedOutput"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     :proofs="performanceRelatedOutput?.proofs"
-                    :file-items="performanceRelatedOutput?.fileItems">
-                </attachment-section>
+                    :file-items="performanceRelatedOutput?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -184,15 +183,13 @@
                     :keywords="performanceRelatedOutput?.keywords ? performanceRelatedOutput.keywords : []"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="performanceRelatedOutput?.description"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="performanceRelatedOutput?.remark"

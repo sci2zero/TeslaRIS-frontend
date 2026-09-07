@@ -18,8 +18,7 @@
                 shows-research-outputs
                 allow-selection
                 limit-one-selection
-                @switch-page="switchPage">
-            </publication-table-component>
+                @switch-page="switchPage" />
         </v-col>
     </v-row>
 </template>

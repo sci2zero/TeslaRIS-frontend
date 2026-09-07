@@ -84,9 +84,9 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="otherEvent?.uris"></uri-list>
+                                    <uri-list :uris="otherEvent?.uris" />
                                 </div>
-                                <br />
+                                <br>
                                 <div v-if="otherEvent?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
@@ -144,14 +144,12 @@
                 <keyword-list
                     :keywords="otherEvent?.keywords ? otherEvent?.keywords : []"
                     :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
                 <description-section
                     :description="otherEvent?.description ? otherEvent.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <div class="mt-10">
                     <events-relation-list

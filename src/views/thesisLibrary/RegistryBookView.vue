@@ -1,8 +1,8 @@
 <template>
     <v-container>
         <h1>{{ $t("registryBookLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <v-tabs
             v-model="currentTab"
             color="deep-purple-accent-4"
@@ -40,14 +40,14 @@
                             class="input-component"
                             :label="$t('fromLabel')"
                             color="primary"
-                        ></date-picker>
+                        />
                     </v-col>
                     <v-col cols="6" md="4" lg="3">
                         <date-picker
                             v-model="toDateSimple"
                             :label="$t('toLabel')"
                             color="primary"
-                        ></date-picker>
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="justify-start mb-5">
@@ -79,8 +79,7 @@
                     :total-publications="tableStates.notYetAdded.totalEntries"
                     rich-results-view
                     sort-by-date-default
-                    @switch-page="(...args) => switchPage('notYetAdded', ...(args as [number, number, string, string]))">
-                </publication-table-component>
+                    @switch-page="(...args) => switchPage('notYetAdded', ...(args as [number, number, string, string]))" />
             </v-window-item>
             <v-window-item value="nonPromoted">
                 <registry-book-entry-table
@@ -119,8 +118,7 @@
                         :title="$t('promotionPreviewLabel')"
                         :row-data="promotionPreview"
                         :headers="headers"
-                        @continue="promoteAll">
-                    </persistent-table-dialog>
+                        @continue="promoteAll" />
                     <v-btn
                         v-if="isAdmin || isPromotionRegistryAdministrator"
                         class="ml-3"
@@ -138,14 +136,14 @@
                             class="input-component"
                             :label="$t('fromLabel')"
                             color="primary"
-                        ></date-picker-split>
+                        />
                     </v-col>
                     <v-col cols="6" md="4" lg="3">
                         <date-picker-split
                             v-model="toDate"
                             :label="$t('toLabel')"
                             color="primary"
-                        ></date-picker-split>
+                        />
                     </v-col>
                     <v-col cols="6" md="4" lg="3">
                         <div class="flex justify-start">
@@ -183,15 +181,13 @@
                         <v-text-field
                             v-model="authorFullName"
                             :label="$t('fullNameLabel')"
-                            :placeholder="$t('fullNameLabel')">
-                        </v-text-field>
+                            :placeholder="$t('fullNameLabel')" />
                     </v-col>
                     <v-col cols="12" sm="6" lg="3">
                         <v-text-field
                             v-model="authorAcquiredTitle"
                             :label="$t('acquiredTitleLabel')"
-                            :placeholder="$t('acquiredTitleLabel')">
-                        </v-text-field>
+                            :placeholder="$t('acquiredTitleLabel')" />
                     </v-col>
                 </v-row>
                 <v-row v-if="isPromotionRegistryAdministrator || isAdmin" class="justify-start">
@@ -203,8 +199,7 @@
                             :items="langItems"
                             :label="$t('languageLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                     <v-col
                         v-if="tableStates.promoted.entries.length > 0" 
@@ -214,8 +209,7 @@
                             :items="recurrenceTypes"
                             :label="$t('recurrenceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                     <v-col v-if="tableStates.promoted.entries.length > 0">
                         <v-btn
@@ -253,8 +247,7 @@
                 <scheduled-tasks-list
                     class="mt-10!"
                     :scheduled-tasks="scheduledTasks"
-                    @delete="deleteScheduledTask">
-                </scheduled-tasks-list>
+                    @delete="deleteScheduledTask" />
             </v-window-item>
             <v-window-item value="reports">
                 <v-row class="justify-start mt-3">
@@ -271,27 +264,26 @@
                             class="input-component"
                             :label="$t('fromLabel') + '*'"
                             color="primary"
-                        ></date-picker>
+                        />
                     </v-col>
                     <v-col cols="6" md="3" lg="1">
                         <date-picker
                             v-model="toDate"
                             :label="$t('toLabel') + '*'"
                             color="primary"
-                        ></date-picker>
+                        />
                     </v-col>
                 </v-row>
                 <promotion-count-report
                     v-show="!reportLoading"
                     class="mt-5"
-                    :report="reportCounts">
-                </promotion-count-report>
+                    :report="reportCounts" />
                 <v-progress-circular
                     v-if="reportLoading"
                     class="ml-2"
                     color="primary"
                     indeterminate
-                ></v-progress-circular>
+                />
             </v-window-item>
         </v-tabs-window>
         
@@ -303,8 +295,7 @@
             :message="$t('removeAllFromPromotionMessage')"
             show-radio-options
             :radio-options="[{title: $t('deletePromotionLabel'), value: 1}, {title: $t('doNotDeletePromotionLabel'), value: 2}]"
-            @continue="removeAllFromPromotion">
-        </persistent-question-dialog>
+            @continue="removeAllFromPromotion" />
     </v-container>
 </template>
   

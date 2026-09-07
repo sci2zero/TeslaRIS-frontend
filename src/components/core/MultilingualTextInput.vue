@@ -4,18 +4,17 @@
             <v-text-field
                 v-if="!isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
-                :rules="rules" @input="sendContentToParent"></v-text-field>
+                :rules="rules" @input="sendContentToParent" />
             <v-textarea
                 v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
-                :rules="rules" @input="sendContentToParent"></v-textarea>
+                :rules="rules" @input="sendContentToParent" />
             <rich-text-editor
                 v-if="isRich"
                 ref="richEditorRef"
                 v-model="input.text"
                 :default-placeholder="placeholderLabel"
-                @input="sendContentToParent">
-            </rich-text-editor>
+                @input="sendContentToParent" />
         </v-col>
         <v-col cols="3">
             <v-select
@@ -25,7 +24,7 @@
                 :label="$t('languageLabel')"
                 return-object
                 @update:model-value="updatedLanguage(index)"
-            ></v-select>
+            />
         </v-col>
         <v-col cols="2">
             <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">

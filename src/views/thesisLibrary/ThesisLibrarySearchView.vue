@@ -21,16 +21,14 @@
         <v-tabs-window-item value="simpleSearch">
             <div class="flex flex-row justify-center mt-4">
                 <search-bar-component
-                    @search="clearSortAndPerformSearch($event)">
-                </search-bar-component>
+                    @search="clearSortAndPerformSearch($event)" />
             </div>
         </v-tabs-window-item>
         <v-tabs-window-item value="advancedSearch">
             <query-input-component
                 :search-fields="searchFields"
                 @search="clearSortAndPerformSearch($event)"
-                @reset="resetFiltersAndSearch">
-            </query-input-component>
+                @reset="resetFiltersAndSearch" />
         </v-tabs-window-item>
     </v-tabs-window>
 
@@ -41,8 +39,7 @@
                 :filter-component="ThesisFilters"
                 :show-reset-button="currentTab === 'simpleSearch'"
                 @apply-filters="search(searchParams)"
-                @reset="search(searchParams)">
-            </filter-bar-component>
+                @reset="search(searchParams)" />
             <div class="w-52">
                 <v-select 
                     v-model="showWordcloud"
@@ -80,8 +77,7 @@
                     :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.THESIS_SIMPLE_SEARCH : ExportableEndpointType.THESIS_ADVANCED_SEARCH"
                     :endpoint-body-parameters="lastSearchRequest"
                     :export-entity="ExportEntity.THESIS"
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
             </v-col>
         </v-row>
         <v-row

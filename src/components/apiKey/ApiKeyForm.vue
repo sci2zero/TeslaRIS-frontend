@@ -4,7 +4,7 @@
             <v-col>
                 <multilingual-text-input
                     v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetApiKey?.name, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetApiKey?.name, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -15,8 +15,7 @@
                     :label="$t('apiKeyTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     return-object
-                    :readonly="presetApiKey !== undefined">
-                </v-select>
+                    :readonly="presetApiKey !== undefined" />
             </v-col>
         </v-row>
         <v-row>
@@ -27,7 +26,7 @@
                     color="primary"
                     required
                     in-future
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -37,8 +36,7 @@
                     :readonly="presetApiKey !== undefined"
                     :label="$t('clientEmailLabel') + '*'"
                     :placeholder="$t('clientEmailLabel') + '*'"
-                    :rules="emailFieldRules">
-                </v-text-field>
+                    :rules="emailFieldRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -49,7 +47,7 @@
                     :label="$t('dailyRequestsLabel') + '*'"
                     :placeholder="$t('dailyRequestsLabel') + '*'"
                     :rules="requiredNumericGreaterThanZeroFieldRules"
-                ></v-text-field>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -60,7 +58,7 @@
                     :items="languages"
                     return-object
                     :readonly="presetApiKey !== undefined"
-                ></v-select>
+                />
             </v-col>
         </v-row>
 

@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedingsPublication?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("proceedingsPublicationLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -179,15 +179,13 @@
                     :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="proceedingsPublication?.description"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="proceedingsPublication?.remark"
@@ -211,8 +209,7 @@
                     :document="proceedingsPublication"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>  
+                    :file-items="proceedingsPublication?.fileItems" />  
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 

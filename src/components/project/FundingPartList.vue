@@ -76,7 +76,7 @@ import FundingPartSubmissionModal from "@/components/project/FundingPartSubmissi
 
 const { locale } = useI18n();
 
-const props = withDefaults(
+withDefaults(
     defineProps<{
         fundingParts: FundingPart[];
         canEdit?: boolean;

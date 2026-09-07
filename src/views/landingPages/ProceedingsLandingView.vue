@@ -12,15 +12,14 @@
                             class="d-flex justify-center align-center"
                         >
                             <rich-title-renderer
-                                :title="returnCurrentLocaleContent(proceedings?.title)">
-                            </rich-title-renderer>
+                                :title="returnCurrentLocaleContent(proceedings?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedings?.acronym) }}
-                        <br v-if="proceedings?.acronym && proceedings?.acronym.length > 0" />
+                        <br v-if="proceedings?.acronym && proceedings?.acronym.length > 0">
                         {{ returnCurrentLocaleContent(proceedings?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("proceedingsLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -159,7 +158,7 @@
             enable-metadata-scanning
         />
 
-        <br />
+        <br>
         <tab-content-loader v-if="!proceedings" :tab-number="3" layout="list" />
         <v-tabs
             v-show="proceedings"
@@ -224,7 +223,7 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
-                <br />
+                <br>
                 <keyword-list
                     :keywords="proceedings?.keywords ? proceedings.keywords : []"
                     :can-edit="canEdit"

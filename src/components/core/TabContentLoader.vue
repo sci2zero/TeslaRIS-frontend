@@ -15,7 +15,7 @@
                     :key="'paragraph-' + index"
                     cols="12"
                 >
-                    <v-card color="grey-lighten-5"></v-card>
+                    <v-card color="grey-lighten-5" />
                     <v-skeleton-loader type="heading" width="30%" />
                     <v-skeleton-loader type="paragraph" width="40%" />
                 </v-col>

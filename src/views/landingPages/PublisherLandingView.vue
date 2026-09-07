@@ -77,7 +77,7 @@
         </v-row>
 
         <!-- Publication Table -->
-        <br />
+        <br>
         <tab-content-loader
             v-if="!publisher"
             :button-header="false"

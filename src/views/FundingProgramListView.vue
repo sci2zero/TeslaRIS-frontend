@@ -43,12 +43,12 @@
                                 :label="$t('showOnlyActiveLabel')"
                                 hide-details
                             />
-<!--                            TODO: Uncomment when the Funder role is added -->
-<!--                            <v-checkbox-->
-<!--                                v-model="returnOnlyMyFundingPrograms"-->
-<!--                                :label="$t('showOnlyMyLabel')"-->
-<!--                                hide-details-->
-<!--                            />-->
+                            <!--                            TODO: Uncomment when the Funder role is added -->
+                            <!--                            <v-checkbox-->
+                            <!--                                v-model="returnOnlyMyFundingPrograms"-->
+                            <!--                                :label="$t('showOnlyMyLabel')"-->
+                            <!--                                hide-details-->
+                            <!--                            />-->
                         </div>
                     </v-menu>
                     <v-btn color="primary" @click="addFundingProgram">
@@ -69,7 +69,6 @@ import type { FundingProgramIndex } from '@/models/FundingModel';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
-import AddPublicationMenu from "@/components/publication/AddPublicationMenu.vue";
 
 
 const loading = ref(false);
@@ -84,7 +83,7 @@ const direction = ref("");
 
 const returnOnlyActiveFundingPrograms = ref(false);
 // TODO: Implement the remainder of the functionality when Funder role is added
-const returnOnlyMyFundingPrograms = ref(false);
+// const returnOnlyMyFundingPrograms = ref(false);
 const initialLoad = ref(true);
 
 const i18n = useI18n();

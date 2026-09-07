@@ -5,7 +5,7 @@
 
     <v-row class="d-flex flex-row justify-center mt-5">
         <v-col cols="12" sm="10" md="8">
-            <api-key-list :api-keys="apiKeys" :total-api-keys="totalApiKeys" @switch-page="switchPage"></api-key-list>
+            <api-key-list :api-keys="apiKeys" :total-api-keys="totalApiKeys" @switch-page="switchPage" />
         </v-col>
     </v-row>
 </template>

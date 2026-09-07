@@ -1,7 +1,7 @@
 <template>
     <v-card class="pa-2 text-left">
         <!-- eslint-disable vue/no-v-html -->
-        <pre><code class="language-xml" v-html="formattedXML"></code></pre>
+        <pre><code class="language-xml" v-html="formattedXML" /></pre>
         <!-- eslint-enable vue/no-v-html -->
     </v-card>
 </template>

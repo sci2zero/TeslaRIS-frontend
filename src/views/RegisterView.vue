@@ -13,8 +13,7 @@
                     <div class="reg-step">
                         <registration-first-step
                             @registration-next-step="nextStep"
-                            @field-update="checkForNextStep">
-                        </registration-first-step>
+                            @field-update="checkForNextStep" />
                     </div>
                 </template>
 
@@ -22,8 +21,7 @@
                     <div class="reg-step">
                         <registration-second-step
                             :firstname="userDetails.firstName"
-                            :lastname="userDetails.lastName">
-                        </registration-second-step>
+                            :lastname="userDetails.lastName" />
                     </div>
                 </template>
 

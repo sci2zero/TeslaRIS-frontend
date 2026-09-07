@@ -1,13 +1,12 @@
 <template>
     <v-container>
         <h1>{{ $t("eventListLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <search-bar-component
             :preset-search-input="presetSearchParams"
-            @search="clearSortAndPerformSearch">
-        </search-bar-component>
-        <br />
+            @search="clearSortAndPerformSearch" />
+        <br>
         <span class="d-flex align-center mb-5 mt-5">
             <add-event-menu compact />
         </span>
@@ -17,7 +16,7 @@
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-select
                 v-if="isAdmin"
                 v-model="selectedCommission"
@@ -33,24 +32,24 @@
                 v-model="returnOnlyUnclassifiedEntities"
                 :label="$t('showUnclassifiedLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-checkbox
                 v-model="returnSerialEvents"
                 :label="$t('showSerialEventsLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-checkbox
                 v-if="isAdmin"
                 v-model="returnEventsWithoutProceedings"
                 :label="$t('showOnlyWithoutProceedingsLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
             <v-checkbox
                 v-if="isAdmin"
                 v-model="returnEventsWithoutContributions"
                 :label="$t('showOnlyWithoutContributionsLabel')"
                 class="ml-4 mt-5"
-            ></v-checkbox>
+            />
         </span>
 
         <tab-content-loader
@@ -70,7 +69,7 @@
                     <div class="filter-header">
                         <span class="filter-title">{{ $t('eventTypeLabel') }}</span>
                     </div>
-                    <v-divider class="my-2"></v-divider>
+                    <v-divider class="my-2" />
                     <div class="checkbox-grid">
                         <div 
                             v-for="type in eventTypes"

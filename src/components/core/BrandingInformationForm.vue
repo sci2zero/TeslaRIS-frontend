@@ -4,14 +4,14 @@
             <v-col>
                 <multilingual-text-input
                     ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <multilingual-text-input
                     ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)" is-area></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)" is-area />
             </v-col>
         </v-row>
 

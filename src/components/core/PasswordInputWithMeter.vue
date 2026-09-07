@@ -10,13 +10,13 @@
             class="mb-6"
             @input="$emit('passwordChange', password)"
             @click:append="showPassword = !showPassword;"
-        ></v-text-field>
+        />
         <v-progress-linear
             :color="score().color"
             :model-value="score().value"
             :bg-opacity="0.1"
             class="progress"
-        ></v-progress-linear>
+        />
     </v-col>
     <v-col v-if="repeatPassword" class="bg-blue-grey-lighten-5">
         <v-text-field
@@ -24,7 +24,7 @@
             :label="$t('repeatNewPasswordLabel')"
             :rules="repeatPasswordRules"
             :type="showPassword ? 'text' : 'password'"
-        ></v-text-field>
+        />
     </v-col>
 </template>
 

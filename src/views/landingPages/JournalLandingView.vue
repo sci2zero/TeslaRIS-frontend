@@ -18,7 +18,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(journal?.subtitle) }}
-                        <br v-if="journal?.subtitle && journal.subtitle.length > 0" />
+                        <br v-if="journal?.subtitle && journal.subtitle.length > 0">
                         {{ $t("journalLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -68,7 +68,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div v-if="journal?.openAlexId" class="response">
-                                    <identifier-link :identifier="journal.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link :identifier="journal.openAlexId" type="open_alex" />
                                 </div>
                                 <div v-if="journal?.languageIds && journal?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -82,7 +82,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="journal?.uris"></uri-list>
+                                    <uri-list :uris="journal?.uris" />
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -101,7 +101,7 @@
             </v-col>
         </v-row>
 
-        <br />
+        <br>
         <tab-content-loader v-if="!journal" :tab-number="3" layout="list" />
         <v-tabs
             v-show="journal"
@@ -135,8 +135,7 @@
                     :total-publications="totalPublications"
                     in-comparator
                     show-publication-concrete-type
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs

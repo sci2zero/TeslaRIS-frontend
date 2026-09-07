@@ -27,7 +27,7 @@
                     :label="$t('birthdateLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="12" sm="6">
                 <v-select

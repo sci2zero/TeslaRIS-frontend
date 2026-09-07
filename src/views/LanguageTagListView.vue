@@ -1,12 +1,12 @@
 <template>
     <v-container>
         <h1>{{ $t("languageTagListLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <search-bar-component @search="clearSortAndPerformSearch" />
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <language-tag-table-component
             ref="tableRef"
             :language-tags="languageTags"

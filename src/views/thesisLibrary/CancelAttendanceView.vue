@@ -16,8 +16,7 @@
             :loading-timeout="30000"
             @verify="handleVerifyCallback"
             @expire="resetChallenge"
-            @error="resetChallenge">
-        </vue-recaptcha>
+            @error="resetChallenge" />
     </div>
     <div v-if="cancellable">
         <div

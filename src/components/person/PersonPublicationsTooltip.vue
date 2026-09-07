@@ -12,7 +12,7 @@
                 @mouseenter="handleMouseEnter"
                 @mouseleave="handleMouseLeave"
             >
-                <slot></slot>
+                <slot />
             </div>
         </template>
 

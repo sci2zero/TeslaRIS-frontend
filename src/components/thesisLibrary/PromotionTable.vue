@@ -48,8 +48,8 @@
                 <td>{{ row.item.placeOrVenue }}</td>
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>
-                    <v-icon v-if="row.item.finished" icon="mdi-check"></v-icon>
-                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                    <v-icon v-if="row.item.finished" icon="mdi-check" />
+                    <v-icon v-else icon="mdi-cancel" />
                 </td>
                 <td v-if="isPromotionRegistryAdministrator || isAdmin">
                     <generic-crud-modal
@@ -83,8 +83,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedPromotions.map(entity => localiseDate(entity.promotionDate))"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

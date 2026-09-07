@@ -60,7 +60,7 @@
                     <v-btn color="blue darken-1" @click="download">
                         {{ $t("downloadLabel") }}
                     </v-btn>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

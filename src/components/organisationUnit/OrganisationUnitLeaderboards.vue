@@ -15,7 +15,7 @@
                 class="mr-2"
                 :min="minYear"
                 :max="min([maxYear, toYear])"
-            ></v-text-field>
+            />
         </v-col>
         <v-col cols="5">
             <v-text-field
@@ -27,7 +27,7 @@
                 :label="$t('toLabel')"
                 :min="max([minYear, fromYear])"
                 :max="maxYear"
-            ></v-text-field>
+            />
         </v-col>
     </v-row>
     <v-row
@@ -205,7 +205,7 @@
                         :label="$t('thesisTypeLabel')"
                         return-object
                         multiple
-                    ></v-select>
+                    />
                 </div>
 
                 <v-row>

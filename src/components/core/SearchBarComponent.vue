@@ -31,7 +31,7 @@
                         class="search-icon"
                         :class="{ 'search-icon--light': !dark }"
                         @click="onSearch"
-                    ></v-icon>
+                    />
                 </template>
             </v-text-field>
         </div>

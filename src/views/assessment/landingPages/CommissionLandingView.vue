@@ -108,10 +108,10 @@
             v-model="currentTab"
         >
             <v-tabs-window-item value="relations">
-                <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>
+                <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations" />
             </v-tabs-window-item>
             <v-tabs-window-item value="researchersForAssessment">
-                <commission-researchers-view :institution-id="institutionId" :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])"></commission-researchers-view>
+                <commission-researchers-view :institution-id="institutionId" :commission-id="(commission?.id as number)" :research-areas="(commission?.recognisedResearchAreas as string[])" />
             </v-tabs-window-item>
         </v-tabs-window>
 

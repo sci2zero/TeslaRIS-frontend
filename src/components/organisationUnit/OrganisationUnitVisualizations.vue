@@ -16,7 +16,7 @@
                 :min="minYear"
                 :max="min([maxYear, toYear])"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
         <v-col cols="5">
             <v-text-field
@@ -29,7 +29,7 @@
                 :min="max([minYear, fromYear])"
                 :max="maxYear"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
     </v-row>
     <v-row
@@ -173,7 +173,7 @@
                         :label="$t('thesisTypeLabel')"
                         return-object
                         multiple
-                    ></v-select>
+                    />
                 </div>
 
                 <v-row class="mt-14!">
@@ -305,7 +305,7 @@
                         :label="$t('thesisTypeLabel')"
                         return-object
                         multiple
-                    ></v-select>
+                    />
                 </div>
             
                 <v-row class="d-flex flex-row text-center mt-10">

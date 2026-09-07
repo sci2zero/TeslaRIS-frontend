@@ -11,7 +11,7 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)" />
                             <div>
                                 <generic-crud-modal
                                     class="mb-6"
@@ -24,12 +24,12 @@
                                     @update="updateTitle"
                                 />
                             </div>
-                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"></rich-title-renderer>
+                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(thesis?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("thesisLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -456,8 +456,7 @@
                     :keywords="thesis?.keywords ? thesis.keywords : []"
                     :can-edit="canEdit && !thesis?.isOnPublicReview"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <div>
@@ -485,8 +484,7 @@
                     :thesis-id="thesis?.id"
                     :can-edit="canEdit"
                     :researcher-id="thesis?.contributions![0].personId"
-                >
-                </thesis-research-output-section>
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -527,8 +525,7 @@
             :message="dialogMessage"
             :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
             :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
-            @continue="commitThesisStatusChange">
-        </persistent-question-dialog>
+            @continue="commitThesisStatusChange" />
 
         <share-buttons
             v-if="thesis && isResearcher && canEdit"

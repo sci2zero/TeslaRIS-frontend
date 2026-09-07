@@ -9,14 +9,14 @@
                     color="primary"
                     indeterminate
                     size="128"
-                ></v-progress-circular>
+                />
             </div>
             <div class="mt-10">
                 <img
                     v-if="registrationId === 'orcid'"
                     src="@/assets/oauth2/orcid_logotype.png"
                     alt="ORCID logotype"
-                />
+                >
             </div>
         </div>
         <div v-else-if="!error">

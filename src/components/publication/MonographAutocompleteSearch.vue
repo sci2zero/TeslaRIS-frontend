@@ -13,7 +13,7 @@
                 return-object
                 @update:search="searchMonographs($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal

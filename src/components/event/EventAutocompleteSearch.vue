@@ -14,7 +14,7 @@
                 return-object
                 @update:search="searchEvents($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission && !readOnly" cols="1">
             <generic-crud-modal

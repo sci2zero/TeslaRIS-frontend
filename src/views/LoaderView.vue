@@ -16,7 +16,7 @@
             <v-checkbox
                 v-model="showOnlyHarvestableInstitutions"
                 :label="$t('onlyWithImportIdentifiersLabel')"
-            ></v-checkbox>
+            />
         </v-col>
         <v-col cols="1">
             <v-btn
@@ -40,7 +40,7 @@
             @match-selected="displayMatchMetadata"
         />
 
-        <br />
+        <br>
         
         <v-btn
             class="load-action mb-5"
@@ -89,8 +89,7 @@
                     :institutions-for-loading="contribution.institutions"
                     :top-level-institution-id="selectedOrganisationUnit.value"
                     :import-as-unmanaged="unmanagedImport"
-                    @user-action-complete="resumeImport">
-                </import-author>
+                    @user-action-complete="resumeImport" />
             </template>
 
             <template #[`item.${steps.length-1}`]>
@@ -99,16 +98,14 @@
                     ref="journalImportRef"
                     :publication-for-loading="(currentLoadRecord as JournalPublicationLoad)"
                     :top-level-institution-id="selectedOrganisationUnit.value"
-                    @user-action-complete="resumeImport">
-                </import-journal>
+                    @user-action-complete="resumeImport" />
                 
                 <import-proceedings
                     v-if="loadingProceedingsPublication"
                     ref="proceedingsImportRef"
                     :publication-for-loading="(currentLoadRecord as ProceedingsPublicationLoad)"
                     :top-level-institution-id="selectedOrganisationUnit.value"
-                    @user-action-complete="resumeImport">
-                </import-proceedings>
+                    @user-action-complete="resumeImport" />
             </template>
 
             <template #[`item.${steps.length}`]>
@@ -119,8 +116,7 @@
                         :preset-metadata="(currentLoadRecord as JournalPublicationLoad)"
                         :metadata-enrichment="(enrichmentMetadata as JournalPublication[])"
                         :display-enrichment-set-index="displayEnrichmentSetIndex"
-                        @update="updateRecord">
-                    </import-journal-publication-details>
+                        @update="updateRecord" />
                     
                     <import-proceedings-publication-details
                         v-if="loadingProceedingsPublication"
@@ -128,8 +124,7 @@
                         :preset-metadata="(currentLoadRecord as ProceedingsPublicationLoad)"
                         :metadata-enrichment="(enrichmentMetadata as ProceedingsPublication[])"
                         :display-enrichment-set-index="displayEnrichmentSetIndex"
-                        @update="updateRecord">
-                    </import-proceedings-publication-details>
+                        @update="updateRecord" />
 
                     <div
                         v-if="!fetchingForSingleRecord && !currentLoadRecord?.isEnrichment"
@@ -146,7 +141,7 @@
                             color="primary"
                             class="mt-4 ml-2"
                             indeterminate
-                        ></v-progress-circular>
+                        />
                     </div>
                 </div>
             </template>

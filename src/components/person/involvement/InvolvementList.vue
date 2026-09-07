@@ -40,13 +40,11 @@
                     <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
                 </localized-link>
                 <strong v-else>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
-                <v-icon icon="mdi-circle-small">
-                </v-icon>
+                <v-icon icon="mdi-circle-small" />
                 <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
                 <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }} ({{ getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus) }})</strong>
                 <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ (involvement as Employment).employmentPositionId ? returnCurrentLocaleContent((involvement as Employment).employmentPositionName) : getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
-                <v-icon icon="mdi-circle-small">
-                </v-icon>
+                <v-icon icon="mdi-circle-small" />
                 <span v-if="involvement.dateFrom">
                     {{ `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` }}
                 </span>
@@ -60,7 +58,7 @@
                         color="primary"
                         size="medium"
                         @click="deleteInvolvement(involvement.id)">
-                        <v-icon size="large" icon="mdi-delete"></v-icon>
+                        <v-icon size="large" icon="mdi-delete" />
                     </v-btn>
                     <person-involvement-modal
                         class="mt-1! ml-2!"
@@ -123,7 +121,7 @@
 
             <attachment-list
                 :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
-                @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)"></attachment-list>
+                @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)" />
         </div>
     </draggable>
 </template>

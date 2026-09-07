@@ -92,7 +92,7 @@
                 </v-menu>
             </div>
             <div :class="[selectedOUs.length > 0 ? 'w-64' : 'w-96']">
-                <slot name="top-left"></slot>
+                <slot name="top-left" />
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -100,9 +100,8 @@
                 v-if="topLevelInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mr-3!"
                 :institution-id="topLevelInstitutionId"
-                @update="notifyUserAndRefreshTable">
-            </add-sub-unit-modal>
-            <slot name="actions"></slot>
+                @update="notifyUserAndRefreshTable" />
+            <slot name="actions" />
         </div>
     </div>
 
@@ -118,8 +117,7 @@
         :total-results="totalOUs"
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
     
     <div ref="tableWrapper" class="modern-table-container">
         <v-data-table-server
@@ -240,8 +238,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedOUs.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

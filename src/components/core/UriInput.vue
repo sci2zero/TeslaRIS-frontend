@@ -7,8 +7,7 @@
                 placeholder="URI"
                 outlined
                 :rules="uriValidationRules"
-                @input="sendContentToParent">
-            </v-text-field>
+                @input="sendContentToParent" />
         </v-col>
         <v-col cols="2">
             <v-btn v-if="uris.length > 1 || uris[index].value !== ''" icon @click="removeUri(index)">

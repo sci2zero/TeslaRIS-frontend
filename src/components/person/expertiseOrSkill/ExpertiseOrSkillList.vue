@@ -7,7 +7,7 @@
             <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill" />
             <h3>{{ $t("expertisesAndSkillsLabel") }}</h3>
             <strong v-if="expertiseOrSkills?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-            <br />
+            <br>
             <draggable 
                 :list="expertiseOrSkills" item-key="id"
                 group="expertiseOrSkills" 
@@ -47,7 +47,7 @@
                                 color="primary"
                                 size="medium"
                                 @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
-                                <v-icon size="large" icon="mdi-delete"></v-icon>
+                                <v-icon size="large" icon="mdi-delete" />
                             </v-btn>
                             <expertise-or-skill-modal
                                 :read-only="!canEdit"
@@ -62,7 +62,7 @@
                     
                     <div
                         v-if="expertiseOrSkill.keywords && expertiseOrSkill.keywords.length > 0">
-                        <br />
+                        <br>
                         <span
                             v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(expertiseOrSkill.keywords)?.split('\n')"
                             :key="keywordIndex">
@@ -72,8 +72,8 @@
                                 {{ keyword }}
                             </v-chip>
                         </span>
-                        <br />
-                        <br />
+                        <br>
+                        <br>
                     </div>
 
                     <attachment-list
@@ -82,8 +82,7 @@
                         is-proof
                         @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
                         @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)"
-                        @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)">
-                    </attachment-list>
+                        @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)" />
                     
                     <v-divider
                         v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1"

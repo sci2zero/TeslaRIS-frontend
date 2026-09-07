@@ -7,7 +7,7 @@
                         v-model="file"
                         :label="$t('fileLabel') + '*'"
                         accept=".pdf,image/*"
-                    ></v-file-input>
+                    />
                 </v-row>
                 <v-row>
                     <v-col>
@@ -26,8 +26,7 @@
                             :items="resourceTypes"
                             :label="$t('resourceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-if="allowLicenceSelection">
@@ -37,8 +36,7 @@
                             :items="accessRights"
                             :label="$t('licenseLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-else-if="!alwaysOpenAccess">
@@ -54,8 +52,7 @@
                             :items="cclicenseTypes"
                             :label="$t('ccLicenseLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-if="canBeArchived">
