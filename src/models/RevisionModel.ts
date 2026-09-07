@@ -284,3 +284,54 @@ export interface IssueStatistics {
     issuesBySeverityAndEntityType: SeverityBreakdown[];
     topRecurringConstraints: RecurringConstraint[];
 }
+
+export enum TrendMetric {
+    OVERALL_SCORE = "OVERALL_SCORE",
+    FAIR_COMPLIANCE = "FAIR_COMPLIANCE",
+    PUBLICATION_CANDIDATE_RATE = "PUBLICATION_CANDIDATE_RATE",
+    COMPLETENESS = "COMPLETENESS",
+    VALIDITY = "VALIDITY",
+    UNIQUENESS = "UNIQUENESS",
+    CONSISTENCY = "CONSISTENCY",
+    TIMELINESS = "TIMELINESS",
+    ACCURACY = "ACCURACY",
+    CONFORMITY = "CONFORMITY",
+    INTEGRITY = "INTEGRITY"
+}
+
+export enum TrendGranularity {
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY"
+}
+
+export interface TrendPoint {
+    label: string;
+    periodEnd: string;
+    value: number | null;
+    recordsAssessed: number;
+}
+
+export interface TrendIndicators {
+    current: number | null;
+    previous: number | null;
+    change: number | null;
+    best: number | null;
+    lowest: number | null;
+}
+
+export interface EntityTypeTrend {
+    entityType: RepositoryEntityType;
+    current: number | null;
+    previous: number | null;
+    change: number | null;
+    supported: boolean;
+}
+
+export interface QualityTrend {
+    metric: TrendMetric;
+    granularity: TrendGranularity;
+    series: TrendPoint[];
+    indicators: TrendIndicators;
+    trendByEntityType: EntityTypeTrend[];
+}
