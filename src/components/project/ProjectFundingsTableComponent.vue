@@ -67,7 +67,15 @@
                         </localized-link>
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
+                        <localized-link
+                            v-if="row.item.funderId"
+                            :to="'organisation-units/' + row.item.funderId"
+                        >
+                            {{ funderName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ displayTextOrPlaceholder(funderName(row.item)) }}
+                        </span>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
@@ -154,6 +162,13 @@ const page = ref(0);
 const size = ref(10);
 const sort = ref("");
 const direction = ref("");
+
+const funderName = (funding: FundingIndex) => {
+    const isSr = i18n.locale.value.startsWith("sr");
+    return isSr
+        ? (funding.funderNameSr || funding.funderNameOther)
+        : (funding.funderNameOther || funding.funderNameSr);
+};
 
 const headers = computed(() => [
     { title: i18n.t("nameLabel"), align: "start", sortable: true, key: "name" },
