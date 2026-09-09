@@ -1,89 +1,45 @@
 <template>
-    <v-container id="publisher">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!publisher"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center">
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(publisher?.name) }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("publisherLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <div id="publisher" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!publisher"
+            :entity-label="$t('publisherLabel')"
+            icon="mdi-account-group"
+            :can-edit="canEdit"
+            :edit-label="$t('updatePublisherLabel')"
+            :entity-type="EntityType.PUBLISHER"
+            :entity-id="publisher?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="PublisherUpdateForm"
+                    :form-props="{ presetPublisher: publisher }"
+                    entity-name="Publisher"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                {{ returnCurrentLocaleContent(publisher?.name) }}
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="publisher?.countryName?.length" :label="$t('countryLabel')" icon="mdi-flag-outline" tone="emerald">
+                    {{ returnCurrentLocaleContent(publisher?.countryName) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="publisher?.place && publisher.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                    {{ returnCurrentLocaleContent(publisher?.place) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="publisher?.state && publisher.state.length > 0" :label="$t('stateLabel')" icon="mdi-map" tone="slate">
+                    {{ returnCurrentLocaleContent(publisher?.state) }}
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
-        <!-- Publisher Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-publisher-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="PublisherUpdateForm"
-                            :form-props="{ presetPublisher: publisher }"
-                            entity-name="Publisher"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Basic Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!publisher" :citation-button="false" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div v-if="publisher?.countryId">
-                                    {{ $t("countryLabel") }}:
-                                </div>
-                                <div v-if="publisher?.countryName?.length ?? 0 > 0" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.countryName) }}
-                                </div>
-                                <div v-if="publisher?.state && publisher?.state.length > 0">
-                                    {{ $t("stateLabel") }}:
-                                </div>
-                                <div v-if="publisher?.state && publisher?.state.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.state) }}
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <div v-if="publisher?.place && publisher?.place.length > 0">
-                                    {{ $t("placeLabel") }}:
-                                </div>
-                                <div v-if="publisher?.place && publisher?.place.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(publisher?.place) }}
-                                </div>
-                            </v-col>
-                            <v-col v-if="isAdmin" cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.PUBLISHER"
-                                    :entity-id="publisher?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Publication Table -->
-        <br />
         <tab-content-loader
             v-if="!publisher"
             :button-header="false"
@@ -95,8 +51,7 @@
             :total-publications="totalPublications"
             @switch-page="switchPage"
         />
-        
-        <!-- Revision History -->
+
         <template v-if="isAdmin && publisher">
             <h2 class="mt-8 mb-2">
                 {{ $t("revisionHistoryLabel") }}
@@ -119,7 +74,7 @@
         </template>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -141,22 +96,29 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, TabContentLoader, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem },
     setup() {
         const { isAdmin } = useUserRole();
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const showAssessmentDetails = (
             version: { majorVersion: number, minorVersion: number }) => {
@@ -180,8 +142,6 @@ export default defineComponent({
 
         const i18n = useI18n();
         const router = useRouter();
-
-        const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
 
@@ -207,7 +167,7 @@ export default defineComponent({
 
                 document.title = returnCurrentLocaleContent(publisher.value.name) as string;
 
-                fetchPublications();     
+                fetchPublications();
                 populateData();
             }).catch(() => {
                 router.push({ name: "notFound" });
@@ -268,32 +228,17 @@ export default defineComponent({
         };
 
         return {
-            publisher, icon,
-            publications, 
+            publisher,
+            publications,
             totalPublications,
             switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage,
             isAdmin, EntityType, fetchPublisher,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #publisher .large-publisher-icon {
-        font-size: 10em;
-    }
-
-    #publisher .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

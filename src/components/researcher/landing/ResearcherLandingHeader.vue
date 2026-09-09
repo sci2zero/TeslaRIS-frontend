@@ -1,10 +1,22 @@
 <template>
     <div class="mb-8">
-        <div class="flex flex-col lg:flex-row items-center lg:items-start">
+        <generic-crud-modal
+            v-if="canEdit"
+            ref="personUpdateModalRef"
+            hide-activator
+            :form-component="PersonUpdateForm"
+            :form-props="{ presetPerson: person }"
+            entity-name="Person"
+            is-update
+            is-section-update
+            :read-only="!canEdit"
+            @update="emit('update', $event)"
+        />
+        <div class="flex flex-col lg:flex-row items-center lg:items-start w-full min-w-0">
             <!-- Profile Image -->
-            <div class="flex-shrink-0 mb-8 lg:mb-0 lg:mr-12">
+            <div class="flex-shrink-0 mb-6 lg:mb-0 lg:mr-12">
                 <div class="relative">
-                    <div class="w-32 h-32 sm:size-48 lg:size-64 rounded-full overflow-hidden shadow-2xl border-4 border-white ring-4 ring-slate-100">
+                    <div class="w-28 h-28 sm:size-48 lg:size-64 rounded-full overflow-hidden shadow-2xl border-4 border-white ring-4 ring-slate-100">
                         <person-profile-image
                             :filename="person?.imageServerFilename"
                             :person-id="person?.id"
@@ -15,22 +27,38 @@
                             alt="Researcher Profile" class="w-full h-full object-cover" /> -->
                     </div>
                     <!-- Academic Status Badge -->
-                    <div class="absolute bottom-2 right-2 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border-2 border-white">
+                    <div class="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 max-w-[85%] bg-emerald-600 text-white text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg border-2 border-white truncate">
                         {{ props.person?.personalInfo.displayTitle && props.person.personalInfo.displayTitle.length > 0 ? returnCurrentLocaleContent(props.person.personalInfo.displayTitle) : $t("researcherLabel") }}
                     </div>
                 </div>
             </div>
             
-            <div class="flex-1 min-w-0 text-center lg:text-left">
+            <div class="flex-1 min-w-0 w-full text-center lg:text-left">
                 <!-- Name -->
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-800 mb-3 leading-tight tracking-tight">
-                    {{ props.researcherName }}
-                </h1>
+                <div class="flex items-start sm:items-center justify-center lg:justify-between w-full gap-2 sm:gap-3 mb-3 min-w-0">
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-800 leading-tight tracking-tight min-w-0 break-words">
+                        {{ props.researcherName }}
+                    </h1>
+                    <v-menu v-if="canEdit" location="bottom end">
+                        <template #activator="{ props: menuProps }">
+                            <UiButton variant="outline" size="icon" class="shrink-0" v-bind="menuProps">
+                                <span class="mdi mdi-dots-vertical text-xl"></span>
+                            </UiButton>
+                        </template>
+                        <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
+                            <v-list-item
+                                prepend-icon="mdi-pencil-outline"
+                                :title="$t('updatePersonLabel')"
+                                @click="openPersonEditModal"
+                            />
+                        </v-list>
+                    </v-menu>
+                </div>
 
 
                 <!-- Affiliation -->
-                <div class="mb-6 lg:mb-8">
-                    <p class="text-lg sm:text-xl serif font-semibold text-slate-600 font-sans">
+                <div class="mb-6 lg:mb-8 px-1">
+                    <p class="text-base sm:text-xl font-semibold text-slate-600 font-sans break-words">
                         <localized-link
                             v-if="primaryEmployment?.organisationUnitId"
                             :to="'organisation-units/' + primaryEmployment?.organisationUnitId"
@@ -45,16 +73,16 @@
                 </div>
 
                 <!-- Academic Identifiers -->
-                <div class="mb-6 flex justify-center lg:justify-start">
-                    <div class="space-y-3">
+                <div class="mb-6 flex justify-center lg:justify-start w-full min-w-0">
+                    <div class="space-y-3 w-full max-w-full">
                         <!-- ORCID -->
-                        <div v-if="props.person?.personalInfo.orcid" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+                        <div v-if="props.person?.personalInfo.orcid" class="flex items-center justify-start gap-3 min-w-0">
+                            <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md shrink-0">
                                 <span class="text-white text-sm font-bold">iD</span>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">ORCID</span>
-                                <span>
+                                <span class="min-w-0 break-all">
                                     <identifier-link
                                         :identifier="props.person.personalInfo.orcid"
                                         type="orcid"
@@ -65,13 +93,13 @@
                         </div>
 
                         <!-- SC Number -->
-                        <div v-if="props.person?.personalInfo.scopusAuthorId" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center shadow-md">
+                        <div v-if="props.person?.personalInfo.scopusAuthorId" class="flex items-center justify-start gap-3 min-w-0">
+                            <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center shadow-md shrink-0">
                                 <span class="text-white text-sm font-bold">SC</span>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Scopus Author ID</span>
-                                <span>
+                                <span class="min-w-0 break-all">
                                     <identifier-link
                                         :identifier="props.person.personalInfo.scopusAuthorId"
                                         type="scopus_author"
@@ -82,13 +110,13 @@
                         </div>
 
                         <!-- OpenAlex Number -->
-                        <div v-if="props.person?.personalInfo.openAlexId" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center shadow-md">
+                        <div v-if="props.person?.personalInfo.openAlexId" class="flex items-center justify-start gap-3 min-w-0">
+                            <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center shadow-md shrink-0">
                                 <span class="text-black text-sm font-bold">OA</span>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">OpenAlex ID</span>
-                                <span>
+                                <span class="min-w-0 break-all">
                                     <identifier-link
                                         :identifier="props.person.personalInfo.openAlexId"
                                         type="open_alex"
@@ -99,13 +127,13 @@
                         </div>
 
                         <!-- WOS Number -->
-                        <div v-if="props.person?.personalInfo.webOfScienceResearcherId" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                        <div v-if="props.person?.personalInfo.webOfScienceResearcherId" class="flex items-center justify-start gap-3 min-w-0">
+                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shrink-0">
                                 <span class="text-white text-sm font-bold">WoS</span>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Researcher ID (Web of Science)</span>
-                                <span>
+                                <span class="min-w-0 break-all">
                                     <identifier-link
                                         :identifier="props.person.personalInfo.webOfScienceResearcherId"
                                         type="researcher_id"
@@ -116,558 +144,91 @@
                         </div>
 
                         <!-- Email -->
-                        <div v-if="props.person?.personalInfo.contact?.contactEmail" class="flex items-center justify-start space-x-3">
-                            <div class="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center shadow-md">
+                        <div v-if="props.person?.personalInfo.contact?.contactEmail" class="flex items-center justify-start gap-3 min-w-0">
+                            <div class="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center shadow-md shrink-0">
                                 <span class="mdi mdi-email text-white text-sm"></span>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col min-w-0">
                                 <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">Email</span>
-                                <identifier-link
-                                    v-if="person?.personalInfo.contact?.contactEmail"
-                                    :identifier="person?.personalInfo.contact.contactEmail"
-                                    type="email"
-                                    compact
-                                />
-                                <span v-else>-</span>
+                                <span class="min-w-0 break-all">
+                                    <identifier-link
+                                        v-if="person?.personalInfo.contact?.contactEmail"
+                                        :identifier="person?.personalInfo.contact.contactEmail"
+                                        type="email"
+                                        compact
+                                    />
+                                    <span v-else>-</span>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                    <button class="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5" @click="showDetails = !showDetails">
-                        <span class="mdi mr-2" :class="showDetails ? 'mdi-chevron-up' : 'mdi-account-details'"></span>
-                        {{ showDetails ? t('hideDetailsLabel') : t('allDetailsLabel') }}
-                    </button>
-                    <!-- <button class="border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-medium hover:bg-slate-50 transition-all duration-200 shadow-sm hover:shadow-md">
-                        <span class="mdi mdi-download mr-2"></span>
-                        Izvezi CV
-                    </button> -->
+                <div
+                    v-if="$slots.actions"
+                    class="flex flex-col sm:flex-row flex-wrap gap-3 justify-center lg:justify-start w-full"
+                >
+                    <slot name="actions"></slot>
                 </div>
-
-                <slot name="actions"></slot>
-            </div>
-
-            <!-- Data Quality -->
-            <div
-                v-if="person?.id"
-                class="w-full lg:w-72 flex-shrink-0 mt-8 lg:mt-0 lg:ml-12">
-                <data-quality-remarks-dialog
-                    :entity-type="EntityType.PERSON"
-                    :entity-id="person?.id"
-                    prominent
-                />
             </div>
         </div>
 
-        <!-- Expandable Details Section -->
-        <div v-if="showDetails" class="mt-12 transition-all duration-300 ease-in-out">
-            <generic-crud-modal
-                :form-component="PersonUpdateForm"
-                :form-props="{ presetPerson: person }"
-                entity-name="Person"
-                is-update
-                is-section-update
-                primary-color outlined
-                :read-only="!canEdit"
-                @update="updatePersonalInfo"
+        <!-- Data Quality -->
+        <div v-if="person?.id" class="mt-8">
+            <data-quality-remarks-dialog
+                :entity-type="EntityType.PERSON"
+                :entity-id="person?.id"
+                prominent
             />
-            <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
-                <!-- Section Tabs -->
-                <div class="border-b border-gray-200">
-                    <!-- Desktop Tabs -->
-                    <nav class="hidden md:flex space-x-8 px-6" aria-label="Tabs">
-                        <button 
-                            v-for="tab in tabs" 
-                            :key="tab.id"
-                            :class="[
-                                'py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
-                                activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            ]"
-                            @click="activeTab = tab.id"
-                        >
-                            {{ tab.name }}
-                        </button>
-                    </nav>
-                    
-                    <!-- Mobile Dropdown -->
-                    <div class="md:hidden px-6 py-4">
-                        <v-menu>
-                            <template #activator="{ props: menuProps }">
-                                <button
-                                    v-bind="menuProps"
-                                    class="w-full flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                >
-                                    <span>{{ tabs.find(tab => tab.id === activeTab)?.name }}</span>
-                                    <span class="mdi mdi-chevron-down text-gray-400"></span>
-                                </button>
-                            </template>
-                            <v-list>
-                                <v-list-item
-                                    v-for="tab in tabs"
-                                    :key="tab.id"
-                                    :class="activeTab === tab.id ? 'bg-blue-50 text-blue-600' : ''"
-                                    @click="activeTab = tab.id"
-                                >
-                                    <v-list-item-title>{{ tab.name }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </div>
-                </div>
-
-                
-                <!-- Tab Content -->
-                <div class="p-6">
-                    <!-- Personal Information Tab -->
-                    <div v-if="activeTab === 'personal'" class="space-y-6">
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-account-circle mr-2 text-blue-600"></span>
-                                {{ t('personalInfoLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('firstNameLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personName?.firstname }}
-                                    </p>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('surnameLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personName?.lastname }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('birthdateLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ (((isResearcher || isAdmin) && canEdit) || props.person?.showFullBirthdate) ? formatDate(props.person?.personalInfo?.localBirthDate) : props.person?.personalInfo?.localBirthDate?.slice(0, 4) }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('placeOfBirthLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personalInfo?.placeOfBirth || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('sexLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ formatSex(props.person?.personalInfo?.sex) }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Address Information -->
-                        <div v-if="props.person?.personalInfo?.postalAddress" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
-                                {{ t('professionalAddressLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('streetAndNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.postalAddress.streetAndNumber) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('cityLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.postalAddress.city) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.postalAddress.state) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.postalAddress.postalNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ countryName || '-' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-if="props.person?.personalInfo?.privatePostalAddress" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
-                                {{ t('privateAddressLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('streetAndNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.streetAndNumber) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('cityLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.city) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(props.person.personalInfo.privatePostalAddress.state) || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.privatePostalAddress.postalNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ privateCountryName || '-' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contact Information -->
-                        <div v-if="props.person?.personalInfo?.contact" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-phone mr-2 text-green-600"></span>
-                                {{ t('professionalContactLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('emailLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.contact.contactEmail || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.contact.phoneNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.contact.faxNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.contact.mobilePhoneNumber || '-' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-if="props.person?.personalInfo?.privateContact" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-phone mr-2 text-green-600"></span>
-                                {{ t('privateContactLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('emailLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.privateContact.contactEmail || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.privateContact.phoneNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.privateContact.faxNumber || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person.personalInfo.privateContact.mobilePhoneNumber || '-' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Research Area -->
-                        <div v-if="researchArea" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-domain mr-2 text-purple-600"></span>
-                                {{ t('researchAreaLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('researchAreaLabel') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ returnCurrentLocaleContent(researchArea.name) }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Academic Identifiers -->
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-identifier mr-2 text-indigo-600"></span>
-                                {{ t('identifiersLabel') }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">APVNT</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personalInfo?.apvnt || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">eCRIS-ID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">enaukaID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personalInfo?.eNaukaId || '-' }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">{{ $t("nationalScienceIdLabel") }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        {{ props.person?.personalInfo?.nationalScienceId || '-' }}
-                                    </p>
-                                </div>
-                                <div v-if="props.person?.personalInfo?.orcid">
-                                    <label class="block text-sm font-medium text-gray-700">ORCID</label>
-                                    <div v-if="person?.personalInfo.orcid" class="response">
-                                        <identifier-link :identifier="person?.personalInfo.orcid" type="orcid"></identifier-link>
-                                    </div>
-                                    <div v-else class="response">
-                                        -
-                                    </div>
-                                </div>
-                                <div v-if="props.person?.personalInfo?.scopusAuthorId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('Scopus Author ID') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div v-if="props.person?.personalInfo?.openAlexId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('OpenAlex ID') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div v-if="props.person?.personalInfo?.webOfScienceResearcherId">
-                                    <label class="block text-sm font-medium text-gray-700">{{ t('ResearcherID (WoS)') }}</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Google Scholar ID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Authenticus ID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Lattes ID</label>
-                                    <p class="mt-1 text-sm text-gray-900">
-                                        <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes"></identifier-link>
-                                        <span v-else>-</span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="personIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="person?.id" 
-                                        :containing-entity-type="ApplicableEntityType.PERSON"
-                                        :concrete-entity-type="ApplicableEntityType.PERSON"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Website URIs -->
-                        <div v-if="props.person?.personalInfo?.uris && props.person.personalInfo.uris.length > 0" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-web mr-2 text-blue-600"></span>
-                                {{ t('websiteLabel') }}
-                            </h3>
-                            <div class="space-y-2">
-                                <div v-for="uri in props.person.personalInfo.uris" :key="uri" class="flex items-center">
-                                    <span class="mdi mdi-link text-gray-400 mr-2"></span>
-                                    <a :href="uri" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline">
-                                        {{ uri }}
-                                    </a>
-                                </div>
-                                <!-- <uri-list :uris="person?.personalInfo.uris"></uri-list> -->
-                            </div>
-                        </div>
-
-                        <!-- Employments -->
-                        <div v-if="activeEmployments && activeEmployments.length > 0" class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mdi mdi-office-building mr-2 text-orange-600"></span>
-                                {{ t('employmentsLabel') }}
-                            </h3>
-                            <div class="space-y-3">
-                                <div v-for="employment in activeEmployments.slice(0, 5)" :key="employment.id" class="border-l-4 border-orange-200 pl-4">
-                                    <localized-link
-                                        v-if="employment.organisationUnitId"
-                                        :to="'organisation-units/' + employment.organisationUnitId"
-                                        class="font-medium text-gray-900 underline"
-                                    >
-                                        <div class="font-medium text-gray-900">
-                                            <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
-                                            {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
-                                        </div>
-                                    </localized-link>
-                                    <div v-else class="font-medium text-gray-900">
-                                        {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
-                                    </div>
-                                    <div v-if="employment.employmentPosition" class="text-sm text-gray-600">
-                                        {{ getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition) }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-
-import { ref, computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
+import { computed, ref } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
-import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import type { Employment } from '@/models/InvolvementModel';
 import type { PersonalInfo, PersonResponse } from '@/models/PersonModel';
-import { Sex } from '@/models/PersonModel';
 import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
-import { useUserRole } from '@/composables/useUserRole';
-import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { ApplicableEntityType } from '@/models/Common';
-import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
-import EntityIdentifierService from '@/services/EntityIdentifierService';
-import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
-
+import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
+import { UiButton } from '@/components/ui/button';
 
 interface Props {
     person: PersonResponse | undefined;
     researcherName: string;
     employments: Employment[];
     canEdit: boolean;
-    researchArea?: any;
-    countryName?: string;
-    privateCountryName?: string;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["update"]);
-const { t } = useI18n();
+const emit = defineEmits<{
+    update: [personalInfo: PersonalInfo];
+}>();
 
-const showDetails = ref(false);
-const activeTab = ref('personal');
+const personUpdateModalRef = ref<{ dialog: boolean } | null>(null);
 
-const {isResearcher, isAdmin} = useUserRole();
-
-const tabs = computed(() => [
-    { id: 'personal', name: t('allDetailsLabel') },
-]);
-
-onMounted(() => {
-    fetchIdentifiers();
-});
-
-const personIdentifiers = ref<EntityIdentifierResponse[]>([]);
-
-const primaryEmployment = computed(() => 
-    props.employments.length > 0 
-        ? props.employments.reduce((a, b) => 
-            (!b.dateFrom ? b : !a.dateFrom ? a : 
-             (!b.dateTo && a.dateTo) ? b : 
-             (b.dateTo && !a.dateTo) ? a :
-             new Date(b.dateFrom || 0) > new Date(a.dateFrom || 0) ? b : a)
-        ) 
-        : null
-);
-
-const activeEmployments = computed(() => {
-    return props.employments.filter(employment => !employment.dateTo);
-});
-
-const formatDate = (dateString: string | null | undefined): string => {
-    if (!dateString) return '-';
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('sr-RS');
-    } catch {
-        return dateString;
+const openPersonEditModal = () => {
+    if (personUpdateModalRef.value) {
+        personUpdateModalRef.value.dialog = true;
     }
 };
 
-const formatSex = (sex: Sex | null | undefined): string => {
-    if (!sex) return "-";
-    return getTitleFromValueAutoLocale(sex) || "-";
-};
-
-const updatePersonalInfo = (personalInfo: PersonalInfo) => {
-    emit("update", personalInfo);
-};
-
-const fetchIdentifiers = () => {
-    EntityIdentifierService.fetchPersonIdentifiers(
-        props.person?.id as number
-    ).then(response => {
-        personIdentifiers.value = response.data;
-    });
-};
-
+const primaryEmployment = computed(() =>
+    props.employments.length > 0
+        ? props.employments.reduce((a, b) =>
+            (!b.dateFrom ? b : !a.dateFrom ? a :
+             (!b.dateTo && a.dateTo) ? b :
+             (b.dateTo && !a.dateTo) ? a :
+             new Date(b.dateFrom || 0) > new Date(a.dateFrom || 0) ? b : a)
+        )
+        : null
+);
 </script>
 
 <style scoped>

@@ -3,8 +3,8 @@
         v-if="identifier"
         variant="plain"
         :density="compact ? 'compact' : 'default'"
-        :class="compact ? 'text-slate-700 text-sm font-mono' : 'no-uppercase m-0 p-0 h-auto semi-transparent'"
-        :style="{ fontSize: '1.2rem', fontWeight: 'bold', marginLeft: (compact && type !== 'researcher_id') ? '-12px' : '-17px' }"
+        :class="compact ? 'text-slate-700 text-sm font-mono max-w-full whitespace-normal h-auto' : 'no-uppercase m-0 p-0 h-auto semi-transparent'"
+        :style="{ fontSize: compact ? '0.875rem' : '1.2rem', fontWeight: 'bold', marginLeft: (compact && type !== 'researcher_id') ? '-12px' : '-17px' }"
         :href="`${computeBaseURL()}${identifier}`"
         target="_blank">
         {{ identifier }}

@@ -1,127 +1,52 @@
 <template>
-    <v-container id="performanceRelatedOutput">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!performanceRelatedOutput"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)"></rich-title-renderer>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(performanceRelatedOutput?.subTitle) }}
-                        <br />
-                        {{ $t("performanceRelatedOutputLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- PerformanceRelatedOutput Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon v-if="!performanceRelatedOutput" size="x-large" class="large-performanceRelatedOutput-icon">
-                    {{ icon }}
-                </v-icon>
+    <div id="performanceRelatedOutput" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!performanceRelatedOutput"
+            :subtitle="returnCurrentLocaleContent(performanceRelatedOutput?.subTitle)"
+            :entity-label="$t('performanceRelatedOutputLabel')"
+            :badge="performanceRelatedOutput?.type ? getPerformanceRelatedOutputTypeTitleFromValueAutoLocale(performanceRelatedOutput.type) : ''"
+            icon="mdi-desktop-classic"
+            :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
+            :edit-label="$t('updateLabel')"
+            :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+            :entity-id="performanceRelatedOutput?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit && !performanceRelatedOutput?.isArchived"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="PerformanceRelatedOutputUpdateForm"
+                    :form-props="{ presetPerformanceRelatedOutput: performanceRelatedOutput }"
+                    entity-name="PerformanceRelatedOutput"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit || performanceRelatedOutput?.isArchived"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)" />
+            </template>
+            <template #visual>
+                <v-icon v-if="!performanceRelatedOutput" size="x-large" class="text-slate-400">mdi-desktop-classic</v-icon>
                 <wordcloud
                     v-else
                     :for-document-id="performanceRelatedOutput?.id"
                     :document-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
                     compact-icon
                 />
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="PerformanceRelatedOutputUpdateForm"
-                            :form-props="{ presetPerformanceRelatedOutput: performanceRelatedOutput }"
-                            entity-name="PerformanceRelatedOutput"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit || performanceRelatedOutput?.isArchived"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Basic Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!performanceRelatedOutput" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div v-if="performanceRelatedOutput?.type">
-                                    {{ $t("performanceRelatedOutputTypeLabel") }}:
-                                </div>
-                                <div v-if="performanceRelatedOutput?.type" class="response">
-                                    {{ getPerformanceRelatedOutputTypeTitleFromValueAutoLocale(performanceRelatedOutput.type) }}
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.producer?.length || 0) > 0">
-                                    {{ $t("producerLabel") }}:
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.producer?.length || 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(performanceRelatedOutput?.producer) }}
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.distributor?.length || 0) > 0">
-                                    {{ $t("distributorLabel") }}:
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.distributor?.length || 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(performanceRelatedOutput?.distributor) }}
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.sourceTitle?.length || 0) > 0">
-                                    {{ $t("sourceTitleLabel") }}:
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.sourceTitle?.length || 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(performanceRelatedOutput?.sourceTitle) }}
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.otherActors?.length || 0) > 0">
-                                    {{ $t("otherActorsLabel") }}:
-                                </div>
-                                <div v-if="(performanceRelatedOutput?.producer?.length || 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(performanceRelatedOutput?.otherActors) }}
-                                </div>
-                                <div v-if="performanceRelatedOutput?.documentDate">
-                                    {{ $t("dateOfPublicationLabel") }}:
-                                </div>
-                                <div v-if="performanceRelatedOutput?.documentDate" class="response">
-                                    {{ localiseFlexibleDate(performanceRelatedOutput.documentDate) }}
-                                </div>
-                                <div v-if="performanceRelatedOutput?.languageTags && performanceRelatedOutput?.languageTags.length > 0">
-                                    {{ $t("languageLabel") }}:
-                                </div>
-                                <div>
-                                    <v-chip v-for="(languageTag, index) in performanceRelatedOutput?.languageTags" :key="index" outlined>
-                                        {{ languageTag.display }}
-                                    </v-chip>
-                                </div>
-                            </v-col>
-                            
-                            <document-common-fields-display
-                                :document="performanceRelatedOutput"
-                                :can-edit="canEdit"
-                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                :concrete-entity-type="ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT"
-                                :document-identifiers="documentIdentifiers"
-                                @identifiers-updated="fetchIdentifiers"
-                            />
-
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
-                                    :entity-id="performanceRelatedOutput?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="performanceRelatedOutput?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                    {{ localiseFlexibleDate(performanceRelatedOutput.documentDate) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="performanceRelatedOutput?.doi" label="DOI" abbrev="DOI" tone="blue">
+                    <identifier-link :identifier="performanceRelatedOutput.doi" compact />
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
         <document-action-box
             ref="actionsRef"
@@ -143,6 +68,8 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
@@ -172,7 +99,9 @@
 
         <v-tabs-window
             v-show="performanceRelatedOutput"
-            v-model="currentTab">
+            v-model="currentTab"
+            class="min-w-0"
+        >
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="performanceRelatedOutput?.id"
@@ -192,27 +121,41 @@
                 </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
-                <!-- Keywords -->
-                <keyword-list
+                <landing-additional-info-tab
                     :keywords="performanceRelatedOutput?.keywords ? performanceRelatedOutput.keywords : []"
-                    :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
-
-                <!-- Description -->
-                <description-section
                     :description="performanceRelatedOutput?.description"
+                    :remark="performanceRelatedOutput?.remark"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    @update="updateDescription">
-                </description-section>
-
-                <description-section
-                    :description="performanceRelatedOutput?.remark"
-                    :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    is-remark
-                    @update="updateRemark"
-                />
+                    :document="performanceRelatedOutput"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :concrete-entity-type="ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT"
+                    :document-identifiers="documentIdentifiers"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                    @update-remark="updateRemark"
+                    @identifiers-updated="fetchIdentifiers"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="(performanceRelatedOutput?.producer?.length || 0) > 0" :label="$t('producerLabel')">
+                            {{ returnCurrentLocaleContent(performanceRelatedOutput?.producer) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="(performanceRelatedOutput?.distributor?.length || 0) > 0" :label="$t('distributorLabel')">
+                            {{ returnCurrentLocaleContent(performanceRelatedOutput?.distributor) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="(performanceRelatedOutput?.sourceTitle?.length || 0) > 0" :label="$t('sourceTitleLabel')">
+                            {{ returnCurrentLocaleContent(performanceRelatedOutput?.sourceTitle) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="(performanceRelatedOutput?.otherActors?.length || 0) > 0" :label="$t('otherActorsLabel')">
+                            {{ returnCurrentLocaleContent(performanceRelatedOutput?.otherActors) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="performanceRelatedOutput?.languageTags && performanceRelatedOutput.languageTags.length > 0" :label="$t('languageLabel')">
+                            <v-chip v-for="(languageTag, index) in performanceRelatedOutput.languageTags" :key="index" outlined>
+                                {{ languageTag.display }}
+                            </v-chip>
+                        </landing-detail-field>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -272,7 +215,7 @@
         />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -288,8 +231,6 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, PerformanceRelatedOutput } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
-import KeywordList from '@/components/core/KeywordList.vue';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import StatisticsService from '@/services/StatisticsService';
@@ -303,7 +244,6 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
@@ -317,17 +257,20 @@ import { getPerformanceRelatedOutputTypeTitleFromValueAutoLocale } from '@/i18n/
 import PerformanceRelatedOutputUpdateForm from '@/components/publication/update/PerformanceRelatedOutputUpdateForm.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "PerformanceRelatedOutputLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
         const currentTab = ref("contributions");
 
@@ -356,8 +299,6 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-desktop-classic");
-
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
         const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
@@ -365,6 +306,13 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
@@ -452,10 +400,6 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
-        const goToURL = (uri: string) => {
-            window.open(uri, "_blank");
-        }
-
         const updateKeywords = (keywords: MultilingualContent[]) => {
             performanceRelatedOutput.value!.keywords = keywords;
             performUpdate(false);
@@ -518,9 +462,9 @@ export default defineComponent({
         };
 
         return {
-            performanceRelatedOutput, icon, ApplicableEntityType,
+            performanceRelatedOutput, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
-            languageTagMap, searchKeyword, goToURL, canEdit,
+            languageTagMap, searchKeyword, canEdit,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, isResearcher, displayConfiguration,
@@ -533,24 +477,8 @@ export default defineComponent({
             PerformanceRelatedOutputUpdateForm, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, updateRemark,
             localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #performanceRelatedOutput .large-performanceRelatedOutput-icon {
-        font-size: 10em;
-    }
-
-    #performanceRelatedOutput .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

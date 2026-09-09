@@ -382,7 +382,7 @@ export default defineComponent(
 
 /* Size variants */
 .search-card--small {
-    @apply max-w-sm rounded-2xl p-0.5;
+    @apply max-w-sm rounded-2xl p-0.5 w-full;
 }
 
 .search-card--small .search-input :deep(.v-field__input) {

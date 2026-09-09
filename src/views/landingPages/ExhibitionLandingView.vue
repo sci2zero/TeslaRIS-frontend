@@ -1,123 +1,47 @@
 <template>
-    <v-container id="exhibition">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!exhibition"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(exhibition?.name) + (exhibition?.nameAbbreviation && exhibition.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(exhibition?.nameAbbreviation) + ")" : "") }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("exhibitionLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Exhibition Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-exhibition-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="ExhibitionUpdateForm"
-                            :form-props="{ presetEvent: exhibition }"
-                            entity-name="Exhibition"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Personal Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!exhibition" :citation-button="false" />
-                        <v-row>
-                            <v-col cols="3">
-                                <div v-if="!exhibition?.serialEvent">
-                                    {{ $t("eventDateLabel") }}:
-                                </div>
-                                <div v-if="!exhibition?.serialEvent" class="response">
-                                    {{ localiseDateRange(exhibition?.dateFrom as string, exhibition?.dateTo as string) }}
-                                </div>
-                                <div v-if="exhibition?.countryId">
-                                    {{ $t("stateLabel") }}:
-                                </div>
-                                <div v-if="exhibition?.countryId" class="response">
-                                    {{ returnCurrentLocaleContent(country?.name) }}
-                                </div>
-                                <div v-if="exhibition?.place && exhibition.place.length > 0">
-                                    {{ $t("placeLabel") }}:
-                                </div>
-                                <div v-if="exhibition?.place && exhibition.place.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(exhibition?.place) }}
-                                </div>
-                                <div v-if="exhibition?.number">
-                                    {{ $t("exhibitionNumberLabel") }}:
-                                </div>
-                                <div v-if="exhibition?.number" class="response">
-                                    {{ exhibition.number }}
-                                </div>
-                                <div v-if="exhibition?.fee">
-                                    {{ $t("cotizationFeeLabel") }}:
-                                </div>
-                                <div v-if="exhibition?.fee" class="response">
-                                    {{ exhibition.fee }}
-                                </div>
-                                <div v-if="(exhibition?.displayOrganizer?.length ?? 0) > 0">
-                                    {{ $t("organizerLabel") }}:
-                                </div>
-                                <div v-if="(exhibition?.displayOrganizer?.length ?? 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(exhibition?.displayOrganizer) }}
-                                </div>
-                                <div v-if="exhibition?.uris && exhibition?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="exhibition?.uris"></uri-list>
-                                </div>
-                                <br />
-                                <div v-if="exhibition?.serialEvent">
-                                    <h2>{{ $t("isSerialEventMessage") }}</h2>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="eventIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="exhibition?.id" 
-                                        :containing-entity-type="ApplicableEntityType.EVENT"
-                                        :concrete-entity-type="ApplicableEntityType.EXHIBITION"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.EXHIBITION"
-                                    :entity-id="exhibition?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+    <div id="exhibition" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!exhibition"
+            :entity-label="$t('exhibitionLabel')"
+            icon="mdi-panorama"
+            :can-edit="canEdit"
+            :edit-label="$t('updateExhibitionLabel')"
+            :entity-type="EntityType.EXHIBITION"
+            :entity-id="exhibition?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="ExhibitionUpdateForm"
+                    :form-props="{ presetEvent: exhibition }"
+                    entity-name="Exhibition"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                {{ returnCurrentLocaleContent(exhibition?.name) + (exhibition?.nameAbbreviation && exhibition.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(exhibition?.nameAbbreviation) + ")" : "") }}
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="!exhibition?.serialEvent && (exhibition?.dateFrom || exhibition?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
+                    {{ localiseDateRange(exhibition?.dateFrom as string, exhibition?.dateTo as string) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="exhibition?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
+                    {{ returnCurrentLocaleContent(country?.name) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="exhibition?.place && exhibition.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                    {{ returnCurrentLocaleContent(exhibition?.place) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="(exhibition?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
+                    {{ returnCurrentLocaleContent(exhibition?.displayOrganizer) }}
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
         <tab-content-loader v-if="!exhibition" layout="sections" />
         <v-tabs
@@ -125,13 +49,12 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
-            <!-- <v-tab v-show="!exhibition?.serialEvent" value="publications">
-                {{ $t("scientificResultsListLabel") }}
-            </v-tab> -->
             <v-tab value="contributions">
                 {{ $t("participationsLabel") }}
-            </v-tab>    
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -151,19 +74,9 @@
 
         <v-tabs-window
             v-show="exhibition"
-            v-model="currentTab">
-            <!-- <v-tabs-window-item value="publications">
-                <div class="mt-10">
-                    <h2 class="mb-5">
-                        {{ $t("exhibitionPublicationsLabel") }}
-                    </h2>
-                    <publication-table-component
-                        :publications="publications"
-                        :total-publications="totalPublications"
-                        @switch-page="switchPublicationsPage">
-                    </publication-table-component>
-                </div>
-            </v-tabs-window-item> -->
+            v-model="currentTab"
+            class="min-w-0"
+        >
             <v-tabs-window-item value="contributions">
                 <person-event-contribution-tabs
                     :event-id="exhibition?.id"
@@ -174,32 +87,49 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
-                <keyword-list
-                    :keywords="exhibition?.keywords ? exhibition?.keywords : []"
-                    :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
-                <description-section
+                <landing-additional-info-tab
+                    :keywords="exhibition?.keywords ? exhibition.keywords : []"
                     :description="exhibition?.description ? exhibition.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    :show-remark="false"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="exhibition?.number" :label="$t('exhibitionNumberLabel')" :value="exhibition.number" />
+                        <landing-detail-field v-if="exhibition?.fee" :label="$t('cotizationFeeLabel')" :value="exhibition.fee" />
+                        <landing-detail-field v-if="exhibition?.uris && exhibition.uris.length > 0" :label="$t('uriInputLabel')">
+                            <uri-list :uris="exhibition.uris" />
+                        </landing-detail-field>
+                        <landing-detail-field v-if="exhibition?.serialEvent" :label="$t('isSerialEventMessage')" :value="$t('isSerialEventMessage')" />
+                        <div class="md:col-span-2">
+                            <entity-identifiers-list
+                                :entity-identifiers="eventIdentifiers"
+                                :can-edit="canEdit"
+                                :entity-id="exhibition?.id"
+                                :containing-entity-type="ApplicableEntityType.EVENT"
+                                :concrete-entity-type="ApplicableEntityType.EXHIBITION"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
+                    </template>
 
-                <div class="mt-10">
-                    <events-relation-list
-                        :preset-event="exhibition"
-                        :readonly="!canEdit"
-                        :event-type="EventType.EXHIBITION"
-                    />
-                </div>
+                    <div class="mt-10">
+                        <events-relation-list
+                            :preset-event="exhibition"
+                            :readonly="!canEdit"
+                            :event-type="EventType.EXHIBITION"
+                        />
+                    </div>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="eventIndicators" 
-                    :applicable-types="[ApplicableEntityType.EVENT]" 
-                    :entity-id="exhibition?.id" 
-                    :entity-type="ApplicableEntityType.EVENT" 
+                <indicators-section
+                    :indicators="eventIndicators"
+                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    :entity-id="exhibition?.id"
+                    :entity-type="ApplicableEntityType.EVENT"
                     :can-edit="canClassify"
                     show-statistics
                     @create="createIndicator"
@@ -235,9 +165,9 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-        
+
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -245,14 +175,12 @@ import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import KeywordList from '@/components/core/KeywordList.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { EventType, type Exhibition, type PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/utils/DateUtil';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -266,28 +194,37 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 
 
 export default defineComponent({
     name: "ExhibitionLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isAdmin } = useUserRole();
 
         const currentTab = ref("contributions");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const showAssessmentDetails = (
             version: { majorVersion: number, minorVersion: number }) => {
@@ -303,11 +240,9 @@ export default defineComponent({
         const currentRoute = useRoute();
         const exhibition = ref<Exhibition>();
         const keywords = ref<string[]>([]);
-        
+
         const i18n = useI18n();
         const router = useRouter();
-
-        const icon = ref("mdi-panorama");
 
         const canEdit = ref(false);
         const canClassify = ref(false);
@@ -360,7 +295,7 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 exhibition.value = response.data;
-                
+
                 document.title = returnCurrentLocaleContent(exhibition.value.name) as string;
 
                 fetchDetails();
@@ -439,7 +374,7 @@ export default defineComponent({
         };
 
         return {
-            exhibition, icon, fetchIdentifiers,
+            exhibition, fetchIdentifiers,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
@@ -450,24 +385,9 @@ export default defineComponent({
             fetchClassifications, canClassify, EventType,
             eventIdentifiers,
             isAdmin, EntityType, fetchExhibition,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #exhibition .large-exhibition-icon {
-        font-size: 10em;
-    }
-
-    #exhibition .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

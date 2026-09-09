@@ -1,60 +1,52 @@
 <template>
-    <v-row
+    <div
         v-if="initialDatesSet && currentTab !== 'statistics'"
-        no-gutters
-        class="align-center mt-2!"
-        style="max-width: 250px;">
-        <v-col cols="5">
-            <v-text-field
-                v-model="fromYear"
-                type="number"
-                density="compact"
-                variant="outlined"
-                hide-details
-                :label="$t('fromLabel')"
-                class="mr-2"
-                :min="minYear"
-                :max="min([maxYear, toYear])"
-                @update:model-value="handleYearChange"
-            ></v-text-field>
-        </v-col>
-        <v-col cols="5">
-            <v-text-field
-                v-model="toYear"
-                type="number"
-                density="compact"
-                variant="outlined"
-                hide-details
-                :label="$t('toLabel')"
-                :min="max([minYear, fromYear])"
-                :max="maxYear"
-                @update:model-value="handleYearChange"
-            ></v-text-field>
-        </v-col>
-    </v-row>
-    <v-row
+        class="flex gap-3 mt-3 max-w-xs">
+        <v-text-field
+            v-model="fromYear"
+            type="number"
+            density="compact"
+            variant="outlined"
+            hide-details
+            :label="$t('fromLabel')"
+            class="min-w-0 flex-1"
+            :min="minYear"
+            :max="min([maxYear, toYear])"
+            @update:model-value="handleYearChange"
+        ></v-text-field>
+        <v-text-field
+            v-model="toYear"
+            type="number"
+            density="compact"
+            variant="outlined"
+            hide-details
+            :label="$t('toLabel')"
+            class="min-w-0 flex-1"
+            :min="max([minYear, fromYear])"
+            :max="maxYear"
+            @update:model-value="handleYearChange"
+        ></v-text-field>
+    </div>
+    <div
         v-else-if="initialDatesSet && currentTab === 'statistics'"
-        class="align-center"
-        style="max-width: 300px;">
-        <v-col cols="6">
-            <date-picker
-                v-model="startDate"
-                :label="$t('startDateLabel') + '*'"
-                color="primary"
-                required
-                :allow-deletion="false"
-            />
-        </v-col>
-        <v-col cols="6">
-            <date-picker
-                v-model="endDate"
-                :label="$t('endDateLabel') + '*'"
-                color="primary"
-                required
-                :allow-deletion="false"
-            />
-        </v-col>
-    </v-row>
+        class="flex flex-col sm:flex-row gap-3 mt-3 max-w-md">
+        <date-picker
+            v-model="startDate"
+            :label="$t('startDateLabel') + '*'"
+            color="primary"
+            required
+            :allow-deletion="false"
+            class="min-w-0 flex-1"
+        />
+        <date-picker
+            v-model="endDate"
+            :label="$t('endDateLabel') + '*'"
+            color="primary"
+            required
+            :allow-deletion="false"
+            class="min-w-0 flex-1"
+        />
+    </div>
     <!-- <v-row v-if="currentTab === 'collaborationNetwork'">
         <v-col>
             <span class="flex flex-row justify-start">
@@ -76,6 +68,8 @@
         v-model="currentTab"
         color="deep-purple-accent-4"
         align-tabs="start"
+        show-arrows
+        class="visualization-tabs"
     >
         <v-tab v-show="displayPublicationsTab" value="publicationCount">
             {{ $t("publicationsLabel") }}
@@ -679,7 +673,18 @@ const showPublicationListModalBar = (sectionType: any, year: number, isThesisTyp
 <style>
 
 .contribution-type-select {
-    max-width: 400px;
+    max-width: 100%;
+}
+
+@media (min-width: 640px) {
+    .contribution-type-select {
+        max-width: 400px;
+    }
+}
+
+.visualization-tabs :deep(.v-tab) {
+    min-width: unset;
+    flex: 0 0 auto;
 }
 
 </style>

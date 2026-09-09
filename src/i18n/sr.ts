@@ -371,6 +371,7 @@ export default {
     abbreviationTitleLabel: "Skraćenica zvanja",
     otherNamesLabel: "Svi oblici imena",
     viewAllPersonNamesLabel: "Prikaz oblika imena",
+    moreActionsLabel: "Više akcija",
     noOtherNamesMessage: "Nema alternativnih oblika imena.",
     recentNotificationsLabel: "Nedavna obaveštenja",
     dateOfAcquisitionLabel: "Datum sticanja",
@@ -1183,6 +1184,18 @@ export default {
         contact: "Kontakt podaci",
         location: "Novi Sad, Srbija",
         allRightsReserved: "Sva prava zadržana"
+    },
+    landingDataQuality: {
+        description: "Praćenje na nivou repozitorijuma i rešavanje operativnih problema.",
+        open: "Otvori →",
+        repositoryAnalytics: {
+            title: "Analitika repozitorijuma",
+            description: "Pregled, trendovi, tipovi entiteta, dimenzije i mere kvaliteta."
+        },
+        issueExplorer: {
+            title: "Istraživač problema",
+            description: "Pronađite neispunjena ograničenja i zahvaćene zapise za izabrani kontekst procene."
+        }
     },
     landingFeatures: {
         title: "Istaknuti resursi",

@@ -8,41 +8,37 @@
     
     <aside
         :class="[
-            'fixed w-24 z-40 h-screen bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800 transition-all duration-300 shadow-lg',
+            'sidebar',
             sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
         ]">
-        <div class="flex items-center justify-center w-full">
+        <div class="sidebar-header">
             <router-link
                 to="/"
-                class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
+                class="sidebar-item sidebar-item--brand"
                 aria-label="Logo">
-                <img src="/logov1.svg" alt="Logo" class="size-10">
-                <span
-                    class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
+                <span class="sidebar-logo" aria-hidden="true"></span>
+                <span class="sidebar-brand">TeslaRIS</span>
             </router-link>
         </div>
 
-        <div class="mt-3 h-px w-12 bg-gray-800"></div>
+        <div class="sidebar-divider"></div>
 
-        <!-- Scroll up button -->
         <button
             v-show="canScrollUp"
-            class="mt-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
+            class="sidebar-scroll-btn"
             aria-label="Scroll up"
             @click="scrollUp"
         >
             <span class="mdi mdi-chevron-up text-sm"></span>
         </button>
 
-        <!-- Menu with scrollable container -->
-        <nav class="side-menu mt-4 flex flex-1 flex-col items-center gap-4 relative min-h-0">
-            <div 
+        <nav class="side-menu">
+            <div
                 ref="scrollContainer"
-                class="flex flex-col items-center gap-2 overflow-y-auto scrollbar-hide w-full px-2"
-                style="height: calc(100vh - 280px);"
+                class="sidebar-scroll scrollbar-hide"
                 @scroll="handleScroll"
             >
-                <div v-for="item in filteredMenuItems" :key="item.key" class="relative">
+                <div v-for="item in filteredMenuItems" :key="item.key" class="sidebar-entry">
                     <template v-if="!item.condition || item.condition">
                         <v-menu
                             v-if="item.subItems && item.subItems.length > 0"
@@ -55,16 +51,17 @@
                             <template #activator="{ props }">
                                 <div
                                     v-bind="props"
-                                    class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20 cursor-pointer"
-                                    :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
+                                    class="sidebar-item"
+                                    :class="{ 'sidebar-item--active': isActive(item.to) }"
                                     :aria-label="item.label"
                                 >
-                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
-                                    <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
+                                    <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                                    <span class="sidebar-item-label">{{ item.label }}</span>
+                                    <span class="mdi mdi-chevron-right sidebar-item-chevron"></span>
                                 </div>
                             </template>
                             
-                            <v-list class="sidebar-menu-list" color="rgb(31, 41, 55)">
+                            <v-list class="sidebar-menu-list" color="#320f9b">
                                 <v-list-item
                                     v-for="subItem in item.subItems"
                                     v-show="!subItem.condition || subItem.condition"
@@ -73,7 +70,7 @@
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
-                                        <v-icon :icon="subItem.icon" class="text-gray-300"></v-icon>
+                                        <v-icon :icon="subItem.icon" class="sidebar-menu-icon"></v-icon>
                                     </template>
                                     <v-list-item-title class="text-sm">
                                         {{ subItem.label }}
@@ -85,22 +82,21 @@
                         <router-link
                             v-else
                             :to="'/' + $i18n.locale + item.to + (item.dynamicValue ? item.dynamicValue : '')"
-                            class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20"
-                            :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
+                            class="sidebar-item"
+                            :class="{ 'sidebar-item--active': isActive(item.to) }"
                             :aria-label="item.label"
                         >
-                            <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
-                            <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
+                            <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                            <span class="sidebar-item-label">{{ item.label }}</span>
                         </router-link>
                     </template>
                 </div>
             </div>
         </nav>
 
-        <!-- Scroll down button -->
         <button
             v-show="canScrollDown"
-            class="mb-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
+            class="sidebar-scroll-btn"
             aria-label="Scroll down"
             @click="scrollDown"
         >
@@ -391,54 +387,272 @@ const isActive = (path: string): boolean => {
 <style scoped>
 @reference "@/assets/main.css";
 
-/* Hide scrollbar but maintain scroll functionality */
-.scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;     /* Firefox */
+.sidebar {
+    --sidebar-primary: #320f9b;
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #334155;
+    --sidebar-text-muted: #64748b;
+    --sidebar-hover-bg: rgba(50, 15, 155, 0.06);
+    --sidebar-active-bg: rgba(50, 15, 155, 0.1);
+    --sidebar-divider: #e2e8f0;
+    --sidebar-border: #e2e8f0;
+    --sidebar-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
+    --sidebar-scroll-bg: #f1f5f9;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 6rem;
+    height: 100vh;
+    padding: 1.25rem 0 1rem;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--sidebar-shadow);
+    transition: width 0.3s ease, transform 0.3s ease, padding 0.3s ease;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;             /* Safari and Chrome */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
-/* Ensure smooth scrolling behavior */
+.sidebar-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    background-color: var(--sidebar-primary);
+    mask: url('/logov1.svg') center / contain no-repeat;
+    -webkit-mask: url('/logov1.svg') center / contain no-repeat;
+}
+
+.sidebar-brand {
+    color: var(--sidebar-primary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.sidebar-divider {
+    height: 1px;
+    width: 3rem;
+    margin: 0.75rem 0;
+    background: var(--sidebar-divider);
+    flex-shrink: 0;
+}
+
+.sidebar-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    color: var(--sidebar-text-muted);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-primary);
+}
+
+.sidebar-item--active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-primary);
+}
+
+.sidebar-item-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-item-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.sidebar-item-chevron {
+    display: none;
+}
+
+.sidebar-scroll-btn {
+    margin: 0.5rem 0;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    background: var(--sidebar-scroll-bg);
+    color: var(--sidebar-text-muted);
+    transition: background 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-scroll-btn:hover {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-primary);
+}
+
+.side-menu {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+}
+
+.sidebar-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-y: auto;
+    width: 100%;
+    padding: 0 0.5rem;
+    min-height: 0;
+    flex: 1;
+}
+
+.sidebar-entry {
+    position: relative;
+    width: auto;
+}
+
 .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     scroll-behavior: smooth;
 }
 
-/* Ensure the scroll container is properly sized */
-nav {
-    min-height: 0;
-    flex: 1;
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 
-/* Make sure the scroll container takes available space */
-.scrollbar-hide {
-    min-height: 0;
-    flex: 1;
-}
-
-
-.side-menu button,
 .side-menu a {
     transition: all 0.2s ease-in-out;
 }
 
-
 .side-menu a:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1024px) {
+    .sidebar {
+        width: 16rem;
+        align-items: stretch;
+        padding: 1.25rem 0.75rem;
+    }
+
+    .sidebar-header {
+        justify-content: flex-start;
+        padding: 0 0.25rem;
+    }
+
+    .sidebar-logo {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .sidebar-brand {
+        font-size: 1rem;
+        text-align: left;
+        margin-top: 0;
+    }
+
+    .sidebar-divider {
+        width: auto;
+        margin: 1rem 0.5rem;
+    }
+
+    .sidebar-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        width: 100%;
+        gap: 0.75rem;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .sidebar-item-icon {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .sidebar-item-label {
+        font-size: 0.875rem;
+        text-align: left;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sidebar-item-chevron {
+        display: block;
+        margin-left: auto;
+        font-size: 1rem;
+        opacity: 0.5;
+        flex-shrink: 0;
+    }
+
+    .side-menu,
+    .sidebar-scroll {
+        align-items: stretch;
+    }
+
+    .sidebar-entry {
+        width: 100%;
+    }
+
+    .side-menu a:hover {
+        transform: none;
+    }
 }
 </style>
 
 <style>
-@reference "@/assets/main.css";
-
 .sidebar-menu-list {
-    @apply !bg-gray-800 text-white min-w-48;
+    --sidebar-primary: #320f9b;
+    --sidebar-text: #334155;
+    --sidebar-menu-bg: #ffffff;
+    --sidebar-menu-hover: rgba(50, 15, 155, 0.06);
+    --sidebar-menu-border: #e2e8f0;
+
+    background: var(--sidebar-menu-bg) !important;
+    color: var(--sidebar-text) !important;
+    min-width: 12rem;
+    border: 1px solid var(--sidebar-menu-border);
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
 }
 
 .sidebar-menu-list-item {
-    @apply hover:bg-gray-700 text-white;
+    color: var(--sidebar-text) !important;
+}
+
+.sidebar-menu-list-item:hover {
+    background: var(--sidebar-menu-hover) !important;
+    color: var(--sidebar-primary) !important;
+}
+
+.sidebar-menu-icon {
+    color: #64748b !important;
+}
+
+.sidebar-menu-list-item:hover .sidebar-menu-icon {
+    color: var(--sidebar-primary) !important;
 }
 </style>

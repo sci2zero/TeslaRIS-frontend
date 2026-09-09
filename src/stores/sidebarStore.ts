@@ -48,13 +48,12 @@ export const useSidebarStore = defineStore('sidebar', () => {
 
   // Computed property for sidebar width
   const sidebarWidth = computed(() => {
-    return isOpen.value ? 'w-24' : 'w-0';
+    return isOpen.value ? 'w-24 lg:w-64' : 'w-0';
   });
 
-  // Computed property for main content margin
   const mainMargin = computed(() => {
     if (!isVisible.value) return 'ml-0';
-    return 'ml-24';
+    return 'ml-24 lg:ml-64';
   });
 
   return {

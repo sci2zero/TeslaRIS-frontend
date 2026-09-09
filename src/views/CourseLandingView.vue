@@ -1,147 +1,53 @@
 <template>
-    <v-container id="course">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!course"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(course?.name) + (course?.nameAbbreviation && course.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(course?.nameAbbreviation) + ")" : "") }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("courseLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Course Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-course-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="CourseUpdateForm"
-                            :form-props="{ presetEvent: course }"
-                            entity-name="Course"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Personal Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!course" :citation-button="false" />
-                        <v-row>
-                            <v-col cols="3">
-                                <div v-if="!course?.serialEvent">
-                                    {{ $t("eventDateLabel") }}:
-                                </div>
-                                <div v-if="!course?.serialEvent" class="response">
-                                    {{ localiseDateRange(course?.dateFrom as string, course?.dateTo as string) }}
-                                </div>
-                                <div v-if="course?.countryId">
-                                    {{ $t("stateLabel") }}:
-                                </div>
-                                <div v-if="course?.countryId" class="response">
-                                    {{ returnCurrentLocaleContent(country?.name) }}
-                                </div>
-                                <div v-if="course?.place && course.place.length > 0">
-                                    {{ $t("placeLabel") }}:
-                                </div>
-                                <div v-if="course?.place && course.place.length > 0" class="response">
-                                    {{ returnCurrentLocaleContent(course?.place) }}
-                                </div>
-                                <div v-if="course?.courseLevel">
-                                    {{ $t("courseLevelLabel") }}:
-                                </div>
-                                <div v-if="course?.courseLevel" class="response">
-                                    {{ course.courseLevel }}
-                                </div>
-                                <div v-if="course?.courseCode">
-                                    {{ $t("courseCodeLabel") }}:
-                                </div>
-                                <div v-if="course?.courseCode" class="response">
-                                    {{ course.courseCode }}
-                                </div>
-                                <div v-if="course?.academicYear">
-                                    {{ $t("academicYearLabel") }}:
-                                </div>
-                                <div v-if="course?.academicYear" class="response">
-                                    {{ course.academicYear }}
-                                </div>
-                                <div v-if="course?.numberOfCredits">
-                                    {{ $t("numberOfCreditsLabel") }}:
-                                </div>
-                                <div v-if="course?.numberOfCredits" class="response">
-                                    {{ course.numberOfCredits }}
-                                </div>
-                                <div v-if="course?.numberOfStudents">
-                                    {{ $t("numberOfStudentsLabel") }}:
-                                </div>
-                                <div v-if="course?.numberOfStudents" class="response">
-                                    {{ course.numberOfStudents }}
-                                </div>
-                                <div v-if="(course?.groupName?.length ?? 0) > 0">
-                                    {{ $t("groupNameLabel") }}:
-                                </div>
-                                <div v-if="(course?.groupName?.length ?? 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(course?.groupName) }}
-                                </div>
-                                <div v-if="(course?.displayOrganizer?.length ?? 0) > 0">
-                                    {{ $t("organizerLabel") }}:
-                                </div>
-                                <div v-if="(course?.displayOrganizer?.length ?? 0) > 0" class="response">
-                                    {{ returnCurrentLocaleContent(course?.displayOrganizer) }}
-                                </div>
-                                <div v-if="course?.uris && course?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="course?.uris"></uri-list>
-                                </div>
-                                <br />
-                                <div v-if="course?.serialEvent">
-                                    <h2>{{ $t("isSerialEventMessage") }}</h2>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="eventIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="course?.id" 
-                                        :containing-entity-type="ApplicableEntityType.EVENT"
-                                        :concrete-entity-type="ApplicableEntityType.COURSE"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.COURSE"
-                                    :entity-id="course?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+    <div id="course" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!course"
+            :entity-label="$t('courseLabel')"
+            icon="mdi-presentation"
+            :can-edit="canEdit"
+            :edit-label="$t('updateLabel')"
+            :entity-type="EntityType.COURSE"
+            :entity-id="course?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="CourseUpdateForm"
+                    :form-props="{ presetEvent: course }"
+                    entity-name="Course"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                {{ returnCurrentLocaleContent(course?.name) + (course?.nameAbbreviation && course.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(course?.nameAbbreviation) + ")" : "") }}
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="!course?.serialEvent && (course?.dateFrom || course?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
+                    {{ localiseDateRange(course?.dateFrom as string, course?.dateTo as string) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="course?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
+                    {{ returnCurrentLocaleContent(country?.name) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="course?.place && course.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                    {{ returnCurrentLocaleContent(course?.place) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="course?.courseLevel" :label="$t('courseLevelLabel')" icon="mdi-school" tone="indigo">
+                    {{ course.courseLevel }}
+                </landing-meta-item>
+                <landing-meta-item v-if="course?.courseCode" :label="$t('courseCodeLabel')" icon="mdi-barcode" tone="blue">
+                    {{ course.courseCode }}
+                </landing-meta-item>
+                <landing-meta-item v-if="course?.academicYear" :label="$t('academicYearLabel')" icon="mdi-calendar-month" tone="violet">
+                    {{ course.academicYear }}
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
         <tab-content-loader v-if="!course" layout="sections" />
         <v-tabs
@@ -149,10 +55,12 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="contributions">
                 {{ $t("participationsLabel") }}
-            </v-tab>    
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
@@ -172,7 +80,9 @@
 
         <v-tabs-window
             v-show="course"
-            v-model="currentTab">
+            v-model="currentTab"
+            class="min-w-0"
+        >
             <v-tabs-window-item value="contributions">
                 <person-event-contribution-tabs
                     :event-id="course?.id"
@@ -183,31 +93,54 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
-                <keyword-list
-                    :keywords="course?.keywords ? course?.keywords : []"
-                    :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
-                <description-section
+                <landing-additional-info-tab
+                    :keywords="course?.keywords ? course.keywords : []"
                     :description="course?.description ? course.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    :show-remark="false"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="course?.numberOfCredits" :label="$t('numberOfCreditsLabel')" :value="course.numberOfCredits" />
+                        <landing-detail-field v-if="course?.numberOfStudents" :label="$t('numberOfStudentsLabel')" :value="course.numberOfStudents" />
+                        <landing-detail-field v-if="(course?.groupName?.length ?? 0) > 0" :label="$t('groupNameLabel')">
+                            {{ returnCurrentLocaleContent(course?.groupName) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="(course?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')">
+                            {{ returnCurrentLocaleContent(course?.displayOrganizer) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="course?.uris && course.uris.length > 0" :label="$t('uriInputLabel')">
+                            <uri-list :uris="course.uris" />
+                        </landing-detail-field>
+                        <landing-detail-field v-if="course?.serialEvent" :label="$t('isSerialEventMessage')" :value="$t('isSerialEventMessage')" />
+                        <div class="md:col-span-2">
+                            <entity-identifiers-list
+                                :entity-identifiers="eventIdentifiers"
+                                :can-edit="canEdit"
+                                :entity-id="course?.id"
+                                :containing-entity-type="ApplicableEntityType.EVENT"
+                                :concrete-entity-type="ApplicableEntityType.COURSE"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
+                    </template>
 
-                <div class="mt-10">
-                    <events-relation-list
-                        :preset-event="course"
-                        :readonly="!canEdit"
-                    />
-                </div>
+                    <div class="mt-10">
+                        <events-relation-list
+                            :preset-event="course"
+                            :readonly="!canEdit"
+                        />
+                    </div>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="eventIndicators" 
-                    :applicable-types="[ApplicableEntityType.EVENT]" 
-                    :entity-id="course?.id" 
-                    :entity-type="ApplicableEntityType.EVENT" 
+                <indicators-section
+                    :indicators="eventIndicators"
+                    :applicable-types="[ApplicableEntityType.EVENT]"
+                    :entity-id="course?.id"
+                    :entity-type="ApplicableEntityType.EVENT"
                     :can-edit="canClassify"
                     show-statistics
                     @create="createIndicator"
@@ -243,9 +176,9 @@
                 />
             </v-tabs-window-item>
         </v-tabs-window>
-        
+
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -253,14 +186,12 @@ import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import KeywordList from '@/components/core/KeywordList.vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Course, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { localiseDateRange } from '@/utils/DateUtil';
 import EventsRelationList from '@/components/event/EventsRelationList.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
@@ -273,7 +204,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import CourseUpdateForm from '@/components/event/update/CourseUpdateForm.vue';
@@ -281,21 +211,31 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 
 
 export default defineComponent({
     name: "CourseLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isAdmin } = useUserRole();
 
         const currentTab = ref("contributions");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const showAssessmentDetails = (
             version: { majorVersion: number, minorVersion: number }) => {
@@ -311,11 +251,9 @@ export default defineComponent({
         const currentRoute = useRoute();
         const course = ref<Course>();
         const keywords = ref<string[]>([]);
-        
+
         const i18n = useI18n();
         const router = useRouter();
-
-        const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
         const canClassify = ref(false);
@@ -368,7 +306,7 @@ export default defineComponent({
                 parseInt(currentRoute.params.id as string)
             ).then((response) => {
                 course.value = response.data;
-                
+
                 document.title = returnCurrentLocaleContent(course.value.name) as string;
 
                 fetchDetails();
@@ -456,7 +394,7 @@ export default defineComponent({
         return {
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent, course,
-            updateContributions, updateKeywords, icon,
+            updateContributions, updateKeywords,
             snackbar, snackbarMessage, updateDescription,
             country, CourseUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
@@ -464,24 +402,9 @@ export default defineComponent({
             fetchClassifications, canClassify, fetchIdentifiers,
             eventIdentifiers,
             isAdmin, EntityType, fetchCourse,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #course .large-course-icon {
-        font-size: 10em;
-    }
-
-    #course .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

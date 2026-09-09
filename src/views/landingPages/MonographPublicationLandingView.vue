@@ -1,142 +1,59 @@
 <template>
-    <v-container id="monographPublication">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!monographPublication"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)"></rich-title-renderer>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(monographPublication?.subTitle) }}
-                        <br />
-                        {{ $t("monographPublicationLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- MonographPublication Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon v-if="!monographPublication" size="x-large" class="large-monographPublication-icon">
-                    {{ icon }}
-                </v-icon>
+    <div id="monographPublication" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!monographPublication"
+            :subtitle="returnCurrentLocaleContent(monographPublication?.subTitle)"
+            :entity-label="$t('monographPublicationLabel')"
+            :badge="monographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(monographPublication.monographPublicationType) : ''"
+            icon="mdi-newspaper-variant"
+            :can-edit="canEdit && !monographPublication?.isArchived"
+            :edit-label="$t('updateMonographPublicationLabel')"
+            :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
+            :entity-id="monographPublication?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit && !monographPublication?.isArchived"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="MonographPublicationUpdateForm"
+                    :form-props="{ presetMonographPublication: monographPublication}"
+                    entity-name="MonographPublication"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit || monographPublication?.isArchived"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)" />
+            </template>
+            <template #visual>
+                <v-icon v-if="!monographPublication" size="x-large" class="text-slate-400">mdi-newspaper-variant</v-icon>
                 <wordcloud
                     v-else
                     :for-document-id="monographPublication?.id"
                     :document-type="PublicationType.MONOGRAPH_PUBLICATION"
                     compact-icon
                 />
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="MonographPublicationUpdateForm"
-                            :form-props="{ presetMonographPublication: monographPublication}"
-                            entity-name="MonographPublication"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit || monographPublication?.isArchived"
-                            @update="updateBasicInfo"
-                        />
-
-
-                        <!-- Basic Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!monographPublication" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div v-if="monographPublication?.monographPublicationType">
-                                    {{ $t("concretePublicationTypeLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.monographPublicationType" class="response">
-                                    {{ getTitleFromValueAutoLocale(monographPublication.monographPublicationType) }}
-                                </div>
-                                <div v-if="monographPublication?.startPage">
-                                    {{ $t("startPageLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.startPage" class="response">
-                                    {{ monographPublication.startPage }}
-                                </div>
-                                <div v-if="monographPublication?.endPage">
-                                    {{ $t("endPageLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.endPage" class="response">
-                                    {{ monographPublication.endPage }}
-                                </div>
-                                <div v-if="monographPublication?.documentDate">
-                                    {{ $t("dateOfPublicationLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.documentDate" class="response">
-                                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
-                                </div>
-                                <div v-if="monographPublication?.monographId">
-                                    {{ $t("monographLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.monographName?.length ?? 0 > 0" class="response">
-                                    <localized-link :to="'scientific-results/monograph/' + monographPublication?.monographId">
-                                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
-                                    </localized-link>
-                                </div>
-                                <div v-if="monographPublication?.eventId">
-                                    {{ $t("conferenceLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.eventId" class="response">
-                                    <localized-link :to="'events/conference/' + monographPublication?.eventId">
-                                        {{ returnCurrentLocaleContent(event?.name) }}
-                                    </localized-link>
-                                </div>
-                                <div v-if="monographPublication?.articleNumber">
-                                    {{ $t("articleNumberLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.articleNumber" class="response">
-                                    {{ monographPublication.articleNumber }}
-                                </div>
-                                <div v-if="monographPublication?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.numberOfPages" class="response">
-                                    {{ monographPublication.numberOfPages }}
-                                </div>
-                                <div v-if="monographPublication?.section?.length ?? 0 > 0">
-                                    {{ $t("sectionLabel") }}:
-                                </div>
-                                <div v-if="monographPublication?.section?.length ?? 0 > 0" class="response">
-                                    {{ returnCurrentLocaleContent(monographPublication.section) }}
-                                </div>
-                            </v-col>
-
-                            <document-common-fields-display
-                                :document="monographPublication"
-                                :can-edit="canEdit"
-                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
-                                :document-identifiers="documentIdentifiers"
-                                @identifiers-updated="fetchIdentifiers"
-                            />
-
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
-                                    :entity-id="monographPublication?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+            </template>
+            <template #affiliation>
+                <p v-if="monographPublication?.monographId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                    <localized-link :to="'scientific-results/monograph/' + monographPublication.monographId" class="font-medium text-gray-900 underline">
+                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
+                    </localized-link>
+                </p>
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="monographPublication?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
+                </landing-meta-item>
+                <landing-meta-item v-if="monographPublication?.doi" label="DOI" abbrev="DOI" tone="blue">
+                    <identifier-link :identifier="monographPublication.doi" compact />
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
         <document-action-box
             ref="actionsRef"
@@ -158,6 +75,8 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
@@ -188,6 +107,7 @@
         <v-tabs-window
             v-show="monographPublication"
             v-model="currentTab"
+            class="min-w-0"
         >
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -208,27 +128,36 @@
                 </attachment-section>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
-                <!-- Keywords -->
-                <keyword-list
+                <landing-additional-info-tab
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
-                    :can-edit="canEdit && !monographPublication?.isArchived"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
-
-                <!-- Description -->
-                <description-section
                     :description="monographPublication?.description"
+                    :remark="monographPublication?.remark"
                     :can-edit="canEdit && !monographPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
-
-                <description-section
-                    :description="monographPublication?.remark"
-                    :can-edit="canEdit && !monographPublication?.isArchived"
-                    is-remark
-                    @update="updateRemark"
-                />
+                    :document="monographPublication"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :concrete-entity-type="ApplicableEntityType.MONOGRAPH_PUBLICATION"
+                    :document-identifiers="documentIdentifiers"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                    @update-remark="updateRemark"
+                    @identifiers-updated="fetchIdentifiers"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="monographPublication?.startPage" :label="$t('startPageLabel')" :value="monographPublication.startPage" />
+                        <landing-detail-field v-if="monographPublication?.endPage" :label="$t('endPageLabel')" :value="monographPublication.endPage" />
+                        <landing-detail-field v-if="monographPublication?.articleNumber" :label="$t('articleNumberLabel')" :value="monographPublication.articleNumber" />
+                        <landing-detail-field v-if="monographPublication?.numberOfPages" :label="$t('numberOfPagesLabel')" :value="monographPublication.numberOfPages" />
+                        <landing-detail-field v-if="monographPublication?.section?.length" :label="$t('sectionLabel')">
+                            {{ returnCurrentLocaleContent(monographPublication.section) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="monographPublication?.eventId" :label="$t('conferenceLabel')">
+                            <localized-link :to="'events/conference/' + monographPublication.eventId" class="underline">
+                                {{ returnCurrentLocaleContent(event?.name) }}
+                            </localized-link>
+                        </landing-detail-field>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -288,7 +217,7 @@
             :document-id="(monographPublication.id as number)"
             :document-type="PublicationType.MONOGRAPH_PUBLICATION"
         />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -304,14 +233,12 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MonographPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
-import KeywordList from '@/components/core/KeywordList.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
-import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -326,7 +253,6 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import Wordcloud from '@/components/core/Wordcloud.vue';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
@@ -338,16 +264,19 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
         const currentTab = ref("contributions");
 
@@ -380,8 +309,6 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-newspaper-variant");
-
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
         const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
@@ -389,6 +316,13 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
@@ -476,10 +410,6 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
-        const goToURL = (uri: string) => {
-            window.open(uri, "_blank");
-        };
-
         const updateKeywords = (keywords: MultilingualContent[]) => {
             monographPublication.value!.keywords = keywords;
             performUpdate(false);
@@ -550,9 +480,9 @@ export default defineComponent({
 
         return {
             monographPublication, publications, event, totalPublications,
-            returnCurrentLocaleContent, handleResearcherUnbind, icon,
+            returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, MonographPublicationUpdateForm,
-            searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
+            searchKeyword, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             documentIndicators, StatisticsType, currentTab, currentRoute,
@@ -562,24 +492,8 @@ export default defineComponent({
             updateRemark, displayConfiguration, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
             fetchMonographPublication,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #monographPublication .large-monographPublication-icon {
-        font-size: 10em;
-    }
-
-    #monographPublication .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

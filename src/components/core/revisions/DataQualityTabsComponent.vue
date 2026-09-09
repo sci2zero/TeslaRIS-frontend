@@ -2,7 +2,8 @@
     <v-tabs
         v-model="currentSubTab"
         color="primary"
-        align-tabs="start">
+        align-tabs="start"
+        show-arrows>
         <v-tab value="assessment">
             {{ $t("assessmentLabel") }}
         </v-tab>

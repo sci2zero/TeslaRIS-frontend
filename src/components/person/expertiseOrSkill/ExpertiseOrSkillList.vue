@@ -39,23 +39,25 @@
                     </v-menu> -->
 
                     <h4>
-                        <div v-if="canEdit" class="flex flex-row justify-end">
-                            <strong>{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong>
-                            <v-btn
-                                class="ml-4!"
-                                icon variant="outlined"
-                                color="primary"
-                                size="medium"
-                                @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
-                                <v-icon size="large" icon="mdi-delete"></v-icon>
-                            </v-btn>
-                            <expertise-or-skill-modal
-                                :read-only="!canEdit"
-                                class="ml-2!"
-                                edit
-                                :preset-expertise-or-skill="expertiseOrSkill"
-                                @update="updateExpertiseOrSkill"
-                            />
+                        <div class="flex flex-row items-start justify-between gap-2">
+                            <strong class="min-w-0 break-words">{{ returnCurrentLocaleContent(expertiseOrSkill.name) }}</strong>
+                            <div v-if="canEdit" class="flex shrink-0 items-center">
+                                <v-btn
+                                    class="ml-2!"
+                                    icon variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                    @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
+                                    <v-icon size="large" icon="mdi-delete"></v-icon>
+                                </v-btn>
+                                <expertise-or-skill-modal
+                                    :read-only="!canEdit"
+                                    class="ml-2!"
+                                    edit
+                                    :preset-expertise-or-skill="expertiseOrSkill"
+                                    @update="updateExpertiseOrSkill"
+                                />
+                            </div>
                         </div>
                     </h4>
                     <p>{{ returnCurrentLocaleContent(expertiseOrSkill.description) }}</p>
@@ -63,15 +65,17 @@
                     <div
                         v-if="expertiseOrSkill.keywords && expertiseOrSkill.keywords.length > 0">
                         <br />
-                        <span
-                            v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(expertiseOrSkill.keywords)?.split('\n')"
-                            :key="keywordIndex">
-                            <v-chip
-                                outlined
-                                size="small">
-                                {{ keyword }}
-                            </v-chip>
-                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(expertiseOrSkill.keywords)?.split('\n')"
+                                :key="keywordIndex">
+                                <v-chip
+                                    outlined
+                                    size="small">
+                                    {{ keyword }}
+                                </v-chip>
+                            </span>
+                        </div>
                         <br />
                         <br />
                     </div>
@@ -199,5 +203,11 @@ export default defineComponent({
 
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
+    }
+
+    @media (hover: none), (max-width: 768px) {
+        .edit-pen-container .edit-pen {
+            opacity: 1;
+        }
     }
 </style>

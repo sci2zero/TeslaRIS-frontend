@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col cols="2">
+        <v-col cols="12" sm="6" md="4" lg="3">
             <date-picker
                 v-model="startDate"
                 :label="$t('startDateLabel') + '*'"
@@ -8,7 +8,7 @@
                 required
             />
         </v-col>
-        <v-col cols="2">
+        <v-col cols="12" sm="6" md="4" lg="3">
             <date-picker
                 v-model="endDate"
                 :label="$t('endDateLabel') + '*'"
@@ -21,11 +21,12 @@
         v-for="assessment in assessments"
         :key="assessment.commissionId"
         class="d-flex justify-center align-center">
-        <v-col>
-            <h3 class="ml-4 mt-5">
+        <v-col cols="12">
+            <h3 class="mt-5 text-base sm:text-lg break-words">
                 {{ $t("commissionLabel") }}: {{ returnCurrentLocaleContent(assessment.commissionDescription) }}
             </h3>
-            <v-table v-if="Object.keys(assessment.publicationsPerCategory).length > 0">
+            <div v-if="Object.keys(assessment.publicationsPerCategory).length > 0" class="overflow-x-auto">
+            <v-table>
                 <thead>
                     <tr>
                         <th class="text-left">
@@ -86,7 +87,8 @@
                     </tr>
                 </tbody>
             </v-table>
-            <p v-else class="ml-5">
+            </div>
+            <p v-else class="mt-3">
                 {{ $t("noAssessedPublicationsMessage") }}
             </p>
         </v-col>
@@ -197,12 +199,21 @@ export default defineComponent({
 <style scoped>
 
 .narrow {
-    width: 200px;
+    width: 4.5rem;
+    min-width: 3.5rem;
+}
+
+@media (min-width: 640px) {
+    .narrow {
+        width: 200px;
+        min-width: 8rem;
+    }
 }
 
 .publication-list {
     list-style-type: disc;
     list-style-position: outside;
+    overflow-wrap: anywhere;
 }
 
 </style>

@@ -17,9 +17,11 @@
                         <b>{{ $t("keywordsLabel") }}</b>
                     </div>
                     <strong v-if="!parsedKeywords || parsedKeywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <v-chip v-for="(keyword, index) in parsedKeywords" :key="index" outlined @click="searchKeyword(keyword)">
-                        {{ keyword }}
-                    </v-chip>
+                    <div class="flex flex-wrap gap-2">
+                        <v-chip v-for="(keyword, index) in parsedKeywords" :key="index" outlined @click="searchKeyword(keyword)">
+                            {{ keyword }}
+                        </v-chip>
+                    </div>
                 </v-card-text>
             </v-card>
         </v-col>
@@ -111,6 +113,12 @@ export default defineComponent({
 
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
+    }
+
+    @media (hover: none), (max-width: 768px) {
+        .edit-pen-container .edit-pen {
+            opacity: 1;
+        }
     }
 
 </style>

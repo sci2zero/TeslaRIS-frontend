@@ -369,6 +369,7 @@ export default {
     abbreviationTitleLabel: "Title Abbreviation",
     otherNamesLabel: "All Person Names",
     viewAllPersonNamesLabel: "All Person Names",
+    moreActionsLabel: "More actions",
     noOtherNamesMessage: "There are no alternative names specified.",
     recentNotificationsLabel: "Recent Notifications",
     dateOfAcquisitionLabel: "Date of Acquisition",
@@ -1176,6 +1177,18 @@ export default {
         contact: "Contact info",
         location: "Novi Sad, Serbia",
         allRightsReserved: "All rights reserved"
+    },
+    landingDataQuality: {
+        description: "Repository-wide monitoring and operational issue resolution.",
+        open: "Open →",
+        repositoryAnalytics: {
+            title: "Repository Analytics",
+            description: "Overview, trends, entity types, dimensions and quality measures."
+        },
+        issueExplorer: {
+            title: "Issue Explorer",
+            description: "Find failed constraints and affected records for a selected assessment context."
+        }
     },
     landingFeatures: {
         title: "Featured Resources",

@@ -43,25 +43,29 @@
                     </v-menu> -->
 
                     <h4>
-                        <div v-if="canEdit" class="flex flex-row justify-end">
-                            <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                            <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
-                            <strong>{{ localiseDate(prize.date) }}</strong>
-                            <v-btn
-                                class="ml-4!"
-                                icon variant="outlined"
-                                color="primary"
-                                size="medium"
-                                @click="deletePrize(prize.id)">
-                                <v-icon size="large" icon="mdi-delete" />
-                            </v-btn>
-                            <prize-modal
-                                class="ml-2!"
-                                :read-only="!canEdit"
-                                edit
-                                :preset-prize="prize"
-                                @update="updatePrize"
-                            />
+                        <div class="flex flex-row items-start justify-between gap-2">
+                            <div class="min-w-0 break-words">
+                                <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
+                                <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                                <strong>{{ localiseDate(prize.date) }}</strong>
+                            </div>
+                            <div v-if="canEdit" class="flex shrink-0 items-center">
+                                <v-btn
+                                    class="ml-2!"
+                                    icon variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                    @click="deletePrize(prize.id)">
+                                    <v-icon size="large" icon="mdi-delete" />
+                                </v-btn>
+                                <prize-modal
+                                    class="ml-2!"
+                                    :read-only="!canEdit"
+                                    edit
+                                    :preset-prize="prize"
+                                    @update="updatePrize"
+                                />
+                            </div>
                         </div>
                     </h4>
                     <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
@@ -69,15 +73,17 @@
                     <div
                         v-if="prize.keywords && prize.keywords.length > 0">
                         <br />
-                        <span
-                            v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
-                            :key="keywordIndex">
-                            <v-chip
-                                outlined
-                                size="small">
-                                {{ keyword }}
-                            </v-chip>
-                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
+                                :key="keywordIndex">
+                                <v-chip
+                                    outlined
+                                    size="small">
+                                    {{ keyword }}
+                                </v-chip>
+                            </span>
+                        </div>
                         <br />
                         <br />
                     </div>
@@ -207,5 +213,11 @@ export default defineComponent({
 
     .edit-pen-container .edit-pen:hover {
         opacity: 1;
+    }
+
+    @media (hover: none), (max-width: 768px) {
+        .edit-pen-container .edit-pen {
+            opacity: 1;
+        }
     }
 </style>

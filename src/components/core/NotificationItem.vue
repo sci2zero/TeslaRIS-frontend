@@ -8,7 +8,7 @@
             <template #activator="{ props }">
                 <v-btn
                     v-bind="props"
-                    :color="variant === 'general' ? '#222' : 'white'"
+                    :color="iconColor"
                     variant="text"
                     icon="mdi-translate"
                 >
@@ -16,7 +16,7 @@
                         style="z-index: 5;"
                         :content="notificationCountStore.notificationCount"
                         :model-value="notificationCountStore.notificationCount > 0">
-                        <v-icon left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                        <v-icon left :style="{ color: iconColor }">
                             mdi-bell
                         </v-icon>
                     </v-badge>
@@ -30,7 +30,7 @@
   
 <script lang="ts">
 import NotificationService from '@/services/NotificationService';
-import { defineComponent, onMounted } from 'vue';  
+import { computed, defineComponent, onMounted } from 'vue';  
 import NotificationList from './NotificationList.vue';
 import { useNotificationCountStore } from '@/stores/notificationCountStore';
 import { useInterval } from '@/composables/useInterval';
@@ -44,10 +44,20 @@ export default defineComponent({
         variant: {
             type: String as () => 'general' | 'home',
             default: 'home'
+        },
+        theme: {
+            type: String as () => 'dark' | 'light',
+            default: 'dark'
         }
     },
-    setup() {
+    setup(props) {
         const notificationCountStore = useNotificationCountStore();
+        const iconColor = computed(() => {
+            if (props.theme === 'light' && props.variant === 'home') {
+                return '#334155';
+            }
+            return props.variant === 'general' ? '#222' : 'white';
+        });
 
         onMounted(() => {
             fetchCount();
@@ -64,7 +74,8 @@ export default defineComponent({
         const { startInterval } = useInterval(fetchCount, 1000 * 30);
 
         return {
-            notificationCountStore
+            notificationCountStore,
+            iconColor
         };
     },
     data: () => ({

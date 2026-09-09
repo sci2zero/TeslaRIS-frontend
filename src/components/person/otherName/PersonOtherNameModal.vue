@@ -1,10 +1,10 @@
 <template>
-    <div justify="start">
+    <div justify="start" :class="{ 'contents': hideActivator }">
         <v-dialog
             v-model="dialog"
             :persistent="!readOnly"
             max-width="1200px">
-            <template #activator="scope">
+            <template v-if="!hideActivator" #activator="scope">
                 <v-btn
                     color="primary" dark
                     density="compact"
@@ -203,6 +203,10 @@ export default defineComponent({
         readOnly: {
             type: Boolean,
             default: true,
+        },
+        hideActivator: {
+            type: Boolean,
+            default: false,
         }
     },
     emits: ["selectPrimary", "update"],

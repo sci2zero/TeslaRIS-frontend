@@ -1,82 +1,105 @@
 <template>
-    <div id="researcher" class="mx-auto max-w-7xl w-full py-12">
+    <div id="researcher" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
         <ResearcherLandingHeader 
             :person="person"
             :researcher-name="researcherName"
             :employments="employments"
             :can-edit="canEdit"
-            :research-area="researchArea"
-            :country-name="personalInfo.country"
-            :private-country-name="personalInfo.countryPrivate"
             @update="updatePersonalInfo"
         >
             <template #actions>
-                <div class="mt-4">
-                    <div class="d-flex flex-wrap gap-2">
-                        <person-other-name-modal
-                            :preset-person="person"
-                            :read-only="!canEdit"
-                            @update="updateNames"
-                            @select-primary="selectPrimaryName"
+                <person-other-name-modal
+                    ref="personOtherNameModalRef"
+                    hide-activator
+                    :preset-person="person"
+                    :read-only="!canEdit"
+                    @update="updateNames"
+                    @select-primary="selectPrimaryName"
+                />
+                <generic-crud-modal
+                    ref="researchAreaModalRef"
+                    hide-activator
+                    :form-component="AssessmentResearchAreaForm"
+                    :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
+                    entity-name="ResearchArea"
+                    is-update
+                    :read-only="!canEdit"
+                    @update="fetchAssessmentResearchArea"
+                />
+                <generic-crud-modal
+                    v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
+                    ref="visibilityConfigModalRef"
+                    hide-activator
+                    :form-component="PersonFieldVisibilityConfigurationForm"
+                    :form-props="{ personId: person?.id }"
+                    entity-name="PersonFieldVisibilityConfiguration"
+                    is-update
+                    :read-only="!canEdit"
+                    @update="updateSuccess()"
+                />
+
+                <UiButton
+                    v-if="canEdit || person?.personOtherNames?.length"
+                    variant="outline"
+                    size="md"
+                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                    @click="openModal(personOtherNameModalRef)"
+                >
+                    <span class="mdi mdi-account-multiple-outline"></span>
+                    {{ $t("viewAllPersonNamesLabel") }}
+                </UiButton>
+
+                <v-menu v-if="canEdit" location="bottom">
+                    <template #activator="{ props: menuProps }">
+                        <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
+                            <span class="mdi mdi-dots-horizontal"></span>
+                            {{ $t("moreActionsLabel") }}
+                            <span class="mdi mdi-chevron-down"></span>
+                        </UiButton>
+                    </template>
+                    <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
+                        <v-list-item
+                            prepend-icon="mdi-flask-outline"
+                            :title="$t('updateResearchAreaLabel')"
+                            @click="openModal(researchAreaModalRef)"
                         />
-                        <generic-crud-modal
-                            class="ml-2" 
-                            :form-component="AssessmentResearchAreaForm"
-                            :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
-                            entity-name="ResearchArea"
-                            is-update compact
-                            primary-color outlined
-                            :read-only="!canEdit"
-                            @update="fetchAssessmentResearchArea"
+                        <v-list-item
+                            prepend-icon="mdi-download"
+                            :title="$t('downloadRoCrateBibliographyLabel')"
+                            @click="downloadRoCrateBibliography"
                         />
-                        <v-btn
-                            v-if="canEdit"
-                            class="mb-5 ml-2" color="primary" density="compact"
-                            variant="outlined"
-                            @click="downloadRoCrateBibliography">
-                            {{ $t("downloadRoCrateBibliographyLabel") }}
-                        </v-btn>
-                        <v-btn
-                            v-if="isResearcher && canEdit"
-                            class="mb-5 ml-2" color="primary" density="compact"
-                            variant="outlined"
-                            @click="performNavigation('documentClaim')">
-                            {{ $t("documentClaimLabel") }}
-                        </v-btn>
-                        <v-btn
-                            v-if="isResearcher && canEdit"
-                            class="mb-5 ml-2" color="primary" density="compact"
-                            variant="outlined"
-                            @click="performNavigation('massInstitutionAssignment')">
-                            {{ $t("massInstitutionAssignmentLabel") }}
-                        </v-btn>
-                        <v-btn
-                            v-if="isResearcher && canEdit"
-                            class="mb-5 ml-2" color="primary" density="compact"
-                            variant="outlined"
-                            @click="performNavigation('importer')">
-                            {{ $t("importerLabel") }}
-                        </v-btn>
-                        <v-btn
-                            v-if="(isAdmin || isInstitutionalEditor) && canEdit"
-                            class="mb-5 ml-2" color="primary" density="compact"
-                            variant="outlined"
-                            @click="performIndicatorHarvest">
-                            {{ $t("harvestExternalIndicatorsLabel") }}
-                        </v-btn>
-                        <generic-crud-modal
-                            v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
-                            class="ml-2"
-                            :form-component="PersonFieldVisibilityConfigurationForm"
-                            :form-props="{ personId: person?.id }"
-                            entity-name="PersonFieldVisibilityConfiguration"
-                            is-update compact
-                            primary-color outlined
-                            :read-only="!canEdit"
-                            @update="updateSuccess()"
+                        <v-list-item
+                            v-if="isResearcher"
+                            prepend-icon="mdi-file-check-outline"
+                            :title="$t('documentClaimLabel')"
+                            @click="performNavigation('documentClaim')"
                         />
-                    </div>
-                </div>
+                        <v-list-item
+                            v-if="isResearcher"
+                            prepend-icon="mdi-domain"
+                            :title="$t('massInstitutionAssignmentLabel')"
+                            @click="performNavigation('massInstitutionAssignment')"
+                        />
+                        <v-list-item
+                            v-if="isResearcher"
+                            prepend-icon="mdi-import"
+                            :title="$t('importerLabel')"
+                            @click="performNavigation('importer')"
+                        />
+                        <v-list-item
+                            v-if="isAdmin || isInstitutionalEditor"
+                            prepend-icon="mdi-cloud-download-outline"
+                            :title="$t('harvestExternalIndicatorsLabel')"
+                            @click="performIndicatorHarvest"
+                        />
+                        <v-list-item
+                            v-if="isAdmin || isInstitutionalEditor || isResearcher"
+                            prepend-icon="mdi-eye-outline"
+                            :title="$t('updatePersonFieldVisibilityConfigurationLabel')"
+                            @click="openModal(visibilityConfigModalRef)"
+                        />
+                    </v-list>
+                </v-menu>
             </template>
         </ResearcherLandingHeader>
 
@@ -90,6 +113,8 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
@@ -117,14 +142,32 @@
         <v-tabs-window
             v-if="person"
             v-model="currentTab"
+            class="min-w-0"
         >
             <v-tabs-window-item value="publications">
-                <h3 class="mt-4 text-2xl lg:text-3xl font-serif font-bold text-slate-800">
-                    Naučni Rezultati
-                </h3>
-                <div class="flex justify-between gap-2 mt-4">
-                    <div class="flex gap-2 items-center w-full">
+                <div class="mt-4 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-slate-800">
+                            {{ $t("scientificResultsListLabel") }}
+                        </h3>
+                        <div v-if="canEdit" class="flex flex-wrap items-center gap-2">
+                            <add-publication-menu
+                                :person-id="isResearcher ? undefined : personId"
+                                compact
+                            />
+                            <v-btn
+                                v-if="isResearcher"
+                                color="primary"
+                                density="compact"
+                                @click="performNavigation('importer')">
+                                {{ $t("importerLabel") }}
+                            </v-btn>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-end gap-3">
                         <search-bar-component
+                            class="w-full min-w-0 max-w-none!"
                             :transparent="false"
                             size="small"
                             @search="clearSortAndPerformPublicationSearch($event)"
@@ -134,181 +177,105 @@
                             :items="publicationTypes"
                             :label="$t('typeOfPublicationLabel')"
                             return-object
-                            class="max-w-xs mt-5"
+                            hide-details
+                            density="comfortable"
+                            class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
                             multiple
                         ></v-select>
                     </div>
-                    <div class="mb-5 mt-5">
-                        <add-publication-menu
-                            v-if="canEdit"
-                            :person-id="isResearcher ? undefined : personId"
-                            compact
-                        />
-                        <v-btn
-                            v-if="isResearcher && canEdit"
-                            class="mt-2" color="primary" density="compact"
-                            @click="performNavigation('importer')">
-                            {{ $t("importerLabel") }}
-                        </v-btn>
-                    </div>
-                </div>
 
-                <publication-table-component
-                    ref="publicationsRef"
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    enable-export
-                    :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
-                    :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
-                    :endpoint-body-parameters="
-                        {
-                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
-                            personId: person.id,
-                            commissionId: null
-                        }"
-                    :allow-researcher-unbinding="canEdit && isResearcher"
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    <publication-table-component
+                        ref="publicationsRef"
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        enable-export
+                        :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                        :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
+                        :endpoint-body-parameters="
+                            {
+                                allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
+                                personId: person.id,
+                                commissionId: null
+                            }"
+                        :allow-researcher-unbinding="canEdit && isResearcher"
+                        @switch-page="switchPage">
+                    </publication-table-component>
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
-                <!-- Keywords -->
-                <keyword-list
+                <researcher-additional-info-tab
+                    :person="person"
                     :keywords="keywords"
+                    :biography="biography"
                     :can-edit="canEdit"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
-
-                <!-- Biography -->
-                <description-section
-                    :description="biography"
-                    :can-edit="canEdit"
-                    is-biography
-                    @update="updateBiography">
-                </description-section>
-
-                <v-row>
-                    <v-col cols="6">
-                        <!-- Expertises and Skills -->
-                        <expertise-or-skill-list
-                            :expertise-or-skills="person?.expertisesOrSkills"
-                            :person="person"
-                            :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </expertise-or-skill-list>
-                        
-                        <br />
-
-                        <!-- Prizes -->
-                        <prize-list
-                            :prizes="person?.prizes"
-                            :person="person"
-                            :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </prize-list>
-                    </v-col>
-
-
-                    <!-- Involvements -->
-                    <v-col cols="6">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <person-involvement-modal
-                                    :read-only="!canEdit"
-                                    :researcher-id="person?.id"
-                                    @create="addInvolvement"
-                                />
-
-                                <div><h2>{{ $t("involvementsLabel") }}</h2></div>
-                                <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                                <br />
-                                <div v-if="employments.length > 0">
-                                    <h3>{{ $t("employmentsLabel") }}</h3>
-                                </div>
-                                <br />
-                                <involvement-list
-                                    :involvements="employments"
-                                    :person="person"
-                                    :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
-                                <div v-if="education.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
-                                </div>
-                                <br />
-                                <involvement-list
-                                    :involvements="education"
-                                    :person="person"
-                                    :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
-                                <div v-if="memberships.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
-                                </div>
-                                <br />
-                                <involvement-list
-                                    :involvements="memberships"
-                                    :person="person"
-                                    :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
-
-                <v-btn
-                    v-if="isAdmin" 
-                    density="compact" class="mt-5" 
-                    color="blue darken-1"
-                    @click="migrateToUnmanaged">
-                    {{ $t("migrateToUnmanagedResearcherLabel") }}
-                </v-btn>
+                    :is-admin="isAdmin"
+                    :employments="employments"
+                    :education="education"
+                    :memberships="memberships"
+                    :research-area="researchArea"
+                    :country-name="personalInfo.country"
+                    :private-country-name="personalInfo.countryPrivate"
+                    @update="updatePersonalInfo"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-biography="updateBiography"
+                    @refresh="fetchPerson()"
+                    @add-involvement="addInvolvement"
+                    @migrate-to-unmanaged="migrateToUnmanaged"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="personIndicators" 
-                    :applicable-types="[ApplicableEntityType.PERSON]" 
-                    :entity-id="person?.id"
-                    :entity-type="ApplicableEntityType.PERSON" 
-                    :can-edit="false"
-                    show-statistics
-                    @updated="fetchIndicators"
-                />
+                <div class="mt-4 min-w-0">
+                    <indicators-section 
+                        :indicators="personIndicators" 
+                        :applicable-types="[ApplicableEntityType.PERSON]" 
+                        :entity-id="person?.id"
+                        :entity-type="ApplicableEntityType.PERSON" 
+                        :can-edit="false"
+                        show-statistics
+                        @updated="fetchIndicators"
+                    />
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <person-assessments-view
-                    :assessments="personAssessments"
-                    :is-loading="assessmentsLoading"
-                    @fetch="fetchAssessment">
-                </person-assessments-view>
+                <div class="mt-4 overflow-x-auto">
+                    <person-assessments-view
+                        :assessments="personAssessments"
+                        :is-loading="assessmentsLoading"
+                        @fetch="fetchAssessment">
+                    </person-assessments-view>
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <person-visualizations
-                    :person-id="(person.id as number)"
-                    :display-settings="displaySettings.displaySettings.value"
-                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
-                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
-                    :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
-                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
-                />
+                <div class="mt-4 min-w-0 overflow-x-auto">
+                    <person-visualizations
+                        :person-id="(person.id as number)"
+                        :display-settings="displaySettings.displaySettings.value"
+                        :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                        :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                        :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
+                        :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                    />
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item v-if="isAdmin" value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="EntityType.PERSON"
-                    :entity-id="person?.id"
-                    @restored="fetchPerson"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <div class="mt-5 overflow-x-auto">
+                    <revision-history-table-component
+                        :entity-type="EntityType.PERSON"
+                        :entity-id="person?.id"
+                        @restored="fetchPerson"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item v-if="isAdmin" value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="EntityType.PERSON"
-                    :entity-id="person?.id"
-                />
+                <div class="mt-5 overflow-x-auto">
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="EntityType.PERSON"
+                        :entity-id="person?.id"
+                    />
+                </div>
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -341,18 +308,11 @@ import type { Employment, Education, Membership } from '@/models/InvolvementMode
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { DocumentFile } from '@/models/DocumentFileModel';
 import DocumentFileService from '@/services/DocumentFileService';
-import KeywordList from '@/components/core/KeywordList.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import PersonInvolvementModal from '@/components/person/involvement/PersonInvolvementModal.vue';
-import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonOtherNameModal from '@/components/person/otherName/PersonOtherNameModal.vue';
-import PrizeList from '@/components/person/prize/PrizeList.vue';
-import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
 import { localiseDate } from '@/utils/DateUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/sex';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { type AssessmentResearchArea, type EntityIndicatorResponse, type ResearcherAssessmentResponse, StatisticsType } from '@/models/AssessmentModel';
@@ -384,11 +344,13 @@ import UserService from '@/services/UserService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { UiButton } from '@/components/ui/button';
+import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent },
+    components: { PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -404,6 +366,15 @@ export default defineComponent({
 
         const dialogRef = ref<typeof PersistentQuestionDialog>();
         const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
+        const personOtherNameModalRef = ref<{ dialog: boolean } | null>(null);
+        const researchAreaModalRef = ref<{ dialog: boolean } | null>(null);
+        const visibilityConfigModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -796,7 +767,7 @@ export default defineComponent({
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
             snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
-            currentTab, PersonUpdateForm, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
+            currentTab, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,
             ExportableEndpointType, isResearcher, performNavigation, ApplicableEntityType, publicationsRef,
@@ -805,38 +776,17 @@ export default defineComponent({
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
             PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
             EntityType,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            personOtherNameModalRef, researchAreaModalRef, visibilityConfigModalRef,
+            openModal
         };
 }});
 </script>
 
 <style scoped>
-
     #researcher .response {
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;
     }
-
-    .edit-pen-container {
-        position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
-
 </style>

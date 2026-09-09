@@ -1,7 +1,7 @@
 <template>
-    <div justify="start">
+    <div :class="{ 'contents': hideActivator }">
         <v-dialog v-model="dialog" class="narrow">
-            <template #activator="scope">
+            <template v-if="!hideActivator" #activator="scope">
                 <v-btn
                     color="primary"
                     density="compact" class="bottom-spacer" v-bind="scope.props"
@@ -41,6 +41,10 @@ export default defineComponent({
         documentId: {
             type: Number,
             required: true
+        },
+        hideActivator: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props) {

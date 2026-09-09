@@ -94,6 +94,8 @@
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="relations">
                 {{ $t("commissionRelationsLabel") }}
@@ -106,6 +108,7 @@
         <v-tabs-window
             v-show="commission"
             v-model="currentTab"
+            class="min-w-0"
         >
             <v-tabs-window-item value="relations">
                 <commission-relations-view :commission-relations="commissionRelations" :can-edit="true" :source-commission-id="commission?.id" @update="fetchRelations"></commission-relations-view>

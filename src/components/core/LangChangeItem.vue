@@ -10,7 +10,7 @@
                     v-bind="props"
                     icon="mdi-web"
                     variant="text"
-                    :color="variant === 'general' ? '#222' : '#fff'"
+                    :color="iconColor"
                 >
                 </v-btn>
             </template>
@@ -36,7 +36,7 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supportedLocales, defaultLocale } from '../../i18n'
 import { getLangItems } from '@/i18n/languages';
@@ -48,9 +48,20 @@ export default defineComponent({
         variant: {
             type: String as () => 'general' | 'home',
             default: 'home'
+        },
+        theme: {
+            type: String as () => 'dark' | 'light',
+            default: 'dark'
         }
     },
-    setup() {
+    setup(props) {
+        const iconColor = computed(() => {
+            if (props.theme === 'light' && props.variant === 'home') {
+                return '#334155';
+            }
+            return props.variant === 'general' ? '#222' : '#fff';
+        });
+
         const currentRoute = useRoute();
         const router = useRouter();
 
@@ -96,7 +107,8 @@ export default defineComponent({
             selectedLocale,
             langItems, fav,
             menu, message,
-            hints
+            hints,
+            iconColor
         };
     }
   });

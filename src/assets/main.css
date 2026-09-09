@@ -270,3 +270,22 @@ h3 {
 .clickable-link:active {
   transform: translateY(1px);
 }
+
+/* Landing page tabs */
+.landing-tabs {
+    width: 100%;
+    max-width: 100%;
+}
+
+.landing-tabs .v-tab {
+    min-width: unset;
+    flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+    .landing-tabs .v-tab {
+        padding-inline: 0.75rem;
+        font-size: 0.8125rem;
+        letter-spacing: 0;
+    }
+}

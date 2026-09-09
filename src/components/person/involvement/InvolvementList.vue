@@ -33,7 +33,7 @@
                     </v-list-item>
                 </v-list>
             </v-menu> -->
-            <h4>
+            <h4 class="flex flex-wrap items-center gap-x-1 gap-y-1">
                 <localized-link
                     v-if="involvement.organisationUnitId"
                     :to="'organisation-units/' + involvement.organisationUnitId">
@@ -53,12 +53,12 @@
                 <span v-else>
                     {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
                 </span>
-                <div v-if="canEdit" class="inline-flex justify-end edit-pen!">
+                <div v-if="canEdit" class="inline-flex justify-end shrink-0">
                     <v-btn
                         class="mt-1! ml-2!"
                         icon variant="outlined"
                         color="primary"
-                        size="medium"
+                        size="small"
                         @click="deleteInvolvement(involvement.id)">
                         <v-icon size="large" icon="mdi-delete"></v-icon>
                     </v-btn>

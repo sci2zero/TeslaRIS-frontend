@@ -1,7 +1,7 @@
 <template>
-    <div justify="start" class="generic-crud-modal">
+    <div justify="start" class="generic-crud-modal" :class="{ 'contents': hideActivator }">
         <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'">
-            <template #activator="scope">
+            <template v-if="!hideActivator" #activator="scope">
                 <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
@@ -123,6 +123,10 @@ export default defineComponent({
             default: false
         },
         compact: {
+            type: Boolean,
+            default: false
+        },
+        hideActivator: {
             type: Boolean,
             default: false
         }

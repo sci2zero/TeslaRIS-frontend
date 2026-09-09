@@ -1,291 +1,66 @@
 <template>
-    <v-container id="institution">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="primary">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!organisationUnit"
-                            type="heading"
-                            color="primary"
-                            class="d-flex justify-center align-center"
-                        >
-                            {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation && organisationUnit?.nameAbbreviation.length > 0 ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("organisationUnitLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Account Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
+    <div id="institution" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!organisationUnit"
+            :entity-label="$t('organisationUnitLabel')"
+            icon="mdi-city"
+            visual-shape="circle"
+            :can-edit="canEdit"
+            :edit-label="$t('updateOrganisationUnitLabel')"
+            :entity-type="EntityType.ORGANISATION_UNIT"
+            :entity-id="organisationUnit?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="OrganisationUnitUpdateForm"
+                    :form-props="{ presetOU: organisationUnit }"
+                    entity-name="OrganisationUnit"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #visual>
                 <organisation-unit-logo
+                    class="org-unit-header-logo"
                     :filename="organisationUnit?.logoServerFilename"
                     :background-color-hex="organisationUnit?.logoBackgroundHex"
                     :org-unit-id="organisationUnit?.id"
-                    :can-edit="canEdit">
-                </organisation-unit-logo>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container">
-                        <!-- <organisation-unit-update-modal :preset-o-u="organisationUnit" :read-only="!canEdit" @update="updateBasicInfo"></organisation-unit-update-modal> -->
-                        <generic-crud-modal
-                            :form-component="OrganisationUnitUpdateForm"
-                            :form-props="{ presetOU: organisationUnit }"
-                            entity-name="OrganisationUnit"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Personal Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader
-                            v-if="!organisationUnit"
-                            color="grey-lighten-5"
-                            :citation-button="false"
-                            show-map
-                        />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div v-if="organisationUnit?.numberOfEmployees">
-                                    {{ $t("numberOfEmployeesLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.numberOfEmployees" class="response">
-                                    {{ organisationUnit?.numberOfEmployees }}
-                                </div>
-                                <div>
-                                    Scopus AFID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Open Alex ID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Research Organisation Registry ID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link
-                                        v-if="organisationUnit?.ror"
-                                        :identifier="organisationUnit.ror"
-                                        type="ror"
-                                    />
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Ringgold ID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.ringgold">
-                                        {{ organisationUnit.ringgold }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    FundRef:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.fundref">
-                                        {{ organisationUnit.fundref }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    ISNI:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.isni">
-                                        {{ organisationUnit.isni }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    FCT ID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.fctId">
-                                        {{ organisationUnit.fctId }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    GRID:
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.grid">
-                                        {{ organisationUnit.grid }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    Wikidata ID:
-                                </div>
-                                <div class="response">
-                                    <identifier-link
-                                        v-if="organisationUnit?.wikidata"
-                                        :identifier="organisationUnit.wikidata"
-                                        type="wikidata"
-                                    />
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    {{ $t("nationalIdLabel") }}
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.nationalId">
-                                        {{ organisationUnit.nationalId }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div>
-                                    {{ $t("taxNumberLabel") }}
-                                </div>
-                                <div class="response">
-                                    <p v-if="organisationUnit?.taxNumber">
-                                        {{ organisationUnit.taxNumber }}
-                                    </p>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                            </v-col>
-                            <v-col cols="4">
-                                <div v-if="isAdmin && organisationUnit?.clientInstitutionCris" class="response">
-                                    {{ $t("clientInstitutionCrisLabel") }}
-                                </div>
-                                <div v-if="isAdmin && organisationUnit?.clientInstitutionDl" class="response">
-                                    {{ $t("clientInstitutionDlLabel") }}
-                                </div>
-                                <div v-if="isAdmin && organisationUnit?.legalEntity" class="response">
-                                    {{ $t("legalEntityLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.startup" class="response">
-                                    {{ $t("startupLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.sector">
-                                    {{ $t("organisationUnitSectorLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.sector" class="response">
-                                    {{ getOUSectorFromValueAutoLocale(organisationUnit?.sector) }}
-                                </div>
-                                <div v-if="organisationUnit?.dateEstablished" class="response">
-                                    {{ $t("dateEstablishedLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.dateEstablished" class="response">
-                                    {{ localiseDate(organisationUnit?.dateEstablished) }}
-                                </div>
-                                <div v-if="organisationUnit?.dateDissolved" class="response">
-                                    {{ $t("dateDissolvedLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.dateDissolved" class="response">
-                                    {{ localiseDate(organisationUnit?.dateDissolved) }}
-                                </div>
-                                <div v-if="organisationUnit?.active" class="response">
-                                    {{ $t("activeLabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.superInstitutionId">
-                                    {{ $t("superOULabel") }}
-                                </div>
-                                <div v-if="organisationUnit?.superInstitutionId" class="response">
-                                    <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId">
-                                        {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
-                                    </localized-link>
-                                </div>
-                                <div>
-                                    {{ $t("addressLabel") }}:
-                                </div>
-                                <div class="response">
-                                    {{ organisationUnit?.location?.address ? organisationUnit?.location?.address : $t("notYetSetMessage") }}
-                                </div>
-                                <div>
-                                    {{ $t("emailLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
-                                    <span v-else>
-                                        {{ $t("notYetSetMessage") }}
-                                    </span>
-                                </div>
-                                <div v-if="loginStore.userLoggedIn">
-                                    {{ $t("phoneNumberLabel") }}:
-                                </div>
-                                <div v-if="loginStore.userLoggedIn" class="response">
-                                    {{ organisationUnit?.contact?.phoneNumber ? organisationUnit?.contact?.phoneNumber : $t("notYetSetMessage") }}
-                                </div>
-                                <div v-if="organisationUnit?.uris && organisationUnit.uris.length > 0">
-                                    {{ $t("websiteLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="organisationUnitIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="organisationUnit?.id" 
-                                        :containing-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
-                                        :concrete-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="5">
-                                <div v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit.location?.address">
-                                    <open-layers-map
-                                        ref="mapRef" height="250px"
-                                        :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
-                                        :read-only="true"
-                                        :show-input="false">
-                                    </open-layers-map>
-                                </div>
-                                <div class="mt-5">
-                                    <data-quality-remarks-dialog
-                                        :entity-type="EntityType.ORGANISATION_UNIT"
-                                        :entity-id="organisationUnit?.id"
-                                    />
-                                </div>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                    :can-edit="canEdit"
+                />
+            </template>
+            <template #title>
+                {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation && organisationUnit?.nameAbbreviation.length > 0 ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
+            </template>
+            <template #affiliation>
+                <p v-if="organisationUnit?.superInstitutionId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                    <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId" class="font-medium text-gray-900 underline">
+                        {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
+                    </localized-link>
+                </p>
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
+                    {{ organisationUnit.location.address }}
+                </landing-meta-item>
+                <landing-meta-item v-if="organisationUnit?.ror" label="ROR" abbrev="ROR" tone="emerald">
+                    <identifier-link :identifier="organisationUnit.ror" type="ror" compact />
+                </landing-meta-item>
+                <landing-meta-item v-if="organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="indigo">
+                    <identifier-link :identifier="organisationUnit.contact.contactEmail" type="email" compact />
+                </landing-meta-item>
+                <landing-meta-item v-if="organisationUnit?.uris && organisationUnit.uris.length > 0" :label="$t('websiteLabel')" icon="mdi-web" tone="blue">
+                    <a :href="organisationUnit.uris[0]" target="_blank" rel="noopener noreferrer" class="underline break-all">
+                        {{ organisationUnit.uris[0] }}
+                    </a>
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
         <div class="actions-box pa-4">
             <div class="text-base font-medium mb-3 ml-1 leading-6">
@@ -406,13 +181,14 @@
                 </v-btn>
             </div>
         </div>
-        <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
             v-if="organisationUnit"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab v-show="showOutputs" value="publications">
                 {{ $t("scientificResultsListLabel") }}
@@ -446,6 +222,7 @@
         <v-tabs-window
             v-if="organisationUnit"
             v-model="currentTab"
+            class="min-w-0"
         >
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
@@ -566,43 +343,100 @@
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
-                <!-- Keywords -->
-                <keyword-list
+                <landing-additional-info-tab
                     :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
-                    :can-edit="canEdit"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
-
-                <!-- Description -->
-                <description-section
                     :description="organisationUnit?.description ? organisationUnit.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    :show-remark="false"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="organisationUnit?.numberOfEmployees" :label="$t('numberOfEmployeesLabel')" :value="organisationUnit.numberOfEmployees" />
+                        <landing-detail-field label="Scopus AFID">
+                            <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" compact />
+                            <span v-else>{{ $t("notYetSetMessage") }}</span>
+                        </landing-detail-field>
+                        <landing-detail-field label="Open Alex ID">
+                            <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" compact />
+                            <span v-else>{{ $t("notYetSetMessage") }}</span>
+                        </landing-detail-field>
+                        <landing-detail-field label="Ringgold ID" :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
+                        <landing-detail-field label="FundRef" :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
+                        <landing-detail-field label="ISNI" :value="organisationUnit?.isni || $t('notYetSetMessage')" />
+                        <landing-detail-field label="FCT ID" :value="organisationUnit?.fctId || $t('notYetSetMessage')" />
+                        <landing-detail-field label="GRID" :value="organisationUnit?.grid || $t('notYetSetMessage')" />
+                        <landing-detail-field label="Wikidata ID">
+                            <identifier-link v-if="organisationUnit?.wikidata" :identifier="organisationUnit.wikidata" type="wikidata" compact />
+                            <span v-else>{{ $t("notYetSetMessage") }}</span>
+                        </landing-detail-field>
+                        <landing-detail-field :label="$t('nationalIdLabel')" :value="organisationUnit?.nationalId || $t('notYetSetMessage')" />
+                        <landing-detail-field :label="$t('taxNumberLabel')" :value="organisationUnit?.taxNumber || $t('notYetSetMessage')" />
+                        <landing-detail-field v-if="isAdmin && organisationUnit?.clientInstitutionCris" :label="$t('clientInstitutionCrisLabel')" :value="$t('clientInstitutionCrisLabel')" />
+                        <landing-detail-field v-if="isAdmin && organisationUnit?.clientInstitutionDl" :label="$t('clientInstitutionDlLabel')" :value="$t('clientInstitutionDlLabel')" />
+                        <landing-detail-field v-if="isAdmin && organisationUnit?.legalEntity" :label="$t('legalEntityLabel')" :value="$t('legalEntityLabel')" />
+                        <landing-detail-field v-if="organisationUnit?.startup" :label="$t('startupLabel')" :value="$t('startupLabel')" />
+                        <landing-detail-field v-if="organisationUnit?.sector" :label="$t('organisationUnitSectorLabel')" :value="getOUSectorFromValueAutoLocale(organisationUnit?.sector)" />
+                        <landing-detail-field v-if="organisationUnit?.dateEstablished" :label="$t('dateEstablishedLabel')" :value="localiseDate(organisationUnit?.dateEstablished)" />
+                        <landing-detail-field v-if="organisationUnit?.dateDissolved" :label="$t('dateDissolvedLabel')" :value="localiseDate(organisationUnit?.dateDissolved)" />
+                        <landing-detail-field v-if="organisationUnit?.active" :label="$t('activeLabel')" :value="$t('activeLabel')" />
+                        <landing-detail-field v-if="!organisationUnit?.ror" label="Research Organisation Registry ID" :value="$t('notYetSetMessage')" />
+                        <landing-detail-field v-if="!organisationUnit?.location?.address" :label="$t('addressLabel')" :value="$t('notYetSetMessage')" />
+                        <landing-detail-field v-if="!organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" :value="$t('notYetSetMessage')" />
+                        <landing-detail-field v-if="loginStore.userLoggedIn" :label="$t('phoneNumberLabel')" :value="organisationUnit?.contact?.phoneNumber || $t('notYetSetMessage')" />
+                        <landing-detail-field v-if="organisationUnit?.uris && organisationUnit.uris.length > 1" :label="$t('uriInputLabel')">
+                            <uri-list :uris="organisationUnit.uris.slice(1)" />
+                        </landing-detail-field>
+                    </template>
 
-                <!-- Research Area -->
-                <v-row>
-                    <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <research-areas-update-modal 
-                                    :research-areas-hierarchy="organisationUnit?.researchAreas"
-                                    :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                    <template #before-keywords>
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <entity-identifiers-list
+                                :entity-identifiers="organisationUnitIdentifiers"
+                                :can-edit="canEdit"
+                                :entity-id="organisationUnit?.id"
+                                :containing-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
+                                :concrete-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
+                        <div
+                            v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit?.location?.address"
+                            class="bg-gray-50 p-6 rounded-lg"
+                        >
+                            <open-layers-map
+                                ref="mapRef"
+                                height="250px"
+                                :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
+                                :read-only="true"
+                                :show-input="false"
+                            />
+                        </div>
+                    </template>
 
-                                <h3 class="mb-1">
-                                    {{ $t("researchAreasLabel") }}
-                                </h3>
-                                <research-area-hierarchy
-                                    :research-areas="organisationUnit?.researchAreas" 
-                                />
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                                <v-card-text class="edit-pen-container">
+                                    <research-areas-update-modal
+                                        :research-areas-hierarchy="organisationUnit?.researchAreas"
+                                        :read-only="!canEdit"
+                                        @update="updateResearchAreas">
+                                    </research-areas-update-modal>
+
+                                    <h3 class="mb-1">
+                                        {{ $t("researchAreasLabel") }}
+                                    </h3>
+                                    <research-area-hierarchy
+                                        :research-areas="organisationUnit?.researchAreas"
+                                    />
+                                </v-card-text>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -665,7 +499,7 @@
             show-radio-options
             @continue="startMetadataEnrichment"
         />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -680,7 +514,6 @@ import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
 import { ApplicableEntityType, ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
@@ -702,7 +535,6 @@ import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnitLogo.vue';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
@@ -729,25 +561,34 @@ import InstitutionDefaultSubmissionContentService from '@/services/InstitutionDe
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import PersistentQuestionDialog from '@/components/core/comparators/PersistentQuestionDialog.vue';
 import ImportService from '@/services/importer/ImportService';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import { getOUSectorFromValueAutoLocale } from '@/i18n/ouSector';
 import { localiseDate } from '@/utils/DateUtil';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const currentTab = ref("relations");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const showAssessmentDetails = (
             version: { majorVersion: number, minorVersion: number }) => {
@@ -1300,23 +1141,14 @@ export default defineComponent({
             getOUSectorFromValueAutoLocale, localiseDate,
             organisationUnitIdentifiers, fetchIdentifiers,
             EntityType, fetchOU,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
 
 <style scoped>
-    #institution .large-institution-icon {
-        font-size: 10em;
-    }
-
-    #institution .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
     .edit-pen-container {
         position:relative;
     }
@@ -1342,4 +1174,20 @@ export default defineComponent({
         max-width: 500px;
     }
 
+    :deep(.org-unit-header-logo) {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #institution :deep(.org-unit-header-logo .large-institution-icon) {
+        font-size: 4em !important;
+    }
+
+    :deep(.org-unit-header-logo .image-container) {
+        width: 100%;
+        height: 100%;
+    }
 </style>

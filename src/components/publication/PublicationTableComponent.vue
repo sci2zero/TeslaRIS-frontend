@@ -1,6 +1,6 @@
 <template>
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div class="flex flex-wrap items-center gap-2 min-w-0 flex-1">
             <div v-if="selectedPublications.length > 0" class="action-menu-container">
                 <v-menu offset-y>
                     <template #activator="{ props }">
@@ -132,11 +132,11 @@
                     </v-list>
                 </v-menu>
             </div>
-            <div :class="[selectedPublications.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
+            <div v-if="$slots['top-left']" class="min-w-0 w-full sm:w-auto sm:max-w-md">
                 <slot name="top-left"></slot>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <slot name="actions"></slot>
         </div>
     </div>
@@ -154,7 +154,7 @@
         :hide-activation-button="true">
     </table-export-modal>
 
-    <div ref="tableWrapper" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+    <div ref="tableWrapper" class="bg-white rounded-xl shadow-sm overflow-x-auto border border-gray-100">
         <v-data-table-server
             v-model="selectedPublications"
             :sort-by="tableOptions.sortBy"
@@ -223,16 +223,16 @@
                                 hide-details
                             />
                         </td>
-                        <td class="py-2!">
-                            <div class="flex gap-2">
+                        <td class="py-2! min-w-0">
+                            <div class="flex gap-2 min-w-0">
                                 <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId" class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center hover:bg-purple-200 transition-colors flex-shrink-0">
                                     <v-icon color="primary" size="20">
                                         {{ getPublicationTypeIcon(item.type) }}
                                     </v-icon>
                                 </localized-link>
-                                <div>
-                                    <div class="flex items-baseline gap-2">
-                                        <div class="text-gray-800! hover:text-blue-900! font-semibold text-base flex">
+                                <div class="min-w-0">
+                                    <div class="flex items-baseline gap-2 flex-wrap">
+                                        <div class="text-gray-800! hover:text-blue-900! font-semibold text-base min-w-0">
                                             <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
                                                 <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="item.titleSr" />
                                                 <rich-title-renderer v-else :title="item.titleOther" />

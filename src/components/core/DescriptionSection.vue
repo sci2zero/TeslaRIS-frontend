@@ -145,4 +145,10 @@ export default defineComponent({
         opacity: 1;
     }
 
+    @media (hover: none), (max-width: 768px) {
+        .edit-pen-container .edit-pen {
+            opacity: 1;
+        }
+    }
+
 </style>

@@ -1,118 +1,57 @@
 <template>
-    <v-container id="bookSeries">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!bookSeries"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(bookSeries?.subtitle) }}
-                        <br v-if="bookSeries?.subtitle && bookSeries.subtitle.length > 0" />
-                        {{ $t("bookSeriesLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <div id="bookSeries" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
+        <entity-landing-header
+            :loading="!bookSeries"
+            :subtitle="returnCurrentLocaleContent(bookSeries?.subtitle)"
+            :entity-label="$t('bookSeriesLabel')"
+            icon="mdi-bookshelf"
+            :can-edit="canEdit"
+            :edit-label="$t('updateBookSeriesLabel')"
+            :entity-type="EntityType.BOOK_SERIES"
+            :entity-id="bookSeries?.id"
+            @edit="openModal(updateModalRef)"
+        >
+            <template #modals>
+                <generic-crud-modal
+                    v-if="canEdit"
+                    ref="updateModalRef"
+                    hide-activator
+                    :form-component="PublicationSeriesUpdateForm"
+                    :form-props="{ presetPublicationSeries: bookSeries, inputType: 'BOOK_SERIES' }"
+                    entity-name="BookSeries"
+                    is-update
+                    is-section-update
+                    :read-only="!canEdit"
+                    @update="updateBasicInfo"
+                />
+            </template>
+            <template #title>
+                {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
+            </template>
+            <template #meta>
+                <landing-meta-item v-if="bookSeries?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
+                    {{ bookSeries.eissn }}
+                </landing-meta-item>
+                <landing-meta-item v-if="bookSeries?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
+                    {{ bookSeries.printISSN }}
+                </landing-meta-item>
+            </template>
+        </entity-landing-header>
 
-        <!-- BookSeries Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-bookSeries-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="PublicationSeriesUpdateForm"
-                            :form-props="{ presetPublicationSeries: bookSeries, inputType: 'BOOK_SERIES' }"
-                            entity-name="BookSeries"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Personal Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!bookSeries" :citation-button="false" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div>eISSN:</div>
-                                <div class="response">
-                                    {{ bookSeries?.eissn ? bookSeries.eissn : $t("notYetSetMessage") }}
-                                </div>
-                                <div>Print ISSN:</div>
-                                <div class="response">
-                                    {{ bookSeries?.printISSN ? bookSeries.printISSN : $t("notYetSetMessage") }}
-                                </div>
-                                <div v-if="bookSeries?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="bookSeries?.openAlexId" class="response">
-                                    <identifier-link :identifier="bookSeries.openAlexId" type="open_alex"></identifier-link>
-                                </div>
-                                <div v-if="bookSeries?.languageIds && bookSeries?.languageIds.length > 0">
-                                    {{ $t("languageLabel") }}:
-                                </div>
-                                <div>
-                                    <v-chip v-for="(languageId, index) in bookSeries?.languageIds" :key="index" outlined>
-                                        {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
-                                    </v-chip>
-                                </div>
-                                <div v-if="bookSeries?.uris && bookSeries?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="bookSeries?.uris"></uri-list>
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="publicationSeriesIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="bookSeries?.id" 
-                                        :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
-                                        :concrete-entity-type="ApplicableEntityType.BOOK_SERIES"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.BOOK_SERIES"
-                                    :entity-id="bookSeries?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <br />
         <tab-content-loader v-if="!bookSeries" :tab-number="3" layout="list" />
         <v-tabs
             v-show="bookSeries"
             v-model="currentTab"
             color="deep-purple-accent-4"
             align-tabs="start"
+            show-arrows
+            class="landing-tabs"
         >
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
@@ -131,9 +70,9 @@
         <v-tabs-window
             v-show="bookSeries"
             v-model="currentTab"
+            class="min-w-0"
         >
             <v-tabs-window-item value="publications">
-                <!-- Publications Table -->
                 <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
                 <publication-table-component
                     :publications="publications"
@@ -141,6 +80,40 @@
                     in-comparator
                     @switch-page="switchPage">
                 </publication-table-component>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <landing-additional-info-tab :show-remark="false">
+                    <template #details>
+                        <landing-detail-field v-if="bookSeries?.languageIds && bookSeries.languageIds.length > 0" :label="$t('languageLabel')">
+                            {{ bookSeries.languageIds.map(id => returnCurrentLocaleContent(languageMap.get(id)?.name)).filter(Boolean).join(', ') }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="bookSeries?.openAlexId" label="Open Alex ID">
+                            <identifier-link :identifier="bookSeries.openAlexId" type="open_alex" compact />
+                        </landing-detail-field>
+                        <landing-detail-field v-if="bookSeries?.uris && bookSeries.uris.length > 0" :label="$t('uriInputLabel')">
+                            <a
+                                v-for="uri in bookSeries.uris"
+                                :key="uri"
+                                :href="uri"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="underline block"
+                            >
+                                {{ uri }}
+                            </a>
+                        </landing-detail-field>
+                        <div class="md:col-span-2">
+                            <entity-identifiers-list
+                                :entity-identifiers="publicationSeriesIdentifiers"
+                                :can-edit="canEdit"
+                                :entity-id="bookSeries?.id"
+                                :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                                :concrete-entity-type="ApplicableEntityType.BOOK_SERIES"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs
@@ -179,7 +152,7 @@
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">
@@ -200,10 +173,8 @@ import type { PersonPublicationSeriesContribution } from '@/models/PublicationSe
 import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPublicationSeriesContributionTabs.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
-import UriList from '@/components/core/UriList.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
@@ -214,15 +185,18 @@ import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifie
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, Toast, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isAdmin } = useUserRole();
 
@@ -255,8 +229,6 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const icon = ref("mdi-bookshelf");
-
         const canEdit = ref(false);
 
         const loginStore = useLoginStore();
@@ -264,6 +236,14 @@ export default defineComponent({
 
         const bookSeriesIndicators = ref<EntityIndicatorResponse[]>();
         const publicationSeriesIdentifiers = ref<EntityIdentifierResponse[]>([]);
+
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -383,7 +363,7 @@ export default defineComponent({
         };
 
         return {
-            bookSeries, icon, publications, 
+            bookSeries, publications, 
             fetchIdentifiers, totalPublications,
             publicationSeriesIdentifiers,
             switchPage, currentTab,
@@ -395,24 +375,9 @@ export default defineComponent({
             ApplicableEntityType,
             bookSeriesIndicators,
             isAdmin, EntityType, fetchBookSeries,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #bookSeries .large-bookSeries-icon {
-        font-size: 10em;
-    }
-
-    #bookSeries .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>
