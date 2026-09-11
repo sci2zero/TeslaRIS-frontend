@@ -158,9 +158,12 @@
                                 <div>{{ $t("fundingApplicationsLabel") }}:</div>
                                 <div class="response">
                                     <div v-for="application in fundingApplications" :key="application.databaseId">
-                                        <localized-link :to="'funding-application/' + application.databaseId">
+                                        <localized-link v-if="isAdmin" :to="'funding-application/' + application.databaseId">
                                             {{ applicationTitle(application) }}
                                         </localized-link>
+                                        <span v-else>
+                                            {{ applicationTitle(application) }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -326,6 +329,7 @@ import FundingCallService from "@/services/project/FundingCallService";
 import FundingApplicationService from "@/services/project/FundingApplicationService";
 import type { FundingApplicationIndex } from "@/models/FundingApplicationModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
+import { useUserRole } from "@/composables/useUserRole";
 
 const route = useRoute();
 const router = useRouter();
@@ -348,6 +352,7 @@ const fundingApplications = ref<FundingApplicationIndex[]>([]);
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
+const { isAdmin } = useUserRole();
 
 const uploadStore = useUploadStore();
 

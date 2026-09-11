@@ -62,9 +62,12 @@
                         />
                     </td>
                     <td>
-                        <localized-link :to="'funding-application/' + row.item.databaseId">
+                        <localized-link v-if="isAdmin" :to="'funding-application/' + row.item.databaseId">
                             {{ applicationTitle(row.item) }}
                         </localized-link>
+                        <span v-else>
+                            {{ displayTextOrPlaceholder(applicationTitle(row.item)) }}
+                        </span>
                     </td>
                     <td>
                         <localized-link
@@ -138,6 +141,7 @@ import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import { getFundingApplicationResultColor, getFundingApplicationResultTitleFromValueAutoLocale } from "@/i18n/fundingApplicationResult";
+import { useUserRole } from "@/composables/useUserRole";
 
 const props = defineProps({
     projectId: {
@@ -151,6 +155,7 @@ const props = defineProps({
 });
 
 const i18n = useI18n();
+const { isAdmin } = useUserRole();
 
 const fundingApplications = ref<FundingApplicationIndex[]>([]);
 const totalApplications = ref(0);
