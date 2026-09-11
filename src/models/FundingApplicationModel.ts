@@ -35,12 +35,15 @@ export interface FundingApplicationIndex {
     fundingCallId?: number;
     projectId?: number;
     funderId?: number;
+    fundingId?: number;
     projectNameSr: string;
     projectNameOther: string;
     fundingCallNameSr: string;
     fundingCallNameOther: string;
     funderNameSr: string;
     funderNameOther: string;
+    descriptionSr: string;
+    descriptionOther: string;
     submissionDate?: string;
     decisionDate?: string;
     result?: FundingApplicationResult;

@@ -14,7 +14,8 @@ export class FundingApplicationService extends BaseService {
         projectId: number | null = null,
         fundingCallId: number | null = null,
         funderId: number | null = null,
-        result: FundingApplicationResult | null = null
+        result: FundingApplicationResult | null = null,
+        fundingId: number | null = null
     ): Promise<AxiosResponse<Page<FundingApplicationIndex>>> {
         let url = `funding-application/search?${tokens}`;
         if (projectId) {
@@ -28,6 +29,9 @@ export class FundingApplicationService extends BaseService {
         }
         if (result) {
             url += `&result=${result}`;
+        }
+        if (fundingId) {
+            url += `&fundingId=${fundingId}`;
         }
         return super.sendRequest(axios.get, url);
     }
