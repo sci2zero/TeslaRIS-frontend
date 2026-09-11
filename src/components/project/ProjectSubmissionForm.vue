@@ -129,21 +129,6 @@
                     </v-col>
                 </v-row>
 
-                <!-- Related Projects -->
-                <v-row>
-                    <v-col>
-                        <h2>{{ $t("relatedProjectsLabel") }}</h2>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <projects-relation-form
-                            ref="relationsRef"
-                            @set-input="relations = $event"
-                        />
-                    </v-col>
-                </v-row>
-
                 <!-- Additional Fields Toggle -->
                 <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                     {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
@@ -197,6 +182,21 @@
                                 ref="costsRef"
                                 v-model="costs"
                                 :amount-label="$t('costsLabel')"
+                            />
+                        </v-col>
+                    </v-row>
+
+                    <!-- Related Projects -->
+                    <v-row>
+                        <v-col>
+                            <h2>{{ $t("relatedProjectsLabel") }}</h2>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <projects-relation-form
+                                ref="relationsRef"
+                                @set-input="relations = $event"
                             />
                         </v-col>
                     </v-row>
