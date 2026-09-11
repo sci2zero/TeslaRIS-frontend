@@ -38,8 +38,8 @@
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
-            <template #[`header.types`]="{ column }">
-                <div class="group flex items-center gap-2">
+            <template #[`header.types`]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="group flex items-center gap-2" @click="toggleSort(column)">
                     <span>{{ column.title }}</span>
                     <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
                         <template #activator="{ props }">
@@ -48,12 +48,14 @@
                                 :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
                                 :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                                 icon="mdi-filter"
+                                @click.stop
                             />
                         </template>
                         <div class="p-3 bg-white rounded-lg shadow-lg">
                             <slot name="type-filter-menu" :column="column" />
                         </div>
                     </v-menu>
+                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                 </div>
             </template>
             <template #item="row">
@@ -193,7 +195,7 @@ const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsP
 const headers = ref<any>([
     { title: nameLabel, align: "start", sortable: true, key: nameColumn},
     { title: programNameLabel, align: "start", sortable: true, key: programNameColumn},
-    { title: fundingTypesLabel, align: "start", sortable: false, key: "types"},
+    { title: fundingTypesLabel, align: "start", sortable: true, key: "types"},
     { title: dateFromLabel, align: "start", sortable: true, key: "dateFrom"},
     { title: dateToLabel, align: "start", sortable: true, key: "dateTo"},
     { title: totalAmountLabel, align: "start", sortable: true, key: "amount"}
@@ -204,6 +206,7 @@ const headersSortableMappings: Map<string, string> = new Map([
     ["nameOther", "name_other_sortable"],
     ["programNameSr", "program_name_sr_sortable"],
     ["programNameOther", "program_name_other_sortable"],
+    ["types", "types"],
     ["dateFrom", "date_from"],
     ["dateTo", "date_to"],
     ["amount", "amount"]

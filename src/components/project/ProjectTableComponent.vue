@@ -39,8 +39,8 @@
             :no-data-text="$t('noDataInTableMessage')"
             :page="tableOptions.page"
             @update:options="refreshTable">
-            <template #[`header.status`]="{ column }">
-                <div class="group flex items-center gap-2">
+            <template #[`header.status`]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="group flex items-center gap-2" @click="toggleSort(column)">
                     <span>{{ column.title }}</span>
                     <v-menu v-if="$slots['status-filter-menu']" :close-on-content-click="false">
                         <template #activator="{ props }">
@@ -49,12 +49,14 @@
                                 :title="hasActiveStatusFilters ? $t('filterActiveLabel') : $t('filterLabel')"
                                 :class="hasActiveStatusFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                                 icon="mdi-filter"
+                                @click.stop
                             />
                         </template>
                         <div class="p-3 bg-white rounded-lg shadow-lg">
                             <slot name="status-filter-menu" :column="column" />
                         </div>
                     </v-menu>
+                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                 </div>
             </template>
             <template #item="row">
