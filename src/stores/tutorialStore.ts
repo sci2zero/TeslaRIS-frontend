@@ -8,7 +8,6 @@ import {
     tutorials,
     type TutorialDefinition,
     type TutorialKey,
-    type TutorialPersist,
     type TutorialStep,
 } from '@/tutorials'
 

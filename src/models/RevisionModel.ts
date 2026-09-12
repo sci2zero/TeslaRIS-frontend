@@ -7,6 +7,13 @@ export enum IssueSeverity {
     ERROR = "ERROR"
 }
 
+// Vuetify colour per severity, shared by every chip that renders one.
+export const SEVERITY_COLORS: Record<IssueSeverity, string> = {
+    [IssueSeverity.ERROR]: "error",
+    [IssueSeverity.WARNING]: "warning",
+    [IssueSeverity.INFO]: "info"
+};
+
 export interface QualityReportResponse {
     profileName: string;
     qualityScore: number;
@@ -105,6 +112,14 @@ export enum RelatedEntityType {
     FUNDINGS = "FUNDINGS"
 }
 
+// The rule-target family each related entity type's issues belong to.
+export const RELATED_ENTITY_TARGETS: Record<RelatedEntityType, string> = {
+    [RelatedEntityType.OUTPUTS]: "Document",
+    [RelatedEntityType.PROJECTS]: "Project",
+    [RelatedEntityType.ACTIVITIES]: "Activity",
+    [RelatedEntityType.FUNDINGS]: "Funding"
+};
+
 export interface ProfileRelatedQuality {
     profileName: string;
     profileVersion: string;
@@ -170,6 +185,12 @@ export interface DataQualityProfile {
 export interface DataQualityIssueOccurrence {
     actualValue: string[];
     message: MultilingualContent[];
+}
+
+export interface DataQualityIssuePage {
+    content: DataQualityIssue[];
+    totalIssues: number;
+    nextCursor: string | null;
 }
 
 export interface DataQualityIssueDetails {

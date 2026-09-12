@@ -164,7 +164,7 @@
                                             :color="severityColors[rule.severity]"
                                             variant="tonal"
                                             size="small">
-                                            {{ rule.severity }}
+                                            {{ getIssueSeverityTitleFromValueAutoLocale(rule.severity) }}
                                         </v-chip>
                                     </td>
                                     <td>
@@ -340,141 +340,20 @@
                 </v-card-text>
             </v-card>
 
-            <h3 class="assessment-title">
-                {{ $t("dataQualityIssuesLabel") }}
-            </h3>
-
-            <v-card variant="flat" class="dq-card mb-5">
-                <v-card-text>
-                    <v-row align="center">
-                        <v-col cols="12" md="2">
-                            <v-select
-                                v-model="issueFilters.target"
-                                :items="targetOptions"
-                                :label="$t('targetEntityTypeLabel')"
-                                density="compact"
-                                clearable
-                                hide-details
-                            />
-                        </v-col>
-                        <v-col cols="12" md="2">
-                            <v-select
-                                v-model="issueFilters.dimension"
-                                :items="dimensionOptions"
-                                :label="$t('dimensionLabel')"
-                                density="compact"
-                                clearable
-                                hide-details
-                            />
-                        </v-col>
-                        <v-col cols="12" md="2">
-                            <v-select
-                                v-model="issueFilters.severity"
-                                :items="severityOptions"
-                                :label="$t('severityLabel')"
-                                density="compact"
-                                clearable
-                                hide-details
-                            />
-                        </v-col>
-                        <v-col cols="12" md="3">
-                            <v-autocomplete
-                                v-model="issueFilters.constraintKey"
-                                :items="constraintOptions"
-                                :label="$t('constraintLabel')"
-                                :no-data-text="$t('noMatchingConstraintsMessage')"
-                                density="compact"
-                                auto-select-first
-                                clearable
-                                hide-details
-                            />
-                        </v-col>
-                        <v-col cols="12" md="3" class="d-flex gap-2">
-                            <v-btn color="primary" variant="outlined" @click="clearIssueFilters">
-                                {{ $t("clearLabel") }}
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-            </v-card>
-
-            <tab-content-loader v-if="issuesLoading" :button-header="false" layout="table" />
-
-            <v-card v-else variant="flat" class="dq-card">
-                <v-card-text>
-                    <div v-if="issues.length === 0" class="text-medium-emphasis">
-                        {{ $t("noFailedConstraintsMessage") }}
-                    </div>
-
-                    <template v-else>
-                        <v-table density="compact">
-                            <thead>
-                                <tr>
-                                    <th>{{ $t("affectedRecordLabel") }}</th>
-                                    <th>{{ $t("targetEntityTypeLabel") }}</th>
-                                    <th>{{ $t("constraintLabel") }}</th>
-                                    <th>{{ $t("dimensionLabel") }}</th>
-                                    <th>{{ $t("severityLabel") }}</th>
-                                    <th>{{ $t("actionLabel") }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="issue in issues"
-                                    :key="`${issue.assessmentId}-${issue.ruleKey}`">
-                                    <td class="context-value">
-                                        <localized-link :to="getLandingPageBasePath(issue.entityType) + issue.entityId">
-                                            {{ $i18n.locale.startsWith('sr') ? issue.entityNameSr : issue.entityNameOther }}
-                                        </localized-link>
-                                    </td>
-                                    <td>{{ issue.target }}</td>
-                                    <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(issue.title) as string) }}</td>
-                                    <td>{{ issue.dimension }}</td>
-                                    <td>
-                                        <v-chip
-                                            :color="severityColors[issue.severity]"
-                                            variant="tonal"
-                                            size="small">
-                                            {{ issue.severity }}
-                                        </v-chip>
-                                    </td>
-                                    <td>
-                                        <v-btn
-                                            density="compact"
-                                            variant="text"
-                                            color="primary"
-                                            append-icon="mdi-arrow-right"
-                                            @click="showIssueDetails(issue)">
-                                            {{ $t("viewDetailsLabel") }}
-                                        </v-btn>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </v-table>
-
-                        <div class="d-flex align-center justify-space-between mt-4">
-                            <span class="text-medium-emphasis text-caption">
-                                {{ $t("totalIssuesLabel", { count: totalIssues }) }}
-                            </span>
-                            <v-pagination
-                                v-model="issuePage"
-                                :length="issuePageCount"
-                                :total-visible="5"
-                                density="compact"
-                            />
-                        </div>
-                    </template>
-                </v-card-text>
-            </v-card>
+            <data-quality-issues-table
+                ref="issuesTable"
+                :profile-name="selectedIssueProfileName"
+                :initial-target="initialIssueTarget"
+                :person-id="entityType === EntityType.PERSON ? entityId : undefined"
+                :organisation-unit-id="entityType === EntityType.ORGANISATION_UNIT ? entityId : undefined"
+            />
         </v-tabs-window-item>
     </v-tabs-window>
 
     <data-quality-issue-details-modal
-        v-model="issueDetailsDialog"
-        :assessment-id="detailsAssessmentId"
-        :rule-key="detailsRuleKey"
-        :record-name-sr="detailsRecordNameSr"
-        :record-name-other="detailsRecordNameOther"
+        v-model="ruleDetailsDialog"
+        :assessment-id="ruleDetailsAssessmentId"
+        :rule-key="ruleDetailsRuleKey"
         :current-entity-type="entityType"
         :current-entity-id="entityId"
     />
@@ -484,12 +363,10 @@
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import {
-    IssueSeverity,
-    QualityDimension,
+    RELATED_ENTITY_TARGETS,
     RelatedEntityType,
-    type ConstraintSummary,
+    SEVERITY_COLORS,
     type DataQualityAssessment,
-    type DataQualityIssue,
     type DataQualityProfileSummary,
     type DataQualityRuleResult,
     type ProfileRelatedQuality,
@@ -503,33 +380,10 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
-import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import DataQualityIssueDetailsModal from "@/components/core/revisions/DataQualityIssueDetailsModal.vue";
-import { getLandingPageBasePath } from "@/utils/PathResolutionUtil";
+import DataQualityIssuesTable from "@/components/core/revisions/DataQualityIssuesTable.vue";
+import { getIssueSeverityTitleFromValueAutoLocale } from "@/i18n/issueSeverity";
 
-
-interface IssueFilters {
-    target?: string;
-    dimension?: QualityDimension;
-    severity?: IssueSeverity;
-    constraintKey?: string;
-}
-
-const EMPTY_ISSUE_FILTERS: IssueFilters = {
-    target: undefined,
-    dimension: undefined,
-    severity: undefined,
-    constraintKey: undefined
-};
-
-const ISSUE_PAGE_SIZE = 10;
-
-const RELATED_ENTITY_TARGETS: Record<RelatedEntityType, string> = {
-    [RelatedEntityType.OUTPUTS]: "Document",
-    [RelatedEntityType.PROJECTS]: "Project",
-    [RelatedEntityType.ACTIVITIES]: "Activity",
-    [RelatedEntityType.FUNDINGS]: "Funding"
-};
 
 interface VersionItem {
     title: string;
@@ -539,7 +393,7 @@ interface VersionItem {
 
 export default defineComponent({
     name: "DataQualityTabsComponent",
-    components: { TabContentLoader, LocalizedLink, DataQualityIssueDetailsModal },
+    components: { TabContentLoader, DataQualityIssueDetailsModal, DataQualityIssuesTable },
     props: {
         entityType: {
             type: String,
@@ -557,24 +411,12 @@ export default defineComponent({
         const revisions = ref<Revision[]>([]);
         const relatedQuality = ref<ProfileRelatedQuality[]>([]);
         const selectedIssueProfileName = ref<string | undefined>(undefined);
-        const issues = ref<DataQualityIssue[]>([]);
-        const issuesLoading = ref(false);
-        const issuePage = ref(1);
-        const totalIssues = ref(0);
+        const issuesTable = ref<InstanceType<typeof DataQualityIssuesTable> | null>(null);
         const profiles = ref<DataQualityProfileSummary[]>([]);
-        const issueFilters = ref<IssueFilters>({ ...EMPTY_ISSUE_FILTERS });
         const assessments = ref<DataQualityAssessment[]>([]);
         const selectedProfileName = ref<string | undefined>(undefined);
         const selectedRelatedProfileName = ref<string | undefined>(undefined);
         const selectedVersion = ref<VersionItem | undefined>(undefined);
-
-        const severityColors = {
-            [IssueSeverity.ERROR]: "error",
-            [IssueSeverity.WARNING]: "warning",
-            [IssueSeverity.INFO]: "info"
-        };
-
-        const targetOptions = Object.entries(RELATED_ENTITY_TARGETS).map(([, target]) => target);
 
         const relatedEntityTypeLabels: Record<RelatedEntityType, string> = {
             [RelatedEntityType.OUTPUTS]: "outputsLabel",
@@ -634,41 +476,6 @@ export default defineComponent({
                 assessment => assessment.profileName === selectedIssueProfileName.value
             )?.finishedAt);
 
-        const issuePageCount = computed(() =>
-            Math.max(1, Math.ceil(totalIssues.value / ISSUE_PAGE_SIZE)));
-
-        const dimensionOptions = computed(() => Object.values(QualityDimension));
-
-        const severityOptions = computed(() => Object.values(IssueSeverity));
-
-        // The constraints of a profile are configuration, not assessment data, so they are fetched
-        // on their own rather than carried along with every rule of the profile.
-        const constraints = ref<ConstraintSummary[]>([]);
-
-        const constraintOptions = computed(() =>
-            constraints.value
-                .map(constraint => ({
-                    title: displayTextOrPlaceholder(
-                        returnCurrentLocaleContent(constraint.title) as string),
-                    value: constraint.key
-                }))
-                .sort((first, second) => first.title.localeCompare(second.title)));
-
-        const fetchConstraints = () => {
-            if (!selectedIssueProfileName.value) {
-                constraints.value = [];
-                return;
-            }
-
-            DataQualityService.listProfileConstraints(
-                selectedIssueProfileName.value, issueFilters.value.target
-            ).then(response => {
-                constraints.value = response.data;
-            }).catch(() => {
-                constraints.value = [];
-            });
-        };
-
         const relatedQualityRows = computed(() =>
             selectedRelatedProfile.value?.relatedQuality ?? []);
 
@@ -695,88 +502,35 @@ export default defineComponent({
             });
         };
 
-        const resetPageAndFetchIssues = () => {
-            if (issuePage.value !== 1) {
-                issuePage.value = 1;
-                return;
-            }
-
-            fetchIssues();
-        };
+        // The issues tab renders lazily. Until it has been shown once there is no table to
+        // filter, so the target is handed to it as its initial filter and the first fetch is
+        // already narrowed; once it exists, the filter is applied to it directly.
+        const initialIssueTarget = ref<string | undefined>(undefined);
 
         const openRelatedIssues = (row: RelatedQuality) => {
             const target = RELATED_ENTITY_TARGETS[row.entityType];
-            const alreadyFiltered = issueFilters.value.target === target &&
-                !issueFilters.value.dimension && !issueFilters.value.severity &&
-                !issueFilters.value.constraintKey;
 
-            issueFilters.value = { ...EMPTY_ISSUE_FILTERS, target };
-            currentSubTab.value = "qualityIssues";
-
-            if (alreadyFiltered) {
-                resetPageAndFetchIssues();
+            if (issuesTable.value) {
+                issuesTable.value.filterByTarget(target);
+            } else {
+                initialIssueTarget.value = target;
             }
+
+            currentSubTab.value = "qualityIssues";
         };
 
-        const clearIssueFilters = () => {
-            issueFilters.value = { ...EMPTY_ISSUE_FILTERS };
-        };
-
-        const issueDetailsDialog = ref(false);
-        const detailsAssessmentId = ref<number | undefined>(undefined);
-        const detailsRuleKey = ref<string | undefined>(undefined);
-        const detailsRecordNameSr = ref("");
-        const detailsRecordNameOther = ref("");
-
-        const showIssueDetails = (issue: DataQualityIssue) => {
-            detailsAssessmentId.value = issue.assessmentId;
-            detailsRuleKey.value = issue.ruleKey;
-            detailsRecordNameSr.value = issue.entityNameSr;
-            detailsRecordNameOther.value = issue.entityNameOther;
-            issueDetailsDialog.value = true;
-        };
+        const ruleDetailsDialog = ref(false);
+        const ruleDetailsAssessmentId = ref<number | undefined>(undefined);
+        const ruleDetailsRuleKey = ref<string | undefined>(undefined);
 
         const showRuleDetails = (rule: DataQualityRuleResult) => {
             if (!selectedAssessment.value) {
                 return;
             }
 
-            detailsAssessmentId.value = selectedAssessment.value.assessmentId;
-            detailsRuleKey.value = rule.key;
-            detailsRecordNameSr.value = "";
-            detailsRecordNameOther.value = "";
-            issueDetailsDialog.value = true;
-        };
-
-        const fetchIssues = () => {
-            if (!props.entityId || !selectedIssueProfileName.value ||
-                !supportsQualityIssues.value) {
-                issues.value = [];
-                totalIssues.value = 0;
-                return;
-            }
-
-            issuesLoading.value = true;
-
-            DataQualityService.getIssuesForEntity(
-                props.entityType,
-                props.entityId,
-                selectedIssueProfileName.value,
-                issueFilters.value.target,
-                issueFilters.value.dimension,
-                issueFilters.value.severity,
-                issueFilters.value.constraintKey,
-                issuePage.value - 1,
-                ISSUE_PAGE_SIZE
-            ).then(response => {
-                issues.value = response.data.content;
-                totalIssues.value = response.data.totalElements;
-            }).catch(() => {
-                issues.value = [];
-                totalIssues.value = 0;
-            }).finally(() => {
-                issuesLoading.value = false;
-            });
+            ruleDetailsAssessmentId.value = selectedAssessment.value.assessmentId;
+            ruleDetailsRuleKey.value = rule.key;
+            ruleDetailsDialog.value = true;
         };
 
         const fetchProfiles = () => {
@@ -836,7 +590,6 @@ export default defineComponent({
 
                 if (!profileNames.value.includes(selectedIssueProfileName.value as string)) {
                     selectedIssueProfileName.value = profileNames.value[0];
-                    fetchIssues();
                 }
             }).catch(() => {
                 assessments.value = [];
@@ -886,44 +639,22 @@ export default defineComponent({
             fetchProfiles();
         });
 
-        watch(selectedIssueProfileName, () => {
-            fetchConstraints();
-            resetPageAndFetchIssues();
-        });
-
-        watch(issuePage, fetchIssues);
-
-        watch(() => issueFilters.value.target, fetchConstraints);
-
-        watch(issueFilters, () => {
-            const constraintKey = issueFilters.value.constraintKey;
-
-            if (constraintKey &&
-                !constraintOptions.value.some(option => option.value === constraintKey)) {
-                issueFilters.value.constraintKey = undefined;
-                return;
-            }
-
-            resetPageAndFetchIssues();
-        }, { deep: true });
         watch(selectedVersion, fetchAssessments);
 
         return {
-            currentSubTab, loading, assessments, getLandingPageBasePath,
+            currentSubTab, loading, assessments, EntityType,
             selectedVersion, versionItems, selectedAssessment,
             selectedProfileName, profileNames, failedRules,
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
             relatedQuality, relatedEntityTypeLabels, openRelatedIssues,
             selectedRelatedProfile, relatedQualityRows, displayTextOrPlaceholder,
-            selectedIssueProfileName, issues, issuesLoading, issuePage, issuePageCount,
-            totalIssues, issueFilters, issueProfileVersion, issueAssessmentDate,
-            targetOptions, dimensionOptions, severityOptions, constraintOptions,
-            clearIssueFilters, showIssueDetails, selectedRelatedProfileName, 
-            relatedProfileNames, latestVersion, downloadFullReport,
-            returnCurrentLocaleContent, localiseDate, totalRules, severityColors,
-            issueDetailsDialog, detailsAssessmentId, detailsRuleKey,
-            detailsRecordNameSr, detailsRecordNameOther, showRuleDetails
+            selectedIssueProfileName, issuesTable, initialIssueTarget, issueProfileVersion,
+            issueAssessmentDate,
+            selectedRelatedProfileName, relatedProfileNames, latestVersion, downloadFullReport,
+            returnCurrentLocaleContent, localiseDate, totalRules, severityColors: SEVERITY_COLORS,
+            ruleDetailsDialog, ruleDetailsAssessmentId, ruleDetailsRuleKey, showRuleDetails,
+            getIssueSeverityTitleFromValueAutoLocale
         };
     }
 });

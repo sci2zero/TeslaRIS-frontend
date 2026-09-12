@@ -1638,7 +1638,10 @@ export default {
     targetEntityTypeLabel: "Target entity type",
     affectedRecordLabel: "Affected record",
     clearLabel: "Clear",
+    refreshLabel: "Refresh",
     totalIssuesLabel: "{count} open issue(s)",
+    shownOfTotalIssuesLabel: "Showing {shown} of {total} open issue(s)",
+    loadMoreLabel: "Load {count} more",
     dataQualityAssessmentLabel: "Data quality assessment",
     cantRestoreVersionMessage: "Cannot restore this version: it references '{0}' with ID {1}, which no longer exists.",
     revisionBackfillMessage: "Automatic entity revisioning"

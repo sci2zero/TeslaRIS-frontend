@@ -39,10 +39,16 @@
             >
                 <div class="tutorial-overlay__header">
                     <span class="tutorial-overlay__step">{{ $t('tutorial.stepCounter', { current: currentIndex + 1, total: totalSteps }) }}</span>
-                    <button class="tutorial-overlay__skip" type="button" @click="handleSkip">{{ $t('tutorial.skipLabel') }}</button>
+                    <button class="tutorial-overlay__skip" type="button" @click="handleSkip">
+                        {{ $t('tutorial.skipLabel') }}
+                    </button>
                 </div>
-                <h3 class="tutorial-overlay__title" v-if="currentStep?.title">{{ $t(currentStep.title) }}</h3>
-                <p class="tutorial-overlay__description" v-if="currentStep?.description">{{ $t(currentStep.description) }}</p>
+                <h3 v-if="currentStep?.title" class="tutorial-overlay__title">
+                    {{ $t(currentStep.title) }}
+                </h3>
+                <p v-if="currentStep?.description" class="tutorial-overlay__description">
+                    {{ $t(currentStep.description) }}
+                </p>
 
                 <div class="tutorial-overlay__actions">
                     <v-btn

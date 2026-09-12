@@ -1,8 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
-import type { Page } from "@/models/Common";
+import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssueDetails, type DataQualityIssuePage, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
 
 
 export class DataQualityService extends BaseService {
@@ -23,8 +22,12 @@ export class DataQualityService extends BaseService {
     return super.sendRequest(axios.get, `data-quality/related/${entityType}/${entityId}`);
   }
 
-  async getIssuesForEntity(entityType: string, entityId: number, profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, page: number, size: number): Promise<AxiosResponse<Page<DataQualityIssue>>> {
-    const params = new URLSearchParams({ profileName, page: `${page}`, size: `${size}` });
+  async getIssuesForEntity(entityType: string, entityId: number, profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, cursor: string | undefined, size: number): Promise<AxiosResponse<DataQualityIssuePage>> {
+    const params = new URLSearchParams({ profileName, size: `${size}` });
+
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
 
     if (target) {
       params.append("target", target);

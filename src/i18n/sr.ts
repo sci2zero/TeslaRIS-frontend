@@ -1652,7 +1652,10 @@ export default {
     targetEntityTypeLabel: "Tip ciljnog entiteta",
     affectedRecordLabel: "Zahvaćeni entitet",
     clearLabel: "Poništi",
+    refreshLabel: "Osveži",
     totalIssuesLabel: "{count} otvorenih problema",
+    shownOfTotalIssuesLabel: "Prikazano {shown} od {total} otvorenih problema",
+    loadMoreLabel: "Učitaj još {count}",
     dataQualityAssessmentLabel: "Procena kvaliteta podataka",
     cantRestoreVersionMessage: "Nije moguće vratiti ovu verziju: referencira se \"{0}\" sa ID-em {1}, koji više ne postoji.",
     revisionBackfillMessage: "Automatsko revizionisanje entiteta"
