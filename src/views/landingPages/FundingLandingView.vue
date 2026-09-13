@@ -154,6 +154,20 @@
                                 </div>
                             </div>
 
+                            <div v-if="fundingApplications.length > 0" class="info-item">
+                                <div>{{ $t("fundingApplicationsLabel") }}:</div>
+                                <div class="response">
+                                    <div v-for="application in fundingApplications" :key="application.databaseId">
+                                        <localized-link v-if="isAdmin" :to="'funding-application/' + application.databaseId">
+                                            {{ applicationTitle(application) }}
+                                        </localized-link>
+                                        <span v-else>
+                                            {{ applicationTitle(application) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div v-if="funding.amount" class="info-item">
                                 <div>{{ $t("amountLabel") }}:</div>
                                 <div class="response">
@@ -312,7 +326,10 @@ import FundingUpdateForm from "@/components/project/FundingUpdateForm.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import ProjectService from "@/services/project/ProjectService";
 import FundingCallService from "@/services/project/FundingCallService";
+import FundingApplicationService from "@/services/project/FundingApplicationService";
+import type { FundingApplicationIndex } from "@/models/FundingApplicationModel";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
+import { useUserRole } from "@/composables/useUserRole";
 
 const route = useRoute();
 const router = useRouter();
@@ -331,9 +348,11 @@ const funderName = ref<MultilingualContent[]>([]);
 const fundingCallName = ref<MultilingualContent[]>([]);
 const fundingProgramName = ref<MultilingualContent[]>([]);
 const fundingProgramId = ref<number | undefined>(undefined);
+const fundingApplications = ref<FundingApplicationIndex[]>([]);
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
+const { isAdmin } = useUserRole();
 
 const uploadStore = useUploadStore();
 
@@ -383,6 +402,15 @@ const fetchLinkedEntityNames = () => {
     fundingCallName.value = [];
     fundingProgramName.value = [];
     fundingProgramId.value = undefined;
+    fundingApplications.value = [];
+
+    if (funding.value?.id) {
+        FundingApplicationService.searchFundingApplications(
+            "tokens=*&page=0&size=50", null, null, null, null, funding.value.id
+        ).then((response) => {
+            fundingApplications.value = response.data.content;
+        });
+    }
 
     if (funding.value?.projectId) {
         ProjectService.readProject(funding.value.projectId).then((response) => {
@@ -403,6 +431,18 @@ const fetchLinkedEntityNames = () => {
             fundingProgramName.value = response.data.fundingProgramName ?? [];
         });
     }
+};
+
+const applicationTitle = (application: FundingApplicationIndex) => {
+    const isSr = i18n.locale.value.startsWith("sr");
+    const description = isSr ? application.descriptionSr : application.descriptionOther;
+    if (description) {
+        return description;
+    }
+
+    const projectName = isSr ? application.projectNameSr : application.projectNameOther;
+    const callName = isSr ? application.fundingCallNameSr : application.fundingCallNameOther;
+    return [projectName, callName].filter(part => part).join(" — ") || `#${application.databaseId}`;
 };
 
 const checkIfUserCanEdit = () => {

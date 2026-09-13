@@ -87,12 +87,12 @@ onMounted(() => {
 });
 
 const composeTitle = (nameParts: (string | undefined)[], databaseId: number): string => {
-    const title = nameParts.filter(namePart => namePart).join(" | ");
+    const title = nameParts.filter(namePart => namePart).join(" — ");
     return title.length > 0 ? title : `#${databaseId}`;
 };
 
 const searchFundingApplications = lodash.debounce((input: string) => {
-    if (input.includes("|")) {
+    if (input === selectedFundingApplication.value?.title) {
         return;
     }
 
@@ -111,11 +111,9 @@ const searchFundingApplications = lodash.debounce((input: string) => {
                 const description = isSerbian ? fundingApplication.descriptionSr : fundingApplication.descriptionOther;
 
                 listOfFundingApplications.push({
-                    // Description is not in the ES index yet, so fall back to the names
-                    // of the call and the project until it is.
-                    title: description ?? composeTitle([
-                        isSerbian ? fundingApplication.fundingCallNameSr : fundingApplication.fundingCallNameOther,
-                        isSerbian ? fundingApplication.projectNameSr : fundingApplication.projectNameOther
+                    title: description || composeTitle([
+                        isSerbian ? fundingApplication.projectNameSr : fundingApplication.projectNameOther,
+                        isSerbian ? fundingApplication.fundingCallNameSr : fundingApplication.fundingCallNameOther
                     ], fundingApplication.databaseId),
                     value: fundingApplication.databaseId
                 });

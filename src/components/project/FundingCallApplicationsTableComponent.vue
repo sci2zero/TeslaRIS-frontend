@@ -63,11 +63,19 @@
                     </td>
                     <td>
                         <localized-link :to="'funding-application/' + row.item.databaseId">
-                            {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? row.item.projectNameSr : row.item.projectNameOther) }}
+                            {{ applicationTitle(row.item) }}
                         </localized-link>
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
+                        <localized-link
+                            v-if="row.item.funderId"
+                            :to="'organisation-units/' + row.item.funderId"
+                        >
+                            {{ funderName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ displayTextOrPlaceholder(funderName(row.item)) }}
+                        </span>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
@@ -166,8 +174,15 @@ const size = ref(10);
 const sort = ref("");
 const direction = ref("");
 
+const funderName = (application: FundingApplicationIndex) => {
+    const isSr = i18n.locale.value.startsWith("sr");
+    return isSr
+        ? (application.funderNameSr || application.funderNameOther)
+        : (application.funderNameOther || application.funderNameSr);
+};
+
 const headers = computed(() => [
-    { title: i18n.t("projectLabel"), align: "start", sortable: true, key: "project" },
+    { title: i18n.t("fundingApplicationLabel"), align: "start", sortable: true, key: "project" },
     { title: i18n.t("funderLabel"), align: "start", sortable: false, key: "funder" },
     { title: i18n.t("submissionDateLabel"), align: "start", sortable: true, key: "submissionDate" },
     { title: i18n.t("dateOfDecisionLabel"), align: "start", sortable: true, key: "decisionDate" },

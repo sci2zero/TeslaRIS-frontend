@@ -278,7 +278,9 @@ import type { FundingCall, PersonFundingCallContribution } from "@/models/Fundin
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import Toast from "@/components/core/Toast.vue";
-import type { MultilingualContent } from "@/models/Common";
+import type { ErrorResponse, MultilingualContent } from "@/models/Common";
+import type { AxiosError } from "axios";
+import { getErrorMessageForErrorKey } from "@/i18n";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useUploadStore } from "@/stores/uploadStore";
 import { useLoginStore } from "@/stores/loginStore";
@@ -412,8 +414,11 @@ const performUpdate = (reload: boolean) => {
         if (reload) {
             fetchFundingCall();
         }
-    }).catch(() => {
-        snackbarMessage.value = i18n.t("genericErrorMessage");
+    }).catch((error: AxiosError<ErrorResponse>) => {
+        const backendMessage = error.response?.data.message;
+        snackbarMessage.value = backendMessage
+            ? getErrorMessageForErrorKey(backendMessage)
+            : i18n.t("genericErrorMessage");
         snackbar.value = true;
         fetchFundingCall();
     });

@@ -239,6 +239,7 @@ const unlinkSelected = () => {
             totalFundingCalls.value = Math.max(0, totalFundingCalls.value - removedIds.length);
             selectedFundingCalls.value = [];
             notify(i18n.t("updatedSuccessMessage"));
+            refetchAfterReindex();
         })
         .catch((error: AxiosError<ErrorResponse>) => {
             notifyError(error);

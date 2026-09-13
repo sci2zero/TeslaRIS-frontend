@@ -62,12 +62,23 @@
                         />
                     </td>
                     <td>
-                        <localized-link :to="'funding-application/' + row.item.databaseId">
+                        <localized-link v-if="isAdmin" :to="'funding-application/' + row.item.databaseId">
                             {{ applicationTitle(row.item) }}
                         </localized-link>
+                        <span v-else>
+                            {{ displayTextOrPlaceholder(applicationTitle(row.item)) }}
+                        </span>
                     </td>
                     <td>
-                        {{ displayTextOrPlaceholder($i18n.locale.startsWith("sr") ? (row.item.funderNameSr || row.item.funderNameOther) : (row.item.funderNameOther || row.item.funderNameSr)) }}
+                        <localized-link
+                            v-if="row.item.funderId"
+                            :to="'organisation-units/' + row.item.funderId"
+                        >
+                            {{ funderName(row.item) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ displayTextOrPlaceholder(funderName(row.item)) }}
+                        </span>
                     </td>
                     <td>
                         {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
@@ -130,6 +141,7 @@ import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import { getFundingApplicationResultColor, getFundingApplicationResultTitleFromValueAutoLocale } from "@/i18n/fundingApplicationResult";
+import { useUserRole } from "@/composables/useUserRole";
 
 const props = defineProps({
     projectId: {
@@ -143,6 +155,7 @@ const props = defineProps({
 });
 
 const i18n = useI18n();
+const { isAdmin } = useUserRole();
 
 const fundingApplications = ref<FundingApplicationIndex[]>([]);
 const totalApplications = ref(0);
@@ -157,8 +170,15 @@ const size = ref(10);
 const sort = ref("");
 const direction = ref("");
 
+const funderName = (application: FundingApplicationIndex) => {
+    const isSr = i18n.locale.value.startsWith("sr");
+    return isSr
+        ? (application.funderNameSr || application.funderNameOther)
+        : (application.funderNameOther || application.funderNameSr);
+};
+
 const headers = computed(() => [
-    { title: i18n.t("fundingCallLabel"), align: "start", sortable: true, key: "fundingCall" },
+    { title: i18n.t("fundingApplicationLabel"), align: "start", sortable: true, key: "fundingCall" },
     { title: i18n.t("funderLabel"), align: "start", sortable: false, key: "funder" },
     { title: i18n.t("submissionDateLabel"), align: "start", sortable: true, key: "submissionDate" },
     { title: i18n.t("dateOfDecisionLabel"), align: "start", sortable: true, key: "decisionDate" },
@@ -178,8 +198,10 @@ const defaultSortField = computed(() => sortFieldMappings.value.get("fundingCall
 
 const applicationTitle = (application: FundingApplicationIndex) => {
     const isSr = i18n.locale.value.startsWith("sr");
+    const projectName = isSr ? application.projectNameSr : application.projectNameOther;
     const callName = isSr ? application.fundingCallNameSr : application.fundingCallNameOther;
-    return callName || `#${application.databaseId}`;
+    const combined = [projectName, callName].filter(part => part).join(" — ");
+    return combined || `#${application.databaseId}`;
 };
 
 // An empty search box emits an empty string, so fall back to "*" -- otherwise the query
