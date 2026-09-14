@@ -120,7 +120,8 @@ export default {
         identifiers: "Identifiers",
         submitPerformanceRelatedOutput: "Submit performance related output",
         performanceRelatedOutputLandingPage: "Performance related output details",
-        repositoryAnalytics: "Repository analytics"
+        repositoryAnalytics: "Repository analytics",
+        issueExplorer: "Issue explorer"
     },
     emailLabel: "Email",
     passwordLabel: "Password",

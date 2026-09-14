@@ -343,7 +343,7 @@
             <data-quality-issues-table
                 ref="issuesTable"
                 :profile-name="selectedIssueProfileName"
-                :initial-target="initialIssueTarget"
+                :initial-filters="{ target: initialIssueTarget }"
                 :person-id="entityType === EntityType.PERSON ? entityId : undefined"
                 :organisation-unit-id="entityType === EntityType.ORGANISATION_UNIT ? entityId : undefined"
             />
@@ -419,9 +419,11 @@ export default defineComponent({
         const selectedVersion = ref<VersionItem | undefined>(undefined);
 
         const relatedEntityTypeLabels: Record<RelatedEntityType, string> = {
+            [RelatedEntityType.PERSONS]: "routeLabel.persons",
+            [RelatedEntityType.ORGANISATION_UNITS]: "organisationUnitsLabel",
             [RelatedEntityType.OUTPUTS]: "outputsLabel",
-            [RelatedEntityType.PROJECTS]: "projectsLabel",
             [RelatedEntityType.ACTIVITIES]: "activitiesLabel",
+            [RelatedEntityType.PROJECTS]: "projectsLabel",
             [RelatedEntityType.FUNDINGS]: "fundingsLabel"
         };
 

@@ -210,7 +210,6 @@ export default defineComponent({
             });
         };
 
-        // TODO: the drill-down into a blocking constraint's issues is not implemented yet.
         const openIssues = (constraint: PrevalentIssue) => {
             emit("openIssues", {
                 entityType: constraint.entityType,

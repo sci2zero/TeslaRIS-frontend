@@ -131,7 +131,6 @@ export default defineComponent({
             });
         };
 
-        // TODO: the drill-down into a dimension's issues is not implemented yet.
         const openIssues = (dimension: DimensionQuality) => {
             emit("openIssues", dimension.dimension);
         };

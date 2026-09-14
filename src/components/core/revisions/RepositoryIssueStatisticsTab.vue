@@ -224,7 +224,6 @@ export default defineComponent({
             });
         };
 
-        // TODO: the drill-down into a constraint's issues is not implemented yet.
         const openIssues = (constraint: RecurringConstraint) => {
             emit("openIssues", { ruleKey: constraint.ruleKey });
         };

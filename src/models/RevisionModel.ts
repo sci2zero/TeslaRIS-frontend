@@ -106,19 +106,35 @@ export interface DataQualityAssessment {
 }
 
 export enum RelatedEntityType {
+    PERSONS = "PERSONS",
+    ORGANISATION_UNITS = "ORGANISATION_UNITS",
     OUTPUTS = "OUTPUTS",
-    PROJECTS = "PROJECTS",
     ACTIVITIES = "ACTIVITIES",
+    PROJECTS = "PROJECTS",
     FUNDINGS = "FUNDINGS"
 }
 
 // The rule-target family each related entity type's issues belong to.
 export const RELATED_ENTITY_TARGETS: Record<RelatedEntityType, string> = {
+    [RelatedEntityType.PERSONS]: "Person",
+    [RelatedEntityType.ORGANISATION_UNITS]: "OrganisationUnit",
     [RelatedEntityType.OUTPUTS]: "Document",
-    [RelatedEntityType.PROJECTS]: "Project",
     [RelatedEntityType.ACTIVITIES]: "Activity",
+    [RelatedEntityType.PROJECTS]: "Project",
     [RelatedEntityType.FUNDINGS]: "Funding"
 };
+
+// Every rule-target family the issues list can be narrowed to.
+export const ISSUE_TARGETS = [
+    "Person", "OrganisationUnit", "Document", "Activity", "Project", "Funding"
+] as const;
+
+export interface IssueFilters {
+    target?: string;
+    dimension?: QualityDimension;
+    severity?: IssueSeverity;
+    constraintKey?: string;
+}
 
 export interface ProfileRelatedQuality {
     profileName: string;
@@ -235,6 +251,15 @@ export enum RepositoryEntityType {
     PROJECTS = "PROJECTS",
     FUNDINGS = "FUNDINGS"
 }
+
+export const REPOSITORY_ENTITY_TARGETS: Record<RepositoryEntityType, string> = {
+    [RepositoryEntityType.PERSONS]: "Person",
+    [RepositoryEntityType.ORGANISATION_UNITS]: "OrganisationUnit",
+    [RepositoryEntityType.OUTPUTS]: "Document",
+    [RepositoryEntityType.ACTIVITIES]: "Activity",
+    [RepositoryEntityType.PROJECTS]: "Project",
+    [RepositoryEntityType.FUNDINGS]: "Funding"
+};
 
 export interface EntityTypeQuality {
     entityType: RepositoryEntityType;

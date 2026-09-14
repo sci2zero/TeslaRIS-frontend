@@ -61,6 +61,7 @@
                 <repository-overview-tab
                     :profile-name="selectedProfileName"
                     :assessment-date="selectedAssessmentDate"
+                    @open-issues="openConstraintIssues"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="trends">
@@ -73,24 +74,28 @@
                 <repository-entity-types-tab
                     :profile-name="selectedProfileName"
                     :assessment-date="selectedAssessmentDate"
+                    @open-issues="openEntityTypeIssues"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="dimensions">
                 <repository-dimensions-tab
                     :profile-name="selectedProfileName"
                     :assessment-date="selectedAssessmentDate"
+                    @open-issues="openDimensionIssues"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publicationCandidates">
                 <repository-publication-candidates-tab
                     :profile-name="selectedProfileName"
                     :assessment-date="selectedAssessmentDate"
+                    @open-issues="openConstraintIssues"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="issueStatistics">
                 <repository-issue-statistics-tab
                     :profile-name="selectedProfileName"
                     :assessment-date="selectedAssessmentDate"
+                    @open-issues="openConstraintIssues"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -100,6 +105,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter, type LocationQueryRaw } from "vue-router";
 import DatePicker from "@/components/core/DatePicker.vue";
 import DataQualityService from "@/services/revision/DataQualityService";
 import RepositoryOverviewTab from "@/components/core/revisions/RepositoryOverviewTab.vue";
@@ -108,6 +114,11 @@ import RepositoryEntityTypesTab from "@/components/core/revisions/RepositoryEnti
 import RepositoryDimensionsTab from "@/components/core/revisions/RepositoryDimensionsTab.vue";
 import RepositoryPublicationCandidatesTab from "@/components/core/revisions/RepositoryPublicationCandidatesTab.vue";
 import RepositoryIssueStatisticsTab from "@/components/core/revisions/RepositoryIssueStatisticsTab.vue";
+import {
+    REPOSITORY_ENTITY_TARGETS,
+    type QualityDimension,
+    type RepositoryEntityType
+} from "@/models/RevisionModel";
 
 
 export default defineComponent({
@@ -129,6 +140,43 @@ export default defineComponent({
         const selectedAssessmentDate = ref<string | undefined>((new Date()).toISOString());
 
         const i18n = useI18n();
+        const router = useRouter();
+
+        // Every drill-down is a navigation into the Issue Explorer carrying this page's context.
+        const openIssueExplorer = (filters: LocationQueryRaw) => {
+            const query: LocationQueryRaw = { ...filters };
+
+            if (selectedProfileName.value) {
+                query.profile = selectedProfileName.value;
+            }
+
+            if (selectedAssessmentDate.value) {
+                query.date = selectedAssessmentDate.value.split("T")[0];
+            }
+
+            router.push({ name: "issueExplorer", query });
+        };
+
+        const openEntityTypeIssues = (entityType: RepositoryEntityType) =>
+            openIssueExplorer({ target: REPOSITORY_ENTITY_TARGETS[entityType] });
+
+        const openDimensionIssues = (dimension: QualityDimension) =>
+            openIssueExplorer({ dimension });
+
+        const openConstraintIssues = (
+            issue: { entityType?: RepositoryEntityType | null; ruleKey?: string | null }) => {
+            const query: LocationQueryRaw = {};
+
+            if (issue.entityType) {
+                query.target = REPOSITORY_ENTITY_TARGETS[issue.entityType];
+            }
+
+            if (issue.ruleKey) {
+                query.constraint = issue.ruleKey;
+            }
+
+            openIssueExplorer(query);
+        };
 
         onMounted(() => {
             document.title = i18n.t("routeLabel.repositoryAnalytics");
@@ -145,7 +193,8 @@ export default defineComponent({
         });
 
         return {
-            currentTab, profileNames, selectedProfileName, selectedAssessmentDate
+            currentTab, profileNames, selectedProfileName, selectedAssessmentDate,
+            openEntityTypeIssues, openDimensionIssues, openConstraintIssues
         };
     }
 });

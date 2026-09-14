@@ -136,7 +136,7 @@
                             density="comfortable"
                             :loading="loadingMore"
                             @click="loadMore">
-                            {{ $t("loadMoreLabel", { count: PAGE_SIZE }) }}
+                            {{ $t("loadMoreLabel", { count: (PAGE_SIZE <= (totalIssues - issues.length)) ? PAGE_SIZE : (totalIssues - issues.length)}) }}
                         </v-btn>
                     </div>
                 </template>
@@ -156,15 +156,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch, type PropType } from "vue";
 import { useI18n } from "vue-i18n";
 import {
-    IssueSeverity,
-    QualityDimension,
-    RELATED_ENTITY_TARGETS,
+    ISSUE_TARGETS,
     SEVERITY_COLORS,
     type ConstraintSummary,
-    type DataQualityIssue
+    type DataQualityIssue,
+    type IssueFilters
 } from "@/models/RevisionModel";
 import { EntityType } from "@/models/MergeModel";
 import DataQualityService from "@/services/revision/DataQualityService";
@@ -183,13 +182,6 @@ import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import DataQualityIssueDetailsModal from "@/components/core/revisions/DataQualityIssueDetailsModal.vue";
 
-
-interface IssueFilters {
-    target?: string;
-    dimension?: QualityDimension;
-    severity?: IssueSeverity;
-    constraintKey?: string;
-}
 
 interface IssueScope {
     entityType: string;
@@ -222,20 +214,25 @@ export default defineComponent({
             default: undefined
         },
         // Read once at creation so a lazily rendered table's first fetch is already narrowed.
-        initialTarget: {
+        initialFilters: {
+            type: Object as PropType<IssueFilters>,
+            default: undefined
+        },
+        assessmentDate: {
             type: String,
             default: undefined
         }
     },
-    setup(props) {
+    emits: ["update:filters"],
+    setup(props, { emit }) {
         const issues = ref<DataQualityIssue[]>([]);
         const loading = ref(false);
         const loadingMore = ref(false);
         const nextCursor = ref<string | null>(null);
         const totalIssues = ref(0);
-        const filters = ref<IssueFilters>({ ...EMPTY_FILTERS, target: props.initialTarget });
+        const filters = ref<IssueFilters>({ ...EMPTY_FILTERS, ...props.initialFilters });
 
-        const targetOptions = Object.values(RELATED_ENTITY_TARGETS);
+        const targetOptions = [...ISSUE_TARGETS];
         const dimensionOptions = ref(getQualityDimensionsForGivenLocale());
         const severityOptions = ref(getIssueSeveritiesForGivenLocale());
 
@@ -277,19 +274,29 @@ export default defineComponent({
                 props.profileName, filters.value.target
             ).then(response => {
                 constraints.value = response.data;
+                dropUnknownConstraint();
             }).catch(() => {
                 constraints.value = [];
             });
+        };
+
+        // Only judged against a loaded list; before that a seeded key would be wiped unread.
+        const dropUnknownConstraint = () => {
+            const constraintKey = filters.value.constraintKey;
+
+            if (constraintKey &&
+                !constraints.value.some(constraint => constraint.key === constraintKey)) {
+                filters.value.constraintKey = undefined;
+            }
         };
 
         // Only the newest in-flight request may write the rows.
         let latestRequest = 0;
 
         const fetchIssues = (append = false) => {
-            const request = ++latestRequest;
+            const requestId = ++latestRequest;
 
-            // TODO: the repository-wide listing has no endpoint yet.
-            if (!props.profileName || !scope.value) {
+            if (!props.profileName) {
                 issues.value = [];
                 totalIssues.value = 0;
                 nextCursor.value = null;
@@ -305,18 +312,20 @@ export default defineComponent({
                 nextCursor.value = null;
             }
 
-            DataQualityService.getIssuesForEntity(
-                scope.value.entityType,
-                scope.value.entityId,
-                props.profileName,
-                filters.value.target,
-                filters.value.dimension,
-                filters.value.severity,
-                filters.value.constraintKey,
-                append ? nextCursor.value ?? undefined : undefined,
-                PAGE_SIZE
-            ).then(response => {
-                if (request !== latestRequest) {
+            const cursor = append ? nextCursor.value ?? undefined : undefined;
+
+            const request = scope.value
+                ? DataQualityService.getIssuesForEntity(
+                    scope.value.entityType, scope.value.entityId, props.profileName,
+                    filters.value.target, filters.value.dimension, filters.value.severity,
+                    filters.value.constraintKey, props.assessmentDate, cursor, PAGE_SIZE)
+                : DataQualityService.getRepositoryIssues(
+                    props.profileName, filters.value.target, filters.value.dimension,
+                    filters.value.severity, filters.value.constraintKey, props.assessmentDate,
+                    cursor, PAGE_SIZE);
+
+            request.then(response => {
+                if (requestId !== latestRequest) {
                     return;
                 }
 
@@ -326,7 +335,7 @@ export default defineComponent({
                 totalIssues.value = response.data.totalIssues;
                 nextCursor.value = response.data.nextCursor;
             }).catch(() => {
-                if (request !== latestRequest) {
+                if (requestId !== latestRequest) {
                     return;
                 }
 
@@ -337,7 +346,7 @@ export default defineComponent({
                     nextCursor.value = null;
                 }
             }).finally(() => {
-                if (request === latestRequest) {
+                if (requestId === latestRequest) {
                     loading.value = false;
                     loadingMore.value = false;
                 }
@@ -372,18 +381,23 @@ export default defineComponent({
             filters.value = { ...EMPTY_FILTERS };
         };
 
-        // Re-applying the filter already in place still refreshes the rows.
-        const filterByTarget = (target: string) => {
-            const alreadyFiltered = filters.value.target === target &&
-                !filters.value.dimension && !filters.value.severity &&
-                !filters.value.constraintKey;
+        const sameFilters = (first: IssueFilters, second: IssueFilters) =>
+            first.target === second.target && first.dimension === second.dimension &&
+            first.severity === second.severity && first.constraintKey === second.constraintKey;
 
-            filters.value = { ...EMPTY_FILTERS, target };
+        // Re-applying the filters already in place still refreshes the rows.
+        const applyFilters = (next: IssueFilters) => {
+            const merged = { ...EMPTY_FILTERS, ...next };
 
-            if (alreadyFiltered) {
+            if (sameFilters(filters.value, merged)) {
                 resetAndFetch();
+                return;
             }
+
+            filters.value = merged;
         };
+
+        const filterByTarget = (target: string) => applyFilters({ target });
 
         const detailsDialog = ref(false);
         const detailsAssessmentId = ref<number | undefined>(undefined);
@@ -406,7 +420,9 @@ export default defineComponent({
             severityOptions.value = getIssueSeveritiesForGivenLocale();
         });
 
-        watch(() => [props.profileName, props.personId, props.organisationUnitId], () => {
+        watch(() => [
+            props.profileName, props.personId, props.organisationUnitId, props.assessmentDate
+        ], () => {
             fetchConstraints();
             resetAndFetch();
         }, { immediate: true });
@@ -414,14 +430,7 @@ export default defineComponent({
         watch(() => filters.value.target, fetchConstraints);
 
         watch(filters, () => {
-            const constraintKey = filters.value.constraintKey;
-
-            if (constraintKey &&
-                !constraintOptions.value.some(option => option.value === constraintKey)) {
-                filters.value.constraintKey = undefined;
-                return;
-            }
-
+            emit("update:filters", { ...filters.value });
             resetAndFetch();
         }, { deep: true });
 
@@ -429,7 +438,7 @@ export default defineComponent({
             issues, loading, loadingMore, nextCursor, totalIssues, filters, scope, loadMore,
             PAGE_SIZE,
             severityColors: SEVERITY_COLORS, targetOptions, dimensionOptions, severityOptions, constraintOptions,
-            clearFilters, resetAndFetch, filterByTarget, showIssueDetails,
+            clearFilters, resetAndFetch, filterByTarget, applyFilters, showIssueDetails,
             detailsDialog, detailsAssessmentId, detailsRuleKey,
             detailsRecordNameSr, detailsRecordNameOther,
             getLandingPageBasePath, returnCurrentLocaleContent, displayTextOrPlaceholder,

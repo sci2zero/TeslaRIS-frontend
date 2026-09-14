@@ -215,7 +215,6 @@ export default defineComponent({
             });
         };
 
-        // TODO: the drill-down into the issues of an entity type is not implemented yet.
         const openIssues = (entityType: RepositoryEntityType, ruleKey?: string | null) => {
             emit("openIssues", { entityType, ruleKey });
         };

@@ -121,7 +121,8 @@ export default {
         identifiers: "Identifikatori",
         submitPerformanceRelatedOutput: "Dodavanje rezultata vezanog za performans",
         performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans",
-        repositoryAnalytics: "Analitika repozitorijuma"
+        repositoryAnalytics: "Analitika repozitorijuma",
+        issueExplorer: "Pregled problema"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
