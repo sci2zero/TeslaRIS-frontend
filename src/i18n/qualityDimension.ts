@@ -3,25 +3,23 @@ import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const qualityDimensionSr = [
-    { title: "Potpunost", value: QualityDimension.COMPLETENESS },
-    { title: "Ispravnost", value: QualityDimension.VALIDITY },
-    { title: "Jedinstvenost", value: QualityDimension.UNIQUENESS },
-    { title: "Doslednost", value: QualityDimension.CONSISTENCY },
-    { title: "Ažurnost", value: QualityDimension.TIMELINESS },
     { title: "Tačnost", value: QualityDimension.ACCURACY },
-    { title: "Usaglašenost", value: QualityDimension.CONFORMITY },
-    { title: "Integritet", value: QualityDimension.INTEGRITY }
+    { title: "Doslednost", value: QualityDimension.CONSISTENCY },
+    { title: "Poreklo", value: QualityDimension.LINEAGE },
+    { title: "Strukturna doslednost", value: QualityDimension.STRUCTURAL_CONSISTENCY },
+    { title: "Kvalitativnost", value: QualityDimension.QUALITATIVE },
+    { title: "Semantika", value: QualityDimension.SEMANTIC },
+    { title: "Ažurnost", value: QualityDimension.CURRENCY }
 ];
 
 export const qualityDimensionEn = [
-    { title: "Completeness", value: QualityDimension.COMPLETENESS },
-    { title: "Validity", value: QualityDimension.VALIDITY },
-    { title: "Uniqueness", value: QualityDimension.UNIQUENESS },
-    { title: "Consistency", value: QualityDimension.CONSISTENCY },
-    { title: "Timeliness", value: QualityDimension.TIMELINESS },
     { title: "Accuracy", value: QualityDimension.ACCURACY },
-    { title: "Conformity", value: QualityDimension.CONFORMITY },
-    { title: "Integrity", value: QualityDimension.INTEGRITY }
+    { title: "Consistency", value: QualityDimension.CONSISTENCY },
+    { title: "Lineage", value: QualityDimension.LINEAGE },
+    { title: "Structural Consistency", value: QualityDimension.STRUCTURAL_CONSISTENCY },
+    { title: "Qualitative", value: QualityDimension.QUALITATIVE },
+    { title: "Semantic", value: QualityDimension.SEMANTIC },
+    { title: "Currency", value: QualityDimension.CURRENCY }
 ];
 
 export const getQualityDimensionTitleFromValueAutoLocale = (value: QualityDimension) => {
