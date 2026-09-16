@@ -413,3 +413,9 @@ export interface FlexibleDate {
     day?: number;
     text?: string;
 }
+
+export interface FeatureModuleToggles {
+    toggleAssessmentModule: boolean;
+    toggleDigitalLibrary: boolean;
+    toggleDigitalRepository: boolean;
+}

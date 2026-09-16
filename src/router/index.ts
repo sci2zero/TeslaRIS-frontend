@@ -87,6 +87,7 @@ import ReportsView from "@/views/reporting/ReportsView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
+import FeatureModuleTogglesView from "@/views/FeatureModuleTogglesView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
@@ -1232,7 +1233,19 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "assessment",                 
+                    path: "feature-module-toggles",
+                    name: "featureModuleToggles",
+                    component: FeatureModuleTogglesView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "assessment",
+                    meta: {
+                        requiredModule: "ASSESSMENT"
+                    },
                     children: [
                         {
                             path: "indicators",

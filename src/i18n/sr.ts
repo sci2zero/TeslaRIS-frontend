@@ -122,7 +122,8 @@ export default {
         submitPerformanceRelatedOutput: "Dodavanje rezultata vezanog za performans",
         performanceRelatedOutputLandingPage: "Detalji rezultata vezanog za performans",
         repositoryAnalytics: "Analitika repozitorijuma",
-        issueExplorer: "Pregled problema"
+        issueExplorer: "Pregled problema",
+        featureModuleToggles: "Konfiguracija modula sistema"
     },
     emailLabel: "Email",
     passwordLabel: "Lozinka",
@@ -1046,6 +1047,9 @@ export default {
     shareLabel: "Podeli preko",
     trustNewPublicationsLabel: "Potrebna je validacija novih publikacija",
     trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
+    toggleAssessmentModuleLabel: "Modul za vrednovanje je omogućen",
+    toggleDigitalLibraryLabel: "Biblioteka završnih radova je omogućena",
+    toggleDigitalRepositoryLabel: "Digitalni repozitorijum je omogućen",
     updateOrganisationUnitTrustConfigurationLabel: "Ažuriraj nivo poverenja za nove entitete",
     validateMetadataLabel: "Validiraj metapodatke",
     validateUploadedFilesLabel: "Validiraj otpremljene fajlove",
@@ -1071,6 +1075,7 @@ export default {
     signInWithOrcidLabel: "Uloguj se putem ORCID-a",
     authorizingLabel: "Autorizuje se {name}",
     pleaseWaitLabel: "Molimo Vas, sačekajte",
+    applyingChangesLabel: "Primena izmena...",
     redirectingLabel: "Redirektovanje...",
     orcidNotLinked: "Vaš ORCID ID nije specificiran ni u jednom profilu istraživača.",
     accountNotActivated: "Vaš nalog nije aktiviran.",

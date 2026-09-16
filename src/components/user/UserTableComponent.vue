@@ -26,6 +26,7 @@
                     @failure="displayFormNotification" 
                 />
                 <register-employee-modal
+                    v-if="isAssessmentModuleEnabled"
                     :employee-role="UserRole.COMMISSION"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
@@ -164,6 +165,7 @@ import { isEqual } from 'lodash';
 import UserEmailChangeModal from './UserEmailChangeModal.vue';
 import RegisterResearcherModal from './RegisterResearcherModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 export default defineComponent({
@@ -187,6 +189,8 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
+
+        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
 
         const accountsThatAllowedRoleTaking = ref<number[]>([]);
 
@@ -347,7 +351,8 @@ export default defineComponent({
             getTitleFromValueAutoLocale, setSortAndPageOption,
             accountsThatAllowedRoleTaking, UserRole, deleteUser,
             generateNewPassword, notifyUserAboutMigration,
-            notifyEmailChanged, resendActivationEmail
+            notifyEmailChanged, resendActivationEmail,
+            isAssessmentModuleEnabled
         };
     }
 });

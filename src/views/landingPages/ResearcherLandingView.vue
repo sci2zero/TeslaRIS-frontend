@@ -20,6 +20,7 @@
                             @select-primary="selectPrimaryName"
                         />
                         <generic-crud-modal
+                            v-if="isAssessmentModuleEnabled"
                             class="ml-2" 
                             :form-component="AssessmentResearchAreaForm"
                             :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
@@ -100,7 +101,7 @@
             <v-tab v-show="personIndicators && personIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab value="assessments">
+            <v-tab v-show="isAssessmentModuleEnabled" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab value="visualizations">
@@ -385,6 +386,7 @@ import UserService from '@/services/UserService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -411,6 +413,8 @@ export default defineComponent({
         
         const router = useRouter();
         const currentRoute = useRoute();
+
+        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
 
         const person = ref<PersonResponse>();
         const country = ref<Country>();
@@ -814,7 +818,7 @@ export default defineComponent({
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
-            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
+            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate, isAssessmentModuleEnabled,
             EntityType, isViceDeanForScience, dataQualityTabsRef, showAssessmentDetails
         };
 }});

@@ -20,8 +20,8 @@
             ref="tableRef"
             :users="users"
             :total-users="totalUsers"
-            @switch-page="switchPage">
-        </user-table-component>
+            @switch-page="switchPage"
+        />
     </v-container>
 </template>
 

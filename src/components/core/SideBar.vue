@@ -111,6 +111,7 @@
 </template>
 
 <script setup lang="ts">
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 import { useUserRole } from '@/composables/useUserRole';
 import AuthenticationService from '@/services/AuthenticationService';
 import PersonService from '@/services/PersonService';
@@ -132,6 +133,8 @@ const {
     isInstitutionalLibrarian,
     isPromotionRegistryAdministrator
 } = useUserRole();
+
+const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
@@ -265,6 +268,7 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'deduplication', label: computed(() => i18n.t('routeLabel.deduplication')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'branding', label: computed(() => i18n.t('brandingLabel')), to: '/branding', icon: 'mdi-palette' },
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },
+    { key: 'feature-module-toggles', label: computed(() => i18n.t('routeLabel.featureModuleToggles')), to: '/feature-module-toggles', icon: 'mdi-toggle-switch-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'language-tags', label: computed(() => i18n.t('routeLabel.languageTags')), to: '/language-tags', icon: 'mdi-tag-multiple-outline' },
     { key: 'health-check', label: computed(() => i18n.t('routeLabel.healthCheck')), to: '/health-check', icon: 'mdi-heart-pulse' },
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
@@ -326,7 +330,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/assessment', 
         icon: 'mdi-clipboard-check',
         subItems: assessmentsMenu.value,
-        condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
+        condition: computed(() => isAssessmentModuleEnabled.value && loginStore.userLoggedIn && isAdmin.value)
     },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isInstitutionalEditor.value)) },
     { key: 'thesis-library-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/thesis-library-reporting', icon: 'mdi-file-chart', condition: computed(() => (isHeadOfLibrary.value)) },
@@ -352,7 +356,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
-    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => isAssessmentModuleEnabled.value && !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) }
 ]);

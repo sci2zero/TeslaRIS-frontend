@@ -69,6 +69,15 @@ import TutorialOverlay from "@/components/core/TutorialOverlay.vue";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useTutorialStore } from "@/stores/tutorialStore";
 import { useGlobalLoading } from "./composables/useGlobalLoading";
+import FeatureModuleTogglesService from "@/services/FeatureModuleTogglesService";
+import type { FeatureModuleToggles } from "@/models/Common";
+
+
+const moduleEnabled: Record<string, (toggles: FeatureModuleToggles) => boolean> = {
+    ASSESSMENT: toggles => toggles.toggleAssessmentModule,
+    DIGITAL_LIBRARY: toggles => toggles.toggleDigitalLibrary,
+    DIGITAL_REPOSITORY: toggles => toggles.toggleDigitalRepository
+};
 
 
 export default defineComponent({
@@ -197,6 +206,27 @@ export default defineComponent({
                 
                 next();
             }
+        });
+
+        router.beforeEach(async (to: any) => {
+            const requiredModule = to.matched
+                .map((record: any) => record.meta.requiredModule as string | undefined)
+                .find((module: string | undefined) => module !== undefined);
+
+            if (!requiredModule) {
+                return true;
+            }
+
+            try {
+                const response = await FeatureModuleTogglesService.fetchConfigurationForSystem();
+                if (!moduleEnabled[requiredModule](response.data)) {
+                    return { name: "notFound", params: { locale: to.params.locale } };
+                }
+            } catch (error) {
+                console.error("Failed to fetch feature module toggles, allowing navigation:", error);
+            }
+
+            return true;
         });
 
         // Configure axios to always include JWT and JWT-fingerprint when sending a request

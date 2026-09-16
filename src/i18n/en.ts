@@ -121,7 +121,8 @@ export default {
         submitPerformanceRelatedOutput: "Submit performance related output",
         performanceRelatedOutputLandingPage: "Performance related output details",
         repositoryAnalytics: "Repository analytics",
-        issueExplorer: "Issue explorer"
+        issueExplorer: "Issue explorer",
+        featureModuleToggles: "Feature module configuration"
     },
     emailLabel: "Email",
     passwordLabel: "Password",
@@ -1045,6 +1046,9 @@ export default {
     shareLabel: "Share via",
     trustNewPublicationsLabel: "Validation is needed for new publications",
     trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
+    toggleAssessmentModuleLabel: "Assessment module is enabled",
+    toggleDigitalLibraryLabel: "Thesis library is enabled",
+    toggleDigitalRepositoryLabel: "Digital repository is enabled",
     updateOrganisationUnitTrustConfigurationLabel: "Update trust level configuration for new entities",
     validateMetadataLabel: "Validate metadata",
     validateUploadedFilesLabel: "Validate uploaded files",
@@ -1070,6 +1074,7 @@ export default {
     signInWithOrcidLabel: "Sign in with ORCID",
     authorizingLabel: "Authorizing {name}",
     pleaseWaitLabel: "Please wait",
+    applyingChangesLabel: "Applying changes...",
     redirectingLabel: "Redirecting...",
     orcidNotLinked: "Your ORCID ID is not specified in any researcher profile.",
     accountNotActivated: "Your account is not activated.",
