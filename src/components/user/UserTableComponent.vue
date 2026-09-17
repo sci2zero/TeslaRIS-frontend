@@ -32,16 +32,19 @@
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.HEAD_OF_LIBRARY"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
@@ -190,7 +193,10 @@ export default defineComponent({
         const snackbarText = ref("");
         const timeout = 5000;
 
-        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+        const { 
+            isAssessmentModuleEnabled,
+            isDigitalLibraryEnabled
+        } = useFeatureModuleToggles();
 
         const accountsThatAllowedRoleTaking = ref<number[]>([]);
 
@@ -352,7 +358,7 @@ export default defineComponent({
             accountsThatAllowedRoleTaking, UserRole, deleteUser,
             generateNewPassword, notifyUserAboutMigration,
             notifyEmailChanged, resendActivationEmail,
-            isAssessmentModuleEnabled
+            isAssessmentModuleEnabled, isDigitalLibraryEnabled
         };
     }
 });

@@ -162,7 +162,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-if="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -204,8 +204,8 @@
                     :document="monographPublication"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     :proofs="monographPublication?.proofs"
-                    :file-items="monographPublication?.fileItems">
-                </attachment-section>
+                    :file-items="monographPublication?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -213,15 +213,15 @@
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="monographPublication?.description"
                     :can-edit="canEdit && !monographPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="monographPublication?.remark"
@@ -344,6 +344,7 @@ import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -368,7 +369,16 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -558,8 +568,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality,
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind, icon,
             languageTagMap, MonographPublicationUpdateForm,
@@ -573,7 +582,7 @@ export default defineComponent({
             updateRemark, displayConfiguration, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
             fetchMonographPublication, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, isDigitalRepositoryEnabled
         };
 }})
 

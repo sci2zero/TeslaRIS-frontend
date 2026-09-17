@@ -140,7 +140,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -181,8 +181,8 @@
                     :document="materialProduct"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     :proofs="materialProduct?.proofs"
-                    :file-items="materialProduct?.fileItems">
-                </attachment-section>
+                    :file-items="materialProduct?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -190,8 +190,8 @@
                     :keywords="materialProduct?.keywords ? materialProduct.keywords : []"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Research Area -->
                 <v-row>
@@ -201,8 +201,8 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="materialProduct?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas"
+                                />
 
                                 <h4 class="mt-5 mb-7">
                                     <strong>{{ $t("researchAreasLabel") }}</strong>
@@ -219,8 +219,8 @@
                 <description-section
                     :description="materialProduct?.description"
                     :can-edit="canEdit && !materialProduct?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="materialProduct?.remark"
@@ -344,6 +344,7 @@ import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -372,7 +373,16 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -563,8 +573,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality,
             materialProduct, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -580,7 +589,8 @@ export default defineComponent({
             getMaterialProductTypeTitleFromValueAutoLocale,
             documentIdentifiers, fetchIdentifiers, localiseDate,
             localiseFlexibleDate, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

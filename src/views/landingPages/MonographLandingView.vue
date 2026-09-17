@@ -192,7 +192,7 @@
             <v-tab value="contributions">
                 {{ $t(monograph?.monographType === MonographType.EDITED_BOOK ? "editorsAndReviewersLabel" : "contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -416,6 +416,7 @@ import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -443,7 +444,16 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -732,7 +742,8 @@ export default defineComponent({
             fetchIdentifiers, documentIdentifiers,
             MonographType, localiseFlexibleDate,
             fetchMonograph, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

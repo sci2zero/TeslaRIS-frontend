@@ -147,7 +147,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -188,8 +188,8 @@
                     :document="performanceRelatedOutput"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     :proofs="performanceRelatedOutput?.proofs"
-                    :file-items="performanceRelatedOutput?.fileItems">
-                </attachment-section>
+                    :file-items="performanceRelatedOutput?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -197,15 +197,15 @@
                     :keywords="performanceRelatedOutput?.keywords ? performanceRelatedOutput.keywords : []"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="performanceRelatedOutput?.description"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="performanceRelatedOutput?.remark"
@@ -324,6 +324,7 @@ import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -351,7 +352,16 @@ export default defineComponent({
         const performanceRelatedOutput = ref<PerformanceRelatedOutput>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -527,8 +537,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality,
             performanceRelatedOutput, icon, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -544,7 +553,8 @@ export default defineComponent({
             PerformanceRelatedOutputUpdateForm, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, updateRemark,
             localiseFlexibleDate, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

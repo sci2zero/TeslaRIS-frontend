@@ -156,7 +156,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryClient">
+            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -291,7 +291,10 @@ const endDate = ref<string>((new Date()).toISOString());
 
 const currentTab = ref("publicationCount");
 
-const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+const { 
+    isAssessmentModuleEnabled,
+    isDigitalLibraryEnabled
+ } = useFeatureModuleToggles();
 
 const {
     isInstitutionalLibrarian,

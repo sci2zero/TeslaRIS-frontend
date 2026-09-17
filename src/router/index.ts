@@ -1338,6 +1338,7 @@ const router = createRouter({
                     name: "thesisLibraryReporting",
                     component: ThesisLibraryReportView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.headOfLibrary, roles.admin],
                     },
@@ -1347,6 +1348,7 @@ const router = createRouter({
                     name: "thesisLibrarySearch",
                     component: ThesisLibrarySearchView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1356,6 +1358,7 @@ const router = createRouter({
                     name: "thesisLibraryBackup",
                     component: ThesisLibraryBackupView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1365,6 +1368,7 @@ const router = createRouter({
                     name: "publicDissertationsReport",
                     component: PublicReviewDissertationsView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1383,6 +1387,7 @@ const router = createRouter({
                     name: "promotions",
                     component: PromotionListView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1399,6 +1404,9 @@ const router = createRouter({
                 {
                     path: "registry-book",
                     name: "registryBookListParent",
+                    meta: {
+                        requiredModule: "DIGITAL_LIBRARY"
+                    },
                     children: [
                         {
                             path: "",

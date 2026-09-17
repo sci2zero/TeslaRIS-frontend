@@ -140,7 +140,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -201,8 +201,8 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="intangibleProduct?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas"
+                                />
 
                                 <h4 class="mt-5 mb-7">
                                     <strong>{{ $t("researchAreasLabel") }}</strong>
@@ -219,8 +219,8 @@
                 <description-section
                     :description="intangibleProduct?.description"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="intangibleProduct?.remark"
@@ -344,6 +344,7 @@ import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRem
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -361,6 +362,10 @@ export default defineComponent({
             nextTick(() => dataQualityTabsRef.value?.selectVersion(
                 version.majorVersion, version.minorVersion));
         };
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -561,8 +566,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality,
             intangibleProduct, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -578,7 +582,8 @@ export default defineComponent({
             getIntangibleProductTypeTitleFromValueAutoLocale,
             isAdmin, isCommission, fetchIdentifiers, documentIdentifiers,
             localiseFlexibleDate, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

@@ -158,7 +158,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -339,6 +339,7 @@ import { localiseFlexibleDate } from '@/utils/DateUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -366,7 +367,16 @@ export default defineComponent({
         const intellectualProperty = ref<IntellectualProperty>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -544,8 +554,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality,
             intellectualProperty, icon, currentTab, ApplicableEntityType,
             returnCurrentLocaleContent, IntellectualPropertyUpdateForm, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit, isResearcher,
@@ -559,7 +568,7 @@ export default defineComponent({
             getIntellectualPropertyTypeTitleFromValueAutoLocale,
             getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale,
             fetchIntellectualProperty, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails, isDigitalRepositoryEnabled
         };
 }})
 

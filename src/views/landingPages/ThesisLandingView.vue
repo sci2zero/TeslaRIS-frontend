@@ -9,9 +9,10 @@
                             :loading="!thesis"
                             type="heading"
                             color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
+                            class="text-center">
+                            <rich-title-renderer
+                                :title="returnCurrentLocaleContent(thesis?.title)"
+                            />
                             <div>
                                 <generic-crud-modal
                                     class="mb-6"
@@ -24,7 +25,10 @@
                                     @update="updateTitle"
                                 />
                             </div>
-                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"></rich-title-renderer>
+                            <rich-title-renderer
+                                v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0"
+                                :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"
+                            />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
@@ -286,7 +290,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="userCanPutOnPublicReview" class="actions-box pa-4">
+        <div v-if="isDigitalLibraryEnabled && userCanPutOnPublicReview" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -404,7 +408,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -635,6 +639,7 @@ import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -652,6 +657,11 @@ export default defineComponent({
             nextTick(() => dataQualityTabsRef.value?.selectVersion(
                 version.majorVersion, version.minorVersion));
         };
+
+        const {
+            isDigitalLibraryEnabled,
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -1067,8 +1077,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
+            canAssessDataQuality, canReviewDataQuality, isDigitalLibraryEnabled,
             thesis, icon, publisher, createIndicator, languageTagMap,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
@@ -1087,7 +1096,8 @@ export default defineComponent({
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,
             fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience
+            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience,
+            isDigitalRepositoryEnabled
         };
 }})
 

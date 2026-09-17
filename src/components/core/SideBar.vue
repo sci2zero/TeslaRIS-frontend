@@ -134,7 +134,10 @@ const {
     isPromotionRegistryAdministrator
 } = useUserRole();
 
-const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+const { 
+    isAssessmentModuleEnabled, 
+    isDigitalLibraryEnabled 
+} = useFeatureModuleToggles();
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
@@ -340,7 +343,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => !loginStore.userLoggedIn)
+        condition: computed(() => isDigitalLibraryEnabled.value && !loginStore.userLoggedIn)
     },
     { 
         key: 'thesis-library', 
@@ -348,7 +351,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => (isAdmin.value || isResearcher.value))
+        condition: computed(() => (isDigitalLibraryEnabled.value && (isAdmin.value || isResearcher.value)))
     },
     { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },

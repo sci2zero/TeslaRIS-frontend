@@ -280,7 +280,7 @@
                         <td>
                             <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi"></identifier-menu>
                         </td>
-                        <td>
+                        <td v-if="isDigitalRepositoryEnabled">
                             <v-menu
                                 v-if="richResultsView"
                                 :close-on-content-click="true"
@@ -320,7 +320,11 @@
                             </div>
                         </td>
                         <td>
-                            <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
+                            <v-btn
+                                v-if="inClaimer"
+                                size="small"
+                                color="primary"
+                                @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
                             <v-btn
@@ -335,8 +339,8 @@
                                 :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
                                 :disabled="!item.year || item.year < 0"
                                 @classified="documentClassified(item)"
-                                @update="refreshTable(tableOptions)">
-                            </entity-classification-modal-content>
+                                @update="refreshTable(tableOptions)"
+                            />
                             <v-btn
                                 v-if="validationView"
                                 size="small"
@@ -414,6 +418,7 @@ import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUn
 import IdentifierMenu from '../core/IdentifierMenu.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 import { getApplicableEntityTypeForDocumentType } from '@/i18n/applicableEntityType';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 export default defineComponent({
@@ -515,6 +520,10 @@ export default defineComponent({
 
         const tableWrapper = ref<any>(null);
 
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         onMounted(() => {
             if ((props.inClaimer ||
                 isAdmin.value ||
@@ -599,9 +608,21 @@ export default defineComponent({
                 sortable: true, 
                 key: "type"
             },
-            { title: "DOI", align: "start", sortable: true, key: "doi"},
-            { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
+            { title: "DOI", align: "start", sortable: true, key: "doi"}
         ]);
+
+        const documentDownloadHeader = { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"};
+
+        watch(isDigitalRepositoryEnabled, (enabled) => {
+            const index = headers.value.findIndex((header: any) => header.key === "documentDownload");
+
+            if (enabled && index === -1) {
+                const doiIndex = headers.value.findIndex((header: any) => header.key === "doi");
+                headers.value.splice(doiIndex + 1, 0, documentDownloadHeader);
+            } else if (!enabled && index !== -1) {
+                headers.value.splice(index, 1);
+            }
+        }, { immediate: true });
 
         // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
         const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"})
@@ -920,7 +941,8 @@ export default defineComponent({
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
             toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
             getPublicationTypeIcon, titleColumn, yearHeader, displayPersistentDialog,
-            startDeletionProcess, getApplicableEntityTypeForDocumentType
+            startDeletionProcess, getApplicableEntityTypeForDocumentType,
+            isDigitalRepositoryEnabled
         };
     }
 });
