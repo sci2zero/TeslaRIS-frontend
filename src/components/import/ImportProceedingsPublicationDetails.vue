@@ -77,7 +77,7 @@
         <v-row>
             <v-col cols="10">
                 <input-with-suggestions
-                    :suggestions="getSuggestions('documentDate')"
+                    :suggestions="getSuggestions('documentDate').map(d => d?.year ? String(d.year) : d)"
                     :apply-suggestion="s => publicationYear = s"
                     :suggestion-label="s => s"
                     :input-value="publicationYear">
