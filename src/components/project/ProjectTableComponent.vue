@@ -5,7 +5,21 @@
         </template>
         <template #action-items>
             <v-list-item
-                v-if="allowBulkActions"
+                v-if="allowUnbinding"
+                class="action-menu-item"
+                @click="displayUnbindDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-link-variant-off
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ isInstitutionalEditor ? $t("removeInstitutionFromProjectLabel") : $t("removeFromProjectLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+            <v-list-item
+                v-else-if="allowBulkActions"
                 class="action-menu-item"
                 @click="startDeletionProcess"
             >
@@ -130,6 +144,13 @@
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedProjects.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
         @continue="deleteSelection" />
+
+    <persistent-question-dialog
+        v-model="displayUnbindDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmUnbindingMessage')"
+        :entity-names="selectedProjects.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="unbindSelection" />
 </template>
 
 <script setup lang="ts">
@@ -152,9 +173,11 @@ const tableProps = withDefaults(defineProps<{
     totalProjects: number;
     hasActiveStatusFilters?: boolean;
     hideBulkActions?: boolean;
+    allowUnbinding?: boolean;
 }>(), {
     hasActiveStatusFilters: false,
-    hideBulkActions: false
+    hideBulkActions: false,
+    allowUnbinding: false
 });
 
 const emit = defineEmits<{
@@ -173,9 +196,12 @@ const statusLabel = computed(() => i18n.t("statusLabel"));
 const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
 const dateToLabel = computed(() => i18n.t("dateToLabel"));
 
-const { isAdmin } = useUserRole();
+const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
 
-const allowBulkActions = computed(() => isAdmin.value && !tableProps.hideBulkActions);
+const allowUnbinding = computed(() =>
+    tableProps.allowUnbinding && (isResearcher.value || isInstitutionalEditor.value));
+const allowBulkActions = computed(() =>
+    (isAdmin.value && !tableProps.hideBulkActions) || allowUnbinding.value);
 
 const nameColumn = computed(() => i18n.t("nameColumn"));
 const coordinatorNameColumn = computed(() => i18n.t("coordinatorNameColumn"));
@@ -250,6 +276,31 @@ const deleteSelection = () => {
     });
 };
 
+const unbindSelection = () => {
+    const unbind = isInstitutionalEditor.value ?
+        (projectId: number) => ProjectService.unbindInstitutionResearchersFromProject(projectId) :
+        (projectId: number) => ProjectService.unbindResearcherFromProject(projectId);
+
+    const successMessage = isInstitutionalEditor.value ?
+        "massInstitutionProjectUnbindSuccessMessage" : "massProjectUnbindSuccessMessage";
+
+    Promise.all(selectedProjects.value.map((project: ProjectIndex) => {
+        const name = i18n.locale.value.startsWith("sr") ? project.nameSr : project.nameOther;
+
+        return unbind(project.databaseId)
+            .then(() => {
+                addNotification(i18n.t(successMessage, { name }));
+            })
+            .catch(() => {
+                addNotification(i18n.t("projectUnbindFailedMessage", { name }));
+                return project;
+            });
+    })).then((failedUnbindings) => {
+        selectedProjects.value = selectedProjects.value.filter((project) => failedUnbindings.includes(project));
+        refreshTable(tableOptions.value);
+    });
+};
+
 const setSortAndPageOption = (sortBy: {key: string, order: string}[], page: number) => {
     if (
         (
@@ -272,6 +323,7 @@ const setSortAndPageOption = (sortBy: {key: string, order: string}[], page: numb
 };
 
 const displayPersistentDialog = ref(false);
+const displayUnbindDialog = ref(false);
 const startDeletionProcess = () => {
     displayPersistentDialog.value = true;
 };

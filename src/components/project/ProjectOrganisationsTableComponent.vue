@@ -2,7 +2,7 @@
     <table-toolbar
         :title="$t('consortiumLabel')"
         :selected-count="selectedMembers.length"
-        :can-act="canEdit"
+        :can-act="canRemoveMembers"
     >
         <template #action-items>
             <v-list-item
@@ -37,14 +37,14 @@
             :items="sortedMembers"
             :headers="headers"
             item-value="id"
-            :show-select="canEdit"
+            :show-select="canRemoveMembers"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
             :no-data-text="$t('noDataInTableMessage')">
             <template #item="row">
                 <tr>
-                    <td v-if="canEdit">
+                    <td v-if="canRemoveMembers">
                         <v-checkbox
                             v-model="selectedMembers"
                             :value="row.item"
@@ -128,6 +128,7 @@ import { getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale } fr
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
+import { useUserRole } from "@/composables/useUserRole";
 
 const props = withDefaults(defineProps<{
     projectId: number;
@@ -142,6 +143,9 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
+const { isAdmin } = useUserRole();
+
+const canRemoveMembers = computed(() => props.canEdit && isAdmin.value);
 
 const selectedMembers = ref<OrganisationUnitProjectContribution[]>([]);
 

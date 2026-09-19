@@ -16,6 +16,7 @@
             :projects="projects"
             :total-projects="totalProjects"
             :has-active-status-filters="selectedStatuses.length > 0"
+            :allow-unbinding="returnOnlyMyProjects"
             @switch-page="switchPage">
             <template #top-left>
                 <search-bar-component
