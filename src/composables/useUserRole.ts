@@ -31,6 +31,7 @@ export function useUserRole() {
     });
 
     const canUserAddPublications = computed(() => userRole.value && userRole.value !== 'COMMISSION' && userRole.value !== 'VICE_DEAN_FOR_SCIENCE');
+    const canUserAddProjects = computed(() => isAdmin.value || isResearcher.value || isInstitutionalEditor.value);
     const returnOnlyInstitutionRelatedEntities = ref(isUserBoundToOU.value);
     const loggedInUser = ref<UserResponse | null>(null);
     const isUserLoggedIn = computed(() => loggedInUser.value !== null);
@@ -63,6 +64,7 @@ export function useUserRole() {
 
     return {
         userRole, canUserAddPublications,
+        canUserAddProjects,
         isUserBoundToOU, isInstitutionalEditor,
         returnOnlyInstitutionRelatedEntities,
         loggedInUser, isAdmin, isCommission,
