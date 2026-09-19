@@ -83,6 +83,14 @@ export class ProjectService extends BaseService {
         return super.sendRequest(axios.delete, `project/${projectId}`);
     }
 
+    async unbindResearcherFromProject(projectId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `project/${projectId}/unbind-researcher`);
+    }
+
+    async unbindInstitutionResearchersFromProject(projectId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.patch, `project/${projectId}/unbind-institution-researchers`);
+    }
+
     async canEdit(projectId: number): Promise<AxiosResponse<boolean>> {
         return super.sendRequest(axios.get, `project/${projectId}/can-edit`);
     }
