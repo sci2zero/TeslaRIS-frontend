@@ -380,7 +380,7 @@ const router = createRouter({
                             component: SubmitProjectView,
                             meta: {
                                 authenticated: true,
-                                authorities: [roles.admin],
+                                authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
                             },
                         },
                     ]
