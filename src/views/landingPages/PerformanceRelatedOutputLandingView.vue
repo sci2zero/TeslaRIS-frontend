@@ -250,6 +250,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
                     :entity-id="performanceRelatedOutput?.id"
+                    :restore-blocked-reason="performanceRelatedOutput?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchPerformanceRelatedOutput"
                     @show-assessment-details="showAssessmentDetails"
                 />

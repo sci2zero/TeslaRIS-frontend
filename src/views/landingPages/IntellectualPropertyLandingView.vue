@@ -261,6 +261,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.INTELLECTUAL_PROPERTY"
                     :entity-id="intellectualProperty?.id"
+                    :restore-blocked-reason="intellectualProperty?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchIntellectualProperty"
                     @show-assessment-details="showAssessmentDetails"
                 />

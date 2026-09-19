@@ -541,6 +541,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.THESIS"
                     :entity-id="thesis?.id"
+                    :restore-blocked-reason="restoreBlockedReason"
                     @restored="fetchThesis"
                     @show-assessment-details="showAssessmentDetails"
                 />
@@ -692,6 +693,18 @@ export default defineComponent({
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
+
+        const restoreBlockedReason = computed(() => {
+            if (thesis.value?.isArchived) {
+                return i18n.t("restoreArchivedDocumentMessage");
+            }
+
+            if (thesis.value?.isOnPublicReview || thesis.value?.isOnPublicReviewPause) {
+                return i18n.t("restoreThesisOnPublicReviewMessage");
+            }
+
+            return undefined;
+        });
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
 
@@ -1079,6 +1092,7 @@ export default defineComponent({
         return {
             canAssessDataQuality, canReviewDataQuality, isDigitalLibraryEnabled,
             thesis, icon, publisher, createIndicator, languageTagMap,
+            restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
             updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,

@@ -1582,6 +1582,8 @@ export default {
     bestAssessmentLabel: "Najbolja",
     confirmRevisionRestoreMessage: "Ova akcija će prebrisati trenutne metapodatke izabranom verzijom i zabeležiti je kao novu reviziju.",
     revisionRestoredMessage: "Vraćeno na verziju {version}.",
+    restoreArchivedDocumentMessage: "Arhivirani dokumenti ne mogu biti vraćeni na raniju verziju.",
+    restoreThesisOnPublicReviewMessage: "Teza ne može biti vraćena na raniju verziju dok je na uvidu javnosti.",
     versionLabel: "Verzija",
     versionNoteLabel: "Napomena uz verziju",
     createdByLabel: "Kreirao",

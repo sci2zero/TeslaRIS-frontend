@@ -1568,6 +1568,8 @@ export default {
     bestAssessmentLabel: "Best",
     confirmRevisionRestoreMessage: "This will overwrite the current metadata with the selected version and record it as a new revision.",
     revisionRestoredMessage: "Restored to version {version}.",
+    restoreArchivedDocumentMessage: "Archived documents cannot be restored to an earlier version.",
+    restoreThesisOnPublicReviewMessage: "A thesis cannot be restored while it is on public review.",
     versionLabel: "Version",
     versionNoteLabel: "Version note",
     createdByLabel: "Created by",

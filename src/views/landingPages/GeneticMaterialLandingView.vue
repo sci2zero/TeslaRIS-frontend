@@ -237,6 +237,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.GENETIC_MATERIAL"
                     :entity-id="geneticMaterial?.id"
+                    :restore-blocked-reason="geneticMaterial?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchGeneticMaterial"
                     @show-assessment-details="showAssessmentDetails"
                 />

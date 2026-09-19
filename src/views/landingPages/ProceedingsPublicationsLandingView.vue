@@ -266,6 +266,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
                     :entity-id="proceedingsPublication?.id"
+                    :restore-blocked-reason="proceedingsPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchProceedingsPublication"
                     @show-assessment-details="showAssessmentDetails"
                 />

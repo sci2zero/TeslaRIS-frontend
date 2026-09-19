@@ -63,15 +63,25 @@
                         @click="showDetailedAssessment(row.item)">
                         {{ $t("detailedAssessmentLabel") }}
                     </v-btn>
-                    <v-btn
+                    <v-tooltip
                         v-if="!isLatestRevision(row.item)"
-                        density="compact"
-                        variant="text"
-                        color="primary"
-                        :loading="restoreInProgress"
-                        @click="startRestoreProcess(row.item)">
-                        {{ $t("restoreRevisionLabel") }}
-                    </v-btn>
+                        :disabled="!restoreBlockedReason"
+                        :text="restoreBlockedReason"
+                        location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <span v-bind="tooltipProps">
+                                <v-btn
+                                    density="compact"
+                                    variant="text"
+                                    color="primary"
+                                    :disabled="!!restoreBlockedReason"
+                                    :loading="restoreInProgress"
+                                    @click="startRestoreProcess(row.item)">
+                                    {{ $t("restoreRevisionLabel") }}
+                                </v-btn>
+                            </span>
+                        </template>
+                    </v-tooltip>
                 </td>
             </tr>
             <tr v-if="isExpanded(row.item)">
@@ -194,6 +204,8 @@ import PersistentQuestionDialog from "@/components/core/comparators/PersistentQu
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 
+const RESTORE_BLOCKED_MESSAGES = ["restoreArchivedDocumentMessage", "restoreThesisOnPublicReviewMessage"];
+
 
 export default defineComponent({
     name: "RevisionHistoryTableComponent",
@@ -206,6 +218,10 @@ export default defineComponent({
         entityId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        restoreBlockedReason: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["restored", "showAssessmentDetails"],
@@ -369,6 +385,8 @@ export default defineComponent({
                     addNotification(
                         i18n.t("cantRestoreVersionMessage", [params[1], params[2]])
                     );
+                } else if (RESTORE_BLOCKED_MESSAGES.includes(message)) {
+                    addNotification(i18n.t(message));
                 } else {
                     addNotification(i18n.t("genericErrorMessage"));
                 }

@@ -265,6 +265,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.INTANGIBLE_PRODUCT"
                     :entity-id="intangibleProduct?.id"
+                    :restore-blocked-reason="intangibleProduct?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchIntangibleProduct"
                     @show-assessment-details="showAssessmentDetails"
                 />

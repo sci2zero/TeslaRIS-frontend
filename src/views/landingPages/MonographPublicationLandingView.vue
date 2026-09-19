@@ -266,6 +266,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
                     :entity-id="monographPublication?.id"
+                    :restore-blocked-reason="monographPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchMonographPublication"
                     @show-assessment-details="showAssessmentDetails"
                 />

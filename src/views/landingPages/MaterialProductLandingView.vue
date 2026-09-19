@@ -265,6 +265,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.MATERIAL_PRODUCT"
                     :entity-id="materialProduct?.id"
+                    :restore-blocked-reason="materialProduct?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchMaterialProduct"
                     @show-assessment-details="showAssessmentDetails"
                 />

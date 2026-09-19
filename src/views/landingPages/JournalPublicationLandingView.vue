@@ -285,6 +285,7 @@
                     class="mt-5"
                     :entity-type="PublicationType.JOURNAL_PUBLICATION"
                     :entity-id="journalPublication?.id"
+                    :restore-blocked-reason="journalPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchJournalPublication"
                     @show-assessment-details="showAssessmentDetails"
                 />
