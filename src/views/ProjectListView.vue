@@ -44,13 +44,20 @@
                                 hide-details
                             />
                             <v-checkbox
+                                v-if="!returnOnlyMyProjects"
                                 v-model="returnOnlyWithoutContributions"
                                 :label="$t('showOnlyWithoutContributions')"
                                 hide-details
                             />
+                            <v-checkbox
+                                v-if="canFilterOwnProjects"
+                                v-model="returnOnlyMyProjects"
+                                :label="isResearcher ? $t('showOnlyMyProjectsLabel') : $t('showEntitiesForMyInstitutionLabel')"
+                                hide-details
+                            />
                         </div>
                     </v-menu>
-                    <v-btn v-if="isAdmin" color="primary" @click="addProject">
+                    <v-btn v-if="canUserAddProjects" color="primary" @click="addProject">
                         {{ $t("createNewProjectLabel") }}
                     </v-btn>
                 </div>
@@ -96,7 +103,8 @@ import { useI18n } from 'vue-i18n';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useUserRole } from '@/composables/useUserRole';
 
-const { isAdmin } = useUserRole();
+const { canUserAddProjects, isResearcher, isInstitutionalEditor, loggedResearcherId, userInstitutionid } = useUserRole();
+const canFilterOwnProjects = computed(() => isResearcher.value || isInstitutionalEditor.value);
 const loading = ref(false);
 const searchParams = ref("tokens=");
 const projects = ref<ProjectIndex[]>([]);
@@ -111,6 +119,7 @@ const selectedStatuses = ref<{ title: string, value: ProjectStatus }[]>([]);
 
 const returnOnlyActiveProjects = ref(false);
 const returnOnlyWithoutContributions = ref(false);
+const returnOnlyMyProjects = ref(false);
 const initialLoad = ref(true);
 
 const i18n = useI18n();
@@ -135,6 +144,12 @@ watch(returnOnlyWithoutContributions, () => {
   }
 });
 
+watch(returnOnlyMyProjects, () => {
+    if (!initialLoad.value) {
+        clearSortAndPerformSearch(searchParams.value);
+    }
+});
+
 const clearSortAndPerformSearch = (tokenParams: string) => {
     tableRef.value?.setSortAndPageOption([], 1);
     page.value = 0;
@@ -145,12 +160,33 @@ const clearSortAndPerformSearch = (tokenParams: string) => {
 
 const search = (tokenParams: string) => {
     searchParams.value = tokenParams;
-    ProjectService.searchProjects(
-        `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`,
-        returnOnlyActiveProjects.value,
-        returnOnlyWithoutContributions.value,
-        selectedStatuses.value.map(status => status.value)
-    ).then((response) => {
+
+    const pageable = `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`;
+    const statuses = selectedStatuses.value.map(status => status.value);
+
+    let request;
+    if (returnOnlyMyProjects.value && isResearcher.value) {
+        if (loggedResearcherId.value <= 0) {
+            loading.value = false;
+            initialLoad.value = false;
+            return;
+        }
+        request = ProjectService.findProjectsForResearcher(
+            loggedResearcherId.value, pageable, returnOnlyActiveProjects.value, statuses);
+    } else if (returnOnlyMyProjects.value && isInstitutionalEditor.value) {
+        if (!userInstitutionid.value) {
+            loading.value = false;
+            initialLoad.value = false;
+            return;
+        }
+        request = ProjectService.findProjectsForOrganisationUnit(
+            userInstitutionid.value, pageable, returnOnlyActiveProjects.value, statuses);
+    } else {
+        request = ProjectService.searchProjects(
+            pageable, returnOnlyActiveProjects.value, returnOnlyWithoutContributions.value, statuses);
+    }
+
+    request.then((response) => {
         projects.value = response.data.content;
         totalProjects.value = response.data.totalElements;
     })
