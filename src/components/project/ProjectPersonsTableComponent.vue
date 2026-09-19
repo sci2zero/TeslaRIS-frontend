@@ -2,7 +2,7 @@
     <table-toolbar
         :title="$t('teamLabel')"
         :selected-count="selectedMembers.length"
-        :can-act="canEdit"
+        :can-act="canRemoveMembers"
     >
         <template #action-items>
             <v-list-item
@@ -27,6 +27,14 @@
                 @click="addDialog = true">
                 {{ $t("addTeamMemberLabel") }}
             </v-btn>
+            <v-btn
+                v-if="canUnbind"
+                color="primary"
+                variant="outlined"
+                prepend-icon="mdi-link-variant-off"
+                @click="displayUnbindDialog = true">
+                {{ isResearcher ? $t("removeFromProjectLabel") : $t("removeInstitutionFromProjectLabel") }}
+            </v-btn>
         </template>
     </table-toolbar>
 
@@ -36,14 +44,14 @@
             :items="sortedMembers"
             :headers="headers"
             item-value="id"
-            :show-select="canEdit"
+            :show-select="canRemoveMembers"
             return-object
             :items-per-page-text="$t('itemsPerPageLabel')"
             :items-per-page-options="[5, 10, 25, 50]"
             :no-data-text="$t('noDataInTableMessage')">
             <template #item="row">
                 <tr>
-                    <td v-if="canEdit">
+                    <td v-if="canRemoveMembers">
                         <v-checkbox
                             v-model="selectedMembers"
                             :value="row.item"
@@ -107,6 +115,12 @@
         :entity-names="selectedMembers.map(member => memberName(member))"
         @continue="removeSelected" />
 
+    <persistent-question-dialog
+        v-model="displayUnbindDialog"
+        :title="$t('areYouSureLabel')"
+        :message="isResearcher ? $t('researcherProjectUnbindWarning') : $t('institutionProjectUnbindWarning')"
+        @continue="unbind" />
+
     <toast v-model="snackbar" :message="snackbarMessage" />
 </template>
 
@@ -126,6 +140,7 @@ import { getPersonProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n
 import { getPersonProjectInvestigationRoleTitleFromValueAutoLocale } from "@/i18n/personProjectInvestigationRole";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
+import { useUserRole } from "@/composables/useUserRole";
 
 const props = withDefaults(defineProps<{
     projectId: number;
@@ -140,11 +155,16 @@ const emit = defineEmits<{
 }>();
 
 const i18n = useI18n();
+const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
+
+const canRemoveMembers = computed(() => props.canEdit && isAdmin.value);
+const canUnbind = computed(() => props.canEdit && (isResearcher.value || isInstitutionalEditor.value));
 
 const selectedMembers = ref<PersonProjectContribution[]>([]);
 
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);
+const displayUnbindDialog = ref(false);
 const isFormValid = ref<boolean | null>(null);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
@@ -223,6 +243,21 @@ const removeSelected = () => {
         selectedMembers.value = [];
         notifyError(error);
         emit("refresh");
+    });
+};
+
+const unbind = () => {
+    const request = isResearcher.value ?
+        ProjectService.unbindResearcherFromProject(props.projectId) :
+        ProjectService.unbindInstitutionResearchersFromProject(props.projectId);
+
+    request.then(() => {
+        notify(isResearcher.value ?
+            i18n.t("projectUnbindSuccessMessage") :
+            i18n.t("institutionProjectUnbindSuccessMessage"));
+        emit("refresh");
+    }).catch((error: AxiosError<ErrorResponse>) => {
+        notifyError(error);
     });
 };
 

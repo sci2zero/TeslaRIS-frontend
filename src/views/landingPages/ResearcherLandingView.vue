@@ -200,6 +200,12 @@
                                 />
                             </div>
                         </v-menu>
+                        <v-btn
+                            v-if="canEdit"
+                            color="primary" density="compact"
+                            @click="addProject">
+                            {{ $t("createNewProjectLabel") }}
+                        </v-btn>
                     </template>
                     <template #status-filter-menu>
                         <project-status-filter v-model="selectedProjectStatuses" />
@@ -805,6 +811,13 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
+        const addProject = () => {
+            router.push({
+                name: "submitProject",
+                query: isResearcher.value ? {} : {researcherId: personId.value}
+            });
+        };
+
         const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
             publicationSearchParams.value = tokenParams;
             publicationsRef.value?.setSortAndPageOption([], 1);
@@ -850,7 +863,8 @@ export default defineComponent({
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
             PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
             projects, totalProjects, projectsRef, switchProjectsPage,
-            selectedProjectStatuses, returnOnlyActiveProjects, clearSortAndPerformProjectSearch
+            selectedProjectStatuses, returnOnlyActiveProjects, clearSortAndPerformProjectSearch,
+            addProject
         };
 }});
 </script>

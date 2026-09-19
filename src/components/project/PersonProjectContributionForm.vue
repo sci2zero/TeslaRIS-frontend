@@ -9,6 +9,8 @@
                     :allow-external-associate="allowExternalAssociate"
                     is-update
                     :preset-contribution-value="input.contribution"
+                    show-top-suggestions
+                    :suggestion-display-check="checkWhetherCurrentUserShouldBeDisplayed"
                     @set-input="input.contribution = $event; sendContentToParent();"
                 />
             </v-col>
@@ -68,6 +70,7 @@ import PersonContributionBase from "../core/PersonContributionBase.vue";
 import MultilingualTextInput from "../core/MultilingualTextInput.vue";
 import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import { useLanguageTags } from "@/composables/useLanguageTags";
+import { useUserRole } from "@/composables/useUserRole";
 import {
     getPersonProjectContributionTypeTitleFromValueAutoLocale,
     getPersonProjectContributionTypesForGivenLocale
@@ -102,6 +105,7 @@ const emit = defineEmits<{
 }>();
 
 const { languageTags } = useLanguageTags();
+const { isResearcher } = useUserRole();
 
 const defaultContributionType = () =>
     props.lockContributionType ? props.lockContributionType[0] : PersonProjectContributionType.TEAM_MEMBER;
@@ -125,6 +129,14 @@ const inputs = ref<any[]>(
 );
 const baseContributionRef = ref<any>([]);
 const otherRoleDescriptionRef = ref<any>([]);
+
+const checkWhetherCurrentUserShouldBeDisplayed = (personId: number): boolean => {
+    if (!isResearcher.value || !inputs.value || inputs.value.length === 0) {
+        return false;
+    }
+
+    return inputs.value.find(input => input.contribution && input.contribution.personId === personId) === undefined;
+};
 
 onMounted(() => {
     if (props.presetContributions && props.presetContributions.length > 0) {
