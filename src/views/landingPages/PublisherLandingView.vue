@@ -48,7 +48,7 @@
                         </div>
                         <basic-info-loader v-if="!publisher" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.countryId">
                                     {{ $t("countryLabel") }}:
                                 </div>
@@ -62,13 +62,19 @@
                                     {{ returnCurrentLocaleContent(publisher?.state) }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.place && publisher?.place.length > 0">
                                     {{ $t("placeLabel") }}:
                                 </div>
                                 <div v-if="publisher?.place && publisher?.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(publisher?.place) }}
                                 </div>
+                            </v-col>
+                            <v-col v-if="isAdmin" cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.PUBLISHER"
+                                    :entity-id="publisher?.id"
+                                />
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -90,6 +96,28 @@
             @switch-page="switchPage"
         />
         
+        <!-- Revision History -->
+        <template v-if="canReviewDataQuality && canAssessDataQuality && publisher">
+            <h2 class="mt-8 mb-2">
+                {{ $t("revisionHistoryLabel") }}
+            </h2>
+            <revision-history-table-component
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
+                @restored="fetchPublisher"
+                @show-assessment-details="showAssessmentDetails"
+            />
+
+            <h2 class="mt-8 mb-2">
+                {{ $t("dataQualityLabel") }}
+            </h2>
+            <data-quality-tabs-component
+                ref="dataQualityTabsRef"
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
+            />
+        </template>
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
@@ -104,6 +132,7 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
@@ -115,12 +144,26 @@ import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            dataQualityTabsRef.value?.selectVersion(version.majorVersion, version.minorVersion);
+        };
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -142,11 +185,19 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PUBLISHER,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PublisherService.canEdit(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -226,13 +277,15 @@ export default defineComponent({
         };
 
         return {
-            publisher, icon,
-            publications, 
-            totalPublications,
-            switchPage,
+            canReviewDataQuality, canAssessDataQuality,
+            publisher, icon, publications, 
+            totalPublications, switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
-            updateBasicInfo, snackbar, snackbarMessage
+            updateBasicInfo, snackbar, snackbarMessage,
+            isAdmin, EntityType, fetchPublisher,
+            dataQualityTabsRef, showAssessmentDetails,
+            isViceDeanForScience
         };
 }})
 

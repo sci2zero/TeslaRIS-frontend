@@ -31,6 +31,7 @@
                 />
 
                 <v-checkbox
+                    v-if="isDigitalRepositoryEnabled"
                     v-model="nonValidFiles"
                     :label="$t('showNonValidatedFilesLabel')"
                     class="ml-4 mt-3"
@@ -44,7 +45,8 @@
                 :allow-comparison="isInstitutionalEditor"
                 validation-view
                 allow-selection
-                @switch-page="switchPage" />
+                @switch-page="switchPage"
+            />
         </div>
     </v-container>
 </template>
@@ -62,6 +64,7 @@ import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { ExportableEndpointType } from '@/models/Common';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -88,7 +91,14 @@ export default defineComponent({
         const nonValidFiles = ref(true);
         const selectedOrganisationUnit = ref<{title: string, value: number}>({title: "", value: -1});
 
-        const { isInstitutionalEditor, loggedInUser, isAdmin } = useUserRole();
+        const {
+            isInstitutionalEditor,
+            loggedInUser, isAdmin
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const previousFilterValues = ref<{publicationTypes: string[], metadata: boolean, files: boolean}>(
             {publicationTypes: [], metadata: true, files: true}
@@ -171,7 +181,7 @@ export default defineComponent({
             ExportableEndpointType, searchParams,
             resetFiltersAndSearch, loggedInUser, loading,
             nonValidMetadata, nonValidFiles, isAdmin,
-            selectedOrganisationUnit
+            selectedOrganisationUnit, isDigitalRepositoryEnabled
         };
     }
 });

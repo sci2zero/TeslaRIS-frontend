@@ -153,7 +153,8 @@ export enum ScheduledTaskType {
     MAINTENANCE = "MAINTENANCE",
     THESES_ASSESSMENT = "THESES_ASSESSMENT",
     MONOGRAPH_PUBLICATIONS_ASSESSMENT = "MONOGRAPH_PUBLICATIONS_ASSESSMENT",
-    METADATA_ENRICHMENT = "METADATA_ENRICHMENT"
+    METADATA_ENRICHMENT = "METADATA_ENRICHMENT",
+    QUALITY_ASSESSMENT_BACKFILL = "QUALITY_ASSESSMENT_BACKFILL"
 }
 
 export interface BrandingInformation {
@@ -411,6 +412,12 @@ export interface FlexibleDate {
     month?: number;
     day?: number;
     text?: string;
+}
+
+export interface FeatureModuleToggles {
+    toggleAssessmentModule: boolean;
+    toggleDigitalLibrary: boolean;
+    toggleDigitalRepository: boolean;
 }
 
 export interface Currency {

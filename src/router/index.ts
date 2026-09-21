@@ -96,6 +96,7 @@ import ReportsView from "@/views/reporting/ReportsView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
+import FeatureModuleTogglesView from "@/views/FeatureModuleTogglesView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
@@ -137,6 +138,8 @@ import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelated
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
 import FundingProgramListView from "@/views/FundingProgramListView.vue";
 import SubmitProjectView from "@/views/SubmitProjectView.vue";
+import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
+import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
 
 
 const roles = {
@@ -1368,7 +1371,19 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "assessment",                 
+                    path: "feature-module-toggles",
+                    name: "featureModuleToggles",
+                    component: FeatureModuleTogglesView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "assessment",
+                    meta: {
+                        requiredModule: "ASSESSMENT"
+                    },
                     children: [
                         {
                             path: "indicators",
@@ -1461,6 +1476,7 @@ const router = createRouter({
                     name: "thesisLibraryReporting",
                     component: ThesisLibraryReportView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.headOfLibrary, roles.admin],
                     },
@@ -1470,6 +1486,7 @@ const router = createRouter({
                     name: "thesisLibrarySearch",
                     component: ThesisLibrarySearchView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1479,6 +1496,7 @@ const router = createRouter({
                     name: "thesisLibraryBackup",
                     component: ThesisLibraryBackupView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1488,6 +1506,7 @@ const router = createRouter({
                     name: "publicDissertationsReport",
                     component: PublicReviewDissertationsView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1506,6 +1525,7 @@ const router = createRouter({
                     name: "promotions",
                     component: PromotionListView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1522,6 +1542,9 @@ const router = createRouter({
                 {
                     path: "registry-book",
                     name: "registryBookListParent",
+                    meta: {
+                        requiredModule: "DIGITAL_LIBRARY"
+                    },
                     children: [
                         {
                             path: "",
@@ -1550,6 +1573,24 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "repository-analytics",
+                    name: "repositoryAnalytics",
+                    component: RepositoryAnalyticsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "issue-explorer",
+                    name: "issueExplorer",
+                    component: IssueExplorerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
                     },
                 }
             ]

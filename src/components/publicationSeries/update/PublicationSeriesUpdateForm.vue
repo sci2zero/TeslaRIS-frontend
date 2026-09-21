@@ -165,15 +165,22 @@ export default defineComponent({
         const selectedLanguages = ref<number[]>(props.presetPublicationSeries?.languageIds as number[]);
 
         const articleCollectionSeriesTypes = computed(() => getArticleCollectionSeriesTypesForGivenLocale());
+
+        const isJournal = () =>
+            props.inputType === 'JOURNAL' ||
+            props.inputType === PublicationSeriesType.JOURNAL.toString();
+
+        const articleCollectionSeriesTypeOf = (): ArticleCollectionSeriesType =>
+            (isJournal() ? (props.presetPublicationSeries as Journal | undefined)?.type : undefined)
+                ?? ArticleCollectionSeriesType.JOURNAL;
+
+        const toArticleCollectionSeriesTypeOption = (type: ArticleCollectionSeriesType) => ({
+            title: getArticleCollectionSeriesTypeTitleFromValueAutoLocale(type) as string,
+            value: type
+        });
+
         const selectedArticleCollectionSeriesType = ref<{title: string, value: ArticleCollectionSeriesType}>(
-            {
-                title: getArticleCollectionSeriesTypeTitleFromValueAutoLocale(
-                    (props.inputType === 'JOURNAL' || props.inputType === PublicationSeriesType.JOURNAL.toString()) ? 
-                        (props.presetPublicationSeries as Journal).type : ArticleCollectionSeriesType.JOURNAL
-                    ) as string,
-                value: (props.inputType === 'JOURNAL' || props.inputType === PublicationSeriesType.JOURNAL.toString()) ? 
-                    (props.presetPublicationSeries as Journal).type : ArticleCollectionSeriesType.JOURNAL
-            }
+            toArticleCollectionSeriesTypeOption(articleCollectionSeriesTypeOf())
         );
 
         const languageTags = ref<LanguageTagResponse[]>([]);
@@ -281,12 +288,9 @@ export default defineComponent({
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             abbreviationsRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviations.value, languageTags.value));
 
-            if (props.inputType === 'JOURNAL' || props.inputType === PublicationSeriesType.JOURNAL.toString()) {
-                selectedArticleCollectionSeriesType.value = 
-                {
-                    title: getArticleCollectionSeriesTypeTitleFromValueAutoLocale((props.presetPublicationSeries as Journal).type) as string,
-                    value: (props.presetPublicationSeries as Journal).type
-                }
+            if (isJournal()) {
+                selectedArticleCollectionSeriesType.value =
+                    toArticleCollectionSeriesTypeOption(articleCollectionSeriesTypeOf());
             }
         };
 

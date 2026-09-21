@@ -12,11 +12,12 @@ export const entityTypeSr = [
     { title: "Izdavači", value: EntityType.PUBLISHER },
     { title: "Korisnički nalozi", value: EntityType.USER_ACCOUNT },
     { title: "Poeni sa vrednovanja", value: EntityType.ASSESSMENT_POINTS },
-    { title: "Projekti", value: EntityType.PROJECT },
-    { title: "Finansiranja", value: EntityType.FUNDING },
-    { title: "Prijave na konkurs", value: EntityType.FUNDING_APPLICATION },
     { title: "Programi finansiranja", value: EntityType.FUNDING_PROGRAM },
-    { title: "Konkursi", value: EntityType.FUNDING_CALL }
+    { title: "Pozivi na finansiranja", value: EntityType.FUNDING_CALL },
+    { title: "Projekti", value: EntityType.PROJECT },
+    { title: "Prijave na finansiranja", value: EntityType.FUNDING_APPLICATION },
+    { title: "Finansiranja", value: EntityType.FUNDING },
+    { title: "Vrednovanja kvaliteta podataka", value: EntityType.QUALITY_ASSESSMENT }
 ];
 
 export const entityTypeEn = [
@@ -29,11 +30,12 @@ export const entityTypeEn = [
     { title: "Publishers", value: EntityType.PUBLISHER },
     { title: "User accounts", value: EntityType.USER_ACCOUNT },
     { title: "Assessment points", value: EntityType.ASSESSMENT_POINTS },
-    { title: "Projects", value: EntityType.PROJECT },
-    { title: "Fundings", value: EntityType.FUNDING },
-    { title: "Funding applications", value: EntityType.FUNDING_APPLICATION },
     { title: "Funding programs", value: EntityType.FUNDING_PROGRAM },
-    { title: "Funding calls", value: EntityType.FUNDING_CALL }
+    { title: "Funding calls", value: EntityType.FUNDING_CALL },
+    { title: "Projects", value: EntityType.PROJECT },
+    { title: "Funding applications", value: EntityType.FUNDING_APPLICATION },
+    { title: "Fundings", value: EntityType.FUNDING },
+    { title: "Data quality assessments", value: EntityType.QUALITY_ASSESSMENT }
 ];
 
 export const getEntityTypeTitleFromValueAutoLocale = (value: EntityType) => {

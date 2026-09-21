@@ -3,7 +3,9 @@ import { defineStore } from 'pinia';
 export const useLoginStore = defineStore('login', {
     state: () => ({
         userLoggedIn: false,
-        reloadUserName: false,
+        // Incremented on every request - a flag would be consumed by whichever
+        // watcher reacts first, leaving the remaining ones without a signal.
+        usernameReloadRequests: 0,
         explicitlyLoggedOut: false
     }),
     actions: {
@@ -11,10 +13,7 @@ export const useLoginStore = defineStore('login', {
             this.userLoggedIn = true;
         },
         emitReloadUsername() {
-            this.reloadUserName = true;
-        },
-        emitUsernameReloaded() {
-            this.reloadUserName = false;
+            this.usernameReloadRequests++;
         },
         userLoggedOut() {
             this.userLoggedIn = false;

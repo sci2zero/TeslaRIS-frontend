@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)" />
+                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)"></rich-title-renderer>
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(performanceRelatedOutput?.subTitle) }}
-                        <br>
+                        <br />
                         {{ $t("performanceRelatedOutputLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!performanceRelatedOutput" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="performanceRelatedOutput?.type">
                                     {{ $t("performanceRelatedOutputTypeLabel") }}:
                                 </div>
@@ -110,6 +110,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+                                    :entity-id="performanceRelatedOutput?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -140,7 +147,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -154,6 +161,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -175,7 +188,8 @@
                     :document="performanceRelatedOutput"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     :proofs="performanceRelatedOutput?.proofs"
-                    :file-items="performanceRelatedOutput?.fileItems" />
+                    :file-items="performanceRelatedOutput?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -183,13 +197,15 @@
                     :keywords="performanceRelatedOutput?.keywords ? performanceRelatedOutput.keywords : []"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords" />
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="performanceRelatedOutput?.description"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
-                    @update="updateDescription" />
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="performanceRelatedOutput?.remark"
@@ -229,6 +245,24 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+                    :entity-id="performanceRelatedOutput?.id"
+                    :restore-blocked-reason="performanceRelatedOutput?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="fetchPerformanceRelatedOutput"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+                    :entity-id="performanceRelatedOutput?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <share-buttons
@@ -244,13 +278,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, PerformanceRelatedOutput } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -287,13 +322,27 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import { localiseFlexibleDate } from '@/utils/DateUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "PerformanceRelatedOutputLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -304,8 +353,18 @@ export default defineComponent({
         const performanceRelatedOutput = ref<PerformanceRelatedOutput>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -334,6 +393,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PERFORMANCE_RELATED_OUTPUT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -472,6 +538,7 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality,
             performanceRelatedOutput, icon, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -486,7 +553,9 @@ export default defineComponent({
             getPerformanceRelatedOutputTypeTitleFromValueAutoLocale,
             PerformanceRelatedOutputUpdateForm, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, updateRemark,
-            localiseFlexibleDate
+            localiseFlexibleDate, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

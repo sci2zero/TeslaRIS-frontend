@@ -87,7 +87,6 @@ import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 
-
 export default defineComponent({
     name: "HomeView",
     components: { SearchBarComponent, Navbar, LandingFeatures },

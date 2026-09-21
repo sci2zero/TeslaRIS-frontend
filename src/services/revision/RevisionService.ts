@@ -1,12 +1,12 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type QualityReportResponse } from "@/models/RevisionModel";
+import type { Revision } from "@/models/RevisionModel";
 
 
 export class RevisionService extends BaseService {
 
-  async getRevisionHistory(entityType: string, entityId: number): Promise<AxiosResponse<string[]>> {
+  async getRevisionHistory(entityType: string, entityId: number): Promise<AxiosResponse<Revision[]>> {
     return super.sendRequest(axios.get, `revision/${entityType}/${entityId}`);
   }
 
@@ -14,8 +14,8 @@ export class RevisionService extends BaseService {
     return super.sendRequest(axios.get, `revision/${entityType}/${entityId}/at?timestamp=${timestamp}`);
   }
 
-  async getQualityReportForEntity(entityType: string, entityId: number): Promise<AxiosResponse<QualityReportResponse[]>> {
-    return super.sendRequest(axios.get, `revision/quality-report/${entityType}/${entityId}`);
+  async restoreRevision(entityType: string, entityId: number, majorVersion: number, minorVersion: number): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.patch, `revision/${entityType}/${entityId}/restore/${majorVersion}/${minorVersion}`);
   }
 }
 

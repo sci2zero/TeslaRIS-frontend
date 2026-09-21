@@ -15,6 +15,7 @@ export interface UserResponse {
     notificationPeriod: UserNotificationPeriod;
     sendOnlyNewNotifications: boolean;
     commissionId: number;
+    tutorialProgress?: Record<string, TutorialProgressStatus> | null;
 }
 
 export interface UserAccountIndex {
@@ -71,4 +72,15 @@ export enum UserNotificationPeriod {
     WEEKLY = "WEEKLY",
     MONTHLY = "MONTHLY",
     NEVER = "NEVER"
+}
+
+export enum TutorialProgressStatus {
+    NOT_FINISHED = "NOT_FINISHED",
+    FINISHED = "FINISHED",
+    SKIPPED = "SKIPPED"
+}
+
+export interface TutorialProgressUpdateRequest {
+    tutorialKey: string;
+    status: TutorialProgressStatus;
 }

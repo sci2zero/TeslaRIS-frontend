@@ -66,7 +66,7 @@
         <v-tab v-show="displayCitationsTab" value="citationCount">
             {{ $t("citationCountLeaderboardLabel") }}
         </v-tab>
-        <v-tab v-show="displayPointsTab" value="assessmentPoints">
+        <v-tab v-show="isAssessmentModuleEnabled && displayPointsTab" value="assessmentPoints">
             {{ $t("assessmentPointsLeaderboardLabel") }}
         </v-tab>
         <v-tab v-show="displayCitationsTab" value="statistics">
@@ -156,7 +156,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryClient">
+            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -247,6 +247,7 @@ import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import DigitalLibraryLeaderboardService from '@/services/visualization/DigitalLibraryLeaderboardService';
 import { useUserRole } from '@/composables/useUserRole';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 const props = defineProps({
@@ -289,6 +290,11 @@ const startDate = ref<string>((new Date(`${(new Date()).getFullYear() - 10}-01-0
 const endDate = ref<string>((new Date()).toISOString());
 
 const currentTab = ref("publicationCount");
+
+const { 
+    isAssessmentModuleEnabled,
+    isDigitalLibraryEnabled
+ } = useFeatureModuleToggles();
 
 const {
     isInstitutionalLibrarian,

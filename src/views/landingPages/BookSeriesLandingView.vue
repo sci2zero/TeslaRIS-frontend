@@ -51,7 +51,7 @@
                         </div>
                         <basic-info-loader v-if="!bookSeries" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div>eISSN:</div>
                                 <div class="response">
                                     {{ bookSeries?.eissn ? bookSeries.eissn : $t("notYetSetMessage") }}
@@ -91,6 +91,12 @@
                                     />
                                 </div>
                             </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.BOOK_SERIES"
+                                    :entity-id="bookSeries?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -113,6 +119,12 @@
             </v-tab>
             <v-tab v-if="bookSeriesIndicators && bookSeriesIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -147,6 +159,23 @@
                     show-statistics
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.BOOK_SERIES"
+                    :entity-id="bookSeries?.id"
+                    @restored="() => fetchBookSeries(false)"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.BOOK_SERIES"
+                    :entity-id="bookSeries?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -155,7 +184,7 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageResponse } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -164,6 +193,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -184,13 +214,30 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, Toast, BasicInfoLoader, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -212,6 +259,7 @@ export default defineComponent({
         const icon = ref("mdi-bookshelf");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
         const router = useRouter();
@@ -221,6 +269,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.BOOK_SERIES,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
@@ -337,6 +392,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             bookSeries, icon, publications, 
             fetchIdentifiers, totalPublications,
             publicationSeriesIdentifiers,
@@ -347,7 +404,9 @@ export default defineComponent({
             snackbarMessage, updateContributions,
             PublicationSeriesUpdateForm,
             ApplicableEntityType,
-            bookSeriesIndicators
+            bookSeriesIndicators, isViceDeanForScience,
+            isAdmin, EntityType, fetchBookSeries,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

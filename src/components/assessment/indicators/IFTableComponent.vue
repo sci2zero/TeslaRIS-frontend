@@ -42,8 +42,7 @@
                     :items="ifValuesTable"
                     density="comfortable"
                     hide-default-footer
-                    class="mb-5"
-                >
+                    class="mb-5">
                     <template #top>
                         <v-toolbar flat>
                             <v-toolbar-title>{{ $t("ifValuesLabel") }}</v-toolbar-title>
@@ -67,8 +66,7 @@
                     :items="categoryData.ifValues"
                     class="mb-5"
                     density="comfortable"
-                    hide-default-footer
-                >
+                    hide-default-footer>
                     <template #top>
                         <v-toolbar flat>
                             <v-toolbar-title>{{ categoryData.category }}</v-toolbar-title>

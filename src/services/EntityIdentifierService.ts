@@ -22,6 +22,16 @@ export class EntityIdentifierService extends BaseService {
     }
 
     async fetchPersonIdentifiers(personId: number): Promise<AxiosResponse<EntityIdentifierResponse[]>> {
+        if (!personId) {
+            return Promise.resolve({
+                data: [],
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {} as any
+            } as AxiosResponse<EntityIdentifierResponse[]>);
+        }
+
         return super.sendRequest(axios.get, `person-identifier/${personId}`);
     }
 

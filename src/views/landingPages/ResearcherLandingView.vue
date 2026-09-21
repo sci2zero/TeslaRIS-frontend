@@ -20,7 +20,8 @@
                             @select-primary="selectPrimaryName"
                         />
                         <generic-crud-modal
-                            class="ml-2" 
+                            v-if="isAssessmentModuleEnabled"
+                            class="ml-2"
                             :form-component="AssessmentResearchAreaForm"
                             :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
                             entity-name="ResearchArea"
@@ -103,11 +104,17 @@
             <v-tab v-show="personIndicators && personIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab value="assessments">
+            <v-tab v-show="isAssessmentModuleEnabled" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -133,7 +140,7 @@
                             return-object
                             class="max-w-xs mt-5"
                             multiple
-                        />
+                        ></v-select>
                     </div>
                     <div class="mb-5 mt-5">
                         <add-publication-menu
@@ -218,14 +225,16 @@
                     :keywords="keywords"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords" />
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Biography -->
                 <description-section
                     :description="biography"
                     :can-edit="canEdit"
                     is-biography
-                    @update="updateBiography" />
+                    @update="updateBiography">
+                </description-section>
 
                 <v-row>
                     <v-col cols="6">
@@ -234,16 +243,18 @@
                             :expertise-or-skills="person?.expertisesOrSkills"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson" />
+                            @crud="fetchPerson">
+                        </expertise-or-skill-list>
                         
-                        <br>
+                        <br />
 
                         <!-- Prizes -->
                         <prize-list
                             :prizes="person?.prizes"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson" />
+                            @crud="fetchPerson">
+                        </prize-list>
                     </v-col>
 
 
@@ -259,34 +270,37 @@
 
                                 <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                                 <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                                <br>
+                                <br />
                                 <div v-if="employments.length > 0">
                                     <h3>{{ $t("employmentsLabel") }}</h3>
                                 </div>
-                                <br>
+                                <br />
                                 <involvement-list
                                     :involvements="employments"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson" />
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="education.length > 0">
-                                    <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
                                 </div>
-                                <br>
+                                <br />
                                 <involvement-list
                                     :involvements="education"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson" />
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                                 <div v-if="memberships.length > 0">
-                                    <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
+                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
                                 </div>
-                                <br>
+                                <br />
                                 <involvement-list
                                     :involvements="memberships"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson" />
+                                    @refresh-involvements="fetchPerson">
+                                </involvement-list>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -315,7 +329,8 @@
                 <person-assessments-view
                     :assessments="personAssessments"
                     :is-loading="assessmentsLoading"
-                    @fetch="fetchAssessment" />
+                    @fetch="fetchAssessment">
+                </person-assessments-view>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <person-visualizations
@@ -327,13 +342,31 @@
                     :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
+                    @restored="fetchPerson"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.PERSON"
+                    :entity-id="person?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <persistent-question-dialog
             ref="dialogRef"
             :title="$t('areYouSureLabel')"
             :message="dialogMessage"
-            @continue="performMigrationToUnmanaged" />
+            @continue="performMigrationToUnmanaged">
+        </persistent-question-dialog>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </div>
@@ -342,8 +375,9 @@
 <script lang="ts">
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import CountryService from '@/services/CountryService';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -400,13 +434,28 @@ import ResearcherFeaturedIndicators from '@/components/researcher/landing/Resear
 import RoCrateService from '@/services/export/RoCrateService';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonFieldVisibilityConfigurationForm from '@/components/person/PersonFieldVisibilityConfigurationForm.vue';
+import UserService from '@/services/UserService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import { EntityType } from '@/models/MergeModel';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, ProjectTableComponent, ProjectStatusFilter },
+    components: { PublicationTableComponent, KeywordList, Toast, DescriptionSection, GenericCrudModal, PersonInvolvementModal, InvolvementList, PersonOtherNameModal, PrizeList, ExpertiseOrSkillList, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("additionalInfo");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const dialogRef = ref<typeof PersistentQuestionDialog>();
         const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
@@ -416,6 +465,8 @@ export default defineComponent({
         
         const router = useRouter();
         const currentRoute = useRoute();
+
+        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
 
         const person = ref<PersonResponse>();
         const country = ref<Country>();
@@ -445,7 +496,7 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalEditor, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const researcherName = ref("");
 
@@ -460,6 +511,7 @@ export default defineComponent({
         const memberships = ref<Membership[]>([]);
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const personIndicators = ref<EntityIndicatorResponse[]>();
 
@@ -485,6 +537,13 @@ export default defineComponent({
             }
 
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PERSON,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -776,6 +835,9 @@ export default defineComponent({
 
                 fetchPerson();
                 updateSuccess();
+
+                UserService.invalidateCaches();
+                loginStore.emitReloadUsername();
             } catch (_error) {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -786,6 +848,9 @@ export default defineComponent({
             PersonService.selectPrimaryName(personNameId as number, person.value?.id as number).then(() => {
                 fetchPerson();
                 updateSuccess();
+
+                UserService.invalidateCaches();
+                loginStore.emitReloadUsername();
             }).catch(() => {
                 snackbarMessage.value = i18n.t("genericErrorMessage");
                 snackbar.value = true;
@@ -848,6 +913,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
@@ -861,7 +928,8 @@ export default defineComponent({
             getEmploymentPositionTitleFromValueAutoLocale, fetchIndicators, clearSortAndPerformPublicationSearch,
             publicationSearchParams, publicationTypes, selectedPublicationTypes, activeEmployments, displaySettings,
             isInstitutionalEditor, performIndicatorHarvest, personId, downloadRoCrateBibliography,
-            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
+            PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate, isAssessmentModuleEnabled,
+            EntityType, isViceDeanForScience, dataQualityTabsRef, showAssessmentDetails,
             projects, totalProjects, projectsRef, switchProjectsPage,
             selectedProjectStatuses, returnOnlyActiveProjects, clearSortAndPerformProjectSearch,
             addProject

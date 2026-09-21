@@ -28,7 +28,8 @@
                     :filename="organisationUnit?.logoServerFilename"
                     :background-color-hex="organisationUnit?.logoBackgroundHex"
                     :org-unit-id="organisationUnit?.id"
-                    :can-edit="canEdit" />
+                    :can-edit="canEdit">
+                </organisation-unit-logo>
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -66,7 +67,7 @@
                                     Scopus AFID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" />
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -75,7 +76,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" />
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -236,7 +237,7 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email" />
+                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -251,7 +252,7 @@
                                     {{ $t("websiteLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="organisationUnit?.uris" />
+                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -270,7 +271,14 @@
                                         ref="mapRef" height="250px"
                                         :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
                                         :read-only="true"
-                                        :show-input="false" />
+                                        :show-input="false">
+                                    </open-layers-map>
+                                </div>
+                                <div class="mt-5">
+                                    <data-quality-remarks-dialog
+                                        :entity-type="EntityType.ORGANISATION_UNIT"
+                                        :entity-id="organisationUnit?.id"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -398,7 +406,7 @@
                 </v-btn>
             </div>
         </div>
-        <br>
+        <br />
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
             v-if="organisationUnit"
@@ -430,6 +438,12 @@
             <v-tab v-show="displaySettings.shouldDisplayLeaderboards()" value="leaderboards">
                 {{ $t("leaderboardsLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -451,13 +465,13 @@
                             return-object
                             class="publication-type-select"
                             multiple
-                        />
+                        ></v-select>
                         <v-checkbox
                             v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
                             v-model="returnOnlyNonArchived"
                             :label="$t('showNonArchivedLabel')"
                             class="mt-2"
-                        />
+                        ></v-checkbox>
                     </div>
                     <div
                         v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
@@ -486,7 +500,8 @@
                             commissionId: null
                         }"
                     :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
-                    @switch-page="switchPublicationsPage" />
+                    @switch-page="switchPublicationsPage">
+                </publication-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
@@ -504,7 +519,8 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true); fetchEmployees(false);" />
+                    @delete="fetchEmployees(true); fetchEmployees(false);">
+                </person-table-component>
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
@@ -516,7 +532,8 @@
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                         :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
-                        @switch-page="switchAlumniPage" />
+                        @switch-page="switchAlumniPage">
+                    </person-table-component>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="projects">
@@ -566,10 +583,10 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations" />
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
 
                                 <h2>{{ $t("relationsLabel") }}</h2>
-                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links" />
+                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -586,7 +603,8 @@
                                 :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
                                 :endpoint-token-parameters="['*', String(organisationUnit.id)]"
                                 :top-level-institution-id="organisationUnit.id"
-                                @switch-page="switchSubUnitsPage" />
+                                @switch-page="switchSubUnitsPage">
+                            </organisation-unit-table-component>
                         </v-col>
                     </v-row>
                 </div>
@@ -597,14 +615,16 @@
                     :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords" />
+                    @update="updateKeywords">
+                </keyword-list>
 
                 <!-- Description -->
                 <description-section
                     :description="organisationUnit?.description ? organisationUnit.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription" />
+                    @update="updateDescription">
+                </description-section>
 
                 <!-- Research Area -->
                 <v-row>
@@ -614,7 +634,8 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="organisationUnit?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas" />
+                                    @update="updateResearchAreas">
+                                </research-areas-update-modal>
 
                                 <h3 class="mb-1">
                                     {{ $t("researchAreasLabel") }}
@@ -660,6 +681,23 @@
                     :is-digital-library-client="organisationUnit?.clientInstitutionDl"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.ORGANISATION_UNIT"
+                    :entity-id="organisationUnit?.id"
+                    @restored="() => fetchOU(false)"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.ORGANISATION_UNIT"
+                    :entity-id="organisationUnit?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -676,7 +714,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, watch, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -686,6 +724,7 @@ import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
@@ -746,13 +785,27 @@ import { localiseDate } from '@/utils/DateUtil';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, ProjectTableComponent, ProjectStatusFilter },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("relations");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
         const displayPersistentDialog = ref(false);
 
         const snackbar = ref(false);
@@ -808,6 +861,7 @@ export default defineComponent({
         const subUnitsDirection = ref("");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canEditDefaultSubmissionContent = ref(false);
 
         const i18n = useI18n();
@@ -825,8 +879,7 @@ export default defineComponent({
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
             loggedInUser, userInstitutionid,
-            isLibrarianUser
-        } = useUserRole();
+            isLibrarianUser, isViceDeanForScience, canReviewDataQuality } = useUserRole();
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
@@ -845,6 +898,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.ORGANISATION_UNIT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -1309,6 +1369,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             organisationUnit, currentTab, isHeadOfLibrary,
             publications, totalPublications, userInstitutionid,
             employees, totalEmployees, publicationsRef,
@@ -1343,6 +1405,8 @@ export default defineComponent({
             startMetadataEnrichment, updateDescription,
             getOUSectorFromValueAutoLocale, localiseDate,
             organisationUnitIdentifiers, fetchIdentifiers,
+            EntityType, fetchOU, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
             projects, totalProjects, projectsRef, switchProjectsPage,
             selectedProjectStatuses, returnOnlyActiveProjects,
             clearSortAndPerformProjectSearch

@@ -567,7 +567,7 @@ export default defineComponent({
             };
         };
 
-        const useHierarchy = ref((props.presetInvolvement as Employment).employmentPositionId ?? false);
+        const useHierarchy = ref((props.presetInvolvement as Employment)?.employmentPositionId ?? false);
 
         return {
             isFormValid, toMultilingualTextInput, involvementTypes,
