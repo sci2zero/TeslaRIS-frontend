@@ -1548,6 +1548,7 @@ export default {
     fundingCallLabel: "Poziv za finansiranje",
     addFundingPartLabel: "Dodaj stavku finansiranja",
     fundingLabel: "Finansiranje",
+    approvedFundingLabel: "Odobreno finansiranje",
     projectEventLabel: "Dogadjaj projekta",
     projectDocumentLabel: "Dokument projekta",
     fundingApplicationLabel: "Zahtev za finansiranje",

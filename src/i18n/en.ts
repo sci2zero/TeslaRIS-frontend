@@ -1534,6 +1534,7 @@ export default {
     fundingCallLabel: "Funding call",
     addFundingPartLabel: "Add Funding Part",
     fundingLabel: "Funding",
+    approvedFundingLabel: "Approved funding",
     projectEventLabel: "Project Event",
     projectDocumentLabel: "Project Document",
     fundingApplicationLabel: "Funding Application",

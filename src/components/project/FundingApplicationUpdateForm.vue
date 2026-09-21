@@ -17,12 +17,6 @@
 
         <v-row>
             <v-col>
-                <funding-autocomplete-search v-model="selectedFunding" />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col>
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
@@ -114,6 +108,15 @@
                 <funding-application-autocomplete-search
                     v-model="selectedRevisedFundingApplication"
                     label="revisedFundingApplicationLabel"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <funding-autocomplete-search
+                    v-model="selectedFunding"
+                    label="approvedFundingLabel"
                 />
             </v-col>
         </v-row>
