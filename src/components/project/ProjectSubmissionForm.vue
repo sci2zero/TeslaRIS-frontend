@@ -109,6 +109,7 @@
                     <v-col>
                         <person-project-contribution-form
                             ref="personsRef"
+                            allow-external-associate
                             @set-input="persons = $event"
                         />
                     </v-col>
