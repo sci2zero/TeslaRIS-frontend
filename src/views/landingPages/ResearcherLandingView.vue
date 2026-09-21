@@ -169,10 +169,10 @@
             <v-tabs-window-item value="projects">
                 <project-table-component
                     ref="projectsRef"
-                    hide-bulk-actions
                     :projects="projects"
                     :total-projects="totalProjects"
                     :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    :allow-unbinding="canEdit && (isResearcher || isInstitutionalEditor)"
                     @switch-page="switchProjectsPage">
                     <template #top-left>
                         <search-bar-component

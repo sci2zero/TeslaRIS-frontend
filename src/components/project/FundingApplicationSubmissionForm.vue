@@ -17,15 +17,6 @@
 
         <v-row>
             <v-col>
-                <funding-autocomplete-search
-                    v-model="selectedFunding"
-                    :preset-funding-call-id="presetFundingCallId"
-                />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col>
                 <person-autocomplete-search
                     v-model="submitter"
                     label="submitterLabel"
@@ -105,6 +96,16 @@
                 <funding-application-autocomplete-search
                     v-model="selectedRevisedFundingApplication"
                     label="revisedFundingApplicationLabel"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <funding-autocomplete-search
+                    v-model="selectedFunding"
+                    label="approvedFundingLabel"
+                    :preset-funding-call-id="presetFundingCallId"
                 />
             </v-col>
         </v-row>

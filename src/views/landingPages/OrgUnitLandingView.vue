@@ -526,6 +526,7 @@
                     :projects="projects"
                     :total-projects="totalProjects"
                     :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    :allow-unbinding="canEdit && isInstitutionalEditor"
                     @switch-page="switchProjectsPage">
                     <template #top-left>
                         <search-bar-component
