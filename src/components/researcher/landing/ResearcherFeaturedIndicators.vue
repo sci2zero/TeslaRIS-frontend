@@ -5,7 +5,7 @@
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                        <span class="mdi mdi-file-document text-white text-xl"></span>
+                        <span class="mdi mdi-file-document text-white text-xl" />
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-blue-600 font-medium uppercase tracking-wide">
@@ -25,8 +25,7 @@
                     v-if="featuredInformation?.publicationCount"
                     class="flex items-center gap-2 text-sm text-blue-600 font-medium">
                     <span 
-                        class="mdi mdi-trending-up text-base">
-                    </span>
+                        class="mdi mdi-trending-up text-base" />
                     +{{ featuredInformation.publicationsGain }} {{ $t("thisYearLabel") }}
                 </div>
             </div>
@@ -35,7 +34,7 @@
             <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
-                        <span class="mdi mdi-chart-line text-white text-xl"></span>
+                        <span class="mdi mdi-chart-line text-white text-xl" />
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-emerald-600 font-medium uppercase tracking-wide">
@@ -62,7 +61,7 @@
             <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center shadow-md">
-                        <span class="mdi mdi-format-quote-close text-white text-xl"></span>
+                        <span class="mdi mdi-format-quote-close text-white text-xl" />
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-amber-600 font-medium uppercase tracking-wide">
@@ -82,8 +81,7 @@
                     v-if="featuredInformation?.currentCitationCount"
                     class="flex items-center gap-2 text-sm text-amber-600 font-medium">
                     <span 
-                        :class="`mdi mdi-trending-${areCitationsTrendingUp ? 'up' : 'down'} text-base`">
-                    </span>
+                        :class="`mdi mdi-trending-${areCitationsTrendingUp ? 'up' : 'down'} text-base`" />
                     {{ areCitationsTrendingUp ? "+" : "-" }}{{ featuredInformation.currentCitationTrend }} {{ $t("thisYearLabel") }}
                 </div>
             </div>

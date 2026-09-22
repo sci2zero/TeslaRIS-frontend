@@ -11,8 +11,7 @@
                     icon="mdi-web"
                     variant="text"
                     :color="variant === 'general' ? '#222' : '#fff'"
-                >
-                </v-btn>
+                />
             </template>
 
             <v-card min-width="150">

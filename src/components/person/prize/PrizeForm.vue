@@ -39,7 +39,7 @@
                             :label="$t('dateOfAcquisitionLabel')"
                             color="primary"
                             persistent
-                        ></date-picker>
+                        />
                     </v-col>
                     <v-col cols="6">
                         <date-picker
@@ -47,7 +47,7 @@
                             :label="$t('endDateLabel')"
                             color="primary"
                             persistent
-                        ></date-picker>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -65,7 +65,7 @@
                         <v-checkbox
                             v-model="favorite"
                             :label="$t('favoriteLabel')"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <h2

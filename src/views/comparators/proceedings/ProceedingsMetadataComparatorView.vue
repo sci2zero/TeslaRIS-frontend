@@ -6,7 +6,7 @@
                     {{ returnCurrentLocaleContent(leftProceedings?.title) }}
                 </h2>
                 
-                <br />
+                <br>
 
                 <proceedings-update-form
                     ref="updateLeftRef"
@@ -16,7 +16,7 @@
                     @update="updateLeft"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
@@ -30,7 +30,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -70,7 +70,7 @@
                     {{ returnCurrentLocaleContent(rightProceedings?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <proceedings-update-form
                     ref="updateRightRef"
@@ -80,7 +80,7 @@
                     @update="updateRight"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
@@ -94,7 +94,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">

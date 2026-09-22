@@ -11,15 +11,13 @@
                 data-badge-popover="left"
                 data-hide-no-mentions="true"
                 data-badge-details="hover"
-                :data-doi="preloadedDoi">
-            </div>
+                :data-doi="preloadedDoi" />
             <span
                 v-show="preloadedDoi"
                 class="__dimensions_badge_embed__ ml-5"
                 data-style="small_circle"
                 data-hide-zero-citations="true"
-                :data-doi="preloadedDoi">
-            </span>
+                :data-doi="preloadedDoi" />
             <div
                 v-show="preloadedDoi"
                 class="ml-5">
@@ -39,16 +37,14 @@
                 v-show="preloadedDoi"
                 ref="openCitationsContainer"
                 class="openCitationsContainer
-                ml-5">
-            </div>
+                ml-5" />
             <div 
                 v-if="description"
                 style="z-index: 5;"
                 class="sdg-wheel"
                 data-wheel-height="70"
                 data-model="aurora-sdg-multi"
-                :data-text="description.substring(0, (description.length > 1000 ? 1000 : description.length))">
-            </div>
+                :data-text="description.substring(0, (description.length > 1000 ? 1000 : description.length))" />
             <div
                 v-if="preloadedDoi && oaStatus !== null"
                 :class="[

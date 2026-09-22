@@ -8,7 +8,7 @@
                     color="primary"
                     required
                     in-future
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="6">
                 <time-picker

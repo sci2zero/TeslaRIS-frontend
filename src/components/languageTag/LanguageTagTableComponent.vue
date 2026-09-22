@@ -75,8 +75,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedLanguageTags.map(entity => entity.display)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

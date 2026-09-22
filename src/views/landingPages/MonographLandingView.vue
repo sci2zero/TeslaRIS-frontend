@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monograph?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("monographLabel") }}
                     </v-card-subtitle>
                 </v-card>

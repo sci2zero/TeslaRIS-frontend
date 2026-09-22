@@ -5,7 +5,7 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftOrganisationUnit?.name) }} {{ leftOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(leftOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
-                <br />
+                <br>
 
                 <organisation-unit-update-form
                     ref="updateLeftRef"
@@ -24,22 +24,20 @@
                     ref="updateLeftDescriptionRef"
                     :preset-description-or-biography="(leftOrganisationUnit?.description as MultilingualContent[])"
                     :placeholder-label="$t('descriptionLabel')"    
-                    @update="updateLeftDescription">
-                </description-or-biography-update-form>
+                    @update="updateLeftDescription" />
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="leftOrganisationUnit?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator />
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card>
                     <v-card-text>
@@ -49,8 +47,7 @@
                             :relations="leftRelations"
                             :source-o-u="leftOrganisationUnit"
                             in-comparator
-                            @update="updateLeftRelations">
-                        </organisation-unit-relation-update-form>
+                            @update="updateLeftRelations" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -69,7 +66,7 @@
                     {{ returnCurrentLocaleContent(rightOrganisationUnit?.name) }} {{ rightOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(rightOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
 
-                <br />
+                <br>
 
                 <organisation-unit-update-form
                     ref="updateRightRef"
@@ -88,22 +85,20 @@
                     ref="updateRightDescriptionRef"
                     :preset-description-or-biography="(rightOrganisationUnit?.description as MultilingualContent[])"
                     :placeholder-label="$t('descriptionLabel')"
-                    @update="updateRightDescription">
-                </description-or-biography-update-form>
+                    @update="updateRightDescription" />
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="rightOrganisationUnit?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator />
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card>
                     <v-card-text>
@@ -113,8 +108,7 @@
                             :relations="rightRelations"
                             :source-o-u="rightOrganisationUnit"
                             in-comparator
-                            @update="updateRightRelations">
-                        </organisation-unit-relation-update-form>
+                            @update="updateRightRelations" />
                     </v-card-text>
                 </v-card>
             </v-col>

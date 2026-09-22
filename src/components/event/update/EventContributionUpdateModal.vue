@@ -7,7 +7,7 @@
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
                     </v-btn>
                 </div>
             </template>
@@ -29,7 +29,7 @@
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

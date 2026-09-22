@@ -42,7 +42,7 @@
                     :items="performanceRelatedOutputTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>

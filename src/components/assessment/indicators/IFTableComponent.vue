@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title class="text-h5 d-flex align-center justify-space-between">
                 <span>{{ $t("impactFactorTableLabel") }}</span>
-                <v-spacer></v-spacer>
+                <v-spacer />
 
                 <v-row no-gutters class="align-center" style="max-width: 250px;">
                     <v-col cols="5">

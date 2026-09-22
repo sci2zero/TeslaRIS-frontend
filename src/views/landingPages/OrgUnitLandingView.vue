@@ -420,6 +420,9 @@
             <v-tab value="employees">
                 {{ $t("employeesLabel") }}
             </v-tab>
+            <v-tab value="projects">
+                {{ $t("projectsLabel") }}
+            </v-tab>
             <v-tab value="relations">
                 {{ $t("relationsLabel") }}
             </v-tab>
@@ -532,6 +535,47 @@
                         @switch-page="switchAlumniPage">
                     </person-table-component>
                 </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="projects">
+                <project-table-component
+                    ref="projectsRef"
+                    hide-bulk-actions
+                    :projects="projects"
+                    :total-projects="totalProjects"
+                    :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    :allow-unbinding="canEdit && isInstitutionalEditor"
+                    @switch-page="switchProjectsPage">
+                    <template #top-left>
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformProjectSearch($event)"
+                        />
+                    </template>
+                    <template #actions>
+                        <v-menu>
+                            <template #activator="{ props: optionsProps }">
+                                <v-btn
+                                    v-bind="optionsProps"
+                                    color="white"
+                                    prepend-icon="mdi-dots-vertical"
+                                >
+                                    {{ $t("optionsLabel") }}
+                                </v-btn>
+                            </template>
+                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                <v-checkbox
+                                    v-model="returnOnlyActiveProjects"
+                                    :label="$t('showOnlyActiveLabel')"
+                                    hide-details
+                                />
+                            </div>
+                        </v-menu>
+                    </template>
+                    <template #status-filter-menu>
+                        <project-status-filter v-model="selectedProjectStatuses" />
+                    </template>
+                </project-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->
@@ -686,6 +730,10 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
 import { ApplicableEntityType, ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
+import ProjectService from '@/services/project/ProjectService';
+import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -745,7 +793,7 @@ import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTab
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("relations");
 
@@ -795,6 +843,17 @@ export default defineComponent({
         const alumniSort = ref("");
         const alumniDirection = ref("");
         const personSearchParams = ref("tokens=*");
+
+        const projects = ref<ProjectIndex[]>([]);
+        const totalProjects = ref<number>(0);
+        const projectsPage = ref(0);
+        const projectsSize = ref(10);
+        const projectsSort = ref("");
+        const projectsDirection = ref("");
+        const projectSearchParams = ref("tokens=*");
+        const selectedProjectStatuses = ref<ProjectStatus[]>([]);
+        const returnOnlyActiveProjects = ref(false);
+        const projectsRef = ref<typeof ProjectTableComponent>();
 
         const subUnitsPage = ref(0);
         const subUnitsSize = ref(10);
@@ -895,7 +954,8 @@ export default defineComponent({
                     document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                     
                     if(uponStartup) {
-                        const operations = [fetchEmployees(false), fetchEmployees(true)];
+                        const operations =
+                            [fetchEmployees(false), fetchEmployees(true), fetchProjects()];
                         if (showOutputs.value) {
                             operations.push(fetchPublications());
                         }
@@ -1001,6 +1061,41 @@ export default defineComponent({
                     totalEmployees.value = response.data.totalElements;
                 }
             });
+        };
+
+        const switchProjectsPage = (nextPage: number, pageSize: number, sortField?: string, sortDir?: string) => {
+            projectsPage.value = nextPage;
+            projectsSize.value = pageSize;
+            projectsSort.value = sortField ?? "";
+            projectsDirection.value = sortDir ?? "";
+            fetchProjects();
+        };
+
+        const fetchProjects = () => {
+            return ProjectService.findProjectsForOrganisationUnit(
+                parseInt(currentRoute.params.id as string),
+                `${projectSearchParams.value}&page=${projectsPage.value}&size=${projectsSize.value}&sort=${projectsSort.value},${projectsDirection.value}`,
+                returnOnlyActiveProjects.value,
+                selectedProjectStatuses.value
+            ).then((response) => {
+                projects.value = response.data.content;
+                totalProjects.value = response.data.totalElements;
+            });
+        };
+
+        watch([selectedProjectStatuses, returnOnlyActiveProjects], () => {
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            fetchProjects();
+        });
+
+        const clearSortAndPerformProjectSearch = (tokenParams: string) => {
+            projectSearchParams.value = tokenParams;
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            projectsSort.value = "";
+            projectsDirection.value = "";
+            fetchProjects();
         };
 
         const clearSortAndPerformPersonSearch = (tokenParams: string) => {
@@ -1311,7 +1406,10 @@ export default defineComponent({
             getOUSectorFromValueAutoLocale, localiseDate,
             organisationUnitIdentifiers, fetchIdentifiers,
             EntityType, fetchOU, isViceDeanForScience,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            projects, totalProjects, projectsRef, switchProjectsPage,
+            selectedProjectStatuses, returnOnlyActiveProjects,
+            clearSortAndPerformProjectSearch
         };
 }})
 

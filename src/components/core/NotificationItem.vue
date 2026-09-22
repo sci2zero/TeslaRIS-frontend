@@ -23,7 +23,7 @@
                 </v-btn>
             </template>
 
-            <notification-list></notification-list>
+            <notification-list />
         </v-menu>
     </div>
 </template>

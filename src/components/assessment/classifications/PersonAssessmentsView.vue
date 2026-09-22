@@ -80,7 +80,7 @@
                         <td class="narrow">
                             <strong>{{ $t("totalLabel") }}</strong>
                         </td>
-                        <td></td>
+                        <td />
                         <td><strong>{{ totalPublicationsCount }}</strong></td>
                         <td><strong>{{ formatNumber(totalPoints) }}</strong></td>
                     </tr>
@@ -98,7 +98,7 @@
                 :size="40"
                 :width="3"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-col>
     </v-row>
 </template>

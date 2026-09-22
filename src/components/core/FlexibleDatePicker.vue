@@ -44,7 +44,7 @@
                         variant="text"
                         color="primary"
                         class="mt-1"
-                    ></v-btn>
+                    />
                 </template>
 
                 <v-date-picker
@@ -52,7 +52,7 @@
                     hide-actions
                     title=""
                     @click.stop>
-                    <template #header></template>
+                    <template #header />
                     <template #actions>
                         <v-btn @click.stop="clearDate">
                             {{ $t("deleteLabel") }}

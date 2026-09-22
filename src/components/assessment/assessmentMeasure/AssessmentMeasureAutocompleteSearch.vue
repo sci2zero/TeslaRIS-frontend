@@ -13,7 +13,7 @@
                 return-object
                 @update:search="searchAssessmentMeasures"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedAssessmentMeasure.value !== -1" icon @click="clearInput()">

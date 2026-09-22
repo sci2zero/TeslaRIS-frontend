@@ -21,7 +21,7 @@
                                             {{ item.title }}
 
                                             <span>
-                                                <v-icon icon="mdi-chevron-down"></v-icon>
+                                                <v-icon icon="mdi-chevron-down" />
                                             </span>
                                         </v-btn>
                                     </template>
@@ -166,7 +166,7 @@
                     </v-navigation-drawer>
                 </div>
 
-                <v-spacer></v-spacer>
+                <v-spacer />
 
                 <div class="d-flex">
                     <template v-for="(item, index) in menuItems">
@@ -175,13 +175,13 @@
                                 :key="index"
                                 inset
                                 class="ms-2 me-2"
-                                vertical></v-divider>
+                                vertical />
                         </template>
                         <template v-else-if="item.type == 'lang_component'">
-                            <component :is="item.component" :key="index"></component>
+                            <component :is="item.component" :key="index" />
                         </template>
                         <template v-else-if="item.type == 'notification_component' && item.condition">
-                            <component :is="item.component" :key="index"></component>
+                            <component :is="item.component" :key="index" />
                         </template>
                         <template v-else>
                             <v-btn

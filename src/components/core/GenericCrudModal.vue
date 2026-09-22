@@ -8,7 +8,7 @@
                         :disabled="disabled"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
                     </v-btn>
                 </div>
                 <v-btn
@@ -47,7 +47,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn
                         color="blue darken-1"
                         @click="dialog = false">

@@ -15,7 +15,7 @@
         <v-date-picker
             v-model="selectedDate" hide-actions title="" :color="color"
             @click.stop>
-            <template #header></template>
+            <template #header />
             <template #actions>
                 <v-btn
                     v-if="allowDeletion"

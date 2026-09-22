@@ -1,15 +1,15 @@
 <template>
     <v-container>
         <h1>{{ $t("publisherListLabel") }}</h1>
-        <br />
-        <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
-        <br />
+        <br>
+        <br>
+        <search-bar-component @search="clearSortAndPerformSearch" />
+        <br>
         <v-btn color="primary" @click="addPublisher">
             {{ $t("createNewPublisherLabel") }}
         </v-btn>
-        <br />
-        <br />
+        <br>
+        <br>
 
         <tab-content-loader
             v-if="loading"

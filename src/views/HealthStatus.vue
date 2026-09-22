@@ -53,7 +53,7 @@
             color="primary"
             indeterminate
             size="128"
-        ></v-progress-circular>
+        />
     </div>
 </template>
   

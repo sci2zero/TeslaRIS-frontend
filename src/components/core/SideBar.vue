@@ -134,9 +134,9 @@ const {
     isPromotionRegistryAdministrator
 } = useUserRole();
 
-const { 
-    isAssessmentModuleEnabled, 
-    isDigitalLibraryEnabled 
+const {
+    isAssessmentModuleEnabled,
+    isDigitalLibraryEnabled
 } = useFeatureModuleToggles();
 
 const loginStore = useLoginStore();
@@ -297,6 +297,11 @@ const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) }
 ]);
 
+const fundingsMenu = ref<MenuItem[]>([
+  { key: 'funding-program', label: computed(() => i18n.t('fundingProgramsLabel')), to: '/funding-program', icon: 'mdi-file-tree' },
+  { key: 'funding-call', label: computed(() => i18n.t('fundingCallsLabel')), to: '/funding-call', icon: 'mdi-bullhorn' },
+]);
+
 const menuItems = ref<MenuItem[]>([
     // { key: 'home', label: computed(() => i18n.t('homeLabel')), to: '/', icon: 'mdi-home' },
     // { 
@@ -312,6 +317,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'projects', label: computed(() => i18n.t('projectsLabel')), to: '/project', icon: 'mdi-folder-star' },
     { key: 'theses-list', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'add-thesis', label: computed(() => i18n.t('createThesisLabel')), to: '/scientific-results/thesis/submit-thesis', icon: 'mdi-file-document-edit', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'public-review', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
@@ -361,7 +367,16 @@ const menuItems = ref<MenuItem[]>([
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
     { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => isAssessmentModuleEnabled.value && !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
-    { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) }
+    { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    {
+      key: 'fundings',
+      label: computed(() => i18n.t('fundingsLabel')),
+      to: '/funding-program',
+      icon: 'mdi-cash-multiple',
+      subItems: fundingsMenu.value,
+      condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
+    },
 ]);
 
 const filteredMenuItems = computed(() => {

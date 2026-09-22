@@ -10,12 +10,11 @@
                     class="mr-4 hover:bg-gray-100 transition-colors"
                     aria-label="Toggle menu"
                     @click="toggleSidebar"
-                >
-                </v-btn>
+                />
                 <breadcrumbs v-else v-model="navigationDepth" />
             </div>
 
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <div
                 v-if="maintenanceModeOn || nextScheduledMaintenance"
@@ -48,20 +47,20 @@
                 </div>
             </div>
 
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <div class="flex items-center gap-1">
                 <template v-for="(item, index) in menuItems">
                     <template v-if="item.type == 'divider'">
                         <v-divider
                             :key="index" inset class="ms-2" vertical
-                            :color="variant === 'general' ? '#000' : 'white'"></v-divider>
+                            :color="variant === 'general' ? '#000' : 'white'" />
                     </template>
                     <template v-else-if="item.type == 'lang_component'">
-                        <component :is="item.component" :key="index" :variant="variant"></component>
+                        <component :is="item.component" :key="index" :variant="variant" />
                     </template>
                     <template v-else-if="item.type == 'notification_component' && item.condition">
-                        <component :is="item.component" :key="index" :variant="variant"></component>
+                        <component :is="item.component" :key="index" :variant="variant" />
                     </template>
                     <template v-else-if="item.type == 'user_profile'">
                         <span :key="index">

@@ -34,8 +34,7 @@
                         :preliminary-supplements="(showThesisSections && document) ? (document as Thesis).preliminarySupplements : []"
                         :commission-reports="(isThesisSection && document) ? (document as Thesis).commissionReports : []"
                         :hide-empty-sections="hideEmptySections"
-                        :hide-regular-sections="hideRegularSections">
-                    </attachment-section>
+                        :hide-regular-sections="hideRegularSections" />
                     <v-progress-circular
                         v-else-if="loading"
                         :size="50"
@@ -49,7 +48,7 @@
                     </h3>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

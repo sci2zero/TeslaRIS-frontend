@@ -17,8 +17,7 @@
                 :total-publications="totalPersonPublications"
                 shows-research-outputs
                 allow-selection
-                @switch-page="switchPage">
-            </publication-table-component>
+                @switch-page="switchPage" />
         </v-col>
     </v-row>
 

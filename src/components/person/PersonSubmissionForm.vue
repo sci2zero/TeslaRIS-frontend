@@ -10,7 +10,7 @@
                                 :label="$t('firstNameLabel') + '*'"
                                 :placeholder="$t('firstNameLabel')"
                                 :rules="requiredFieldRules"
-                            ></v-text-field>
+                            />
                         </v-col>
                         <v-col cols="12" md="6">
                             <v-text-field
@@ -18,7 +18,7 @@
                                 :label="$t('surnameLabel') + '*'"
                                 :placeholder="$t('surnameLabel')"
                                 :rules="requiredFieldRules"
-                            ></v-text-field>
+                            />
                         </v-col>
                     </v-row>
 
@@ -30,7 +30,7 @@
                                 :person-last-name="lastName"
                                 :return-selected="inModal"
                                 @selected="returnToParent"
-                            ></person-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
 
@@ -40,12 +40,12 @@
                                 ref="ouAutocompleteRef"
                                 v-model:model-value="selectedOrganisationUnit"
                                 :top-level-institution-id="role === 'INSTITUTIONAL_EDITOR' ? loggedInUser?.organisationUnitId : undefined"
-                            ></organisation-unit-autocomplete-search>
+                            />
                         </v-col>
                     </v-row>
 
                     <v-row class="d-flex align-center justify-space-between">
-                        <v-spacer></v-spacer>
+                        <v-spacer />
                         <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
                             {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
                         </v-btn>
@@ -58,7 +58,7 @@
                                     v-model="middleName"
                                     :label="$t('middleNameLabel')"
                                     :placeholder="$t('middleNameLabel')"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -69,7 +69,7 @@
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel')"
                                     return-object
-                                ></v-select>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-select
@@ -77,7 +77,7 @@
                                     :items="sexes"
                                     :label="$t('sexLabel')"
                                     return-object
-                                ></v-select>
+                                />
                             </v-col>
                         </v-row>
 
@@ -87,14 +87,14 @@
                                     v-model="email"
                                     :label="$t('emailLabel')"
                                     :placeholder="$t('emailLabel')"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
                                     v-model="phoneNumber"
                                     :label="$t('phoneNumberLabel')"
                                     :placeholder="$t('phoneNumberLabel')"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -104,7 +104,7 @@
                                     v-model="birthdate"
                                     :label="$t('birthdateLabel')"
                                     color="primary"
-                                ></date-picker>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -112,7 +112,7 @@
                                     label="ORCID"
                                     placeholder="ORCID"
                                     :rules="orcidValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -123,7 +123,7 @@
                                     label="eCRIS-ID"
                                     placeholder="eCRIS-ID"
                                     :rules="eCrisIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -131,7 +131,7 @@
                                     label="enaukaID"
                                     placeholder="enaukaID"
                                     :rules="eNaukaIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -141,7 +141,7 @@
                                     v-model="nationalScienceId"
                                     :label="$t('nationalScienceIdLabel')"
                                     :placeholder="$t('nationalScienceIdLabel')"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -149,7 +149,7 @@
                                     label="Google Scholar ID"
                                     placeholder="Google Scholar ID"
                                     :rules="scholarIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -160,7 +160,7 @@
                                     label="APVNT"
                                     placeholder="APVNT"
                                     :rules="apvntValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -168,7 +168,7 @@
                                     label="Scopus Author ID"
                                     placeholder="Scopus Author ID"
                                     :rules="scopusAuthorIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -179,7 +179,7 @@
                                     label="Open Alex ID"
                                     placeholder="Open Alex ID"
                                     :rules="personOpenAlexIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -187,7 +187,7 @@
                                     label="ReearcherID (WoS)"
                                     placeholder="ResearcherID (WoS)"
                                     :rules="personWebOfScienceIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -198,7 +198,7 @@
                                     label="Authenticus ID"
                                     placeholder="Authenticus ID"
                                     :rules="personAuthenticusIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" md="6">
                                 <v-text-field
@@ -206,7 +206,7 @@
                                     label="Lattes ID"
                                     placeholder="Lattes ID"
                                     :rules="lattesIdValidationRules"
-                                ></v-text-field>
+                                />
                             </v-col>
                         </v-row>
 
@@ -214,8 +214,7 @@
                             <v-col cols="12">
                                 <multilingual-text-input
                                     v-model="displayTitle"
-                                    :label="$t('displayTitleLabel')">
-                                </multilingual-text-input>
+                                    :label="$t('displayTitleLabel')" />
                             </v-col>
                         </v-row>
                     </v-container>

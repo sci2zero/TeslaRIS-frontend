@@ -4,7 +4,7 @@
             <v-col>
                 <multilingual-text-input
                     ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetAssessmentMeasure?.title, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetAssessmentMeasure?.title, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -13,8 +13,7 @@
                     v-model="selectedPointRule"
                     :items="pointRules"
                     :label="$t('pointRuleLabel') + '*'"
-                    :rules="requiredSelectionRules">
-                </v-select>
+                    :rules="requiredSelectionRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -23,8 +22,7 @@
                     v-model="selectedScalingRule"
                     :items="scalingRules"
                     :label="$t('scalingRuleLabel') + '*'"
-                    :rules="requiredSelectionRules">
-                </v-select>
+                    :rules="requiredSelectionRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -33,8 +31,7 @@
                     v-model="selectedAssessmentClassificationGroup"
                     :items="assessmentClassificationGroups"
                     :label="$t('classificationLabel') + '*'"
-                    :rules="requiredSelectionRules">
-                </v-select>
+                    :rules="requiredSelectionRules" />
             </v-col>
         </v-row>
 

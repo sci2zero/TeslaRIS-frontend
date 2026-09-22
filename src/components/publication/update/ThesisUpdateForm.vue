@@ -136,8 +136,7 @@
                     v-model="numberOfReferences" type="number"
                     :label="$t('numberOfReferencesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfReferencesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfReferencesLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -146,16 +145,14 @@
                     v-model="numberOfGraphs" type="number"
                     :label="$t('numberOfGraphsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfGraphsLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfGraphsLabel')" />
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="numberOfIllustrations" type="number"
                     :label="$t('numberOfIllustrationsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfIllustrationsLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfIllustrationsLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -164,16 +161,14 @@
                     v-model="numberOfTables" type="number"
                     :label="$t('numberOfTablesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfTablesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfTablesLabel')" />
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="numberOfAppendices" type="number"
                     :label="$t('numberOfAppendicesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfAppendicesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfAppendicesLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -182,8 +177,7 @@
                     v-model="eIsbn"
                     label="E-ISBN"
                     placeholder="E-ISBN"
-                    :rules="isbnValidationRules">
-                </v-text-field>
+                    :rules="isbnValidationRules" />
             </v-col>
             <v-col cols="2" class="text-center">
                 <v-btn 
@@ -199,8 +193,7 @@
                     v-model="printIsbn"
                     label="Print ISBN"
                     placeholder="Print ISBN"
-                    :rules="isbnValidationRules">
-                </v-text-field>
+                    :rules="isbnValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -209,8 +202,7 @@
                     ref="placeOfKeepRef"
                     v-model="placeOfKeep"
                     :label="$t('placeOfKeepLabel')"
-                    :initial-value="toMultilingualTextInput(presetThesis?.placeOfKeep, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetThesis?.placeOfKeep, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -218,13 +210,12 @@
                 <v-text-field
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    :placeholder="$t('udcLabel')">
-                </v-text-field>
+                    :placeholder="$t('udcLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -233,7 +224,7 @@
                     v-model="selectedLanguage"
                     :label="$t('languageLabel')"
                     :items="languageList"
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -243,7 +234,7 @@
                     :label="$t('writingLanguageLabel')"
                     :items="languageTagsList"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -252,8 +243,7 @@
                     ref="typeOfTitleRef"
                     v-model="typeOfTitle"
                     :label="$t('typeOfTitleLabel')"
-                    :initial-value="toMultilingualTextInput(presetThesis?.typeOfTitle, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetThesis?.typeOfTitle, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -261,8 +251,7 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint />
             </v-col>
         </v-row>
         <v-row>
@@ -271,24 +260,21 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
 

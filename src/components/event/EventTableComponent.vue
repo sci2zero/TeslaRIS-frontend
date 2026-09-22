@@ -44,13 +44,13 @@
                             :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
                             :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                             icon="mdi-filter"
-                        ></v-icon>
+                        />
                     </template>
                     <div class="p-3 bg-white rounded-lg shadow-lg">
-                        <slot name="type-filter-menu" :column="column"></slot>
+                        <slot name="type-filter-menu" :column="column" />
                     </div>
                 </v-menu>
-                <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
             </div>
         </template>
         <template #item="row">
@@ -86,8 +86,8 @@
                     {{ displayTextOrPlaceholder(row.item.stateOther) }}
                 </td>
                 <td>
-                    <v-icon v-if="row.item.serialEvent" icon="mdi-check"></v-icon>
-                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                    <v-icon v-if="row.item.serialEvent" icon="mdi-check" />
+                    <v-icon v-else icon="mdi-cancel" />
                 </td>
                 <td>
                     <entity-classification-modal-content
@@ -95,12 +95,11 @@
                         :entity-type="ApplicableEntityType.EVENT"
                         :applicable-type="getApplicableEntityTypeForEventType(row.item.eventType)"
                         @classified="eventClassified(row.item)"
-                        @update="refreshTable(tableOptions)">
-                    </entity-classification-modal-content>
+                        @update="refreshTable(tableOptions)" />
                 </td>
                 <td v-if="isCommission">
-                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
-                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check" />
+                    <v-icon v-else icon="mdi-cancel" />
                 </td>
             </tr>
         </template>
@@ -122,8 +121,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedEvents.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

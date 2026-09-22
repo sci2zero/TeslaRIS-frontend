@@ -11,7 +11,7 @@
 
             <h3>{{ $t("prizesLabel") }}</h3>
             <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-            <br />
+            <br>
             <draggable 
                 :list="prizes" item-key="id"
                 group="prizes" 
@@ -45,7 +45,7 @@
                     <h4>
                         <div v-if="canEdit" class="flex flex-row justify-end">
                             <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                            <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                            <v-icon v-if="prize.date" icon="mdi-circle-small" />
                             <strong>{{ localiseDate(prize.date) }}</strong>
                             <v-btn
                                 class="ml-4!"
@@ -68,7 +68,7 @@
                     
                     <div
                         v-if="prize.keywords && prize.keywords.length > 0">
-                        <br />
+                        <br>
                         <span
                             v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
                             :key="keywordIndex">
@@ -78,8 +78,8 @@
                                 {{ keyword }}
                             </v-chip>
                         </span>
-                        <br />
-                        <br />
+                        <br>
+                        <br>
                     </div>
 
                     <attachment-list

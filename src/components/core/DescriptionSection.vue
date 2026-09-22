@@ -16,7 +16,7 @@
 
                     <div><b>{{ getSectionTitle() }}</b></div>
                     <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
+                    <rich-text-editor v-model="descriptionDisplay" :editable="false" />
                 </v-card-text>
             </v-card>
         </v-col>

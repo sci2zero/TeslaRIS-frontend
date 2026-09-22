@@ -8,7 +8,7 @@
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        <v-icon size="x-large" icon="mdi-plus" />
                     </v-btn>
                     <!-- <v-list-item
                         v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"

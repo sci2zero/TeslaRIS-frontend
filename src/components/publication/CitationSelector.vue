@@ -13,10 +13,10 @@
             <v-card class="d-flex flex-column align-right pa-4">
                 <v-card-title>{{ $t("citePublicationLabel") }}</v-card-title>
                 <v-card-text class="text-right">
-                    <citation-formats :citation="citation"></citation-formats>
+                    <citation-formats :citation="citation" />
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

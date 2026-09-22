@@ -21,7 +21,7 @@
                             :items="countries"
                             :label="$t('countryLabel')"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>

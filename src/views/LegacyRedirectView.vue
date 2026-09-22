@@ -17,7 +17,7 @@
                 :width="7"
                 color="blue"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-row>
         <v-row 
             v-if="!redirectionFinished"

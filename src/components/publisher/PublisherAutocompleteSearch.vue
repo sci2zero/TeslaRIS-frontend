@@ -10,7 +10,7 @@
                 return-object
                 @update:search="searchPublishers($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
@@ -34,7 +34,7 @@
             <v-checkbox
                 v-model="authorReprint"
                 :label="$t('authorReprintLabel')"
-            ></v-checkbox>
+            />
         </v-col>
     </v-row>
 </template>

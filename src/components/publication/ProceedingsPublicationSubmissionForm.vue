@@ -96,8 +96,7 @@
                             :items="publicationTypes"
                             :label="$t('concretePublicationTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row>

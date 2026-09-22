@@ -1,11 +1,11 @@
 <template>
     <v-container>
         <h1>{{ $t("documentClaimMessage") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <publication-table-component
             ref="tableRef" :publications="publications" :total-publications="totalPublications" in-claimer
-            @switch-page="switchPage" @claim="claimPublication" @decline-claim="declinePublicationClaim"></publication-table-component>
+            @switch-page="switchPage" @claim="claimPublication" @decline-claim="declinePublicationClaim" />
         
         <toast v-model="snackbar" :message="message" />
     </v-container>

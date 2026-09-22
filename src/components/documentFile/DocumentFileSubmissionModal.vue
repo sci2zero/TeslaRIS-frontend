@@ -7,14 +7,14 @@
                         icon variant="outlined"
                         color="primary" v-bind="scope.props" class="bottom-spacer ml-2!"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-upload"></v-icon>
+                        <v-icon size="x-large" icon="mdi-upload" />
                     </v-btn>
                 </div>
                 <v-btn
                     v-else icon variant="outlined"
                     color="primary" v-bind="scope.props" class="inline-edit-btn"
                     :disabled="readOnly" size="medium" v-on="scope.isActive">
-                    <v-icon size="x-large" icon="mdi-pen"></v-icon>
+                    <v-icon size="x-large" icon="mdi-pen" />
                 </v-btn>
             </template>
             <v-card>
@@ -31,6 +31,7 @@
                             :always-open-access="alwaysOpenAccess"
                             :allow-licence-selection="allowLicenceSelection"
                             :disable-resource-type-selection="disableResourceTypeSelection"
+                            :allowed-resource-types="allowedResourceTypes"
                             :can-be-archived="canBeArchived"
                             @create="emitCreateToParent"
                             @update="emitUpdateToParent"
@@ -38,7 +39,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
@@ -55,7 +56,7 @@
 import { ref } from "vue";
 import { defineComponent } from "vue";
 import DocumentFileSubmissionForm from "./DocumentFileSubmissionForm.vue";
-import type { DocumentFile, DocumentFileResponse } from "@/models/DocumentFileModel";
+import type { DocumentFile, DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import type { PropType } from "vue";
 
 
@@ -94,6 +95,10 @@ export default defineComponent({
         canBeArchived: {
             type: Boolean,
             default: false
+        },
+        allowedResourceTypes: {
+            type: Array as PropType<ResourceType[]>,
+            default: undefined
         }
     },
     emits: ["create", "update"],

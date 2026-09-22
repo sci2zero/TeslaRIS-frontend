@@ -9,6 +9,12 @@ export const resourceTypeSr = [
     { title: "Dodatak", value: ResourceType.SUPPLEMENT },
     { title: "Izjava", value: ResourceType.STATEMENT },
     { title: "Savetnik - Sukob interesa", value: ResourceType.ADVISOR_CONFLICT_OF_INTEREST },
+    { title: "Ugovor", value: ResourceType.CONTRACT },
+    { title: "Šablon za izveštavanje", value: ResourceType.REPORTING_TEMPLATE },
+    { title: "Opis programa", value: ResourceType.PROGRAM_DESCRIPTION },
+    { title: "Tekst poziva", value: ResourceType.CALL_TEXT },
+    { title: "Šablon za prijavu", value: ResourceType.APPLICATION_TEMPLATE },
+    { title: "Ostalo", value: ResourceType.OTHER },
 ];
 
 export const resourceTypeEn = [
@@ -17,6 +23,12 @@ export const resourceTypeEn = [
     { title: "Supplement", value: ResourceType.SUPPLEMENT },
     { title: "Statement", value: ResourceType.STATEMENT },
     { title: "Advisor - Conflict of Interest", value: ResourceType.ADVISOR_CONFLICT_OF_INTEREST },
+    { title: "Contract", value: ResourceType.CONTRACT },
+    { title: "Reporting template", value: ResourceType.REPORTING_TEMPLATE },
+    { title: "Program description", value: ResourceType.PROGRAM_DESCRIPTION },
+    { title: "Call text", value: ResourceType.CALL_TEXT },
+    { title: "Application template", value: ResourceType.APPLICATION_TEMPLATE },
+    { title: "Other", value: ResourceType.OTHER },
 ];
 
 export const getResourceTypeTitleFromValueAutoLocale = (value: ResourceType) => {

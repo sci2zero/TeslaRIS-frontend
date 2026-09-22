@@ -14,8 +14,7 @@
                     v-model:model-value="selectedOrganisationUnit"
                     readonly
                     disable-submission
-                    required>
-                </organisation-unit-autocomplete-search>
+                    required />
             </v-col>
             <v-col cols="12" sm="6">
                 <v-text-field
@@ -49,7 +48,7 @@
                     :label="$t('defenceDateLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="12">
                 <v-text-field
@@ -69,7 +68,7 @@
                     v-model="formValue.diplomaIssueDate"
                     :label="$t('diplomaIssueDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="12" sm="6">
                 <v-text-field
@@ -82,7 +81,7 @@
                     v-model="formValue.diplomaSupplementsIssueDate"
                     :label="$t('diplomaSupplementsIssueDateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
         </v-row>
     </v-form>

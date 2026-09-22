@@ -5,14 +5,12 @@
         :readonly="readOnly"
         :label="$t('addressLabel')"
         :placeholder="$t('addressLabel')"
-        @update:model-value="onAddressChange">
-    </v-text-field>
+        @update:model-value="onAddressChange" />
     <div
         v-show="address"
         ref="map"
         :style="'height: ' + height"
-        class="openlayers-map">
-    </div>
+        class="openlayers-map" />
 </template>
 
 <script lang="ts">

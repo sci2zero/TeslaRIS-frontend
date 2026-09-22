@@ -6,7 +6,7 @@
                     <v-btn
                         icon color="primary" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" v-on="scope.isActive">
-                        <v-icon icon="mdi-pencil-plus-outline"></v-icon>
+                        <v-icon icon="mdi-pencil-plus-outline" />
                     </v-btn>
                 </div>
             </template>
@@ -24,8 +24,7 @@
                                         :items="relationTypes"
                                         :label="$t('relationTypeLabel') + '*'"
                                         :rules="requiredSelectionRules"
-                                        return-object>
-                                    </v-select>
+                                        return-object />
                                 </v-col>
                                 <v-col cols="7">
                                     <event-autocomplete-search
@@ -47,7 +46,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

@@ -6,8 +6,7 @@
                     v-model="selectedPerson"
                     required
                     :read-only="!newResearcherCreationAllowed"
-                    disable-submission>
-                </person-autocomplete-search>
+                    disable-submission />
             </div>
             <div v-if="newResearcherCreationAllowed">
                 <v-btn
@@ -21,30 +20,29 @@
                 v-model="firstName"
                 :label="$t('firstNameLabel') + '*'"
                 :rules="requiredFieldRules"
-            ></v-text-field>
+            />
             <v-text-field
                 v-model="lastName"
                 :label="$t('surnameLabel') + '*'"
                 :rules="requiredFieldRules"
-            ></v-text-field>
+            />
             <organisation-unit-autocomplete-search
                 ref="ouAutocompleteRef"
                 v-model="selectedOrganisationUnit"
                 required
                 only-client-institutions-cris
-                :readonly="disableOUSelection">
-            </organisation-unit-autocomplete-search>
+                :readonly="disableOUSelection" />
             <v-select
                 v-model="selectedLanguage"
                 :label="$t('preferredLanguageLabel') + '*'"
                 :items="languages"
                 return-object
-            ></v-select>
+            />
             <v-text-field
                 v-model="email"
                 :label="$t('emailLabel') + '*'"
                 :rules="emailFieldRules"
-            ></v-text-field>
+            />
         </v-form>
 
         <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">

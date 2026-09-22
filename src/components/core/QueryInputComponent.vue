@@ -34,7 +34,7 @@
                     v-model="clause.value"
                     :label="$t('dateLabel')"
                     color="primary"
-                ></date-picker>
+                />
             </v-col>
   
             <v-col cols="2" class="d-flex mb-5">

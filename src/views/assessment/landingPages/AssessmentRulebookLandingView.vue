@@ -82,21 +82,21 @@
         </v-row>
 
         <!-- Description -->
-        <description-section :description="assessmentRulebook?.description" can-edit is-general-description @update="updateDescription"></description-section>
+        <description-section :description="assessmentRulebook?.description" can-edit is-general-description @update="updateDescription" />
 
         <!-- Assessment Measures -->
-        <br />
+        <br>
         <tab-content-loader v-if="!assessmentRulebook" :button-header="false" layout="table" />
         <assessment-measure-table-component
             :assessment-measures="assessmentMeasures" :total-assessment-measures="totalAssessmentMeasures" @switch-page="switchPage" @create="addAssessmentMeasure"
-            @update="updateAssessmentMeasure"></assessment-measure-table-component>
+            @update="updateAssessmentMeasure" />
 
         <v-row>
             <h2>{{ $t("fileItemsLabel") }}</h2>
             <v-col cols="12">
                 <attachment-list
                     :attachments="assessmentRulebook?.pdfFile ? [assessmentRulebook.pdfFile] : []" can-edit @create="addAttachment" @update="updateAttachment"
-                    @delete="deleteAttachment"></attachment-list>
+                    @delete="deleteAttachment" />
             </v-col>
         </v-row>
 

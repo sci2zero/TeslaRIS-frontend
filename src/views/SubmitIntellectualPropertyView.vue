@@ -3,8 +3,8 @@
         <v-sheet class="text-center">
             <h1>{{ $t("addIntellectualPropertyLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
+        <br>
+        <br>
         <intellectual-property-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">

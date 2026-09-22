@@ -60,12 +60,11 @@
                         :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
                         :applicable-type="ApplicableEntityType.PUBLICATION_SERIES"
                         @classified="journalClassified(row.item)"
-                        @update="refreshTable(tableOptions)">
-                    </entity-classification-modal-content>
+                        @update="refreshTable(tableOptions)" />
                 </td>
                 <td v-if="isCommission">
-                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
-                    <v-icon v-else icon="mdi-cancel"></v-icon>
+                    <v-icon v-if="row.item.classifiedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check" />
+                    <v-icon v-else icon="mdi-cancel" />
                 </td>
             </tr>
         </template>
@@ -87,8 +86,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedJournals.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

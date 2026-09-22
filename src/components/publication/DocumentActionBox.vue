@@ -10,8 +10,7 @@
                     <citation-selector
                         v-if="displayCitation"
                         ref="citationRef"
-                        :document-id="documentId">
-                    </citation-selector>
+                        :document-id="documentId" />
                     <v-btn
                         class="mb-5 ml-2" color="primary" 
                         density="compact"
@@ -22,8 +21,7 @@
                     <publication-unbind-button
                         v-if="canEdit && isResearcher"
                         :document-id="documentId"
-                        @unbind="handleResearcherUnbind">
-                    </publication-unbind-button>
+                        @unbind="handleResearcherUnbind" />
                     <v-btn
                         v-show="!metadataValid && canEdit && canValidate"
                         class="mb-5 ml-2" color="primary" density="compact"
@@ -82,7 +80,7 @@
             </v-col>
         </v-row>
 
-        <toast v-model="snackbar" :message="snackbarMessage"></toast>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </div>
 </template>
 
