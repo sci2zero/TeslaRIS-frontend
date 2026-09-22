@@ -3,6 +3,15 @@
         v-show="!loading"
         v-model="step"
         :editable="!validateEveryStep">
+        <v-alert
+            v-if="cannotSaveReason"
+            type="info"
+            variant="tonal"
+            density="compact"
+            class="ma-2"
+            :text="cannotSaveReason"
+        />
+
         <v-stepper-header>
             <v-stepper-item v-for="(label, index) in steps" :key="index" :value="index + 1">
                 {{ $t(label) }}
@@ -46,13 +55,23 @@
                         @click="prevStep">
                         {{ $t("previousLabel") }}
                     </v-btn>
-                    <v-btn
-                        class="ml-2"
-                        :color="step === steps.length ? 'primary' : 'default'"
-                        :disabled="((validateEveryStep || step === validSteps.length) && !validSteps[step - 1]) || (step === validSteps.length && !canSave)"
-                        @click="step === steps.length ? submit() : nextStep()">
-                        {{ step === steps.length ? getSaveButtonLabel() : $t("nextLabel") }}
-                    </v-btn>
+                    <v-tooltip
+                        :disabled="!submitDisabledReason"
+                        :text="submitDisabledReason"
+                        location="top"
+                        max-width="420">
+                        <template #activator="{ props: tooltipProps }">
+                            <span v-bind="tooltipProps">
+                                <v-btn
+                                    class="ml-2"
+                                    :color="step === steps.length ? 'primary' : 'default'"
+                                    :disabled="!!submitDisabledReason"
+                                    @click="step === steps.length ? submit() : nextStep()">
+                                    {{ step === steps.length ? getSaveButtonLabel() : $t("nextLabel") }}
+                                </v-btn>
+                            </span>
+                        </template>
+                    </v-tooltip>
                     <v-btn
                         v-if="!isUpdate"
                         class="ml-2"
@@ -80,7 +99,7 @@
 </template>  
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, type PropType } from 'vue';
+import { computed, defineComponent, nextTick, onMounted, type PropType } from 'vue';
 import { ref } from 'vue';
 import { AcademicTitle, type RegistryBookEntry } from '@/models/ThesisLibraryModel';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
@@ -108,6 +127,10 @@ export default defineComponent({
         canSave: {
             type: Boolean,
             default: false
+        },
+        cannotSaveReason: {
+            type: String,
+            default: undefined
         }
     },
     emits: ["create"],
@@ -207,7 +230,7 @@ export default defineComponent({
                     registryEntry.value.personalInformation.placeOfBrith = response.data.placeOfBirth;
                     registryEntry.value.contactInformation.place = returnCurrentLocaleContent(response.data.postalAddress.city) as string;
                     registryEntry.value.contactInformation.streetAndNumber = returnCurrentLocaleContent(response.data.postalAddress.streetAndNumber) as string;
-                    registryEntry.value.contactInformation.residenceCountryId = response.data.postalAddress.countryId;
+                    registryEntry.value.contactInformation.residenceCountryId = response.data.postalAddress.countryId as number;
                     registryEntry.value.contactInformation.contact = response.data.contact;
                     registryEntry.value.dissertationInformation.commission = response.data.commission;
                     registryEntry.value.dissertationInformation.mentor = response.data.mentor;
@@ -269,6 +292,20 @@ export default defineComponent({
             });
         };
 
+        const isLastStep = computed(() => step.value === steps.length);
+
+        const submitDisabledReason = computed(() => {
+            if (isLastStep.value && !props.canSave) {
+                return props.cannotSaveReason ?? i18n.t("registryEntryCannotBeSavedMessage");
+            }
+
+            if ((validateEveryStep.value || isLastStep.value) && !validSteps.value[step.value - 1]) {
+                return i18n.t("registryEntryStepIncompleteMessage");
+            }
+
+            return undefined;
+        });
+
         const getSaveButtonLabel = () => {
             return !isUpdate.value ? i18n.t("readyForPromotionLabel") : i18n.t("updateLabel");
         };
@@ -281,7 +318,8 @@ export default defineComponent({
             validateEveryStep,
             message, snackbar,
             getSaveButtonLabel,
-            saveDraft, isUpdate
+            saveDraft, isUpdate,
+            submitDisabledReason
         };
     }
 });

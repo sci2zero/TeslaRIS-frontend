@@ -268,7 +268,22 @@
                                         {{ $t(relatedEntityTypeLabels[row.entityType]) }}
                                     </td>
                                     <td>{{ row.supported ? row.linkedRecords : "-" }}</td>
-                                    <td>{{ row.supported ? row.affectedRecords : "-" }}</td>
+                                    <td>
+                                        {{ row.supported ? row.affectedRecords : "-" }}
+                                        <v-tooltip
+                                            v-if="row.supported && row.entityType === RelatedEntityType.ACTIVITIES"
+                                            :text="$t('relatedActivitiesExplanationMessage')"
+                                            location="top"
+                                            max-width="420">
+                                            <template #activator="{ props: tooltipProps }">
+                                                <v-icon
+                                                    v-bind="tooltipProps"
+                                                    size="small"
+                                                    class="ml-1"
+                                                    icon="mdi-information-outline" />
+                                            </template>
+                                        </v-tooltip>
+                                    </td>
                                     <td>{{ row.supported ? row.openIssues : "-" }}</td>
                                     <td
                                         class="font-weight-bold"
@@ -650,6 +665,7 @@ export default defineComponent({
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
             relatedQuality, relatedEntityTypeLabels, openRelatedIssues,
+            RelatedEntityType,
             selectedRelatedProfile, relatedQualityRows, displayTextOrPlaceholder,
             selectedIssueProfileName, issuesTable, initialIssueTarget, issueProfileVersion,
             issueAssessmentDate,
