@@ -28,8 +28,7 @@
                     :filename="organisationUnit?.logoServerFilename"
                     :background-color-hex="organisationUnit?.logoBackgroundHex"
                     :org-unit-id="organisationUnit?.id"
-                    :can-edit="canEdit">
-                </organisation-unit-logo>
+                    :can-edit="canEdit" />
             </v-col>
             <v-col cols="9">
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -57,11 +56,17 @@
                         />
                         <v-row v-else>
                             <v-col cols="3">
+                                <div v-if="organisationUnit?.numberOfEmployees">
+                                    {{ $t("numberOfEmployeesLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.numberOfEmployees" class="response">
+                                    {{ organisationUnit?.numberOfEmployees }}
+                                </div>
                                 <div>
                                     Scopus AFID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -70,7 +75,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -79,7 +84,11 @@
                                     Research Organisation Registry ID:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror"></identifier-link>
+                                    <identifier-link
+                                        v-if="organisationUnit?.ror"
+                                        :identifier="organisationUnit.ror"
+                                        type="ror"
+                                    />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -129,6 +138,41 @@
                                     </span>
                                 </div>
                                 <div>
+                                    GRID:
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.grid">
+                                        {{ organisationUnit.grid }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    Wikidata ID:
+                                </div>
+                                <div class="response">
+                                    <identifier-link
+                                        v-if="organisationUnit?.wikidata"
+                                        :identifier="organisationUnit.wikidata"
+                                        type="wikidata"
+                                    />
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ $t("nationalIdLabel") }}
+                                </div>
+                                <div class="response">
+                                    <p v-if="organisationUnit?.nationalId">
+                                        {{ organisationUnit.nationalId }}
+                                    </p>
+                                    <span v-else>
+                                        {{ $t("notYetSetMessage") }}
+                                    </span>
+                                </div>
+                                <div>
                                     {{ $t("taxNumberLabel") }}
                                 </div>
                                 <div class="response">
@@ -165,6 +209,15 @@
                                 <div v-if="organisationUnit?.dateEstablished" class="response">
                                     {{ localiseDate(organisationUnit?.dateEstablished) }}
                                 </div>
+                                <div v-if="organisationUnit?.dateDissolved" class="response">
+                                    {{ $t("dateDissolvedLabel") }}
+                                </div>
+                                <div v-if="organisationUnit?.dateDissolved" class="response">
+                                    {{ localiseDate(organisationUnit?.dateDissolved) }}
+                                </div>
+                                <div v-if="organisationUnit?.active" class="response">
+                                    {{ $t("activeLabel") }}
+                                </div>
                                 <div v-if="organisationUnit?.superInstitutionId">
                                     {{ $t("superOULabel") }}
                                 </div>
@@ -183,7 +236,7 @@
                                     {{ $t("emailLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email"></identifier-link>
+                                    <identifier-link v-if="organisationUnit?.contact?.contactEmail" :identifier="organisationUnit?.contact.contactEmail" type="email" />
                                     <span v-else>
                                         {{ $t("notYetSetMessage") }}
                                     </span>
@@ -198,7 +251,7 @@
                                     {{ $t("websiteLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="organisationUnit?.uris"></uri-list>
+                                    <uri-list :uris="organisationUnit?.uris" />
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -217,8 +270,13 @@
                                         ref="mapRef" height="250px"
                                         :init-coordinates="[organisationUnit?.location?.longitude as number, organisationUnit?.location?.latitude as number]"
                                         :read-only="true"
-                                        :show-input="false">
-                                    </open-layers-map>
+                                        :show-input="false" />
+                                </div>
+                                <div class="mt-5">
+                                    <data-quality-remarks-dialog
+                                        :entity-type="EntityType.ORGANISATION_UNIT"
+                                        :entity-id="organisationUnit?.id"
+                                    />
                                 </div>
                             </v-col>
                         </v-row>
@@ -346,7 +404,7 @@
                 </v-btn>
             </div>
         </div>
-        <br />
+        <br>
         <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
         <v-tabs
             v-if="organisationUnit"
@@ -359,6 +417,9 @@
             </v-tab>
             <v-tab value="employees">
                 {{ $t("employeesLabel") }}
+            </v-tab>
+            <v-tab value="projects">
+                {{ $t("projectsLabel") }}
             </v-tab>
             <v-tab value="relations">
                 {{ $t("relationsLabel") }}
@@ -374,6 +435,12 @@
             </v-tab>
             <v-tab v-show="displaySettings.shouldDisplayLeaderboards()" value="leaderboards">
                 {{ $t("leaderboardsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -396,13 +463,13 @@
                             return-object
                             class="publication-type-select"
                             multiple
-                        ></v-select>
+                        />
                         <v-checkbox
                             v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
                             v-model="returnOnlyNonArchived"
                             :label="$t('showNonArchivedLabel')"
                             class="mt-2"
-                        ></v-checkbox>
+                        />
                     </div>
                     <div
                         v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
@@ -431,8 +498,7 @@
                             commissionId: null
                         }"
                     :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
-                    @switch-page="switchPublicationsPage">
-                </publication-table-component>
+                    @switch-page="switchPublicationsPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
                 <!-- Employees -->
@@ -450,8 +516,7 @@
                     :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                     :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
                     @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true); fetchEmployees(false);">
-                </person-table-component>
+                    @delete="fetchEmployees(true); fetchEmployees(false);" />
 
                 <div v-if="totalAlumni > 0">
                     <h1>{{ $t("alumniLabel") }}</h1>
@@ -463,9 +528,49 @@
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
                         :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
-                        @switch-page="switchAlumniPage">
-                    </person-table-component>
+                        @switch-page="switchAlumniPage" />
                 </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="projects">
+                <project-table-component
+                    ref="projectsRef"
+                    hide-bulk-actions
+                    :projects="projects"
+                    :total-projects="totalProjects"
+                    :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    :allow-unbinding="canEdit && isInstitutionalEditor"
+                    @switch-page="switchProjectsPage">
+                    <template #top-left>
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformProjectSearch($event)"
+                        />
+                    </template>
+                    <template #actions>
+                        <v-menu>
+                            <template #activator="{ props: optionsProps }">
+                                <v-btn
+                                    v-bind="optionsProps"
+                                    color="white"
+                                    prepend-icon="mdi-dots-vertical"
+                                >
+                                    {{ $t("optionsLabel") }}
+                                </v-btn>
+                            </template>
+                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                <v-checkbox
+                                    v-model="returnOnlyActiveProjects"
+                                    :label="$t('showOnlyActiveLabel')"
+                                    hide-details
+                                />
+                            </div>
+                        </v-menu>
+                    </template>
+                    <template #status-filter-menu>
+                        <project-status-filter v-model="selectedProjectStatuses" />
+                    </template>
+                </project-table-component>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
                 <!-- Relations -->
@@ -473,10 +578,10 @@
                     <v-col cols="12">
                         <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                             <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations"></organisation-unit-relation-update-modal>
+                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations" />
 
                                 <h2>{{ $t("relationsLabel") }}</h2>
-                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links"></relations-graph>
+                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links" />
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -493,8 +598,7 @@
                                 :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
                                 :endpoint-token-parameters="['*', String(organisationUnit.id)]"
                                 :top-level-institution-id="organisationUnit.id"
-                                @switch-page="switchSubUnitsPage">
-                            </organisation-unit-table-component>
+                                @switch-page="switchSubUnitsPage" />
                         </v-col>
                     </v-row>
                 </div>
@@ -505,16 +609,14 @@
                     :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="organisationUnit?.description ? organisationUnit.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <!-- Research Area -->
                 <v-row>
@@ -524,8 +626,7 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="organisationUnit?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas" />
 
                                 <h3 class="mb-1">
                                     {{ $t("researchAreasLabel") }}
@@ -571,6 +672,23 @@
                     :is-digital-library-client="organisationUnit?.clientInstitutionDl"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.ORGANISATION_UNIT"
+                    :entity-id="organisationUnit?.id"
+                    @restored="() => fetchOU(false)"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.ORGANISATION_UNIT"
+                    :entity-id="organisationUnit?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -587,7 +705,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, watch, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -597,11 +715,16 @@ import RelationsGraph from '../../components/core/RelationsGraph.vue';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import KeywordList from '@/components/core/KeywordList.vue';
 import { useI18n } from 'vue-i18n';
 import { ApplicableEntityType, ExportableEndpointType, type MultilingualContent } from '@/models/Common';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
+import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
+import ProjectService from '@/services/project/ProjectService';
+import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -653,13 +776,27 @@ import { localiseDate } from '@/utils/DateUtil';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList },
+    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, KeywordList, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, BasicInfoLoader, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, DescriptionSection, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("relations");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
         const displayPersistentDialog = ref(false);
 
         const snackbar = ref(false);
@@ -698,12 +835,24 @@ export default defineComponent({
         const alumniDirection = ref("");
         const personSearchParams = ref("tokens=*");
 
+        const projects = ref<ProjectIndex[]>([]);
+        const totalProjects = ref<number>(0);
+        const projectsPage = ref(0);
+        const projectsSize = ref(10);
+        const projectsSort = ref("");
+        const projectsDirection = ref("");
+        const projectSearchParams = ref("tokens=*");
+        const selectedProjectStatuses = ref<ProjectStatus[]>([]);
+        const returnOnlyActiveProjects = ref(false);
+        const projectsRef = ref<typeof ProjectTableComponent>();
+
         const subUnitsPage = ref(0);
         const subUnitsSize = ref(10);
         const subUnitsSort = ref("");
         const subUnitsDirection = ref("");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canEditDefaultSubmissionContent = ref(false);
 
         const i18n = useI18n();
@@ -721,8 +870,7 @@ export default defineComponent({
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
             loggedInUser, userInstitutionid,
-            isLibrarianUser
-        } = useUserRole();
+            isLibrarianUser, isViceDeanForScience, canReviewDataQuality } = useUserRole();
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
@@ -741,6 +889,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.ORGANISATION_UNIT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 OrganisationUnitService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -790,7 +945,8 @@ export default defineComponent({
                     document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
                     
                     if(uponStartup) {
-                        const operations = [fetchEmployees(false), fetchEmployees(true)];
+                        const operations =
+                            [fetchEmployees(false), fetchEmployees(true), fetchProjects()];
                         if (showOutputs.value) {
                             operations.push(fetchPublications());
                         }
@@ -898,6 +1054,41 @@ export default defineComponent({
             });
         };
 
+        const switchProjectsPage = (nextPage: number, pageSize: number, sortField?: string, sortDir?: string) => {
+            projectsPage.value = nextPage;
+            projectsSize.value = pageSize;
+            projectsSort.value = sortField ?? "";
+            projectsDirection.value = sortDir ?? "";
+            fetchProjects();
+        };
+
+        const fetchProjects = () => {
+            return ProjectService.findProjectsForOrganisationUnit(
+                parseInt(currentRoute.params.id as string),
+                `${projectSearchParams.value}&page=${projectsPage.value}&size=${projectsSize.value}&sort=${projectsSort.value},${projectsDirection.value}`,
+                returnOnlyActiveProjects.value,
+                selectedProjectStatuses.value
+            ).then((response) => {
+                projects.value = response.data.content;
+                totalProjects.value = response.data.totalElements;
+            });
+        };
+
+        watch([selectedProjectStatuses, returnOnlyActiveProjects], () => {
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            fetchProjects();
+        });
+
+        const clearSortAndPerformProjectSearch = (tokenParams: string) => {
+            projectSearchParams.value = tokenParams;
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            projectsSort.value = "";
+            projectsDirection.value = "";
+            fetchProjects();
+        };
+
         const clearSortAndPerformPersonSearch = (tokenParams: string) => {
             personSearchParams.value = tokenParams;
             employeesRef.value?.setSortAndPageOption([], 1);
@@ -951,6 +1142,9 @@ export default defineComponent({
             organisationUnit.value!.isni = basicInfo.isni;
             organisationUnit.value!.taxNumber = basicInfo.taxNumber;
             organisationUnit.value!.fctId = basicInfo.fctId;
+            organisationUnit.value!.grid = basicInfo.grid;
+            organisationUnit.value!.wikidata = basicInfo.wikidata;
+            organisationUnit.value!.nationalId = basicInfo.nationalId;
             organisationUnit.value!.uris = basicInfo.uris;
             organisationUnit.value!.allowedThesisTypes = basicInfo.allowedThesisTypes;
             organisationUnit.value!.clientInstitutionCris = basicInfo.clientInstitutionCris;
@@ -965,6 +1159,9 @@ export default defineComponent({
             organisationUnit.value!.sector = basicInfo.sector;
             organisationUnit.value!.startup = basicInfo.startup;
             organisationUnit.value!.dateEstablished = basicInfo.dateEstablished;
+            organisationUnit.value!.dateDissolved = basicInfo.dateDissolved;
+            organisationUnit.value!.active = basicInfo.active;
+            organisationUnit.value!.numberOfEmployees = basicInfo.numberOfEmployees;
             organisationUnit.value!.postalAddress = basicInfo.postalAddress;
             performUpdate(false);
         };
@@ -1015,6 +1212,9 @@ export default defineComponent({
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
                 fctId: organisationUnit.value?.fctId,
+                grid: organisationUnit.value?.grid,
+                nationalId: organisationUnit.value?.nationalId,
+                wikidata: organisationUnit.value?.wikidata,
                 taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
@@ -1030,6 +1230,9 @@ export default defineComponent({
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
                 dateEstablished: organisationUnit.value?.dateEstablished,
+                dateDissolved: organisationUnit.value?.dateDissolved,
+                active: organisationUnit.value?.active,
+                numberOfEmployees: organisationUnit.value?.numberOfEmployees,
                 postalAddress: organisationUnit.value?.postalAddress
             };
 
@@ -1058,6 +1261,9 @@ export default defineComponent({
                 fundref: organisationUnit.value?.fundref,
                 isni: organisationUnit.value?.isni,
                 fctId: organisationUnit.value?.fctId,
+                grid: organisationUnit.value?.grid,
+                nationalId: organisationUnit.value?.nationalId,
+                wikidata: organisationUnit.value?.wikidata,
                 taxNumber: organisationUnit.value?.taxNumber,
                 uris: organisationUnit.value?.uris as string[],
                 allowedThesisTypes: organisationUnit.value?.allowedThesisTypes as ThesisType[],
@@ -1073,6 +1279,9 @@ export default defineComponent({
                 sector: organisationUnit.value?.sector,
                 startup: organisationUnit.value?.startup,
                 dateEstablished: organisationUnit.value?.dateEstablished,
+                dateDissolved: organisationUnit.value?.dateDissolved,
+                active: organisationUnit.value?.active,
+                numberOfEmployees: organisationUnit.value?.numberOfEmployees,
                 postalAddress: organisationUnit.value?.postalAddress
             };
 
@@ -1151,6 +1360,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             organisationUnit, currentTab, isHeadOfLibrary,
             publications, totalPublications, userInstitutionid,
             employees, totalEmployees, publicationsRef,
@@ -1184,7 +1395,12 @@ export default defineComponent({
             openMetadataEnrichmentDialog, displayPersistentDialog,
             startMetadataEnrichment, updateDescription,
             getOUSectorFromValueAutoLocale, localiseDate,
-            organisationUnitIdentifiers, fetchIdentifiers
+            organisationUnitIdentifiers, fetchIdentifiers,
+            EntityType, fetchOU, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
+            projects, totalProjects, projectsRef, switchProjectsPage,
+            selectedProjectStatuses, returnOnlyActiveProjects,
+            clearSortAndPerformProjectSearch
         };
 }})
 

@@ -39,7 +39,7 @@
                 </v-container>
             </v-card-text>
             <v-card-actions>
-                <v-spacer></v-spacer>
+                <v-spacer />
                 <v-btn color="blue darken-1" @click="dialog = false">
                     {{ $t("closeLabel") }}
                 </v-btn>
@@ -88,7 +88,7 @@ export default defineComponent({
                 dateFrom: new Date().toJSON().slice(0, 10), // today's date
                 dateTo: undefined,
                 involvementType: InvolvementType.EMPLOYED_AT,
-                affiliationStatement: [],
+                displayOrganisationUnit: [],
                 organisationUnitId: props.institutionId,
                 role: [],
                 employmentPosition: selectedEmploymentPosition.value.value

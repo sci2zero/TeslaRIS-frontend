@@ -25,8 +25,7 @@
         ref="dialogRef"
         :title="$t('areYouSureLabel')"
         :message="$t('backupDownloadWarning')"
-        @continue="finishBackupDownloading">
-    </persistent-question-dialog>
+        @continue="finishBackupDownloading" />
 </template>
 
 <script lang="ts">

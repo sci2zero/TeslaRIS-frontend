@@ -82,8 +82,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedEntries.map(entity => `${entity.personalInformation.authorName.firstname} ${entity.personalInformation.authorName.lastname}`)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
   
 <script lang="ts">

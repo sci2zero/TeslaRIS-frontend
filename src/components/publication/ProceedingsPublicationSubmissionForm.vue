@@ -96,8 +96,7 @@
                             :items="publicationTypes"
                             :label="$t('concretePublicationTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -226,6 +225,7 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil.js';
 
 
 export default defineComponent({
@@ -333,7 +333,7 @@ export default defineComponent({
                     }
 
                     if (proceedingsResponse.documentDate) {
-                        availableProceedings.value.push({title: `${title} | ${proceedingsResponse.documentDate}`, value: proceedingsResponse.id as number });
+                        availableProceedings.value.push({title: `${title} | ${localiseFlexibleDate(proceedingsResponse.documentDate)}`, value: proceedingsResponse.id as number });
                     } else {
                         availableProceedings.value.push({title: title as string, value: proceedingsResponse.id as number });
                     }
@@ -399,7 +399,7 @@ export default defineComponent({
             if (!title && proceedings.title.length > 0) {
                 title = proceedings.title[0].content;
             }
-            const toSelect = {title: `${title} | ${proceedings.documentDate}`, value: proceedings.id as number};
+            const toSelect = {title: `${title} | ${localiseFlexibleDate(proceedings.documentDate)}`, value: proceedings.id as number};
             availableProceedings.value.push(toSelect);
             selectedProceedings.value = toSelect;
         };

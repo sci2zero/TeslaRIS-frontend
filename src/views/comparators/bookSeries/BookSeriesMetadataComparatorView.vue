@@ -5,13 +5,13 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftBookSeries?.title) }}
                 </h2>
-                <br />
+                <br>
 
                 <publication-series-update-form
                     ref="updateLeftRef" input-type="JOURNAL" :preset-publication-series="leftBookSeries" :in-modal="false"
-                    @update="updateLeft"></publication-series-update-form>
+                    @update="updateLeft" />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -26,8 +26,7 @@
                             :publication-series-id="leftBookSeries?.id"
                             :contribution-list="leftBookSeries?.contributions ? leftBookSeries.contributions : []"
                             in-comparator
-                            :can-reorder="true">
-                        </person-publication-series-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -46,13 +45,13 @@
                     {{ returnCurrentLocaleContent(rightBookSeries?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <publication-series-update-form
                     ref="updateRightRef" input-type="JOURNAL" :preset-publication-series="rightBookSeries" :in-modal="false"
-                    @update="updateRight"></publication-series-update-form>
+                    @update="updateRight" />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -67,8 +66,7 @@
                             :publication-series-id="rightBookSeries?.id"
                             :contribution-list="rightBookSeries?.contributions ? rightBookSeries.contributions : []"
                             in-comparator
-                            :can-reorder="true">
-                        </person-publication-series-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -82,8 +80,7 @@
             :right-id="(rightBookSeries?.id as number)"
             :entity-type="EntityType.BOOK_SERIES"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

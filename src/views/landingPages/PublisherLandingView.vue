@@ -9,8 +9,7 @@
                             :loading="!publisher"
                             type="heading"
                             color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
+                            class="d-flex justify-center align-center">
                             <p class="text-h5">
                                 {{ returnCurrentLocaleContent(publisher?.name) }}
                             </p>
@@ -49,12 +48,12 @@
                         </div>
                         <basic-info-loader v-if="!publisher" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.countryId">
                                     {{ $t("countryLabel") }}:
                                 </div>
-                                <div v-if="publisher?.countryId" class="response">
-                                    {{ returnCurrentLocaleContent(country?.name) }}
+                                <div v-if="publisher?.countryName?.length ?? 0 > 0" class="response">
+                                    {{ returnCurrentLocaleContent(publisher?.countryName) }}
                                 </div>
                                 <div v-if="publisher?.state && publisher?.state.length > 0">
                                     {{ $t("stateLabel") }}:
@@ -63,13 +62,19 @@
                                     {{ returnCurrentLocaleContent(publisher?.state) }}
                                 </div>
                             </v-col>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="publisher?.place && publisher?.place.length > 0">
                                     {{ $t("placeLabel") }}:
                                 </div>
                                 <div v-if="publisher?.place && publisher?.place.length > 0" class="response">
                                     {{ returnCurrentLocaleContent(publisher?.place) }}
                                 </div>
+                            </v-col>
+                            <v-col v-if="isAdmin" cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.PUBLISHER"
+                                    :entity-id="publisher?.id"
+                                />
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -78,7 +83,7 @@
         </v-row>
 
         <!-- Publication Table -->
-        <br />
+        <br>
         <tab-content-loader
             v-if="!publisher"
             :button-header="false"
@@ -88,15 +93,37 @@
             v-else
             :publications="publications"
             :total-publications="totalPublications"
-            @switch-page="switchPage">
-        </publication-table-component>
+            @switch-page="switchPage"
+        />
         
+        <!-- Revision History -->
+        <template v-if="canReviewDataQuality && canAssessDataQuality && publisher">
+            <h2 class="mt-8 mb-2">
+                {{ $t("revisionHistoryLabel") }}
+            </h2>
+            <revision-history-table-component
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
+                @restored="fetchPublisher"
+                @show-assessment-details="showAssessmentDetails"
+            />
+
+            <h2 class="mt-8 mb-2">
+                {{ $t("dataQualityLabel") }}
+            </h2>
+            <data-quality-tabs-component
+                ref="dataQualityTabsRef"
+                :entity-type="EntityType.PUBLISHER"
+                :entity-id="publisher?.id"
+            />
+        </template>
+
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
 </template>
 
 <script lang="ts">
-import type { Country, LanguageTagResponse } from '@/models/Common';
+import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -105,24 +132,38 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { getErrorMessageForErrorKey } from '@/i18n';
-import CountryService from '@/services/CountryService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
 
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader },
+    components: { PublicationTableComponent, GenericCrudModal, Toast, BasicInfoLoader, TabContentLoader, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            dataQualityTabsRef.value?.selectVersion(version.majorVersion, version.minorVersion);
+        };
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -144,13 +185,22 @@ export default defineComponent({
         const icon = ref("mdi-account-group");
 
         const canEdit = ref(false);
-        const country = ref<Country>();
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
-                PublisherService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PUBLISHER,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
+                PublisherService.canEdit(
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
                     canEdit.value = response.data;
                 });
             }
@@ -168,7 +218,6 @@ export default defineComponent({
 
                 fetchPublications();     
                 populateData();
-                fetchDetails();
             }).catch(() => {
                 router.push({ name: "notFound" });
             });
@@ -177,14 +226,6 @@ export default defineComponent({
         watch(i18n.locale, () => {
             populateData();
         });
-
-        const fetchDetails = () => {
-            if (publisher.value?.countryId) {
-                CountryService.readCountry(publisher.value.countryId as number).then((response) => {
-                    country.value = response.data;
-                });
-            }
-        };
 
         const populateData = () => {
             LanguageService.getAllLanguageTags().then(response => {
@@ -207,7 +248,10 @@ export default defineComponent({
                 return;
             }
 
-            DocumentPublicationService.findPublicationsForPublisher(publisher.value?.id as number, `page=${page.value}&size=${size.value}&sort=${sort.value}`).then((response) => {
+            DocumentPublicationService.findPublicationsForPublisher(
+                publisher.value?.id as number,
+                `page=${page.value}&size=${size.value}&sort=${sort.value}`
+            ).then((response) => {
                 publications.value = response.data.content;
                 totalPublications.value = response.data.totalElements;
             })
@@ -219,10 +263,13 @@ export default defineComponent({
             publisher.value!.state = updatedBasicInfo.state;
             publisher.value!.countryId = updatedBasicInfo.countryId;
 
-            PublisherService.updatePublisher(publisher.value?.id as number, publisher.value as Publisher).then(() => {
+            PublisherService.updatePublisher(
+                publisher.value?.id as number,
+                publisher.value as Publisher
+            ).then(() => {
                 snackbarMessage.value = i18n.t("updatedSuccessMessage");
                 snackbar.value = true;
-                fetchDetails();
+                fetchPublisher();
             }).catch((error) => {
                 snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
                 snackbar.value = true;
@@ -230,13 +277,15 @@ export default defineComponent({
         };
 
         return {
-            publisher, icon,
-            publications, 
-            totalPublications,
-            switchPage, country,
+            canReviewDataQuality, canAssessDataQuality,
+            publisher, icon, publications, 
+            totalPublications, switchPage,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
-            updateBasicInfo, snackbar, snackbarMessage
+            updateBasicInfo, snackbar, snackbarMessage,
+            isAdmin, EntityType, fetchPublisher,
+            dataQualityTabsRef, showAssessmentDetails,
+            isViceDeanForScience
         };
 }})
 

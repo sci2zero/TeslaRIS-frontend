@@ -49,7 +49,7 @@
                         </div>
                         <basic-info-loader v-if="!conference" :citation-button="false" />
                         <v-row>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="!conference?.serialEvent">
                                     {{ $t("eventDateLabel") }}:
                                 </div>
@@ -78,7 +78,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div v-if="conference?.openAlexId" class="response">
-                                    <identifier-link :identifier="conference.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link :identifier="conference.openAlexId" type="open_alex" />
                                 </div>
                                 <div v-if="conference?.number">
                                     {{ $t("conferenceNumberLabel") }}:
@@ -102,9 +102,9 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="conference?.uris"></uri-list>
+                                    <uri-list :uris="conference?.uris" />
                                 </div>
-                                <br />
+                                <br>
                                 <div v-if="conference?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
@@ -118,6 +118,12 @@
                                         @updated="fetchIdentifiers"
                                     />
                                 </div>
+                            </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.CONFERENCE"
+                                    :entity-id="conference?.id"
+                                />
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -146,6 +152,12 @@
             </v-tab>
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -191,7 +203,7 @@
             
                 <!-- Proceedings List -->
                 <div v-if="!conference?.serialEvent">
-                    <br />
+                    <br>
                     <proceedings-list
                         :preset-event="conference"
                         :readonly="!canEdit"
@@ -228,6 +240,23 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.CONFERENCE"
+                    :entity-id="conference?.id"
+                    @restored="fetchConference"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.CONFERENCE"
+                    :entity-id="conference?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -235,7 +264,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -243,6 +272,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
@@ -271,13 +301,30 @@ import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -299,6 +346,7 @@ export default defineComponent({
         const icon = ref("mdi-presentation");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const country = ref<Country>();
 
@@ -310,6 +358,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.CONFERENCE,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -454,6 +509,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             conference, icon, publications,
             totalPublications, switchPublicationsPage,
             keywords, localiseDateRange, updateBasicInfo,
@@ -464,7 +521,10 @@ export default defineComponent({
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, ExportableEndpointType,
-            fetchIdentifiers, eventIdentifiers
+            fetchIdentifiers, eventIdentifiers,
+            isAdmin, EntityType, fetchConference,
+            dataQualityTabsRef, showAssessmentDetails,
+            isViceDeanForScience
         };
 }})
 

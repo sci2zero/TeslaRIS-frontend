@@ -19,14 +19,14 @@
                         <div class="text-center">
                             <!-- Search bar -->
                             <div class="flex justify-center">
-                                <search-bar-component :dark="true" :search-when-typing="false" @search="search"></search-bar-component>
+                                <search-bar-component :dark="true" :search-when-typing="false" @search="search" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="max-w-5xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 py-8 pb-12 px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 py-8 pb-12 px-8">
                     <!-- Cards -->
                     <div v-for="(item, index) in cardsData" :key="index" class="">
                         <div
@@ -34,7 +34,7 @@
                             @click="item.path !== undefined ? $router.push('/' + $i18n.locale + '/' + item.path) : undefined">
                             <div class="text-center mb-3 sm:mb-4">
                                 <div class="icon-wrapper">
-                                    <v-icon :icon="item.icon" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" :size="$vuetify.display.xs ? '32' : $vuetify.display.sm ? '40' : '48'"></v-icon>
+                                    <v-icon :icon="item.icon" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" :size="$vuetify.display.xs ? '32' : $vuetify.display.sm ? '40' : '48'" />
                                 </div>
                             </div>
                             <h3 class="text-center text-sm sm:text-base font-medium mb-2 sm:mb-3 text-white px-2">
@@ -47,7 +47,7 @@
                                         color="white"
                                         :size="40"
                                         :width="3"
-                                    ></v-progress-circular>
+                                    />
                                 </div>
                                 <div v-else>
                                     <span class="frosted-number text-lg sm:text-xl md:text-2xl">
@@ -77,6 +77,7 @@ import PersonService from "@/services/PersonService";
 import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import ProjectService from "@/services/project/ProjectService";
 import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import Navbar from "@/components/core/MainNavbar.vue";
@@ -85,7 +86,6 @@ import { type PersonIndex } from "@/models/PersonModel";
 import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
-
 
 export default defineComponent({
     name: "HomeView",
@@ -100,10 +100,12 @@ export default defineComponent({
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
         const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
+        const projectsLabel = computed(() => i18n.t("projectsLabel"));
 
         const researcherCount = ref(0);
         const ouCount = ref(0);
         const publicationCount = ref(0);
+        const projectCount = ref(0);
         const isLoadingCounts = ref(true);
 
         onMounted(() => {
@@ -115,7 +117,8 @@ export default defineComponent({
             Promise.all([
                 PersonService.getResearcherCount().then((response) => researcherCount.value = response.data),
                 OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data),
-                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data)
+                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data),
+                ProjectService.getProjectCount().then((response) => projectCount.value = response.data)
             ]).finally(() => {
                 isLoadingCounts.value = false;
             });
@@ -131,6 +134,7 @@ export default defineComponent({
             {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, path:'persons', icon: 'mdi-account-group'},
             {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain'},
             {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple'},
+            {name: projectsLabel, value: projectCount, path:'project', icon: 'mdi-folder-star'},
         ]);
 
         const search = (tokenParams: string) => {

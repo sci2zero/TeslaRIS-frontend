@@ -13,7 +13,7 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <time-picker v-model="scheduledTime" :label="$t('timeLabel') + '*'" required></time-picker>
+                <time-picker v-model="scheduledTime" :label="$t('timeLabel') + '*'" required />
             </v-col>
         </v-row>
         <v-row>
@@ -23,8 +23,7 @@
                     :items="recurrenceTypes"
                     :label="$t('recurrenceTypeLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row v-if="selectedRecurrenceType.value != RecurrenceType.ONCE">

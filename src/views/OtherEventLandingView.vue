@@ -49,7 +49,7 @@
                         </div>
                         <basic-info-loader v-if="!otherEvent" :citation-button="false" />
                         <v-row>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="!otherEvent?.serialEvent">
                                     {{ $t("eventDateLabel") }}:
                                 </div>
@@ -84,9 +84,9 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="otherEvent?.uris"></uri-list>
+                                    <uri-list :uris="otherEvent?.uris" />
                                 </div>
-                                <br />
+                                <br>
                                 <div v-if="otherEvent?.serialEvent">
                                     <h2>{{ $t("isSerialEventMessage") }}</h2>
                                 </div>
@@ -100,6 +100,12 @@
                                         @updated="fetchIdentifiers"
                                     />
                                 </div>
+                            </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.OTHER_EVENT"
+                                    :entity-id="otherEvent?.id"
+                                />
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -126,6 +132,12 @@
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -144,14 +156,12 @@
                 <keyword-list
                     :keywords="otherEvent?.keywords ? otherEvent?.keywords : []"
                     :can-edit="canEdit"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
                 <description-section
                     :description="otherEvent?.description ? otherEvent.description : []"
                     :can-edit="canEdit"
                     is-general-description
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <div class="mt-10">
                     <events-relation-list
@@ -183,6 +193,23 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.OTHER_EVENT"
+                    :entity-id="otherEvent?.id"
+                    @restored="fetchOtherEvent"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.OTHER_EVENT"
+                    :entity-id="otherEvent?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -190,7 +217,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -222,13 +249,31 @@ import { getOtherEventTypeTitleFromValueAutoLocale } from '@/i18n/otherEventType
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import DataQualityService from '@/services/revision/DataQualityService';
 
 
 export default defineComponent({
     name: "OtherEventLandingPage",
-    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList },
+    components: { PersonEventContributionTabs, KeywordList, GenericCrudModal, DescriptionSection, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, isInstitutionalEditor, canReviewDataQuality } = useUserRole();
+
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -244,6 +289,7 @@ export default defineComponent({
 
         const canEdit = ref(false);
         const canClassify = ref(false);
+        const canAssessDataQuality = ref(false);
         const country = ref<Country>();
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
@@ -257,6 +303,14 @@ export default defineComponent({
                 EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                DataQualityService.canAssessDataQuality(
+                    "OTHER_EVENT", 
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+                
                 EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
                 });
@@ -374,6 +428,7 @@ export default defineComponent({
         };
 
         return {
+            canReviewDataQuality,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent, otherEvent,
             updateContributions, updateKeywords, icon,
@@ -382,7 +437,10 @@ export default defineComponent({
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, fetchIdentifiers,
-            getOtherEventTypeTitleFromValueAutoLocale, eventIdentifiers
+            getOtherEventTypeTitleFromValueAutoLocale, eventIdentifiers,
+            isAdmin, EntityType, fetchOtherEvent, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails, isInstitutionalEditor,
+            canAssessDataQuality
         };
 }})
 

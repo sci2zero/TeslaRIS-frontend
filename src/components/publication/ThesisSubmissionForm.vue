@@ -18,7 +18,7 @@
                             :items="thesisTypes"
                             :rules="requiredSelectionRules"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -28,8 +28,7 @@
                             v-model:model-value="selectedOrganisationUnit"
                             :top-level-institution-id="topLevelInstitutionId"
                             required
-                            :allowed-thesis-type="selectedThesisType.value">
-                        </organisation-unit-autocomplete-search>
+                            :allowed-thesis-type="selectedThesisType.value" />
                     </v-col>
                 </v-row>
                 <v-row v-if="enterExternalOU">
@@ -55,8 +54,7 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'" />
                     </v-col>
                 </v-row>
 
@@ -70,19 +68,18 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
 
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field
-                            v-model="publicationYear" type="number" 
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                            :placeholder="$t('yearOfPublicationLabel') + (canAddAsNonReference ? '' : '*')"
-                            :rules="(canAddAsNonReference) ? [] : requiredFieldRules">
-                        </v-text-field>
+                            :required="!canAddAsNonReference"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -90,8 +87,7 @@
                         <multilingual-text-input
                             ref="scientificAreaRef"
                             v-model="scientificArea"
-                            :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artAreaLabel' : 'scientificAreaLabel')">
-                        </multilingual-text-input>
+                            :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artAreaLabel' : 'scientificAreaLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -116,8 +112,7 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -125,8 +120,7 @@
                             <multilingual-text-input
                                 ref="alternateTitleRef"
                                 v-model="alternateTitle"
-                                :label="$t('alternateTitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('alternateTitleLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -135,7 +129,7 @@
                                 v-model="topicAcceptanceDate"
                                 :label="$t('topicAcceptanceDateLabel')"
                                 color="primary"
-                            ></date-picker>
+                            />
                         </v-col>
                         <v-col
                             v-if="!isOrganisationUnitDLClient || isAdmin || isHeadOfLibrary"
@@ -144,7 +138,7 @@
                                 v-model="thesisDefenceDate"
                                 :label="$t('defenceDateLabel')"
                                 color="primary"
-                            ></date-picker>
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -153,7 +147,7 @@
                                 v-model="selectedLanguage"
                                 :label="$t('languageLabel')"
                                 :items="languageList"
-                            ></v-select>
+                            />
                         </v-col>
                         <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)" cols="12" md="6">
                             <v-select
@@ -161,7 +155,7 @@
                                 :label="$t('writingLanguageLabel')"
                                 :items="languageTagsList"
                                 return-object
-                            ></v-select>
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -169,8 +163,7 @@
                             <multilingual-text-input
                                 ref="scientificSubAreaRef"
                                 v-model="scientificSubArea"
-                                :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artSubAreaLabel' : 'scientificSubAreaLabel')">
-                            </multilingual-text-input>
+                                :label="$t((selectedThesisType.value == ThesisType.PHD_ART_PROJECT) ? 'artSubAreaLabel' : 'scientificSubAreaLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -179,24 +172,21 @@
                                 v-model="numberOfPages" type="number"
                                 :label="$t('numberOfPagesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfPagesLabel')" />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="numberOfChapters" type="number"
                                 :label="$t('numberOfChaptersLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfChaptersLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfChaptersLabel')" />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="numberOfReferences" type="number"
                                 :label="$t('numberOfReferencesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfReferencesLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfReferencesLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -205,32 +195,28 @@
                                 v-model="numberOfGraphs" type="number"
                                 :label="$t('numberOfGraphsLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfGraphsLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfGraphsLabel')" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="numberOfIllustrations" type="number"
                                 :label="$t('numberOfIllustrationsLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfIllustrationsLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfIllustrationsLabel')" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="numberOfTables" type="number"
                                 :label="$t('numberOfTablesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfTablesLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfTablesLabel')" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="numberOfAppendices" type="number"
                                 :label="$t('numberOfAppendicesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfAppendicesLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfAppendicesLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -239,16 +225,14 @@
                                 v-model="eIsbn"
                                 label="E-ISBN"
                                 placeholder="E-ISBN"
-                                :rules="isbnValidationRules">
-                            </v-text-field>
+                                :rules="isbnValidationRules" />
                         </v-col>
                         <v-col cols="6">
                             <v-text-field
                                 v-model="printIsbn"
                                 label="Print ISBN"
                                 placeholder="Print ISBN"
-                                :rules="isbnValidationRules">
-                            </v-text-field>
+                                :rules="isbnValidationRules" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -257,7 +241,7 @@
                                 v-model="udc"
                                 :label="$t('udcLabel')"
                                 :placeholder="$t('udcLabel')"
-                                :rules="udcValidationRules"></v-text-field>
+                                :rules="udcValidationRules" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -267,8 +251,7 @@
                                 v-model="placeOfKeep"
                                 :initial-value="toMultilingualTextInput(presetContent?.placeOfKeep, languageTagsList)"
                                 :label="$t('placeOfKeepLabel')"
-                                :default-placeholder="(presetContent?.placeOfKeep && presetContent?.placeOfKeep.length > 0) ? '.' : ''">
-                            </multilingual-text-input>
+                                :default-placeholder="(presetContent?.placeOfKeep && presetContent?.placeOfKeep.length > 0) ? '.' : ''" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -278,29 +261,26 @@
                                 v-model="typeOfTitle"
                                 :label="$t('typeOfTitleLabel')"
                                 :initial-value="toMultilingualTextInput(presetContent?.typeOfTitle, languageTagsList)"
-                                default-placeholder="PhD (dr)">
-                            </multilingual-text-input>
+                                default-placeholder="PhD (dr)" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
                             <multilingual-text-input
                                 ref="descriptionRef" v-model="description"
-                                is-area :label="$t('abstractLabel')">
-                            </multilingual-text-input>
+                                is-area :label="$t('abstractLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
                             <multilingual-text-input
                                 ref="keywordsRef" v-model="keywords"
-                                :label="$t('keywordsLabel')" is-area>
-                            </multilingual-text-input>
+                                :label="$t('keywordsLabel')" is-area />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -308,8 +288,7 @@
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
                                 v-model="selectedPublisher"
-                                allow-author-reprint>
-                            </publisher-autocomplete-search>
+                                allow-author-reprint />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -326,16 +305,14 @@
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules" />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules" />
                         </v-col>
                     </v-row>
 
@@ -370,7 +347,7 @@ import { type CommonFieldsData, DocumentContributionType, type PersonDocumentCon
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useI18n } from 'vue-i18n';
-import type { ErrorResponse, LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, LanguageResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import LanguageService from '@/services/LanguageService';
 import { onMounted } from 'vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -388,11 +365,12 @@ import PersonService from '@/services/PersonService';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitThesis",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -559,7 +537,7 @@ export default defineComponent({
         const description = ref([]);
         const keywords = ref<any[]>([]);
         const contributions = ref<PersonDocumentContribution[]>([]);
-        const publicationYear = ref(props.presetYear ? props.presetYear : "");
+        const publicationDate = ref<FlexibleDate | undefined>(props.presetYear ? {year: Number.parseInt(props.presetYear)} : undefined);
         const doi = ref("");
         const openAlexId = ref("");
         const webOfScienceId = ref("");
@@ -634,7 +612,7 @@ export default defineComponent({
                 alternateTitle: alternateTitle.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
                 scopusId: scopus.value,
@@ -668,7 +646,7 @@ export default defineComponent({
                     urisRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     ouAutocompleteRef.value?.clearInput();
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     openAlexId.value = "";
                     webOfScienceId.value = "";
@@ -723,7 +701,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (contributions.value.length === 0 && metadata.contributions.length !== 0) {
@@ -779,7 +757,7 @@ export default defineComponent({
         return {
             isFormValid, PublicationType, popuateMetadata,
             additionalFields, snackbar, error, title, titleRef,
-            subtitle, subtitleRef, publicationYear, doi, openAlexId,
+            subtitle, subtitleRef, publicationDate, doi, openAlexId,
             publisherAutocompleteRef, selectedPublisher, numberOfPages,
             description, descriptionRef, doiValidationRules,
             keywords, keywordsRef, uris, urisRef, selectedLanguage,

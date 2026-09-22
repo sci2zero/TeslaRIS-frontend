@@ -41,6 +41,16 @@
                 />
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="10">
+                <v-text-field
+                    v-model="localNationalId"
+                    :label="$t('nationalIdLabel')"
+                    :placeholder="$t('nationalIdLabel')"
+                    @update:model-value="emitUpdate"
+                />
+            </v-col>
+        </v-row>
 
         <v-row>
             <v-col>
@@ -157,6 +167,7 @@ export default defineComponent({
         const localArxivId = ref(props.modelValue?.arxivId || props.presetData?.arxivId || "");
         const localPubmedId = ref(props.modelValue?.pubmedId || props.presetData?.pubmedId || "");
         const localSsrnId = ref(props.modelValue?.ssrnId || props.presetData?.ssrnId || "");
+        const localNationalId = ref(props.modelValue?.nationalId || props.presetData?.nationalId || "");
         const localCity = ref<any[]>(props.modelValue?.city || props.presetData?.city || []);
         const localEdition = ref<any[]>(props.modelValue?.edition || props.presetData?.edition || []);
         const localGeoSpaceDescription = ref<any[]>(
@@ -203,6 +214,7 @@ export default defineComponent({
                 arxivId: localArxivId.value,
                 pubmedId: localPubmedId.value,
                 ssrnId: localSsrnId.value,
+                nationalId: localNationalId.value,
                 city: localCity.value,
                 geoSpaceDescription: localGeoSpaceDescription.value,
                 chronologicalSpaceDescription: localChronologicalSpaceDescription.value,
@@ -227,6 +239,7 @@ export default defineComponent({
                 localArxivId.value = newModelValue.arxivId || "";
                 localPubmedId.value = newModelValue.pubmedId || "";
                 localSsrnId.value = newModelValue.ssrnId || "";
+                localNationalId.value = newModelValue.nationalId || "";
                 localCity.value = newModelValue.city || [];
                 localEdition.value = newModelValue.edition || [];
                 localGeoSpaceDescription.value = newModelValue.geoSpaceDescription || [];
@@ -247,6 +260,7 @@ export default defineComponent({
             localArxivId.value = data.arxivId || "";
             localPubmedId.value = data.pubmedId || "";
             localSsrnId.value = data.ssrnId || "";
+            localNationalId.value = data.nationalId || "";
             localCity.value = data.city || [];
             localEdition.value = data.edition || [];
             localGeoSpaceDescription.value = data.geoSpaceDescription || [];
@@ -282,6 +296,7 @@ export default defineComponent({
             localArxivId.value = "";
             localPubmedId.value = "";
             localSsrnId.value = "";
+            localNationalId.value = "";
             localCity.value = [];
             localEdition.value = [];
             localGeoSpaceDescription.value = [];
@@ -319,7 +334,8 @@ export default defineComponent({
             arxivIdValidationRules,
             pubmedIdValidationRules,
             ssrnIdValidationRules,
-            emitUpdate, refreshForm, clearInputs
+            emitUpdate, refreshForm,
+            clearInputs, localNationalId
         };
     }
 });

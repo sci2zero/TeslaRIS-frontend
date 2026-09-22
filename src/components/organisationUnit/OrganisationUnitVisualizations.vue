@@ -16,7 +16,7 @@
                 :min="minYear"
                 :max="min([maxYear, toYear])"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
         <v-col cols="5">
             <v-text-field
@@ -29,7 +29,7 @@
                 :min="max([minYear, fromYear])"
                 :max="maxYear"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
     </v-row>
     <v-row
@@ -78,7 +78,7 @@
         v-model="currentTab"
     >
         <v-tabs-window-item value="publicationCount">
-            <div v-if="isDigitalLibraryClient" class="mt-7">
+            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient" class="mt-7">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -160,7 +160,7 @@
             </v-row>
 
             <div
-                v-if="displayThesesLibraryAnalytics"
+                v-if="isDigitalLibraryEnabled && displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
                 <div class="flex flex-col justify-center items-center text-center mt-14">
                     <h2 class="text-3xl font-semibold">
@@ -173,7 +173,7 @@
                         :label="$t('thesisTypeLabel')"
                         return-object
                         multiple
-                    ></v-select>
+                    />
                 </div>
 
                 <v-row class="mt-14!">
@@ -247,7 +247,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryClient" class="mt-7">
+            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient" class="mt-7">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -292,7 +292,7 @@
             </v-row>
 
             <div
-                v-if="displayThesesLibraryAnalytics"
+                v-if="isDigitalLibraryEnabled && displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
                 <div class="flex flex-col justify-center items-center text-center mt-14">
                     <h2 class="text-3xl font-semibold">
@@ -305,7 +305,7 @@
                         :label="$t('thesisTypeLabel')"
                         return-object
                         multiple
-                    ></v-select>
+                    />
                 </div>
             
                 <v-row class="d-flex flex-row text-center mt-10">
@@ -416,6 +416,7 @@ import DigitalLibraryVisualizationService from '@/services/visualization/Digital
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { useUserRole } from '@/composables/useUserRole';
 import { StatisticsType } from '@/models/AssessmentModel';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 const props = defineProps({
@@ -448,6 +449,10 @@ const props = defineProps({
         default: false
     }
 });
+
+const { 
+    isDigitalLibraryEnabled
+ } = useFeatureModuleToggles();
 
 const publicationsYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
 const publicationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();

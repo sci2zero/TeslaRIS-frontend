@@ -38,7 +38,7 @@
                     {{ returnCurrentLocaleContent(mc) }}
                 </em>
             </div>
-            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10"></v-divider>
+            <v-divider v-if="index < (contributionList ? contributionList.length : 1) - 1 " class="mt-10" />
         </div>
     </draggable>
     <strong

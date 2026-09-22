@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(intangibleProduct?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(intangibleProduct?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(intangibleProduct?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("intangibleProductLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!intangibleProduct" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="intangibleProduct?.intangibleProductType">
                                     {{ $t("intangibleProductTypeLabel") }}:
                                 </div>
@@ -69,10 +69,10 @@
                                     {{ intangibleProduct.internalNumber }}
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="intangibleProduct?.documentDate" class="response">
-                                    {{ intangibleProduct.documentDate }}
+                                    {{ localiseFlexibleDate(intangibleProduct.documentDate) }}
                                 </div>
                                 <div v-if="intangibleProduct?.publisherId || intangibleProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -103,6 +103,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                                    :entity-id="intangibleProduct?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -133,7 +140,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -147,6 +154,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -168,8 +181,7 @@
                     :document="intangibleProduct"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
                     :proofs="intangibleProduct?.proofs"
-                    :file-items="intangibleProduct?.fileItems">
-                </attachment-section>
+                    :file-items="intangibleProduct?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -177,8 +189,7 @@
                     :keywords="intangibleProduct?.keywords ? intangibleProduct.keywords : []"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Research Area -->
                 <v-row>
@@ -188,8 +199,8 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="intangibleProduct?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas"
+                                />
 
                                 <h4 class="mt-5 mb-7">
                                     <strong>{{ $t("researchAreasLabel") }}</strong>
@@ -206,8 +217,8 @@
                 <description-section
                     :description="intangibleProduct?.description"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="intangibleProduct?.remark"
@@ -233,7 +244,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="intangibleProduct?.id"
-                    :can-edit="canClassify && intangibleProduct?.documentDate !== ''"
+                    :can-edit="canClassify && !!intangibleProduct?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -245,6 +256,24 @@
                     :document-id="(intangibleProduct?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                    :entity-id="intangibleProduct?.id"
+                    :restore-blocked-reason="intangibleProduct?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="fetchIntangibleProduct"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.INTANGIBLE_PRODUCT"
+                    :entity-id="intangibleProduct?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -262,13 +291,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, IntangibleProduct } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -309,13 +339,32 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreasUpdateModal, ResearchAreaHierarchy, DocumentCommonFieldsDisplay, DataQualityRemarksDialog, RevisionHistoryTableComponent, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -327,8 +376,9 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const { isResearcher, isAdmin, isCommission, isViceDeanForScience, canReviewDataQuality } = useUserRole();
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -357,6 +407,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.INTANGIBLE_PRODUCT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -508,6 +565,7 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality,
             intangibleProduct, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -521,7 +579,10 @@ export default defineComponent({
             fetchIntangibleProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas,
             getIntangibleProductTypeTitleFromValueAutoLocale,
-            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers
+            isAdmin, isCommission, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

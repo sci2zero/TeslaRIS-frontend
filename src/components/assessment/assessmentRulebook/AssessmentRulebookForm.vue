@@ -4,14 +4,14 @@
             <v-col>
                 <multilingual-text-input
                     ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetAssessmentRulebook?.name, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetAssessmentRulebook?.name, languageTags)" />
             </v-col>
         </v-row>
         <v-row v-if="!isUpdate">
             <v-col>
                 <multilingual-text-input
                     ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetAssessmentRulebook?.description, languageTags)"></multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetAssessmentRulebook?.description, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -21,12 +21,12 @@
                     :label="$t('issueDateLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <publisher-autocomplete-search v-model="selectedPublisher"></publisher-autocomplete-search>
+                <publisher-autocomplete-search v-model="selectedPublisher" />
             </v-col>
         </v-row>
 

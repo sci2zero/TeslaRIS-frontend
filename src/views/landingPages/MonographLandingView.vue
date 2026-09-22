@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monograph?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("monographLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!monograph" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="monograph?.monographType">
                                     {{ $t("monographTypeLabel") }}:
                                 </div>
@@ -63,10 +63,10 @@
                                     {{ getMonographTypeTitleFromValueAutoLocale(monograph.monographType) }}
                                 </div>
                                 <div v-if="monograph?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monograph?.documentDate" class="response">
-                                    {{ monograph.documentDate }}
+                                    {{ localiseFlexibleDate(monograph.documentDate) }}
                                 </div>
                                 <div v-if="monograph?.eisbn">
                                     eISBN:
@@ -101,9 +101,9 @@
                                 <div v-if="monograph?.publisherId || monograph?.authorReprint">
                                     {{ $t("publisherLabel") }}:
                                 </div>
-                                <div v-if="monograph?.publisherId" class="response">
+                                <div v-if="monograph?.publisherName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'publishers/' + monograph?.publisherId">
-                                        {{ returnCurrentLocaleContent(publisher?.name) }}
+                                        {{ returnCurrentLocaleContent(monograph?.publisherName) }}
                                     </localized-link>
                                 </div>
                                 <div v-else-if="monograph?.authorReprint" class="response">
@@ -152,6 +152,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.MONOGRAPH"
+                                    :entity-id="monograph?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -185,7 +192,7 @@
             <v-tab value="contributions">
                 {{ $t(monograph?.monographType === MonographType.EDITED_BOOK ? "editorsAndReviewersLabel" : "contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -202,6 +209,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -312,6 +325,24 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.MONOGRAPH"
+                    :entity-id="monograph?.id"
+                    :restore-blocked-reason="monograph?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="() => fetchMonograph(false)"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.MONOGRAPH"
+                    :entity-id="monograph?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -327,13 +358,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { MonographType, PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -375,21 +407,34 @@ import { useTrustConfigurationActions } from '@/composables/useTrustConfiguratio
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
-import PublisherService from '@/services/PublisherService';
-import { type Publisher } from '@/models/PublisherModel';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, KeywordList, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -399,10 +444,19 @@ export default defineComponent({
 
         const monograph = ref<Monograph>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
-        const publisher = ref<Publisher>();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -438,6 +492,13 @@ export default defineComponent({
 
         const fetchDisplayData = (uponStartup: boolean) => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.MONOGRAPH,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -559,12 +620,6 @@ export default defineComponent({
                     });
                 });
             }
-
-            if(monograph.value?.publisherId) {
-                PublisherService.readPublisher(monograph.value.publisherId).then(response => {
-                    publisher.value = response.data;
-                });
-            }
         };
 
         const searchKeyword = (keyword: string) => {
@@ -663,6 +718,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             monograph, icon, actionsRef,
             returnCurrentLocaleContent,
             languageMap, updateBasicInfo,
@@ -681,10 +738,13 @@ export default defineComponent({
             createClassification, fetchClassifications,
             documentClassifications, canClassify,
             fetchValidationStatus, PublicationType,
-            publisher, updateRemark, displayConfiguration,
+            updateRemark, displayConfiguration,
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
-            MonographType
+            MonographType, localiseFlexibleDate,
+            fetchMonograph, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

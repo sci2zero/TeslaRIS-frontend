@@ -13,7 +13,7 @@
                 return-object
                 @update:search="searchMonographs($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
@@ -183,7 +183,7 @@ export default defineComponent({
             }
 
             const toSelect = {
-                title: `${title} | ${monograph.documentDate}`,
+                title: `${title} | ${monograph.documentDate?.year}`,
                 value: monograph.id as number
             };
 

@@ -15,28 +15,28 @@
                     <v-col cols="12">
                         <v-text-field
                             v-model="name" :label="$t('fullNameLabel') + '*'" :placeholder="$t('fullNameLabel') + '*'"
-                            :rules="requiredFieldRules"></v-text-field>
+                            :rules="requiredFieldRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
                             v-model="senderEmail" :label="$t('emailLabel') + '*'" :placeholder="$t('emailLabel') + '*'"
-                            :rules="emailFieldRules"></v-text-field>
+                            :rules="emailFieldRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
                             v-model="subject" :label="$t('subjectLabel') + '*'" :placeholder="$t('subjectLabel') + '*'"
-                            :rules="requiredFieldRules"></v-text-field>
+                            :rules="requiredFieldRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
                         <v-textarea
                             v-model="body" :label="$t('bodyLabel') + '*'" :placeholder="$t('bodyLabel') + '*'"
-                            :rules="requiredFieldRules" rows="15"></v-textarea>
+                            :rules="requiredFieldRules" rows="15" />
                     </v-col>
                 </v-row>
 
@@ -60,8 +60,7 @@
                 :loading-timeout="30000"
                 @verify="handleVerifyCallback"
                 @expire="resetChallenge"
-                @error="resetChallenge">
-            </vue-recaptcha>
+                @error="resetChallenge" />
         </v-col>
     </v-row>
 

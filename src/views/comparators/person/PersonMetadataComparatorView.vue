@@ -5,50 +5,49 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ `${leftPerson?.personName.firstname} ${leftPerson?.personName.lastname}` + (isLeftBoundToUser ? ` - ${$t("boundToUserLabel")}` : "") }}
                 </h2>
-                <br />
+                <br>
 
-                <person-update-form ref="updateLeftRef" :preset-person="leftPerson" :in-modal="false" @update="updateLeft"></person-update-form>
+                <person-update-form ref="updateLeftRef" :preset-person="leftPerson" :in-modal="false" @update="updateLeft" />
 
                 <description-or-biography-update-form
                     ref="updateLeftBioRef"
                     :preset-description-or-biography="(leftPerson?.biography as MultilingualContent[])"
                     :placeholder-label="$t('biographyLabel')"    
-                    @update="updateLeftBiography">
-                </description-or-biography-update-form>
+                    @update="updateLeftBiography" />
 
-                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="(leftPerson?.keyword as MultilingualContent[])" @update="updateLeftKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateleftKeywordsRef" :preset-keywords="(leftPerson?.keyword as MultilingualContent[])" @update="updateLeftKeywords" />
 
-                <br />
+                <br>
 
                 <!-- Left Involvement Lists -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                         <strong v-if="leftEmployments.length === 0 && leftEducation.length === 0 && leftMemberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <br />
+                        <br>
                         <div v-if="leftEmployments.length > 0">
                             <h3>{{ $t("employmentsLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="leftEmployments" :person="leftPerson" in-comparator drag-group="employments"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="leftEmployments" :person="leftPerson" in-comparator drag-group="employments" />
                         <div v-if="leftEducation.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="leftEducation" :person="leftPerson" in-comparator drag-group="education"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="leftEducation" :person="leftPerson" in-comparator drag-group="education" />
                         <div v-if="leftMemberships.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="leftMemberships" :person="leftPerson" in-comparator drag-group="memberships"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="leftMemberships" :person="leftPerson" in-comparator drag-group="memberships" />
                     </v-card-text>
                 </v-card>
 
-                <br />
-                <expertise-or-skill-list :expertise-or-skills="leftPerson?.expertisesOrSkills" :person="leftPerson" in-comparator></expertise-or-skill-list>
+                <br>
+                <expertise-or-skill-list :expertise-or-skills="leftPerson?.expertisesOrSkills" :person="leftPerson" in-comparator />
 
-                <br />
-                <prize-list :prizes="leftPerson?.prizes" :person="leftPerson" in-comparator></prize-list>
+                <br>
+                <prize-list :prizes="leftPerson?.prizes" :person="leftPerson" in-comparator />
             </v-col>
 
             <v-col cols="1">
@@ -65,50 +64,49 @@
                     {{ `${rightPerson?.personName.firstname} ${rightPerson?.personName.lastname}` + (isRightBoundToUser ? ` - ${$t("boundToUserLabel")}` : "") }}
                 </h2>
 
-                <br />
+                <br>
 
-                <person-update-form ref="updateRightRef" :preset-person="rightPerson" :in-modal="false" @update="updateRight"></person-update-form>
+                <person-update-form ref="updateRightRef" :preset-person="rightPerson" :in-modal="false" @update="updateRight" />
 
                 <description-or-biography-update-form
                     ref="updateRightBioRef"
                     :preset-description-or-biography="(rightPerson?.biography as MultilingualContent[])"
                     :placeholder-label="$t('biographyLabel')"
-                    @update="updateRightBiography">
-                </description-or-biography-update-form>
+                    @update="updateRightBiography" />
 
-                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightPerson?.keyword as MultilingualContent[])" @update="updateRightKeywords"></keyword-update-form>
+                <keyword-update-form ref="updateRightKeywordsRef" :preset-keywords="(rightPerson?.keyword as MultilingualContent[])" @update="updateRightKeywords" />
 
-                <br />
+                <br>
 
                 <!-- Right Involvement Lists -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                         <strong v-if="rightEmployments.length === 0 && rightEducation.length === 0 && rightMemberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                        <br />
+                        <br>
                         <div v-if="rightEmployments.length > 0">
                             <h3>{{ $t("employmentsLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="rightEmployments" :person="rightPerson" in-comparator drag-group="employments"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="rightEmployments" :person="rightPerson" in-comparator drag-group="employments" />
                         <div v-if="rightEducation.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="rightEducation" :person="rightPerson" in-comparator drag-group="education"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="rightEducation" :person="rightPerson" in-comparator drag-group="education" />
                         <div v-if="rightMemberships.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
                         </div>
-                        <br />
-                        <involvement-list :involvements="rightMemberships" :person="rightPerson" in-comparator drag-group="memberships"></involvement-list>
+                        <br>
+                        <involvement-list :involvements="rightMemberships" :person="rightPerson" in-comparator drag-group="memberships" />
                     </v-card-text>
                 </v-card>
                 
-                <br />
-                <expertise-or-skill-list :expertise-or-skills="rightPerson?.expertisesOrSkills" :person="rightPerson" in-comparator></expertise-or-skill-list>
+                <br>
+                <expertise-or-skill-list :expertise-or-skills="rightPerson?.expertisesOrSkills" :person="rightPerson" in-comparator />
             
-                <br />
-                <prize-list :prizes="rightPerson?.prizes" :person="rightPerson" in-comparator></prize-list>
+                <br>
+                <prize-list :prizes="rightPerson?.prizes" :person="rightPerson" in-comparator />
             </v-col>
         </v-row>
 
@@ -120,8 +118,7 @@
             :right-id="(rightPerson?.id as number)"
             :entity-type="EntityType.PERSON"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

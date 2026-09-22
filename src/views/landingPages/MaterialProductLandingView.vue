@@ -16,7 +16,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(materialProduct?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("materialProductLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!materialProduct" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="materialProduct?.materialProductType">
                                     {{ $t("materialProductTypeLabel") }}:
                                 </div>
@@ -69,10 +69,10 @@
                                     {{ materialProduct.internalNumber }}
                                 </div>
                                 <div v-if="materialProduct?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="materialProduct?.documentDate" class="response">
-                                    {{ localiseDate(materialProduct.documentDate) }}
+                                    {{ localiseFlexibleDate(materialProduct.documentDate) }}
                                 </div>
                                 <div v-if="materialProduct?.publisherId || materialProduct?.authorReprint">
                                     {{ $t("publisherLabel") }}:
@@ -103,6 +103,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.MATERIAL_PRODUCT"
+                                    :entity-id="materialProduct?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -133,7 +140,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -147,6 +154,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -168,8 +181,8 @@
                     :document="materialProduct"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     :proofs="materialProduct?.proofs"
-                    :file-items="materialProduct?.fileItems">
-                </attachment-section>
+                    :file-items="materialProduct?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -177,8 +190,8 @@
                     :keywords="materialProduct?.keywords ? materialProduct.keywords : []"
                     :can-edit="canEdit && !materialProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Research Area -->
                 <v-row>
@@ -188,8 +201,8 @@
                                 <research-areas-update-modal 
                                     :research-areas-hierarchy="materialProduct?.researchAreas"
                                     :read-only="!canEdit"
-                                    @update="updateResearchAreas">
-                                </research-areas-update-modal>
+                                    @update="updateResearchAreas"
+                                />
 
                                 <h4 class="mt-5 mb-7">
                                     <strong>{{ $t("researchAreasLabel") }}</strong>
@@ -206,8 +219,8 @@
                 <description-section
                     :description="materialProduct?.description"
                     :can-edit="canEdit && !materialProduct?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="materialProduct?.remark"
@@ -233,7 +246,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="materialProduct?.id"
-                    :can-edit="canClassify && materialProduct?.documentDate !== ''"
+                    :can-edit="canClassify && !!materialProduct?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MATERIAL_PRODUCT]"
                     @create="createClassification"
@@ -245,6 +258,24 @@
                     :document-id="(materialProduct?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.MATERIAL_PRODUCT"
+                    :entity-id="materialProduct?.id"
+                    :restore-blocked-reason="materialProduct?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="fetchMaterialProduct"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.MATERIAL_PRODUCT"
+                    :entity-id="materialProduct?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -262,13 +293,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, MaterialProduct } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -307,16 +339,30 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -328,8 +374,18 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -358,6 +414,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.MATERIAL_PRODUCT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -511,6 +574,7 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality,
             materialProduct, icon, publisher, ApplicableEntityType,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, goToURL, canEdit,
@@ -524,7 +588,10 @@ export default defineComponent({
             fetchMaterialProduct, fetchValidationStatus, updateRemark,
             displayConfiguration, updateResearchAreas, isAdmin,
             getMaterialProductTypeTitleFromValueAutoLocale,
-            documentIdentifiers, fetchIdentifiers, localiseDate
+            documentIdentifiers, fetchIdentifiers, localiseDate,
+            localiseFlexibleDate, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails,
+            isDigitalRepositoryEnabled
         };
 }})
 

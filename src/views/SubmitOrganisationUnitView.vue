@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewOULabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <organisation-unit-submission-form ref="submissionFormRef"></organisation-unit-submission-form>
+        <br>
+        <br>
+        <organisation-unit-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">

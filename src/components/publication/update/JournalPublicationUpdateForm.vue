@@ -49,8 +49,18 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
-                <v-text-field v-model="publicationYear" :label="$t('yearOfPublicationLabel')" :placeholder="$t('yearOfPublicationLabel')" />
+            <v-col v-if="!disableYearInput" cols="8">
+                <flexible-date-picker
+                    v-model="publicationDate"
+                    :label="$t('yearOfPublicationLabel') + '*'"
+                    required
+                />
+            </v-col>
+            <v-col :cols="disableYearInput ? 10 : 2">
+                <v-checkbox
+                    v-model="disableYearInput"
+                    :label="$t('yearUnknownLabel')"
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -77,8 +87,7 @@
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')">
-                </v-text-field>
+                    :placeholder="$t('numberOfPagesLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -93,7 +102,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -107,24 +116,21 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID"
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
 
@@ -166,11 +172,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
@@ -234,7 +241,8 @@ export default defineComponent({
         const issue = ref(props.presetJournalPublication?.issue);
         const startPage = ref(props.presetJournalPublication?.startPage);
         const endPage = ref(props.presetJournalPublication?.endPage);
-        const publicationYear = ref(props.presetJournalPublication?.documentDate);
+        const publicationDate = ref(props.presetJournalPublication?.documentDate);
+        const disableYearInput = ref(!props.presetJournalPublication?.documentDate?.year);
         const doi = ref(props.presetJournalPublication?.doi);
         const openAlexId = ref(props.presetJournalPublication?.openAlexId);
         const webOfScienceId = ref(props.presetJournalPublication?.webOfScienceId);
@@ -265,7 +273,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         )
                     ],
                     props.presetJournalPublication?.id as number,
@@ -290,7 +299,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetJournalPublication?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: disableYearInput.value ? undefined : publicationDate.value,
                 scopusId: scopus.value,
                 doi: doi.value,
                 openAlexId: openAlexId.value,
@@ -321,7 +330,8 @@ export default defineComponent({
             startPage.value = props.presetJournalPublication?.startPage;
             endPage.value = props.presetJournalPublication?.endPage;
             numberOfPages.value = props.presetJournalPublication?.numberOfPages;
-            publicationYear.value = props.presetJournalPublication?.documentDate;
+            publicationDate.value = props.presetJournalPublication?.documentDate;
+            disableYearInput.value = !props.presetJournalPublication?.documentDate?.year;
             doi.value = props.presetJournalPublication?.doi;
             scopus.value = props.presetJournalPublication?.scopusId;
             openAlexId.value = props.presetJournalPublication?.openAlexId;
@@ -356,7 +366,7 @@ export default defineComponent({
 
         return {
             isFormValid, title, subtitle,
-            publicationYear, doi, scopus,
+            publicationDate, doi, scopus,
             selectedJournal, articleNumber,
             uris, numberOfPages, doiValidationRules,
             requiredFieldRules, selectedEvent,
@@ -368,7 +378,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules,
             optionalNumericZeroOrGreaterFieldRules,
-            commonFieldsRef, commonFieldsData,
+            disableYearInput, commonFieldsRef, commonFieldsData,
             presetCommonFieldsData, section, sectionRef
         };
     }

@@ -29,11 +29,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisCountTotal.display"
                                 :label="$t('totalThesesLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -41,11 +41,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisCountByYear.display"
                                 :label="$t('numberOfThesesYearlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisCountByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -53,11 +53,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisTypeByYear.display"
                                 :label="$t('numberOfThesesByTypeAndYearLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisTypeByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -68,11 +68,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisTypeRatio.display"
                                 :label="$t('thesisTypeRatioLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisTypeRatio.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -86,11 +86,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountTotal.display"
                                 :label="$t('totalViewsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -98,11 +98,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountByMonth.display"
                                 :label="$t('numberOfViewsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -110,11 +110,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountByCountry.display"
                                 :label="$t('viewsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisViewCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -125,11 +125,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountTotal.display"
                                 :label="$t('totalViewsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -137,11 +137,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountByMonth.display"
                                 :label="$t('numberOfViewsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -149,11 +149,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountByCountry.display"
                                 :label="$t('viewsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.thesisDownloadCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -167,11 +167,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.viewCountThesisLeaderboard.display"
                                 :label="$t('thesesViewCountsLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.viewCountThesisLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -179,11 +179,11 @@
                             <v-checkbox
                                 v-model="digitalLibrarySettings.downloadCountThesisLeaderboard.display"
                                 :label="$t('thesesDownloadCountsLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="digitalLibrarySettings.downloadCountThesisLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>

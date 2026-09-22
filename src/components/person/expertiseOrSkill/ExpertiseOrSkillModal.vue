@@ -2,13 +2,13 @@
     <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="800px">
             <template #activator="scope">
-                <div v-if="!readOnly" class="edit-pen">
+                <div v-if="!readOnly" :class="edit ? 'mt-3' : 'edit-pen'">
                     <v-btn
                         v-if="!edit"
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        <v-icon size="x-large" icon="mdi-plus" />
                     </v-btn>
                     <!-- <v-list-item
                         v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"
@@ -19,7 +19,7 @@
                         v-else icon variant="outlined"
                         color="primary" v-bind="scope.props"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
-                        <v-icon size="large" icon="mdi-pen"></v-icon>
+                        <v-icon size="large" icon="mdi-pen" />
                     </v-btn>
                 </div>
             </template>
@@ -31,11 +31,11 @@
                     <v-container>
                         <expertise-or-skill-form
                             ref="formRef" :edit="edit" :preset-expertise-or-skill="presetExpertiseOrSkill" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></expertise-or-skill-form>
+                            @update="emitUpdateToParent" />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

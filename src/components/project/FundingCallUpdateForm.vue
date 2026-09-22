@@ -1,0 +1,237 @@
+<template>
+    <v-form v-model="isFormValid" @submit.prevent>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameRef"
+                    v-model="name"
+                    :rules="requiredFieldRules"
+                    :label="$t('nameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetFundingCall?.name, languageTags)"
+                    is-area />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameAbbreviationRef"
+                    v-model="nameAbbreviation"
+                    :label="$t('nameAbbreviationLabel')"
+                    :initial-value="toMultilingualTextInput(presetFundingCall?.nameAbbreviation, languageTags)"
+                    is-area />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateFrom"
+                    :label="$t('dateFromLabel')"
+                    color="primary"
+                />
+            </v-col>
+            <v-col cols="6">
+                <date-picker
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                    color="primary"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <organisation-unit-autocomplete-search
+                    v-model:model-value="selectedFunder"
+                    :label="$t('funderLabel')"
+                    allow-manual-clearing
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <v-select
+                    v-model="selectedFundingTypes"
+                    :label="$t('fundingTypesLabel')"
+                    :items="fundingTypeOptions"
+                    item-title="title"
+                    item-value="value"
+                    multiple
+                    chips
+                    closable-chips
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <funding-program-autocomplete-search v-model="selectedFundingProgram" />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <monetary-amount-input
+                    ref="monetaryAmountRef"
+                    :preset-amount="props.presetFundingCall?.monetaryAmount"
+                    @update:model-value="monetaryAmount = $event"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <uri-input ref="urisRef" v-model="uris" />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <v-checkbox
+                    v-model="oaMandated"
+                    :label="$t('oaMandatedLabel')"
+                />
+            </v-col>
+            <v-col v-if="oaMandated" cols="6">
+                <v-text-field
+                    v-model="oaMandateUrl"
+                    :label="$t('oaMandateUrlLabel')"
+                    :placeholder="$t('oaMandateUrlLabel')"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <p class="required-fields-message">
+                {{ $t("requiredFieldsMessage") }}
+            </p>
+        </v-row>
+    </v-form>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
+import UriInput from '@/components/core/UriInput.vue';
+import DatePicker from '@/components/core/DatePicker.vue';
+import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
+import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
+import FundingProgramAutocompleteSearch from '@/components/project/FundingProgramAutocompleteSearch.vue';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { useValidationUtils } from '@/utils/ValidationUtils';
+import { toMultilingualTextInput, returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import type { MonetaryAmount, MultilingualContent } from '@/models/Common';
+import type { FundingCall } from '@/models/FundingCallModel';
+import { FundingType } from '@/models/FundingModel';
+import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
+
+const props = defineProps<{
+    presetFundingCall: FundingCall | undefined;
+}>();
+
+const emit = defineEmits<{
+    (e: "update", payload: any): void;
+}>();
+
+const isFormValid = ref(false);
+const { languageTags } = useLanguageTags();
+
+const { requiredFieldRules } = useValidationUtils();
+
+const nameRef = ref<typeof MultilingualTextInput>();
+const nameAbbreviationRef = ref<typeof MultilingualTextInput>();
+const urisRef = ref<typeof UriInput>();
+const monetaryAmountRef = ref<typeof MonetaryAmountInput>();
+
+const dateFrom = ref(props.presetFundingCall?.dateFrom as string);
+const dateTo = ref(props.presetFundingCall?.dateTo as string);
+const uris = ref<string[]>(props.presetFundingCall?.uris as string[] ?? []);
+const oaMandated = ref<boolean>(props.presetFundingCall?.oaMandated ?? false);
+const oaMandateUrl = ref(props.presetFundingCall?.oaMandateUrl);
+// The preset already carries the program name, so no extra read is needed here.
+const toFundingProgramSelection = (fundingCall: FundingCall | undefined) => {
+    return fundingCall?.fundingProgramId
+        ? { title: returnCurrentLocaleContent(fundingCall.fundingProgramName) ?? "", value: fundingCall.fundingProgramId }
+        : { title: "", value: -1 };
+};
+
+const selectedFundingProgram = ref<{ title: string, value: number }>(toFundingProgramSelection(props.presetFundingCall));
+
+const name = ref<any>([]);
+const nameAbbreviation = ref<any>([]);
+
+const selectedFunder = ref<{ title: string, value: number }>({ title: "", value: -1 });
+
+const fundingTypeOptions = computed(() => getFundingTypesForGivenLocale());
+const selectedFundingTypes = ref<FundingType[]>(props.presetFundingCall?.fundingTypes ?? []);
+
+const monetaryAmount = ref<MonetaryAmount | undefined>(props.presetFundingCall?.monetaryAmount);
+
+onMounted(() => {
+    if (props.presetFundingCall?.funderId) {
+        refreshForm();
+    }
+});
+
+watch(() => props.presetFundingCall, () => {
+    if (props.presetFundingCall) {
+        refreshForm();
+    }
+});
+
+const refreshForm = () => {
+    dateFrom.value = props.presetFundingCall?.dateFrom as string;
+    dateTo.value = props.presetFundingCall?.dateTo as string;
+    oaMandated.value = props.presetFundingCall?.oaMandated ?? false;
+    oaMandateUrl.value = props.presetFundingCall?.oaMandateUrl;
+    selectedFundingProgram.value = toFundingProgramSelection(props.presetFundingCall);
+    selectedFundingTypes.value = props.presetFundingCall?.fundingTypes ?? [];
+    monetaryAmountRef.value?.setValue(props.presetFundingCall?.monetaryAmount);
+
+    nameRef.value?.clearInput();
+    name.value = props.presetFundingCall?.name as MultilingualContent[];
+
+    nameAbbreviationRef.value?.clearInput();
+    nameAbbreviation.value = props.presetFundingCall?.nameAbbreviation as MultilingualContent[];
+
+    urisRef.value?.refreshModelValue(props.presetFundingCall?.uris as string[] ?? []);
+    uris.value = props.presetFundingCall?.uris as string[] ?? [];
+
+    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
+
+    if (props.presetFundingCall?.funderId) {
+        OrganisationUnitService.readOU(props.presetFundingCall.funderId).then(response => {
+            selectedFunder.value = { title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number };
+        });
+    } else {
+        selectedFunder.value = { title: "", value: -1 };
+    }
+};
+
+const submit = () => {
+    const updatedFundingCall = {
+        name: name.value,
+        nameAbbreviation: nameAbbreviation.value,
+        fundingTypes: selectedFundingTypes.value,
+        dateFrom: dateFrom.value,
+        dateTo: dateTo.value,
+        funderId: selectedFunder.value.value > 0 ? selectedFunder.value.value : undefined,
+        fundingProgramId: selectedFundingProgram.value.value > 0 ? selectedFundingProgram.value.value : undefined,
+        monetaryAmount: monetaryAmount.value,
+        uris: uris.value,
+        oaMandated: oaMandated.value,
+        oaMandateUrl: oaMandated.value ? oaMandateUrl.value : undefined
+    };
+
+    emit("update", updatedFundingCall);
+};
+
+defineExpose({
+    submit,
+    isFormValid,
+    refreshForm
+});
+</script>

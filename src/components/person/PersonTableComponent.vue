@@ -109,7 +109,7 @@
                 </v-menu>
             </div>
             <div :class="[selectedPersons.length > 0 ? 'w-64' : 'w-96']">
-                <slot name="top-left"></slot>
+                <slot name="top-left" />
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -117,9 +117,8 @@
                 v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mb-4"
                 :institution-id="employmentInstitutionId"
-                @update="notifyUserAndRefreshTable">
-            </add-employment-modal>
-            <slot name="actions"></slot>
+                @update="notifyUserAndRefreshTable" />
+            <slot name="actions" />
         </div>
     </div>
 
@@ -135,8 +134,7 @@
         :total-results="totalPersons"
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
     
     <div ref="tableWrapper" class="modern-table-container">
         <v-data-table-server
@@ -275,10 +273,10 @@
                         <td class="py-4">
                             <div v-if="item.orcid || item.scopusAuthorId || item.openAlexId || item.webOfScienceResearcherId" class="identifiers-cell">
                                 <div class="flex flex-wrap gap-2">
-                                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
+                                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid" />
+                                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus" />
+                                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex" />
+                                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience" />
                                 </div>
                             </div>
                             <div v-else class="no-identifiers">
@@ -311,8 +309,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedPersons.map(entity => entity.name.split('; ')[0])"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

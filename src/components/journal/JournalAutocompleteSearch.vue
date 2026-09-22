@@ -13,7 +13,7 @@
                 return-object
                 @update:search="searchJournals($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
@@ -155,12 +155,17 @@ export default defineComponent({
                 tokens.forEach((token) => {
                     params += `tokens=${token}&`
                 });
-                params += "page=0&size=5";
+                params += "page=0&size=10";
                 JournalService.searchJournals(params, null).then((response) => {
                     const listOfJournals: { title: string, value: number }[] = [];
                     response.data.content.forEach((journal: JournalIndex) => {
                         if (i18n.locale.value.startsWith("sr")) {
-                            listOfJournals.push({title: journal.titleSr, value: journal.databaseId});
+                            listOfJournals.push(
+                                {
+                                    title: journal.titleSr + ` (${journal.eissn ? ("E:" + journal.eissn) : i18n.t("noEIssnLabel")}, ${journal.printISSN ? ("Print:" + journal.printISSN) : i18n.t("noPrintIssnLabel")})`,
+                                    value: journal.databaseId
+                                }
+                            );
                         } else {
                             listOfJournals.push({title: journal.titleOther, value: journal.databaseId});
                         }

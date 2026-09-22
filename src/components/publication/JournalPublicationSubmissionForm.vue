@@ -79,11 +79,10 @@
                 </v-row>
                 <v-row>
                     <v-col v-if="!disableYearInput" cols="8">
-                        <v-text-field
-                            v-model="publicationYear"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'"
-                            :rules="requiredFieldRules"
+                            required
                         />
                     </v-col>
                     <v-col :cols="disableYearInput ? 10 : 2">
@@ -158,7 +157,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -167,24 +166,21 @@
                                 v-model="scopus"
                                 label="Scopus ID"
                                 placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules">
-                            </v-text-field>
+                                :rules="scopusIdValidationRules" />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules" />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules" />
                         </v-col>
                     </v-row>
 
@@ -221,7 +217,7 @@ import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { watch } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { AxiosError } from 'axios';
-import type { ErrorResponse, PrepopulatedMetadata } from '@/models/Common';
+import type { ErrorResponse, FlexibleDate, PrepopulatedMetadata } from '@/models/Common';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import Toast from '../core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -230,11 +226,12 @@ import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -279,7 +276,7 @@ export default defineComponent({
         const issue = ref("");
         const startPage = ref("");
         const endPage = ref("");
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const scopus = ref("");
         const openAlexId = ref("");
@@ -342,7 +339,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
             
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
@@ -387,7 +384,7 @@ export default defineComponent({
                 uris: uris.value,
                 volume: volume.value,
                 contributions: contributions.value,
-                documentDate: disableYearInput.value ? undefined : publicationYear.value,
+                documentDate: disableYearInput.value ? undefined : publicationDate.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
@@ -416,7 +413,7 @@ export default defineComponent({
                     issue.value = "";
                     startPage.value = "";
                     endPage.value = "";
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     doi.value = "";
                     scopus.value = "";
                     openAlexId.value = "";
@@ -448,7 +445,7 @@ export default defineComponent({
         return {
             isFormValid, subtitleRef, openAlexId, workOpenAlexIdValidationRules,
             additionalFields, snackbar, error, title, titleRef, subtitle,
-            volume, issue, startPage, endPage, publicationYear, doi, scopus,
+            volume, issue, startPage, endPage, publicationDate, doi, scopus,
             articleNumber, numberOfPages, description, descriptionRef,
             keywords, keywordsRef, isResearcher, uris, urisRef, doiValidationRules,
             selectedJournal, journalAutocompleteRef, myPublications, submit,

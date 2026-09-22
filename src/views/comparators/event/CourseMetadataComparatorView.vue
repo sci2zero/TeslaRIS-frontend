@@ -5,7 +5,7 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftCourse?.name) }}
                 </h2>
-                <br />
+                <br>
 
                 <course-update-form
                     ref="updateLeftRef"
@@ -15,7 +15,7 @@
                     @update="updateLeft"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
@@ -30,7 +30,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -63,7 +63,7 @@
                     {{ returnCurrentLocaleContent(rightCourse?.name) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <course-update-form
                     ref="updateRightRef"
@@ -73,7 +73,7 @@
                     @update="updateRight"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
@@ -88,7 +88,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">

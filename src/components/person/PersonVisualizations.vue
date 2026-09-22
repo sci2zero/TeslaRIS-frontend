@@ -16,7 +16,7 @@
                 :min="minYear"
                 :max="min([maxYear, toYear])"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
         <v-col cols="5">
             <v-text-field
@@ -29,7 +29,7 @@
                 :min="max([minYear, fromYear])"
                 :max="maxYear"
                 @update:model-value="handleYearChange"
-            ></v-text-field>
+            />
         </v-col>
     </v-row>
     <v-row

@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewBookSeriesLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <publication-series-submission-form ref="submissionFormRef" :input-type="inputType"></publication-series-submission-form>
+        <br>
+        <br>
+        <publication-series-submission-form ref="submissionFormRef" :input-type="inputType" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">

@@ -37,7 +37,7 @@
                 v-for="item in proceedings"
                 :key="item.id"
                 :title="(returnCurrentLocaleContent(item.title) as string)"
-                :subtitle="item.documentDate ? item.documentDate : presetEvent?.dateTo.split('-')[0]"
+                :subtitle="item.documentDate ? item.documentDate.year : presetEvent?.dateTo.split('-')[0]"
                 @click="navigateToProceedings(item.id as number)"
             >
                 <template v-if="isAdmin" #prepend>

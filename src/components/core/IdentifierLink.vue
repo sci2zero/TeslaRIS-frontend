@@ -52,6 +52,8 @@ export default defineComponent({
                     return "https://openalex.org/";
                 case "ror":
                     return "https://ror.org/";
+                case "raid":
+                    return "https://raid.org/";
                 case "researcher_id":
                     return "http://www.researcherid.com/rid/";
                 case "web_of_science":
@@ -62,6 +64,8 @@ export default defineComponent({
                     return "http://lattes.cnpq.br/";
                 case "authenticus":
                     return "https://authenticus.pt/author/";
+                case "wikidata":
+                    return "https://www.wikidata.org/wiki/";
             }
 
             return "https://doi.org/";

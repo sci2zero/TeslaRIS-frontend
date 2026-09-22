@@ -1,4 +1,4 @@
-import type { LanguageTagResponse, MultilingualContent } from "./Common";
+import type { FlexibleDate, LanguageTagResponse, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import { EmploymentTitle, PersonalTitle } from "./InvolvementModel";
 import type { EntityType } from "./MergeModel";
@@ -53,9 +53,8 @@ export interface DocumentPublicationIndex {
 export enum PublicationType {
     JOURNAL_PUBLICATION = "JOURNAL_PUBLICATION",
     PROCEEDINGS_PUBLICATION = "PROCEEDINGS_PUBLICATION",
-    PATENT = "PATENT",
+    INTELLECTUAL_PROPERTY = "INTELLECTUAL_PROPERTY",
     PROCEEDINGS = "PROCEEDINGS",
-    DATASET = "DATASET",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
     MONOGRAPH = "MONOGRAPH",
     MONOGRAPH_PUBLICATION = "MONOGRAPH_PUBLICATION",
@@ -111,7 +110,7 @@ export interface Document {
     keywords: MultilingualContent[];
     contributions?: PersonDocumentContribution[];
     uris: string[];
-    documentDate?: string;
+    documentDate?: FlexibleDate;
     doi?: string;
     scopusId?: string;
     openAlexId?: string;
@@ -120,6 +119,7 @@ export interface Document {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     eventId?: number;
     fileItems: DocumentFileResponse[] | undefined;
     proofs: DocumentFileResponse[] | undefined;
@@ -135,6 +135,8 @@ export interface Document {
     city?: MultilingualContent[];
     edition?: MultilingualContent[];
     authorReprint?: boolean;
+    publisherName?: MultilingualContent[];
+    eventName?: MultilingualContent[];
 }
 
 export interface CommonFieldsData {
@@ -142,6 +144,7 @@ export interface CommonFieldsData {
     arxivId?: string;
     pubmedId?: string;
     ssrnId?: string;
+    nationalId?: string;
     city?: MultilingualContent[];
     geoSpaceDescription?: MultilingualContent[];
     chronologicalSpaceDescription?: MultilingualContent[];
@@ -214,7 +217,7 @@ export interface ProceedingsPublicationResponse {
     id: number,
     proceedingsTitle: MultilingualContent[];
     title: MultilingualContent[];
-    documentDate: string;
+    documentDate: FlexibleDate;
 }
 
 export interface ProceedingsPublication extends Document {
@@ -257,6 +260,7 @@ export interface Monograph extends Document {
     languageIds?: number[];
     researchAreaId?: number;
     publisherId?: number;
+    publisherName?: MultilingualContent[];
     udc?: string;
 }
 
@@ -279,12 +283,41 @@ export interface MonographPublication extends Document {
     numberOfPages?: number;
     articleNumber?: string;
     monographId?: number;
+    monographName?: MultilingualContent[];
     section?: MultilingualContent[];
 }
 
-export interface Patent extends Document {
+export interface IntellectualProperty extends Document {
     number: string;
     publisherId?: number;
+    publisherName?: MultilingualContent[];
+    dateRequested?: FlexibleDate;
+    dateFilingPriority?: FlexibleDate;
+    dateTo?: FlexibleDate;
+    type: IntellectualPropertyType;
+    applicationStatus: IntellectualPropertyApplicationStatus;
+}
+
+export enum IntellectualPropertyType {
+    PATENT = "PATENT",
+    LICENSE = "LICENSE",
+    DISCLOSURE = "DISCLOSURE",
+    REGISTERED_COPYRIGHT = "REGISTERED_COPYRIGHT",
+    TRADEMARK = "TRADEMARK"
+}
+
+export enum IntellectualPropertyApplicationStatus {
+    DISCLOSED = "DISCLOSED",
+    PENDING = "PENDING",
+    IN_NEGOTIATION = "IN_NEGOTIATION",
+    ALLOWED = "ALLOWED",
+    GRANTED_OR_REGISTERED = "GRANTED_OR_REGISTERED",
+    PROTECTED = "PROTECTED",
+    ASSIGNED = "ASSIGNED",
+    FIRST_FIXATION = "FIRST_FIXATION",
+    EXPIRED = "EXPIRED",
+    WITHDRAWN = "WITHDRAWN",
+    ELIMINATED = "ELIMINATED"
 }
 
 export interface IntangibleProduct extends Document {
@@ -310,11 +343,6 @@ export interface GeneticMaterial extends Document {
     internalNumber: string;
     publisherId?: number;
     geneticMaterialType: GeneticMaterialType
-}
-
-export interface Dataset extends Document {
-    internalNumber: string;
-    publisherId?: number;
 }
 
 export interface DeduplicationSuggestion {
@@ -422,12 +450,14 @@ export enum IntangibleProductType {
     TEST = "TEST",
     WEBSITE = "WEBSITE",
     AUDIO_RECORDING = "AUDIO_RECORDING",
+    MUSICAL_COMPOSITION = "MUSICAL_COMPOSITION",
     RADIO_TV_PROGRAM = "RADIO_TV_PROGRAM",
     VIDEO_RECORDING = "VIDEO_RECORDING",
     SOUND_DESIGN = "SOUND_DESIGN",
     SET_DESIGN = "SET_DESIGN",
     LIGHT_DESIGN = "LIGHT_DESIGN",
     CHOREOGRAPHY = "CHOREOGRAPHY",
+    DATASET = "DATASET",
     STANDARD = "STANDARD"
 }
 

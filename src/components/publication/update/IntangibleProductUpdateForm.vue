@@ -22,18 +22,16 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
-                    v-model="publicationYear"
-                    type="number"
+                <flexible-date-picker
+                    v-model="publicationDate"
                     :label="$t('yearOfPublicationLabel') + '*'"
-                    :placeholder="$t('yearOfPublicationLabel') + '*'"
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    required
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules"></v-text-field>
+                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -44,17 +42,17 @@
                     :items="intangibleProductTypes"
                     :rules="requiredSelectionRules"
                     return-object
-                ></v-select>
+                />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="intangibleProductNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')"></v-text-field>
+                <v-text-field v-model="intangibleProductNumber" :label="$t('internalNumberLabel')" :placeholder="$t('internalNumberLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -62,8 +60,7 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint />
             </v-col>
         </v-row>
         <v-row>
@@ -72,24 +69,21 @@
                     v-model="scopus"
                     label="Scopus ID"
                     placeholder="Scopus ID"
-                    :rules="scopusIdValidationRules">
-                </v-text-field>
+                    :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
                 <v-text-field
                     v-model="openAlexId"
                     label="Open Alex ID"
                     placeholder="Open Alex ID" 
-                    :rules="workOpenAlexIdValidationRules">
-                </v-text-field>
+                    :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="3">
                 <v-text-field
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     placeholder="Web of Science ID"
-                    :rules="documentWebOfScienceIdValidationRules">
-                </v-text-field>
+                    :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
         <v-row>
@@ -97,8 +91,7 @@
                 <multilingual-text-input
                     ref="usersRef"
                     v-model="productUsers"
-                    :label="$t('productUsersLabel')">
-                </multilingual-text-input>
+                    :label="$t('productUsersLabel')" />
             </v-col>
         </v-row>
         <h2
@@ -156,11 +149,12 @@ import { getIntangibleProductTypesForGivenLocale, getIntangibleProductTypeTitleF
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "IntangibleProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
     props: {
         presetIntangibleProduct: {
             type: Object as PropType<IntangibleProduct | undefined>,
@@ -218,7 +212,7 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
-        const publicationYear = ref(props.presetIntangibleProduct?.documentDate);
+        const publicationDate = ref(props.presetIntangibleProduct?.documentDate);
         const doi = ref(props.presetIntangibleProduct?.doi);
         const openAlexId = ref(props.presetIntangibleProduct?.openAlexId);
         const webOfScienceId = ref(props.presetIntangibleProduct?.webOfScienceId);
@@ -251,7 +245,8 @@ export default defineComponent({
                             commonFieldsData.value.handleId,
                             commonFieldsData.value.arxivId,
                             commonFieldsData.value.pubmedId,
-                            commonFieldsData.value.ssrnId
+                            commonFieldsData.value.ssrnId,
+                            commonFieldsData.value.nationalId
                         )
                     ],
                     props.presetIntangibleProduct?.id as number,
@@ -271,7 +266,7 @@ export default defineComponent({
                 subTitle: subtitle.value as MultilingualContent[],
                 uris: uris.value,
                 contributions: props.presetIntangibleProduct?.contributions,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 scopusId: scopus.value,
                 openAlexId: openAlexId.value,
@@ -302,7 +297,7 @@ export default defineComponent({
 
             uris.value = props.presetIntangibleProduct?.uris as string[];
             intangibleProductNumber.value = props.presetIntangibleProduct?.internalNumber;
-            publicationYear.value = props.presetIntangibleProduct?.documentDate;
+            publicationDate.value = props.presetIntangibleProduct?.documentDate;
             doi.value = props.presetIntangibleProduct?.doi;
             openAlexId.value = props.presetIntangibleProduct?.openAlexId;
             webOfScienceId.value = props.presetIntangibleProduct?.webOfScienceId;
@@ -349,7 +344,7 @@ export default defineComponent({
 
         return {
             isFormValid, doi, snackbar, message,
-            title, subtitle, publicationYear,
+            title, subtitle, publicationDate,
             selectedPublisher, intangibleProductNumber,
             uris, requiredFieldRules, titleRef,
             submit, toMultilingualTextInput,

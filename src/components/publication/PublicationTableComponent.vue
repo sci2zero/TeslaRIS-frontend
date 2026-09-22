@@ -133,11 +133,11 @@
                 </v-menu>
             </div>
             <div :class="[selectedPublications.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
-                <slot name="top-left"></slot>
+                <slot name="top-left" />
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <slot name="actions"></slot>
+            <slot name="actions" />
         </div>
     </div>
     <table-export-modal
@@ -151,8 +151,7 @@
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
         :endpoint-body-parameters="endpointBodyParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
 
     <div ref="tableWrapper" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <v-data-table-server
@@ -172,12 +171,12 @@
                 <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
                     <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
                         <span>{{ column.title }}</span>
-                        <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                        <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                     </div>
 
                     <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
                         <span>{{ yearHeader.title }}</span>
-                        <v-icon class="" :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)"></v-icon>
+                        <v-icon class="" :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)" />
                     </div>
                 </div>
             </template>
@@ -191,13 +190,13 @@
                                 :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
                                 :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                                 icon="mdi-filter"
-                            ></v-icon>
+                            />
                         </template>
                         <div class="p-3 bg-white rounded-lg shadow-lg">
-                            <slot name="type-filter-menu" :column="column"></slot>
+                            <slot name="type-filter-menu" :column="column" />
                         </div>
                     </v-menu>
-                    <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                    <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                 </div>
             </template>
             <template #body="properties">
@@ -278,9 +277,9 @@
                             </v-chip>
                         </td>
                         <td>
-                            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi"></identifier-menu>
+                            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi" />
                         </td>
-                        <td>
+                        <td v-if="isDigitalRepositoryEnabled">
                             <v-menu
                                 v-if="richResultsView"
                                 :close-on-content-click="true"
@@ -320,7 +319,11 @@
                             </div>
                         </td>
                         <td>
-                            <v-btn v-if="inClaimer" size="small" color="primary" @click="claimPublication(item.databaseId as number)">
+                            <v-btn
+                                v-if="inClaimer"
+                                size="small"
+                                color="primary"
+                                @click="claimPublication(item.databaseId as number)">
                                 {{ $t("claimLabel") }}
                             </v-btn>
                             <v-btn
@@ -335,8 +338,8 @@
                                 :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
                                 :disabled="!item.year || item.year < 0"
                                 @classified="documentClassified(item)"
-                                @update="refreshTable(tableOptions)">
-                            </entity-classification-modal-content>
+                                @update="refreshTable(tableOptions)"
+                            />
                             <v-btn
                                 v-if="validationView"
                                 size="small"
@@ -356,8 +359,8 @@
                             </v-btn>
                         </td>
                         <td v-if="isCommission">
-                            <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check"></v-icon>
-                            <v-icon v-else icon="mdi-close"></v-icon>
+                            <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check" />
+                            <v-icon v-else icon="mdi-close" />
                         </td>
                     </tr>
                 </draggable>
@@ -382,8 +385,7 @@
         :title="$t('areYouSureLabel')"
         :message="!allowResearcherUnbinding ? $t('confirmDeletionMessage') : $t('confirmUnbindingMessage')"
         :entity-names="selectedPublications.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">
@@ -414,6 +416,7 @@ import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUn
 import IdentifierMenu from '../core/IdentifierMenu.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 import { getApplicableEntityTypeForDocumentType } from '@/i18n/applicableEntityType';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 export default defineComponent({
@@ -515,6 +518,10 @@ export default defineComponent({
 
         const tableWrapper = ref<any>(null);
 
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         onMounted(() => {
             if ((props.inClaimer ||
                 isAdmin.value ||
@@ -599,9 +606,21 @@ export default defineComponent({
                 sortable: true, 
                 key: "type"
             },
-            { title: "DOI", align: "start", sortable: true, key: "doi"},
-            { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
+            { title: "DOI", align: "start", sortable: true, key: "doi"}
         ]);
+
+        const documentDownloadHeader = { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"};
+
+        watch(isDigitalRepositoryEnabled, (enabled) => {
+            const index = headers.value.findIndex((header: any) => header.key === "documentDownload");
+
+            if (enabled && index === -1) {
+                const doiIndex = headers.value.findIndex((header: any) => header.key === "doi");
+                headers.value.splice(doiIndex + 1, 0, documentDownloadHeader);
+            } else if (!enabled && index !== -1) {
+                headers.value.splice(index, 1);
+            }
+        }, { immediate: true });
 
         // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
         const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"})
@@ -793,10 +812,8 @@ export default defineComponent({
                     return 'mdi-book-open-page-variant';
                 case 'PROCEEDINGS':
                     return 'mdi-presentation';
-                case 'PATENT':
+                case 'INTELLECTUAL_PROPERTY':
                     return 'mdi-shield-check';
-                case 'DATASET':
-                    return 'mdi-database';
                 case 'INTANGIBLE_PRODUCT':
                     return 'mdi-code-tags';
                 case 'MONOGRAPH':
@@ -922,7 +939,8 @@ export default defineComponent({
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
             toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
             getPublicationTypeIcon, titleColumn, yearHeader, displayPersistentDialog,
-            startDeletionProcess, getApplicableEntityTypeForDocumentType
+            startDeletionProcess, getApplicableEntityTypeForDocumentType,
+            isDigitalRepositoryEnabled
         };
     }
 });

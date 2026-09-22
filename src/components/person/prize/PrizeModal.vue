@@ -8,7 +8,7 @@
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        <v-icon size="x-large" icon="mdi-plus" />
                     </v-btn>
                     <!-- <v-list-item
                         v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"
@@ -19,7 +19,7 @@
                         v-else icon variant="outlined"
                         color="primary" v-bind="scope.props"
                         :disabled="readOnly" size="medium" v-on="scope.isActive">
-                        <v-icon size="large" icon="mdi-pen"></v-icon>
+                        <v-icon size="large" icon="mdi-pen" />
                     </v-btn>
                 </div>
             </template>
@@ -39,7 +39,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

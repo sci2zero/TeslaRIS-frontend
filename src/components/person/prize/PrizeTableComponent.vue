@@ -1,5 +1,5 @@
 <template>
-    <slot name="top-left"></slot>
+    <slot name="top-left" />
 
     <v-btn
         v-if="isAdmin"
@@ -94,8 +94,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedPrizes.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

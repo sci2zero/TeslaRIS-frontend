@@ -5,11 +5,11 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftPublisher?.name) }}
                 </h2>
-                <br />
+                <br>
 
                 <publisher-update-form
                     ref="updateLeftRef" input-type="JOURNAL" :preset-publisher="leftPublisher" :in-modal="false"
-                    @update="updateLeft"></publisher-update-form>
+                    @update="updateLeft" />
             </v-col>
 
             <v-col cols="1">
@@ -26,11 +26,11 @@
                     {{ returnCurrentLocaleContent(rightPublisher?.name) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <publisher-update-form
                     ref="updateRightRef" input-type="JOURNAL" :preset-publisher="rightPublisher" :in-modal="false"
-                    @update="updateRight"></publisher-update-form>
+                    @update="updateRight" />
             </v-col>
         </v-row>
 
@@ -42,8 +42,7 @@
             :right-id="(rightPublisher?.id as number)"
             :entity-type="EntityType.PUBLISHER"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

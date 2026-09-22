@@ -13,8 +13,7 @@
         <v-col cols="auto">
             <research-area-modal
                 :preset-research-area="undefined"
-                @submit="createNewEmploymentPosition">
-            </research-area-modal>
+                @submit="createNewEmploymentPosition" />
             <generic-crud-modal
                 :form-component="EmploymentPositionForm"
                 :form-props="{ presetEmploymentPosition: undefined }"
@@ -53,8 +52,7 @@
                     <rich-text-editor
                         v-model="row.item.displayDescription"
                         :editable="false"
-                        :limit-display="100">
-                    </rich-text-editor>
+                        :limit-display="100" />
                 </td>
                 <td>
                     {{ row.item.schemeName }}
@@ -91,8 +89,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedEmploymentPositions.map(entity => returnCurrentLocaleContent(entity.name) as string)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

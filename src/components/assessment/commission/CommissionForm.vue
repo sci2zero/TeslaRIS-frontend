@@ -18,7 +18,7 @@
                     :label="$t('fromLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
             <v-col>
                 <date-picker
@@ -26,7 +26,7 @@
                     :label="$t('toLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -36,8 +36,7 @@
                     :items="ruleEngines"
                     :label="$t('formalDescriptionOfRuleLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>
@@ -66,8 +65,7 @@
                     :label="$t('researchAreasLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     multiple
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>

@@ -15,7 +15,7 @@
                 :readonly="readonly"
                 @update:search="searchOUs($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission && isAdmin" cols="1">
             <generic-crud-modal

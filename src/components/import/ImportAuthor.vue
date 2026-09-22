@@ -59,8 +59,7 @@
                             :button-text="$t('viewPublicationsLabel')"
                             :id-for-fetching="row.item.databaseId"
                             icon="mdi-note"
-                            :title="$t('latestPublicationsLabel')">
-                        </publications-dialog>
+                            :title="$t('latestPublicationsLabel')" />
                         <v-btn
                             class="ml-2"
                             size="small" color="primary"
@@ -86,8 +85,8 @@
             :ou-for-loading="institution"
             :top-level-institution-id="topLevelInstitutionId"
             :import-as-unmanaged="importAsUnmanaged"
-            @user-action-complete="notifyParentIfAllHandled">
-        </import-affiliation>
+            @user-action-complete="notifyParentIfAllHandled"
+        />
     </v-container>
 </template>
 

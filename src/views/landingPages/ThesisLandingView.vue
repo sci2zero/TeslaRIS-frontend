@@ -9,9 +9,10 @@
                             :loading="!thesis"
                             type="heading"
                             color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)"></rich-title-renderer>
+                            class="text-center">
+                            <rich-title-renderer
+                                :title="returnCurrentLocaleContent(thesis?.title)"
+                            />
                             <div>
                                 <generic-crud-modal
                                     class="mb-6"
@@ -24,12 +25,15 @@
                                     @update="updateTitle"
                                 />
                             </div>
-                            <rich-title-renderer v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0" :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"></rich-title-renderer>
+                            <rich-title-renderer
+                                v-if="thesis?.alternateTitle && thesis?.alternateTitle.length > 0"
+                                :title="`(${returnCurrentLocaleContent(thesis?.alternateTitle)})`"
+                            />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(thesis?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("thesisLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -93,10 +97,10 @@
                                     {{ getThesisTitleFromValueAutoLocale(thesis.thesisType) }}
                                 </div>
                                 <div v-if="thesis?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="thesis?.documentDate" class="response">
-                                    {{ localiseDate(thesis.documentDate) }}
+                                    {{ localiseFlexibleDate(thesis.documentDate) }}
                                 </div>
                                 <div v-if="thesis?.topicAcceptanceDate">
                                     {{ $t("topicAcceptanceDateLabel") }}:
@@ -171,6 +175,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.THESIS"
+                                    :entity-id="thesis?.id"
+                                />
+                            </v-col>
                             <v-col cols="3">
                                 <div v-if="thesis?.numberOfPages">
                                     {{ $t("numberOfPagesLabel") }}:
@@ -279,7 +290,7 @@
             </v-col>
         </v-row>
 
-        <div v-if="userCanPutOnPublicReview" class="actions-box pa-4">
+        <div v-if="isDigitalLibraryEnabled && userCanPutOnPublicReview" class="actions-box pa-4">
             <div class="text-subtitle-1 font-weight-medium mb-3">
                 {{ $t("librarianActionsLabel") }}
             </div>
@@ -320,7 +331,7 @@
                     {{ $t("restartPublicReviewLabel") }}
                 </v-btn>
                 <v-btn
-                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived && !thesis.isOnPublicReview"
+                    v-if="thesis?.thesisDefenceDate && userCanPutOnPublicReview && !thesis?.isArchived && !thesis.isOnPublicReview && !thesis.isOnPublicReviewPause"
                     class="mb-5 ml-2" color="primary" density="compact"
                     variant="outlined"
                     @click="changeArchiveState(true)">
@@ -397,7 +408,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -416,6 +427,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -456,8 +473,7 @@
                     :keywords="thesis?.keywords ? thesis.keywords : []"
                     :can-edit="canEdit && !thesis?.isOnPublicReview"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <div>
@@ -485,8 +501,7 @@
                     :thesis-id="thesis?.id"
                     :can-edit="canEdit"
                     :researcher-id="thesis?.contributions![0].personId"
-                >
-                </thesis-research-output-section>
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -505,7 +520,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="thesis?.id"
-                    :can-edit="canClassify && !thesis?.isOnPublicReview && thesis?.documentDate !== ''"
+                    :can-edit="canClassify && !thesis?.isOnPublicReview && !!thesis?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.THESIS]"
                     @create="createClassification"
@@ -519,6 +534,24 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.THESIS"
+                    :entity-id="thesis?.id"
+                    :restore-blocked-reason="restoreBlockedReason"
+                    @restored="fetchThesis"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.THESIS"
+                    :entity-id="thesis?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <persistent-question-dialog
@@ -527,8 +560,7 @@
             :message="dialogMessage"
             :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
             :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
-            @continue="commitThesisStatusChange">
-        </persistent-question-dialog>
+            @continue="commitThesisStatusChange" />
 
         <share-buttons
             v-if="thesis && isResearcher && canEdit"
@@ -543,13 +575,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type LanguageResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { DocumentContributionType, PublicationType, ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -562,7 +595,7 @@ import KeywordList from '@/components/core/KeywordList.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import type { OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
@@ -601,13 +634,32 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, DescriptionSection, LocalizedLink, KeywordList, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, PersistentQuestionDialog, ThesisResearchOutputSection, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
+
+        const {
+            isDigitalLibraryEnabled,
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -627,11 +679,29 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission } = useUserRole();
+        const {
+            isAdmin, isResearcher,
+            isInstitutionalLibrarian,
+            isHeadOfLibrary, isCommission,
+            isViceDeanForScience, canReviewDataQuality } = useUserRole();
+        
         const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
+
+        const restoreBlockedReason = computed(() => {
+            if (thesis.value?.isArchived) {
+                return i18n.t("restoreArchivedDocumentMessage");
+            }
+
+            if (thesis.value?.isOnPublicReview || thesis.value?.isOnPublicReviewPause) {
+                return i18n.t("restoreThesisOnPublicReviewMessage");
+            }
+
+            return undefined;
+        });
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
 
@@ -654,6 +724,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.THESIS,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 EntityClassificationService.canClassifyDocument(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -1010,7 +1087,9 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality, isDigitalLibraryEnabled,
             thesis, icon, publisher, createIndicator, languageTagMap,
+            restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, goToURL, canEdit, putOnPublicReview,
             updateKeywords, updateDescription, localiseDate, examineRegistryBookEntry,
@@ -1027,7 +1106,9 @@ export default defineComponent({
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
+            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience,
+            isDigitalRepositoryEnabled
         };
 }})
 

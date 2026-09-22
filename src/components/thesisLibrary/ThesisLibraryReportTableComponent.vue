@@ -8,8 +8,7 @@
                 :items="langItems"
                 :label="$t('languageLabel') + '*'"
                 :rules="requiredSelectionRules"
-                return-object>
-            </v-select>
+                return-object />
         </v-col>
         <v-col cols="12" sm="6" md="2">
             <v-btn
@@ -29,7 +28,7 @@
             :size="40"
             :width="3"
             indeterminate
-        ></v-progress-circular>
+        />
     </div>
     
     <div v-show="!isLoading">
@@ -64,8 +63,7 @@
                             :display-count="props.item.defendedCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.DEFENDED"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -73,8 +71,7 @@
                             :display-count="props.item.notDefendedCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.NOT_DEFENDED"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -82,8 +79,7 @@
                             :display-count="props.item.publiclyAvailableCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.PUBLICLY_AVAILABLE"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -91,8 +87,7 @@
                             :display-count="props.item.closedAccessCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.CLOSED_ACCESS"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -100,8 +95,7 @@
                             :display-count="props.item.acceptedCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.ACCEPTED"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -109,8 +103,7 @@
                             :display-count="props.item.publicReviewCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.PUBLIC_REVIEW"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -118,8 +111,7 @@
                             :display-count="props.item.submittedCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.SUBMITTED"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                     <td>
                         <thesis-library-report-table-modal
@@ -127,8 +119,7 @@
                             :display-count="props.item.archivedCount"
                             :report-request="(reportRequest as ThesisReportRequest)"
                             :report-type="ThesisReportType.ARCHIVED"
-                            :institution-id="props.item.institutionId">
-                        </thesis-library-report-table-modal>
+                            :institution-id="props.item.institutionId" />
                     </td>
                 </tr>
             </template>

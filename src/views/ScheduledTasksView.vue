@@ -8,14 +8,13 @@
                 v-model="selectedScheduledTaskType"
                 :items="scheduledTaskTypes"
                 :label="$t('scheduledTaskTypeLabel')"
-                :readonly="false">
-            </v-select>
+                :readonly="false" />
         </v-col>
     </v-row>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
             <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment"
+                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment && !qualityAssessmentBackfill"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedApplicableEntityType"
@@ -24,8 +23,7 @@
                     :rules="requiredSelectionRules"
                     :class="taskClassificationComputation ? 'comfortable' : ''"
                     return-object
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <v-col v-if="reportGeneration" cols="12" sm="3" md="2">
                 <v-select
@@ -34,8 +32,7 @@
                     :label="$t('reportTypeLabel') + '*'"
                     :class="isSummaryReport() ? 'comfortable' : ''"
                     :rules="requiredSelectionRules"
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <v-col v-if="taskReindexing" cols="8" md="4">
                 <v-select
@@ -44,15 +41,39 @@
                     :label="$t('entityTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
                     return-object
-                    multiple>
-                </v-select>
+                    multiple />
             </v-col>
             <v-col v-if="taskReindexing" cols="4" md="2">
                 <v-checkbox
                     v-model="reharvestCitationIndicators"
                     class="mt-2"
                     :label="$t('reharvestCitationIndicatorsLabel')"
-                ></v-checkbox>
+                />
+            </v-col>
+            <v-col v-if="qualityAssessmentBackfill" cols="8" md="4">
+                <v-select
+                    v-model="selectedBackfillTargets"
+                    :items="backfillTargets"
+                    :label="$t('backfillTargetTypeLabel') + '*'"
+                    :rules="requiredMultiSelectionRules"
+                    return-object
+                    multiple
+                />
+            </v-col>
+            <v-col v-if="qualityAssessmentBackfill" cols="12" sm="3" md="2">
+                <v-select
+                    v-model="selectedQualityProfile"
+                    :items="qualityProfiles"
+                    :label="$t('qualityProfileLabel') + '*'"
+                    :rules="requiredSelectionRules"
+                />
+            </v-col>
+            <v-col v-if="qualityAssessmentBackfill" cols="4" md="2">
+                <v-checkbox
+                    v-model="rewriteExistingAssessments"
+                    class="mt-2"
+                    :label="$t('rewriteExistingAssessmentsLabel')"
+                />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="10" md="6">
                 <v-select
@@ -60,8 +81,7 @@
                     :items="thesisTypes"
                     :label="$t('thesisTypeLabel') + '*'"
                     :rules="requiredMultiSelectionRules"
-                    multiple>
-                </v-select>
+                    multiple />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="3" md="2">
                 <v-text-field
@@ -71,14 +91,14 @@
                     :label="$t('publicReviewLengthLabel') + '*'"
                     :placeholder="$t('publicReviewLengthLabel') + '*'"
                     :rules="requiredNumericGreaterThanZeroFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col v-if="publicReviewEndCheck" cols="4" md="2">
                 <v-checkbox
                     v-model="shortenedReviewPeriod"
                     class="mt-3"
                     :label="$t('shortenedReviewPeriodLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
                 <v-select
@@ -87,8 +107,7 @@
                     :label="$t('sourceLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
-                    :readonly="false">
-                </v-select>
+                    :readonly="false" />
             </v-col>
             <!-- <v-col v-if="taskClassificationLoad" cols="2">
                 <v-select
@@ -132,8 +151,7 @@
                     :label="(reportGeneration ? $t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') : $t('yearsLabel')) + '*'"
                     :rules="requiredMultiSelectionRules"
                     :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
-                    :multiple="!reportGeneration">
-                </v-select>
+                    :multiple="!reportGeneration" />
             </v-col>
             <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
                 <journal-autocomplete-search
@@ -174,7 +192,7 @@
                     v-model="autoload"
                     class="mt-2"
                     :label="$t('automaticLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col v-if="maintenance" cols="12" md="4">
                 <v-text-field
@@ -182,8 +200,24 @@
                     :label="$t('approximateEndMomentLabel') + '*'"
                     :placeholder="$t('approximateEndMomentLabel')"
                     outlined
-                    :rules="requiredFieldRules">
-                </v-text-field>
+                    :rules="requiredFieldRules" />
+            </v-col>
+        </v-row>
+        <v-row
+            v-if="qualityAssessmentBackfill"
+            class="d-flex flex-row justify-center bg-grey-lighten-5">
+            <v-col cols="12" md="3">
+                <person-autocomplete-search
+                    v-model="selectedPersons"
+                    multiple disable-submission
+                />
+            </v-col>
+            <v-col cols="12" md="3">
+                <organisation-unit-autocomplete-search
+                    v-model="selectedOUs"
+                    multiple
+                    disable-submission
+                />
             </v-col>
         </v-row>
         <v-row 
@@ -194,14 +228,14 @@
                     v-model="calculateIF5Rank"
                     class="mt-2"
                     :label="$t('calculateIf5RankLabel')"
-                ></v-checkbox>
+                />
             </v-col>
             <v-col cols="2" md="2">
                 <v-checkbox
                     v-model="calculateJCIRank"
                     class="mt-2"
                     :label="$t('calculateJciRankLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row
@@ -218,8 +252,7 @@
                     :items="publicationTypes"
                     :label="$t('typeOfPublicationLabel')"
                     clearable
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center mb-5">
@@ -243,18 +276,17 @@
                 />
             </v-col>
             <v-col cols="12" sm="3" md="1">
-                <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required></time-picker>
+                <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required />
             </v-col>
             <v-col
-                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck"
+                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck || qualityAssessmentBackfill"
                 cols="12" sm="3" md="2">
                 <v-select
                     v-model="selectedRecurrenceType"
                     :items="recurrenceTypes"
                     :label="$t('recurrenceTypeLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
             <v-col cols="12" sm="3" md="1">
                 <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
@@ -267,8 +299,7 @@
     <scheduled-tasks-list
         class="mt-10! mb-5!"
         :scheduled-tasks="scheduledTasks"
-        @delete="deleteScheduledLoadTask">
-    </scheduled-tasks-list>
+        @delete="deleteScheduledLoadTask" />
 
     <toast v-model="snackbar" :message="message" />
 </template>
@@ -306,6 +337,9 @@ import { getThesisTypesForGivenLocale } from "@/i18n/thesisType";
 import { getPublicationTypesForGivenLocale } from "@/i18n/publicationType";
 import ApplicationConfigurationService from "@/services/ApplicationConfigurationService";
 import MonographAutocompleteSearch from "@/components/publication/MonographAutocompleteSearch.vue";
+import { QualityAssessmentTarget } from "@/models/RevisionModel";
+import { getQualityAssessmentTargetsForGivenLocale } from "@/i18n/qualityAssessmentTarget";
+import DataQualityService from "@/services/revision/DataQualityService";
 
 
 export default defineComponent({
@@ -362,6 +396,7 @@ export default defineComponent({
         const publicReviewEndCheck = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK);
         const maintenance = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.MAINTENANCE);
         const metadataEnrichment = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.METADATA_ENRICHMENT);
+        const qualityAssessmentBackfill = computed(() => selectedScheduledTaskType.value === ScheduledTaskType.QUALITY_ASSESSMENT_BACKFILL);
 
         const approximateEndMoment = ref<string>("");
 
@@ -399,6 +434,12 @@ export default defineComponent({
 
         const reharvestCitationIndicators = ref(false);
 
+        const backfillTargets = ref<{ title: string; value: QualityAssessmentTarget; }[]>(getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[]);
+        const selectedBackfillTargets = ref<{ title: string, value: QualityAssessmentTarget }[]>([]);
+        const rewriteExistingAssessments = ref(false);
+        const qualityProfiles = ref<string[]>([]);
+        const selectedQualityProfile = ref<string | undefined>(undefined);
+
         const calculateIF5Rank = ref(true);
         const calculateJCIRank = ref(false);
 
@@ -408,6 +449,7 @@ export default defineComponent({
 
         onMounted(() => {
             fetchScheduledTasks();
+            fetchQualityProfiles();
 
             populateSelectionData();
             
@@ -431,6 +473,18 @@ export default defineComponent({
             populateSelectionData();
         });
 
+        const fetchQualityProfiles = () => {
+            DataQualityService.listProfileNames().then(response => {
+                qualityProfiles.value = [
+                    ...new Set(response.data.map(profile => profile.profileName))
+                ];
+
+                if (!selectedQualityProfile.value) {
+                    selectedQualityProfile.value = qualityProfiles.value[0];
+                }
+            });
+        };
+
         const fetchScheduledTasks = () => {
             TaskManagerService.listScheduledTasks().then((response) => {
                 scheduledTasks.value = response.data;
@@ -450,6 +504,7 @@ export default defineComponent({
             scheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
             reportTypes.value = getReportTypesForGivenLocale();
             entityTypes.value = getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[];
+            backfillTargets.value = getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[];
             applicableTypes.value = (getApplicableEntityTypesForGivenLocale() as { title: string, value: ApplicableEntityType }[]).filter(item => item.value === ApplicableEntityType.PUBLICATION_SERIES);
             indicatorSources.value = (getIndicatorSourceForGivenLocale() as { title: string, value: EntityIndicatorSource }[]).filter(item => item.value !== EntityIndicatorSource.MANUAL);
         };
@@ -623,6 +678,20 @@ export default defineComponent({
                     );
                     break;
 
+                case ScheduledTaskType.QUALITY_ASSESSMENT_BACKFILL:
+                    scheduleTask(() =>
+                        TaskManagerService.scheduleQualityAssessmentBackfill(
+                            timestamp,
+                            selectedBackfillTargets.value.map(target => target.value),
+                            selectedPersons.value.map(person => person.value),
+                            (selectedOUs.value as { title: string; value: number; }[]).map(ou => ou.value),
+                            selectedQualityProfile.value as string,
+                            rewriteExistingAssessments.value,
+                            selectedRecurrenceType.value.value
+                        )
+                    );
+                    break;
+
                 default:
                     message.value = i18n.t("invalidTaskTypeMessage");
                     snackbar.value = true;
@@ -707,7 +776,10 @@ export default defineComponent({
             calculateIF5Rank, calculateJCIRank, thesesAssessment,
             monographPublicationsAssessment, selectedMonographs,
             metadataEnrichment, autoload, shortenedReviewPeriod,
-            isScientificProductionReport, startYear
+            isScientificProductionReport, startYear,
+            qualityAssessmentBackfill, backfillTargets,
+            selectedBackfillTargets, rewriteExistingAssessments,
+            qualityProfiles, selectedQualityProfile
         };
     },
 });

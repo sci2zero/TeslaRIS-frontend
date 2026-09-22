@@ -18,7 +18,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(journal?.subtitle) }}
-                        <br v-if="journal?.subtitle && journal.subtitle.length > 0" />
+                        <br v-if="journal?.subtitle && journal.subtitle.length > 0">
                         {{ $t("journalLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -51,7 +51,7 @@
                         </div>
                         <basic-info-loader v-if="!journal" :citation-button="false" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div>{{ $t("articleCollectionSeriesTypeLabel") }}:</div>
                                 <div class="response">
                                     {{ getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal?.type) }}
@@ -68,7 +68,7 @@
                                     Open Alex ID:
                                 </div>
                                 <div v-if="journal?.openAlexId" class="response">
-                                    <identifier-link :identifier="journal.openAlexId" type="open_alex"></identifier-link>
+                                    <identifier-link :identifier="journal.openAlexId" type="open_alex" />
                                 </div>
                                 <div v-if="journal?.languageIds && journal?.languageIds.length > 0">
                                     {{ $t("languageLabel") }}:
@@ -82,7 +82,7 @@
                                     {{ $t("uriInputLabel") }}:
                                 </div>
                                 <div class="response">
-                                    <uri-list :uris="journal?.uris"></uri-list>
+                                    <uri-list :uris="journal?.uris" />
                                 </div>
                                 <div>
                                     <entity-identifiers-list
@@ -95,13 +95,19 @@
                                     />
                                 </div>
                             </v-col>
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="EntityType.JOURNAL"
+                                    :entity-id="journal?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
 
-        <br />
+        <br>
         <tab-content-loader v-if="!journal" :tab-number="3" layout="list" />
         <v-tabs
             v-show="journal"
@@ -121,6 +127,12 @@
             <v-tab v-if="canClassify || (journalClassifications && journalClassifications.length > 0)" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -135,8 +147,7 @@
                     :total-publications="totalPublications"
                     in-comparator
                     show-publication-concrete-type
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs
@@ -169,6 +180,23 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.JOURNAL"
+                    :entity-id="journal?.id"
+                    @restored="() => fetchJournal(false)"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.JOURNAL"
+                    :entity-id="journal?.id"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
 
         <toast v-model="snackbar" :message="snackbarMessage" />
@@ -178,7 +206,7 @@
 <script lang="ts">
 
 import { ApplicableEntityType, type LanguageResponse } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -186,6 +214,7 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import DataQualityService from '@/services/revision/DataQualityService';
 import type { Journal } from '@/models/JournalModel';
 import JournalService from '@/services/JournalService';
 import LanguageService from '@/services/LanguageService';
@@ -211,13 +240,30 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import { getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import { EntityType } from '@/models/MergeModel';
+import { useUserRole } from '@/composables/useUserRole';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList },
+    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
+
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -240,6 +286,7 @@ export default defineComponent({
         const icon = ref("mdi-book-open-blank-variant");
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const journalIndicators = ref<EntityIndicatorResponse[]>();
@@ -250,6 +297,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.JOURNAL,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 JournalService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
@@ -385,6 +439,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             journal, icon, publications, totalPublications,
             switchPage, canEdit, returnCurrentLocaleContent,
             languageMap, updateBasicInfo, canClassify,
@@ -394,7 +450,9 @@ export default defineComponent({
             journalClassifications, createJournalClassification,
             fetchClassifications, publicationSeriesIdentifiers,
             getArticleCollectionSeriesTypeTitleFromValueAutoLocale,
-            fetchIdentifiers
+            fetchIdentifiers, isViceDeanForScience,
+            isAdmin, EntityType, fetchJournal,
+            dataQualityTabsRef, showAssessmentDetails
         };
 }})
 

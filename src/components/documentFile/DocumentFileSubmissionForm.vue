@@ -7,7 +7,7 @@
                         v-model="file"
                         :label="$t('fileLabel') + '*'"
                         accept=".pdf,image/*"
-                    ></v-file-input>
+                    />
                 </v-row>
                 <v-row>
                     <v-col>
@@ -26,8 +26,7 @@
                             :items="resourceTypes"
                             :label="$t('resourceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-if="allowLicenceSelection">
@@ -37,8 +36,7 @@
                             :items="accessRights"
                             :label="$t('licenseLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-else-if="!alwaysOpenAccess">
@@ -54,8 +52,7 @@
                             :items="cclicenseTypes"
                             :label="$t('ccLicenseLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row v-if="canBeArchived">
@@ -90,7 +87,7 @@ import { toMultilingualTextInput } from "@/i18n/MultilingualContentUtil";
 import LanguageService from '@/services/LanguageService';
 import type { LanguageTagResponse } from '@/models/Common';
 import { getLicenseTitleFromValueAutoLocale, getLisenseTypesForGivenLocale } from '@/i18n/license';
-import { getResourceTypesForGivenLocale } from '@/i18n/resourceType';
+import { getResourceTypeTitleFromValueAutoLocale, getResourceTypesForGivenLocale } from '@/i18n/resourceType';
 
 export default defineComponent({
     name: "DocumentFileSubmissionForm",
@@ -123,6 +120,10 @@ export default defineComponent({
         canBeArchived: {
             type: Boolean,
             default: false
+        },
+        allowedResourceTypes: {
+            type: Array as PropType<ResourceType[]>,
+            default: undefined
         }
     },
     emits: ["create", "update"],
@@ -147,7 +148,12 @@ export default defineComponent({
                     selectedCCLicense.value = { title: cclicenseTypes?.find(ccLicense => props.presetDocumentFile?.license == ccLicense.value)?.title as string, value: props.presetDocumentFile.license };
                 }
 
-                selectedResourceType.value = { title: resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title as string, value: props.presetDocumentFile.resourceType };
+                const presetResourceTypeTitle = resourceTypes.value?.find(resourceType => getNameFromOrdinal(ResourceType, resourceType.value) === props.presetDocumentFile?.resourceType.toString())?.title;
+
+                selectedResourceType.value = {
+                    title: (presetResourceTypeTitle ?? getResourceTypeTitleFromValueAutoLocale(props.presetDocumentFile.resourceType)) as string,
+                    value: props.presetDocumentFile.resourceType
+                };
                 isArchived.value = props.presetDocumentFile.isArchived;
             }
 
@@ -164,7 +170,16 @@ export default defineComponent({
         const descriptionRef = ref<typeof MultilingualTextInput>();
         
         const selectionPlaceholder: { title: string, value: any } = { title: "", value: null };
-        const resourceTypes = computed(() => getResourceTypesForGivenLocale());
+        const resourceTypes = computed(() => {
+            const allResourceTypes = getResourceTypesForGivenLocale();
+            const allowed = props.allowedResourceTypes;
+
+            if (!allowed) {
+                return allResourceTypes;
+            }
+
+            return allResourceTypes?.filter(resourceType => allowed.includes(resourceType.value));
+        });
         const selectedResourceType = ref(selectionPlaceholder);
         const isArchived = ref(false);
 

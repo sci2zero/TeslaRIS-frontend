@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(proceedingsPublication?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("proceedingsPublicationLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -55,7 +55,7 @@
                         </div>
                         <basic-info-loader v-if="!proceedingsPublication" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="proceedingsPublication?.proceedingsPublicationType">
                                     {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
@@ -79,10 +79,10 @@
                                     </localized-link>
                                 </div>
                                 <div v-if="proceedingsPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ localiseDate(proceedingsPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(proceedingsPublication.documentDate) }}
                                 </div>
                                 <div v-if="proceedingsPublication?.startPage">
                                     {{ $t("startPageLabel") }}:
@@ -121,6 +121,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                                    :entity-id="proceedingsPublication?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -153,7 +160,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -168,6 +175,12 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window
@@ -179,15 +192,13 @@
                     :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Description -->
                 <description-section
                     :description="proceedingsPublication?.description"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription" />
 
                 <description-section
                     :description="proceedingsPublication?.remark"
@@ -211,8 +222,7 @@
                     :document="proceedingsPublication"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>  
+                    :file-items="proceedingsPublication?.fileItems" />  
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -234,7 +244,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="proceedingsPublication?.id"
-                    :can-edit="canClassify && proceedingsPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!proceedingsPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.PROCEEDINGS_PUBLICATION]"
                     @create="createClassification"
@@ -246,6 +256,24 @@
                     :document-id="(proceedingsPublication?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    :entity-id="proceedingsPublication?.id"
+                    :restore-blocked-reason="proceedingsPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="fetchProceedingsPublication"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    :entity-id="proceedingsPublication?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -263,13 +291,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution, type ProceedingsPublicationType } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -283,7 +312,7 @@ import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
 import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -313,13 +342,27 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -327,8 +370,18 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
@@ -361,6 +414,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PROCEEDINGS_PUBLICATION,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -522,6 +582,7 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
             proceedingsPublication, icon, publications, event, displayConfiguration,
             totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
@@ -533,7 +594,9 @@ export default defineComponent({
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
             fetchValidationStatus, PublicationType, updateRemark, isAdmin,
-            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers
+            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate, fetchProceedingsPublication,
+            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience
         };
 }})
 

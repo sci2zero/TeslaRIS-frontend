@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(monographPublication?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("monographPublicationLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -56,7 +56,7 @@
                         </div>
                         <basic-info-loader v-if="!monographPublication" />
                         <v-row v-else>
-                            <v-col cols="6">
+                            <v-col cols="3">
                                 <div v-if="monographPublication?.monographPublicationType">
                                     {{ $t("concretePublicationTypeLabel") }}:
                                 </div>
@@ -76,17 +76,17 @@
                                     {{ monographPublication.endPage }}
                                 </div>
                                 <div v-if="monographPublication?.documentDate">
-                                    {{ $t("yearOfPublicationLabel") }}:
+                                    {{ $t("dateOfPublicationLabel") }}:
                                 </div>
                                 <div v-if="monographPublication?.documentDate" class="response">
-                                    {{ localiseDate(monographPublication.documentDate) }}
+                                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
                                 </div>
                                 <div v-if="monographPublication?.monographId">
                                     {{ $t("monographLabel") }}:
                                 </div>
-                                <div v-if="monographPublication?.monographId" class="response">
+                                <div v-if="monographPublication?.monographName?.length ?? 0 > 0" class="response">
                                     <localized-link :to="'scientific-results/monograph/' + monographPublication?.monographId">
-                                        {{ returnCurrentLocaleContent(monograph?.title) }}
+                                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
                                     </localized-link>
                                 </div>
                                 <div v-if="monographPublication?.eventId">
@@ -125,6 +125,13 @@
                                 :document-identifiers="documentIdentifiers"
                                 @identifiers-updated="fetchIdentifiers"
                             />
+
+                            <v-col cols="3">
+                                <data-quality-remarks-dialog
+                                    :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
+                                    :entity-id="monographPublication?.id"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-card>
@@ -155,7 +162,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-if="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -169,6 +176,12 @@
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -191,8 +204,8 @@
                     :document="monographPublication"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     :proofs="monographPublication?.proofs"
-                    :file-items="monographPublication?.fileItems">
-                </attachment-section>
+                    :file-items="monographPublication?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -200,15 +213,15 @@
                     :keywords="monographPublication?.keywords ? monographPublication.keywords : []"
                     :can-edit="canEdit && !monographPublication?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords"
+                />
 
                 <!-- Description -->
                 <description-section
                     :description="monographPublication?.description"
                     :can-edit="canEdit && !monographPublication?.isArchived"
-                    @update="updateDescription">
-                </description-section>
+                    @update="updateDescription"
+                />
 
                 <description-section
                     :description="monographPublication?.remark"
@@ -234,7 +247,7 @@
                 <entity-classification-view
                     :entity-classifications="documentClassifications"
                     :entity-id="monographPublication?.id"
-                    :can-edit="canClassify && monographPublication?.documentDate !== ''"
+                    :can-edit="canClassify && !!monographPublication?.documentDate?.year"
                     :containing-entity-type="ApplicableEntityType.DOCUMENT"
                     :applicable-types="[ApplicableEntityType.MONOGRAPH_PUBLICATION]"
                     @create="createClassification"
@@ -246,6 +259,24 @@
                     :document-id="(monographPublication?.id as number)"
                     :display-settings="displayConfiguration.displaySettings.value"
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
+                    :entity-id="monographPublication?.id"
+                    :restore-blocked-reason="monographPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                    @restored="fetchMonographPublication"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
+                    :entity-id="monographPublication?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -263,13 +294,14 @@
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { onMounted } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MonographPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -281,9 +313,7 @@ import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/monographPublicationType';
-import type { Monograph } from '@/models/PublicationModel';
-import MonographService from '@/services/DocumentPublicationService';
-import { localiseDate } from '@/utils/DateUtil';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import MonographPublicationUpdateForm from '@/components/publication/update/MonographPublicationUpdateForm.vue';
@@ -312,13 +342,27 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
+import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
+import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
+import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay },
+    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
     setup() {
         const currentTab = ref("contributions");
+
+        const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
+        const showAssessmentDetails = (
+            version: { majorVersion: number, minorVersion: number }) => {
+            currentTab.value = "dataQuality";
+
+            nextTick(() => dataQualityTabsRef.value?.selectVersion(
+                version.majorVersion, version.minorVersion));
+        };
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -326,14 +370,23 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission, isViceDeanForScience,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const monographPublication = ref<MonographPublication>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         const event = ref<Conference>();
-        const monograph = ref<Monograph>();
 
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
@@ -358,6 +411,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.MONOGRAPH_PUBLICATION,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -396,10 +456,6 @@ export default defineComponent({
                         event.value = eventResponse.data;
                     })
                 }
-
-                MonographService.readMonograph(monographPublication.value.monographId as number).then(response => {
-                    monograph.value = response.data;
-                });
     
                 populateData();
             }).catch(() => {
@@ -513,9 +569,10 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality, canReviewDataQuality,
             monographPublication, publications, event, totalPublications,
             returnCurrentLocaleContent, handleResearcherUnbind, icon,
-            languageTagMap, monograph, MonographPublicationUpdateForm,
+            languageTagMap, MonographPublicationUpdateForm,
             searchKeyword, goToURL, canEdit, localiseDate, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
@@ -524,7 +581,9 @@ export default defineComponent({
             fetchClassifications, createClassification, fetchIndicators,
             createIndicator, actionsRef, fetchValidationStatus, PublicationType,
             updateRemark, displayConfiguration, isAdmin, isCommission,
-            fetchIdentifiers, documentIdentifiers
+            fetchIdentifiers, documentIdentifiers, localiseFlexibleDate,
+            fetchMonographPublication, isViceDeanForScience,
+            dataQualityTabsRef, showAssessmentDetails, isDigitalRepositoryEnabled
         };
 }})
 

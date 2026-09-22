@@ -1,0 +1,1 @@
+These files are copied here because the ELD (Embedded Language Detector) library is not fully compatible with Vite and requires n-gram data files to be available as static assets at runtime. Without these files, the build will fail.

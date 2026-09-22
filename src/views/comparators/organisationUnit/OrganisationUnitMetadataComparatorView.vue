@@ -5,7 +5,7 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftOrganisationUnit?.name) }} {{ leftOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(leftOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
-                <br />
+                <br>
 
                 <organisation-unit-update-form
                     ref="updateLeftRef"
@@ -24,22 +24,20 @@
                     ref="updateLeftDescriptionRef"
                     :preset-description-or-biography="(leftOrganisationUnit?.description as MultilingualContent[])"
                     :placeholder-label="$t('descriptionLabel')"    
-                    @update="updateLeftDescription">
-                </description-or-biography-update-form>
+                    @update="updateLeftDescription" />
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="leftOrganisationUnit?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator />
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card>
                     <v-card-text>
@@ -49,8 +47,7 @@
                             :relations="leftRelations"
                             :source-o-u="leftOrganisationUnit"
                             in-comparator
-                            @update="updateLeftRelations">
-                        </organisation-unit-relation-update-form>
+                            @update="updateLeftRelations" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -69,7 +66,7 @@
                     {{ returnCurrentLocaleContent(rightOrganisationUnit?.name) }} {{ rightOrganisationUnit?.nameAbbreviation ? `(${returnCurrentLocaleContent(rightOrganisationUnit?.nameAbbreviation)})` : "" }}
                 </h2>
 
-                <br />
+                <br>
 
                 <organisation-unit-update-form
                     ref="updateRightRef"
@@ -88,22 +85,20 @@
                     ref="updateRightDescriptionRef"
                     :preset-description-or-biography="(rightOrganisationUnit?.description as MultilingualContent[])"
                     :placeholder-label="$t('descriptionLabel')"
-                    @update="updateRightDescription">
-                </description-or-biography-update-form>
+                    @update="updateRightDescription" />
 
-                <br />
+                <br>
 
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
                     <v-card-text class="edit-pen-container">
                         <div><b>{{ $t("researchAreasLabel") }}</b></div>
                         <research-area-hierarchy
                             :research-areas="rightOrganisationUnit?.researchAreas"
-                            in-comparator>
-                        </research-area-hierarchy>
+                            in-comparator />
                     </v-card-text>
                 </v-card>
 
-                <br />
+                <br>
 
                 <v-card>
                     <v-card-text>
@@ -113,8 +108,7 @@
                             :relations="rightRelations"
                             :source-o-u="rightOrganisationUnit"
                             in-comparator
-                            @update="updateRightRelations">
-                        </organisation-unit-relation-update-form>
+                            @update="updateRightRelations" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -266,6 +260,10 @@ export default defineComponent({
                 { fieldName: "fundref", emptyValue: "" },
                 { fieldName: "isni", emptyValue: "" },
                 { fieldName: "fctId", emptyValue: "" },
+                { fieldName: "grid", emptyValue: "" },
+                { fieldName: "wikidata", emptyValue: "" },
+                { fieldName: "nationalId", emptyValue: "" },
+                { fieldName: "numberOfEmployees", emptyValue: "" },
                 { fieldName: "taxNumber", emptyValue: "" },
                 { fieldName: "allowedThesisTypes", emptyValue: [] },
                 { fieldName: "clientInstitutionCris", emptyValue: false },
@@ -275,10 +273,12 @@ export default defineComponent({
                 { fieldName: "clientInstitutionDl", emptyValue: false },
                 { fieldName: "validatingEmailDomainDl", emptyValue: false },
                 { fieldName: "allowingSubdomainsDl", emptyValue: false },
+                { fieldName: "active", emptyValue: false },
                 { fieldName: "institutionEmailDomainDl", emptyValue: "" },
                 { fieldName: "legalEntity", emptyValue: false, setEmpty: false },
                 { fieldName: "startup", emptyValue: false, setEmpty: false },
                 { fieldName: "dateEstablished", emptyValue: null },
+                { fieldName: "dateDissolved", emptyValue: null },
                 { fieldName: "contact.contactEmail", emptyValue: "", nested: true },
                 { fieldName: "contact.phoneNumber", emptyValue: "", nested: true },
                 { fieldName: "location.latitude", emptyValue: null, nested: true, setEmpty: false },
@@ -340,6 +340,10 @@ export default defineComponent({
             leftOrganisationUnit.value!.isni = updatedData.isni;
             leftOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             leftOrganisationUnit.value!.fctId = updatedData.fctId;
+            leftOrganisationUnit.value!.grid = updatedData.grid;
+            leftOrganisationUnit.value!.wikidata = updatedData.wikidata;
+            leftOrganisationUnit.value!.nationalId = updatedData.nationalId;
+            leftOrganisationUnit.value!.numberOfEmployees = updatedData.numberOfEmployees;
             leftOrganisationUnit.value!.location = updatedData.location;
             leftOrganisationUnit.value!.contact = updatedData.contact;
             leftOrganisationUnit.value!.description = updatedData.description;
@@ -358,6 +362,8 @@ export default defineComponent({
             leftOrganisationUnit.value!.sector = updatedData.sector;
             leftOrganisationUnit.value!.startup = updatedData.startup;
             leftOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            leftOrganisationUnit.value!.dateDissolved = updatedData.dateDissolved;
+            leftOrganisationUnit.value!.active = updatedData.active;
             leftOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             leftUpdateRequest.value = updatedData;
@@ -379,6 +385,9 @@ export default defineComponent({
             rightOrganisationUnit.value!.isni = updatedData.isni;
             rightOrganisationUnit.value!.taxNumber = updatedData.taxNumber;
             rightOrganisationUnit.value!.fctId = updatedData.fctId;
+            rightOrganisationUnit.value!.grid = updatedData.grid;
+            rightOrganisationUnit.value!.wikidata = updatedData.wikidata;
+            rightOrganisationUnit.value!.nationalId = updatedData.nationalId;
             rightOrganisationUnit.value!.location = updatedData.location;
             rightOrganisationUnit.value!.contact = updatedData.contact;
             rightOrganisationUnit.value!.description = updatedData.description;
@@ -397,6 +406,8 @@ export default defineComponent({
             rightOrganisationUnit.value!.sector = updatedData.sector;
             rightOrganisationUnit.value!.startup = updatedData.startup;
             rightOrganisationUnit.value!.dateEstablished = updatedData.dateEstablished;
+            rightOrganisationUnit.value!.dateDissolved = updatedData.dateDissolved;
+            rightOrganisationUnit.value!.active = updatedData.active;
             rightOrganisationUnit.value!.postalAddress = updatedData.postalAddress;
 
             rightUpdateRequest.value = updatedData;

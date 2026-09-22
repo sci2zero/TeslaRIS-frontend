@@ -4,7 +4,7 @@
         v-if="sidebarStore.isMobile && sidebarStore.isVisible"
         class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 cursor-pointer"
         @click="sidebarStore.close()"
-    ></div>
+    />
     
     <aside
         :class="[
@@ -22,7 +22,7 @@
             </router-link>
         </div>
 
-        <div class="mt-3 h-px w-12 bg-gray-800"></div>
+        <div class="mt-3 h-px w-12 bg-gray-800" />
 
         <!-- Scroll up button -->
         <button
@@ -31,7 +31,7 @@
             aria-label="Scroll up"
             @click="scrollUp"
         >
-            <span class="mdi mdi-chevron-up text-sm"></span>
+            <span class="mdi mdi-chevron-up text-sm" />
         </button>
 
         <!-- Menu with scrollable container -->
@@ -59,7 +59,7 @@
                                     :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                                     :aria-label="item.label"
                                 >
-                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
+                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
                                     <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
                                 </div>
                             </template>
@@ -73,7 +73,7 @@
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
-                                        <v-icon :icon="subItem.icon" class="text-gray-300"></v-icon>
+                                        <v-icon :icon="subItem.icon" class="text-gray-300" />
                                     </template>
                                     <v-list-item-title class="text-sm">
                                         {{ subItem.label }}
@@ -88,8 +88,9 @@
                             class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20"
                             :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
                             :aria-label="item.label"
+                            :data-tutorial="item.key === 'persons' || item.key === 'organisation-units' ? `nav-${item.key}` : undefined"
                         >
-                            <span :class="['mdi', item.icon, 'text-2xl mb-2']"></span>
+                            <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
                             <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
                         </router-link>
                     </template>
@@ -104,12 +105,13 @@
             aria-label="Scroll down"
             @click="scrollDown"
         >
-            <span class="mdi mdi-chevron-down text-sm"></span>
+            <span class="mdi mdi-chevron-down text-sm" />
         </button>
     </aside>
 </template>
 
 <script setup lang="ts">
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 import { useUserRole } from '@/composables/useUserRole';
 import AuthenticationService from '@/services/AuthenticationService';
 import PersonService from '@/services/PersonService';
@@ -131,6 +133,11 @@ const {
     isInstitutionalLibrarian,
     isPromotionRegistryAdministrator
 } = useUserRole();
+
+const {
+    isAssessmentModuleEnabled,
+    isDigitalLibraryEnabled
+} = useFeatureModuleToggles();
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
@@ -207,11 +214,8 @@ const populateUserData = () => {
     });
 };
 
-watch(() => loginStore.reloadUserName, () => {
-    if (loginStore.reloadUserName) {
-        populateUserData();
-        loginStore.emitUsernameReloaded();
-    }
+watch(() => loginStore.usernameReloadRequests, () => {
+    populateUserData();
 });
 
 watch(() => loginStore.userLoggedIn, () => {
@@ -267,6 +271,8 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'deduplication', label: computed(() => i18n.t('routeLabel.deduplication')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'branding', label: computed(() => i18n.t('brandingLabel')), to: '/branding', icon: 'mdi-palette' },
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },
+    { key: 'feature-module-toggles', label: computed(() => i18n.t('routeLabel.featureModuleToggles')), to: '/feature-module-toggles', icon: 'mdi-toggle-switch-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+    { key: 'language-tags', label: computed(() => i18n.t('routeLabel.languageTags')), to: '/language-tags', icon: 'mdi-tag-multiple-outline' },
     { key: 'health-check', label: computed(() => i18n.t('routeLabel.healthCheck')), to: '/health-check', icon: 'mdi-heart-pulse' },
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) },
@@ -291,6 +297,11 @@ const thesisLibraryMenu = ref<MenuItem[]>([
     { key: 'thesis-library-backup', label: computed(() => i18n.t('backupLabel')), to: '/thesis-library-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) }
 ]);
 
+const fundingsMenu = ref<MenuItem[]>([
+  { key: 'funding-program', label: computed(() => i18n.t('fundingProgramsLabel')), to: '/funding-program', icon: 'mdi-file-tree' },
+  { key: 'funding-call', label: computed(() => i18n.t('fundingCallsLabel')), to: '/funding-call', icon: 'mdi-bullhorn' },
+]);
+
 const menuItems = ref<MenuItem[]>([
     // { key: 'home', label: computed(() => i18n.t('homeLabel')), to: '/', icon: 'mdi-home' },
     // { 
@@ -306,6 +317,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'persons', label: computed(() => i18n.t('personListLabel')), to: '/persons', icon: 'mdi-account-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'organisation-units', label: computed(() => i18n.t('ouListLabel')), to: '/organisation-units', icon: 'mdi-office-building', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
     { key: 'scientific-results', label: computed(() => i18n.t('scientificResultsListLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'projects', label: computed(() => i18n.t('projectsLabel')), to: '/project', icon: 'mdi-folder-star' },
     { key: 'theses-list', label: computed(() => i18n.t('thesesLabel')), to: '/scientific-results', icon: 'mdi-file-document-multiple', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'add-thesis', label: computed(() => i18n.t('createThesisLabel')), to: '/scientific-results/thesis/submit-thesis', icon: 'mdi-file-document-edit', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'public-review', label: computed(() => i18n.t('publicReviewDissertationsLabel')), to: '/thesis-library/public-dissertations', icon: 'mdi-file-document', condition: computed(() => loginStore.userLoggedIn && (isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
@@ -327,7 +339,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/assessment', 
         icon: 'mdi-clipboard-check',
         subItems: assessmentsMenu.value,
-        condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
+        condition: computed(() => isAssessmentModuleEnabled.value && loginStore.userLoggedIn && isAdmin.value)
     },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isInstitutionalEditor.value)) },
     { key: 'thesis-library-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/thesis-library-reporting', icon: 'mdi-file-chart', condition: computed(() => (isHeadOfLibrary.value)) },
@@ -337,7 +349,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => !loginStore.userLoggedIn)
+        condition: computed(() => isDigitalLibraryEnabled.value && !loginStore.userLoggedIn)
     },
     { 
         key: 'thesis-library', 
@@ -345,7 +357,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => (isAdmin.value || isResearcher.value))
+        condition: computed(() => (isDigitalLibraryEnabled.value && (isAdmin.value || isResearcher.value)))
     },
     { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
@@ -353,7 +365,18 @@ const menuItems = ref<MenuItem[]>([
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
-    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) }
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => isAssessmentModuleEnabled.value && !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
+    { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
+    { key: 'm-service', label: computed(() => i18n.t('mServiceLabel')), to: '/assessment/m-service', icon: 'mdi-school', condition: computed(() => !isHeadOfLibrary.value && !isInstitutionalLibrarian.value && !isPromotionRegistryAdministrator.value) },
+    {
+      key: 'fundings',
+      label: computed(() => i18n.t('fundingsLabel')),
+      to: '/funding-program',
+      icon: 'mdi-cash-multiple',
+      subItems: fundingsMenu.value,
+      condition: computed(() => loginStore.userLoggedIn && isAdmin.value)
+    },
 ]);
 
 const filteredMenuItems = computed(() => {

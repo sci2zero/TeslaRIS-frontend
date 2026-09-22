@@ -7,8 +7,7 @@
                     :items="assessmentClassifications"
                     :label="$t(entityType === ApplicableEntityType.DOCUMENT ? 'assessmentLabel' : 'classificationLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row
@@ -17,7 +16,7 @@
                 <v-checkbox
                     v-model="showAllForEntityType"
                     :label="$t('showAllCategoriesLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT' && entityType !== 'PRIZE'">
@@ -27,8 +26,7 @@
                     type="number"
                     :label="$t('classificationYearLabel') + '*'"
                     :placeholder="$t('classificationYearLabel') + '*'"
-                    :rules="requiredNumericFieldRules">
-                </v-text-field>
+                    :rules="requiredNumericFieldRules" />
             </v-col>
         </v-row>
         <v-row v-if="!isCommission && !isViceDeanForScience">
@@ -93,11 +91,10 @@ export default defineComponent({
             props.applicableTypes.includes(ApplicableEntityType.MONOGRAPH_PUBLICATION) || 
             props.applicableTypes.includes(ApplicableEntityType.JOURNAL_PUBLICATION) || 
             props.applicableTypes.includes(ApplicableEntityType.PROCEEDINGS_PUBLICATION) || 
-            props.applicableTypes.includes(ApplicableEntityType.PATENT) || 
+            props.applicableTypes.includes(ApplicableEntityType.INTELLECTUAL_PROPERTY) || 
             props.applicableTypes.includes(ApplicableEntityType.MATERIAL_PRODUCT) || 
             props.applicableTypes.includes(ApplicableEntityType.GENETIC_MATERIAL) || 
-            props.applicableTypes.includes(ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT) || 
-            props.applicableTypes.includes(ApplicableEntityType.DATASET) || 
+            props.applicableTypes.includes(ApplicableEntityType.PERFORMANCE_RELATED_OUTPUT) ||
             props.applicableTypes.includes(ApplicableEntityType.THESIS)
         );
 

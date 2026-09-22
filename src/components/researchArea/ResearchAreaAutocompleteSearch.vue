@@ -10,7 +10,7 @@
                 return-object
                 @update:search="searchResearchAreas($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && selectedResearchArea.value !== -1" icon @click="clearInput()">

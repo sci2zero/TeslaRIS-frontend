@@ -111,6 +111,7 @@ export default {
     scholarIdFormatError: "Погрешан формат Google Scholar ID-а.",
     authenticusIdFormatError: "Погрешан формат Google Scholar ID-а.",
     lattesIdFormatError: "Погрешан формат Lattes ID-а.",
+    handleIdFormatError: "Погрешан формат Handle ID-а.",
     invalidRorMessage: "Погрешан формат Lattes ID-а.",
     invalidRinggoldMessage: "Погрешан формат Ringgold ID-а.",
     invalidFundrefMessage: "Погрешан формат FundRef ID-а.",
@@ -120,5 +121,20 @@ export default {
     handleIdExistsError: "Handle ID је већ у употреби.",
     arxivIdExistsError: "ArXiv ID је већ у употреби.",
     pubmedIdExistsError: "PubMed ID је већ у употреби.",
-    ssrnIdExistsError: "SSRN ID је већ у употреби."
+    ssrnIdExistsError: "SSRN ID је већ у употреби.",
+    invalidGridMessage: "Погрешан формат GRID-а.",
+    invalidWikidataMessage: "Погрешан формат Wikidata ID-а.",
+    noEIssnLabel: "Нема E-ISSN",
+    noPrintIssnLabel: "Нема Print ISSN",
+    cantRestoreVersionMessage: "Није могуће вратити ову верзију: референцира се \"{0}\" са ID-ем {1}, који више не постоји.",
+    tutorial: {
+        stepCounter: "Корак {current} / {total}",
+        skipLabel: "Прескочи",
+        continueLabel: "Даље",
+        nextLabel: "Следеће",
+        scrollUpLabel: "Скролујте нагоре",
+        scrollDownLabel: "Скролујте надоле",
+        scrollLeftLabel: "Скролујте лево",
+        scrollRightLabel: "Скролујте десно",
+    }
 };

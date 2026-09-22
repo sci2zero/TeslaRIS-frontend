@@ -219,7 +219,10 @@ export default defineComponent({
                                             contribution.personName?.otherName, 
                                             contribution.personName?.lastname
                                         ],
-                                institutionIds: contribution.institutionIds
+                                institutionIds: contribution.institutionIds,
+                                dateFrom: contribution.dateFrom,
+                                dateTo: contribution.dateTo,
+                                researchAreas: contribution.researchAreas
                             }, 
                         contributionType: {
                             title: getTitleFromValueAutoLocale(contribution.contributionType),
@@ -274,7 +277,7 @@ export default defineComponent({
                 isCorrespondingContributor: false,
                 isBoardPresident: false,
                 employmentTitle: EmploymentTitle.FULL_PROFESSOR,
-                personalTitle: PersonalTitle.DR
+                personalTitle: PersonalTitle.PHD
             });
         };
 
@@ -334,7 +337,7 @@ export default defineComponent({
                 }
 
                 if (input.contributionType.value === DocumentContributionType.BOARD_MEMBER && !input.personalTitle) {
-                    input.personalTitle = PersonalTitle.DR;
+                    input.personalTitle = PersonalTitle.PHD;
                     sendContentToParent();
                 }
 
@@ -352,7 +355,10 @@ export default defineComponent({
                     isBoardPresident: input.contributionType.value === DocumentContributionType.BOARD_MEMBER ? (props.basic ? false : input.isBoardPresident) : false,
                     institutionIds: input.contribution.institutionIds,
                     employmentTitle: advisorOrBoardMember ? input.employmentTitle : undefined,
-                    personalTitle: advisorOrBoardMember ? input.personalTitle : undefined
+                    personalTitle: advisorOrBoardMember ? input.personalTitle : undefined,
+                    dateFrom: input.contribution.dateFrom,
+                    dateTo: input.contribution.dateTo,
+                    researchAreasId: input.contribution.researchAreasId
                 };
 
                 returnObject.push(contributionObject);

@@ -6,8 +6,7 @@
             :items="collaborationTypes"
             :label="$t('collaborationTypeLabel')"
             :rules="requiredSelectionRules"
-            return-object>
-        </v-select>
+            return-object />
         <v-text-field
             v-model.number="depth"
             class="ml-2" 

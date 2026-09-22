@@ -4,18 +4,17 @@
             <v-text-field
                 v-if="!isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
-                :rules="rules" @input="sendContentToParent"></v-text-field>
+                :rules="rules" @input="sendContentToParent" />
             <v-textarea
                 v-if="isArea && !isRich"
                 v-model="input.text" hide-details="auto" :label="label" :placeholder="label"
-                :rules="rules" @input="sendContentToParent"></v-textarea>
+                :rules="rules" @input="sendContentToParent" />
             <rich-text-editor
                 v-if="isRich"
                 ref="richEditorRef"
                 v-model="input.text"
                 :default-placeholder="placeholderLabel"
-                @input="sendContentToParent">
-            </rich-text-editor>
+                @input="sendContentToParent" />
         </v-col>
         <v-col cols="3">
             <v-select
@@ -25,7 +24,7 @@
                 :label="$t('languageLabel')"
                 return-object
                 @update:model-value="updatedLanguage(index)"
-            ></v-select>
+            />
         </v-col>
         <v-col cols="2">
             <v-btn v-show="inputs.length > 1" icon @click="removeInput(index)">
@@ -74,11 +73,11 @@ export default defineComponent({
             default: () => [],
         },
         modelValue: {
-            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
+            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[], priority: number }[] | undefined>,
             required: true,
         },
         initialValue: {
-            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[] | undefined>,
+            type: Object as PropType<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[], priority: number }[] | undefined>,
             required: false,
             default: undefined
         },
@@ -95,7 +94,12 @@ export default defineComponent({
     setup(props, {emit}) {
         const userPreferredLanguage = ref<{tag: string, id: number}>({tag: "", id: -1});
         const supportedLanguages = ref<{title: string, value: number}[]>([]);
-        const inputs = ref<{ language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]>([]);
+        const inputs = ref<{
+            language: {title: string, value: number},
+            text: string,
+            priority: number,
+            supportedLanguages: {title: string, value: number}[]
+        }[]>([]);
 
         const richEditorRef = ref<typeof RichTextEditor[]>([]);
 
@@ -119,7 +123,8 @@ export default defineComponent({
                                     {
                                         language: {title: language.languageCode, value: language.id}, 
                                         text: props.defaultPlaceholder,
-                                        supportedLanguages: supportedLanguages.value 
+                                        supportedLanguages: supportedLanguages.value ,
+                                        priority: 1
                                     }
                                 );
                             }
@@ -136,9 +141,17 @@ export default defineComponent({
         const setInitialModelValue = () => {
             if(props.initialValue && props.initialValue.length > 0 && props.initialValue[0].text !== "") {
                 inputs.value = [];
-                props.initialValue.forEach(input => {
+
+                const sortedInputs = [...props.initialValue]
+                    .sort((a, b) => b.priority - a.priority);
+
+                sortedInputs.forEach(input => {
                     input.supportedLanguages.push(input.language);
-                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
+                    inputs.value.push({ 
+                        language: input.language, 
+                        text: input.text, 
+                        priority: input.priority,
+                        supportedLanguages: input.supportedLanguages });
                     filterFromInputChoices(input.language);
                 });
 
@@ -148,12 +161,16 @@ export default defineComponent({
             }
         };
 
-        const setNewInputValue = (value: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]) => {
+        const setNewInputValue = (value: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[], priority: number }[]) => {
             if(value && value.length > 0 && value[0].text !== "") {
                 inputs.value = [];
                 value.forEach(input => {
                     input.supportedLanguages.push(input.language);
-                    inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
+                    inputs.value.push({ 
+                        language: input.language,
+                        text: input.text,
+                        priority: input.priority,
+                        supportedLanguages: input.supportedLanguages });
                     filterFromInputChoices(input.language);
                 });
 
@@ -163,11 +180,15 @@ export default defineComponent({
             }
         };
 
-        const forceRefreshModelValue = (modelValue: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[] }[]) => {
+        const forceRefreshModelValue = (modelValue: { language: {title: string, value: number}, text: string, supportedLanguages: {title: string, value: number}[], priority: number }[]) => {
             inputs.value = [];
             modelValue.forEach(input => {
                 input.supportedLanguages.push(input.language);
-                inputs.value.push({ language: input.language, text: input.text, supportedLanguages: input.supportedLanguages });
+                inputs.value.push({ 
+                    language: input.language, 
+                    text: input.text, 
+                    priority: input.priority,
+                    supportedLanguages: input.supportedLanguages });
                 filterFromInputChoices(input.language);
             });
         
@@ -189,7 +210,11 @@ export default defineComponent({
                 languageChoice = languageChoice.filter(item => item.value !== input.language.value);
             });
             
-            inputs.value.push({ language: {title: languageChoice[0].title, value: languageChoice[0].value}, text: "", supportedLanguages: languageChoice });
+            inputs.value.push({ 
+                language: {title: languageChoice[0].title, value: languageChoice[0].value}, 
+                text: "", 
+                priority: 1,
+                supportedLanguages: languageChoice });
             
             filterFromInputChoices(languageChoice[0]);
         };
@@ -241,19 +266,26 @@ export default defineComponent({
         };
 
         const sendContentToParent = () => {
+            updatePriorities();
+
             const returnObject: MultilingualContent[] = [];
             inputs.value.forEach((input, index) => {
                 if (!input.text || input.text === "<p></p>") {
                     input.text = "";
                     return;
-                } else if(input.text.trim() === "") {
+                } else if (input.text.trim() === "") {
                     return;
                 }
-                returnObject.push({content: input.text, 
-                                languageTag: input.language.title, 
-                                languageTagId: input.language.value, 
-                                priority: inputs.value.length - index});
+
+                returnObject.push({
+                    content: input.text, 
+                    languageTag: input.language.title, 
+                    languageTagId: input.language.value, 
+                    priority: inputs.value.length - index
+                });
             });
+
+            returnObject.sort((a, b) => a.priority - b.priority);
 
             emit("update:modelValue", returnObject);
             emit("update");
@@ -266,9 +298,16 @@ export default defineComponent({
                 inputs.value.push({
                     language: supportedLanguages.value[0],
                     text: "",
-                    supportedLanguages: supportedLanguages.value
+                    supportedLanguages: supportedLanguages.value,
+                    priority: 1
                 });
             }
+        };
+
+        const updatePriorities = () => {
+            inputs.value.forEach((input, index) => {
+                input.priority = inputs.value.length - index;
+            });
         };
 
         return {

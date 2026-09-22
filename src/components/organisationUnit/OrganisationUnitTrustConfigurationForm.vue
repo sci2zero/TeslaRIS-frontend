@@ -5,7 +5,7 @@
                 <v-checkbox
                     v-model="doNotTrustNewPublications"
                     :label="$t('trustNewPublicationsLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -13,7 +13,7 @@
                 <v-checkbox
                     v-model="doNotTrustNewDocumentFiles"
                     :label="$t('trustNewDocumentFilesLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
     </v-form>

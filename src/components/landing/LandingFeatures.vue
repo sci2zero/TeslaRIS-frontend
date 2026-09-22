@@ -15,7 +15,7 @@
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
-                            <v-icon icon="mdi-account-group" size="32" color="#10b981"></v-icon>
+                            <v-icon icon="mdi-account-group" size="32" color="#10b981" />
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
                             {{ $t('landingFeatures.topResearchers.title') }}
@@ -23,13 +23,13 @@
                     </div>
                     <div class="flex-1 mb-6">
                         <div v-if="isLoadingResearchers" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin" />
                             <p class="mt-2">
                                 {{ $t('loading') }}
                             </p>
                         </div>
                         <div v-else-if="topResearchers.length === 0" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-database-off" size="32"></v-icon>
+                            <v-icon icon="mdi-database-off" size="32" />
                             <p class="mt-2">
                                 {{ $t('noDataInTableMessage') }}
                             </p>
@@ -43,7 +43,7 @@
                                     icon="mdi-account-circle" 
                                     size="32" 
                                     color="#94a3b8"
-                                ></v-icon>
+                                />
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
@@ -54,7 +54,7 @@
                                 </p>
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ researcher.value }} {{ $t('citations') }}</span>
                             </div>
-                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
+                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8" />
                         </RouterLink>
                     </div>
                     <v-btn 
@@ -71,7 +71,7 @@
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
-                            <v-icon icon="mdi-domain" size="32" color="#f59e0b"></v-icon>
+                            <v-icon icon="mdi-domain" size="32" color="#f59e0b" />
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
                             {{ $t('landingFeatures.topInstitutions.title') }}
@@ -79,13 +79,13 @@
                     </div>
                     <div class="flex-1 mb-6">
                         <div v-if="isLoadingInstitutions" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin" />
                             <p class="mt-2">
                                 {{ $t('loading') }}
                             </p>
                         </div>
                         <div v-else-if="topInstitutions.length === 0" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-database-off" size="32"></v-icon>
+                            <v-icon icon="mdi-database-off" size="32" />
                             <p class="mt-2">
                                 {{ $t('noDataInTableMessage') }}
                             </p>
@@ -95,7 +95,7 @@
                             :to="{ name: 'organisationUnitLandingPage', params: { locale: $i18n.locale, id: institution.item.databaseId } }"
                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-amber-500/10">
-                                <v-icon icon="mdi-office-building" size="20" color="#f59e0b"></v-icon>
+                                <v-icon icon="mdi-office-building" size="20" color="#f59e0b" />
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 mb-1 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
@@ -106,7 +106,7 @@
                                 </p>
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ institution.value }} {{ $t('citations') }}</span>
                             </div>
-                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
+                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8" />
                         </RouterLink>
                     </div>
                     <v-btn 
@@ -123,7 +123,7 @@
                 <div class="feature-card">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="flex items-center justify-center w-[60px] h-[60px] rounded-[16px] shadow-md flex-shrink-0 bg-gradient-to-br from-slate-50 to-slate-200">
-                            <v-icon icon="mdi-book-open-page-variant" size="32" color="#3b82f6"></v-icon>
+                            <v-icon icon="mdi-book-open-page-variant" size="32" color="#3b82f6" />
                         </div>
                         <h4 class="text-xl font-semibold text-slate-800 m-0 leading-[1.3]">
                             {{ $t('landingFeatures.topPublications.title') }}
@@ -131,13 +131,13 @@
                     </div>
                     <div class="flex-1 mb-6">
                         <div v-if="isLoadingPublications" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-loading" size="32" class="animate-spin"></v-icon>
+                            <v-icon icon="mdi-loading" size="32" class="animate-spin" />
                             <p class="mt-2">
                                 {{ $t('loading') }}
                             </p>
                         </div>
                         <div v-else-if="topPublications.length === 0" class="text-center py-8 text-slate-400">
-                            <v-icon icon="mdi-database-off" size="32"></v-icon>
+                            <v-icon icon="mdi-database-off" size="32" />
                             <p class="mt-2">
                                 {{ $t('noDataInTableMessage') }}
                             </p>
@@ -147,7 +147,7 @@
                             :to="{ name: getDocumentLandingPageName(pub.item.type), params: { locale: $i18n.locale, id: pub.item.databaseId } }"
                             class="flex items-center justify-between p-4 rounded-xl bg-slate-50 mb-3 transition-all duration-200 cursor-pointer border border-transparent gap-3 hover:bg-slate-100 hover:border-blue-400/20 hover:translate-x-1 last:mb-0">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 bg-blue-500/10">
-                                <v-icon icon="mdi-book-open-variant" size="20" color="#3b82f6"></v-icon>
+                                <v-icon icon="mdi-book-open-variant" size="20" color="#3b82f6" />
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h6 class="text-sm font-semibold text-slate-800 m-0 leading-[1.4] overflow-hidden text-ellipsis whitespace-nowrap">
@@ -158,7 +158,7 @@
                                 </p>
                                 <span class="text-[0.7rem] text-slate-400 font-medium block">{{ pub.item.year }} • {{ pub.value }} {{ $t('citations') }}</span>
                             </div>
-                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8"></v-icon>
+                            <v-icon icon="mdi-arrow-right" size="16" color="#94a3b8" />
                         </RouterLink>
                     </div>
                     <v-btn 

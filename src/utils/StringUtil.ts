@@ -37,3 +37,27 @@ export const foldSerbianText = (value: string): string => {
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
 };
+
+const unsafeUriCharacters: Record<string, string> = {
+    " ": "%20",
+    "\"": "%22",
+    "<": "%3C",
+    ">": "%3E",
+    "{": "%7B",
+    "}": "%7D",
+    "|": "%7C",
+    "\\": "%5C",
+    "^": "%5E",
+    "`": "%60"
+};
+
+export const sanitizeUri = (value: string): string => {
+    if (!value) {
+        return "";
+    }
+
+    return value.trim().replace(
+        /[ "<>{}|\\^`]/g,
+        (character) => unsafeUriCharacters[character]
+    );
+};

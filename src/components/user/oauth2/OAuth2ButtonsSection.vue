@@ -9,7 +9,7 @@
                 src="@/assets/oauth2/orcid_logo.png"
                 alt="ORCID logo"
                 class="orcid-logo"
-            />
+            >
             {{ $t("signInWithOrcidLabel") }}
         </a>
     </div>

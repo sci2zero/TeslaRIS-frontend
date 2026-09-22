@@ -16,8 +16,8 @@
                             ref="titleRef"
                             v-model="title"
                             :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'">
-                        </multilingual-text-input>
+                            :label="$t('titleLabel') + '*'"
+                        />
                     </v-col>
                 </v-row>
 
@@ -31,19 +31,18 @@
                                 :scopus-id="scopus"
                                 :web-of-science-id="webOfScienceId"
                                 :open-alex-id="openAlexId"
-                            ></publication-deduplication-table>
+                            />
                         </v-col>
                     </v-row>
                 </v-row>
 
                 <v-row>
                     <v-col cols="10">
-                        <v-text-field
-                            v-model="publicationYear"
-                            :rules="requiredFieldRules"
+                        <flexible-date-picker
+                            v-model="publicationDate"
                             :label="$t('yearOfPublicationLabel') + '*'"
-                            :placeholder="$t('yearOfPublicationLabel') + '*'">
-                        </v-text-field>
+                            required
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -55,7 +54,7 @@
                             :rules="requiredSelectionRules"
                             :disabled="inModal"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -64,16 +63,16 @@
                             v-model="eIsbn"
                             label="E-ISBN"
                             placeholder="E-ISBN"
-                            :rules="isbnValidationRules">
-                        </v-text-field>
+                            :rules="isbnValidationRules"
+                        />
                     </v-col>
                     <v-col cols="5">
                         <v-text-field
                             v-model="printIsbn"
                             label="Print ISBN"
                             placeholder="Print ISBN"
-                            :rules="isbnValidationRules">
-                        </v-text-field>
+                            :rules="isbnValidationRules"
+                        />
                     </v-col>
                 </v-row>
 
@@ -84,8 +83,8 @@
                             ref="contributionsRef"
                             basic
                             :required="false"
-                            @set-input="contributions = $event">
-                        </person-publication-contribution>
+                            @set-input="contributions = $event"
+                        />
                     </v-col>
                 </v-row>
                 
@@ -98,8 +97,8 @@
                             <multilingual-text-input
                                 ref="subtitleRef"
                                 v-model="subtitle"
-                                :label="$t('subtitleLabel')">
-                            </multilingual-text-input>
+                                :label="$t('subtitleLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -108,8 +107,8 @@
                                 ref="descriptionRef"
                                 v-model="description"
                                 is-area
-                                :label="$t('abstractLabel')">
-                            </multilingual-text-input>
+                                :label="$t('abstractLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -118,13 +117,13 @@
                                 ref="keywordsRef"
                                 v-model="keywords"
                                 :label="$t('keywordsLabel')"
-                                is-area>
-                            </multilingual-text-input>
+                                is-area
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <uri-input ref="urisRef" v-model="uris"></uri-input>
+                            <uri-input ref="urisRef" v-model="uris" />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -135,7 +134,7 @@
                                 :placeholder="$t('researchAreaLabel')"
                                 :items="researchAreasSelectable"
                                 return-object
-                            ></v-select>
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -145,7 +144,7 @@
                                 :label="$t('languageLabel')"
                                 :items="languageList"
                                 multiple
-                            ></v-select>
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -155,8 +154,8 @@
                                 type="number"
                                 :label="$t('numberOfPagesLabel')"
                                 :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')">
-                            </v-text-field>
+                                :placeholder="$t('numberOfPagesLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -165,8 +164,8 @@
                                 ref="journalAutocompleteRef"
                                 v-model="selectedJournal"
                                 allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation">
-                            </journal-autocomplete-search>
+                                :external-validation="publicationSeriesExternalValidation"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -175,8 +174,8 @@
                                 ref="bookSeriesAutocompleteRef"
                                 v-model="selectedBookSeries"
                                 allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation">
-                            </book-series-autocomplete-search>
+                                :external-validation="publicationSeriesExternalValidation"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -184,15 +183,15 @@
                             <v-text-field
                                 v-model="volume"
                                 :label="$t('volumeLabel')"
-                                :placeholder="$t('volumeLabel')">
-                            </v-text-field>
+                                :placeholder="$t('volumeLabel')"
+                            />
                         </v-col>
                         <v-col cols="5">
                             <v-text-field
                                 v-model="number"
                                 :label="$t('issueLabel')"
-                                :placeholder="$t('issueLabel')">
-                            </v-text-field>
+                                :placeholder="$t('issueLabel')"
+                            />
                         </v-col>
                     </v-row>
                     <!-- <v-row>
@@ -208,8 +207,8 @@
                             <publisher-autocomplete-search
                                 ref="publisherAutocompleteRef"
                                 v-model="selectedPublisher"
-                                allow-author-reprint>
-                            </publisher-autocomplete-search>
+                                allow-author-reprint
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -218,24 +217,24 @@
                                 v-model="scopus"
                                 label="Scopus ID"
                                 placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules">
-                            </v-text-field>
+                                :rules="scopusIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="4">
                             <v-text-field
                                 v-model="openAlexId"
                                 label="Open Alex ID"
                                 placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules">
-                            </v-text-field>
+                                :rules="workOpenAlexIdValidationRules"
+                            />
                         </v-col>
                         <v-col cols="3">
                             <v-text-field
                                 v-model="webOfScienceId"
                                 label="Web of Science ID"
                                 placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules">
-                            </v-text-field>
+                                :rules="documentWebOfScienceIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -244,7 +243,8 @@
                                 v-model="udc"
                                 :label="$t('udcLabel')"
                                 :placeholder="$t('udcLabel')"
-                                :rules="udcValidationRules"></v-text-field>
+                                :rules="udcValidationRules"
+                            />
                         </v-col>
                     </v-row>
 
@@ -276,7 +276,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import type { LanguageTagResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
+import type { FlexibleDate, LanguageTagResponse, MultilingualContent, PrepopulatedMetadata } from '@/models/Common';
 import { onMounted } from 'vue';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
@@ -301,11 +301,12 @@ import PublisherAutocompleteSearch from '../publisher/PublisherAutocompleteSearc
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
 import { detectLanguage } from '@/utils/LanguageDetector.js';
+import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
 export default defineComponent({
     name: "SubmitMonograph",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch, PublicationDeduplicationTable, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublisherAutocompleteSearch, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
     props: {
         inModal: {
             type: Boolean,
@@ -435,7 +436,7 @@ export default defineComponent({
         const eIsbn = ref("");
         const printIsbn = ref("");
         const numberOfPages = ref();
-        const publicationYear = ref("");
+        const publicationDate = ref<FlexibleDate>();
         const doi = ref("");
         const scopus = ref("");
         const number = ref("");
@@ -447,7 +448,7 @@ export default defineComponent({
         const setPublicationYear = (date: string) => {
             const year = /\d{4}/.exec(date);
             if (year) {
-                publicationYear.value = year[0];
+                publicationDate.value = {year: Number.parseInt(year[0])};
             }
         };
 
@@ -496,7 +497,7 @@ export default defineComponent({
                 title: title.value,
                 uris: uris.value,
                 contributions: contributions.value,
-                documentDate: publicationYear.value,
+                documentDate: publicationDate.value,
                 doi: doi.value,
                 eisbn: eIsbn.value,
                 eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
@@ -541,7 +542,7 @@ export default defineComponent({
                     eIsbn.value = "";
                     udc.value = "";
                     printIsbn.value = "";
-                    publicationYear.value = "";
+                    publicationDate.value = undefined;
                     contributionsRef.value?.clearInput();
                     publisherAutocompleteRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
@@ -571,7 +572,7 @@ export default defineComponent({
             doi.value = doi.value ? doi.value : metadata.doi;
 
             if (metadata.year > 0) {
-                publicationYear.value = `${metadata.year}`;
+                publicationDate.value = { year: metadata.year };
             }
 
             if (metadata.publishedInName && selectedJournal.value.value <= 0) {
@@ -604,7 +605,7 @@ export default defineComponent({
             journalAutocompleteRef, selectedJournal, uris, urisRef,
             eIsbn, printIsbn, languageList, selectedLanguages,
             description, descriptionRef, requiredSelectionRules,
-            publicationYear, doi, scopus, numberOfPages,
+            publicationDate, doi, scopus, numberOfPages,
             keywords, keywordsRef, setPublicationYear,
             volume, number, monographTypes, selectedMonographType,
             bookSeriesAutocompleteRef, selectedBookSeries,

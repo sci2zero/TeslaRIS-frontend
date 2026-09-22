@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!loading" ref="chartRef" :style="{ width: width, height: height }"></div>
+    <div v-if="!loading" ref="chartRef" :style="{ width: width, height: height }" />
     <div v-else class="d-flex flex-row justify-center mt-10">
         <v-progress-circular
             color="primary"

@@ -20,7 +20,7 @@
                     class="ms-auto"
                     :text="$t('closeLabel')"
                     @click="dialog = false"
-                ></v-btn>
+                />
             </template>
         </v-card>
     </v-dialog>
