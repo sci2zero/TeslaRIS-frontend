@@ -11,7 +11,7 @@
                         <v-checkbox
                             v-model="toggleAssessmentModule"
                             :label="$t('toggleAssessmentModuleLabel')"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -19,7 +19,7 @@
                         <v-checkbox
                             v-model="toggleDigitalLibrary"
                             :label="$t('toggleDigitalLibraryLabel')"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -27,7 +27,7 @@
                         <v-checkbox
                             v-model="toggleDigitalRepository"
                             :label="$t('toggleDigitalRepositoryLabel')"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>

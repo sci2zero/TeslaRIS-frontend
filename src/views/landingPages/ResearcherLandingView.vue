@@ -140,7 +140,7 @@
                             return-object
                             class="max-w-xs mt-5"
                             multiple
-                        ></v-select>
+                        />
                     </div>
                     <div class="mb-5 mt-5">
                         <add-publication-menu
@@ -225,16 +225,14 @@
                     :keywords="keywords"
                     :can-edit="canEdit"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Biography -->
                 <description-section
                     :description="biography"
                     :can-edit="canEdit"
                     is-biography
-                    @update="updateBiography">
-                </description-section>
+                    @update="updateBiography" />
 
                 <v-row>
                     <v-col cols="6">
@@ -243,18 +241,16 @@
                             :expertise-or-skills="person?.expertisesOrSkills"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </expertise-or-skill-list>
+                            @crud="fetchPerson" />
                         
-                        <br />
+                        <br>
 
                         <!-- Prizes -->
                         <prize-list
                             :prizes="person?.prizes"
                             :person="person"
                             :can-edit="canEdit"
-                            @crud="fetchPerson">
-                        </prize-list>
+                            @crud="fetchPerson" />
                     </v-col>
 
 
@@ -270,37 +266,34 @@
 
                                 <div><h2>{{ $t("involvementsLabel") }}</h2></div>
                                 <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                                <br />
+                                <br>
                                 <div v-if="employments.length > 0">
                                     <h3>{{ $t("employmentsLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="employments"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                                 <div v-if="education.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                                    <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="education"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                                 <div v-if="memberships.length > 0">
-                                    <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                                    <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
                                 </div>
-                                <br />
+                                <br>
                                 <involvement-list
                                     :involvements="memberships"
                                     :person="person"
                                     :can-edit="canEdit"
-                                    @refresh-involvements="fetchPerson">
-                                </involvement-list>
+                                    @refresh-involvements="fetchPerson" />
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -329,8 +322,7 @@
                 <person-assessments-view
                     :assessments="personAssessments"
                     :is-loading="assessmentsLoading"
-                    @fetch="fetchAssessment">
-                </person-assessments-view>
+                    @fetch="fetchAssessment" />
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
                 <person-visualizations
@@ -365,8 +357,7 @@
             ref="dialogRef"
             :title="$t('areYouSureLabel')"
             :message="dialogMessage"
-            @continue="performMigrationToUnmanaged">
-        </persistent-question-dialog>
+            @continue="performMigrationToUnmanaged" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </div>

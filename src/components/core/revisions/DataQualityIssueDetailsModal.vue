@@ -3,7 +3,7 @@
         <v-card class="issue-details-card">
             <v-card-text>
                 <div v-if="loading" class="d-flex justify-center py-10">
-                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    <v-progress-circular indeterminate color="primary" />
                 </div>
 
                 <template v-else-if="details">

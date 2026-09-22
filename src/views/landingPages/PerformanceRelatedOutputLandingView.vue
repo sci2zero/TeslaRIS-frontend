@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(performanceRelatedOutput?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(performanceRelatedOutput?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("performanceRelatedOutputLabel") }}
                     </v-card-subtitle>
                 </v-card>

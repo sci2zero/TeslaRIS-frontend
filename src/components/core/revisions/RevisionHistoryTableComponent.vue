@@ -190,8 +190,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmRevisionRestoreMessage')"
         :entity-names="revisionToRestore ? [versionLabelFor(revisionToRestore)] : []"
-        @continue="restoreRevision">
-    </persistent-question-dialog>
+        @continue="restoreRevision" />
 </template>
 
 <script lang="ts">

@@ -16,7 +16,7 @@
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(materialProduct?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("materialProductLabel") }}
                     </v-card-subtitle>
                 </v-card>

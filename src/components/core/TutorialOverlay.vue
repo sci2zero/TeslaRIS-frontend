@@ -6,19 +6,19 @@
             :class="{ 'tutorial-overlay--animate': animateSpotlight }"
             aria-live="polite"
         >
-            <div v-if="!targetRect" class="tutorial-overlay__block tutorial-overlay__block--full"></div>
+            <div v-if="!targetRect" class="tutorial-overlay__block tutorial-overlay__block--full" />
             <template v-else>
-                <div class="tutorial-overlay__block" :style="blockStyles.top"></div>
-                <div class="tutorial-overlay__block" :style="blockStyles.bottom"></div>
-                <div class="tutorial-overlay__block" :style="blockStyles.left"></div>
-                <div class="tutorial-overlay__block" :style="blockStyles.right"></div>
-                <div class="tutorial-overlay__highlight" :style="highlightStyle"></div>
+                <div class="tutorial-overlay__block" :style="blockStyles.top" />
+                <div class="tutorial-overlay__block" :style="blockStyles.bottom" />
+                <div class="tutorial-overlay__block" :style="blockStyles.left" />
+                <div class="tutorial-overlay__block" :style="blockStyles.right" />
+                <div class="tutorial-overlay__highlight" :style="highlightStyle" />
                 <div
                     v-if="shouldBlockRouteChanges"
                     class="tutorial-overlay__shield"
                     :style="highlightStyle"
                     aria-hidden="true"
-                ></div>
+                />
             </template>
 
             <button

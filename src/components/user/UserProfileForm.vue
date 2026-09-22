@@ -103,7 +103,7 @@
                                 append-icon="mdi-chevron-right"
                             >
                                 <template #prepend>
-                                    <v-icon icon="mdi-map-marker-path"></v-icon>
+                                    <v-icon icon="mdi-map-marker-path" />
                                 </template>
                                 <v-list-item-title>{{ $t("tutorialOptionsLabel") }}</v-list-item-title>
                             </v-list-item>
@@ -119,18 +119,18 @@
                                         <v-icon
                                             :icon="tutorialStore.isCompleted(tutorial.key) ? 'mdi-check-circle' : 'mdi-play-circle-outline'"
                                             :color="tutorialStore.isCompleted(tutorial.key) ? 'success' : undefined"
-                                        ></v-icon>
+                                        />
                                     </template>
                                     <v-list-item-title>{{ $t(tutorial.label) }}</v-list-item-title>
                                     <template v-if="tutorialStore.isCompleted(tutorial.key)" #append>
-                                        <v-icon icon="mdi-check" color="success" size="small"></v-icon>
+                                        <v-icon icon="mdi-check" color="success" size="small" />
                                     </template>
                                 </v-list-item>
-                                <v-divider class="my-1"></v-divider>
+                                <v-divider class="my-1" />
                             </template>
                             <v-list-item @click="resetTutorialHistory">
                                 <template #prepend>
-                                    <v-icon icon="mdi-delete-outline" color="error"></v-icon>
+                                    <v-icon icon="mdi-delete-outline" color="error" />
                                 </template>
                                 <v-list-item-title>{{ $t("resetTutorialHistoryLabel") }}</v-list-item-title>
                             </v-list-item>

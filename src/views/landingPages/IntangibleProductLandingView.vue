@@ -11,12 +11,12 @@
                             color="blue-lighten-3"
                             class="text-center"
                         >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(intangibleProduct?.title)"></rich-title-renderer>
+                            <rich-title-renderer :title="returnCurrentLocaleContent(intangibleProduct?.title)" />
                         </v-skeleton-loader>
                     </v-card-title>
                     <v-card-subtitle class="text-center">
                         {{ returnCurrentLocaleContent(intangibleProduct?.subTitle) }}
-                        <br />
+                        <br>
                         {{ $t("intangibleProductLabel") }}
                     </v-card-subtitle>
                 </v-card>
@@ -181,8 +181,7 @@
                     :document="intangibleProduct"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
                     :proofs="intangibleProduct?.proofs"
-                    :file-items="intangibleProduct?.fileItems">
-                </attachment-section>
+                    :file-items="intangibleProduct?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <!-- Keywords -->
@@ -190,8 +189,7 @@
                     :keywords="intangibleProduct?.keywords ? intangibleProduct.keywords : []"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
                     @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords">
-                </keyword-list>
+                    @update="updateKeywords" />
 
                 <!-- Research Area -->
                 <v-row>

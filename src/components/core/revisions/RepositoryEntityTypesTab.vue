@@ -33,7 +33,7 @@
                             <th>{{ $t("publicationCandidatesLabel") }}</th>
                             <th>{{ $t("affectedRecordsLabel") }}</th>
                             <th>{{ $t("openIssuesLabel") }}</th>
-                            <th></th>
+                            <th />
                         </tr>
                     </thead>
                     <tbody>

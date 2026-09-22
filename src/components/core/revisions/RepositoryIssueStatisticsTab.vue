@@ -54,7 +54,7 @@
                             <v-table density="compact" class="statistics-table">
                                 <thead>
                                     <tr>
-                                        <th></th>
+                                        <th />
                                         <th class="text-right">
                                             {{ $t("errorIssuesLabel") }}
                                         </th>
