@@ -3,7 +3,7 @@
         <bubble-menu
             v-if="editor"
             :editor="editor"
-            :tippy-options="{ duration: 100 }"
+            :options="{ offset: 6, placement: 'top' }"
         >
             <div class="bubble-menu">
                 <button :class="{ 'is-active': editor.isActive('bold') }" @click="editor.chain().focus().toggleBold().run()">
@@ -46,10 +46,11 @@
 </template>
 
 <script lang="ts">
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/vue-3'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { BubbleMenu } from '@tiptap/vue-3/menus'
 import StarterKit from '@tiptap/starter-kit'
 import { computed, defineComponent, type PropType, ref, watch } from 'vue';
-import Placeholder from '@tiptap/extension-placeholder'
+import { Placeholder } from '@tiptap/extensions'
 import { useI18n } from 'vue-i18n';
 import lodash from "lodash";
 import DOMPurify from "dompurify";
@@ -183,12 +184,12 @@ export default defineComponent({
                 if (lastKeyCode.value === " ") return;
 
                 if (!props.editable) {
-                    editorInstance.commands.setContent(newVal);
+                    editorInstance.commands.setContent(newVal, { emitUpdate: false });
                 } else {
                     const { state } = editorInstance;
                     const { from, to } = state.selection;
 
-                    editorInstance.commands.setContent(newVal);
+                    editorInstance.commands.setContent(newVal, { emitUpdate: false });
                     editorInstance.commands.setTextSelection({ from, to });
                 }
 
@@ -199,7 +200,7 @@ export default defineComponent({
 
         watch(() => props.modelValue, () => {
             if (!props.editable) {
-                editor.value?.chain().setContent(props.modelValue).run();
+                editor.value?.chain().setContent(props.modelValue, { emitUpdate: false }).run();
             } else {
                 const editorInstance = editor.value;
                 if (!editorInstance) return;
@@ -208,7 +209,7 @@ export default defineComponent({
                 const { from, to } = state.selection;
 
                 editorInstance.chain()
-                    .setContent(props.modelValue)
+                    .setContent(props.modelValue, { emitUpdate: false })
                     .run();
 
                 editorInstance.chain()
