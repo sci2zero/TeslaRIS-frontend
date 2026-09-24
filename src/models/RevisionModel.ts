@@ -202,6 +202,27 @@ export interface DataQualityIssueOccurrence {
     message: MultilingualContent[];
 }
 
+export interface PolicyConstraint {
+    key: string;
+    title: MultilingualContent[];
+    target: string;
+    targetWeight: number;
+    dimension: QualityDimension;
+    severity: IssueSeverity;
+    blocking: boolean;
+    points: number;
+    usedForFairCompliance: boolean;
+    constraints: Record<string, unknown>;
+    affectedRecords: number;
+}
+
+export interface PolicyExplorer {
+    profileName: string;
+    version: string;
+    constraints: PolicyConstraint[];
+    dimensionDefinitions: Record<QualityDimension, MultilingualContent[]>;
+}
+
 export interface DataQualityIssuePage {
     content: DataQualityIssue[];
     totalIssues: number;

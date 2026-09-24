@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssueDetails, type DataQualityIssuePage, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
+import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssueDetails, type DataQualityIssuePage, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality, type PolicyExplorer } from "@/models/RevisionModel";
 
 
 export class DataQualityService extends BaseService {
@@ -74,6 +74,16 @@ export class DataQualityService extends BaseService {
 
   async listProfileConstraints(profileName: string, target: string | undefined): Promise<AxiosResponse<ConstraintSummary[]>> {
     return super.sendRequest(axios.get, `data-quality/profiles/${profileName}/constraints${target ? `?target=${target}` : ""}`);
+  }
+
+  async getPolicy(profileName: string, assessmentDate: string | undefined): Promise<AxiosResponse<PolicyExplorer>> {
+    const params = new URLSearchParams({ profileName });
+
+    if (assessmentDate) {
+      params.append("assessmentDate", assessmentDate.split("T")[0]);
+    }
+
+    return super.sendRequest(axios.get, `data-quality/policy?${params.toString()}`);
   }
 
   async listProfiles(): Promise<AxiosResponse<DataQualityProfile[]>> {

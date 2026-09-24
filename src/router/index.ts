@@ -140,6 +140,7 @@ import FundingProgramListView from "@/views/FundingProgramListView.vue";
 import SubmitProjectView from "@/views/SubmitProjectView.vue";
 import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
 import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
+import PolicyExplorerView from "@/views/revisions/PolicyExplorerView.vue";
 
 
 const roles = {
@@ -1588,6 +1589,15 @@ const router = createRouter({
                     path: "issue-explorer",
                     name: "issueExplorer",
                     component: IssueExplorerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "policy-explorer",
+                    name: "policyExplorer",
+                    component: PolicyExplorerView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],

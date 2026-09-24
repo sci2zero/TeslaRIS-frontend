@@ -367,6 +367,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
     { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
+    { key: 'policy-explorer', label: computed(() => i18n.t('routeLabel.policyExplorer')), to: '/policy-explorer', icon: 'mdi-shield-check-outline', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     {
       key: 'fundings',
       label: computed(() => i18n.t('fundingsLabel')),

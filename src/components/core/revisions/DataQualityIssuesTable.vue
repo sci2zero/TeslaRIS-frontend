@@ -11,6 +11,8 @@
                         <v-select
                             v-model="filters.target"
                             :items="targetOptions"
+                            item-title="title"
+                            item-value="value"
                             :label="$t('targetEntityTypeLabel')"
                             density="compact"
                             clearable
@@ -176,6 +178,7 @@ import {
     getIssueSeveritiesForGivenLocale,
     getIssueSeverityTitleFromValueAutoLocale
 } from "@/i18n/issueSeverity";
+import { getIssueTargetsForGivenLocale } from "@/i18n/issueTarget";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { getLandingPageBasePath } from "@/utils/PathResolutionUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
@@ -232,7 +235,7 @@ export default defineComponent({
         const totalIssues = ref(0);
         const filters = ref<IssueFilters>({ ...EMPTY_FILTERS, ...props.initialFilters });
 
-        const targetOptions = [...ISSUE_TARGETS];
+        const targetOptions = ref(getIssueTargetsForGivenLocale(ISSUE_TARGETS));
         const dimensionOptions = ref(getQualityDimensionsForGivenLocale());
         const severityOptions = ref(getIssueSeveritiesForGivenLocale());
 
