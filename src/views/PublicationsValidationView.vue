@@ -64,7 +64,7 @@ import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
 import { ExportableEndpointType } from '@/models/Common';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
 export default defineComponent({
@@ -98,7 +98,7 @@ export default defineComponent({
 
         const {
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         const previousFilterValues = ref<{publicationTypes: string[], metadata: boolean, files: boolean}>(
             {publicationTypes: [], metadata: true, files: true}

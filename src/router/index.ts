@@ -96,7 +96,7 @@ import ReportsView from "@/views/reporting/ReportsView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
-import FeatureModuleTogglesView from "@/views/FeatureModuleTogglesView.vue";
+import CrisContextInformationView from "@/views/CrisContextInformationView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
@@ -1372,9 +1372,9 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "feature-module-toggles",
-                    name: "featureModuleToggles",
-                    component: FeatureModuleTogglesView,
+                    path: "cris-context-information",
+                    name: "crisContextInformation",
+                    component: CrisContextInformationView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

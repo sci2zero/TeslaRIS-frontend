@@ -416,7 +416,7 @@ import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUn
 import IdentifierMenu from '../core/IdentifierMenu.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 import { getApplicableEntityTypeForDocumentType } from '@/i18n/applicableEntityType';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 export default defineComponent({
@@ -520,7 +520,7 @@ export default defineComponent({
 
         const {
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         onMounted(() => {
             if ((props.inClaimer ||

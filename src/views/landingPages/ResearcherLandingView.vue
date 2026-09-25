@@ -429,7 +429,7 @@ import UserService from '@/services/UserService';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
 export default defineComponent({
@@ -457,7 +457,7 @@ export default defineComponent({
         const router = useRouter();
         const currentRoute = useRoute();
 
-        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+        const { isAssessmentModuleEnabled } = useCrisContextInformation();
 
         const person = ref<PersonResponse>();
         const country = ref<Country>();

@@ -416,7 +416,7 @@ import DigitalLibraryVisualizationService from '@/services/visualization/Digital
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { useUserRole } from '@/composables/useUserRole';
 import { StatisticsType } from '@/models/AssessmentModel';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 const props = defineProps({
@@ -452,7 +452,7 @@ const props = defineProps({
 
 const { 
     isDigitalLibraryEnabled
- } = useFeatureModuleToggles();
+ } = useCrisContextInformation();
 
 const publicationsYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
 const publicationsYearData = ref<{ categories: string[]; series: BarSeries[]; }>();

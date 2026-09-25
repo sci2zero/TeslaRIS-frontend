@@ -73,6 +73,13 @@
                                 </div>
                             </div>
 
+                            <div v-if="project.nationalId" class="info-item">
+                                <div>{{ $t("nationalIdLabel") }}:</div>
+                                <div class="response">
+                                    {{ project.nationalId }}
+                                </div>
+                            </div>
+
                             <div v-if="project.dateFrom" class="info-item">
                                 <div>{{ $t("dateFromLabel") }}:</div>
                                 <div class="response">

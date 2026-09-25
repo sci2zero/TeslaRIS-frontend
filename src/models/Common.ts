@@ -1,3 +1,4 @@
+import { License } from "@/models/DocumentFileModel";
 import { RecurrenceType } from "./LoadModel";
 import { type OrganisationUnitIndex } from "./OrganisationUnitModel";
 import { type PersonIndex } from "./PersonModel";
@@ -414,10 +415,15 @@ export interface FlexibleDate {
     text?: string;
 }
 
-export interface FeatureModuleToggles {
+export interface CrisContextInformation {
     toggleAssessmentModule: boolean;
     toggleDigitalLibrary: boolean;
     toggleDigitalRepository: boolean;
+    personNationalIdRegularExpression: string;
+    projectNationalIdRegularExpression: string;
+    organisationUnitNationalIdRegularExpression: string;
+    documentNationalIdRegularExpression: string;
+    metadataLicense: License;
 }
 
 export interface Currency {

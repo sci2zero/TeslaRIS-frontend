@@ -166,7 +166,7 @@ import { isEqual } from 'lodash';
 import UserEmailChangeModal from './UserEmailChangeModal.vue';
 import RegisterResearcherModal from './RegisterResearcherModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 export default defineComponent({
@@ -194,7 +194,7 @@ export default defineComponent({
         const { 
             isAssessmentModuleEnabled,
             isDigitalLibraryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         const accountsThatAllowedRoleTaking = ref<number[]>([]);
 

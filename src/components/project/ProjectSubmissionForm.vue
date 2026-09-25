@@ -167,6 +167,18 @@
                         </v-col>
                     </v-row>
 
+                    <!-- National ID -->
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="nationalId"
+                                :label="$t('nationalIdLabel')"
+                                :placeholder="$t('nationalIdLabel')"
+                                :rules="projectNationalIdValidationRules"
+                            />
+                        </v-col>
+                    </v-row>
+
                     <!-- Not Funded / Costs -->
                     <v-row>
                         <v-col cols="6">
@@ -269,6 +281,7 @@ const keywords = ref<MultilingualContent[]>([]);
 const uris = ref<string[]>([]);
 const doi = ref("");
 const raid = ref("");
+const nationalId = ref("");
 const dateFrom = ref("");
 const dateTo = ref("");
 const notFunded = ref(false);
@@ -288,7 +301,8 @@ const projectResearchTypeOptions = computed(() => getProjectResearchTypesForGive
 
 const {
     requiredFieldRules,
-    uriValidationRules
+    uriValidationRules,
+    projectNationalIdValidationRules
 } = useValidationUtils();
 
 const { languageTags } = useLanguageTags();
@@ -416,6 +430,7 @@ const submitProject = (stayOnPage: boolean) => {
         uris: uris.value,
         doi: doi.value || undefined,
         raid: raid.value || undefined,
+        nationalId: nationalId.value || undefined,
         status: status.value as ProjectStatus,
         collaborationType: collaborationType.value as ProjectCollaborationType,
         researchType: researchType.value as ProjectResearchType,
@@ -444,6 +459,7 @@ const submitProject = (stayOnPage: boolean) => {
             urisRef.value?.clearInput();
             doi.value = "";
             raid.value = "";
+            nationalId.value = "";
             dateFrom.value = "";
             dateTo.value = "";
             notFunded.value = false;

@@ -72,6 +72,17 @@
         </v-row>
 
         <v-row>
+            <v-col>
+                <v-text-field
+                    v-model="nationalId"
+                    :label="$t('nationalIdLabel')"
+                    :placeholder="$t('nationalIdLabel')"
+                    :rules="projectNationalIdValidationRules"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col cols="6">
                 <v-checkbox
                     v-model="notFunded"
@@ -121,13 +132,14 @@ const emit = defineEmits<{
 
 const isFormValid = ref(false);
 
-const { doiValidationRules } = useValidationUtils();
+const { doiValidationRules, projectNationalIdValidationRules } = useValidationUtils();
 
 const urisRef = ref<typeof UriInput>();
 const costsRef = ref<typeof MonetaryAmountInput>();
 
 const doi = ref(props.presetProject?.doi);
 const raid = ref(props.presetProject?.raid);
+const nationalId = ref(props.presetProject?.nationalId);
 const dateFrom = ref(props.presetProject?.dateFrom as string);
 const dateTo = ref(props.presetProject?.dateTo as string);
 const uris = ref<string[]>(props.presetProject?.uris as string[] ?? []);
@@ -152,6 +164,7 @@ watch(() => props.presetProject, () => {
 const refreshForm = () => {
     doi.value = props.presetProject?.doi;
     raid.value = props.presetProject?.raid;
+    nationalId.value = props.presetProject?.nationalId;
     dateFrom.value = props.presetProject?.dateFrom as string;
     dateTo.value = props.presetProject?.dateTo as string;
     notFunded.value = props.presetProject?.notFunded ?? false;
@@ -168,6 +181,7 @@ const submit = () => {
     const updatedProject = {
         doi: doi.value,
         raid: raid.value,
+        nationalId: nationalId.value,
         status: status.value,
         collaborationType: collaborationType.value,
         researchType: researchType.value,
