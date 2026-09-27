@@ -2,15 +2,26 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+/** Must stay in sync with `@media (max-width: 1023px)` layout rules. */
+export const SIDEBAR_MOBILE_MAX_WIDTH = 1023;
+
+const getIsMobileViewport = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia(`(max-width: ${SIDEBAR_MOBILE_MAX_WIDTH}px)`).matches;
+
 export const useSidebarStore = defineStore('sidebar', () => {
   const isOpen = ref(true);
   const route = useRoute();
-  const isMobile = ref(false);
+  const isMobile = ref(getIsMobileViewport());
 
   // Load sidebar state from localStorage on initialization
   const savedState = localStorage.getItem('sidebar-open');
   if (savedState !== null) {
     isOpen.value = JSON.parse(savedState);
+  }
+
+  if (isMobile.value) {
+    isOpen.value = false;
   }
 
   const toggle = () => {
@@ -26,6 +37,10 @@ export const useSidebarStore = defineStore('sidebar', () => {
   };
 
   const setMobile = (mobile: boolean) => {
+    if (isMobile.value === mobile) {
+      return;
+    }
+
     isMobile.value = mobile;
     if (mobile && isOpen.value) {
       isOpen.value = false;
@@ -46,14 +61,14 @@ export const useSidebarStore = defineStore('sidebar', () => {
     return route.name === "home";
   });
 
-  // Computed property for sidebar width
+  const reservesSpace = computed(() => isVisible.value && !isMobile.value);
+
   const sidebarWidth = computed(() => {
-    return isOpen.value ? 'w-24 lg:w-64' : 'w-0';
+    return reservesSpace.value ? 'w-64' : 'w-0';
   });
 
   const mainMargin = computed(() => {
-    if (!isVisible.value) return 'ml-0';
-    return 'ml-24 lg:ml-64';
+    return reservesSpace.value ? 'sidebar-offset' : 'ml-0';
   });
 
   return {

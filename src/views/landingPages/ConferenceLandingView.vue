@@ -1,57 +1,59 @@
 <template>
-    <div id="conference" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!conference"
+    <landing-page-layout
+        id="conference"
+        v-model="currentTab"
+        :loading="!conference"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!conference"
             :entity-label="$t('conferenceLabel')"
+            :year="!conference?.serialEvent && conference?.dateFrom ? conference.dateFrom.substring(0, 4) : ''"
             icon="mdi-presentation"
-            :can-edit="canEdit"
-            :edit-label="$t('updateConferenceLabel')"
-            :entity-type="EntityType.CONFERENCE"
-            :entity-id="conference?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="EventUpdateForm"
-                    :form-props="{ presetEvent: conference }"
-                    entity-name="Conference"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="!conference?.serialEvent && (conference?.dateFrom || conference?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="conference?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
-                    {{ returnCurrentLocaleContent(country?.name) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="conference?.place && conference.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
-                    {{ returnCurrentLocaleContent(conference?.place) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="(conference?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
-                    {{ returnCurrentLocaleContent(conference?.displayOrganizer) }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+                :can-edit="canEdit"
+                :edit-label="$t('updateConferenceLabel')"
+                :entity-type="EntityType.CONFERENCE"
+                :entity-id="conference?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="EventUpdateForm"
+                        :form-props="{ presetEvent: conference }"
+                        entity-name="Conference"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(conference?.name) + (conference?.nameAbbreviation && conference.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(conference?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="!conference?.serialEvent && (conference?.dateFrom || conference?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseDateRange(conference?.dateFrom as string, conference?.dateTo as string) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="conference?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
+                        {{ returnCurrentLocaleContent(country?.name) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="conference?.place && conference.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                        {{ returnCurrentLocaleContent(conference?.place) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="(conference?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
+                        {{ returnCurrentLocaleContent(conference?.displayOrganizer) }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <tab-content-loader v-if="!conference" layout="sections" />
-        <v-tabs
-            v-show="conference"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab v-show="!conference?.serialEvent" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -73,13 +75,18 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="conference"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="conference?.description"
+                    is-general-description
+                    :contributions="conference?.contributions"
+                    :contributors-label="$t('participationsLabel')"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <div class="mt-10">
                     <h2 class="mb-5">
@@ -192,10 +199,12 @@
                     :entity-id="conference?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -226,7 +235,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
@@ -240,15 +248,16 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin } = useUserRole();
 
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
         const updateModalRef = ref<{ dialog: boolean } | null>(null);
@@ -341,7 +350,7 @@ export default defineComponent({
                 fetchPublications();
                 fetchDetails();
 
-                currentTab.value = !conference.value?.serialEvent ? "publications" : "contributions";
+                currentTab.value = currentTab.value === "dataQuality" ? "dataQuality" : "overview";
             }).catch(() => {
                 router.push({ name: "notFound" });
             });

@@ -1,53 +1,56 @@
 <template>
-    <div id="journal" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!journal"
-            :subtitle="returnCurrentLocaleContent(journal?.subtitle)"
-            :entity-label="$t('journalLabel')"
-            :badge="journal?.type ? getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal.type) : ''"
-            icon="mdi-book-open-blank-variant"
-            :can-edit="canEdit"
-            :edit-label="$t('updateJournalLabel')"
-            :entity-type="EntityType.JOURNAL"
-            :entity-id="journal?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="PublicationSeriesUpdateForm"
-                    :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
-                    entity-name="Journal"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="journal?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
-                    {{ journal.eissn }}
-                </landing-meta-item>
-                <landing-meta-item v-if="journal?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
-                    {{ journal.printISSN }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="journal"
+        v-model="currentTab"
+        :loading="!journal"
+        loader-layout="list"
+        :tab-number="3"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!journal"
+                :subtitle="returnCurrentLocaleContent(journal?.subtitle)"
+                :entity-label="$t('journalLabel')"
+                :badge="journal?.type ? getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal.type) : ''"
+                icon="mdi-book-open-blank-variant"
+                :can-edit="canEdit"
+                :edit-label="$t('updateJournalLabel')"
+                :entity-type="EntityType.JOURNAL"
+                :entity-id="journal?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="PublicationSeriesUpdateForm"
+                        :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
+                        entity-name="Journal"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="journal?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
+                        {{ journal.eissn }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="journal?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
+                        {{ journal.printISSN }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <tab-content-loader v-if="!journal" :tab-number="3" layout="list" />
-        <v-tabs
-            v-show="journal"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -69,13 +72,17 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="journal"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :contributions="journal?.contributions"
+                    :contribution-types="['EDITOR']"
+                    :contributors-label="$t('editorsLabel')"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
                 <publication-table-component
@@ -167,10 +174,12 @@
                     :entity-id="journal?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -200,7 +209,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
@@ -215,15 +223,16 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin } = useUserRole();
 
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -391,12 +400,8 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if(totalPublications.value > 0) {
-                currentTab.value = "publications";
-            } else if ((journal.value?.contributions?.length && journal.value?.contributions?.length > 0) || canEdit.value) {
-                currentTab.value = "contributions";
-            } else {
-                currentTab.value = "indicators";
+            if (currentTab.value !== "dataQuality") {
+                currentTab.value = "overview";
             }
         };
 

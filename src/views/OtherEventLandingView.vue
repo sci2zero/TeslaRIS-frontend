@@ -1,58 +1,57 @@
 <template>
-    <div id="otherEvent" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!otherEvent"
+    <landing-page-layout
+        id="otherEvent"
+        v-model="currentTab"
+        :loading="!otherEvent"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!otherEvent"
             :entity-label="$t('otherEventLabel')"
             :badge="otherEvent?.type ? getOtherEventTypeTitleFromValueAutoLocale(otherEvent.type) : ''"
+            :year="!otherEvent?.serialEvent && otherEvent?.dateFrom ? otherEvent.dateFrom.substring(0, 4) : ''"
             icon="mdi-presentation"
-            :can-edit="canEdit"
-            :edit-label="$t('updateLabel')"
-            :entity-type="EntityType.OTHER_EVENT"
-            :entity-id="otherEvent?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="OtherEventUpdateForm"
-                    :form-props="{ presetEvent: otherEvent }"
-                    entity-name="OtherEvent"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(otherEvent?.name) + (otherEvent?.nameAbbreviation && otherEvent.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(otherEvent?.nameAbbreviation) + ")" : "") }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="!otherEvent?.serialEvent && (otherEvent?.dateFrom || otherEvent?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseDateRange(otherEvent?.dateFrom as string, otherEvent?.dateTo as string) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="otherEvent?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
-                    {{ returnCurrentLocaleContent(country?.name) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="otherEvent?.place && otherEvent.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
-                    {{ returnCurrentLocaleContent(otherEvent?.place) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="(otherEvent?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
-                    {{ returnCurrentLocaleContent(otherEvent?.displayOrganizer) }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+                :can-edit="canEdit"
+                :edit-label="$t('updateLabel')"
+                :entity-type="EntityType.OTHER_EVENT"
+                :entity-id="otherEvent?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="OtherEventUpdateForm"
+                        :form-props="{ presetEvent: otherEvent }"
+                        entity-name="OtherEvent"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(otherEvent?.name) + (otherEvent?.nameAbbreviation && otherEvent.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(otherEvent?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="!otherEvent?.serialEvent && (otherEvent?.dateFrom || otherEvent?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseDateRange(otherEvent?.dateFrom as string, otherEvent?.dateTo as string) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="otherEvent?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
+                        {{ returnCurrentLocaleContent(country?.name) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="otherEvent?.place && otherEvent.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                        {{ returnCurrentLocaleContent(otherEvent?.place) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="(otherEvent?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
+                        {{ returnCurrentLocaleContent(otherEvent?.displayOrganizer) }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <tab-content-loader v-if="!otherEvent" layout="sections" />
-        <v-tabs
-            v-show="otherEvent"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
             <v-tab value="contributions">
                 {{ $t("participationsLabel") }}
             </v-tab>
@@ -71,13 +70,9 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="otherEvent"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
             <v-tabs-window-item value="contributions">
                 <person-event-contribution-tabs
                     :event-id="otherEvent?.id"
@@ -162,10 +157,12 @@
                     :entity-id="otherEvent?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -192,7 +189,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import { getOtherEventTypeTitleFromValueAutoLocale } from '@/i18n/otherEventType';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
@@ -206,11 +202,11 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "OtherEventLandingPage",
-    components: { PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isAdmin } = useUserRole();
 

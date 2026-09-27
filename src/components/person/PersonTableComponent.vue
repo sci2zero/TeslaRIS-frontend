@@ -1,130 +1,148 @@
 <template>
-    <!-- Action Menu for Selected Items -->
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
-            <div v-if="selectedPersons.length > 0" class="action-menu-container">
-                <v-menu offset-y>
-                    <template #activator="{ props }">
-                        <v-btn
-                            v-bind="props"
-                            color="white"
-                            variant="elevated"
-                            height="48"
-                            prepend-icon="mdi-dots-vertical"
-                            class="action-menu-trigger"
-                        >
-                            {{ $t("actions") }} <template v-if="selectedPersons.length > 0">
-                                ({{ selectedPersons.length }})
-                            </template>
-                        </v-btn>
-                    </template>
-                    
-                    <v-list class="action-menu-list" density="compact">
-                        <!-- Delete Action -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            :disabled="selectedPersons.length <= 0"
-                            class="action-menu-item"
-                            @click="startDeletionProcess"
-                        >
-                            <template #prepend>
-                                <v-icon color="error" size="18">
-                                    mdi-delete
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("deleteLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Remove Action -->
-                        <v-list-item
-                            v-if="(isAdmin || isCommission) && isCommissionResearchersTable"
-                            :disabled="selectedPersons.length <= 0"
-                            class="action-menu-item"
-                            @click="removeSelection"
-                        >
-                            <template #prepend>
-                                <v-icon color="warning" size="18">
-                                    mdi-account-remove
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("removeResearcherLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Compare Publications -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            :disabled="selectedPersons.length !== 2"
-                            class="action-menu-item"
-                            @click="startPublicationComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-file-document-multiple
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("compareContributionsLabel") }}
-                                <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Compare Metadata -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
-                            :disabled="selectedPersons.length !== 2"
-                            class="action-menu-item"
-                            @click="startMetadataComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-database-search
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("compareMetadataLabel") }}
-                                <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Export Action -->
-                        <v-list-item
-                            v-if="enableExport"
-                            class="action-menu-item"
-                            @click="openExportModal"
-                        >
-                            <template #prepend>
-                                <v-icon color="success" size="18">
-                                    mdi-download
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("exportLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </div>
+    <responsive-data-table
+        v-model="selectedPersons"
+        :items="persons"
+        :headers="headers"
+        :items-length="totalPersons"
+        :show-select="showSelect"
+        :page="tableOptions.page"
+        :items-per-page="tableOptions.itemsPerPage"
+        :sort-by="tableOptions.sortBy"
+        :in-comparator="inComparator"
+        draggable-group="persons"
+        container-class="modern-table-container"
+        :table-class="selectedPersons.length > 0 ? 'modern-data-table has-selection' : 'modern-data-table'"
+        @update:options="refreshTable"
+        @dragged="onDropCallback"
+    >
+        <template v-if="$slots['top-left']" #top-left>
             <div :class="[selectedPersons.length > 0 ? 'w-64' : 'w-96']">
                 <slot name="top-left"></slot>
             </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <add-employment-modal 
+        </template>
+        <template #actions>
+            <add-employment-modal
                 v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mb-4"
                 :institution-id="employmentInstitutionId"
                 @update="notifyUserAndRefreshTable">
             </add-employment-modal>
             <slot name="actions"></slot>
-        </div>
-    </div>
+        </template>
+        <template #selection-menu>
+            <v-list-item
+                v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                :disabled="selectedPersons.length <= 0"
+                class="action-menu-item"
+                @click="startDeletionProcess"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("deleteLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-    
-    <!-- Table Export Modal -->
+            <v-list-item
+                v-if="(isAdmin || isCommission) && isCommissionResearchersTable"
+                :disabled="selectedPersons.length <= 0"
+                class="action-menu-item"
+                @click="removeSelection"
+            >
+                <template #prepend>
+                    <v-icon color="warning" size="18">
+                        mdi-account-remove
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeResearcherLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+                v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                :disabled="selectedPersons.length !== 2"
+                class="action-menu-item"
+                @click="startPublicationComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-file-document-multiple
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("compareContributionsLabel") }}
+                    <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
+                </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+                v-if="(isAdmin || allowComparison) && !isAlumniTable && !isCommissionResearchersTable"
+                :disabled="selectedPersons.length !== 2"
+                class="action-menu-item"
+                @click="startMetadataComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-database-search
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("compareMetadataLabel") }}
+                    <span class="selection-indicator">({{ selectedPersons.length }}/2)</span>
+                </v-list-item-title>
+            </v-list-item>
+
+            <v-list-item
+                v-if="enableExport"
+                class="action-menu-item"
+                @click="openExportModal"
+            >
+                <template #prepend>
+                    <v-icon color="success" size="18">
+                        mdi-download
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("exportLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #compact-item="{ item }">
+            <person-list-item
+                :item="item"
+                :selected-persons="selectedPersons"
+                :show-select="showSelect"
+                @update:selected-persons="selectedPersons = $event"
+                @open="openGlance(item)"
+            />
+        </template>
+        <template #row="{ item }">
+            <person-table-row
+                :item="item"
+                :selected-persons="selectedPersons"
+                :show-select="showSelect"
+                @update:selected-persons="selectedPersons = $event"
+            />
+        </template>
+        <template #empty>
+            <div class="empty-state">
+                <v-icon size="48" color="grey-lighten-1" class="mb-4">
+                    mdi-database-search
+                </v-icon>
+                <p class="text-h6 text-grey-darken-1 mb-2">
+                    {{ $t("noDataInTableMessage") }}
+                </p>
+                <p class="text-body-2 text-grey">
+                    {{ $t("tryAdjustingFilters") }}
+                </p>
+            </div>
+        </template>
+    </responsive-data-table>
+
     <table-export-modal
         v-if="enableExport"
         ref="exportModal"
@@ -137,162 +155,11 @@
         :endpoint-token-parameters="endpointTokenParameters"
         :hide-activation-button="true">
     </table-export-modal>
-    
-    <div ref="tableWrapper" class="modern-table-container">
-        <v-data-table-server
-            v-model="selectedPersons"
-            :sort-by="tableOptions.sortBy"
-            :items="persons"
-            :headers="headers"
-            item-value="row"
-            :items-length="totalPersons"
-            :show-select="isAdmin || enableExport"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :page="tableOptions.page"
-            class="modern-data-table"
-            :class="{ 'has-selection': selectedPersons.length > 0 }"
-            @update:options="refreshTable">
-            <template #body="props">
-                <draggable
-                    :list="props.items as any"
-                    tag="tbody"
-                    :disabled="!inComparator"
-                    group="persons"
-                    handle=".handle"
-                    @change="onDropCallback"
-                >
-                    <tr v-if="props.items?.length === 0" class="empty-state-row">
-                        <td colspan="10" class="text-center py-12">
-                            <div class="empty-state">
-                                <v-icon size="48" color="grey-lighten-1" class="mb-4">
-                                    mdi-database-search
-                                </v-icon>
-                                <p class="text-h6 text-grey-darken-1 mb-2">
-                                    {{ $t("noDataInTableMessage") }}
-                                </p>
-                                <p class="text-body-2 text-grey">
-                                    {{ $t("tryAdjustingFilters") }}
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-for="item in props.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || enableExport" class="checkbox-column px-2!">
-                            <v-checkbox
-                                v-model="selectedPersons"
-                                :value="item"
-                                class="table-checkbox"
-                                hide-details
-                                color="primary"
-                            />
-                        </td>
-                        <td class="py-2!">
-                            <div class="person-info">
-                                <div class="person-name-section">
-                                    <localized-link :to="'persons/' + item.databaseId" class="person-name">
-                                        <v-avatar size="40" class="profile-avatar modern-avatar">
-                                            <v-img
-                                                :src="`${baseServerUrl}file/raw-image/${item.databaseId}`"
-                                                class="avatar-img"
-                                                cover
-                                            >
-                                                <template #error>
-                                                    <v-icon color="primary" class="mt-2">
-                                                        mdi-account
-                                                    </v-icon>
-                                                </template>
-                                            </v-img>
-                                        </v-avatar>
-                                    </localized-link>
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex flex-col items-start text-center">
-                                            <div class="flex flex-wrap justify-left gap-x-1">
-                                                <span v-for="(nameVariant, index) in getDisplayedNameVariants(item)" :key="nameVariant" class="whitespace-nowrap">
-                                                    <localized-link :to="'persons/' + item.databaseId" class="person-name">
-                                                        {{ nameVariant }}
-                                                    </localized-link>
-                                                    <span v-if="(index + 1 < getDisplayedNameVariants(item).length) || item.birthdate">, </span>
-                                                </span>
-                                                <span v-if="item.birthdate" class="person-year">{{ item.displayBirthdate ? localiseDate(item.birthdate) : extractYear(item.birthdate) }}</span>
-                                            </div>
-                                            <v-btn
-                                                v-if="shouldShowMoreButton(item)"
-                                                variant="text"
-                                                size="x-small"
-                                                color="primary"
-                                                :class="item.birthdate ? 'ml-[-0.5rem]' : 'ml-[-0.35rem]'"
-                                                @click="toggleShowAllNameVariants(item.databaseId as number)"
-                                            >
-                                                {{ getShowMoreText(item) }}
-                                            </v-btn>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-4">
-                            <div v-if="hasEmployment(item)" class="person-employment">
-                                <div v-if="$i18n.locale.startsWith('sr')" class="employment-item">
-                                    <template v-if="item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
-                                        <div v-for="(employment, index) in item.employmentsSr.split('; ')" :key="index" class="employment-entry">
-                                            <v-icon size="16" class="employment-icon">
-                                                mdi-domain
-                                            </v-icon>
-                                            <localized-link
-                                                v-if="item.employmentInstitutionsId[index] !== -1"
-                                                :to="'organisation-units/' + item.employmentInstitutionsId[index]"
-                                                class="employment-link">
-                                                {{ employment.trim() }}
-                                            </localized-link>
-                                            <span v-else class="employment-text">{{ employment.trim() }}</span>
-                                        </div>
-                                    </template>
-                                </div>
-                                <div v-else class="employment-item">
-                                    <template v-if="item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0">
-                                        <div v-for="(employment, index) in item.employmentsOther.split('; ')" :key="index" class="employment-entry">
-                                            <v-icon size="16" class="employment-icon">
-                                                mdi-domain
-                                            </v-icon>
-                                            <localized-link
-                                                v-if="item.employmentInstitutionsId[index] !== -1"
-                                                :to="'organisation-units/' + item.employmentInstitutionsId[index]"
-                                                class="employment-link">
-                                                {{ employment.trim() }}
-                                            </localized-link>
-                                            <span v-else class="employment-text">{{ employment.trim() }}</span>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                            <!-- <div class="date-cell">
-                                <v-icon size="16" color="grey-darken-1" class="mr-2">mdi-calendar</v-icon>
-                                <span class="text-body-2">{{ item.birthdate ? localiseDate(item.birthdate) : displayTextOrPlaceholder(item.birthdate) }}</span>
-                            </div> -->
-                        </td>
-                        <td class="py-4">
-                            <div v-if="item.orcid || item.scopusAuthorId || item.openAlexId || item.webOfScienceResearcherId" class="identifiers-cell">
-                                <div class="flex flex-wrap gap-2">
-                                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
-                                </div>
-                            </div>
-                            <div v-else class="no-identifiers">
-                                <v-icon size="16" color="grey-lighten-1" class="mr-2">
-                                    mdi-identifier
-                                </v-icon>
-                                <span class="text-body-2 text-grey">{{ displayTextOrPlaceholder(item.orcid) }}</span>
-                            </div>
-                        </td>
-                    </tr>
-                </draggable>
-            </template>
-        </v-data-table-server>
-    </div>
+
+    <person-quick-glance
+        v-model="glanceOpen"
+        :item="glancedPerson"
+    />
     
     <div class="notificationContainer">
         <v-slide-y-transition group>
@@ -321,13 +188,6 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PersonIndex } from '@/models/PersonModel';
 import PersonService from '@/services/PersonService';
-import LocalizedLink from '../localization/LocalizedLink.vue';
-import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { localiseDate } from '@/utils/DateUtil';
-import { useRouter } from 'vue-router';
-import { VueDraggableNext } from 'vue-draggable-next';
-import { watch } from 'vue';
-import IdentifierMenu from '../core/IdentifierMenu.vue';
 import InvolvementService from '@/services/InvolvementService';
 import AddEmploymentModal from './involvement/AddEmploymentModal.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -335,11 +195,16 @@ import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { useRouter } from 'vue-router';
+import ResponsiveDataTable from '../core/ResponsiveDataTable.vue';
+import PersonTableRow from './PersonTableRow.vue';
+import PersonListItem from './PersonListItem.vue';
+import PersonQuickGlance from './PersonQuickGlance.vue';
 
 
 export default defineComponent({
     name: "PersonTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, AddEmploymentModal, TableExportModal, IdentifierMenu, PersistentQuestionDialog },
+    components: { ResponsiveDataTable, AddEmploymentModal, TableExportModal, PersistentQuestionDialog, PersonTableRow, PersonListItem, PersonQuickGlance },
     props: {
         persons: {
             type: Array<PersonIndex>,
@@ -385,25 +250,13 @@ export default defineComponent({
     emits: ["switchPage", "dragged", "delete"],
     setup(props, {emit}) {
         const selectedPersons = ref<PersonIndex[]>([]);
-
-        const baseServerUrl = import.meta.env.VITE_BASE_URL as string;
+        const glanceOpen = ref(false);
+        const glancedPerson = ref<PersonIndex | null>(null);
 
         const i18n = useI18n();
         const router = useRouter();
 
         const notifications = ref<Map<string, string>>(new Map());
-
-        const tableWrapper = ref<any>(null);
-
-        watch(tableWrapper, () => {
-            if (tableWrapper.value) {
-                const table = tableWrapper.value;
-                const sortableTbody = table.querySelector('.v-table__wrapper > table > tbody > tbody')
-                const tbody = table.querySelector('.v-table__wrapper > table > tbody')
-                tbody!.parentNode!.append(sortableTbody!)
-                tbody!.remove()
-            }
-        });
 
         const fullNameLabel = computed(() => i18n.t("fullNameLabel"));
         const organisationUnitLabel = computed(() => i18n.t("organisationUnitLabel"));
@@ -411,6 +264,8 @@ export default defineComponent({
         const identifiers = computed(() => i18n.t("identifiersLabel"));
 
         const { isAdmin, isInstitutionalEditor, isCommission, isUserLoggedIn } = useUserRole();
+
+        const showSelect = computed(() => isAdmin.value || props.enableExport);
 
         const employmentColumn = computed(() => i18n.t("employmentColumn"));
 
@@ -538,23 +393,6 @@ export default defineComponent({
             emit("delete", selectedPersons.value.map(person => person.databaseId));
         };
 
-        const hasEmployment = (item: PersonIndex) => {
-            if (i18n.locale.value.startsWith('sr')) {
-                return item.employmentsSr.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0;
-            } else {
-                return item.employmentsOther.trim() !== '' && item.employmentInstitutionsId && item.employmentInstitutionsId.length > 0;
-            }
-        };
-
-
-        const extractYear = (dateString: string) => {
-            const d = new Date(dateString);
-            if (isNaN(d.getTime())) {
-                return '';
-            }
-            return d.getFullYear();
-        };
-
         const exportModal = ref<any>(null);
 
         const openExportModal = () => {
@@ -568,55 +406,21 @@ export default defineComponent({
             displayPersistentDialog.value = true;
         };
 
-        const expandedNames = ref<Set<number>>(new Set());
-
-        const getDisplayedNameVariants = (item: PersonIndex) => {
-            const nameVariants = item.name.split("; ");
-            const isExpanded = expandedNames.value.has(item.databaseId as number);
-            
-            if (nameVariants.length <= 1 || isExpanded) {
-                return nameVariants;
-            }
-            
-            return nameVariants.slice(0, 1);
-        };
-
-        const toggleShowAllNameVariants = (personId: number) => {
-            if (expandedNames.value.has(personId)) {
-                expandedNames.value.delete(personId);
-            } else {
-                expandedNames.value.add(personId);
-            }
-        };
-
-        const shouldShowMoreButton = (item: PersonIndex) => {
-            const authors = item.name.split("; ");
-            return authors.length > 1;
-        };
-
-        const getShowMoreText = (item: PersonIndex) => {
-            const nameVariants = item.name.split("; ");
-            const isExpanded = expandedNames.value.has(item.databaseId as number);
-            
-            if (isExpanded) {
-                return i18n.t("showLessLabel");
-            }
-            
-            const remainingCount = nameVariants.length - 1;
-            return i18n.t("showMoreNameVariantsLabel", { count: remainingCount });
+        const openGlance = (item: PersonIndex) => {
+            glancedPerson.value = item;
+            glanceOpen.value = true;
         };
 
         return {
             selectedPersons, headers, notifications, isUserLoggedIn,
             refreshTable, isAdmin, deleteSelection, ExportEntity,
-            tableOptions, displayTextOrPlaceholder, isInstitutionalEditor,
-            localiseDate, startPublicationComparison, isCommission,
+            tableOptions, isInstitutionalEditor,
+            startPublicationComparison, isCommission,
             startMetadataComparison, onDropCallback, removeSelection,
-            tableWrapper, setSortAndPageOption, notifyUserAndRefreshTable,
-            hasEmployment, extractYear, openExportModal, exportModal,
-            baseServerUrl, startDeletionProcess, displayPersistentDialog,
-            getShowMoreText, shouldShowMoreButton, toggleShowAllNameVariants,
-            getDisplayedNameVariants
+            setSortAndPageOption, notifyUserAndRefreshTable,
+            openExportModal, exportModal,
+            startDeletionProcess, displayPersistentDialog,
+            showSelect, glanceOpen, glancedPerson, openGlance
         };
     }
 });
@@ -661,8 +465,7 @@ export default defineComponent({
         margin-left: 4px;
     }
 
-    /* Table Container */
-    .modern-table-container {
+    :deep(.modern-table-container) {
         background: white;
         border-radius: 12px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -670,29 +473,28 @@ export default defineComponent({
         border: 1px solid rgba(0, 0, 0, 0.06);
     }
 
-    /* Modern Data Table */
-    .modern-data-table {
+    :deep(.modern-data-table) {
         background: transparent;
     }
 
-    .modern-data-table :deep(.v-data-table__wrapper) {
+    :deep(.modern-data-table .v-data-table__wrapper) {
         border-radius: 12px;
     }
 
-    .modern-data-table :deep(.v-table) {
+    :deep(.modern-data-table .v-table) {
         background: transparent;
     }
 
-    .modern-data-table :deep(.v-table__wrapper) {
+    :deep(.modern-data-table .v-table__wrapper) {
         border-radius: 12px;
     }
 
-    .modern-data-table :deep(.v-data-table-header) {
+    :deep(.modern-data-table .v-data-table-header) {
         background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         border-bottom: 2px solid rgba(25, 118, 210, 0.1);
     }
 
-    .modern-data-table :deep(.v-data-table-header th) {
+    :deep(.modern-data-table .v-data-table-header th) {
         font-weight: 600;
         color: #424242;
         font-size: 0.9rem;
@@ -702,7 +504,7 @@ export default defineComponent({
         border-bottom: 2px solid rgba(25, 118, 210, 0.1);
     }
 
-    .modern-data-table :deep(.v-data-table-header .v-checkbox) {
+    :deep(.modern-data-table .v-data-table-header .v-checkbox) {
         margin: 0;
     }
 
@@ -727,12 +529,6 @@ export default defineComponent({
         display: flex;
         align-items: center;
         gap: 12px;
-    }
-
-    .modern-avatar {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        color: #1976d2;
-        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
     }
 
     .person-name {
@@ -824,7 +620,7 @@ export default defineComponent({
     }
 
     /* Selection State */
-    .modern-data-table.has-selection :deep(.v-data-table-header) {
+    :deep(.modern-data-table.has-selection .v-data-table-header) {
         background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
         border-bottom: 2px solid rgba(25, 118, 210, 0.2);
     }
@@ -833,11 +629,6 @@ export default defineComponent({
     @media (max-width: 768px) {
         .person-name-section {
             gap: 8px;
-        }
-        
-        .modern-avatar {
-            width: 32px !important;
-            height: 32px !important;
         }
 
         .action-menu-trigger {

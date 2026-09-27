@@ -3,7 +3,7 @@
         <h3 v-if="entityIdentifiersFiltered?.length > 0">
             {{ $t("otherIdentifiersLabel") }}
         </h3>
-        <div class="crud-modal-wrapper mt-2">
+        <div v-if="canEdit" class="crud-modal-wrapper mt-2">
             <generic-crud-modal
                 :form-component="EntityIdentifierForm"
                 :form-props="{
@@ -12,9 +12,19 @@
                     entityType: containingEntityType
                 }"
                 entity-name="EntityIdentifier"
-                :read-only="!canEdit"
                 @create="createIdentifier"
-            />
+            >
+                <template #activator="{ props: activatorProps }">
+                    <v-btn
+                        v-bind="activatorProps"
+                        variant="outlined"
+                        size="small"
+                        class="text-none"
+                        prepend-icon="mdi-plus">
+                        {{ $t("createNewEntityIdentifierLabel") }}
+                    </v-btn>
+                </template>
+            </generic-crud-modal>
         </div>
         <v-expansion-panels v-model="openedPanel" class="mt-1">
             <v-expansion-panel
@@ -28,14 +38,25 @@
                     </v-row>
                     <v-row class="actions-row">
                         <generic-crud-modal
+                            v-if="canEdit"
                             class="mt-2"
                             :form-component="EntityIdentifierForm"
                             :form-props="{ presetIdentifier: identifier, applicableTypes: identifier.identifierResponse.applicableEntityTypes, entityId: entityId, entityType: containingEntityType }"
                             entity-name=""
                             is-update
-                            :read-only="!canEdit"
                             @update="updateIdentifier($event, identifier.id)"
-                        />
+                        >
+                            <template #activator="{ props: activatorProps }">
+                                <v-btn
+                                    v-bind="activatorProps"
+                                    variant="outlined"
+                                    size="small"
+                                    class="text-none"
+                                    prepend-icon="mdi-pencil-outline">
+                                    {{ $t("editActionLabel") }}
+                                </v-btn>
+                            </template>
+                        </generic-crud-modal>
                         <v-btn
                             v-if="canEdit"
                             class="mb-3"

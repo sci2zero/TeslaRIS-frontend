@@ -2,7 +2,53 @@
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-white">
         <div class="mx-auto max-w-7xl px-6 py-12">
             <!-- Header Section -->
-            <ResearcherLandingHeader />
+            <entity-landing-header
+                :loading="!person"
+                visual-shape="circle"
+                :badge="academicTitle"
+            >
+                <template #visual>
+                    <person-profile-image
+                        class="person-header-photo"
+                        :filename="person?.imageServerFilename"
+                        :person-id="person?.id"
+                    />
+                </template>
+                <template #title>
+                    {{ researcherName }}
+                </template>
+                <template v-if="primaryEmployment" #affiliation>
+                    <p class="text-base sm:text-xl font-semibold text-slate-600 font-sans break-words">
+                        <localized-link
+                            v-if="primaryEmployment.organisationUnitId"
+                            :to="'organisation-units/' + primaryEmployment.organisationUnitId"
+                            class="font-medium text-gray-900 underline"
+                        >
+                            {{ primaryEmployment.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        </localized-link>
+                    </p>
+                    <p class="text-sm text-slate-500 font-sans">
+                        {{ primaryEmployment.employmentPosition ? getEmploymentPositionTitleFromValueAutoLocale(primaryEmployment.employmentPosition) : "" }}
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="person?.personalInfo.orcid" label="ORCID" abbrev="iD" tone="emerald">
+                        <identifier-link :identifier="person.personalInfo.orcid" type="orcid" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.scopusAuthorId" label="Scopus Author ID" abbrev="SC" tone="amber">
+                        <identifier-link :identifier="person.personalInfo.scopusAuthorId" type="scopus_author" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.openAlexId" label="OpenAlex ID" abbrev="OA" tone="slate">
+                        <identifier-link :identifier="person.personalInfo.openAlexId" type="open_alex" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.webOfScienceResearcherId" label="Researcher ID (Web of Science)" abbrev="WoS" tone="blue">
+                        <identifier-link :identifier="person.personalInfo.webOfScienceResearcherId" type="researcher_id" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="slate">
+                        <identifier-link :identifier="person.personalInfo.contact.contactEmail" type="email" compact />
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
             <ResearcherFeaturedIndicators />
 
             <!-- Biography and Keywords Section -->
@@ -241,27 +287,58 @@
 </template>
 
 <script setup lang="ts">
-import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { type MultilingualContent, ExportableEndpointType } from '@/models/Common';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 
-import { ref, onMounted, watch, onUnmounted } from 'vue';
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import PersonService from '@/services/PersonService';
 import InvolvementService from '@/services/InvolvementService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import type { Employment } from '@/models/InvolvementModel';
 import type { PersonResponse } from '@/models/PersonModel';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
 
 const route = useRoute();
 const router = useRouter();
+const i18n = useI18n();
 
 const person = ref<PersonResponse>();
 const researcherName = ref("");
 const employments = ref<Employment[]>([]);
+
+const academicTitle = computed(() => {
+    if (!person.value) {
+        return "";
+    }
+
+    const displayTitle = person.value.personalInfo?.displayTitle;
+    if (displayTitle && displayTitle.length > 0) {
+        return returnCurrentLocaleContent(displayTitle) || i18n.t("researcherLabel");
+    }
+
+    return i18n.t("researcherLabel");
+});
+
+const primaryEmployment = computed(() =>
+    employments.value.length > 0
+        ? employments.value.reduce((a, b) =>
+            (!b.dateFrom ? b : !a.dateFrom ? a :
+             (!b.dateTo && a.dateTo) ? b :
+             (b.dateTo && !a.dateTo) ? a :
+             new Date(b.dateFrom || 0) > new Date(a.dateFrom || 0) ? b : a)
+        )
+        : null
+);
 
 // Publication state
 const publications = ref<DocumentPublicationIndex[]>([]);
@@ -443,6 +520,16 @@ const getKeywordsAsArray = (keywords: MultilingualContent[] | undefined): string
 <style scoped>
 .font-serif {
     font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+:deep(.person-header-photo) {
+    width: 100%;
+    height: 100%;
+}
+
+:deep(.person-header-photo .image-container) {
+    width: 100%;
+    height: 100%;
 }
 
 .prose {

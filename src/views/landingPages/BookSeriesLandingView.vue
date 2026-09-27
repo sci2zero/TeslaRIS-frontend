@@ -1,52 +1,55 @@
 <template>
-    <div id="bookSeries" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!bookSeries"
-            :subtitle="returnCurrentLocaleContent(bookSeries?.subtitle)"
-            :entity-label="$t('bookSeriesLabel')"
-            icon="mdi-bookshelf"
-            :can-edit="canEdit"
-            :edit-label="$t('updateBookSeriesLabel')"
-            :entity-type="EntityType.BOOK_SERIES"
-            :entity-id="bookSeries?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="PublicationSeriesUpdateForm"
-                    :form-props="{ presetPublicationSeries: bookSeries, inputType: 'BOOK_SERIES' }"
-                    entity-name="BookSeries"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="bookSeries?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
-                    {{ bookSeries.eissn }}
-                </landing-meta-item>
-                <landing-meta-item v-if="bookSeries?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
-                    {{ bookSeries.printISSN }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="bookSeries"
+        v-model="currentTab"
+        :loading="!bookSeries"
+        loader-layout="list"
+        :tab-number="3"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!bookSeries"
+                :subtitle="returnCurrentLocaleContent(bookSeries?.subtitle)"
+                :entity-label="$t('bookSeriesLabel')"
+                icon="mdi-bookshelf"
+                :can-edit="canEdit"
+                :edit-label="$t('updateBookSeriesLabel')"
+                :entity-type="EntityType.BOOK_SERIES"
+                :entity-id="bookSeries?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="PublicationSeriesUpdateForm"
+                        :form-props="{ presetPublicationSeries: bookSeries, inputType: 'BOOK_SERIES' }"
+                        entity-name="BookSeries"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(bookSeries?.title) + (bookSeries?.nameAbbreviation && bookSeries.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(bookSeries?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="bookSeries?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
+                        {{ bookSeries.eissn }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="bookSeries?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
+                        {{ bookSeries.printISSN }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <tab-content-loader v-if="!bookSeries" :tab-number="3" layout="list" />
-        <v-tabs
-            v-show="bookSeries"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -65,13 +68,17 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="bookSeries"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :contributions="bookSeries?.contributions"
+                    :contribution-types="['EDITOR']"
+                    :contributors-label="$t('editorsLabel')"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
                 <publication-table-component
@@ -149,10 +156,12 @@
                     :entity-id="bookSeries?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -175,7 +184,6 @@ import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import { type EntityIndicatorResponse } from '@/models/AssessmentModel';
@@ -192,15 +200,16 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "BookSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, Toast, TabContentLoader, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, Toast, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin } = useUserRole();
 
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -355,10 +364,8 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if(totalPublications.value > 0) {
-                currentTab.value = "publications";
-            } else {
-                currentTab.value = "contributions";
+            if (currentTab.value !== "dataQuality") {
+                currentTab.value = "overview";
             }
         };
 

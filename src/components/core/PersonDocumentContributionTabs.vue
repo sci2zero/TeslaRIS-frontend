@@ -1,185 +1,134 @@
 <template>
-    <v-row>
-        <v-col cols="12">
-            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                <v-card-text class="edit-pen-container">
-                    <publication-contribution-update-modal
-                        :read-only="readOnly"
-                        :preset-document-contributions="getContributorGroupForUpdating()"
-                        :board-members-allowed="boardMembersAllowed"
-                        :board-member-ids="boardMembersAllowed ? boardMemberList.map(bm => bm.personId).filter(id => !!id) : []"
-                        :lock-contribution-type="getLockedContributionTypes()"
-                        :limit-one="limitOneAuthor && currentTab === 'authors'"
-                        @update="sendToParent"
-                    />
+    <div class="mt-4 space-y-4">
+        <div
+            v-if="readOnly && visibleSections.length === 0"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-6 text-slate-600 shadow-sm">
+            <p class="font-semibold text-slate-800">
+                {{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}
+            </p>
+            <p class="mt-1 text-sm text-slate-500">
+                {{ $t("notYetSetMessage") }}
+            </p>
+        </div>
 
-                    <div
-                        v-if="contributionList?.length === 0"
-                        class="mt-5">
-                        <b>{{ showsBoardAndReviewers ? $t("boardAndReviewersLabel") : $t("contributionsLabel") }}</b>
-                    </div>
-                    <strong v-if="contributionList?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <v-tabs
-                        v-else
-                        v-model="currentTab"
-                        color="deep-purple-accent-4"
-                        align-tabs="start"
-                    >
-                        <v-tab v-show="showAuthorsOrStaff()" value="authors">
-                            {{ $t("authorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showEditors()" value="editors">
-                            {{ $t("editorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showEditors()" value="editors">
-                            {{ $t("associatedEditorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showInvitedEditors()" value="editors">
-                            {{ $t("invitedEditorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showReviewers()" value="reviewers">
-                            {{ $t("reviewersLabel") }}
-                        </v-tab>
-                        <v-tab v-show="documentType === PublicationType.THESIS" value="advisors">
-                            {{ $t(limitOneAuthor ? "mentorsLabel" : "advisorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="boardMembers">
-                            {{ $t("boardMembersLabel") }}
-                        </v-tab>
-                        <v-tab v-show="documentType === PublicationType.PERFORMANCE_RELATED_OUTPUT" value="presenters">
-                            {{ $t("presentersLabel") }}
-                        </v-tab>
-                        <v-tab value="translators">
-                            {{ $t("translatorsLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showAuthorsOrStaff()" value="assistantStaff">
-                            {{ $t("assistantStaffLabel") }}
-                        </v-tab>
-                        <v-tab v-show="boardMembersAllowed && documentType === PublicationType.THESIS" value="arguers">
-                            {{ $t("arguersLabel") }}
-                        </v-tab>
-                        <v-tab v-show="showOwners()" value="owners">
-                            {{ $t("ownersLabel") }}
-                        </v-tab>
-                    </v-tabs>
+        <landing-section-card
+            v-for="section in visibleSections"
+            :key="section.key"
+            :title="$t(section.titleKey)"
+            :count="section.list.length"
+            :icon="section.icon"
+            :icon-class="section.iconClass">
+            <template v-if="!readOnly" #action>
+                <publication-contribution-update-modal
+                    :key="sectionModalKey(section)"
+                    :preset-document-contributions="section.list"
+                    :board-members-allowed="boardMembersAllowed"
+                    :board-member-ids="boardMemberIds"
+                    :lock-contribution-type="[section.contributionType]"
+                    :limit-one="section.limitOne"
+                    @update="sendToParent(section.key, $event)">
+                    <template #activator="{ props: activatorProps }">
+                        <v-btn
+                            v-bind="activatorProps"
+                            variant="outlined"
+                            size="small"
+                            class="text-none"
+                            prepend-icon="mdi-pencil-outline">
+                            {{ $t("editActionLabel") }}
+                        </v-btn>
+                    </template>
+                </publication-contribution-update-modal>
+            </template>
 
-                    <v-window v-model="currentTab">
-                        <v-window-item value="authors">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="authorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="editors">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="editorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="associatedEditors">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="associatedEditorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="invitedEditors">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="invitedEditorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="reviewers">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="reviewerList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="advisors">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="advisorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="boardMembers">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="boardMemberList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="presenters">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="presenterList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="translators">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="translatorList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="assistantStaff">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="assistantStaffList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="arguers">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="arguerList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                        <v-window-item value="owners">
-                            <person-document-contribution-list
-                                :document-id="documentId"
-                                :contribution-list="ownerList"
-                                :can-reorder="!readOnly"
-                                @positions-changed="updateOrderInParentList"
-                            />
-                        </v-window-item>
-                    </v-window>
-                </v-card-text>
-            </v-card>
-        </v-col>
-    </v-row>
+            <div v-if="section.list.length === 0" class="px-4 py-5 text-sm text-slate-500">
+                {{ $t("notYetSetMessage") }}
+            </div>
+
+            <ul v-else class="divide-y divide-slate-100">
+                <li
+                    v-for="(contribution, index) in section.list"
+                    :key="contribution.id ?? `${section.key}-${index}`">
+                    <person-contribution-row
+                        :contribution="contribution"
+                        :index="index + 1">
+                        <template #badges>
+                            <v-chip
+                                v-if="contribution.isMainContributor"
+                                size="small"
+                                variant="tonal"
+                                color="indigo">
+                                {{ $t("mainContributorLabel") }}
+                            </v-chip>
+                            <v-chip
+                                v-else
+                                size="small"
+                                variant="tonal"
+                                :color="section.chipColor">
+                                {{ getTitleFromValueAutoLocale(contribution.contributionType) }}
+                            </v-chip>
+                            <v-chip
+                                v-if="contribution.isCorrespondingContributor"
+                                size="small"
+                                variant="tonal"
+                                color="teal">
+                                {{ $t("correspondingContributorLabel") }}
+                            </v-chip>
+                            <v-chip
+                                v-if="contribution.isBoardPresident"
+                                size="small"
+                                variant="tonal"
+                                color="deep-purple">
+                                {{ $t("boardPresidentLabel") }}
+                            </v-chip>
+                        </template>
+                    </person-contribution-row>
+                </li>
+            </ul>
+        </landing-section-card>
+    </div>
 </template>
 
 <script lang="ts">
 import { DocumentContributionType, MonographType, PerformanceRelatedOutputType, PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
-import { defineComponent, onMounted, type PropType } from 'vue';
+import { computed, defineComponent, watch, type PropType } from 'vue';
 import PublicationContributionUpdateModal from '@/components/publication/update/PublicationContributionUpdateModal.vue';
 import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 import { ref } from 'vue';
-import { watch } from 'vue';
-import PersonDocumentContributionList from './PersonDocumentContributionList.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
+import PersonContributionRow from '@/components/person/PersonContributionRow.vue';
 
+type SectionKey =
+    | "authors"
+    | "editors"
+    | "associatedEditors"
+    | "invitedEditors"
+    | "reviewers"
+    | "advisors"
+    | "boardMembers"
+    | "presenters"
+    | "translators"
+    | "assistantStaff"
+    | "arguers"
+    | "owners";
+
+interface ContributionSection {
+    key: SectionKey;
+    titleKey: string;
+    icon: string;
+    iconClass: string;
+    chipColor: string;
+    list: PersonDocumentContribution[];
+    contributionType: DocumentContributionType;
+    visible: boolean;
+    limitOne: boolean;
+}
+
+const matchesType = (contribution: PersonDocumentContribution, type: DocumentContributionType) =>
+    contribution.contributionType?.toString() === type.toString();
 
 export default defineComponent({
     name: "PersonDocumentContributionTabs",
-    components: { PublicationContributionUpdateModal, PersonDocumentContributionList },
+    components: { PublicationContributionUpdateModal, LandingSectionCard, PersonContributionRow },
     props: {
         contributionList: {
             type: Array as PropType<PersonDocumentContribution[]>,
@@ -216,8 +165,6 @@ export default defineComponent({
     },
     emits: ["update", "positionsChanged"],
     setup(props, { emit }) {
-        const currentTab = ref(props.documentType === PublicationType.PROCEEDINGS ? "editors" : "authors");
-
         const localContributions = ref<PersonDocumentContribution[]>([]);
 
         const authorList = ref<PersonDocumentContribution[]>([]);
@@ -233,75 +180,246 @@ export default defineComponent({
         const arguerList = ref<PersonDocumentContribution[]>([]);
         const ownerList = ref<PersonDocumentContribution[]>([]);
 
-        onMounted(() => {
-            if (props.contributionList) {
-                populateLists();
-            }
-        });
+        const showAuthorsOrStaff = () =>
+            ![
+                MonographType.JOURNAL_ISSUE,
+                PerformanceRelatedOutputType.LITIGATION,
+                PerformanceRelatedOutputType.BROADCAST_INTERVIEW,
+                PerformanceRelatedOutputType.TEXT_INTERVIEW,
+                PerformanceRelatedOutputType.NON_RESEARCH_PRESENTATION
+            ].includes(props.concreteType as MonographType | PerformanceRelatedOutputType);
+
+        const showEditors = () =>
+            [
+                MonographType.EDITED_BOOK,
+                MonographType.JOURNAL_ISSUE,
+                MonographType.ENCYCLOPEDIA,
+                MonographType.DICTIONARY,
+                MonographType.REPORT,
+            ].includes(props.concreteType as MonographType);
+
+        const showInvitedEditors = () =>
+            [
+                MonographType.JOURNAL_ISSUE
+            ].includes(props.concreteType as MonographType);
+
+        const showReviewers = () =>
+            [
+                PublicationType.PROCEEDINGS_PUBLICATION,
+                PublicationType.MONOGRAPH_PUBLICATION,
+                PublicationType.JOURNAL_PUBLICATION,
+                PublicationType.THESIS,
+            ].includes(props.documentType);
+
+        const showOwners = () =>
+            [
+                PublicationType.INTANGIBLE_PRODUCT,
+                PublicationType.MATERIAL_PRODUCT,
+                PublicationType.GENETIC_MATERIAL
+            ].includes(props.documentType);
+
+        const populateLists = () => {
+            localContributions.value = props.contributionList;
+
+            authorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.AUTHOR)
+            );
+            editorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.EDITOR)
+            );
+            associatedEditorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.ASSOCIATED_EDITOR)
+            );
+            invitedEditorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.INVITED_EDITOR)
+            );
+            reviewerList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.REVIEWER)
+            );
+            advisorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.ADVISOR)
+            );
+            boardMemberList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.BOARD_MEMBER)
+            );
+            presenterList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.PRESENTER)
+            );
+            translatorList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.TRANSLATOR)
+            );
+            assistantStaffList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.ASSISTANT_STAFF)
+            );
+            arguerList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.ARGUER)
+            );
+            ownerList.value = localContributions.value.filter(
+                (contribution) => matchesType(contribution, DocumentContributionType.OWNER)
+            );
+        };
 
         watch(() => props.contributionList, () => {
             if (props.contributionList) {
                 populateLists();
             }
-        });
+        }, { immediate: true });
 
-        const populateLists = () => {
-            localContributions.value = props.contributionList;
+        const allSections = computed<ContributionSection[]>(() => [
+            {
+                key: "authors",
+                titleKey: "authorsLabel",
+                icon: "mdi-account-group",
+                iconClass: "bg-indigo-50 text-indigo-600",
+                chipColor: "indigo",
+                list: authorList.value,
+                contributionType: DocumentContributionType.AUTHOR,
+                visible: showAuthorsOrStaff(),
+                limitOne: props.limitOneAuthor
+            },
+            {
+                key: "editors",
+                titleKey: "editorsLabel",
+                icon: "mdi-pencil",
+                iconClass: "bg-cyan-50 text-cyan-700",
+                chipColor: "cyan",
+                list: editorList.value,
+                contributionType: DocumentContributionType.EDITOR,
+                visible: showEditors(),
+                limitOne: false
+            },
+            {
+                key: "associatedEditors",
+                titleKey: "associatedEditorsLabel",
+                icon: "mdi-account-edit",
+                iconClass: "bg-sky-50 text-sky-700",
+                chipColor: "light-blue",
+                list: associatedEditorList.value,
+                contributionType: DocumentContributionType.ASSOCIATED_EDITOR,
+                visible: showEditors(),
+                limitOne: false
+            },
+            {
+                key: "invitedEditors",
+                titleKey: "invitedEditorsLabel",
+                icon: "mdi-account-star",
+                iconClass: "bg-blue-50 text-blue-700",
+                chipColor: "blue",
+                list: invitedEditorList.value,
+                contributionType: DocumentContributionType.INVITED_EDITOR,
+                visible: showInvitedEditors(),
+                limitOne: false
+            },
+            {
+                key: "reviewers",
+                titleKey: "reviewersLabel",
+                icon: "mdi-clipboard-check",
+                iconClass: "bg-orange-50 text-orange-700",
+                chipColor: "orange",
+                list: reviewerList.value,
+                contributionType: DocumentContributionType.REVIEWER,
+                visible: showReviewers(),
+                limitOne: false
+            },
+            {
+                key: "advisors",
+                titleKey: props.limitOneAuthor ? "mentorsLabel" : "advisorsLabel",
+                icon: "mdi-school",
+                iconClass: "bg-purple-50 text-purple-700",
+                chipColor: "deep-purple",
+                list: advisorList.value,
+                contributionType: DocumentContributionType.ADVISOR,
+                visible: props.documentType === PublicationType.THESIS,
+                limitOne: false
+            },
+            {
+                key: "boardMembers",
+                titleKey: "boardMembersLabel",
+                icon: "mdi-account-tie",
+                iconClass: "bg-violet-50 text-violet-700",
+                chipColor: "purple",
+                list: boardMemberList.value,
+                contributionType: DocumentContributionType.BOARD_MEMBER,
+                visible: props.boardMembersAllowed && props.documentType === PublicationType.THESIS,
+                limitOne: false
+            },
+            {
+                key: "presenters",
+                titleKey: "presentersLabel",
+                icon: "mdi-presentation",
+                iconClass: "bg-blue-50 text-blue-700",
+                chipColor: "blue",
+                list: presenterList.value,
+                contributionType: DocumentContributionType.PRESENTER,
+                visible: props.documentType === PublicationType.PERFORMANCE_RELATED_OUTPUT,
+                limitOne: false
+            },
+            {
+                key: "translators",
+                titleKey: "translatorsLabel",
+                icon: "mdi-translate",
+                iconClass: "bg-emerald-50 text-emerald-700",
+                chipColor: "green",
+                list: translatorList.value,
+                contributionType: DocumentContributionType.TRANSLATOR,
+                visible: true,
+                limitOne: false
+            },
+            {
+                key: "assistantStaff",
+                titleKey: "assistantStaffLabel",
+                icon: "mdi-account-hard-hat",
+                iconClass: "bg-amber-50 text-amber-700",
+                chipColor: "amber",
+                list: assistantStaffList.value,
+                contributionType: DocumentContributionType.ASSISTANT_STAFF,
+                visible: showAuthorsOrStaff(),
+                limitOne: false
+            },
+            {
+                key: "arguers",
+                titleKey: "arguersLabel",
+                icon: "mdi-gavel",
+                iconClass: "bg-stone-100 text-stone-700",
+                chipColor: "brown",
+                list: arguerList.value,
+                contributionType: DocumentContributionType.ARGUER,
+                visible: props.boardMembersAllowed && props.documentType === PublicationType.THESIS,
+                limitOne: false
+            },
+            {
+                key: "owners",
+                titleKey: "ownersLabel",
+                icon: "mdi-key-variant",
+                iconClass: "bg-rose-50 text-rose-700",
+                chipColor: "pink",
+                list: ownerList.value,
+                contributionType: DocumentContributionType.OWNER,
+                visible: showOwners(),
+                limitOne: false
+            }
+        ]);
 
-            authorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.AUTHOR]
-                );
-            editorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.EDITOR]
-                );
-            associatedEditorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ASSOCIATED_EDITOR]
-                );
-            invitedEditorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.INVITED_EDITOR]
-                );
-            reviewerList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.REVIEWER]
-                );
-            advisorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ADVISOR]
-                );
-            boardMemberList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.BOARD_MEMBER]
-                );
-            presenterList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.PRESENTER]
-                );
-            translatorList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.TRANSLATOR]
-                );
-            assistantStaffList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ASSISTANT_STAFF]
-                );
-            arguerList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.ARGUER]
-                );
-            ownerList.value =
-                localContributions.value.filter(
-                    (contribution) => contribution.contributionType.toString() == DocumentContributionType[DocumentContributionType.OWNER]
-                );
+        const visibleSections = computed(() =>
+            allSections.value.filter((section) => {
+                if (!section.visible) {
+                    return false;
+                }
+                if (props.readOnly && section.list.length === 0) {
+                    return false;
+                }
+                return true;
+            })
+        );
 
-            selectFirstNonEmptyTab();
-        };
+        const boardMemberIds = computed(() =>
+            props.boardMembersAllowed
+                ? boardMemberList.value.map(bm => bm.personId).filter(id => !!id)
+                : []
+        );
 
-        const sendToParent = (contributions: any[]) => {
-            const contributionLists: Record<string, any[]> = {
+        const sendToParent = (sectionKey: SectionKey, contributions: PersonDocumentContribution[]) => {
+            const contributionLists: Record<SectionKey, PersonDocumentContribution[]> = {
                 authors: authorList.value,
                 editors: editorList.value,
                 associatedEditors: associatedEditorList.value,
@@ -316,237 +434,27 @@ export default defineComponent({
                 owners: ownerList.value
             };
 
-            const tabs = Object.keys(contributionLists);
-            const allContributions: any[] = [];
-
-            if (tabs.includes(currentTab.value)) {
-                for (const tab of tabs) {
-                    if (tab === currentTab.value) {
-                        allContributions.push(...contributions);
-                    } else {
-                        allContributions.push(...(contributionLists[tab] || []));
-                    }
+            const allContributions: PersonDocumentContribution[] = [];
+            (Object.keys(contributionLists) as SectionKey[]).forEach((key) => {
+                if (key === sectionKey) {
+                    allContributions.push(...contributions);
+                } else {
+                    allContributions.push(...(contributionLists[key] || []));
                 }
-            } else {
-                allContributions.push(...contributions);
-            }
+            });
 
             emit("update", allContributions);
         };
 
-        const getLockedContributionTypes = () => {
-            switch (currentTab.value) {
-                case "authors":
-                    return [DocumentContributionType.AUTHOR];
-                case "editors":
-                    return [DocumentContributionType.EDITOR];
-                case "associatedEditors":
-                    return [DocumentContributionType.ASSOCIATED_EDITOR];
-                case "invitedEditors":
-                    return [DocumentContributionType.INVITED_EDITOR];
-                case "reviewers":
-                    return [DocumentContributionType.REVIEWER];
-                case "advisors":
-                    return [DocumentContributionType.ADVISOR];
-                case "boardMembers":
-                    return [DocumentContributionType.BOARD_MEMBER];
-                case "presenters":
-                    return [DocumentContributionType.PRESENTER];
-                case "translators":
-                    return [DocumentContributionType.TRANSLATOR];
-                case "assistantStaff":
-                    return [DocumentContributionType.ASSISTANT_STAFF];
-                case "arguers":
-                    return [DocumentContributionType.ARGUER];
-                case "owners":
-                    return [DocumentContributionType.OWNER];
-            }
-
-            return getGlobalAllowedContributionTypesList();
-        };
-
-        const updateOrderInParentList = () => {
-            const indexes: number[] = [];
-            authorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            editorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            associatedEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            invitedEditorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            reviewerList.value.forEach(contribution => indexes.push(contribution.id as number));
-            advisorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            boardMemberList.value.forEach(contribution => indexes.push(contribution.id as number));
-            presenterList.value.forEach(contribution => indexes.push(contribution.id as number));
-            translatorList.value.forEach(contribution => indexes.push(contribution.id as number));
-            assistantStaffList.value.forEach(contribution => indexes.push(contribution.id as number));
-            arguerList.value.forEach(contribution => indexes.push(contribution.id as number));
-            ownerList.value.forEach(contribution => indexes.push(contribution.id as number));
-
-            updateContributionPositions(indexes);
-            selectFirstNonEmptyTab();
-        };
-
-        const updateContributionPositions = (indexes: number[]) => {
-            if (!localContributions.value) return;
-
-            const contributionMap = new Map<number, any>(
-                localContributions.value.map(contribution => [contribution.id as number, contribution])
-            );
-
-            localContributions.value = indexes
-                .map(id => contributionMap.get(id))
-                .filter((c): c is NonNullable<typeof c> => !!c);
-        };
-
-        const selectFirstNonEmptyTab = () => {
-            if (authorList.value.length > 0) {
-                currentTab.value = "authors";
-            } else if (editorList.value.length > 0) {
-                currentTab.value = "editors";
-            } else if (associatedEditorList.value.length > 0) {
-                currentTab.value = "associatedEditors";
-            } else if (invitedEditorList.value.length > 0) {
-                currentTab.value = "invitedEditors";
-            } else if (reviewerList.value.length > 0) {
-                currentTab.value = "reviewers";
-            } else if (advisorList.value.length > 0) {
-                currentTab.value = "advisors";
-            } else if (boardMemberList.value.length > 0) {
-                currentTab.value = "boardMembers";
-            } else if (presenterList.value.length > 0) {
-                currentTab.value = "presenters";
-            } else if (translatorList.value.length > 0) {
-                currentTab.value = "translators";
-            } else if (assistantStaffList.value.length > 0) {
-                currentTab.value = "assistantStaff";
-            } else if (arguerList.value.length > 0) {
-                currentTab.value = "arguers";
-            } else if (ownerList.value.length > 0) {
-                currentTab.value = "owners";
-            } else {
-                currentTab.value = "";
-            }
-        };
-
-        const getContributorGroupForUpdating = () => {
-            switch (currentTab.value) {
-                case "authors":
-                    return authorList.value;
-                case "editors":
-                    return editorList.value;
-                case "associatedEditors":
-                    return associatedEditorList.value;
-                case "invitedEditors":
-                    return invitedEditorList.value;
-                case "reviewers":
-                    return reviewerList.value;
-                case "advisors":
-                    return advisorList.value;
-                case "boardMembers":
-                    return boardMemberList.value;
-                case "presenters":
-                    return presenterList.value;
-                case "translators":
-                    return translatorList.value;
-                case "assistantStaff":
-                    return assistantStaffList.value;
-                case "arguers":
-                    return arguerList.value;
-                case "owners":
-                    return ownerList.value;
-            }
-
-            return boardMemberList.value;
-        };
-
-        const showAuthorsOrStaff = () => 
-            ![
-                MonographType.JOURNAL_ISSUE,
-                PerformanceRelatedOutputType.LITIGATION,
-                PerformanceRelatedOutputType.BROADCAST_INTERVIEW,
-                PerformanceRelatedOutputType.TEXT_INTERVIEW,
-                PerformanceRelatedOutputType.NON_RESEARCH_PRESENTATION
-            ].includes(props.concreteType as MonographType | PerformanceRelatedOutputType);
-
-        const showEditors = () => 
-            [
-                MonographType.EDITED_BOOK,
-                MonographType.JOURNAL_ISSUE,
-                MonographType.ENCYCLOPEDIA,
-                MonographType.DICTIONARY,
-                MonographType.REPORT,
-            ].includes(props.concreteType as MonographType);
-
-        const showInvitedEditors = () => 
-            [
-                MonographType.JOURNAL_ISSUE
-            ].includes(props.concreteType as MonographType);
-
-        const showReviewers = () => 
-            [
-                PublicationType.PROCEEDINGS_PUBLICATION,
-                PublicationType.MONOGRAPH_PUBLICATION,
-                PublicationType.JOURNAL_PUBLICATION,
-                PublicationType.THESIS,
-            ].includes(props.documentType);
-
-        const showOwners = () => 
-            [
-                PublicationType.INTANGIBLE_PRODUCT,
-                PublicationType.MATERIAL_PRODUCT,
-                PublicationType.GENETIC_MATERIAL
-            ].includes(props.documentType);
-
-        const getGlobalAllowedContributionTypesList = (): DocumentContributionType[] => {
-            const contributionTypes: DocumentContributionType[] = [];
-
-            if (showAuthorsOrStaff()) {
-                contributionTypes.push(DocumentContributionType.AUTHOR, DocumentContributionType.ASSISTANT_STAFF);
-            }
-
-            if (showEditors()) {
-                contributionTypes.push(DocumentContributionType.EDITOR, DocumentContributionType.ASSOCIATED_EDITOR);
-            }
-
-            if (showInvitedEditors()) {
-                contributionTypes.push(DocumentContributionType.INVITED_EDITOR);
-            }
-
-            if (showReviewers()) {
-                contributionTypes.push(DocumentContributionType.REVIEWER);
-            }
-
-            if (showOwners()) {
-                contributionTypes.push(DocumentContributionType.OWNER);
-            }
-
-            if (props.documentType === PublicationType.THESIS) {
-                contributionTypes.push(DocumentContributionType.ADVISOR);
-
-                if (props.boardMembersAllowed) {
-                    contributionTypes.push(DocumentContributionType.BOARD_MEMBER);
-                    contributionTypes.push(DocumentContributionType.ARGUER);
-                }
-            }
-
-            if (props.documentType === PublicationType.PERFORMANCE_RELATED_OUTPUT) {
-                contributionTypes.push(DocumentContributionType.PRESENTER);
-            }
-
-            contributionTypes.push(DocumentContributionType.TRANSLATOR);
-
-            return contributionTypes;
-        };
+        const sectionModalKey = (section: ContributionSection) =>
+            `${section.key}-${section.list.map((contribution) => contribution.id ?? contribution.personId).join("|")}`;
 
         return {
-            sendToParent, getTitleFromValueAutoLocale,
-            currentTab, authorList, editorList,
-            reviewerList, advisorList, boardMemberList,
-            updateOrderInParentList, localContributions,
-            getContributorGroupForUpdating, presenterList,
-            getLockedContributionTypes, translatorList,
-            assistantStaffList, arguerList, ownerList,
-            PublicationType, showAuthorsOrStaff, showEditors,
-            showInvitedEditors, showReviewers, showOwners,
-            associatedEditorList, invitedEditorList
+            sendToParent,
+            getTitleFromValueAutoLocale,
+            visibleSections,
+            boardMemberIds,
+            sectionModalKey
         };
     },
 });

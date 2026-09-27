@@ -10,6 +10,7 @@ import './assets/main.css';
 import i18n from './i18n';
 import { createHead } from "@vueuse/head";
 import { initializeLanguageDetector } from "./utils/LanguageDetector";
+import { usePublicConfigurationStore } from "./stores/publicConfigurationStore";
 
 
 async function bootstrap() {
@@ -21,6 +22,9 @@ async function bootstrap() {
     loadFonts();
     i18n.setup();
 
+    const publicConfigurationStore = usePublicConfigurationStore(pinia);
+    publicConfigurationStore.hydrateFromCacheOrDefault();
+
     createApp(App)
         .use(router)
         .use(pinia)
@@ -28,6 +32,8 @@ async function bootstrap() {
         .use(i18n.vueI18n)
         .use(head)
         .mount("#app");
+
+    void publicConfigurationStore.refreshFromBackend();
 }
 
 bootstrap();

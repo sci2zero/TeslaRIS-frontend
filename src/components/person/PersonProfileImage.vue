@@ -1,17 +1,5 @@
 <template>
-    <div class="edit-pen-container size-full">
-        <div class="non-solid-bg" style="position: absolute; inset: 0; padding: 12px;">
-            <generic-crud-modal
-                :form-component="PersonProfileImageForm"
-                :form-props="{ originalFileName: imageName, personId: personId }"
-                entity-name="ProfilePicture"
-                is-update
-                is-section-update
-                :read-only="!canEdit"
-                @update="fetchImage"
-            />
-        </div>
-
+    <div class="size-full">
         <v-img
             v-if="imageSrc"
             class="image-container"
@@ -29,13 +17,10 @@
 <script lang="ts">
 import BaseService from '@/services/BaseService';
 import { defineComponent, ref, type PropType, watch } from 'vue';
-import GenericCrudModal from '../core/GenericCrudModal.vue';
-import PersonProfileImageForm from './update/PersonProfileImageForm.vue';
 
 
 export default defineComponent({
     name: "PersonProfileImage",
-    components: { GenericCrudModal },
     props: {
         filename: {
             type: Object as PropType<string | undefined>,
@@ -44,21 +29,18 @@ export default defineComponent({
         personId: {
             type: Object as PropType<number | undefined>,
             required: true
-        },
-        canEdit: {
-            type: Boolean,
-            required: true
         }
     },
     setup(props) {
         const imageSrc = ref<string | null>(null);
         const imageName = ref<string | null>(null);
 
-        const accountIcon = ref('mdi-account-circle');
-
         watch(() => props.filename, async () => {
             if (props.filename) {
                 await fetchImage();
+            } else {
+                imageSrc.value = null;
+                imageName.value = null;
             }
         });
 
@@ -69,8 +51,7 @@ export default defineComponent({
         };
 
         return {
-            imageSrc, fetchImage, imageName,
-            accountIcon, PersonProfileImageForm
+            imageSrc, fetchImage, imageName
         };
     },
 });

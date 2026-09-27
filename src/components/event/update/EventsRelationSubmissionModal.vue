@@ -5,7 +5,7 @@
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
                         icon color="primary" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" v-on="scope.isActive">
+                        :disabled="readOnly">
                         <v-icon icon="mdi-pencil-plus-outline"></v-icon>
                     </v-btn>
                 </div>

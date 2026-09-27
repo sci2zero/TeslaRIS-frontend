@@ -1,88 +1,92 @@
 <template>
-    <div id="materialProduct" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!materialProduct"
-            :subtitle="returnCurrentLocaleContent(materialProduct?.subTitle)"
-            :entity-label="$t('materialProductLabel')"
-            :badge="materialProduct?.materialProductType ? getMaterialProductTypeTitleFromValueAutoLocale(materialProduct.materialProductType) : ''"
-            icon="mdi-desktop-classic"
-            :can-edit="canEdit && !materialProduct?.isArchived"
-            :edit-label="$t('updateMaterialProductLabel')"
-            :entity-type="PublicationType.MATERIAL_PRODUCT"
-            :entity-id="materialProduct?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit && !materialProduct?.isArchived"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="MaterialProductUpdateForm"
-                    :form-props="{ presetMaterialProduct: materialProduct }"
-                    entity-name="MaterialProduct"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit || materialProduct?.isArchived"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                <rich-title-renderer :title="returnCurrentLocaleContent(materialProduct?.title)" />
-            </template>
-            <template #visual>
-                <v-icon v-if="!materialProduct" size="x-large" class="text-slate-400">mdi-desktop-classic</v-icon>
-                <wordcloud
-                    v-else
-                    :for-document-id="materialProduct?.id"
-                    :document-type="PublicationType.MATERIAL_PRODUCT"
-                    compact-icon
-                />
-            </template>
-            <template #affiliation>
-                <p v-if="materialProduct?.publisherId" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link :to="'publishers/' + materialProduct.publisherId" class="font-medium text-gray-900 underline">
-                        {{ returnCurrentLocaleContent(publisher?.name) }}
-                    </localized-link>
-                </p>
-                <p v-else-if="materialProduct?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
-                        {{ $t("authorReprintLabel") }}
-                    </localized-link>
-                </p>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="materialProduct?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseFlexibleDate(materialProduct.documentDate) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="materialProduct?.doi" label="DOI" abbrev="DOI" tone="blue">
-                    <identifier-link :identifier="materialProduct.doi" compact />
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="materialProduct"
+        v-model="currentTab"
+        :loading="!materialProduct"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!materialProduct"
+                :subtitle="returnCurrentLocaleContent(materialProduct?.subTitle)"
+                :entity-label="$t('materialProductLabel')"
+                :badge="materialProduct?.materialProductType ? getMaterialProductTypeTitleFromValueAutoLocale(materialProduct.materialProductType) : ''"
+                :year="materialProduct?.documentDate?.year"
+                icon="mdi-desktop-classic"
+                :can-edit="canEdit && !materialProduct?.isArchived"
+                :edit-label="$t('updateMaterialProductLabel')"
+                :entity-type="PublicationType.MATERIAL_PRODUCT"
+                :entity-id="materialProduct?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !materialProduct?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="MaterialProductUpdateForm"
+                        :form-props="{ presetMaterialProduct: materialProduct }"
+                        entity-name="MaterialProduct"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || materialProduct?.isArchived"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(materialProduct?.title)" />
+                </template>
+                <template #affiliation>
+                    <p v-if="materialProduct?.publisherId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'publishers/' + materialProduct.publisherId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(publisher?.name) }}
+                        </localized-link>
+                    </p>
+                    <p v-else-if="materialProduct?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
+                            {{ $t("authorReprintLabel") }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="materialProduct?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(materialProduct.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="materialProduct?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="materialProduct.doi" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="materialProduct?.doi"
+                        :can-edit="canEdit && !materialProduct?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="materialProduct?.isMetadataValid"
+                        :files-valid="materialProduct?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(materialProduct?.description)"
+                        :document="materialProduct"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        @update="fetchValidationStatus(materialProduct?.id as number, materialProduct as _Document)"
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <document-action-box
-            ref="actionsRef"
-            :doi="materialProduct?.doi"
-            :can-edit="canEdit && !materialProduct?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="materialProduct?.isMetadataValid"
-            :files-valid="materialProduct?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(materialProduct?.description)"
-            :document="materialProduct"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(materialProduct?.id as number, materialProduct as _Document)"
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="materialProduct?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(materialProduct?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!materialProduct" layout="sections" />
-        <v-tabs
-            v-show="materialProduct"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -107,13 +111,19 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="materialProduct"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="materialProduct?.description"
+                    :contributions="materialProduct?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="materialProduct?.id"
+                    :document-type="PublicationType.MATERIAL_PRODUCT"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="materialProduct?.id"
@@ -155,26 +165,11 @@
                         </landing-detail-field>
                     </template>
                     <template #after-keywords>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                                    <v-card-text class="edit-pen-container">
-                                        <research-areas-update-modal 
-                                            :research-areas-hierarchy="materialProduct?.researchAreas"
-                                            :read-only="!canEdit"
-                                            @update="updateResearchAreas">
-                                        </research-areas-update-modal>
-
-                                        <h4 class="mt-5 mb-7">
-                                            <strong>{{ $t("researchAreasLabel") }}</strong>
-                                        </h4>
-                                        <research-area-hierarchy
-                                            :research-areas="materialProduct?.researchAreas" 
-                                        />
-                                    </v-card-text>
-                                </v-card>
-                            </v-col>
-                        </v-row>
+                        <landing-research-areas-section
+                            :research-areas="materialProduct?.researchAreas"
+                            :can-edit="canEdit && !materialProduct?.isArchived"
+                            @update="updateResearchAreas"
+                        />
                     </template>
                 </landing-additional-info-tab>
             </v-tabs-window-item>
@@ -226,17 +221,19 @@
                     :entity-id="materialProduct?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <share-buttons
-            v-if="materialProduct && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(materialProduct.title) as string)"
-            :document-id="(materialProduct.id as number)"
-            :document-type="PublicationType.MATERIAL_PRODUCT"
-        />
+        <template #footer>
+            <share-buttons
+                v-if="materialProduct && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(materialProduct.title) as string)"
+                :document-id="(materialProduct.id as number)"
+                :document-type="PublicationType.MATERIAL_PRODUCT"
+            />
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -266,19 +263,18 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import Wordcloud from '@/components/core/Wordcloud.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
-import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
-import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
+import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
@@ -292,13 +288,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, ResearchAreaHierarchy, ResearchAreasUpdateModal, GenericCrudModal, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, GenericCrudModal, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink, LandingResearchAreasSection },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -524,9 +520,3 @@ export default defineComponent({
 }})
 
 </script>
-
-<style scoped>
-.edit-pen-container {
-    position: relative;
-}
-</style>

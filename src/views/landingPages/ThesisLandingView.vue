@@ -1,245 +1,381 @@
 <template>
-    <div id="thesis" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <thesis-landing-header
-            :thesis="thesis"
-            :organisation-unit="organisationUnit"
-            :publisher="publisher"
-            :can-edit="canEdit"
-            @update="updateBasicInfo"
-            @update-title="updateTitle"
-        >
-            <template #actions>
-                <citation-selector
-                    v-if="thesisId"
-                    ref="citationRef"
-                    hide-activator
-                    :document-id="thesisId"
-                />
-                <generic-crud-modal
-                    v-if="canCreateRegistryBookEntry"
-                    ref="registryModalRef"
-                    hide-activator
-                    :form-component="RegistryBookEntryForm"
-                    :form-props="{ thesisId: thesisId, canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) }"
-                    entity-name="RegistryBookEntry"
-                    :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
-                    disable-submission
-                    wide
-                    @create="createRegistryBookEntry"
-                />
-                <generic-crud-modal
-                    v-if="canDefineSubstitution"
-                    ref="substitutionModalRef"
-                    hide-activator
-                    :form-component="ThesisSubstitutionForm"
-                    :form-props="{ thesisId: thesis?.id, researcherId: thesis?.contributions?.find(c => c.contributionType === DocumentContributionType.AUTHOR)?.personId, existingSubstitutionId: thesis?.substitutedBy }"
-                    entity-name="Substitution"
-                    is-update
-                    :read-only="!canEdit || !userCanPutOnPublicReview"
-                    wide
-                    @update="fetchThesis"
-                />
-                <publication-unbind-button
-                    v-if="canEdit && isResearcher && thesisId"
-                    ref="unbindRef"
-                    hide-activator
-                    :document-id="thesisId"
-                    @unbind="handleResearcherUnbind"
-                />
+    <landing-page-layout
+        id="thesis"
+        v-model="currentTab"
+        :loading="!thesis"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!thesis"
+                :entity-label="$t('thesisLabel')"
+                :badge="thesis?.thesisType ? getThesisTitleFromValueAutoLocale(thesis.thesisType) : ''"
+                :year="thesis?.documentDate?.year"
+                icon="mdi-certificate-outline"
+                :can-edit="canEdit && !thesis?.isOnPublicReview"
+                :edit-label="$t('updateThesisLabel')"
+                :entity-type="PublicationType.THESIS"
+                :entity-id="thesis?.id"
+                @edit="openModal(thesisUpdateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !thesis?.isOnPublicReview"
+                        ref="thesisUpdateModalRef"
+                        hide-activator
+                        :form-component="ThesisUpdateForm"
+                        :form-props="{ presetThesis: thesis }"
+                        entity-name="Thesis"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || thesis?.isOnPublicReview"
+                        @update="updateBasicInfo"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && !thesis?.isOnPublicReview"
+                        ref="titleUpdateModalRef"
+                        hide-activator
+                        :form-component="AlternateTitleForm"
+                        :form-props="{ presetTitle: thesis?.title, presetAlternateTitle: thesis?.alternateTitle }"
+                        entity-name="Title"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || thesis?.isOnPublicReview"
+                        @update="updateTitle"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)" />
+                </template>
+                <template #edit-menu>
+                    <v-list-item
+                        prepend-icon="mdi-format-title"
+                        :title="$t('updateTitleLabel')"
+                        @click="openModal(titleUpdateModalRef)"
+                    />
+                </template>
+                <template #subtitle>
+                    <p
+                        v-if="thesis?.alternateTitle && thesis.alternateTitle.length > 0"
+                        class="text-lg sm:text-xl text-slate-500 italic mb-2"
+                    >
+                        <rich-title-renderer :title="`(${returnCurrentLocaleContent(thesis.alternateTitle)})`" />
+                    </p>
+                    <p
+                        v-if="returnCurrentLocaleContent(thesis?.subTitle)"
+                        class="text-lg sm:text-xl text-slate-600 mb-2"
+                    >
+                        {{ returnCurrentLocaleContent(thesis?.subTitle) }}
+                    </p>
+                </template>
+                <template #affiliation>
+                    <p v-if="thesis?.organisationUnitId || (thesis?.externalOrganisationUnitName && thesis.externalOrganisationUnitName.length > 0)" class="text-lg sm:text-xl font-semibold text-slate-600 font-sans">
+                        <localized-link
+                            v-if="thesis?.organisationUnitId"
+                            :to="'organisation-units/' + thesis.organisationUnitId"
+                            class="font-medium text-gray-900 underline"
+                        >
+                            {{ returnCurrentLocaleContent(organisationUnit?.name) }}
+                        </localized-link>
+                        <span v-else>
+                            {{ returnCurrentLocaleContent(thesis?.externalOrganisationUnitName) }}
+                        </span>
+                    </p>
+                    <p v-if="thesis?.publisherId || thesis?.authorReprint" class="text-sm text-slate-500 font-sans">
+                        <localized-link
+                            v-if="thesis?.publisherId"
+                            :to="'publishers/' + thesis.publisherId"
+                            class="underline"
+                        >
+                            {{ returnCurrentLocaleContent(publisher?.name) }}
+                        </localized-link>
+                        <localized-link
+                            v-else-if="thesis?.authorReprint"
+                            to="scientific-results/author-reprints"
+                            class="underline"
+                        >
+                            {{ $t("authorReprintLabel") }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="thesis?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(thesis.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="thesis?.thesisDefenceDate" :label="$t('defenceDateLabel')" icon="mdi-school" tone="emerald">
+                        {{ localiseDate(thesis.thesisDefenceDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="thesis?.topicAcceptanceDate" :label="$t('topicAcceptanceDateLabel')" icon="mdi-file-check-outline" tone="amber">
+                        {{ localiseDate(thesis.topicAcceptanceDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="thesis?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="thesis.doi" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="thesis?.eisbn" label="eISBN" abbrev="eISBN" tone="indigo">
+                        {{ thesis.eisbn }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="thesis?.printISBN" label="Print ISBN" abbrev="ISBN" tone="violet">
+                        {{ thesis.printISBN }}
+                    </landing-meta-item>
+                </template>
+                <template #status>
+                    <div v-if="thesis?.substituteFor || thesis?.substitutedBy" class="mb-4 space-y-1 text-sm">
+                        <p v-if="thesis.substituteFor">
+                            <span class="text-slate-500">{{ $t("substituteForLabel") }}:</span>
+                            <localized-link
+                                :to="'scientific-results/thesis/' + thesis.substituteFor"
+                                class="ml-1 font-medium text-gray-900 underline"
+                            >
+                                {{ returnCurrentLocaleContent(thesis.substitutedTitle) }}
+                            </localized-link>
+                        </p>
+                        <p v-if="thesis.substitutedBy">
+                            <span class="text-slate-500">{{ $t("substitutedByLabel") }}:</span>
+                            <localized-link
+                                :to="'scientific-results/thesis/' + thesis.substitutedBy"
+                                class="ml-1 font-medium text-gray-900 underline"
+                            >
+                                {{ returnCurrentLocaleContent(thesis.substituteTitle) }}
+                            </localized-link>
+                        </p>
+                    </div>
+                    <div
+                        v-if="thesis?.isOnPublicReview"
+                        class="inline-flex items-center gap-2 bg-amber-50 text-amber-800 text-sm font-medium px-3 py-1.5 rounded-full border border-amber-200 mb-6"
+                    >
+                        <span class="mdi mdi-eye-outline"></span>
+                        {{ $t("onPublicReviewLabel", [localiseDate(thesis.publicReviewEnd)]) }}
+                    </div>
+                </template>
+                <template #actions>
+                    <citation-selector
+                        v-if="thesisId"
+                        ref="citationRef"
+                        hide-activator
+                        :document-id="thesisId"
+                    />
+                    <generic-crud-modal
+                        v-if="canCreateRegistryBookEntry"
+                        ref="registryModalRef"
+                        hide-activator
+                        :form-component="RegistryBookEntryForm"
+                        :form-props="{ thesisId: thesisId, canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) }"
+                        entity-name="RegistryBookEntry"
+                        :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
+                        disable-submission
+                        wide
+                        @create="createRegistryBookEntry"
+                    />
+                    <generic-crud-modal
+                        v-if="canDefineSubstitution"
+                        ref="substitutionModalRef"
+                        hide-activator
+                        :form-component="ThesisSubstitutionForm"
+                        :form-props="{ thesisId: thesis?.id, researcherId: thesis?.contributions?.find(c => c.contributionType === DocumentContributionType.AUTHOR)?.personId, existingSubstitutionId: thesis?.substitutedBy }"
+                        entity-name="Substitution"
+                        is-update
+                        :read-only="!canEdit || !userCanPutOnPublicReview"
+                        wide
+                        @update="fetchThesis"
+                    />
+                    <publication-unbind-button
+                        v-if="canEdit && isResearcher && thesisId"
+                        ref="unbindRef"
+                        hide-activator
+                        :document-id="thesisId"
+                        @unbind="handleResearcherUnbind"
+                    />
 
-                <UiButton
-                    v-if="thesisId"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="openCitationDialog"
-                >
-                    <span class="mdi mdi-format-quote-close"></span>
-                    {{ $t("citePublicationLabel") }}
-                </UiButton>
+                    <UiButton
+                        v-if="thesisId"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="openCitationDialog"
+                    >
+                        <span class="mdi mdi-format-quote-close"></span>
+                        {{ $t("citePublicationLabel") }}
+                    </UiButton>
 
-                <UiButton
-                    v-if="primaryLibrarianAction === 'putOn'"
-                    variant="primary"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="changePublicReviewState(true, false)"
-                >
-                    <span class="mdi mdi-eye-outline"></span>
-                    {{ $t("putOnPublicReviewLabel") }}
-                </UiButton>
-                <UiButton
-                    v-else-if="primaryLibrarianAction === 'remove'"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="changePublicReviewState(false, false)"
-                >
-                    <span class="mdi mdi-eye-off-outline"></span>
-                    {{ $t("removeFromPublicReviewLabel") }}
-                </UiButton>
-                <UiButton
-                    v-else-if="primaryLibrarianAction === 'continue'"
-                    variant="primary"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="changePublicReviewState(true, true)"
-                >
-                    <span class="mdi mdi-play-outline"></span>
-                    {{ $t("continuePublicReviewLabel") }}
-                </UiButton>
-                <UiButton
-                    v-else-if="primaryLibrarianAction === 'archive'"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="changeArchiveState(true)"
-                >
-                    <span class="mdi mdi-archive-outline"></span>
-                    {{ $t("archiveLabel") }}
-                </UiButton>
-                <UiButton
-                    v-else-if="primaryLibrarianAction === 'unarchive'"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="changeArchiveState(false)"
-                >
-                    <span class="mdi mdi-archive-arrow-up-outline"></span>
-                    {{ $t("unarchiveLabel") }}
-                </UiButton>
-                <UiButton
-                    v-else-if="primaryLibrarianAction === 'examine'"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="examineRegistryBookEntry"
-                >
-                    <span class="mdi mdi-book-open-page-variant-outline"></span>
-                    {{ $t("examineRegistryBookEntryLabel") }}
-                </UiButton>
+                    <UiButton
+                        v-if="primaryLibrarianAction === 'putOn'"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="changePublicReviewState(true, false)"
+                    >
+                        <span class="mdi mdi-eye-outline"></span>
+                        {{ $t("putOnPublicReviewLabel") }}
+                    </UiButton>
+                    <UiButton
+                        v-else-if="primaryLibrarianAction === 'remove'"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="changePublicReviewState(false, false)"
+                    >
+                        <span class="mdi mdi-eye-off-outline"></span>
+                        {{ $t("removeFromPublicReviewLabel") }}
+                    </UiButton>
+                    <UiButton
+                        v-else-if="primaryLibrarianAction === 'continue'"
+                        variant="primary"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="changePublicReviewState(true, true)"
+                    >
+                        <span class="mdi mdi-play-outline"></span>
+                        {{ $t("continuePublicReviewLabel") }}
+                    </UiButton>
+                    <UiButton
+                        v-else-if="primaryLibrarianAction === 'archive'"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="changeArchiveState(true)"
+                    >
+                        <span class="mdi mdi-archive-outline"></span>
+                        {{ $t("archiveLabel") }}
+                    </UiButton>
+                    <UiButton
+                        v-else-if="primaryLibrarianAction === 'unarchive'"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="changeArchiveState(false)"
+                    >
+                        <span class="mdi mdi-archive-arrow-up-outline"></span>
+                        {{ $t("unarchiveLabel") }}
+                    </UiButton>
+                    <UiButton
+                        v-else-if="primaryLibrarianAction === 'examine'"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="examineRegistryBookEntry"
+                    >
+                        <span class="mdi mdi-book-open-page-variant-outline"></span>
+                        {{ $t("examineRegistryBookEntryLabel") }}
+                    </UiButton>
 
-                <v-menu v-if="hasMoreActions" location="bottom">
-                    <template #activator="{ props: menuProps }">
-                        <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                            <span class="mdi mdi-dots-horizontal"></span>
-                            {{ $t("moreActionsLabel") }}
-                            <span class="mdi mdi-chevron-down"></span>
-                        </UiButton>
-                    </template>
-                    <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
-                        <v-list-item
-                            v-if="showPutOnPublicReview && primaryLibrarianAction !== 'putOn'"
-                            prepend-icon="mdi-eye-outline"
-                            :title="$t('putOnPublicReviewLabel')"
-                            @click="changePublicReviewState(true, false)"
-                        />
-                        <v-list-item
-                            v-if="showPutOnPublicReviewShortened"
-                            prepend-icon="mdi-eye-minus-outline"
-                            :title="$t('putOnPublicReviewShortenedLabel')"
-                            @click="changePublicReviewState(true, false, true)"
-                        />
-                        <v-list-item
-                            v-if="showRemoveFromPublicReview && primaryLibrarianAction !== 'remove'"
-                            prepend-icon="mdi-eye-off-outline"
-                            :title="$t('removeFromPublicReviewLabel')"
-                            @click="changePublicReviewState(false, false)"
-                        />
-                        <v-list-item
-                            v-if="showContinuePublicReview && primaryLibrarianAction !== 'continue'"
-                            prepend-icon="mdi-play-outline"
-                            :title="$t('continuePublicReviewLabel')"
-                            @click="changePublicReviewState(true, true)"
-                        />
-                        <v-list-item
-                            v-if="showRestartPublicReview"
-                            prepend-icon="mdi-restart"
-                            :title="$t('restartPublicReviewLabel')"
-                            @click="changePublicReviewState(true, false)"
-                        />
-                        <v-list-item
-                            v-if="showArchive && primaryLibrarianAction !== 'archive'"
-                            prepend-icon="mdi-archive-outline"
-                            :title="$t('archiveLabel')"
-                            @click="changeArchiveState(true)"
-                        />
-                        <v-list-item
-                            v-if="showUnarchive && primaryLibrarianAction !== 'unarchive'"
-                            prepend-icon="mdi-archive-arrow-up-outline"
-                            :title="$t('unarchiveLabel')"
-                            @click="changeArchiveState(false)"
-                        />
-                        <v-list-item
-                            v-if="showExamineRegistry && primaryLibrarianAction !== 'examine'"
-                            prepend-icon="mdi-book-open-page-variant-outline"
-                            :title="$t('examineRegistryBookEntryLabel')"
-                            @click="examineRegistryBookEntry"
-                        />
-                        <v-list-item
-                            v-if="canCreateRegistryBookEntry"
-                            prepend-icon="mdi-book-plus-outline"
-                            :title="$t('createNewRegistryBookEntryLabel')"
-                            @click="openModal(registryModalRef)"
-                        />
-                        <v-list-item
-                            v-if="canDefineSubstitution"
-                            prepend-icon="mdi-swap-horizontal"
-                            :title="$t('updateSubstitutionLabel')"
-                            @click="openModal(substitutionModalRef)"
-                        />
-                        <v-list-item
-                            v-if="showRemoveSubstitution"
-                            prepend-icon="mdi-swap-horizontal"
-                            :title="$t('removeSubstitutionLabel')"
-                            @click="removeSubstitution"
-                        />
-                        <v-list-item
-                            v-if="isUserLoggedIn"
-                            prepend-icon="mdi-download"
-                            :title="$t('downloadRoCrateLabel')"
-                            @click="downloadRoCrate"
-                        />
-                        <v-list-item
-                            v-if="canEdit && isResearcher"
-                            prepend-icon="mdi-account-remove-outline"
-                            :title="$t('removeFromPublicationLabel')"
-                            @click="openUnbindDialog"
-                        />
-                        <v-list-item
-                            v-if="showValidateMetadata"
-                            prepend-icon="mdi-check-decagram-outline"
-                            :title="$t('validateMetadataLabel')"
-                            @click="validateMetadata"
-                        />
-                        <v-list-item
-                            v-if="showValidateFiles"
-                            prepend-icon="mdi-file-check-outline"
-                            :title="$t('validateUploadedFilesLabel')"
-                            @click="validateUploadedFiles"
-                        />
-                    </v-list>
-                </v-menu>
-            </template>
-        </thesis-landing-header>
+                    <v-menu v-if="hasMoreActions" location="bottom">
+                        <template #activator="{ props: menuProps }">
+                            <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
+                                <span class="mdi mdi-dots-horizontal"></span>
+                                {{ $t("moreActionsLabel") }}
+                                <span class="mdi mdi-chevron-down"></span>
+                            </UiButton>
+                        </template>
+                        <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
+                            <v-list-item
+                                v-if="showPutOnPublicReview && primaryLibrarianAction !== 'putOn'"
+                                prepend-icon="mdi-eye-outline"
+                                :title="$t('putOnPublicReviewLabel')"
+                                @click="changePublicReviewState(true, false)"
+                            />
+                            <v-list-item
+                                v-if="showPutOnPublicReviewShortened"
+                                prepend-icon="mdi-eye-minus-outline"
+                                :title="$t('putOnPublicReviewShortenedLabel')"
+                                @click="changePublicReviewState(true, false, true)"
+                            />
+                            <v-list-item
+                                v-if="showRemoveFromPublicReview && primaryLibrarianAction !== 'remove'"
+                                prepend-icon="mdi-eye-off-outline"
+                                :title="$t('removeFromPublicReviewLabel')"
+                                @click="changePublicReviewState(false, false)"
+                            />
+                            <v-list-item
+                                v-if="showContinuePublicReview && primaryLibrarianAction !== 'continue'"
+                                prepend-icon="mdi-play-outline"
+                                :title="$t('continuePublicReviewLabel')"
+                                @click="changePublicReviewState(true, true)"
+                            />
+                            <v-list-item
+                                v-if="showRestartPublicReview"
+                                prepend-icon="mdi-restart"
+                                :title="$t('restartPublicReviewLabel')"
+                                @click="changePublicReviewState(true, false)"
+                            />
+                            <v-list-item
+                                v-if="showArchive && primaryLibrarianAction !== 'archive'"
+                                prepend-icon="mdi-archive-outline"
+                                :title="$t('archiveLabel')"
+                                @click="changeArchiveState(true)"
+                            />
+                            <v-list-item
+                                v-if="showUnarchive && primaryLibrarianAction !== 'unarchive'"
+                                prepend-icon="mdi-archive-arrow-up-outline"
+                                :title="$t('unarchiveLabel')"
+                                @click="changeArchiveState(false)"
+                            />
+                            <v-list-item
+                                v-if="showExamineRegistry && primaryLibrarianAction !== 'examine'"
+                                prepend-icon="mdi-book-open-page-variant-outline"
+                                :title="$t('examineRegistryBookEntryLabel')"
+                                @click="examineRegistryBookEntry"
+                            />
+                            <v-list-item
+                                v-if="canCreateRegistryBookEntry"
+                                prepend-icon="mdi-book-plus-outline"
+                                :title="$t('createNewRegistryBookEntryLabel')"
+                                @click="openModal(registryModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canDefineSubstitution"
+                                prepend-icon="mdi-swap-horizontal"
+                                :title="$t('updateSubstitutionLabel')"
+                                @click="openModal(substitutionModalRef)"
+                            />
+                            <v-list-item
+                                v-if="showRemoveSubstitution"
+                                prepend-icon="mdi-swap-horizontal"
+                                :title="$t('removeSubstitutionLabel')"
+                                @click="removeSubstitution"
+                            />
+                            <v-list-item
+                                v-if="isUserLoggedIn"
+                                prepend-icon="mdi-download"
+                                :title="$t('downloadRoCrateLabel')"
+                                @click="downloadRoCrate"
+                            />
+                            <v-list-item
+                                v-if="canEdit && isResearcher"
+                                prepend-icon="mdi-account-remove-outline"
+                                :title="$t('removeFromPublicationLabel')"
+                                @click="openUnbindDialog"
+                            />
+                            <v-list-item
+                                v-if="showValidateMetadata"
+                                prepend-icon="mdi-check-decagram-outline"
+                                :title="$t('validateMetadataLabel')"
+                                @click="validateMetadata"
+                            />
+                            <v-list-item
+                                v-if="showValidateFiles"
+                                prepend-icon="mdi-file-check-outline"
+                                :title="$t('validateUploadedFilesLabel')"
+                                @click="validateUploadedFiles"
+                            />
+                        </v-list>
+                    </v-menu>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <publication-badge-section
-            v-if="thesis"
-            class="mb-8"
-            :preloaded-doi="thesis?.doi"
-            :document-id="thesisId"
-            :description="returnCurrentLocaleContent(thesis?.description)"
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                v-if="thesis"
+                class="mb-8"
+                :preloaded-doi="thesis?.doi"
+                :document-id="thesisId"
+                :description="returnCurrentLocaleContent(thesis?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!thesis" layout="sections" />
-        <v-tabs
-            v-show="thesis"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -269,13 +405,19 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="thesis"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="thesis?.description"
+                    :contributions="thesis?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="thesis?.id"
+                    :document-type="PublicationType.THESIS"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="thesis?.id"
@@ -375,26 +517,28 @@
                     :entity-id="thesis?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <persistent-question-dialog
-            ref="publicDialogRef"
-            :title="$t('areYouSureLabel')"
-            :message="dialogMessage"
-            :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
-            :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
-            @continue="commitThesisStatusChange">
-        </persistent-question-dialog>
+        <template #footer>
+            <persistent-question-dialog
+                ref="publicDialogRef"
+                :title="$t('areYouSureLabel')"
+                :message="dialogMessage"
+                :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
+                :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
+                @continue="commitThesisStatusChange">
+            </persistent-question-dialog>
 
-        <share-buttons
-            v-if="thesis && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(thesis.title) as string)"
-            :document-id="(thesis.id as number)"
-            :document-type="PublicationType.THESIS"
-        />
+            <share-buttons
+                v-if="thesis && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(thesis.title) as string)"
+                :document-id="(thesis.id as number)"
+                :document-type="PublicationType.THESIS"
+            />
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -433,7 +577,6 @@ import ThesisResearchOutputSection from '@/components/publication/ThesisResearch
 import RegistryBookEntryForm from '@/components/thesisLibrary/RegistryBookEntryForm.vue';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import { type RegistryBookEntry } from '@/models/ThesisLibraryModel';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
@@ -447,7 +590,6 @@ import EntityIdentifierService from '@/services/EntityIdentifierService';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
-import ThesisLandingHeader from '@/components/publication/landing/ThesisLandingHeader.vue';
 import ThesisAdditionalInfoTab from '@/components/publication/landing/ThesisAdditionalInfoTab.vue';
 import CitationSelector from '@/components/publication/CitationSelector.vue';
 import PublicationUnbindButton from '@/components/publication/PublicationUnbindButton.vue';
@@ -455,13 +597,23 @@ import PublicationBadgeSection from '@/components/publication/PublicationBadgeSe
 import { UiButton } from '@/components/ui/button';
 import RoCrateService from '@/services/export/RoCrateService';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
+import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
+import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, TabContentLoader, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisLandingHeader, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton },
+    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton, EntityLandingHeader, LandingMetaItem, LandingOverviewTab, RichTitleRenderer, LocalizedLink, IdentifierLink },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -510,6 +662,8 @@ export default defineComponent({
         const registryModalRef = ref<{ dialog: boolean } | null>(null);
         const substitutionModalRef = ref<{ dialog: boolean } | null>(null);
         const unbindRef = ref<{ unbindResearcherFromDocument: () => void } | null>(null);
+        const thesisUpdateModalRef = ref<{ dialog: boolean } | null>(null);
+        const titleUpdateModalRef = ref<{ dialog: boolean } | null>(null);
 
         const thesisId = computed(() => parseInt(currentRoute.params.id as string));
         const canValidate = computed(() => isAdmin.value || isInstitutionalEditor.value || isInstitutionalLibrarian.value);
@@ -992,6 +1146,9 @@ export default defineComponent({
             fetchIdentifiers, documentIdentifiers,
             dataQualityTabsRef, showAssessmentDetails,
             citationRef, registryModalRef, substitutionModalRef, unbindRef,
+            thesisUpdateModalRef, titleUpdateModalRef,
+            ThesisUpdateForm, AlternateTitleForm,
+            getThesisTitleFromValueAutoLocale, localiseDate, localiseFlexibleDate,
             thesisId, isUserLoggedIn,
             showPutOnPublicReview, showPutOnPublicReviewShortened,
             showRemoveFromPublicReview, showContinuePublicReview, showRestartPublicReview,

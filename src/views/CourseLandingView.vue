@@ -1,63 +1,62 @@
 <template>
-    <div id="course" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!course"
+    <landing-page-layout
+        id="course"
+        v-model="currentTab"
+        :loading="!course"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!course"
             :entity-label="$t('courseLabel')"
+            :year="course?.academicYear || (!course?.serialEvent && course?.dateFrom ? course.dateFrom.substring(0, 4) : '')"
             icon="mdi-presentation"
-            :can-edit="canEdit"
-            :edit-label="$t('updateLabel')"
-            :entity-type="EntityType.COURSE"
-            :entity-id="course?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="CourseUpdateForm"
-                    :form-props="{ presetEvent: course }"
-                    entity-name="Course"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(course?.name) + (course?.nameAbbreviation && course.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(course?.nameAbbreviation) + ")" : "") }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="!course?.serialEvent && (course?.dateFrom || course?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseDateRange(course?.dateFrom as string, course?.dateTo as string) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="course?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
-                    {{ returnCurrentLocaleContent(country?.name) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="course?.place && course.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
-                    {{ returnCurrentLocaleContent(course?.place) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="course?.courseLevel" :label="$t('courseLevelLabel')" icon="mdi-school" tone="indigo">
-                    {{ course.courseLevel }}
-                </landing-meta-item>
-                <landing-meta-item v-if="course?.courseCode" :label="$t('courseCodeLabel')" icon="mdi-barcode" tone="blue">
-                    {{ course.courseCode }}
-                </landing-meta-item>
-                <landing-meta-item v-if="course?.academicYear" :label="$t('academicYearLabel')" icon="mdi-calendar-month" tone="violet">
-                    {{ course.academicYear }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+                :can-edit="canEdit"
+                :edit-label="$t('updateLabel')"
+                :entity-type="EntityType.COURSE"
+                :entity-id="course?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="CourseUpdateForm"
+                        :form-props="{ presetEvent: course }"
+                        entity-name="Course"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(course?.name) + (course?.nameAbbreviation && course.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(course?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="!course?.serialEvent && (course?.dateFrom || course?.dateTo)" :label="$t('eventDateLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseDateRange(course?.dateFrom as string, course?.dateTo as string) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="course?.countryId" :label="$t('stateLabel')" icon="mdi-flag-outline" tone="emerald">
+                        {{ returnCurrentLocaleContent(country?.name) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="course?.place && course.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                        {{ returnCurrentLocaleContent(course?.place) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="course?.courseLevel" :label="$t('courseLevelLabel')" icon="mdi-school" tone="indigo">
+                        {{ course.courseLevel }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="course?.courseCode" :label="$t('courseCodeLabel')" icon="mdi-barcode" tone="blue">
+                        {{ course.courseCode }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="course?.academicYear" :label="$t('academicYearLabel')" icon="mdi-calendar-month" tone="violet">
+                        {{ course.academicYear }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <tab-content-loader v-if="!course" layout="sections" />
-        <v-tabs
-            v-show="course"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
             <v-tab value="contributions">
                 {{ $t("participationsLabel") }}
             </v-tab>
@@ -76,13 +75,9 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="course"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
             <v-tabs-window-item value="contributions">
                 <person-event-contribution-tabs
                     :event-id="course?.id"
@@ -175,10 +170,12 @@
                     :entity-id="course?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -204,7 +201,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import CourseUpdateForm from '@/components/event/update/CourseUpdateForm.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
@@ -218,11 +214,11 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "CourseLandingPage",
-    components: { PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, TabContentLoader, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isAdmin } = useUserRole();
 

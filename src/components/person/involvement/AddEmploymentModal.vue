@@ -4,8 +4,7 @@
             <v-btn
                 v-bind="scope.props"
                 variant="elevated"
-                prepend-icon="mdi-briefcase-plus"
-                v-on="scope.isActive">
+                prepend-icon="mdi-briefcase-plus">
                 {{ $t("addEmployeeLabel") }}
             </v-btn>
         </template>

@@ -1,121 +1,198 @@
 <template>
-    <div id="researcher" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <ResearcherLandingHeader 
-            :person="person"
-            :researcher-name="researcherName"
-            :employments="employments"
-            :can-edit="canEdit"
-            @update="updatePersonalInfo"
-        >
-            <template #actions>
-                <person-other-name-modal
-                    ref="personOtherNameModalRef"
-                    hide-activator
-                    :preset-person="person"
-                    :read-only="!canEdit"
-                    @update="updateNames"
-                    @select-primary="selectPrimaryName"
-                />
-                <generic-crud-modal
-                    ref="researchAreaModalRef"
-                    hide-activator
-                    :form-component="AssessmentResearchAreaForm"
-                    :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
-                    entity-name="ResearchArea"
-                    is-update
-                    :read-only="!canEdit"
-                    @update="fetchAssessmentResearchArea"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
-                    ref="visibilityConfigModalRef"
-                    hide-activator
-                    :form-component="PersonFieldVisibilityConfigurationForm"
-                    :form-props="{ personId: person?.id }"
-                    entity-name="PersonFieldVisibilityConfiguration"
-                    is-update
-                    :read-only="!canEdit"
-                    @update="updateSuccess()"
-                />
+    <landing-page-layout
+        id="researcher"
+        v-model="currentTab"
+        :loading="!person"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!person"
+                visual-shape="circle"
+                :badge="academicTitle"
+                :can-edit="canEdit"
+                :entity-type="EntityType.PERSON"
+                :entity-id="person?.id"
+                @edit="openModal(personUpdateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="personUpdateModalRef"
+                        hide-activator
+                        :form-component="PersonUpdateForm"
+                        :form-props="{ presetPerson: person }"
+                        entity-name="Person"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updatePersonalInfo"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="profileImageModalRef"
+                        hide-activator
+                        :form-component="PersonProfileImageForm"
+                        :form-props="{ originalFileName: person?.imageServerFilename, personId: person?.id }"
+                        entity-name="ProfilePicture"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateProfileImage"
+                    />
+                </template>
+                <template #visual>
+                    <person-profile-image
+                        ref="personProfileImageRef"
+                        class="person-header-photo"
+                        :filename="person?.imageServerFilename"
+                        :person-id="person?.id"
+                    />
+                </template>
+                <template #title>
+                    {{ researcherName }}
+                </template>
+                <template #edit-menu>
+                    <v-list-item
+                        prepend-icon="mdi-image-edit-outline"
+                        :title="$t('updateProfilePictureLabel')"
+                        @click="openModal(profileImageModalRef)"
+                    />
+                </template>
+                <template v-if="primaryEmployment" #affiliation>
+                    <p class="text-base sm:text-xl font-semibold text-slate-600 font-sans break-words">
+                        <localized-link
+                            v-if="primaryEmployment.organisationUnitId"
+                            :to="'organisation-units/' + primaryEmployment.organisationUnitId"
+                            class="font-medium text-gray-900 underline"
+                        >
+                            {{ primaryEmployment.organisationUnitName ? returnCurrentLocaleContent(primaryEmployment.organisationUnitName) : "" }}
+                        </localized-link>
+                    </p>
+                    <p class="text-sm text-slate-500 font-sans">
+                        {{ primaryEmployment.employmentPosition ? getEmploymentPositionTitleFromValueAutoLocale(primaryEmployment.employmentPosition) : "" }}
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="person?.personalInfo.orcid" label="ORCID" abbrev="iD" tone="emerald">
+                        <identifier-link :identifier="person.personalInfo.orcid" type="orcid" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.scopusAuthorId" label="Scopus Author ID" abbrev="SC" tone="amber">
+                        <identifier-link :identifier="person.personalInfo.scopusAuthorId" type="scopus_author" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.openAlexId" label="OpenAlex ID" abbrev="OA" tone="slate">
+                        <identifier-link :identifier="person.personalInfo.openAlexId" type="open_alex" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.webOfScienceResearcherId" label="Researcher ID (Web of Science)" abbrev="WoS" tone="blue">
+                        <identifier-link :identifier="person.personalInfo.webOfScienceResearcherId" type="researcher_id" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="person?.personalInfo.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="slate">
+                        <identifier-link :identifier="person.personalInfo.contact.contactEmail" type="email" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <person-other-name-modal
+                        ref="personOtherNameModalRef"
+                        hide-activator
+                        :preset-person="person"
+                        :read-only="!canEdit"
+                        @update="updateNames"
+                        @select-primary="selectPrimaryName"
+                    />
+                    <generic-crud-modal
+                        ref="researchAreaModalRef"
+                        hide-activator
+                        :form-component="AssessmentResearchAreaForm"
+                        :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
+                        entity-name="ResearchArea"
+                        is-update
+                        :read-only="!canEdit"
+                        @update="fetchAssessmentResearchArea"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
+                        ref="visibilityConfigModalRef"
+                        hide-activator
+                        :form-component="PersonFieldVisibilityConfigurationForm"
+                        :form-props="{ personId: person?.id }"
+                        entity-name="PersonFieldVisibilityConfiguration"
+                        is-update
+                        :read-only="!canEdit"
+                        @update="updateSuccess()"
+                    />
 
-                <UiButton
-                    v-if="canEdit || person?.personOtherNames?.length"
-                    variant="outline"
-                    size="md"
-                    class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                    @click="openModal(personOtherNameModalRef)"
-                >
-                    <span class="mdi mdi-account-multiple-outline"></span>
-                    {{ $t("viewAllPersonNamesLabel") }}
-                </UiButton>
+                    <UiButton
+                        v-if="canEdit || person?.personOtherNames?.length"
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="openModal(personOtherNameModalRef)"
+                    >
+                        <span class="mdi mdi-account-multiple-outline"></span>
+                        {{ $t("viewAllPersonNamesLabel") }}
+                    </UiButton>
 
-                <v-menu v-if="canEdit" location="bottom">
-                    <template #activator="{ props: menuProps }">
-                        <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                            <span class="mdi mdi-dots-horizontal"></span>
-                            {{ $t("moreActionsLabel") }}
-                            <span class="mdi mdi-chevron-down"></span>
-                        </UiButton>
-                    </template>
-                    <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
-                        <v-list-item
-                            prepend-icon="mdi-flask-outline"
-                            :title="$t('updateResearchAreaLabel')"
-                            @click="openModal(researchAreaModalRef)"
-                        />
-                        <v-list-item
-                            prepend-icon="mdi-download"
-                            :title="$t('downloadRoCrateBibliographyLabel')"
-                            @click="downloadRoCrateBibliography"
-                        />
-                        <v-list-item
-                            v-if="isResearcher"
-                            prepend-icon="mdi-file-check-outline"
-                            :title="$t('documentClaimLabel')"
-                            @click="performNavigation('documentClaim')"
-                        />
-                        <v-list-item
-                            v-if="isResearcher"
-                            prepend-icon="mdi-domain"
-                            :title="$t('massInstitutionAssignmentLabel')"
-                            @click="performNavigation('massInstitutionAssignment')"
-                        />
-                        <v-list-item
-                            v-if="isResearcher"
-                            prepend-icon="mdi-import"
-                            :title="$t('importerLabel')"
-                            @click="performNavigation('importer')"
-                        />
-                        <v-list-item
-                            v-if="isAdmin || isInstitutionalEditor"
-                            prepend-icon="mdi-cloud-download-outline"
-                            :title="$t('harvestExternalIndicatorsLabel')"
-                            @click="performIndicatorHarvest"
-                        />
-                        <v-list-item
-                            v-if="isAdmin || isInstitutionalEditor || isResearcher"
-                            prepend-icon="mdi-eye-outline"
-                            :title="$t('updatePersonFieldVisibilityConfigurationLabel')"
-                            @click="openModal(visibilityConfigModalRef)"
-                        />
-                    </v-list>
-                </v-menu>
-            </template>
-        </ResearcherLandingHeader>
+                    <v-menu v-if="canEdit" location="bottom">
+                        <template #activator="{ props: menuProps }">
+                            <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
+                                <span class="mdi mdi-dots-horizontal"></span>
+                                {{ $t("moreActionsLabel") }}
+                                <span class="mdi mdi-chevron-down"></span>
+                            </UiButton>
+                        </template>
+                        <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
+                            <v-list-item
+                                prepend-icon="mdi-flask-outline"
+                                :title="$t('updateResearchAreaLabel')"
+                                @click="openModal(researchAreaModalRef)"
+                            />
+                            <v-list-item
+                                prepend-icon="mdi-download"
+                                :title="$t('downloadRoCrateBibliographyLabel')"
+                                @click="downloadRoCrateBibliography"
+                            />
+                            <v-list-item
+                                v-if="isResearcher"
+                                prepend-icon="mdi-file-check-outline"
+                                :title="$t('documentClaimLabel')"
+                                @click="performNavigation('documentClaim')"
+                            />
+                            <v-list-item
+                                v-if="isResearcher"
+                                prepend-icon="mdi-domain"
+                                :title="$t('massInstitutionAssignmentLabel')"
+                                @click="performNavigation('massInstitutionAssignment')"
+                            />
+                            <v-list-item
+                                v-if="isResearcher"
+                                prepend-icon="mdi-import"
+                                :title="$t('importerLabel')"
+                                @click="performNavigation('importer')"
+                            />
+                            <v-list-item
+                                v-if="isAdmin || isInstitutionalEditor"
+                                prepend-icon="mdi-cloud-download-outline"
+                                :title="$t('harvestExternalIndicatorsLabel')"
+                                @click="performIndicatorHarvest"
+                            />
+                            <v-list-item
+                                v-if="isAdmin || isInstitutionalEditor || isResearcher"
+                                prepend-icon="mdi-eye-outline"
+                                :title="$t('updatePersonFieldVisibilityConfigurationLabel')"
+                                @click="openModal(visibilityConfigModalRef)"
+                            />
+                        </v-list>
+                    </v-menu>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <researcher-featured-indicators
-            :person-id="(person?.id as number)"
-        />
+        <template #before-tabs>
+            <researcher-featured-indicators
+                :person-id="(person?.id as number)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!person" :tab-number="Math.random() * (4 - 2) + 2" layout="sections" />
-        <v-tabs
-            v-if="person"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -137,69 +214,73 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-if="person"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
             <v-tabs-window-item value="publications">
-                <div class="mt-4 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <h3 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-slate-800">
-                            {{ $t("scientificResultsListLabel") }}
-                        </h3>
-                        <div v-if="canEdit" class="flex flex-wrap items-center gap-2">
-                            <add-publication-menu
-                                :person-id="isResearcher ? undefined : personId"
-                                compact
-                            />
-                            <v-btn
-                                v-if="isResearcher"
-                                color="primary"
-                                density="compact"
-                                @click="performNavigation('importer')">
-                                {{ $t("importerLabel") }}
-                            </v-btn>
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('scientificResultsListLabel')"
+                        :count="totalPublications"
+                        icon="mdi-file-document-multiple-outline"
+                        icon-class="bg-indigo-50 text-indigo-600">
+                        <template v-if="canEdit" #action>
+                            <div class="flex flex-wrap items-center justify-end gap-2">
+                                <add-publication-menu
+                                    :person-id="isResearcher ? undefined : personId"
+                                    outlined
+                                />
+                                <v-btn
+                                    v-if="isResearcher"
+                                    variant="outlined"
+                                    size="small"
+                                    class="text-none"
+                                    prepend-icon="mdi-database-import"
+                                    @click="performNavigation('importer')">
+                                    {{ $t("importerLabel") }}
+                                </v-btn>
+                            </div>
+                        </template>
+
+                        <div class="space-y-4 px-4 py-4">
+                            <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+                                <search-bar-component
+                                    class="w-full min-w-0 max-w-none!"
+                                    :transparent="false"
+                                    size="small"
+                                    @search="clearSortAndPerformPublicationSearch($event)"
+                                />
+                                <v-select
+                                    v-model="selectedPublicationTypes"
+                                    :items="publicationTypes"
+                                    :label="$t('typeOfPublicationLabel')"
+                                    return-object
+                                    hide-details
+                                    density="comfortable"
+                                    class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
+                                    multiple
+                                ></v-select>
+                            </div>
+
+                            <publication-table-component
+                                ref="publicationsRef"
+                                embedded
+                                :publications="publications"
+                                :total-publications="totalPublications"
+                                enable-export
+                                :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
+                                :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
+                                :endpoint-body-parameters="
+                                    {
+                                        allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
+                                        personId: person.id,
+                                        commissionId: null
+                                    }"
+                                :allow-researcher-unbinding="canEdit && isResearcher"
+                                @switch-page="switchPage">
+                            </publication-table-component>
                         </div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row sm:items-end gap-3">
-                        <search-bar-component
-                            class="w-full min-w-0 max-w-none!"
-                            :transparent="false"
-                            size="small"
-                            @search="clearSortAndPerformPublicationSearch($event)"
-                        />
-                        <v-select
-                            v-model="selectedPublicationTypes"
-                            :items="publicationTypes"
-                            :label="$t('typeOfPublicationLabel')"
-                            return-object
-                            hide-details
-                            density="comfortable"
-                            class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
-                            multiple
-                        ></v-select>
-                    </div>
-
-                    <publication-table-component
-                        ref="publicationsRef"
-                        :publications="publications"
-                        :total-publications="totalPublications"
-                        enable-export
-                        :endpoint-type="ExportableEndpointType.PERSON_OUTPUTS"
-                        :endpoint-token-parameters="[`${person?.id}`, publicationSearchParams]"
-                        :endpoint-body-parameters="
-                            {
-                                allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
-                                personId: person.id,
-                                commissionId: null
-                            }"
-                        :allow-researcher-unbinding="canEdit && isResearcher"
-                        @switch-page="switchPage">
-                    </publication-table-component>
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
@@ -277,17 +358,19 @@
                     />
                 </div>
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <persistent-question-dialog
-            ref="dialogRef"
-            :title="$t('areYouSureLabel')"
-            :message="dialogMessage"
-            @continue="performMigrationToUnmanaged">
-        </persistent-question-dialog>
+        <template #footer>
+            <persistent-question-dialog
+                ref="dialogRef"
+                :title="$t('areYouSureLabel')"
+                :message="dialogMessage"
+                @continue="performMigrationToUnmanaged">
+            </persistent-question-dialog>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -325,8 +408,8 @@ import EntityClassificationService from '@/services/assessment/EntityClassificat
 import PersonAssessmentsView from '@/components/assessment/classifications/PersonAssessmentsView.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import { getPublicationTypesForGivenLocale } from '@/i18n/publicationType';
@@ -334,7 +417,13 @@ import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
 import { type AxiosResponseHeaders } from 'axios';
 import PersonVisualizations from '@/components/person/PersonVisualizations.vue';
 import { usePersonChartDisplay } from '@/composables/usePersonChartDisplay';
-import ResearcherLandingHeader from '@/components/researcher/landing/ResearcherLandingHeader.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
+import PersonProfileImage from '@/components/person/PersonProfileImage.vue';
+import PersonProfileImageForm from '@/components/person/update/PersonProfileImageForm.vue';
+import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import ExternalIndicatorConfigurationService from '@/services/assessment/ExternalIndicatorConfigurationService';
 import ResearcherFeaturedIndicators from '@/components/researcher/landing/ResearcherFeaturedIndicators.vue';
 import RoCrateService from '@/services/export/RoCrateService';
@@ -346,11 +435,11 @@ import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { UiButton } from '@/components/ui/button';
 import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, TabContentLoader, IndicatorsSection, SearchBarComponent, PersonVisualizations, ResearcherLandingHeader, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -366,6 +455,9 @@ export default defineComponent({
 
         const dialogRef = ref<typeof PersistentQuestionDialog>();
         const dialogMessage = computed(() => i18n.t("migrateToUnmanagedMessage"));
+        const personUpdateModalRef = ref<{ dialog: boolean } | null>(null);
+        const profileImageModalRef = ref<{ dialog: boolean } | null>(null);
+        const personProfileImageRef = ref<{ fetchImage: () => Promise<void> } | null>(null);
         const personOtherNameModalRef = ref<{ dialog: boolean } | null>(null);
         const researchAreaModalRef = ref<{ dialog: boolean } | null>(null);
         const visibilityConfigModalRef = ref<{ dialog: boolean } | null>(null);
@@ -431,6 +523,30 @@ export default defineComponent({
         const displaySettings = usePersonChartDisplay(parseInt(currentRoute.params.id as string));
 
         const personId = computed(() => parseInt(currentRoute.params.id as string));
+
+        const academicTitle = computed(() => {
+            if (!person.value) {
+                return "";
+            }
+
+            const displayTitle = person.value.personalInfo?.displayTitle;
+            if (displayTitle && displayTitle.length > 0) {
+                return returnCurrentLocaleContent(displayTitle) || i18n.t("researcherLabel");
+            }
+
+            return i18n.t("researcherLabel");
+        });
+
+        const primaryEmployment = computed(() =>
+            employments.value.length > 0
+                ? employments.value.reduce((a, b) =>
+                    (!b.dateFrom ? b : !a.dateFrom ? a :
+                     (!b.dateTo && a.dateTo) ? b :
+                     (b.dateTo && !a.dateTo) ? a :
+                     new Date(b.dateFrom || 0) > new Date(a.dateFrom || 0) ? b : a)
+                )
+                : null
+        );
 
         onMounted(async () => {
             if ((currentRoute.query.displayCollaborationNetwork as string) === "true") {
@@ -655,6 +771,12 @@ export default defineComponent({
             });
         };
 
+        const updateProfileImage = async () => {
+            await personProfileImageRef.value?.fetchImage();
+            fetchPerson();
+            updateSuccess();
+        };
+
         const addInvolvement = (involvement: Education | Membership | Employment) => {
             if("title" in involvement) {
                 InvolvementService.addEducation(involvement, person.value?.id as number).then(() => {
@@ -777,8 +899,9 @@ export default defineComponent({
             PersonFieldVisibilityConfigurationForm, updateSuccess, countryPrivate,
             EntityType,
             dataQualityTabsRef, showAssessmentDetails,
-            personOtherNameModalRef, researchAreaModalRef, visibilityConfigModalRef,
-            openModal
+            personUpdateModalRef, profileImageModalRef, personProfileImageRef, personOtherNameModalRef,
+            researchAreaModalRef, visibilityConfigModalRef, openModal, academicTitle, primaryEmployment,
+            PersonUpdateForm, PersonProfileImageForm, updateProfileImage
         };
 }});
 </script>
@@ -788,5 +911,15 @@ export default defineComponent({
         font-size: 1.2rem;
         margin-bottom: 10px;
         font-weight: bold;
+    }
+
+    :deep(.person-header-photo) {
+        width: 100%;
+        height: 100%;
+    }
+
+    :deep(.person-header-photo .image-container) {
+        width: 100%;
+        height: 100%;
     }
 </style>

@@ -1,41 +1,60 @@
 <template>
-    <v-row>
-        <v-col cols="12">
-            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                <v-card-text class="edit-pen-container">
-                    <generic-crud-modal
-                        :form-component="DescriptionOrBiographyUpdateForm"
-                        :form-props="{ presetDescriptionOrBiography: description ? description : [], placeholderLabel: getSectionTitle() }"
-                        :entity-name="getEntityName()"
-                        is-update
-                        is-section-update
-                        :read-only="!canEdit"
-                        wide
-                        @update="emitToParent"
-                    />
+    <landing-section-card
+        :title="getSectionTitle()"
+        :icon="sectionIcon"
+        :icon-class="sectionIconClass"
+        padded
+    >
+        <template v-if="canEdit" #action>
+            <generic-crud-modal
+                :form-component="DescriptionOrBiographyUpdateForm"
+                :form-props="{ presetDescriptionOrBiography: description ? description : [], placeholderLabel: getSectionTitle() }"
+                :entity-name="getEntityName()"
+                is-update
+                is-section-update
+                wide
+                @update="emitToParent"
+            >
+                <template #activator="{ props: activatorProps }">
+                    <v-btn
+                        v-bind="activatorProps"
+                        variant="outlined"
+                        size="small"
+                        class="text-none"
+                        prepend-icon="mdi-pencil-outline">
+                        {{ $t("editActionLabel") }}
+                    </v-btn>
+                </template>
+            </generic-crud-modal>
+        </template>
 
-                    <div><b>{{ getSectionTitle() }}</b></div>
-                    <strong v-if="!description || description.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <rich-text-editor v-model="descriptionDisplay" :editable="false"></rich-text-editor>
-                </v-card-text>
-            </v-card>
-        </v-col>
-    </v-row>
+        <p
+            v-if="!hasDescription"
+            class="text-sm text-slate-500">
+            {{ $t("notYetSetMessage") }}
+        </p>
+        <rich-text-editor
+            v-else
+            v-model="descriptionDisplay"
+            :editable="false"
+        />
+    </landing-section-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch, type PropType } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { MultilingualContent } from '@/models/Common';
 import GenericCrudModal from './GenericCrudModal.vue';
 import DescriptionOrBiographyUpdateForm from './update/DescriptionOrBiographyUpdateForm.vue';
 import RichTextEditor from './RichTextEditor.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import { useI18n } from 'vue-i18n';
 
 
 export default defineComponent({
     name: "DescriptionSection",
-    components: { GenericCrudModal, RichTextEditor },
+    components: { GenericCrudModal, RichTextEditor, LandingSectionCard },
     props: {
         canEdit: {
             type: Boolean,
@@ -82,11 +101,16 @@ export default defineComponent({
 
         const displayDescription = () => {
             if (!props.description) {
+                descriptionDisplay.value = "";
                 return;
             }
             
-            descriptionDisplay.value = returnCurrentLocaleContent(props.description) as string;
+            descriptionDisplay.value = (returnCurrentLocaleContent(props.description) as string) || "";
         };
+
+        const hasDescription = computed(() =>
+            descriptionDisplay.value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().length > 0
+        );
 
         const getSectionTitle = () => {
             if (props.isGeneralDescription) {
@@ -114,41 +138,39 @@ export default defineComponent({
             return props.isGeneralDescription ? "" : "Abstract";
         };
 
+        const sectionIcon = computed(() => {
+            if (props.isBiography) {
+                return "mdi-account";
+            }
+            if (props.isRemark) {
+                return "mdi-comment-text-outline";
+            }
+            if (props.isExtendedAbstract) {
+                return "mdi-file-document-outline";
+            }
+            return "mdi-text-box-outline";
+        });
+
+        const sectionIconClass = computed(() => {
+            if (props.isBiography) {
+                return "bg-indigo-50 text-indigo-600";
+            }
+            if (props.isRemark) {
+                return "bg-slate-100 text-slate-600";
+            }
+            if (props.isExtendedAbstract) {
+                return "bg-cyan-50 text-cyan-700";
+            }
+            return "bg-blue-50 text-blue-600";
+        });
+
         return { 
             emitToParent, returnCurrentLocaleContent,
             DescriptionOrBiographyUpdateForm,
             descriptionDisplay, getSectionTitle,
-            getEntityName
+            getEntityName, sectionIcon, sectionIconClass,
+            hasDescription
         };
     },
 });
 </script>
-
-<style scoped>
-    .edit-pen-container {
-        position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
-    @media (hover: none), (max-width: 768px) {
-        .edit-pen-container .edit-pen {
-            opacity: 1;
-        }
-    }
-
-</style>

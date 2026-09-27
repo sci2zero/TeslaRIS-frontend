@@ -163,10 +163,7 @@ import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
-import BrandingService from '@/services/BrandingService';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
-import { useBrandingStore } from '@/stores/brandingStore';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import ApplicationConfigurationService from '@/services/ApplicationConfigurationService';
@@ -200,7 +197,6 @@ const props = withDefaults(defineProps<Props>(), {
     showBreadcrumbs: false
 });
 
-const appTitle = ref("");
 const navigationDepth = ref(0);
 
 const { userRole } = useUserRole();
@@ -236,7 +232,6 @@ const loginTitle = computed(() => i18n.t("loginLabel"));
 const registerTitle = computed(() => i18n.t("registerLabel"));
 const logoutTitle = computed(() => i18n.t("logoutLabel"));
 
-const brandingStore = useBrandingStore();
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
 const userName = ref("");
@@ -274,13 +269,6 @@ const toggleSidebar = () => {
     sidebarStore.toggle();
 };
 
-watch(() => brandingStore.rebranded, () => {
-    if (brandingStore.rebranded) {
-        appTitle.value = returnCurrentLocaleContent(brandingStore.newTitle) as string;
-        brandingStore.rebrandingHandled();
-    }
-});
-
 watch(() => loginStore.userLoggedIn, () => {
     if (loginStore.userLoggedIn) {
         populateUserData();
@@ -292,10 +280,6 @@ watch(() => loginStore.usernameReloadRequests, () => {
 });
 
 onMounted(() => {
-    BrandingService.fetchBrandingInfo().then((response) => {
-        appTitle.value = returnCurrentLocaleContent(response.data.title) as string;
-    });
-
     if (AuthenticationService.userLoggedIn()) {
         populateUserData();
     }

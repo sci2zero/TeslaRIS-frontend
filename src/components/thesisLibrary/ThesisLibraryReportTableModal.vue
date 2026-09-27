@@ -4,8 +4,7 @@
             <template #activator="scope">
                 <v-btn
                     color="primary" :disabled="displayCount === 0"
-                    density="compact" class="bottom-spacer" v-bind="scope.props"
-                    v-on="scope.isActive">
+                    density="compact" class="bottom-spacer" v-bind="scope.props">
                     {{ displayCount }}
                 </v-btn>
             </template>

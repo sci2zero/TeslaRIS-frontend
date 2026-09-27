@@ -1,7 +1,10 @@
 <template>
     <div>
         <!-- Hero section with background image covering navbar and content -->
-        <div class="hero-section-bg" :class="`theme-${heroTheme}`">
+        <div
+            class="hero-section-bg"
+            :class="`theme-${heroTheme}`"
+            :style="heroBackgroundStyle">
             <Navbar variant="home" :theme="heroTheme" />
             <div class="py-16">
                 <div class="text-center hero-text-container">
@@ -106,7 +109,6 @@ import PersonService from "@/services/PersonService";
 import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import BrandingService from "@/services/BrandingService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import Navbar from "@/components/core/MainNavbar.vue";
 import LandingFeatures from "@/components/landing/LandingFeatures.vue";
@@ -114,18 +116,23 @@ import { type PersonIndex } from "@/models/PersonModel";
 import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
+import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
 
 
 export default defineComponent({
     name: "HomeView",
     components: { SearchBarComponent, Navbar, LandingFeatures },
     setup() {
-        const title = ref();
-        const description = ref();
+        const publicConfigurationStore = usePublicConfigurationStore();
+        const title = computed(() => publicConfigurationStore.title);
+        const description = computed(() => publicConfigurationStore.description);
+        const heroBackgroundStyle = computed(() => ({
+            backgroundImage: `url('${publicConfigurationStore.backgroundDisplayUrl}')`
+        }));
 
         const router = useRouter();
         const i18n = useI18n();
-        const heroTheme = ref<'dark' | 'light'>('light');
+        const heroTheme = ref<'dark' | 'light'>('dark');
 
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
@@ -143,11 +150,6 @@ export default defineComponent({
         const isLoadingCounts = ref(true);
 
         onMounted(() => {
-            BrandingService.fetchBrandingInfo().then((response) => {
-                title.value = response.data.title;
-                description.value = response.data.description;
-            });
-
             Promise.all([
                 PersonService.getResearcherCount().then((response) => researcherCount.value = response.data),
                 OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data),
@@ -156,7 +158,7 @@ export default defineComponent({
                 isLoadingCounts.value = false;
             });
 
-            document.title = `TeslaRIS - ${i18n.t("homeLabel")}`;
+            document.title = `${returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS"} - ${i18n.t("homeLabel")}`;
         });
 
         const mostCitedResearchersLabel = computed(() => i18n.t("mostCitedResearchersLabel"));
@@ -239,7 +241,8 @@ export default defineComponent({
             getItemName,
             isLoadingCounts,
             dataQualityOptions,
-            heroTheme
+            heroTheme,
+            heroBackgroundStyle
         };
     },
 });

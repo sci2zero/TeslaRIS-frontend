@@ -2,9 +2,13 @@
     <v-menu open-on-hover open-on-click :open-delay="100">
         <template #activator="{ props }">
             <v-btn
-                color="primary"
-                :density="compact ? 'compact' : 'default'"
-                v-bind="props">
+                v-bind="props"
+                :color="outlined ? undefined : 'primary'"
+                :variant="outlined ? 'outlined' : 'elevated'"
+                :size="outlined ? 'small' : undefined"
+                :density="!outlined && compact ? 'compact' : 'default'"
+                :class="outlined ? 'text-none' : undefined"
+                :prepend-icon="outlined ? 'mdi-plus' : undefined">
                 {{ $t("addNewEntityLabel") }}
             </v-btn>
         </template>
@@ -32,6 +36,10 @@ export default defineComponent({
     name: "AddPublicationMenu",
     props: {
         compact: {
+            type: Boolean,
+            default: false
+        },
+        outlined: {
             type: Boolean,
             default: false
         },

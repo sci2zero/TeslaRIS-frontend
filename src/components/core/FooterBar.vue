@@ -9,12 +9,19 @@
                         <!-- Logo and Description -->
                         <div class="col-span-1 md:col-span-2">
                             <div class="text-white">
-                                <img src="/logov1.svg" alt="TeslaRIS Logo" class="mx-auto md:mx-0 h-12 md:h-16 w-auto brightness-0 invert opacity-90 mb-4" />
+                                <img
+                                    :src="logoUrl"
+                                    alt=""
+                                    :class="[
+                                        'mx-auto md:mx-0 h-12 md:h-16 w-auto mb-4',
+                                        hasCustomLogo ? 'opacity-90' : 'brightness-0 invert opacity-90'
+                                    ]"
+                                />
                                 <h3 class="text-3xl font-bold text-white mb-3 text-shadow-2xs">
-                                    {{ returnCurrentLocaleContent(title) }}
+                                    {{ localizedTitle }}
                                 </h3>
                                 <p class="text-white/90 leading-relaxed text-xs md:text-sm">
-                                    {{ returnCurrentLocaleContent(description) }}
+                                    {{ localizedDescription }}
                                 </p>
                             </div>
                         </div>
@@ -96,42 +103,33 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import VersionLink from './VersionLink.vue';
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
-import BrandingService from '@/services/BrandingService';
+import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
 
 
+const i18n = useI18n();
+const publicConfigurationStore = usePublicConfigurationStore();
+const homeLabel = computed(() => i18n.t("homeLabel"));
+const personListLabel = computed(() => i18n.t("personListLabel"));
+const ouListLabel = computed(() => i18n.t("ouListLabel"));
+const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
+const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
 
+const logoUrl = computed(() => publicConfigurationStore.logoDisplayUrl);
+const hasCustomLogo = computed(() => publicConfigurationStore.hasCustomLogo);
+const localizedTitle = computed(() => returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS");
+const localizedDescription = computed(() => returnCurrentLocaleContent(publicConfigurationStore.description) || "");
 
-    const i18n = useI18n();
-    const homeLabel = computed(() => i18n.t("homeLabel"));
-    const personListLabel = computed(() => i18n.t("personListLabel"));
-    const ouListLabel = computed(() => i18n.t("ouListLabel"));
-    const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-    const simpleSearchLabel = computed(() => i18n.t("simpleSearchLabel"));
-    
-    const title = ref();
-    const description = ref();
-
-    const quickLinks = ref([
-        { title: homeLabel, path: "" },
-        { title: personListLabel, path: "persons" },
-        { title: ouListLabel, path: "organisation-units" },
-        { title: scientificResultsListLabel, path: "scientific-results" },
-        { title: simpleSearchLabel, path: "advanced-search" }
-    ]);
-
-    onMounted(() => {
-        BrandingService.fetchBrandingInfo().then((response) => {
-            title.value = response.data.title;
-            description.value = response.data.description;
-        });
-
-
-        document.title = `TeslaRIS - ${i18n.t("homeLabel")}`;
-    });
+const quickLinks = ref([
+    { title: homeLabel, path: "" },
+    { title: personListLabel, path: "persons" },
+    { title: ouListLabel, path: "organisation-units" },
+    { title: scientificResultsListLabel, path: "scientific-results" },
+    { title: simpleSearchLabel, path: "advanced-search" }
+]);
 
 </script>
 

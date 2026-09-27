@@ -4,8 +4,7 @@
             <template #activator="scope">
                 <v-list-item
                     v-bind="scope.props"
-                    class="inline-action"
-                    v-on="scope.isActive">
+                    class="inline-action">
                     <v-list-item-title>{{ $t("referenceFormatsLabel") }}</v-list-item-title>
                 </v-list-item>
             </template>

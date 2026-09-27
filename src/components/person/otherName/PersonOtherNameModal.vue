@@ -11,8 +11,7 @@
                     variant="outlined"
                     v-bind="scope.props"
                     :class="readOnly ? 'bottom-spacer' : ''"
-                    :disabled="readOnly && otherNames.length === 0"
-                    v-on="scope.isActive">
+                    :disabled="readOnly && otherNames.length === 0">
                     {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
             </template>

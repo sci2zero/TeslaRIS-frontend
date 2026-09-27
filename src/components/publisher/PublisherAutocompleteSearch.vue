@@ -1,8 +1,9 @@
 <template>
     <v-row v-if="!allowAuthorReprint || (allowAuthorReprint && !authorReprint)">
         <v-col :cols="allowManualClearing && selectedPublisher.value !== -1 ? 10 : 11">
-            <v-autocomplete
+            <ui-input
                 v-model="selectedPublisher"
+                control="autocomplete"
                 :label="$t('publisherLabel')"
                 :items="readonly ? [] : publishers"
                 :custom-filter="((): boolean => true)"
@@ -10,7 +11,7 @@
                 return-object
                 @update:search="searchPublishers($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col v-if="!disableSubmission" cols="1">
             <generic-crud-modal
@@ -49,11 +50,12 @@ import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import PublisherSubmissionForm from './PublisherSubmissionForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PublisherAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         allowManualClearing: {
             type: Boolean,

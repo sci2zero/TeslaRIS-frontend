@@ -1,113 +1,128 @@
 <template>
-    <div id="proceedings" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!proceedings"
-            :subtitle="returnCurrentLocaleContent(proceedings?.subTitle)"
+    <landing-page-layout
+        id="proceedings"
+        v-model="currentTab"
+        :loading="!proceedings"
+        loader-layout="list"
+        :tab-number="3"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!proceedings"
+                :subtitle="returnCurrentLocaleContent(proceedings?.subTitle)"
             :entity-label="$t('proceedingsLabel')"
+            :year="proceedings?.documentDate?.year"
             icon="mdi-newspaper-variant-multiple"
-            :can-edit="canEdit && !proceedings?.isArchived"
-            :edit-label="$t('updateProceedingsLabel')"
-            :entity-type="PublicationType.PROCEEDINGS"
-            :entity-id="proceedings?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit && !proceedings?.isArchived"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="ProceedingsUpdateForm"
-                    :form-props="{ presetProceedings: proceedings}"
-                    entity-name="Proceedings"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                <rich-title-renderer :title="returnCurrentLocaleContent(proceedings?.title)" />
-                <span v-if="proceedings?.acronym && proceedings.acronym.length > 0">
-                    ({{ returnCurrentLocaleContent(proceedings.acronym) }})
-                </span>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="proceedings?.eventId" :label="$t('conferenceLabel')" icon="mdi-calendar-star" tone="violet">
-                    <localized-link
-                        v-if="(proceedings?.eventName?.length ?? 0) > 0"
-                        :to="'events/conference/' + proceedings?.eventId"
-                        class="underline"
-                    >
-                        {{ returnCurrentLocaleContent(proceedings?.eventName) }}
-                    </localized-link>
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.publisherId || proceedings?.authorReprint" :label="$t('publisherLabel')" icon="mdi-domain" tone="emerald">
-                    <localized-link
-                        v-if="(proceedings?.publisherName?.length ?? 0) > 0"
-                        :to="'publishers/' + proceedings?.publisherId"
-                        class="underline"
-                    >
-                        {{ returnCurrentLocaleContent(proceedings?.publisherName) }}
-                    </localized-link>
-                    <localized-link
-                        v-else-if="proceedings?.authorReprint"
-                        to="scientific-results/author-reprints"
-                        class="underline"
-                    >
-                        {{ $t("authorReprintLabel") }}
-                    </localized-link>
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.documentDate" :label="$t('yearOfPublicationLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseFlexibleDate(proceedings.documentDate) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.eISBN" label="eISBN" abbrev="eISBN" tone="blue">
-                    {{ proceedings.eISBN }}
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.printISBN" label="Print ISBN" abbrev="ISBN" tone="indigo">
-                    {{ proceedings.printISBN }}
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.publicationSeriesId" :label="$t('publicationSeriesLabel')" icon="mdi-book-multiple" tone="amber">
-                    <localized-link
-                        :to="`${publicationSeriesType.toString() === '0' ? 'journals' : 'book-series'}/` + proceedings?.publicationSeriesId"
-                        class="underline"
-                    >
-                        {{ returnCurrentLocaleContent(publicationSeries?.title) }}
-                    </localized-link>
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" icon="mdi-book-open-variant" tone="emerald">
-                    {{ proceedings.publicationSeriesVolume }}
-                </landing-meta-item>
-                <landing-meta-item v-if="proceedings?.publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" icon="mdi-numeric" tone="amber">
-                    {{ proceedings.publicationSeriesIssue }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+                :can-edit="canEdit && !proceedings?.isArchived"
+                :edit-label="$t('updateProceedingsLabel')"
+                :entity-type="PublicationType.PROCEEDINGS"
+                :entity-id="proceedings?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !proceedings?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="ProceedingsUpdateForm"
+                        :form-props="{ presetProceedings: proceedings}"
+                        entity-name="Proceedings"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(proceedings?.title)" />
+                    <span v-if="proceedings?.acronym && proceedings.acronym.length > 0">
+                        ({{ returnCurrentLocaleContent(proceedings.acronym) }})
+                    </span>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="proceedings?.eventId" :label="$t('conferenceLabel')" icon="mdi-calendar-star" tone="violet">
+                        <localized-link
+                            v-if="(proceedings?.eventName?.length ?? 0) > 0"
+                            :to="'events/conference/' + proceedings?.eventId"
+                            class="underline"
+                        >
+                            {{ returnCurrentLocaleContent(proceedings?.eventName) }}
+                        </localized-link>
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.publisherId || proceedings?.authorReprint" :label="$t('publisherLabel')" icon="mdi-domain" tone="emerald">
+                        <localized-link
+                            v-if="(proceedings?.publisherName?.length ?? 0) > 0"
+                            :to="'publishers/' + proceedings?.publisherId"
+                            class="underline"
+                        >
+                            {{ returnCurrentLocaleContent(proceedings?.publisherName) }}
+                        </localized-link>
+                        <localized-link
+                            v-else-if="proceedings?.authorReprint"
+                            to="scientific-results/author-reprints"
+                            class="underline"
+                        >
+                            {{ $t("authorReprintLabel") }}
+                        </localized-link>
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.documentDate" :label="$t('yearOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(proceedings.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.eISBN" label="eISBN" abbrev="eISBN" tone="blue">
+                        {{ proceedings.eISBN }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.printISBN" label="Print ISBN" abbrev="ISBN" tone="indigo">
+                        {{ proceedings.printISBN }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.publicationSeriesId" :label="$t('publicationSeriesLabel')" icon="mdi-book-multiple" tone="amber">
+                        <localized-link
+                            :to="`${publicationSeriesType.toString() === '0' ? 'journals' : 'book-series'}/` + proceedings?.publicationSeriesId"
+                            class="underline"
+                        >
+                            {{ returnCurrentLocaleContent(publicationSeries?.title) }}
+                        </localized-link>
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.publicationSeriesVolume" :label="$t('publicationSeriesVolumeLabel')" icon="mdi-book-open-variant" tone="emerald">
+                        {{ proceedings.publicationSeriesVolume }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedings?.publicationSeriesIssue" :label="$t('publicationSeriesIssueLabel')" icon="mdi-numeric" tone="amber">
+                        {{ proceedings.publicationSeriesIssue }}
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="proceedings?.doi"
+                        :can-edit="canEdit && !proceedings?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="proceedings?.isMetadataValid"
+                        :files-valid="proceedings?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(proceedings?.description)"
+                        :document="proceedings"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        :display-citation="false"
+                        for-proceedings
+                        enable-metadata-scanning
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <document-action-box
-            ref="actionsRef"
-            :doi="proceedings?.doi"
-            :can-edit="canEdit && !proceedings?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="proceedings?.isMetadataValid"
-            :files-valid="proceedings?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(proceedings?.description)"
-            :document="proceedings"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            :display-citation="false"
-            for-proceedings
-            enable-metadata-scanning
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="proceedings?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(proceedings?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!proceedings" :tab-number="3" layout="list" />
-        <v-tabs
-            v-show="proceedings"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -132,13 +147,18 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="proceedings"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="proceedings?.description"
+                    :contributions="proceedings?.contributions"
+                    :contribution-types="['EDITOR']"
+                    :contributors-label="$t('editorsLabel')"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
                 <publication-table-component
@@ -231,17 +251,19 @@
                     :entity-id="proceedings?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <share-buttons
-            v-if="proceedings && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(proceedings.title) as string)"
-            :document-id="(proceedings.id as number)"
-            :document-type="PublicationType.PROCEEDINGS"
-        />
-    </div>
+            <share-buttons
+                v-if="proceedings && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(proceedings.title) as string)"
+                :document-id="(proceedings.id as number)"
+                :document-type="PublicationType.PROCEEDINGS"
+            />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -274,10 +296,10 @@ import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse } 
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
 import { useUserRole } from '@/composables/useUserRole';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
@@ -292,13 +314,14 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, TabContentLoader, DocumentActionBox, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
-        const currentTab = ref("");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -525,10 +548,8 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if(totalPublications.value > 0) {
-                currentTab.value = "publications";
-            } else {
-                currentTab.value = "contributions";
+            if (currentTab.value !== "dataQuality") {
+                currentTab.value = "overview";
             }
         };
 

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!(forProceedings && isResearcher && !canEdit)" class="mb-8">
+    <div v-if="!(forProceedings && isResearcher && !canEdit)" :class="embedded ? 'contents' : 'mb-8'">
         <citation-selector
             v-if="displayCitation"
             ref="citationRef"
@@ -24,7 +24,7 @@
             wide
         />
 
-        <div class="flex flex-col sm:flex-row flex-wrap gap-3">
+        <div :class="embedded ? 'contents' : 'flex flex-col sm:flex-row flex-wrap gap-3'">
             <UiButton
                 v-if="displayCitation"
                 variant="outline"
@@ -103,6 +103,7 @@
         </div>
 
         <publication-badge-section
+            v-if="!embedded"
             class="mt-6"
             :preloaded-doi="doi"
             :document-id="documentId"
@@ -194,6 +195,10 @@ export default defineComponent({
             default: ""
         },
         enableMetadataScanning: {
+            type: Boolean,
+            default: false
+        },
+        embedded: {
             type: Boolean,
             default: false
         }

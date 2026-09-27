@@ -1,34 +1,34 @@
 <template>
-    <div justify="start" class="generic-crud-modal" :class="{ 'contents': hideActivator }">
-        <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'">
+    <div :class="['generic-crud-modal', { 'contents': hideActivator || $slots.activator }]">
+        <v-dialog v-model="dialog" persistent :class="wide ? 'wide' : 'narrow'" @keydown.esc="dialog = false">
             <template v-if="!hideActivator" #activator="scope">
-                <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
+                <slot name="activator" v-bind="scope">
+                    <div v-if="isSectionUpdate && !readOnly" class="edit-pen">
+                        <v-btn
+                            icon variant="outlined"
+                            :disabled="disabled"
+                            color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
+                            size="small">
+                            <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        </v-btn>
+                    </div>
                     <v-btn
-                        icon variant="outlined"
+                        v-if="!isSectionUpdate && !readOnly && isSubmission"
                         :disabled="disabled"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        color="primary" icon v-bind="scope.props" class="bottom-spacer">
+                        <v-icon>mdi-pencil-plus-outline</v-icon>
                     </v-btn>
-                </div>
-                <v-btn
-                    v-if="!isSectionUpdate && !readOnly && isSubmission"
-                    :disabled="disabled"
-                    color="primary" icon v-bind="scope.props" class="bottom-spacer"
-                    v-on="scope.isActive">
-                    <v-icon>mdi-pencil-plus-outline</v-icon>
-                </v-btn>
-                <v-btn
-                    v-if="!isSectionUpdate && !readOnly && !isSubmission"
-                    :disabled="disabled"
-                    :variant="outlined ? 'outlined' : 'elevated'"
-                    :color="primaryColor ? 'primary' : ''"
-                    :density="primaryColor && !compact ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props"
-                    v-on="scope.isActive">
-                    {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
-                </v-btn>
+                    <v-btn
+                        v-if="!isSectionUpdate && !readOnly && !isSubmission"
+                        :disabled="disabled"
+                        :variant="outlined ? 'outlined' : 'elevated'"
+                        :color="primaryColor ? 'primary' : ''"
+                        :density="primaryColor && !compact ? 'default' : 'compact'" class="bottom-spacer" v-bind="scope.props">
+                        {{ isUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}
+                    </v-btn>
+                </slot>
             </template>
-            <v-card>
+            <v-card class="bg-slate-100">
                 <v-card-title>
                     <span class="text-h5">{{ isUpdate || isSectionUpdate ? $t("update" + entityName + "Label") : $t("createNew" + entityName + "Label") }}</span>
                 </v-card-title>

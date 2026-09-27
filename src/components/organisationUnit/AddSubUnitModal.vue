@@ -3,8 +3,7 @@
         <v-dialog v-model="dialog" persistent max-width="800px">
             <template #activator="scope">
                 <v-btn
-                    density="compact" class="bottom-spacer ml-3" v-bind="scope.props"
-                    v-on="scope.isActive">
+                    density="compact" class="bottom-spacer ml-3" v-bind="scope.props">
                     {{ $t("addSubUnitLabel") }}
                 </v-btn>
             </template>

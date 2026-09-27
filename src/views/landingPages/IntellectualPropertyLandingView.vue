@@ -1,94 +1,98 @@
 <template>
-    <div id="intellectualProperty" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!intellectualProperty"
-            :subtitle="returnCurrentLocaleContent(intellectualProperty?.subTitle)"
-            :entity-label="$t('intellectualPropertyLabel')"
-            :badge="intellectualProperty?.type ? getIntellectualPropertyTypeTitleFromValueAutoLocale(intellectualProperty.type) : ''"
-            icon="mdi-seal-variant"
-            :can-edit="canEdit && !intellectualProperty?.isArchived"
-            :edit-label="$t('updateLabel')"
-            :entity-type="PublicationType.INTELLECTUAL_PROPERTY"
-            :entity-id="intellectualProperty?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit && !intellectualProperty?.isArchived"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="IntellectualPropertyUpdateForm"
-                    :form-props="{ presetIntellectualProperty: intellectualProperty }"
-                    entity-name="IntellectualProperty"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit || intellectualProperty?.isArchived"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                <rich-title-renderer :title="returnCurrentLocaleContent(intellectualProperty?.title)" />
-            </template>
-            <template #visual>
-                <v-icon v-if="!intellectualProperty" size="x-large" class="text-slate-400">mdi-seal-variant</v-icon>
-                <wordcloud
-                    v-else
-                    :for-document-id="intellectualProperty?.id"
-                    :document-type="PublicationType.INTELLECTUAL_PROPERTY"
-                    compact-icon
-                />
-            </template>
-            <template #affiliation>
-                <p v-if="intellectualProperty?.publisherName?.length" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link :to="'publishers/' + intellectualProperty.publisherId" class="font-medium text-gray-900 underline">
-                        {{ returnCurrentLocaleContent(intellectualProperty?.publisherName) }}
-                    </localized-link>
-                </p>
-                <p v-else-if="intellectualProperty?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
-                        {{ $t("authorReprintLabel") }}
-                    </localized-link>
-                </p>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="intellectualProperty?.applicationStatus" :label="$t('intellectualPropertyApplicationStatusLabel')" icon="mdi-progress-check" tone="amber">
-                    {{ getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(intellectualProperty.applicationStatus) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="intellectualProperty?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseFlexibleDate(intellectualProperty.documentDate) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="intellectualProperty?.number" :label="$t('intellectualPropertyNumberLabel')" icon="mdi-identifier" tone="emerald">
-                    {{ intellectualProperty.number }}
-                </landing-meta-item>
-                <landing-meta-item v-if="intellectualProperty?.doi" label="DOI" abbrev="DOI" tone="blue">
-                    <identifier-link :identifier="intellectualProperty.doi" compact />
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="intellectualProperty"
+        v-model="currentTab"
+        :loading="!intellectualProperty"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!intellectualProperty"
+                :subtitle="returnCurrentLocaleContent(intellectualProperty?.subTitle)"
+                :entity-label="$t('intellectualPropertyLabel')"
+                :badge="intellectualProperty?.type ? getIntellectualPropertyTypeTitleFromValueAutoLocale(intellectualProperty.type) : ''"
+                :year="intellectualProperty?.documentDate?.year"
+                icon="mdi-seal-variant"
+                :can-edit="canEdit && !intellectualProperty?.isArchived"
+                :edit-label="$t('updateLabel')"
+                :entity-type="PublicationType.INTELLECTUAL_PROPERTY"
+                :entity-id="intellectualProperty?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !intellectualProperty?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="IntellectualPropertyUpdateForm"
+                        :form-props="{ presetIntellectualProperty: intellectualProperty }"
+                        entity-name="IntellectualProperty"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || intellectualProperty?.isArchived"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(intellectualProperty?.title)" />
+                </template>
+                <template #affiliation>
+                    <p v-if="intellectualProperty?.publisherName?.length" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'publishers/' + intellectualProperty.publisherId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(intellectualProperty?.publisherName) }}
+                        </localized-link>
+                    </p>
+                    <p v-else-if="intellectualProperty?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
+                            {{ $t("authorReprintLabel") }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="intellectualProperty?.applicationStatus" :label="$t('intellectualPropertyApplicationStatusLabel')" icon="mdi-progress-check" tone="amber">
+                        {{ getIntellectualPropertyApplicationStatusTitleFromValueAutoLocale(intellectualProperty.applicationStatus) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="intellectualProperty?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(intellectualProperty.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="intellectualProperty?.number" :label="$t('intellectualPropertyNumberLabel')" icon="mdi-identifier" tone="emerald">
+                        {{ intellectualProperty.number }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="intellectualProperty?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="intellectualProperty.doi" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="intellectualProperty?.doi"
+                        :can-edit="canEdit && !intellectualProperty?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="intellectualProperty?.isMetadataValid"
+                        :files-valid="intellectualProperty?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(intellectualProperty?.description)"
+                        :document="intellectualProperty"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        @update="fetchValidationStatus(intellectualProperty?.id as number, intellectualProperty as _Document)"
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <document-action-box
-            ref="actionsRef"
-            :doi="intellectualProperty?.doi"
-            :can-edit="canEdit && !intellectualProperty?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="intellectualProperty?.isMetadataValid"
-            :files-valid="intellectualProperty?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(intellectualProperty?.description)"
-            :document="intellectualProperty"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(intellectualProperty?.id as number, intellectualProperty as _Document)"
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="intellectualProperty?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(intellectualProperty?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!intellectualProperty" layout="sections" />
-        <v-tabs
-            v-show="intellectualProperty"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -113,13 +117,19 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="intellectualProperty"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="intellectualProperty?.description"
+                    :contributions="intellectualProperty?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="intellectualProperty?.id"
+                    :document-type="PublicationType.INTELLECTUAL_PROPERTY"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="intellectualProperty?.id"
@@ -214,17 +224,19 @@
                     :entity-id="intellectualProperty?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <share-buttons
-            v-if="intellectualProperty && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(intellectualProperty.title) as string)"
-            :document-id="(intellectualProperty.id as number)"
-            :document-type="PublicationType.INTELLECTUAL_PROPERTY"
-        />
+        <template #footer>
+            <share-buttons
+                v-if="intellectualProperty && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(intellectualProperty.title) as string)"
+                :document-id="(intellectualProperty.id as number)"
+                :document-type="PublicationType.INTELLECTUAL_PROPERTY"
+            />
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -256,10 +268,10 @@ import { ApplicableEntityType } from '@/models/Common';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import Wordcloud from '@/components/core/Wordcloud.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
@@ -279,13 +291,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "IntellectualPropertyLandingPage",
-    components: { AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 

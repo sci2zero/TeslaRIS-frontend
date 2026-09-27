@@ -1,6 +1,6 @@
 <template>
     <!-- eslint-disable vue/no-v-html -->
-    <div class="renderer" v-html="safeRenderedTitle"></div>
+    <div class="renderer" :class="{ 'renderer-inline': inline }" v-html="safeRenderedTitle"></div>
     <!-- eslint-enable vue/no-v-html -->
 </template>
   
@@ -17,6 +17,10 @@ export default defineComponent({
         title: {
             type: Object as PropType<string | null>,
             required: true,
+        },
+        inline: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {
@@ -103,6 +107,11 @@ export default defineComponent({
     word-break: break-word;
     white-space: normal;
     width: 100%;
+}
+
+.renderer-inline {
+    display: inline;
+    width: auto;
 }
 
 </style>

@@ -16,8 +16,17 @@
                 to="/"
                 class="sidebar-item sidebar-item--brand"
                 aria-label="Logo">
-                <span class="sidebar-logo" aria-hidden="true"></span>
-                <span class="sidebar-brand">TeslaRIS</span>
+                <span
+                    v-if="!hasCustomLogo"
+                    class="sidebar-logo"
+                    aria-hidden="true"></span>
+                <img
+                    v-else
+                    :src="logoUrl"
+                    alt=""
+                    class="sidebar-logo-img"
+                />
+                <span class="sidebar-brand">{{ brandTitle }}</span>
             </router-link>
         </div>
 
@@ -61,7 +70,7 @@
                                 </div>
                             </template>
                             
-                            <v-list class="sidebar-menu-list" color="#320f9b">
+                            <v-list class="sidebar-menu-list" theme="dark">
                                 <v-list-item
                                     v-for="subItem in item.subItems"
                                     v-show="!subItem.condition || subItem.condition"
@@ -111,7 +120,9 @@ import AuthenticationService from '@/services/AuthenticationService';
 import PersonService from '@/services/PersonService';
 import UserService from '@/services/UserService';
 import { useLoginStore } from '@/stores/loginStore';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { SIDEBAR_MOBILE_MAX_WIDTH, useSidebarStore } from '@/stores/sidebarStore';
+import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { computed, ref, onMounted, nextTick, onUnmounted, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -130,9 +141,13 @@ const {
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
+const publicConfigurationStore = usePublicConfigurationStore();
 const personId = ref(-1);
 const commissionId = ref(-1);
 const institutionId = ref(-1);
+const logoUrl = computed(() => publicConfigurationStore.logoDisplayUrl);
+const hasCustomLogo = computed(() => publicConfigurationStore.hasCustomLogo);
+const brandTitle = computed(() => returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS");
 
 const scrollContainer = ref<HTMLElement>();
 const canScrollUp = ref(false);
@@ -214,14 +229,8 @@ watch(() => loginStore.userLoggedIn, () => {
 });
 
 const checkScreenSize = () => {
-    const isMobileView = window.innerWidth < 768;
-    const isVerySmall = window.innerWidth < 640;
-    
+    const isMobileView = window.matchMedia(`(max-width: ${SIDEBAR_MOBILE_MAX_WIDTH}px)`).matches;
     sidebarStore.setMobile(isMobileView);
-    
-    if (isVerySmall && sidebarStore.isVisible) {
-        sidebarStore.close();
-    }
 };
 
 onUnmounted(() => {
@@ -339,7 +348,7 @@ const menuItems = ref<MenuItem[]>([
         to: '/thesis-library', 
         icon: 'mdi-book-open-variant',
         subItems: thesisLibraryMenu.value,
-        condition: computed(() => (isAdmin.value || isResearcher.value))
+        condition: computed(() => isAdmin.value || isResearcher.value)
     },
     { key: 'registry-book', label: computed(() => i18n.t('registryBookLabel')), to: '/registry-book', icon: 'mdi-book', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
     { key: 'promotion-list', label: computed(() => i18n.t('promotionListLabel')), to: '/promotions', icon: 'mdi-school', condition: computed(() => (isPromotionRegistryAdministrator.value || isHeadOfLibrary.value || isInstitutionalLibrarian.value)) },
@@ -388,16 +397,16 @@ const isActive = (path: string): boolean => {
 @reference "@/assets/main.css";
 
 .sidebar {
-    --sidebar-primary: #320f9b;
-    --sidebar-bg: #ffffff;
-    --sidebar-text: #334155;
-    --sidebar-text-muted: #64748b;
-    --sidebar-hover-bg: rgba(50, 15, 155, 0.06);
-    --sidebar-active-bg: rgba(50, 15, 155, 0.1);
-    --sidebar-divider: #e2e8f0;
-    --sidebar-border: #e2e8f0;
-    --sidebar-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
-    --sidebar-scroll-bg: #f1f5f9;
+    --sidebar-primary: #c4b5fd;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #f8fafc;
+    --sidebar-text-muted: #cbd5e1;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+    --sidebar-active-bg: rgba(196, 181, 253, 0.18);
+    --sidebar-divider: rgba(248, 250, 252, 0.12);
+    --sidebar-border: rgba(15, 23, 42, 0.6);
+    --sidebar-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --sidebar-scroll-bg: rgba(255, 255, 255, 0.08);
 
     position: fixed;
     top: 0;
@@ -405,10 +414,10 @@ const isActive = (path: string): boolean => {
     z-index: 40;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 6rem;
+    align-items: stretch;
+    width: 16rem;
     height: 100vh;
-    padding: 1.25rem 0 1rem;
+    padding: 1.25rem 0.75rem;
     background: var(--sidebar-bg);
     color: var(--sidebar-text);
     border-right: 1px solid var(--sidebar-border);
@@ -419,31 +428,48 @@ const isActive = (path: string): boolean => {
 .sidebar-header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
+    padding: 0 0.25rem;
 }
 
 .sidebar-logo {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2rem;
+    height: 2rem;
     flex-shrink: 0;
-    background-color: var(--sidebar-primary);
+    background-color: var(--sidebar-text);
     mask: url('/logov1.svg') center / contain no-repeat;
     -webkit-mask: url('/logov1.svg') center / contain no-repeat;
 }
 
+.sidebar-logo-img {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
 .sidebar-brand {
-    color: var(--sidebar-primary);
+    color: var(--sidebar-text);
     font-weight: 600;
-    font-size: 0.75rem;
-    text-align: center;
-    margin-top: 0.5rem;
+    font-size: 1rem;
+    text-align: left;
+    margin-top: 0;
+}
+
+.sidebar-item--brand {
+    color: var(--sidebar-text);
+}
+
+.sidebar-item--brand:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
 }
 
 .sidebar-divider {
     height: 1px;
-    width: 3rem;
-    margin: 0.75rem 0;
+    width: auto;
+    margin: 1rem 0.5rem;
     background: var(--sidebar-divider);
     flex-shrink: 0;
 }
@@ -451,14 +477,16 @@ const isActive = (path: string): boolean => {
 .sidebar-item {
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    width: 5rem;
-    padding: 0.75rem 0.5rem;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
     border-radius: 0.75rem;
     cursor: pointer;
     color: var(--sidebar-text-muted);
+    text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -473,20 +501,30 @@ const isActive = (path: string): boolean => {
 }
 
 .sidebar-item-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
 .sidebar-item-label {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 500;
     line-height: 1.2;
-    text-align: center;
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sidebar-item-chevron {
-    display: none;
+    display: block;
+    margin-left: auto;
+    font-size: 1rem;
+    opacity: 0.5;
+    flex-shrink: 0;
 }
 
 .sidebar-scroll-btn {
@@ -508,7 +546,7 @@ const isActive = (path: string): boolean => {
     display: flex;
     flex: 1;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     min-height: 0;
     width: 100%;
     position: relative;
@@ -517,7 +555,7 @@ const isActive = (path: string): boolean => {
 .sidebar-scroll {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 0.5rem;
     overflow-y: auto;
     width: 100%;
@@ -528,7 +566,7 @@ const isActive = (path: string): boolean => {
 
 .sidebar-entry {
     position: relative;
-    width: auto;
+    width: 100%;
 }
 
 .scrollbar-hide {
@@ -546,100 +584,30 @@ const isActive = (path: string): boolean => {
 }
 
 .side-menu a:hover {
-    transform: translateY(-1px);
-}
-
-@media (min-width: 1024px) {
-    .sidebar {
-        width: 16rem;
-        align-items: stretch;
-        padding: 1.25rem 0.75rem;
-    }
-
-    .sidebar-header {
-        justify-content: flex-start;
-        padding: 0 0.25rem;
-    }
-
-    .sidebar-logo {
-        width: 2rem;
-        height: 2rem;
-    }
-
-    .sidebar-brand {
-        font-size: 1rem;
-        text-align: left;
-        margin-top: 0;
-    }
-
-    .sidebar-divider {
-        width: auto;
-        margin: 1rem 0.5rem;
-    }
-
-    .sidebar-item {
-        flex-direction: row;
-        justify-content: flex-start;
-        width: 100%;
-        gap: 0.75rem;
-        padding: 0.625rem 0.75rem;
-    }
-
-    .sidebar-item-icon {
-        font-size: 1.25rem;
-        margin-bottom: 0;
-        flex-shrink: 0;
-    }
-
-    .sidebar-item-label {
-        font-size: 0.875rem;
-        text-align: left;
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .sidebar-item-chevron {
-        display: block;
-        margin-left: auto;
-        font-size: 1rem;
-        opacity: 0.5;
-        flex-shrink: 0;
-    }
-
-    .side-menu,
-    .sidebar-scroll {
-        align-items: stretch;
-    }
-
-    .sidebar-entry {
-        width: 100%;
-    }
-
-    .side-menu a:hover {
-        transform: none;
-    }
+    transform: none;
 }
 </style>
 
 <style>
 .sidebar-menu-list {
-    --sidebar-primary: #320f9b;
-    --sidebar-text: #334155;
-    --sidebar-menu-bg: #ffffff;
-    --sidebar-menu-hover: rgba(50, 15, 155, 0.06);
-    --sidebar-menu-border: #e2e8f0;
+    --sidebar-primary: #c4b5fd;
+    --sidebar-text: #f8fafc;
+    --sidebar-menu-bg: #1e293b;
+    --sidebar-menu-hover: rgba(255, 255, 255, 0.08);
+    --sidebar-menu-border: rgba(248, 250, 252, 0.12);
 
     background: var(--sidebar-menu-bg) !important;
     color: var(--sidebar-text) !important;
     min-width: 12rem;
     border: 1px solid var(--sidebar-menu-border);
-    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .sidebar-menu-list-item {
+    color: var(--sidebar-text) !important;
+}
+
+.sidebar-menu-list-item .v-list-item-title {
     color: var(--sidebar-text) !important;
 }
 
@@ -648,8 +616,12 @@ const isActive = (path: string): boolean => {
     color: var(--sidebar-primary) !important;
 }
 
+.sidebar-menu-list-item:hover .v-list-item-title {
+    color: var(--sidebar-primary) !important;
+}
+
 .sidebar-menu-icon {
-    color: #64748b !important;
+    color: #cbd5e1 !important;
 }
 
 .sidebar-menu-list-item:hover .sidebar-menu-icon {

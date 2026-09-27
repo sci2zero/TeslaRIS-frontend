@@ -1,22 +1,23 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="600px">
-            <template #activator="scope">
+    <v-dialog v-model="dialog" persistent max-width="600px">
+        <template v-if="!hideActivator" #activator="scope">
+            <slot name="activator" v-bind="scope">
                 <div v-if="!edit" class="edit-pen">
                     <v-btn
                         icon variant="outlined"
                         color="primary" v-bind="scope.props" class="bottom-spacer ml-2!"
-                        :disabled="readOnly" size="medium" v-on="scope.isActive">
+                        :disabled="readOnly" size="medium">
                         <v-icon size="x-large" icon="mdi-upload"></v-icon>
                     </v-btn>
                 </div>
                 <v-btn
                     v-else icon variant="outlined"
                     color="primary" v-bind="scope.props" class="inline-edit-btn"
-                    :disabled="readOnly" size="medium" v-on="scope.isActive">
+                    :disabled="readOnly" size="medium">
                     <v-icon size="x-large" icon="mdi-pen"></v-icon>
                 </v-btn>
-            </template>
+            </slot>
+        </template>
             <v-card>
                 <v-card-title>
                     <span class="text-h5">{{ edit ? $t("updateLabel") : (isProof ? $t("addProofLabel") : $t("addDocumentFileLabel")) }}</span>
@@ -47,8 +48,7 @@
                     </v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>
-    </v-row>
+    </v-dialog>
 </template>
 
 <script lang="ts">
@@ -94,6 +94,10 @@ export default defineComponent({
         canBeArchived: {
             type: Boolean,
             default: false
+        },
+        hideActivator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["create", "update"],
@@ -112,8 +116,12 @@ export default defineComponent({
             dialog.value = false;
         };
 
+        const openDialog = () => {
+            dialog.value = true;
+        };
+
         return {
-            dialog, submissionFormRef, emitCreateToParent, emitUpdateToParent
+            dialog, submissionFormRef, emitCreateToParent, emitUpdateToParent, openDialog
         };
     }
 });

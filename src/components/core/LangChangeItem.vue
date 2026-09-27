@@ -4,6 +4,7 @@
             v-model="menu"
             :close-on-content-click="true"
             location="bottom"
+            :z-index="zIndex"
         >
             <template #activator="{ props }">
                 <v-btn
@@ -52,6 +53,10 @@ export default defineComponent({
         theme: {
             type: String as () => 'dark' | 'light',
             default: 'dark'
+        },
+        zIndex: {
+            type: [Number, String],
+            default: undefined
         }
     },
     setup(props) {

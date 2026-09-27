@@ -7,18 +7,17 @@
                         v-if="!edit"
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small" v-on="scope.isActive">
+                        :disabled="readOnly" size="small">
                         <v-icon size="x-large" icon="mdi-plus"></v-icon>
                     </v-btn>
                     <!-- <v-list-item
-                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"
-                        v-on="scope.isActive">
+                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action">
                         <v-list-item-title>{{ $t("updatePrizeLabel") }}</v-list-item-title>
                     </v-list-item> -->
                     <v-btn
                         v-else icon variant="outlined"
                         color="primary" v-bind="scope.props"
-                        :disabled="readOnly" size="medium" v-on="scope.isActive">
+                        :disabled="readOnly" size="medium">
                         <v-icon size="large" icon="mdi-pen"></v-icon>
                     </v-btn>
                 </div>

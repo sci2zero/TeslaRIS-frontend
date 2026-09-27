@@ -1,32 +1,34 @@
 <template>
-    <div class="mt-4 space-y-6">
-        <div v-if="$slots.details" class="bg-gray-50 p-6 rounded-lg">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <span class="mdi mdi-book-open-page-variant-outline mr-2 text-blue-600"></span>
-                {{ $t("basicInfoLabel") }}
-            </h3>
+    <div class="mt-4 space-y-4">
+        <landing-section-card
+            v-if="$slots.details"
+            :title="$t('basicInfoLabel')"
+            icon="mdi-book-open-page-variant-outline"
+            icon-class="bg-blue-50 text-blue-600"
+            padded
+        >
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <slot name="details"></slot>
             </div>
-        </div>
+        </landing-section-card>
 
-        <div v-if="document" class="bg-gray-50 p-6 rounded-lg">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <span class="mdi mdi-identifier mr-2 text-indigo-600"></span>
-                {{ $t("identifiersLabel") }}
-            </h3>
-            <v-row>
-                <document-common-fields-display
-                    :document="document"
-                    :cols="12"
-                    :can-edit="canEdit"
-                    :containing-entity-type="containingEntityType"
-                    :concrete-entity-type="concreteEntityType"
-                    :document-identifiers="documentIdentifiers"
-                    @identifiers-updated="$emit('identifiers-updated')"
-                />
-            </v-row>
-        </div>
+        <landing-section-card
+            v-if="document"
+            :title="$t('identifiersLabel')"
+            icon="mdi-identifier"
+            icon-class="bg-indigo-50 text-indigo-600"
+            padded
+        >
+            <document-common-fields-display
+                :document="document"
+                :cols="12"
+                :can-edit="canEdit"
+                :containing-entity-type="containingEntityType"
+                :concrete-entity-type="concreteEntityType"
+                :document-identifiers="documentIdentifiers"
+                @identifiers-updated="$emit('identifiers-updated')"
+            />
+        </landing-section-card>
 
         <slot name="before-keywords"></slot>
 
@@ -63,6 +65,7 @@
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import DocumentCommonFieldsDisplay from "@/components/publication/DocumentCommonFieldsDisplay.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import { ApplicableEntityType, type MultilingualContent } from "@/models/Common";
 import type { Document } from "@/models/PublicationModel";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";

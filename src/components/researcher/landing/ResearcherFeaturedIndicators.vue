@@ -32,7 +32,7 @@
             </div>
 
             <!-- H-Index -->
-            <div class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
+            <div v-if="featuredInformation?.hIndex" class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
                 <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
                     <span class="mdi mdi-chart-line text-white text-lg"></span>
                 </div>
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Citations -->
-            <div class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
+            <div v-if="featuredInformation?.currentCitationCount" class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
                 <div class="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
                     <span class="mdi mdi-format-quote-close text-white text-lg"></span>
                 </div>

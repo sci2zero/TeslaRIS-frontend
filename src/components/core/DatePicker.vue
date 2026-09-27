@@ -1,16 +1,15 @@
 <template>
     <v-menu v-model="isMenuOpen" :close-on-content-click="false" :persistent="persistent">
         <template #activator="{ props }">
-            <v-text-field
+            <ui-input
                 ref="fieldRef"
                 :label="label"
                 :model-value="formattedDate"
                 :rules="applyRules()"
                 readonly
                 v-bind="props"
-                variant="solo"
                 :hide-details="additionalRules.length == 0"
-            ></v-text-field>
+            />
         </template>
         <v-date-picker
             v-model="selectedDate" hide-actions title="" :color="color"
@@ -34,10 +33,11 @@
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
 import { ref, computed, watch, defineComponent } from "vue";
-import { VTextField } from "vuetify/lib/components/index.mjs";
+import UiInput from "@/components/ui/input/Input.vue";
 
 export default defineComponent({
     name: "DatePicker",
+    components: { UiInput },
     props: {
         label: {
             type: String,
@@ -60,8 +60,8 @@ export default defineComponent({
             default: false
         },
         modelValue: {
-            type: Object as PropType<string | undefined>,
-            required: true,
+            type: String as PropType<string | undefined>,
+            default: "",
         },
         additionalRules: {
             type: Array as PropType<Array<(value: string) => string | true>>,
@@ -79,7 +79,7 @@ export default defineComponent({
 
         const { requiredFieldRules, dateTodayOrFutureRules } = useValidationUtils();
 
-        const fieldRef = ref<typeof VTextField>();
+        const fieldRef = ref<InstanceType<typeof UiInput>>();
 
         const toIsoString = (date: Date) => {
         const pad = function(num : number) {

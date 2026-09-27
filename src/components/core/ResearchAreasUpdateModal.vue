@@ -1,40 +1,44 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="600px">
-            <template #activator="scope">
+    <v-dialog v-model="dialog" persistent max-width="600px">
+        <template #activator="scope">
+            <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small" v-on="scope.isActive">
+                        icon
+                        variant="outlined"
+                        color="grey-lighten"
+                        v-bind="scope.props"
+                        class="bottom-spacer"
+                        :disabled="readOnly"
+                        size="small">
                         <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                     </v-btn>
                 </div>
-            </template>
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ $t("updateResearchAreasLabel") }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <research-areas-selection
-                        ref="researchAreasSelectionRef"
-                        :research-areas-hierarchy="researchAreasHierarchy"
-                        :limit-one="limitOne"
-                        @update="emitToParent"
-                    />
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" @click="dialog = false">
-                        {{ $t("closeLabel") }}
-                    </v-btn>
-                    <v-btn color="blue darken-1" @click="submitSelection">
-                        {{ $t("updateLabel") }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </v-row>
+            </slot>
+        </template>
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ $t("updateResearchAreasLabel") }}</span>
+            </v-card-title>
+            <v-card-text>
+                <research-areas-selection
+                    ref="researchAreasSelectionRef"
+                    :research-areas-hierarchy="researchAreasHierarchy"
+                    :limit-one="limitOne"
+                    @update="emitToParent"
+                />
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" @click="dialog = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+                <v-btn color="blue darken-1" @click="submitSelection">
+                    {{ $t("updateLabel") }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts">

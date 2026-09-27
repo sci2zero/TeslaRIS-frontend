@@ -6,20 +6,40 @@ import type { BrandingInformation } from "@/models/Common";
 
 export class BrandingService extends BaseService {
 
-    public cachedBrandingInformation: AxiosResponse<BrandingInformation> | null = null;
-
+    private static idempotencyKey: string = super.generateIdempotencyKey();
 
     async fetchBrandingInfo(): Promise<AxiosResponse<BrandingInformation>> {
-        if (this.cachedBrandingInformation) {
-            return Promise.resolve(this.cachedBrandingInformation);
-        }
-        
         return super.sendRequest(axios.get, "branding");
     }
 
     async updateBrandingInfo(body: BrandingInformation): Promise<AxiosResponse<void>> {
-        this.cachedBrandingInformation = null;
         return super.sendRequest(axios.put, "branding", body);
+    }
+
+    async updateLogo(file: File): Promise<AxiosResponse<void>> {
+        return super.sendMultipartFormDataRequest(
+            axios.patch,
+            "branding/logo",
+            { file },
+            BrandingService.idempotencyKey
+        );
+    }
+
+    async removeLogo(): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, "branding/logo");
+    }
+
+    async updateBackground(file: File): Promise<AxiosResponse<void>> {
+        return super.sendMultipartFormDataRequest(
+            axios.patch,
+            "branding/background",
+            { file },
+            BrandingService.idempotencyKey
+        );
+    }
+
+    async removeBackground(): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.delete, "branding/background");
     }
 }
 

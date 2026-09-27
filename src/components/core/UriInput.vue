@@ -1,14 +1,13 @@
 <template>
     <v-row v-for="(element, index) in uris" :key="index">
         <v-col cols="10">
-            <v-text-field
+            <ui-input
                 v-model="element.value"
                 :label="isWebsite ? $t('websiteLabel') : $t('uriInputLabel')"
                 placeholder="URI"
-                outlined
                 :rules="uriValidationRules"
-                @input="sendContentToParent">
-            </v-text-field>
+                @update:model-value="sendContentToParent"
+            />
         </v-col>
         <v-col cols="2">
             <v-btn v-if="uris.length > 1 || uris[index].value !== ''" icon @click="removeUri(index)">
@@ -25,9 +24,11 @@
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 export default defineComponent({
     name: "UriInput",
+    components: { UiInput },
     props: {
         modelValue: {
             type: Array<string>,

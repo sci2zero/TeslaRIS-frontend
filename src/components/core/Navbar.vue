@@ -224,10 +224,9 @@ import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
-import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
-import { useBrandingStore } from '@/stores/brandingStore';
+import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 
@@ -308,14 +307,13 @@ export default defineComponent(
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
             
-            const appTitle = ref();
-            const sidebar = ref(false);
-            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
-
-            const brandingStore = useBrandingStore();
+            const publicConfigurationStore = usePublicConfigurationStore();
             const loginStore = useLoginStore();
             const userName = ref("");
             const router = useRouter();
+            const appTitle = computed(() => publicConfigurationStore.title);
+            const sidebar = ref(false);
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
             const populateUserData = () => {
                 UserService.getLoggedInUser().then((response) => {
@@ -342,13 +340,6 @@ export default defineComponent(
                 router.push({ name: "login" });
             };
 
-            watch(() => brandingStore.rebranded, () => {
-                if (brandingStore.rebranded) {
-                    appTitle.value = brandingStore.newTitle;
-                    brandingStore.rebrandingHandled();
-                }
-            });
-
             watch(() => loginStore.userLoggedIn, () => {
                 if (loginStore.userLoggedIn) {
                     populateUserData();
@@ -360,10 +351,6 @@ export default defineComponent(
             });
 
             onMounted(() => {
-                BrandingService.fetchBrandingInfo().then((response) => {
-                    appTitle.value = response.data.title;
-                });
-
                 if (AuthenticationService.userLoggedIn()) {
                     populateUserData();
                 }

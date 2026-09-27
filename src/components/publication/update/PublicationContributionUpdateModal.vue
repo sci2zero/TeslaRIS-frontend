@@ -1,48 +1,49 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="800px">
-            <template #activator="scope">
+    <v-dialog v-model="dialog" persistent scrollable max-width="960px">
+        <template #activator="scope">
+            <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        size="small" v-on="scope.isActive">
+                        icon
+                        variant="outlined"
+                        color="grey-lighten"
+                        v-bind="scope.props"
+                        class="bottom-spacer"
+                        size="small">
                         <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                     </v-btn>
                 </div>
-            </template>
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ $t("updateContributionsLabel") }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form v-model="isFormValid" @submit.prevent>
-                        <v-container>
-                            <person-publication-contribution
-                                ref="updateFormRef"
-                                :preset-contributions="presetDocumentContributions"
-                                :board-members-allowed="boardMembersAllowed"
-                                :board-member-ids="boardMemberIds"
-                                is-update
-                                :limit-one="limitOne"
-                                :lock-contribution-type="lockContributionType"
-                                @set-input="contributions = $event">
-                            </person-publication-contribution>
-                        </v-container>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" @click="dialog = false">
-                        {{ $t("closeLabel") }}
-                    </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="emitToParent">
-                        {{ $t("updateLabel") }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </v-row>
+            </slot>
+        </template>
+        <v-card>
+            <v-card-title class="pb-1">
+                <span class="text-h5">{{ $t("updateContributionsLabel") }}</span>
+            </v-card-title>
+            <v-card-text class="pt-2">
+                <v-form v-model="isFormValid" @submit.prevent>
+                    <person-publication-contribution
+                        ref="updateFormRef"
+                        :preset-contributions="presetDocumentContributions"
+                        :board-members-allowed="boardMembersAllowed"
+                        :board-member-ids="boardMemberIds"
+                        is-update
+                        :limit-one="limitOne"
+                        :lock-contribution-type="lockContributionType"
+                        @set-input="contributions = $event">
+                    </person-publication-contribution>
+                </v-form>
+            </v-card-text>
+            <v-card-actions class="px-6 pb-4">
+                <v-spacer></v-spacer>
+                <v-btn variant="text" @click="dialog = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+                <v-btn color="primary" variant="flat" :disabled="!isFormValid" @click="emitToParent">
+                    {{ $t("updateLabel") }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts">

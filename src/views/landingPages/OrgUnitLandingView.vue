@@ -1,195 +1,259 @@
 <template>
-    <div id="institution" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!organisationUnit"
-            :entity-label="$t('organisationUnitLabel')"
-            icon="mdi-city"
-            visual-shape="circle"
-            :can-edit="canEdit"
-            :edit-label="$t('updateOrganisationUnitLabel')"
-            :entity-type="EntityType.ORGANISATION_UNIT"
-            :entity-id="organisationUnit?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="OrganisationUnitUpdateForm"
-                    :form-props="{ presetOU: organisationUnit }"
-                    entity-name="OrganisationUnit"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #visual>
-                <organisation-unit-logo
-                    class="org-unit-header-logo"
-                    :filename="organisationUnit?.logoServerFilename"
-                    :background-color-hex="organisationUnit?.logoBackgroundHex"
-                    :org-unit-id="organisationUnit?.id"
-                    :can-edit="canEdit"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation && organisationUnit?.nameAbbreviation.length > 0 ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
-            </template>
-            <template #affiliation>
-                <p v-if="organisationUnit?.superInstitutionId" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId" class="font-medium text-gray-900 underline">
-                        {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
-                    </localized-link>
-                </p>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
-                    {{ organisationUnit.location.address }}
-                </landing-meta-item>
-                <landing-meta-item v-if="organisationUnit?.ror" label="ROR" abbrev="ROR" tone="emerald">
-                    <identifier-link :identifier="organisationUnit.ror" type="ror" compact />
-                </landing-meta-item>
-                <landing-meta-item v-if="organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="indigo">
-                    <identifier-link :identifier="organisationUnit.contact.contactEmail" type="email" compact />
-                </landing-meta-item>
-                <landing-meta-item v-if="organisationUnit?.uris && organisationUnit.uris.length > 0" :label="$t('websiteLabel')" icon="mdi-web" tone="blue">
-                    <a :href="organisationUnit.uris[0]" target="_blank" rel="noopener noreferrer" class="underline break-all">
-                        {{ organisationUnit.uris[0] }}
-                    </a>
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="institution"
+        v-model="currentTab"
+        :loading="!organisationUnit"
+        loader-layout="table"
+        :tab-number="5"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!organisationUnit"
+                :entity-label="$t('organisationUnitLabel')"
+                :year="organisationUnit?.dateEstablished ? organisationUnit.dateEstablished.substring(0, 4) : ''"
+                icon="mdi-city"
+                visual-shape="circle"
+                :can-edit="canEdit"
+                :edit-label="$t('updateOrganisationUnitLabel')"
+                :entity-type="EntityType.ORGANISATION_UNIT"
+                :entity-id="organisationUnit?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="OrganisationUnitUpdateForm"
+                        :form-props="{ presetOU: organisationUnit }"
+                        entity-name="OrganisationUnit"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #visual>
+                    <organisation-unit-logo
+                        class="org-unit-header-logo"
+                        :filename="organisationUnit?.logoServerFilename"
+                        :background-color-hex="organisationUnit?.logoBackgroundHex"
+                        :org-unit-id="organisationUnit?.id"
+                        :can-edit="canEdit"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(organisationUnit?.name) }} {{ organisationUnit?.nameAbbreviation && organisationUnit?.nameAbbreviation.length > 0 ? `(${returnCurrentLocaleContent(organisationUnit?.nameAbbreviation)})` : "" }}
+                </template>
+                <template #affiliation>
+                    <p v-if="organisationUnit?.superInstitutionId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'organisation-units/' + organisationUnit?.superInstitutionId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(organisationUnit?.superInstitutionName) }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
+                        {{ organisationUnit.location.address }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="organisationUnit?.ror" label="ROR" abbrev="ROR" tone="emerald">
+                        <identifier-link :identifier="organisationUnit.ror" type="ror" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="indigo">
+                        <identifier-link :identifier="organisationUnit.contact.contactEmail" type="email" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="organisationUnit?.uris && organisationUnit.uris.length > 0" :label="$t('websiteLabel')" icon="mdi-web" tone="blue">
+                        <a :href="organisationUnit.uris[0]" target="_blank" rel="noopener noreferrer" class="underline break-all">
+                            {{ organisationUnit.uris[0] }}
+                        </a>
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="externalIndicatorsModalRef"
+                        hide-activator
+                        :form-component="ExternalIndicatorsConfigurationForm"
+                        :form-props="{ institutionId: organisationUnit?.id }"
+                        entity-name="ExternalIndicatorConfiguration"
+                        is-update
+                        :read-only="!canEdit"
+                        @update="updateSuccess"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="publicReviewModalRef"
+                        hide-activator
+                        :form-component="PublicReviewContentForm"
+                        :form-props="{ institutionId: organisationUnit?.id, presetPageContent: publicReviewPageContent }"
+                        entity-name="PublicReviewPageContent"
+                        is-update
+                        wide
+                        :read-only="!canEdit"
+                        @update="updateSuccess(); fetchPublicReviewPageContent()"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                        ref="trustConfigModalRef"
+                        hide-activator
+                        :form-component="OrganisationUnitTrustConfigurationForm"
+                        :form-props="{ institutionId: organisationUnit?.id }"
+                        entity-name="OrganisationUnitTrustConfiguration"
+                        is-update
+                        :read-only="!canEdit"
+                        @update="updateSuccess()"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                        ref="importSourceModalRef"
+                        hide-activator
+                        :form-component="OrganisationUnitImportSourceForm"
+                        :form-props="{ institutionId: organisationUnit?.id }"
+                        entity-name="OrganisationUnitImportSource"
+                        is-update
+                        :read-only="!canEdit"
+                    />
+                    <generic-crud-modal
+                        v-if="canEditDefaultSubmissionContent"
+                        ref="defaultSubmissionModalRef"
+                        hide-activator
+                        :form-component="InstitutionDefaultSubmissionContentForm"
+                        :form-props="{ institutionId: organisationUnit?.id }"
+                        entity-name="InstitutionDefaultSubmissionContent"
+                        is-update
+                        wide
+                        :read-only="false"
+                        @update="updateSuccess()"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                        ref="outputConfigModalRef"
+                        hide-activator
+                        :form-component="OrganisationUnitOutputConfigurationForm"
+                        :form-props="{ institutionId: organisationUnit?.id }"
+                        entity-name="OrganisationUnitOutputConfiguration"
+                        is-update
+                        :read-only="!canEdit"
+                        @update="outputConfigurationUpdated"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                        ref="chartDisplayModalRef"
+                        hide-activator
+                        :form-component="ChartDisplayConfigurationForm"
+                        :form-props="{ organisationUnitId: organisationUnit?.id }"
+                        entity-name="ChartDisplayConfiguration"
+                        is-update
+                        wide
+                        :read-only="!canEdit"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
+                        ref="dlDisplayModalRef"
+                        hide-activator
+                        :form-component="DLDisplayConfigurationForm"
+                        :form-props="{ organisationUnitId: organisationUnit?.id }"
+                        entity-name="DLDisplayConfiguration"
+                        is-update
+                        wide
+                        :read-only="!canEdit"
+                    />
 
-        <div class="actions-box pa-4">
-            <div class="text-base font-medium mb-3 ml-1 leading-6">
-                {{ $t("additionalActionsLabel") }}
-            </div>
-            <div class="d-flex flex-row flex-wrap ml-2">
-                <generic-crud-modal
-                    v-if="canEdit"
-                    class="ml-2" 
-                    :form-component="ExternalIndicatorsConfigurationForm"
-                    :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="ExternalIndicatorConfiguration"
-                    is-update compact
-                    primary-color outlined
-                    :read-only="!canEdit"
-                    @update="updateSuccess"
-                />
-                <v-btn
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="navigateToPublicTheses">
-                    {{ $t("routeLabel.publicDissertationsReport") }}
-                </v-btn>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    class="ml-2"
-                    :form-component="PublicReviewContentForm"
-                    :form-props="{ institutionId: organisationUnit?.id, presetPageContent: publicReviewPageContent }"
-                    entity-name="PublicReviewPageContent"
-                    is-update compact wide
-                    primary-color outlined
-                    :read-only="!canEdit"
-                    @update="updateSuccess(); fetchPublicReviewPageContent()"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
-                    class="ml-2"
-                    :form-component="OrganisationUnitTrustConfigurationForm"
-                    :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="OrganisationUnitTrustConfiguration"
-                    is-update compact
-                    primary-color outlined
-                    :read-only="!canEdit"
-                    @update="updateSuccess()"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
-                    class="ml-2"
-                    :form-component="OrganisationUnitImportSourceForm"
-                    :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="OrganisationUnitImportSource"
-                    is-update compact
-                    primary-color outlined
-                    :read-only="!canEdit"
-                />
-                <generic-crud-modal
-                    v-if="canEditDefaultSubmissionContent"
-                    class="ml-2"
-                    :form-component="InstitutionDefaultSubmissionContentForm"
-                    :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="InstitutionDefaultSubmissionContent"
-                    is-update compact wide
-                    primary-color outlined
-                    :read-only="false"
-                    @update="updateSuccess()"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
-                    class="ml-2"
-                    :form-component="OrganisationUnitOutputConfigurationForm"
-                    :form-props="{ institutionId: organisationUnit?.id }"
-                    entity-name="OrganisationUnitOutputConfiguration"
-                    is-update compact
-                    primary-color outlined
-                    :read-only="!canEdit"
-                    @update="outputConfigurationUpdated"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalEditor)"
-                    class="ml-2"
-                    :form-component="ChartDisplayConfigurationForm"
-                    :form-props="{ organisationUnitId: organisationUnit?.id }"
-                    entity-name="ChartDisplayConfiguration"
-                    is-update compact wide
-                    primary-color outlined
-                    :read-only="!canEdit"
-                />
-                <generic-crud-modal
-                    v-if="canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
-                    class="ml-2"
-                    :form-component="DLDisplayConfigurationForm"
-                    :form-props="{ organisationUnitId: organisationUnit?.id }"
-                    entity-name="DLDisplayConfiguration"
-                    is-update compact wide
-                    primary-color outlined
-                    :read-only="!canEdit"
-                />
-                <v-btn
-                    v-if="isInstitutionalEditor && canEdit"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="performNavigation('importer')">
-                    {{ $t("importerLabel") }}
-                </v-btn>
-                <v-btn
-                    v-if="isInstitutionalEditor && canEdit"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="navigateToBackupPage">
-                    {{ $t("backupLabel") }}
-                </v-btn>
-                <v-btn
-                    v-if="isAdmin || (isInstitutionalEditor && canEdit)"
-                    class="mb-5 ml-2" color="primary" density="compact"
-                    variant="outlined"
-                    @click="openMetadataEnrichmentDialog">
-                    {{ $t("enrichDocumentMetadata") }}
-                </v-btn>
-            </div>
-        </div>
-        <tab-content-loader v-if="!organisationUnit" :tab-number="5" layout="table" />
-        <v-tabs
-            v-if="organisationUnit"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+                    <UiButton
+                        variant="outline"
+                        size="md"
+                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
+                        @click="navigateToPublicTheses"
+                    >
+                        <span class="mdi mdi-eye-outline"></span>
+                        {{ $t("routeLabel.publicDissertationsReport") }}
+                    </UiButton>
+
+                    <v-menu v-if="hasMoreInstitutionActions" location="bottom">
+                        <template #activator="{ props: menuProps }">
+                            <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
+                                <span class="mdi mdi-dots-horizontal"></span>
+                                {{ $t("moreActionsLabel") }}
+                                <span class="mdi mdi-chevron-down"></span>
+                            </UiButton>
+                        </template>
+                        <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
+                            <v-list-item
+                                v-if="canEdit"
+                                prepend-icon="mdi-chart-box-outline"
+                                :title="$t('updateExternalIndicatorConfigurationLabel')"
+                                @click="openModal(externalIndicatorsModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit"
+                                prepend-icon="mdi-text-box-edit-outline"
+                                :title="$t('updatePublicReviewPageContentLabel')"
+                                @click="openModal(publicReviewModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                                prepend-icon="mdi-shield-check-outline"
+                                :title="$t('updateOrganisationUnitTrustConfigurationLabel')"
+                                @click="openModal(trustConfigModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                                prepend-icon="mdi-database-import-outline"
+                                :title="$t('updateOrganisationUnitImportSourceLabel')"
+                                @click="openModal(importSourceModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEditDefaultSubmissionContent"
+                                prepend-icon="mdi-file-document-edit-outline"
+                                :title="$t('updateInstitutionDefaultSubmissionContentLabel')"
+                                @click="openModal(defaultSubmissionModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                                prepend-icon="mdi-cog-outline"
+                                :title="$t('updateOrganisationUnitOutputConfigurationLabel')"
+                                @click="openModal(outputConfigModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor)"
+                                prepend-icon="mdi-chart-line"
+                                :title="$t('updateChartDisplayConfigurationLabel')"
+                                @click="openModal(chartDisplayModalRef)"
+                            />
+                            <v-list-item
+                                v-if="canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
+                                prepend-icon="mdi-bookshelf"
+                                :title="$t('updateDLDisplayConfigurationLabel')"
+                                @click="openModal(dlDisplayModalRef)"
+                            />
+                            <v-list-item
+                                v-if="isInstitutionalEditor && canEdit"
+                                prepend-icon="mdi-import"
+                                :title="$t('importerLabel')"
+                                @click="performNavigation('importer')"
+                            />
+                            <v-list-item
+                                v-if="isInstitutionalEditor && canEdit"
+                                prepend-icon="mdi-backup-restore"
+                                :title="$t('backupLabel')"
+                                @click="navigateToBackupPage"
+                            />
+                            <v-list-item
+                                v-if="isAdmin || (isInstitutionalEditor && canEdit)"
+                                prepend-icon="mdi-magnify-plus-outline"
+                                :title="$t('enrichDocumentMetadata')"
+                                @click="openMetadataEnrichmentDialog"
+                            />
+                        </v-list>
+                    </v-menu>
+                </template>
+            </entity-landing-header>
+        </template>
+
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab v-show="showOutputs" value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
@@ -217,13 +281,17 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-if="organisationUnit"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="organisationUnit?.description"
+                    is-general-description
+                    description-tab="researchAreas"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
                 <!-- Publication Table -->
                 <search-bar-component
@@ -392,7 +460,12 @@
                     </template>
 
                     <template #before-keywords>
-                        <div class="bg-gray-50 p-6 rounded-lg">
+                        <landing-section-card
+                            :title="$t('identifiersLabel')"
+                            icon="mdi-identifier"
+                            icon-class="bg-indigo-50 text-indigo-600"
+                            padded
+                        >
                             <entity-identifiers-list
                                 :entity-identifiers="organisationUnitIdentifiers"
                                 :can-edit="canEdit"
@@ -401,10 +474,13 @@
                                 :concrete-entity-type="ApplicableEntityType.ORGANISATION_UNIT"
                                 @updated="fetchIdentifiers"
                             />
-                        </div>
-                        <div
+                        </landing-section-card>
+                        <landing-section-card
                             v-if="(organisationUnit?.location?.latitude && organisationUnit?.location?.longitude) || organisationUnit?.location?.address"
-                            class="bg-gray-50 p-6 rounded-lg"
+                            :title="$t('locationLabel')"
+                            icon="mdi-map-marker-outline"
+                            icon-class="bg-rose-50 text-rose-600"
+                            padded
                         >
                             <open-layers-map
                                 ref="mapRef"
@@ -413,29 +489,14 @@
                                 :read-only="true"
                                 :show-input="false"
                             />
-                        </div>
+                        </landing-section-card>
                     </template>
 
-                    <v-row>
-                        <v-col cols="12">
-                            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                                <v-card-text class="edit-pen-container">
-                                    <research-areas-update-modal
-                                        :research-areas-hierarchy="organisationUnit?.researchAreas"
-                                        :read-only="!canEdit"
-                                        @update="updateResearchAreas">
-                                    </research-areas-update-modal>
-
-                                    <h3 class="mb-1">
-                                        {{ $t("researchAreasLabel") }}
-                                    </h3>
-                                    <research-area-hierarchy
-                                        :research-areas="organisationUnit?.researchAreas"
-                                    />
-                                </v-card-text>
-                            </v-card>
-                        </v-col>
-                    </v-row>
+                    <landing-research-areas-section
+                        :research-areas="organisationUnit?.researchAreas"
+                        :can-edit="canEdit"
+                        @update="updateResearchAreas"
+                    />
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
@@ -487,19 +548,21 @@
                     :entity-id="organisationUnit?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <persistent-question-dialog
-            v-model="displayPersistentDialog"
-            :title="$t('selectEnrichmentTypeLabel')"
-            :message="$t('selectEnrichmentTypeMessage')"
-            :radio-options="[{title: $t('uiBasedLabel'), value: 1}, {title: $t('automaticLabel'), value: 2}]"
-            show-radio-options
-            @continue="startMetadataEnrichment"
-        />
-    </div>
+            <persistent-question-dialog
+                v-model="displayPersistentDialog"
+                :title="$t('selectEnrichmentTypeLabel')"
+                :message="$t('selectEnrichmentTypeMessage')"
+                :radio-options="[{title: $t('uiBasedLabel'), value: 1}, {title: $t('automaticLabel'), value: 2}]"
+                show-radio-options
+                @continue="startMetadataEnrichment"
+            />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -510,7 +573,8 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
-import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
+import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
@@ -522,7 +586,6 @@ import PersonService from '@/services/PersonService';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import OrganisationUnitRelationUpdateModal from '@/components/organisationUnit/update/OrganisationUnitRelationUpdateModal.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
@@ -535,7 +598,6 @@ import { useLoginStore } from '@/stores/loginStore';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import OrganisationUnitLogo from '@/components/organisationUnit/OrganisationUnitLogo.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import ExternalIndicatorsConfigurationForm from '@/components/assessment/indicators/ExternalIndicatorsConfigurationForm.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
@@ -573,16 +635,26 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTableComponent, OpenLayersMap, ResearchAreaHierarchy, Toast, RelationsGraph, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, ResearchAreasUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, TabContentLoader, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton },
     setup() {
-        const currentTab = ref("relations");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
         const updateModalRef = ref<{ dialog: boolean } | null>(null);
+        const externalIndicatorsModalRef = ref<{ dialog: boolean } | null>(null);
+        const publicReviewModalRef = ref<{ dialog: boolean } | null>(null);
+        const trustConfigModalRef = ref<{ dialog: boolean } | null>(null);
+        const importSourceModalRef = ref<{ dialog: boolean } | null>(null);
+        const defaultSubmissionModalRef = ref<{ dialog: boolean } | null>(null);
+        const outputConfigModalRef = ref<{ dialog: boolean } | null>(null);
+        const chartDisplayModalRef = ref<{ dialog: boolean } | null>(null);
+        const dlDisplayModalRef = ref<{ dialog: boolean } | null>(null);
 
         const openModal = (modal: { dialog: boolean } | null) => {
             if (modal) {
@@ -660,6 +732,13 @@ export default defineComponent({
             loggedInUser, userInstitutionid,
             isLibrarianUser
         } = useUserRole();
+
+        const hasMoreInstitutionActions = computed(() =>
+            canEdit.value
+            || canEditDefaultSubmissionContent.value
+            || (isInstitutionalEditor.value && canEdit.value)
+            || isAdmin.value
+        );
         
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
@@ -856,12 +935,8 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if(totalPublications.value > 0) {
-                currentTab.value = "publications";
-            } else if( totalEmployees.value > 0) {
-                currentTab.value = "employees";
-            } else {
-                currentTab.value = "relations";
+            if (currentTab.value !== "dataQuality") {
+                currentTab.value = "overview";
             }
         };
 
@@ -1142,7 +1217,10 @@ export default defineComponent({
             organisationUnitIdentifiers, fetchIdentifiers,
             EntityType, fetchOU,
             dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal
+            updateModalRef, openModal,
+            externalIndicatorsModalRef, publicReviewModalRef, trustConfigModalRef,
+            importSourceModalRef, defaultSubmissionModalRef, outputConfigModalRef,
+            chartDisplayModalRef, dlDisplayModalRef, hasMoreInstitutionActions
         };
 }})
 

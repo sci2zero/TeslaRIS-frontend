@@ -4,8 +4,7 @@
             <template #activator="scope">
                 <v-list-item
                     v-if="!readOnly"
-                    v-bind="scope.props" :disabled="readOnly"
-                    v-on="scope.isActive">
+                    v-bind="scope.props" :disabled="readOnly">
                     <v-list-item-title>{{ $t("migrateDataLabel") }}</v-list-item-title>
                 </v-list-item>
             </template>

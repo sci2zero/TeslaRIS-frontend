@@ -1,83 +1,87 @@
 <template>
-    <div id="monographPublication" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!monographPublication"
-            :subtitle="returnCurrentLocaleContent(monographPublication?.subTitle)"
-            :entity-label="$t('monographPublicationLabel')"
-            :badge="monographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(monographPublication.monographPublicationType) : ''"
-            icon="mdi-newspaper-variant"
-            :can-edit="canEdit && !monographPublication?.isArchived"
-            :edit-label="$t('updateMonographPublicationLabel')"
-            :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
-            :entity-id="monographPublication?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit && !monographPublication?.isArchived"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="MonographPublicationUpdateForm"
-                    :form-props="{ presetMonographPublication: monographPublication}"
-                    entity-name="MonographPublication"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit || monographPublication?.isArchived"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)" />
-            </template>
-            <template #visual>
-                <v-icon v-if="!monographPublication" size="x-large" class="text-slate-400">mdi-newspaper-variant</v-icon>
-                <wordcloud
-                    v-else
-                    :for-document-id="monographPublication?.id"
-                    :document-type="PublicationType.MONOGRAPH_PUBLICATION"
-                    compact-icon
-                />
-            </template>
-            <template #affiliation>
-                <p v-if="monographPublication?.monographId" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link :to="'scientific-results/monograph/' + monographPublication.monographId" class="font-medium text-gray-900 underline">
-                        {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
-                    </localized-link>
-                </p>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="monographPublication?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseFlexibleDate(monographPublication.documentDate) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="monographPublication?.doi" label="DOI" abbrev="DOI" tone="blue">
-                    <identifier-link :identifier="monographPublication.doi" compact />
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="monographPublication"
+        v-model="currentTab"
+        :loading="!monographPublication"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!monographPublication"
+                :subtitle="returnCurrentLocaleContent(monographPublication?.subTitle)"
+                :entity-label="$t('monographPublicationLabel')"
+                :badge="monographPublication?.monographPublicationType ? getTitleFromValueAutoLocale(monographPublication.monographPublicationType) : ''"
+                :year="monographPublication?.documentDate?.year"
+                icon="mdi-newspaper-variant"
+                :can-edit="canEdit && !monographPublication?.isArchived"
+                :edit-label="$t('updateMonographPublicationLabel')"
+                :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
+                :entity-id="monographPublication?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !monographPublication?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="MonographPublicationUpdateForm"
+                        :form-props="{ presetMonographPublication: monographPublication}"
+                        entity-name="MonographPublication"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || monographPublication?.isArchived"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(monographPublication?.title)" />
+                </template>
+                <template #affiliation>
+                    <p v-if="monographPublication?.monographId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'scientific-results/monograph/' + monographPublication.monographId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(monographPublication?.monographName) }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="monographPublication?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(monographPublication.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="monographPublication?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="monographPublication.doi" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="monographPublication?.doi"
+                        :can-edit="canEdit && !monographPublication?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="monographPublication?.isMetadataValid"
+                        :files-valid="monographPublication?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(monographPublication?.description)"
+                        :document="monographPublication"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <document-action-box
-            ref="actionsRef"
-            :doi="monographPublication?.doi"
-            :can-edit="canEdit && !monographPublication?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="monographPublication?.isMetadataValid"
-            :files-valid="monographPublication?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(monographPublication?.description)"
-            :document="monographPublication"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(monographPublication?.id as number, monographPublication as _Document)"
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="monographPublication?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(monographPublication?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!monographPublication" layout="sections" />
-        <v-tabs
-            v-show="monographPublication"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -102,13 +106,19 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="monographPublication"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="monographPublication?.description"
+                    :contributions="monographPublication?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="monographPublication?.id"
+                    :document-type="PublicationType.MONOGRAPH_PUBLICATION"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="monographPublication?.id"
@@ -207,17 +217,19 @@
                     :entity-id="monographPublication?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <share-buttons
-            v-if="monographPublication && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(monographPublication.title) as string)"
-            :document-id="(monographPublication.id as number)"
-            :document-type="PublicationType.MONOGRAPH_PUBLICATION"
-        />
-    </div>
+            <share-buttons
+                v-if="monographPublication && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(monographPublication.title) as string)"
+                :document-id="(monographPublication.id as number)"
+                :document-type="PublicationType.MONOGRAPH_PUBLICATION"
+            />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -252,10 +264,10 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import Wordcloud from '@/components/core/Wordcloud.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
@@ -272,13 +284,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "MonographPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 

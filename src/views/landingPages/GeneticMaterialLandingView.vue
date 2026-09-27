@@ -1,88 +1,92 @@
 <template>
-    <div id="geneticMaterial" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!geneticMaterial"
-            :subtitle="returnCurrentLocaleContent(geneticMaterial?.subTitle)"
-            :entity-label="$t('geneticMaterialLabel')"
-            :badge="geneticMaterial?.geneticMaterialType ? getGeneticMaterialTypeTitleFromValueAutoLocale(geneticMaterial.geneticMaterialType) : ''"
-            icon="mdi-desktop-classic"
-            :can-edit="canEdit && !geneticMaterial?.isArchived"
-            :edit-label="$t('updateGeneticMaterialLabel')"
-            :entity-type="PublicationType.GENETIC_MATERIAL"
-            :entity-id="geneticMaterial?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit && !geneticMaterial?.isArchived"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="GeneticMaterialUpdateForm"
-                    :form-props="{ presetGeneticMaterial: geneticMaterial }"
-                    entity-name="GeneticMaterial"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit || geneticMaterial?.isArchived"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                <rich-title-renderer :title="returnCurrentLocaleContent(geneticMaterial?.title)" />
-            </template>
-            <template #visual>
-                <v-icon v-if="!geneticMaterial" size="x-large" class="text-slate-400">mdi-desktop-classic</v-icon>
-                <wordcloud
-                    v-else
-                    :for-document-id="geneticMaterial?.id"
-                    :document-type="PublicationType.GENETIC_MATERIAL"
-                    compact-icon
-                />
-            </template>
-            <template #affiliation>
-                <p v-if="geneticMaterial?.publisherId" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link :to="'publishers/' + geneticMaterial.publisherId" class="font-medium text-gray-900 underline">
-                        {{ returnCurrentLocaleContent(publisher?.name) }}
-                    </localized-link>
-                </p>
-                <p v-else-if="geneticMaterial?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
-                    <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
-                        {{ $t("authorReprintLabel") }}
-                    </localized-link>
-                </p>
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="geneticMaterial?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
-                    {{ localiseFlexibleDate(geneticMaterial.documentDate) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="geneticMaterial?.doi" label="DOI" abbrev="DOI" tone="blue">
-                    <identifier-link :identifier="geneticMaterial.doi" compact />
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
+    <landing-page-layout
+        id="geneticMaterial"
+        v-model="currentTab"
+        :loading="!geneticMaterial"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!geneticMaterial"
+                :subtitle="returnCurrentLocaleContent(geneticMaterial?.subTitle)"
+                :entity-label="$t('geneticMaterialLabel')"
+                :badge="geneticMaterial?.geneticMaterialType ? getGeneticMaterialTypeTitleFromValueAutoLocale(geneticMaterial.geneticMaterialType) : ''"
+                :year="geneticMaterial?.documentDate?.year"
+                icon="mdi-desktop-classic"
+                :can-edit="canEdit && !geneticMaterial?.isArchived"
+                :edit-label="$t('updateGeneticMaterialLabel')"
+                :entity-type="PublicationType.GENETIC_MATERIAL"
+                :entity-id="geneticMaterial?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !geneticMaterial?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="GeneticMaterialUpdateForm"
+                        :form-props="{ presetGeneticMaterial: geneticMaterial }"
+                        entity-name="GeneticMaterial"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || geneticMaterial?.isArchived"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(geneticMaterial?.title)" />
+                </template>
+                <template #affiliation>
+                    <p v-if="geneticMaterial?.publisherId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'publishers/' + geneticMaterial.publisherId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(publisher?.name) }}
+                        </localized-link>
+                    </p>
+                    <p v-else-if="geneticMaterial?.authorReprint" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link to="scientific-results/author-reprints" class="font-medium text-gray-900 underline">
+                            {{ $t("authorReprintLabel") }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="geneticMaterial?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(geneticMaterial.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="geneticMaterial?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="geneticMaterial.doi" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="geneticMaterial?.doi"
+                        :can-edit="canEdit && !geneticMaterial?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="geneticMaterial?.isMetadataValid"
+                        :files-valid="geneticMaterial?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(geneticMaterial?.description)"
+                        :document="geneticMaterial"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        @update="fetchValidationStatus(geneticMaterial?.id as number, geneticMaterial as _Document)"
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <document-action-box
-            ref="actionsRef"
-            :doi="geneticMaterial?.doi"
-            :can-edit="canEdit && !geneticMaterial?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="geneticMaterial?.isMetadataValid"
-            :files-valid="geneticMaterial?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(geneticMaterial?.description)"
-            :document="geneticMaterial"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            @update="fetchValidationStatus(geneticMaterial?.id as number, geneticMaterial as _Document)"
-        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="geneticMaterial?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(geneticMaterial?.description)"
+            />
+        </template>
 
-        <tab-content-loader v-if="!geneticMaterial" layout="sections" />
-        <v-tabs
-            v-show="geneticMaterial"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-            show-arrows
-            class="landing-tabs"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -107,13 +111,19 @@
             <v-tab v-show="isAdmin" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="geneticMaterial"
-            v-model="currentTab"
-            class="min-w-0"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :description="geneticMaterial?.description"
+                    :contributions="geneticMaterial?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="geneticMaterial?.id"
+                    :document-type="PublicationType.GENETIC_MATERIAL"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
                     :document-id="geneticMaterial?.id"
@@ -201,17 +211,19 @@
                     :entity-id="geneticMaterial?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <share-buttons
-            v-if="geneticMaterial && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(geneticMaterial.title) as string)"
-            :document-id="(geneticMaterial.id as number)"
-            :document-type="PublicationType.GENETIC_MATERIAL"
-        />
+        <template #footer>
+            <share-buttons
+                v-if="geneticMaterial && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(geneticMaterial.title) as string)"
+                :document-id="(geneticMaterial.id as number)"
+                :document-type="PublicationType.GENETIC_MATERIAL"
+            />
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -242,10 +254,10 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import Wordcloud from '@/components/core/Wordcloud.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import { injectFairSignposting } from '@/utils/FairSignpostingHeadUtil';
@@ -265,13 +277,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
-
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "GeneticMaterialLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, Wordcloud, TabContentLoader, DocumentActionBox, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
