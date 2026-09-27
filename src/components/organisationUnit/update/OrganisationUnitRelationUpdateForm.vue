@@ -11,11 +11,10 @@
                         v-model="relation.relationType"
                         :items="relationTypes"
                         :label="$t('relationTypeLabel')"
-                        return-object>
-                    </v-select>
+                        return-object />
                 </v-col>
                 <v-col cols="7">
-                    <organisation-unit-autocomplete-search :ref="(el) => (autocompleteSearchRef[index] = el)" v-model:model-value="relation.targetOrganisationUnit" required></organisation-unit-autocomplete-search>
+                    <organisation-unit-autocomplete-search :ref="(el) => (autocompleteSearchRef[index] = el)" v-model:model-value="relation.targetOrganisationUnit" required />
                 </v-col>
                 <v-col cols="2">
                     <v-btn v-if="relation.id || index > 0" icon @click="removeRelation(index, relation.id)">

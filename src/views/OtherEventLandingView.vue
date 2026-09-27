@@ -64,10 +64,10 @@
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -140,7 +140,7 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.OTHER_EVENT"
@@ -149,7 +149,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -203,12 +203,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import DataQualityService from '@/services/revision/DataQualityService';
 
 export default defineComponent({
     name: "OtherEventLandingPage",
     components: { LandingPageLayout, PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience, isInstitutionalEditor, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("contributions");
 
@@ -241,6 +242,7 @@ export default defineComponent({
 
         const canEdit = ref(false);
         const canClassify = ref(false);
+        const canAssessDataQuality = ref(false);
         const country = ref<Country>();
 
         const eventIndicators = ref<EntityIndicatorResponse[]>();
@@ -254,6 +256,14 @@ export default defineComponent({
                 EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
+
+                DataQualityService.canAssessDataQuality(
+                    "OTHER_EVENT", 
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+                
                 EventService.canClassify(parseInt(currentRoute.params.id as string)).then((response) => {
                     canClassify.value = response.data;
                 });
@@ -371,6 +381,7 @@ export default defineComponent({
         };
 
         return {
+            canReviewDataQuality,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent, otherEvent,
             updateContributions, updateKeywords,
@@ -380,9 +391,7 @@ export default defineComponent({
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, fetchIdentifiers,
             getOtherEventTypeTitleFromValueAutoLocale, eventIdentifiers,
-            isAdmin, EntityType, fetchOtherEvent,
-            dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal
+            isAdmin, EntityType, fetchOtherEvent, dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal, isViceDeanForScience, isInstitutionalEditor, canAssessDataQuality,
         };
 }})
 

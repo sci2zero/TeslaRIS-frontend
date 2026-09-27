@@ -24,8 +24,7 @@
                                         :items="relationTypes"
                                         :label="$t('relationTypeLabel') + '*'"
                                         :rules="requiredSelectionRules"
-                                        return-object>
-                                    </v-select>
+                                        return-object />
                                 </v-col>
                                 <v-col cols="7">
                                     <event-autocomplete-search
@@ -47,7 +46,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

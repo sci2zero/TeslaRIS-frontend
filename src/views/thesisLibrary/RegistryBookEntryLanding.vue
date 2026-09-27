@@ -26,7 +26,7 @@
                     <v-card-text class="edit-pen-container">
                         <generic-crud-modal
                             :form-component="RegistryBookEntryForm"
-                            :form-props="{ presetRegistryBookEntry: registryBookEntry, canSave: canEdit }"
+                            :form-props="{ presetRegistryBookEntry: registryBookEntry, canSave: canEdit, cannotSaveReason: $t('registryEntryPromotionFinishedMessage') }"
                             is-section-update
                             entity-name="RegistryBookEntry"
                             :read-only="!canEdit"
@@ -316,8 +316,7 @@
             v-model="displayPersistentDialog"
             :title="$t('areYouSureLabel')"
             :message="$t('removeOneFromPromotionMessage')"
-            @continue="removeFromPromotion">
-        </persistent-question-dialog>
+            @continue="removeFromPromotion" />
     </v-container>
 </template>
 

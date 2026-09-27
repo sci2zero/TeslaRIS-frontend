@@ -75,8 +75,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedCountries.map(entity => returnCurrentLocaleContent(entity.name) as string)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

@@ -16,7 +16,7 @@
                 :class="comfortable ? 'comfortable' : ''"
                 @update:search="searchCommissions"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
         <v-col cols="1">
             <v-btn v-show="allowManualClearing && hasSelection" icon @click="clearInput">

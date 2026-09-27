@@ -172,6 +172,7 @@
                 :show-classification="showClassification"
                 :is-commission="isCommission"
                 :logged-in-commission-id="loggedInUser?.commissionId"
+                :show-document-download="isDigitalRepositoryEnabled"
                 @update:selected-publications="selectedPublications = $event"
                 @claim="claimPublication"
                 @decline-claim="declinePublicationClaim"
@@ -192,8 +193,7 @@
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
         :endpoint-body-parameters="endpointBodyParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
 
     <publication-quick-glance
         v-model="glanceOpen"
@@ -229,8 +229,7 @@
         :title="$t('areYouSureLabel')"
         :message="!allowResearcherUnbinding ? $t('confirmDeletionMessage') : $t('confirmUnbindingMessage')"
         :entity-names="selectedPublications.map(entity => $i18n.locale.startsWith('sr') ? entity.titleSr : entity.titleOther)"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">
@@ -252,6 +251,7 @@ import ResponsiveDataTable from '../core/ResponsiveDataTable.vue';
 import PublicationTableRow from './PublicationTableRow.vue';
 import PublicationCard from './PublicationCard.vue';
 import PublicationQuickGlance from './PublicationQuickGlance.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -355,6 +355,9 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
         const exportModal = ref<any>(null);
 
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
         onMounted(() => {
             if ((props.inClaimer ||
                 isAdmin.value ||
@@ -432,9 +435,21 @@ export default defineComponent({
                 sortable: true, 
                 key: "type"
             },
-            { title: "DOI", align: "start", sortable: true, key: "doi"},
-            { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"}
+            { title: "DOI", align: "start", sortable: true, key: "doi"}
         ]);
+
+        const documentDownloadHeader = { title: downloadableDocumentsLabel, align: "start", sortable: false, key: "documentDownload"};
+
+        watch(isDigitalRepositoryEnabled, (enabled) => {
+            const index = headers.value.findIndex((header: any) => header.key === "documentDownload");
+
+            if (enabled && index === -1) {
+                const doiIndex = headers.value.findIndex((header: any) => header.key === "doi");
+                headers.value.splice(doiIndex + 1, 0, documentDownloadHeader);
+            } else if (!enabled && index !== -1) {
+                headers.value.splice(index, 1);
+            }
+        }, { immediate: true });
 
         // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
         const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year", defaultOrder: "desc" })
@@ -682,9 +697,7 @@ export default defineComponent({
             removeResearchOutputs, ExportEntity,
             isUserLoggedIn, validateSection,
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
-            titleColumn, yearHeader, displayPersistentDialog,
-            startDeletionProcess, showSelect, showClassification,
-            glanceOpen, glancedPublication, openGlance
+            titleColumn, yearHeader, displayPersistentDialog, startDeletionProcess, showSelect, showClassification, glanceOpen, glancedPublication, openGlance, isDigitalRepositoryEnabled,
         };
     }
 });

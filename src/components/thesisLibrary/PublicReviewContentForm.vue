@@ -32,8 +32,7 @@
                         :items="pageContentTypes"
                         :label="$t('contentTypeLabel') + '*'"
                         :rules="requiredSelectionRules"
-                        return-object>
-                    </v-select>
+                        return-object />
                 </v-col>
                 <v-col cols="6">
                     <v-select
@@ -41,8 +40,7 @@
                         :items="pageTypes"
                         :label="$t('pageTypeLabel') + '*'"
                         :rules="requiredSelectionRules"
-                        return-object>
-                    </v-select>
+                        return-object />
                 </v-col>
             </v-row>
             <v-row>
@@ -53,8 +51,7 @@
                         :label="$t('applicableTypeLabel') + '*'"
                         :rules="requiredSelectionRules"
                         return-object
-                        multiple>
-                    </v-select>
+                        multiple />
                 </v-col>
             </v-row>
         </v-container>

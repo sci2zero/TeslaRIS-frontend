@@ -21,11 +21,11 @@
                             :key="option.value"
                             :label="option.title"
                             :value="option.value"
-                        ></v-radio>
+                        />
                     </v-radio-group>
                 </v-card-text>
                 <template #actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
   
                     <v-btn @click="cancelOperation">
                         {{ $t("cancelLabel") }}

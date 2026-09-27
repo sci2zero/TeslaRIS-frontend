@@ -7,7 +7,7 @@
             <expertise-or-skill-modal :read-only="!canEdit" @create="createExpertiseOrSkill" />
             <h3>{{ $t("expertisesAndSkillsLabel") }}</h3>
             <strong v-if="expertiseOrSkills?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-            <br />
+            <br>
             <draggable 
                 :list="expertiseOrSkills" item-key="id"
                 group="expertiseOrSkills" 
@@ -86,8 +86,7 @@
                         is-proof
                         @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
                         @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)"
-                        @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)">
-                    </attachment-list>
+                        @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)" />
                     
                     <v-divider
                         v-if="index < (expertiseOrSkills ? expertiseOrSkills.length : 1) - 1"

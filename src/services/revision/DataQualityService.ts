@@ -1,12 +1,15 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
-import { type DataQualityAssessment, type DataQualityIssue, type DataQualityIssueDetails, type DataQualityProfile, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
-import type { Page } from "@/models/Common";
+import { type ConstraintSummary, type DataQualityAssessment, type DataQualityIssueDetails, type DataQualityIssuePage, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality } from "@/models/RevisionModel";
 
 
 export class DataQualityService extends BaseService {
 
+  async canAssessDataQuality(entityType: string, entityId: number): Promise<AxiosResponse<boolean>> {
+    return super.sendRequest(axios.get, `data-quality/${entityType}/${entityId}/can-assess`);
+  }
+  
   async getQualityReportForEntity(entityType: string, entityId: number): Promise<AxiosResponse<QualityReportResponse[]>> {
     return super.sendRequest(axios.get, `data-quality/report/${entityType}/${entityId}`);
   }
@@ -19,8 +22,28 @@ export class DataQualityService extends BaseService {
     return super.sendRequest(axios.get, `data-quality/related/${entityType}/${entityId}`);
   }
 
-  async getIssuesForEntity(entityType: string, entityId: number, profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, page: number, size: number): Promise<AxiosResponse<Page<DataQualityIssue>>> {
-    const params = new URLSearchParams({ profileName, page: `${page}`, size: `${size}` });
+  async getIssuesForEntity(entityType: string, entityId: number, profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, assessmentDate: string | undefined, cursor: string | undefined, size: number): Promise<AxiosResponse<DataQualityIssuePage>> {
+    const params = this.issueParams(profileName, target, dimension, severity, constraintKey, assessmentDate, cursor, size);
+
+    return super.sendRequest(axios.get, `data-quality/issues/${entityType}/${entityId}?${params.toString()}`);
+  }
+
+  async getRepositoryIssues(profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, assessmentDate: string | undefined, cursor: string | undefined, size: number): Promise<AxiosResponse<DataQualityIssuePage>> {
+    const params = this.issueParams(profileName, target, dimension, severity, constraintKey, assessmentDate, cursor, size);
+
+    return super.sendRequest(axios.get, `data-quality/issues?${params.toString()}`);
+  }
+
+  private issueParams(profileName: string, target: string | undefined, dimension: string | undefined, severity: string | undefined, constraintKey: string | undefined, assessmentDate: string | undefined, cursor: string | undefined, size: number): URLSearchParams {
+    const params = new URLSearchParams({ profileName, size: `${size}` });
+
+    if (assessmentDate) {
+      params.append("assessmentDate", assessmentDate.split("T")[0]);
+    }
+
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
 
     if (target) {
       params.append("target", target);
@@ -38,11 +61,19 @@ export class DataQualityService extends BaseService {
       params.append("constraintKey", constraintKey);
     }
 
-    return super.sendRequest(axios.get, `data-quality/issues/${entityType}/${entityId}?${params.toString()}`);
+    return params;
   }
 
   async getIssueDetails(assessmentId: number, ruleKey: string): Promise<AxiosResponse<DataQualityIssueDetails>> {
     return super.sendRequest(axios.get, `data-quality/issue/${assessmentId}/${ruleKey}`);
+  }
+
+  async listProfileNames(): Promise<AxiosResponse<DataQualityProfileSummary[]>> {
+    return super.sendRequest(axios.get, "data-quality/profiles/names");
+  }
+
+  async listProfileConstraints(profileName: string, target: string | undefined): Promise<AxiosResponse<ConstraintSummary[]>> {
+    return super.sendRequest(axios.get, `data-quality/profiles/${profileName}/constraints${target ? `?target=${target}` : ""}`);
   }
 
   async listProfiles(): Promise<AxiosResponse<DataQualityProfile[]>> {

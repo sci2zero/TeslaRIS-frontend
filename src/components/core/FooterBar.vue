@@ -1,7 +1,7 @@
 <template>
     <div id="footer">
         <footer class="footer-section relative text-center md:text-left">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm z-[2]"></div>
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm z-[2]" />
             <div class="z-[2] relative">
                 <div class="container mx-auto px-4 py-12">
                     <!-- Main Footer Content -->
@@ -56,7 +56,7 @@
                             </h4>
                             <div class="footer-contact">
                                 <p class="text-white/80 text-sm flex items-center mb-2">
-                                    <v-icon icon="mdi-map-marker" class="mr-2" size="16"></v-icon>
+                                    <v-icon icon="mdi-map-marker" class="mr-2" size="16" />
                                     {{ $t('footer.location') }}
                                 </p>
                                 <!-- <p class="text-white/80 text-sm flex items-center mb-2">
@@ -92,7 +92,7 @@
                                 </p>
                             </div>
                             <div class="text-white/70">
-                                <version-link></version-link>
+                                <version-link />
                             </div>
                         </div>
                     </div>

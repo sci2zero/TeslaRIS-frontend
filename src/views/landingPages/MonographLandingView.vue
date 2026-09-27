@@ -108,7 +108,7 @@
             <v-tab value="contributions">
                 {{ $t(monograph?.monographType === MonographType.EDITED_BOOK ? "editorsAndReviewersLabel" : "contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -126,10 +126,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -258,15 +258,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.MONOGRAPH"
                     :entity-id="monograph?.id"
+                    :restore-blocked-reason="monograph?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="() => fetchMonograph(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -298,6 +300,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { MonographType, PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -349,6 +352,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "MonographLandingPage",
@@ -375,8 +379,18 @@ export default defineComponent({
         const monograph = ref<Monograph>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -417,6 +431,13 @@ export default defineComponent({
 
         const fetchDisplayData = (uponStartup: boolean) => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.MONOGRAPH,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -634,7 +655,7 @@ export default defineComponent({
         };
 
         return {
-            monograph, actionsRef,
+            monograph, actionsRef, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent,
             languageMap, updateBasicInfo,
             searchKeyword, goToURL, canEdit,
@@ -658,7 +679,9 @@ export default defineComponent({
             MonographType, localiseFlexibleDate,
             fetchMonograph,
             dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal
+            updateModalRef, openModal,
+
+            isDigitalRepositoryEnabled,
         };
 }})
 

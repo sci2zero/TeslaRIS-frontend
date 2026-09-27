@@ -17,7 +17,7 @@
     >
         <template v-if="$slots['top-left']" #top-left>
             <div :class="[selectedPersons.length > 0 ? 'w-64' : 'w-96']">
-                <slot name="top-left"></slot>
+                <slot name="top-left" />
             </div>
         </template>
         <template #actions>
@@ -178,8 +178,7 @@
         :title="$t('areYouSureLabel')"
         :message="$t('confirmDeletionMessage')"
         :entity-names="selectedPersons.map(entity => entity.name.split('; ')[0])"
-        @continue="deleteSelection">
-    </persistent-question-dialog>
+        @continue="deleteSelection" />
 </template>
 
 <script lang="ts">

@@ -1,9 +1,9 @@
 <template>
     <v-container>
         <h1>{{ $t("indicatorListLabel") }}</h1>
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header

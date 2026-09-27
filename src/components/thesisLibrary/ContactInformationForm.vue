@@ -11,48 +11,48 @@
                     return-object
                     :rules="requiredSelectionRules"
                     hide-details="auto"
-                ></v-select>
+                />
             </v-col>
             <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="formValue.streetAndNumber"
                     :label="$t('streetAndNumberLabel') + '*'"
                     :rules="requiredFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="formValue.place"
                     :label="$t('placeLabel') + '*'"
                     :rules="requiredFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="formValue.municipality"
                     :label="$t('municipalityLabel') + '*'"
                     :rules="requiredFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="formValue.postalCode"
                     :label="$t('postalCodeLabel') + '*'"
                     :rules="requiredFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="formValue.contact.contactEmail"
                     :label="$t('emailLabel') + '*'"
                     :rules="emailFieldRules"
-                ></v-text-field>
+                />
             </v-col>
             <v-col cols="6">
                 <v-text-field
                     v-model="formValue.contact.phoneNumber"
                     :label="$t('phoneNumberLabel')"
-                ></v-text-field>
+                />
             </v-col>
         </v-row>
     </v-form>

@@ -40,14 +40,14 @@
                         <localized-link
                             :to="'scientific-results/thesis/' + row.item.databaseId"
                             open-in-new-tab>
-                            <rich-title-renderer :title="row.item.titleSr"></rich-title-renderer>
+                            <rich-title-renderer :title="row.item.titleSr" />
                         </localized-link>
                     </td>
                     <td v-else>
                         <localized-link
                             :to="'scientific-results/thesis/' + row.item.databaseId"
                             open-in-new-tab>
-                            <rich-title-renderer :title="row.item.titleOther"></rich-title-renderer>
+                            <rich-title-renderer :title="row.item.titleOther" />
                         </localized-link>
                     </td>
                     <td>

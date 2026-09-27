@@ -1,7 +1,11 @@
 import { type Composer, createI18n, type I18n } from 'vue-i18n';
+import { merge } from 'lodash';
 import en from "./en";
 import sr from "./sr";
 import srCyrOverrides from "./sr-cyr";
+import enOverride from "./en-override";
+import srOverride from "./sr-override";
+import srCyrOverride from "./sr-cyr-override";
 import { toCyrillic } from './serbianTransliteration';
 
 
@@ -39,12 +43,14 @@ function setup(options = { locale: defaultLocale }) {
         fallbackLocale: defaultLocale,
         allowComposition: true,
         messages: {
-            en: en,
-            sr: sr,
-            "sr-cyr": {
-                ...transliterateMessages(sr),
-                ...srCyrOverrides
-            }
+            en: merge({}, en, enOverride),
+            sr: merge({}, sr, srOverride),
+            "sr-cyr": merge(
+                {},
+                transliterateMessages(merge({}, sr, srOverride)),
+                srCyrOverrides,
+                srCyrOverride
+            )
         },
     });
 

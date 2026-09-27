@@ -78,7 +78,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -93,10 +93,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -127,8 +127,8 @@
                     :document="performanceRelatedOutput"
                     :can-edit="canEdit && !performanceRelatedOutput?.isArchived"
                     :proofs="performanceRelatedOutput?.proofs"
-                    :file-items="performanceRelatedOutput?.fileItems">
-                </attachment-section>
+                    :file-items="performanceRelatedOutput?.fileItems"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab
@@ -198,16 +198,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
                     :entity-id="performanceRelatedOutput?.id"
+                    :restore-blocked-reason="performanceRelatedOutput?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchPerformanceRelatedOutput"
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -239,6 +240,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, PerformanceRelatedOutput } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -279,6 +281,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "PerformanceRelatedOutputLandingPage",
@@ -305,8 +308,18 @@ export default defineComponent({
         const performanceRelatedOutput = ref<PerformanceRelatedOutput>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -340,6 +353,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PERFORMANCE_RELATED_OUTPUT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -474,7 +494,7 @@ export default defineComponent({
         };
 
         return {
-            performanceRelatedOutput, ApplicableEntityType,
+            performanceRelatedOutput, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, canEdit,
             updateKeywords, updateDescription, StatisticsType,
@@ -489,7 +509,9 @@ export default defineComponent({
             PerformanceRelatedOutputUpdateForm, isAdmin, isCommission,
             fetchIdentifiers, documentIdentifiers, updateRemark,
             localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal
+            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal,
+
+            isDigitalRepositoryEnabled,
         };
 }})
 

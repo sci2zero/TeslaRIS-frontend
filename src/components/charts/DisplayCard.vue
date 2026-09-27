@@ -13,7 +13,7 @@
                 v-else
                 color="primary"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-card-text>
     </v-card>
 </template>

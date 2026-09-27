@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title class="text-h5 d-flex align-center justify-space-between">
                 <span>{{ $t("impactFactorTableLabel") }}</span>
-                <v-spacer></v-spacer>
+                <v-spacer />
 
                 <v-row no-gutters class="align-center" style="max-width: 250px;">
                     <v-col cols="5">
@@ -17,7 +17,7 @@
                             class="mr-2"
                             min="1999"
                             :max="(new Date()).getFullYear() + 2"
-                        ></v-text-field>
+                        />
                     </v-col>
 
                     <v-col cols="5">
@@ -30,7 +30,7 @@
                             :label="$t('toLabel')"
                             min="1999"
                             :max="(new Date()).getFullYear() + 2"
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
             </v-card-title>
@@ -42,8 +42,7 @@
                     :items="ifValuesTable"
                     density="comfortable"
                     hide-default-footer
-                    class="mb-5"
-                >
+                    class="mb-5">
                     <template #top>
                         <v-toolbar flat>
                             <v-toolbar-title>{{ $t("ifValuesLabel") }}</v-toolbar-title>
@@ -67,8 +66,7 @@
                     :items="categoryData.ifValues"
                     class="mb-5"
                     density="comfortable"
-                    hide-default-footer
-                >
+                    hide-default-footer>
                     <template #top>
                         <v-toolbar flat>
                             <v-toolbar-title>{{ categoryData.category }}</v-toolbar-title>

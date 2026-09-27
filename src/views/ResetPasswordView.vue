@@ -3,14 +3,14 @@
         <v-sheet class="text-center">
             <h1>{{ $t("resetPasswordLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
+        <br>
+        <br>
         <v-row v-if="success === null">
             <v-col cols="12">
                 <v-form v-model="isFormValid" @submit.prevent>
                     <v-row justify="center">
                         <v-col cols="6" class="bg-blue-grey-lighten-5">
-                            <password-input-with-meter :label="$t('newPasswordLabel')" repeat-password @password-change="newPassword = $event"></password-input-with-meter>
+                            <password-input-with-meter :label="$t('newPasswordLabel')" repeat-password @password-change="newPassword = $event" />
                         </v-col>
                     </v-row>
                     <v-row justify="center">

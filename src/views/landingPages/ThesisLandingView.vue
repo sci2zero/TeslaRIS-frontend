@@ -379,7 +379,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -399,10 +399,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -466,8 +466,7 @@
                     :thesis-id="thesis?.id"
                     :can-edit="canEdit"
                     :researcher-id="thesis?.contributions![0].personId"
-                >
-                </thesis-research-output-section>
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -500,16 +499,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.THESIS"
                     :entity-id="thesis?.id"
+                    :restore-blocked-reason="restoreBlockedReason"
                     @restored="fetchThesis"
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -550,6 +550,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { DocumentContributionType, PublicationType, ThesisType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, Thesis } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -608,6 +609,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "ThesisLandingPage",
@@ -624,6 +626,11 @@ export default defineComponent({
             nextTick(() => dataQualityTabsRef.value?.selectVersion(
                 version.majorVersion, version.minorVersion));
         };
+
+        const {
+            isDigitalLibraryEnabled,
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -643,11 +650,24 @@ export default defineComponent({
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission, isInstitutionalEditor, isUserLoggedIn } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalLibrarian, isHeadOfLibrary, isCommission, isInstitutionalEditor, isUserLoggedIn, canReviewDataQuality } = useUserRole();
         const userCanPutOnPublicReview = computed(() => isAdmin.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value);
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const canBePutOnPublicReview = ref(false);
+
+        const restoreBlockedReason = computed(() => {
+            if (thesis.value?.isArchived) {
+                return i18n.t("restoreArchivedDocumentMessage");
+            }
+
+            if (thesis.value?.isOnPublicReview || thesis.value?.isOnPublicReviewPause) {
+                return i18n.t("restoreThesisOnPublicReviewMessage");
+            }
+
+            return undefined;
+        });
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
 
@@ -758,6 +778,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.THESIS,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 EntityClassificationService.canClassifyDocument(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -1126,7 +1153,7 @@ export default defineComponent({
         };
 
         return {
-            thesis, publisher, createIndicator, languageTagMap,
+            thesis, publisher, createIndicator, languageTagMap, canAssessDataQuality, isDigitalLibraryEnabled, restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, fetchIndicators,
             languageMap, searchKeyword, canEdit, putOnPublicReview,
             updateKeywords, updateDescription, examineRegistryBookEntry,
@@ -1157,7 +1184,10 @@ export default defineComponent({
             showValidateMetadata, showValidateFiles,
             primaryLibrarianAction, hasMoreActions,
             openModal, openCitationDialog, openUnbindDialog,
-            downloadRoCrate, validateMetadata, validateUploadedFiles
+            downloadRoCrate, validateMetadata, validateUploadedFiles,
+
+            canReviewDataQuality,
+            isDigitalRepositoryEnabled,
         };
 }})
 

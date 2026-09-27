@@ -66,10 +66,10 @@
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -154,7 +154,7 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.EXHIBITION"
@@ -163,7 +163,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -187,6 +187,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { EventType, type Exhibition, type PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import PersonEventContributionTabs from '@/components/core/PersonEventContributionTabs.vue';
 import { ApplicableEntityType, type Country, type MultilingualContent } from '@/models/Common';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -222,7 +223,7 @@ export default defineComponent({
     name: "ExhibitionLandingPage",
     components: { LandingPageLayout, PersonEventContributionTabs, GenericCrudModal, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("overview");
 
@@ -254,6 +255,7 @@ export default defineComponent({
         const router = useRouter();
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const country = ref<Country>();
 
@@ -265,6 +267,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.EXHIBITION,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -383,7 +392,7 @@ export default defineComponent({
         };
 
         return {
-            exhibition, fetchIdentifiers,
+            exhibition, fetchIdentifiers, canAssessDataQuality, canReviewDataQuality,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,
             updateContributions, updateKeywords,
@@ -392,7 +401,7 @@ export default defineComponent({
             eventIndicators, fetchIndicators, createIndicator,
             currentTab, eventClassifications, createClassification,
             fetchClassifications, canClassify, EventType,
-            eventIdentifiers,
+            eventIdentifiers, isViceDeanForScience,
             isAdmin, EntityType, fetchExhibition,
             dataQualityTabsRef, showAssessmentDetails,
             updateModalRef, openModal

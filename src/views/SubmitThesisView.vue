@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("addThesisLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <thesis-submission-form ref="submissionFormRef"></thesis-submission-form>
+        <br>
+        <br>
+        <thesis-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid || submissionFormRef?.ouAutocompleteRef?.showThesisTypeError" class="submission-action" @click="submissionFormRef?.submitThesis(false)">

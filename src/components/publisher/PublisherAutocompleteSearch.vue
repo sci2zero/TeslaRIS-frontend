@@ -35,7 +35,7 @@
             <v-checkbox
                 v-model="authorReprint"
                 :label="$t('authorReprintLabel')"
-            ></v-checkbox>
+            />
         </v-col>
     </v-row>
 </template>

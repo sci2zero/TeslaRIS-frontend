@@ -34,8 +34,7 @@
                     :label="$t('contributionTypeLabel')"
                     return-object
                     :readonly="lockContributionType !== undefined && lockContributionType.length === 1"
-                    @update:model-value="sendContentToParent">
-                </v-select>
+                    @update:model-value="sendContentToParent" />
             </v-col>
         </v-row>
         <v-row v-if="input.eventContributionType && showPerTypeFields(input.eventContributionType.value, EventContributionType.ARGUER, 'ARGUER')">

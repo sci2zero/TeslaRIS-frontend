@@ -47,7 +47,7 @@
                         v-bind="props"
                         variant="text"
                         color="primary"
-                    ></v-btn>
+                    />
                 </template>
 
                 <v-date-picker
@@ -57,7 +57,7 @@
                     :color="color"
                     @click.stop
                 >
-                    <template #header></template>
+                    <template #header />
                     <template #actions>
                         <v-btn @click.stop="clearDate">
                             {{ $t("deleteLabel") }}

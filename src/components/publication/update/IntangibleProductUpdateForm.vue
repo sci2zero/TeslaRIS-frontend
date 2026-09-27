@@ -60,7 +60,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <uri-input ref="urisRef" v-model="uris"></uri-input>
+                <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
         <v-row>
@@ -68,8 +68,7 @@
                 <publisher-autocomplete-search
                     ref="publisherAutocompleteRef"
                     v-model="selectedPublisher"
-                    allow-author-reprint>
-                </publisher-autocomplete-search>
+                    allow-author-reprint />
             </v-col>
         </v-row>
         <v-row>
@@ -100,8 +99,7 @@
                 <multilingual-text-input
                     ref="usersRef"
                     v-model="productUsers"
-                    :label="$t('productUsersLabel')">
-                </multilingual-text-input>
+                    :label="$t('productUsersLabel')" />
             </v-col>
         </v-row>
         <h2

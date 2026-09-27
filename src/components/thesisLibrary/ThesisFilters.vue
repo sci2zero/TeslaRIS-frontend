@@ -6,7 +6,7 @@
                 multiple
                 disable-submission
                 label="institutionsLabel"
-            ></organisation-unit-autocomplete-search>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <v-select
@@ -15,7 +15,7 @@
                 :items="thesisTypes"
                 return-object
                 multiple
-            ></v-select>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <person-autocomplete-search
@@ -23,7 +23,7 @@
                 multiple
                 disable-submission
                 label="boardPresidentsLabel"
-            ></person-autocomplete-search>
+            />
         </v-col>
     </v-row>
     <v-row>
@@ -33,7 +33,7 @@
                 multiple
                 disable-submission
                 label="authorsLabel"
-            ></person-autocomplete-search>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <person-autocomplete-search
@@ -41,7 +41,7 @@
                 multiple
                 disable-submission
                 label="advisorsLabel"
-            ></person-autocomplete-search>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <person-autocomplete-search
@@ -49,7 +49,7 @@
                 multiple
                 disable-submission
                 label="boardMembersLabel"
-            ></person-autocomplete-search>
+            />
         </v-col>
     </v-row>
     <v-row>
@@ -58,20 +58,19 @@
                 v-model="fromDate"
                 :label="$t('fromLabel')"
                 color="primary"
-            ></date-picker>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <date-picker
                 v-model="toDate"
                 :label="$t('toLabel')"
                 color="primary"
-            ></date-picker>
+            />
         </v-col>
         <v-col cols="12" md="4">
             <v-checkbox 
                 v-model="showOnlyOpenAccess"
-                :label="$t('onlyOpenAccessLabel')">
-            </v-checkbox>
+                :label="$t('onlyOpenAccessLabel')" />
         </v-col>
     </v-row>
 </template>

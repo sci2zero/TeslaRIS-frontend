@@ -90,7 +90,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -105,10 +105,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -139,8 +139,7 @@
                     :document="intangibleProduct"
                     :can-edit="canEdit && !intangibleProduct?.isArchived"
                     :proofs="intangibleProduct?.proofs"
-                    :file-items="intangibleProduct?.fileItems">
-                </attachment-section>
+                    :file-items="intangibleProduct?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab
@@ -204,16 +203,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.INTANGIBLE_PRODUCT"
                     :entity-id="intangibleProduct?.id"
+                    :restore-blocked-reason="intangibleProduct?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchIntangibleProduct"
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -245,6 +245,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Document as _Document, IntangibleProduct } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -289,6 +290,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
@@ -306,6 +308,10 @@ export default defineComponent({
                 version.majorVersion, version.minorVersion));
         };
 
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const snackbar = ref(false);
         const snackbarMessage = ref("");
 
@@ -316,8 +322,9 @@ export default defineComponent({
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const { isResearcher, isAdmin, isCommission, canReviewDataQuality } = useUserRole();
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const i18n = useI18n();
@@ -351,6 +358,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.INTANGIBLE_PRODUCT,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -498,7 +512,7 @@ export default defineComponent({
         };
 
         return {
-            intangibleProduct, publisher, ApplicableEntityType,
+            intangibleProduct, publisher, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent, currentTab, canClassify,
             languageTagMap, searchKeyword, canEdit,
             updateKeywords, updateDescription, StatisticsType,
@@ -513,9 +527,10 @@ export default defineComponent({
             getIntangibleProductTypeTitleFromValueAutoLocale,
             isAdmin, isCommission, fetchIdentifiers, documentIdentifiers,
             localiseFlexibleDate,
-            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal
+            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal,
+
+            isDigitalRepositoryEnabled,
         };
 }})
 
 </script>
-

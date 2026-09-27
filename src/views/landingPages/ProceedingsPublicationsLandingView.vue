@@ -93,7 +93,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -108,10 +108,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -142,8 +142,7 @@
                     :document="proceedingsPublication"
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     :proofs="proceedingsPublication?.proofs"
-                    :file-items="proceedingsPublication?.fileItems">
-                </attachment-section>  
+                    :file-items="proceedingsPublication?.fileItems" />  
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab
@@ -206,16 +205,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
                     :entity-id="proceedingsPublication?.id"
+                    :restore-blocked-reason="proceedingsPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchProceedingsPublication"
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -247,6 +247,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -294,6 +295,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
@@ -317,8 +319,18 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
@@ -355,6 +367,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PROCEEDINGS_PUBLICATION,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -512,7 +531,7 @@ export default defineComponent({
         };
 
         return {
-            proceedingsPublication, publications, event, displayConfiguration,
+            proceedingsPublication, publications, event, displayConfiguration, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
             totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, ProceedingsPublicationUpdateForm,
             searchKeyword, canEdit, proceedings, getTitleFromValueAutoLocale,

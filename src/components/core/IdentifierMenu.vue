@@ -6,19 +6,19 @@
             <template #activator="{ props }">
                 <span v-bind="props" class="inline-flex items-center cursor-pointer select-none transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
                     <span v-if="type === 'orcid'">
-                        <img src="/icons/orcid.svg" alt="ORCID" class="pointer-events-none size-6" />
+                        <img src="/icons/orcid.svg" alt="ORCID" class="pointer-events-none size-6">
                     </span>
                     <span v-else-if="type === 'scopus'" class="size-6 rounded-full bg-[#ff8400] p-[2px]">
-                        <img src="/icons/scopus-icon.png" alt="SCOPUS" class="pointer-events-none rounded-full" />
+                        <img src="/icons/scopus-icon.png" alt="SCOPUS" class="pointer-events-none rounded-full">
                     </span>
                     <span v-else-if="type === 'openalex'" class="size-6 p-0.5">
-                        <img src="/icons/openalex-logo.png" alt="SCOPUS" class="pointer-events-none" />
+                        <img src="/icons/openalex-logo.png" alt="SCOPUS" class="pointer-events-none">
                     </span>
                     <span v-else-if="type === 'webofscience'" class="size-6 p-0.5">
-                        <img src="/icons/wos-logo.svg" alt="SCOPUS" class="pointer-events-none" />
+                        <img src="/icons/wos-logo.svg" alt="SCOPUS" class="pointer-events-none">
                     </span>
                     <span v-else-if="type === 'doi'" class="size-6 p-0.5">
-                        <img src="/icons/doi.svg" alt="DOI" class="pointer-events-none" />
+                        <img src="/icons/doi.svg" alt="DOI" class="pointer-events-none">
                     </span>
                     <span v-else>
                         <v-icon class="pointer-events-none size-6" color="#666">mdi-identifier</v-icon>

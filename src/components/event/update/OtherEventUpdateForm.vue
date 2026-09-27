@@ -44,7 +44,7 @@
                             :label="$t('fromLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker>
+                        />
                     </v-col>
                     <v-col v-if="timePeriodInput" cols="3">
                         <date-picker
@@ -52,12 +52,12 @@
                             :label="$t('toLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker>
+                        />
                     </v-col>
                     <v-col v-if="!timePeriodInput" cols="6">
                         <v-text-field
                             v-model="eventYear" type="number" :min="1950" :max="2030"
-                            :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules"></v-text-field>
+                            :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules" />
                     </v-col>
                     <v-col>
                         <v-btn color="blue darken-1" compact @click="timePeriodInput = !timePeriodInput">
@@ -69,7 +69,7 @@
                     {{ dateRangeFormatError }}
                 </p>
                 <v-row v-if="!inComparator" class="mt-2">
-                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')"></v-checkbox>
+                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')" />
                 </v-row>
                 <v-row>
                     <v-col>
@@ -79,7 +79,7 @@
                             :items="countries"
                             :label="$t('countryLabel')"
                             return-object
-                        ></v-select>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>

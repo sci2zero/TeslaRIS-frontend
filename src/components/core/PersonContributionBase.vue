@@ -592,7 +592,10 @@ export default defineComponent({
 
                         sendContentToParent();
                     });
-                } else if (selectedPersonName) {
+                } else if (!props.presetContributionValue.personId) {
+                    // A missing id means a non-managed contributor. The -1 placeholder only means
+                    // "nothing picked yet", so it must neither flip the row into external mode nor
+                    // reach readPerson(-1).
                     customNameInput.value = true;
                     selectExternalAssociate.value = true;
                 }

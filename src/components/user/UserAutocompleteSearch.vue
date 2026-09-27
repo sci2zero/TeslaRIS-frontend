@@ -13,7 +13,7 @@
                 return-object
                 @update:search="searchUsers($event)"
                 @update:model-value="sendContentToParent"
-            ></v-autocomplete>
+            />
         </v-col>
     </v-row>
 </template>

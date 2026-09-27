@@ -4,7 +4,7 @@
             <h1 class="d-flex flex-row justify-center">
                 {{ $t("harvestDataLabel") }}
             </h1>
-            <br />
+            <br>
             <div>
                 <v-section v-if="currentTab === 'externalSources'">
                     <v-row
@@ -216,8 +216,7 @@
                     <v-window-item value="scheduledHarvests">
                         <scheduled-tasks-list
                             :scheduled-tasks="scheduledTasks"
-                            @delete="deleteScheduledHarvestTask">
-                        </scheduled-tasks-list>
+                            @delete="deleteScheduledHarvestTask" />
                     </v-window-item>
                 </v-window>
             </div>
@@ -231,7 +230,7 @@
                     :width="7"
                     color="blue"
                     indeterminate
-                ></v-progress-circular>
+                />
             </v-row>
             <v-container v-if="harvestComplete" class="d-flex flex-row justify-center">
                 <h2 v-if="newDocumentsHarvested > 0">

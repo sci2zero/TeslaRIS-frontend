@@ -38,7 +38,7 @@
                 </template>
 
                 <template #actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
   
                     <v-btn @click="dialog = false">
                         {{ $t("cancelLabel") }}

@@ -7,6 +7,13 @@ export enum IssueSeverity {
     ERROR = "ERROR"
 }
 
+// Vuetify colour per severity, shared by every chip that renders one.
+export const SEVERITY_COLORS: Record<IssueSeverity, string> = {
+    [IssueSeverity.ERROR]: "error",
+    [IssueSeverity.WARNING]: "warning",
+    [IssueSeverity.INFO]: "info"
+};
+
 export interface QualityReportResponse {
     profileName: string;
     qualityScore: number;
@@ -47,14 +54,13 @@ export interface Revision {
 }
 
 export enum QualityDimension {
-    COMPLETENESS = "COMPLETENESS",
-    VALIDITY = "VALIDITY",
-    UNIQUENESS = "UNIQUENESS",
-    CONSISTENCY = "CONSISTENCY",
-    TIMELINESS = "TIMELINESS",
     ACCURACY = "ACCURACY",
-    CONFORMITY = "CONFORMITY",
-    INTEGRITY = "INTEGRITY"
+    CONSISTENCY = "CONSISTENCY",
+    LINEAGE = "LINEAGE",
+    STRUCTURAL_CONSISTENCY = "STRUCTURAL_CONSISTENCY",
+    QUALITATIVE = "QUALITATIVE",
+    SEMANTIC = "SEMANTIC",
+    CURRENCY = "CURRENCY"
 }
 
 export interface DimensionScore {
@@ -99,10 +105,34 @@ export interface DataQualityAssessment {
 }
 
 export enum RelatedEntityType {
+    PERSONS = "PERSONS",
+    ORGANISATION_UNITS = "ORGANISATION_UNITS",
     OUTPUTS = "OUTPUTS",
-    PROJECTS = "PROJECTS",
     ACTIVITIES = "ACTIVITIES",
+    PROJECTS = "PROJECTS",
     FUNDINGS = "FUNDINGS"
+}
+
+// The rule-target family each related entity type's issues belong to.
+export const RELATED_ENTITY_TARGETS: Record<RelatedEntityType, string> = {
+    [RelatedEntityType.PERSONS]: "Person",
+    [RelatedEntityType.ORGANISATION_UNITS]: "OrganisationUnit",
+    [RelatedEntityType.OUTPUTS]: "Document",
+    [RelatedEntityType.ACTIVITIES]: "Activity",
+    [RelatedEntityType.PROJECTS]: "Project",
+    [RelatedEntityType.FUNDINGS]: "Funding"
+};
+
+// Every rule-target family the issues list can be narrowed to.
+export const ISSUE_TARGETS = [
+    "Person", "OrganisationUnit", "Document", "Activity", "Project", "Funding"
+] as const;
+
+export interface IssueFilters {
+    target?: string;
+    dimension?: QualityDimension;
+    severity?: IssueSeverity;
+    constraintKey?: string;
 }
 
 export interface ProfileRelatedQuality {
@@ -117,7 +147,7 @@ export interface RelatedQuality {
     linkedRecords: number;
     affectedRecords: number;
     openIssues: number;
-    averageScore?: number;
+    averageScore: number | null;
     supported: boolean;
 }
 
@@ -151,6 +181,16 @@ export interface DataQualityRemark {
     usedForFairCompliance: boolean;
 }
 
+export interface ConstraintSummary {
+    key: string;
+    title: MultilingualContent[];
+}
+
+export interface DataQualityProfileSummary {
+    profileName: string;
+    version: string;
+}
+
 export interface DataQualityProfile {
     profileName: string;
     version: string;
@@ -160,6 +200,12 @@ export interface DataQualityProfile {
 export interface DataQualityIssueOccurrence {
     actualValue: string[];
     message: MultilingualContent[];
+}
+
+export interface DataQualityIssuePage {
+    content: DataQualityIssue[];
+    totalIssues: number;
+    nextCursor: string | null;
 }
 
 export interface DataQualityIssueDetails {
@@ -194,4 +240,142 @@ export enum QualityAssessmentTarget {
     JOURNAL = "JOURNAL",
     BOOK_SERIES = "BOOK_SERIES",
     PUBLISHER = "PUBLISHER"
+}
+
+export enum RepositoryEntityType {
+    PERSONS = "PERSONS",
+    ORGANISATION_UNITS = "ORGANISATION_UNITS",
+    OUTPUTS = "OUTPUTS",
+    ACTIVITIES = "ACTIVITIES",
+    PROJECTS = "PROJECTS",
+    FUNDINGS = "FUNDINGS"
+}
+
+export const REPOSITORY_ENTITY_TARGETS: Record<RepositoryEntityType, string> = {
+    [RepositoryEntityType.PERSONS]: "Person",
+    [RepositoryEntityType.ORGANISATION_UNITS]: "OrganisationUnit",
+    [RepositoryEntityType.OUTPUTS]: "Document",
+    [RepositoryEntityType.ACTIVITIES]: "Activity",
+    [RepositoryEntityType.PROJECTS]: "Project",
+    [RepositoryEntityType.FUNDINGS]: "Funding"
+};
+
+export interface EntityTypeQuality {
+    entityType: RepositoryEntityType;
+    records: number;
+    affectedRecords: number;
+    openIssues: number;
+    averageScore: number | null;
+    publicationCandidatePercentage: number | null;
+    supported: boolean;
+}
+
+export interface DimensionQuality {
+    dimension: QualityDimension;
+    averageScore: number | null;
+    openIssues: number;
+    affectedRecords: number;
+}
+
+export interface PrevalentIssue {
+    entityType: RepositoryEntityType;
+    ruleKey: string | null;
+    title: MultilingualContent[];
+    occurrences: number;
+}
+
+export interface RepositoryOverview {
+    averageScore: number | null;
+    publicationCandidatePercentage: number | null;
+    openIssues: number;
+    recordsAssessed: number;
+    qualityByEntityType: EntityTypeQuality[];
+    issuesRequiringAttention: PrevalentIssue[];
+}
+
+export interface PublicationCandidateAnalysis {
+    publicationCandidates: number;
+    notPublicationCandidates: number;
+    candidateRate: number | null;
+    blockingConstraints: number;
+    blockingIssues: number;
+    candidateRateByEntityType: EntityTypeQuality[];
+    mostCommonBlockingConstraints: PrevalentIssue[];
+}
+
+export interface SeverityBreakdown {
+    entityType: RepositoryEntityType;
+    errorIssues: number;
+    warningIssues: number;
+    infoIssues: number;
+    supported: boolean;
+}
+
+/**
+ * A rule counted across the whole repository rather than for one entity type, so unlike
+ * PrevalentIssue it carries no entity type to render or drill down by.
+ */
+export interface RecurringConstraint {
+    ruleKey: string | null;
+    title: MultilingualContent[];
+    occurrences: number;
+}
+
+export interface IssueStatistics {
+    openIssues: number;
+    errorIssues: number;
+    warningIssues: number;
+    infoIssues: number;
+    issuesBySeverityAndEntityType: SeverityBreakdown[];
+    topRecurringConstraints: RecurringConstraint[];
+}
+
+export enum TrendMetric {
+    OVERALL_SCORE = "OVERALL_SCORE",
+    FAIR_COMPLIANCE = "FAIR_COMPLIANCE",
+    PUBLICATION_CANDIDATE_RATE = "PUBLICATION_CANDIDATE_RATE",
+    ACCURACY = "ACCURACY",
+    CONSISTENCY = "CONSISTENCY",
+    LINEAGE = "LINEAGE",
+    STRUCTURAL_CONSISTENCY = "STRUCTURAL_CONSISTENCY",
+    QUALITATIVE = "QUALITATIVE",
+    SEMANTIC = "SEMANTIC",
+    CURRENCY = "CURRENCY"
+}
+
+export enum TrendGranularity {
+    DAILY = "DAILY",
+    WEEKLY = "WEEKLY",
+    MONTHLY = "MONTHLY"
+}
+
+export interface TrendPoint {
+    label: string;
+    periodEnd: string;
+    value: number | null;
+    recordsAssessed: number;
+}
+
+export interface TrendIndicators {
+    current: number | null;
+    previous: number | null;
+    change: number | null;
+    best: number | null;
+    lowest: number | null;
+}
+
+export interface EntityTypeTrend {
+    entityType: RepositoryEntityType;
+    current: number | null;
+    previous: number | null;
+    change: number | null;
+    supported: boolean;
+}
+
+export interface QualityTrend {
+    metric: TrendMetric;
+    granularity: TrendGranularity;
+    series: TrendPoint[];
+    indicators: TrendIndicators;
+    trendByEntityType: EntityTypeTrend[];
 }

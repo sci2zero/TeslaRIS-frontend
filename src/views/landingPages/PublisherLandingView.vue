@@ -87,6 +87,7 @@ import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Publisher } from '@/models/PublisherModel';
 import PublisherService from '@/services/PublisherService';
@@ -109,7 +110,7 @@ export default defineComponent({
     name: "PublisherSeriesLandingPage",
     components: { PublicationTableComponent, GenericCrudModal, Toast, TabContentLoader, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
         const updateModalRef = ref<{ dialog: boolean } | null>(null);
@@ -144,11 +145,19 @@ export default defineComponent({
         const router = useRouter();
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PUBLISHER,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PublisherService.canEdit(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -228,16 +237,13 @@ export default defineComponent({
         };
 
         return {
-            publisher,
-            publications,
-            totalPublications,
-            switchPage,
+            publisher, publications, totalPublications, switchPage, canReviewDataQuality, canAssessDataQuality,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage,
             isAdmin, EntityType, fetchPublisher,
             dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal
+            updateModalRef, openModal, isViceDeanForScience,
         };
 }})
 

@@ -11,7 +11,7 @@
 
             <h3>{{ $t("prizesLabel") }}</h3>
             <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-            <br />
+            <br>
             <draggable 
                 :list="prizes" item-key="id"
                 group="prizes" 

@@ -4,8 +4,7 @@
             <v-col>
                 <multilingual-text-input
                     ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetResearchArea?.name, languageTags)">
-                </multilingual-text-input>
+                    :initial-value="toMultilingualTextInput(presetResearchArea?.name, languageTags)" />
             </v-col>
         </v-row>
         <v-row>
@@ -16,8 +15,7 @@
                     :label="$t('descriptionLabel')"
                     placeholder-label="descriptionLabel"
                     :initial-value="toMultilingualTextInput(presetResearchArea?.description, languageTags)"
-                    is-rich is-area>
-                </multilingual-text-input>
+                    is-rich is-area />
             </v-col>
         </v-row>
         <v-row>

@@ -129,7 +129,7 @@
             <v-tab value="contributions">
                 {{ $t("editorsAndReviewersLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -141,10 +141,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -235,15 +235,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.PROCEEDINGS"
                     :entity-id="proceedings?.id"
+                    :restore-blocked-reason="proceedings?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="() => fetchProceedings(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -274,6 +276,7 @@ import { useI18n } from 'vue-i18n';
 import { watch } from 'vue';
 import { PublicationType, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
@@ -316,6 +319,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
@@ -341,9 +345,15 @@ export default defineComponent({
 
         const {
             isResearcher, isAdmin,
-            isCommission, isInstitutionalEditor
+            isCommission, isInstitutionalEditor, canReviewDataQuality
         } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const proceedings = ref<Proceedings>();
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
@@ -382,6 +392,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.PROCEEDINGS,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(
                     parseInt(currentRoute.params.id as string)
                 ).then((response) => {
@@ -578,7 +595,7 @@ export default defineComponent({
         };
 
         return {
-            proceedings, fetchIndicators, PublicationType,
+            proceedings, fetchIndicators, PublicationType, canAssessDataQuality, canReviewDataQuality,
             publications, currentTab, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseFlexibleDate, fetchIdentifiers,
@@ -591,7 +608,9 @@ export default defineComponent({
             isAdmin, isCommission, ExportableEndpointType, isInstitutionalEditor,
             fetchProceedings,
             dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal, actionsRef
+            updateModalRef, openModal, actionsRef,
+
+            isDigitalRepositoryEnabled,
         };
 }})
 

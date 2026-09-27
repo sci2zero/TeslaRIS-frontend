@@ -62,10 +62,10 @@
             <v-tab v-if="bookSeriesIndicators && bookSeriesIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -85,8 +85,7 @@
                     :publications="publications"
                     :total-publications="totalPublications"
                     in-comparator
-                    @switch-page="switchPage">
-                </publication-table-component>
+                    @switch-page="switchPage" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab :show-remark="false">
@@ -140,15 +139,16 @@
                     show-statistics
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.BOOK_SERIES"
                     :entity-id="bookSeries?.id"
                     @restored="() => fetchBookSeries(false)"
+                    @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -175,6 +175,7 @@ import PublicationTableComponent from '@/components/publication/PublicationTable
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import type { BookSeries } from '@/models/BookSeriesModel';
 import BookSeriesService from '@/services/BookSeriesService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import LanguageService from '@/services/LanguageService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
@@ -207,7 +208,7 @@ export default defineComponent({
     name: "BookSeriesLandingPage",
     components: { LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, Toast, IndicatorsSection, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("overview");
 
@@ -239,6 +240,7 @@ export default defineComponent({
         const i18n = useI18n();
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const loginStore = useLoginStore();
         const router = useRouter();
@@ -256,6 +258,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.BOOK_SERIES,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 BookSeriesService.canEdit(parseInt(currentRoute.params.id as string)).then(response => {
                     canEdit.value = response.data;
                 });
@@ -370,7 +379,7 @@ export default defineComponent({
         };
 
         return {
-            bookSeries, publications, 
+            bookSeries, publications, canAssessDataQuality, canReviewDataQuality,
             fetchIdentifiers, totalPublications,
             publicationSeriesIdentifiers,
             switchPage, currentTab,
@@ -380,7 +389,7 @@ export default defineComponent({
             snackbarMessage, updateContributions,
             PublicationSeriesUpdateForm,
             ApplicableEntityType,
-            bookSeriesIndicators,
+            bookSeriesIndicators, isViceDeanForScience,
             isAdmin, EntityType, fetchBookSeries,
             dataQualityTabsRef, showAssessmentDetails,
             updateModalRef, openModal

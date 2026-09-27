@@ -1,10 +1,10 @@
 <template>
     <v-container>
         <h1>{{ $t("journalListLabel") }}</h1>
-        <br />
-        <br />
-        <search-bar-component @search="clearSortAndPerformSearch"></search-bar-component>
-        <br />
+        <br>
+        <br>
+        <search-bar-component @search="clearSortAndPerformSearch" />
+        <br>
         <span class="d-flex align-center">
             <v-btn
                 v-if="isAdmin"
@@ -20,7 +20,7 @@
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4"
-            ></v-checkbox>
+            />
             <v-select
                 v-if="isAdmin"
                 v-model="selectedCommission"
@@ -36,7 +36,7 @@
                 v-model="returnOnlyUnclassifiedEntities"
                 :label="$t('showUnclassifiedLabel')"
                 class="ml-4"
-            ></v-checkbox>
+            />
         </span>
 
         <tab-content-loader

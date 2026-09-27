@@ -8,8 +8,7 @@
                     :label="$t('promotionLabel') + '*'"
                     :rules="requiredSelectionRules"
                     return-object
-                    :no-data-text="$t('noDataInTableMessage')">
-                </v-select>
+                    :no-data-text="$t('noDataInTableMessage')" />
             </v-col>
         </v-row>
 

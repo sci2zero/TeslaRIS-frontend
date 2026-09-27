@@ -7,8 +7,7 @@
                     :items="researchAreas"
                     :label="$t('researchAreaLabel') + '*'"
                     :rules="requiredStringSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row>

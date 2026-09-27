@@ -94,7 +94,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -109,10 +109,10 @@
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -143,8 +143,7 @@
                     :document="journalPublication"
                     :can-edit="canEdit && !journalPublication?.isArchived"
                     :proofs="journalPublication?.proofs"
-                    :file-items="journalPublication?.fileItems">
-                </attachment-section>
+                    :file-items="journalPublication?.fileItems" />
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab
@@ -212,16 +211,17 @@
                     :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="PublicationType.JOURNAL_PUBLICATION"
                     :entity-id="journalPublication?.id"
+                    :restore-blocked-reason="journalPublication?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
                     @restored="fetchJournalPublication"
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -253,6 +253,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
 import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { JournalPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -300,6 +301,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
@@ -323,8 +325,18 @@ export default defineComponent({
         const currentRoute = useRoute();
         const router = useRouter();
 
-        const { isResearcher, isAdmin, isCommission } = useUserRole();
+        const {
+            isResearcher, isAdmin,
+            isCommission,
+            canReviewDataQuality
+        } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
+
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
 
         const journalPublication = ref<JournalPublication>();
@@ -360,6 +372,13 @@ export default defineComponent({
 
         const fetchDisplayData = () => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    PublicationType.JOURNAL_PUBLICATION,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 DocumentPublicationService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 }).catch(() => canEdit.value = false);
@@ -522,7 +541,7 @@ export default defineComponent({
         };
 
         return {
-            journalPublication, canClassify, fetchJournalPublication,
+            journalPublication, canClassify, fetchJournalPublication, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind, actionsRef,
             languageTagMap, journal, JournalPublicationUpdateForm,

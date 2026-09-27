@@ -30,11 +30,11 @@
                     <v-container>
                         <expertise-or-skill-form
                             ref="formRef" :edit="edit" :preset-expertise-or-skill="presetExpertiseOrSkill" @create="emitCreateToParent"
-                            @update="emitUpdateToParent"></expertise-or-skill-form>
+                            @update="emitUpdateToParent" />
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

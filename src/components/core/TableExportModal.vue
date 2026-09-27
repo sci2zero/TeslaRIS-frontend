@@ -24,8 +24,7 @@
                                         :items="exportFileFormats"
                                         :label="$t('exportFileFormatLabel') + '*'"
                                         :rules="requiredSelectionRules"
-                                        return-object>
-                                    </v-select>
+                                        return-object />
                                 </v-col>
                                 <v-col cols="12" sm="6">
                                     <v-select
@@ -33,8 +32,7 @@
                                         :items="langItems"
                                         :label="$t('languageLabel') + '*'"
                                         :rules="requiredSelectionRules"
-                                        return-object>
-                                    </v-select>
+                                        return-object />
                                 </v-col>
                             </v-row>
                             <v-row v-if="potentialMaxAmountRequested">
@@ -42,7 +40,7 @@
                                     <v-checkbox
                                         v-model="exportAll"
                                         :label="$t('exportAllLabel')"
-                                    ></v-checkbox>
+                                    />
                                 </v-col>
                                 <v-col cols="12" sm="6">
                                     <v-text-field
@@ -54,7 +52,7 @@
                                         :label="$t('pageLabel', [maxExportsPerPage]) + '*'"
                                         :placeholder="$t('pageLabel', [maxExportsPerPage]) + '*'"
                                         :rules="requiredNumericGreaterThanZeroFieldRules"
-                                    ></v-text-field>
+                                    />
                                 </v-col>
                             </v-row>
                             <v-expand-transition>
@@ -79,31 +77,31 @@
                                                 <v-checkbox
                                                     v-model="mla"
                                                     label="MLA"
-                                                ></v-checkbox>
+                                                />
                                             </v-col>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
                                                     v-model="chicago"
                                                     label="Chicago"
-                                                ></v-checkbox>
+                                                />
                                             </v-col>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
                                                     v-model="harvard"
                                                     label="Harvard"
-                                                ></v-checkbox>
+                                                />
                                             </v-col>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
                                                     v-model="vancouver"
                                                     label="Vancouver"
-                                                ></v-checkbox>
+                                                />
                                             </v-col>
                                             <v-col cols="3" sm="2">
                                                 <v-checkbox
                                                     v-model="apa"
                                                     label="APA"
-                                                ></v-checkbox>
+                                                />
                                             </v-col>
                                         </v-row>
                                     </v-container>
@@ -118,12 +116,12 @@
                                 class="ml-3 mt-5"
                                 color="primary"
                                 indeterminate
-                            ></v-progress-circular>
+                            />
                         </div>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

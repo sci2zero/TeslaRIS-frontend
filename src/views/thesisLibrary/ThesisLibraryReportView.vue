@@ -24,8 +24,7 @@
                     required
                     comfortable
                     only-client-institutions-dl
-                    label="institutionsLabel">
-                </organisation-unit-autocomplete-search>
+                    label="institutionsLabel" />
             </v-col>    
         </v-row>
         <v-row class="d-flex flex-row justify-center">
@@ -35,7 +34,7 @@
                     :label="$t('fromLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
             <v-col cols="12" sm="6" md="2">
                 <date-picker
@@ -43,7 +42,7 @@
                     :label="$t('toLabel') + '*'"
                     color="primary"
                     required
-                ></date-picker>
+                />
             </v-col>
         </v-row>
         <v-row class="d-flex flex-row justify-center">
@@ -61,8 +60,7 @@
     <v-row class="d-flex flex-row justify-center mt-15!">
         <v-col cols="12" sm="10" md="8">
             <thesis-library-report-table-component
-                :report-request="reportRequest">
-            </thesis-library-report-table-component>
+                :report-request="reportRequest" />
         </v-col>
     </v-row>
 </template>

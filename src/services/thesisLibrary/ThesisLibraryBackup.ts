@@ -21,6 +21,8 @@ export class ThesisLibraryBackupService extends BaseService {
             return;
         }
 
+        downloadStore.downloadProgressRef?.startDownload(backupFileName);
+
         const accessTokenResponse = 
             await super.sendRequest(axios.get, `thesis-library/backup/access-token`);
         if (!accessTokenResponse.data) {

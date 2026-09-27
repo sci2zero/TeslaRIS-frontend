@@ -1,16 +1,16 @@
 <template>
     <v-container>
         <h1>{{ $t("assessmentRulebookPageLabel") }}</h1>
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header
             :tab-number="1"
             layout="table"
         />
-        <assessment-rulebook-table-component :assessment-rulebooks="assessmentRulebooks" :total-assessment-rulebooks="totalAssessmentRulebooks" @switch-page="switchPage"></assessment-rulebook-table-component>
+        <assessment-rulebook-table-component :assessment-rulebooks="assessmentRulebooks" :total-assessment-rulebooks="totalAssessmentRulebooks" @switch-page="switchPage" />
     </v-container>
 </template>
 

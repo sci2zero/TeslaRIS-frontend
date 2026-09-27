@@ -24,6 +24,8 @@ export class RegistryBookReportService extends BaseService {
             return;
         }
 
+        downloadStore.downloadProgressRef?.startDownload(reportFileName);
+
         const response = await axios.get(this.basePath + `registry-book/report/download/${reportFileName}`,
             {
                 responseType: "blob",
@@ -37,7 +39,15 @@ export class RegistryBookReportService extends BaseService {
                     }
                 }
             }
-        );
+        ).catch(error => {
+            downloadStore.downloadProgressRef?.cancelDownload();
+            throw error;
+        });
+
+        // A response without a content length never reports progress, so the bar is closed
+        // explicitly rather than left spinning.
+        downloadStore.downloadProgressRef?.updateProgress(100);
+
         this.initialzeDownload(response, `${reportFileName}`, "");
     }
 }

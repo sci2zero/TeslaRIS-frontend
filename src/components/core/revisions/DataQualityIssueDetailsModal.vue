@@ -3,7 +3,7 @@
         <v-card class="issue-details-card">
             <v-card-text>
                 <div v-if="loading" class="d-flex justify-center py-10">
-                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                    <v-progress-circular indeterminate color="primary" />
                 </div>
 
                 <template v-else-if="details">
@@ -78,7 +78,7 @@
                                             :key="index"
                                             class="issue-details-occurrence">
                                             <div class="issue-details-value">
-                                                {{ occurrence.actualValue.length > 0
+                                                {{ (occurrence.actualValue.length > 0 && details.targetEntityType !== "Activity")
                                                     ? occurrence.actualValue.join(", ")
                                                     : "-" }}
                                             </div>

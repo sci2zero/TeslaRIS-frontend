@@ -110,7 +110,7 @@
             :description="description"
         />
 
-        <toast v-model="snackbar" :message="snackbarMessage"></toast>
+        <toast v-model="snackbar" :message="snackbarMessage" />
     </div>
 </template>
 

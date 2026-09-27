@@ -91,6 +91,7 @@
             :preset-document-file="attachment"
             :allow-licence-selection="allowLicenceSelection"
             :disable-resource-type-selection="disableResourceTypeSelection"
+            :allowed-resource-types="allowedResourceTypes"
             :can-be-archived="canBeArchived"
             @update="emit('update', $event)"
         />
@@ -108,7 +109,7 @@ import DocumentFileSubmissionModal from "@/components/documentFile/DocumentFileS
 import { useUserRole } from "@/composables/useUserRole";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { getResourceTypeTitleFromValueAutoLocale } from "@/i18n/resourceType";
-import type { DocumentFile, DocumentFileResponse } from "@/models/DocumentFileModel";
+import type { DocumentFile, DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import DocumentFileService from "@/services/DocumentFileService";
 
 const props = defineProps<{
@@ -118,6 +119,7 @@ const props = defineProps<{
     allowLicenceSelection?: boolean;
     disableUpdates?: boolean;
     disableResourceTypeSelection?: boolean;
+    allowedResourceTypes?: ResourceType[];
     canMakeOfficial?: boolean;
     canBeArchived?: boolean;
 }>();

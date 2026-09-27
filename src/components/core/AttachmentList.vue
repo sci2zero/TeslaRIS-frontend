@@ -8,6 +8,7 @@
                 :allow-licence-selection="allowLicenceSelection"
                 :always-open-access="alwaysOpenAccess"
                 :disable-resource-type-selection="disableResourceTypeSelection"
+                :allowed-resource-types="allowedResourceTypes"
                 @create="sendDataToParent">
                 <template #activator="{ props: activatorProps }">
                     <v-btn
@@ -46,6 +47,7 @@
                     :allow-licence-selection="allowLicenceSelection"
                     :disable-updates="disableUpdates"
                     :disable-resource-type-selection="disableResourceTypeSelection"
+                    :allowed-resource-types="allowedResourceTypes"
                     :can-make-official="canMakeOfficial"
                     :can-be-archived="canBeArchived"
                     @delete="sendDeleteRequestToParent(attachment.id)"
@@ -58,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import type { DocumentFile, DocumentFileResponse } from "@/models/DocumentFileModel";
+import type { DocumentFile, DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
 import DocumentFileService from "@/services/DocumentFileService";
 import { defineComponent, type PropType } from "vue";
 import DocumentFileSubmissionModal from "../documentFile/DocumentFileSubmissionModal.vue";
@@ -114,6 +116,10 @@ export default defineComponent({
         embedded: {
             type: Boolean,
             default: false
+        },
+        allowedResourceTypes: {
+            type: Array as PropType<ResourceType[]>,
+            default: undefined
         }
     },
     emits: ["create", "delete", "update", "made-official"],

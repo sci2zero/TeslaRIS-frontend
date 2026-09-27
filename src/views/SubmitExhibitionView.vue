@@ -3,8 +3,8 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewExhibitionLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
+        <br>
+        <br>
         <exhibition-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">

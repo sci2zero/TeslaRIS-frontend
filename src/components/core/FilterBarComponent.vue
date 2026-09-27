@@ -14,7 +14,7 @@
                     in-modal
                 />
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <div>
                         <v-btn color="primary" @click="applyFilters">
                             {{ $t("applyFiltersLabel") }}

@@ -5,13 +5,13 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftJournal?.title) }}
                 </h2>
-                <br />
+                <br>
 
                 <publication-series-update-form
                     ref="updateLeftRef" input-type="JOURNAL" :preset-publication-series="leftJournal" :in-modal="false"
-                    @update="updateLeft"></publication-series-update-form>
+                    @update="updateLeft" />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -26,8 +26,7 @@
                             :publication-series-id="leftJournal?.id"
                             :contribution-list="leftJournal?.contributions ? leftJournal.contributions : []"
                             in-comparator
-                            :can-reorder="true">
-                        </person-publication-series-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -46,13 +45,13 @@
                     {{ returnCurrentLocaleContent(rightJournal?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <publication-series-update-form
                     ref="updateRightRef" input-type="JOURNAL" :preset-publication-series="rightJournal" :in-modal="false"
-                    @update="updateRight"></publication-series-update-form>
+                    @update="updateRight" />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -67,8 +66,7 @@
                             :publication-series-id="rightJournal?.id"
                             :contribution-list="rightJournal?.contributions ? rightJournal.contributions : []"
                             in-comparator
-                            :can-reorder="true">
-                        </person-publication-series-contribution-list>
+                            :can-reorder="true" />
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -82,8 +80,7 @@
             :right-id="(rightJournal?.id as number)"
             :entity-type="EntityType.JOURNAL"
             @update="updateAll"
-            @delete="deleteSide">
-        </comparison-actions>
+            @delete="deleteSide" />
 
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>

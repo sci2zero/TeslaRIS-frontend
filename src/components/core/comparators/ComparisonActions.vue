@@ -15,8 +15,7 @@
             </v-btn>
             <delete-dropdown
                 v-if="supportsForceDelete"
-                @delete="forceDeleteLeft">
-            </delete-dropdown>
+                @delete="forceDeleteLeft" />
 
             <v-btn
                 color="blue darken-1"
@@ -31,8 +30,7 @@
             </v-btn>
             <delete-dropdown
                 v-if="supportsForceDelete"
-                @delete="forceDeleteRight">
-            </delete-dropdown>
+                @delete="forceDeleteRight" />
 
             <persistent-question-dialog
                 ref="dialogRef"

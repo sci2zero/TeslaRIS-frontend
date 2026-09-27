@@ -4,7 +4,7 @@
         :to="localizedUrl"
         class="router-link"
     >
-        <slot></slot>
+        <slot />
     </router-link>
 
     <router-link
@@ -19,7 +19,7 @@
             target="_blank"
             rel="noopener noreferrer"
         >
-            <slot></slot>
+            <slot />
         </a>
     </router-link>
 </template>

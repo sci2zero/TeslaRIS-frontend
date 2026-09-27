@@ -5,7 +5,7 @@
                 <v-checkbox
                     v-model="importScopus"
                     label="Scopus"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -13,7 +13,7 @@
                 <v-checkbox
                     v-model="importOpenAlex"
                     label="OpenAlex"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row v-if="webOfScienceConfigured">
@@ -21,7 +21,7 @@
                 <v-checkbox
                     v-model="importWebOfScience"
                     label="Web of Science"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
     </v-form>

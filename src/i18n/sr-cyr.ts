@@ -126,5 +126,15 @@ export default {
     invalidWikidataMessage: "Погрешан формат Wikidata ID-а.",
     noEIssnLabel: "Нема E-ISSN",
     noPrintIssnLabel: "Нема Print ISSN",
-    cantRestoreVersionMessage: "Није могуће вратити ову верзију: референцира се \"{0}\" са ID-ем {1}, који више не постоји."
+    cantRestoreVersionMessage: "Није могуће вратити ову верзију: референцира се \"{0}\" са ID-ем {1}, који више не постоји.",
+    tutorial: {
+        stepCounter: "Корак {current} / {total}",
+        skipLabel: "Прескочи",
+        continueLabel: "Даље",
+        nextLabel: "Следеће",
+        scrollUpLabel: "Скролујте нагоре",
+        scrollDownLabel: "Скролујте надоле",
+        scrollLeftLabel: "Скролујте лево",
+        scrollRightLabel: "Скролујте десно",
+    }
 };

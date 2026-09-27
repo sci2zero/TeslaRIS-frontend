@@ -1,9 +1,9 @@
 <template>
     <v-container>
         <h1>{{ $t("commissionListLabel") }}</h1>
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header
@@ -13,8 +13,7 @@
         <commission-table-component
             :commissions="commissions"
             :total-commissions="totalCommissions"
-            @switch-page="switchPage">
-        </commission-table-component>
+            @switch-page="switchPage" />
     </v-container>
 </template>
 

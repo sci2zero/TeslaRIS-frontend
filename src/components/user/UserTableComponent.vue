@@ -26,21 +26,25 @@
                     @failure="displayFormNotification" 
                 />
                 <register-employee-modal
+                    v-if="isAssessmentModuleEnabled"
                     :employee-role="UserRole.COMMISSION"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.INSTITUTIONAL_LIBRARIAN"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.HEAD_OF_LIBRARY"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
                 />
                 <register-employee-modal
+                    v-if="isDigitalLibraryEnabled"
                     :employee-role="UserRole.PROMOTION_REGISTRY_ADMINISTRATOR"
                     @success="refreshTable(tableOptions)"
                     @failure="displayFormNotification"
@@ -121,14 +125,12 @@
                                         v-if="row.item.userRole === 'COMMISSION' || row.item.userRole === 'RESEARCHER'"
                                         :migrate-from-id="row.item.databaseId"
                                         :allowed-roles="[row.item.userRole]"
-                                        @migrate="notifyUserAboutMigration">
-                                    </user-migration-selection-modal>
+                                        @migrate="notifyUserAboutMigration" />
                                     <user-email-change-modal
                                         :user-id="row.item.databaseId"
                                         :preset-email="row.item.email"
                                         :read-only="row.item.active"
-                                        @update="notifyEmailChanged">
-                                    </user-email-change-modal>
+                                        @update="notifyEmailChanged" />
                                     <v-list-item
                                         v-if="!row.item.active"
                                         @click="resendActivationEmail(row.item.databaseId)">
@@ -164,6 +166,7 @@ import { isEqual } from 'lodash';
 import UserEmailChangeModal from './UserEmailChangeModal.vue';
 import RegisterResearcherModal from './RegisterResearcherModal.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
 
 
 export default defineComponent({
@@ -187,6 +190,11 @@ export default defineComponent({
         const snackbar = ref(false);
         const snackbarText = ref("");
         const timeout = 5000;
+
+        const { 
+            isAssessmentModuleEnabled,
+            isDigitalLibraryEnabled
+        } = useFeatureModuleToggles();
 
         const accountsThatAllowedRoleTaking = ref<number[]>([]);
 
@@ -347,7 +355,8 @@ export default defineComponent({
             getTitleFromValueAutoLocale, setSortAndPageOption,
             accountsThatAllowedRoleTaking, UserRole, deleteUser,
             generateNewPassword, notifyUserAboutMigration,
-            notifyEmailChanged, resendActivationEmail
+            notifyEmailChanged, resendActivationEmail,
+            isAssessmentModuleEnabled, isDigitalLibraryEnabled
         };
     }
 });

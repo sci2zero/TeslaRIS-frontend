@@ -29,11 +29,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationCountTotal.display"
                                 :label="$t('totalPublicationsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -41,11 +41,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationCountByYear.display"
                                 :label="$t('numberOfPublicationsYearlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationCountByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -53,11 +53,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationTypeByYear.display"
                                 :label="$t('numberOfPublicationsByTypeAndYearLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationTypeByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -65,11 +65,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryByYear.display"
                                 :label="$t('numberOfPublicationsByMCategoryAndYearLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -80,11 +80,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationTypeRatio.display"
                                 :label="$t('publicationTypeRatioLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationTypeRatio.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -92,11 +92,11 @@
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryRatio.display"
                                 :label="$t('publicationMCategoryRatioLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryRatio.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -107,11 +107,11 @@
                             <v-checkbox
                                 v-model="personSettings.citationCountTotal.display"
                                 :label="$t('totalCitationsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.citationCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -119,11 +119,11 @@
                             <v-checkbox
                                 v-model="personSettings.citationCountByYear.display"
                                 :label="$t('numberOfCitationsYearlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.citationCountByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -134,11 +134,11 @@
                             <v-checkbox
                                 v-model="personSettings.viewCountTotal.display"
                                 :label="$t('totalViewsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.viewCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -146,11 +146,11 @@
                             <v-checkbox
                                 v-model="personSettings.viewCountByMonth.display"
                                 :label="$t('numberOfViewsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.viewCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -158,11 +158,11 @@
                             <v-checkbox
                                 v-model="personSettings.viewCountByCountry.display"
                                 :label="$t('viewsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="personSettings.viewCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -176,11 +176,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCountTotal.display"
                                 :label="$t('totalPublicationsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -188,11 +188,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCountByYear.display"
                                 :label="$t('numberOfPublicationsYearlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCountByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -200,11 +200,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationTypeByYear.display"
                                 :label="$t('numberOfPublicationsByTypeAndYearLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationTypeByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -212,11 +212,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryByYear.display"
                                 :label="$t('numberOfPublicationsByMCategoryAndYearLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryByYear.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -227,11 +227,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationTypeRatio.display"
                                 :label="$t('publicationTypeRatioLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationTypeRatio.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -239,11 +239,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryRatio.display"
                                 :label="$t('publicationMCategoryRatioLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryRatio.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -254,11 +254,11 @@
                             <v-checkbox
                                 v-model="ouSettings.viewCountTotal.display"
                                 :label="$t('totalViewsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.viewCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -266,11 +266,11 @@
                             <v-checkbox
                                 v-model="ouSettings.viewCountByMonth.display"
                                 :label="$t('numberOfViewsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.viewCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -278,11 +278,11 @@
                             <v-checkbox
                                 v-model="ouSettings.viewCountByCountry.display"
                                 :label="$t('viewsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.viewCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -293,11 +293,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCountPersonLeaderboard.display"
                                 :label="$t('personPublicationCountLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCountPersonLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -305,11 +305,11 @@
                             <v-checkbox
                                 v-model="ouSettings.publicationCountSubUnitLeaderboard.display"
                                 :label="$t('subUnitPublicationCountLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.publicationCountSubUnitLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -317,11 +317,11 @@
                             <v-checkbox
                                 v-model="ouSettings.citationCountPersonLeaderboard.display"
                                 :label="$t('personCitationCountLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.citationCountPersonLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -329,11 +329,11 @@
                             <v-checkbox
                                 v-model="ouSettings.citationCountSubUnitLeaderboard.display"
                                 :label="$t('subUnitCitationCountLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.citationCountSubUnitLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -341,11 +341,11 @@
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointPersonLeaderboard.display"
                                 :label="$t('personAssessmentPointsLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointPersonLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -353,11 +353,11 @@
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointSubUnitLeaderboard.display"
                                 :label="$t('subUnitAssessmentPointsLeaderboardLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointSubUnitLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>
@@ -371,11 +371,11 @@
                             <v-checkbox
                                 v-model="documentSettings.viewCountTotal.display"
                                 :label="$t('totalViewsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.viewCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -383,11 +383,11 @@
                             <v-checkbox
                                 v-model="documentSettings.viewCountByMonth.display"
                                 :label="$t('numberOfViewsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.viewCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -395,11 +395,11 @@
                             <v-checkbox
                                 v-model="documentSettings.downloadCountTotal.display"
                                 :label="$t('totalDownloadsLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.downloadCountTotal.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -407,11 +407,11 @@
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByMonth.display"
                                 :label="$t('numberOfDownloadsMonthlyLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByMonth.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -419,11 +419,11 @@
                             <v-checkbox
                                 v-model="documentSettings.viewCountByCountry.display"
                                 :label="$t('viewsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.viewCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                     <v-col cols="6">
@@ -431,11 +431,11 @@
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByCountry.display"
                                 :label="$t('downloadsByCountryLabel')"
-                            ></v-checkbox>
+                            />
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByCountry.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
-                            ></v-checkbox>
+                            />
                         </div>
                     </v-col>
                 </v-row>

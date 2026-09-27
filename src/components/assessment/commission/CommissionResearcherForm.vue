@@ -6,8 +6,7 @@
                     v-model="selectedPerson"
                     required
                     disable-submission
-                    :institution-id="institutionId">
-                </person-autocomplete-search>
+                    :institution-id="institutionId" />
             </v-col>
         </v-row>
 

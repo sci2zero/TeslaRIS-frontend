@@ -59,8 +59,7 @@
                             :button-text="$t('viewPublicationsLabel')"
                             :id-for-fetching="row.item.databaseId"
                             icon="mdi-note"
-                            :title="$t('latestPublicationsLabel')">
-                        </publications-dialog>
+                            :title="$t('latestPublicationsLabel')" />
                         <v-btn
                             class="ml-2"
                             size="small" color="primary"

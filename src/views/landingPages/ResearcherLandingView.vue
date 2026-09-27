@@ -196,22 +196,25 @@
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
             </v-tab>
+            <v-tab value="projects">
+                {{ $t("projectsLabel") }}
+            </v-tab>
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-show="personIndicators && personIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab value="assessments">
+            <v-tab v-show="isAssessmentModuleEnabled" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab value="visualizations">
                 {{ $t("visualizationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -283,6 +286,53 @@
                     </landing-section-card>
                 </div>
             </v-tabs-window-item>
+
+            <v-tabs-window-item value="projects">
+                <project-table-component
+                    ref="projectsRef"
+                    :projects="projects"
+                    :total-projects="totalProjects"
+                    :has-active-status-filters="selectedProjectStatuses.length > 0"
+                    :allow-unbinding="canEdit && (isResearcher || isInstitutionalEditor)"
+                    @switch-page="switchProjectsPage">
+                    <template #top-left>
+                        <search-bar-component
+                            :transparent="false"
+                            size="small"
+                            @search="clearSortAndPerformProjectSearch($event)"
+                        />
+                    </template>
+                    <template #actions>
+                        <v-menu>
+                            <template #activator="{ props: optionsProps }">
+                                <v-btn
+                                    v-bind="optionsProps"
+                                    color="white"
+                                    prepend-icon="mdi-dots-vertical"
+                                >
+                                    {{ $t("optionsLabel") }}
+                                </v-btn>
+                            </template>
+                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                <v-checkbox
+                                    v-model="returnOnlyActiveProjects"
+                                    :label="$t('showOnlyActiveLabel')"
+                                    hide-details
+                                />
+                            </div>
+                        </v-menu>
+                        <v-btn
+                            v-if="canEdit"
+                            color="primary" density="compact"
+                            @click="addProject">
+                            {{ $t("createNewProjectLabel") }}
+                        </v-btn>
+                    </template>
+                    <template #status-filter-menu>
+                        <project-status-filter v-model="selectedProjectStatuses" />
+                    </template>
+                </project-table-component>
+            </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <researcher-additional-info-tab
                     :person="person"
@@ -339,7 +389,7 @@
                     />
                 </div>
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <div class="mt-5 overflow-x-auto">
                     <revision-history-table-component
                         :entity-type="EntityType.PERSON"
@@ -349,7 +399,7 @@
                     />
                 </div>
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <div class="mt-5 overflow-x-auto">
                     <data-quality-tabs-component
                         ref="dataQualityTabsRef"
@@ -376,6 +426,7 @@
 <script lang="ts">
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
+import DataQualityService from '@/services/revision/DataQualityService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -384,6 +435,10 @@ import { useRoute, useRouter } from 'vue-router';
 import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
+import ProjectService from '@/services/project/ProjectService';
+import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import InvolvementService from '@/services/InvolvementService';
@@ -434,12 +489,13 @@ import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionH
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { UiButton } from '@/components/ui/button';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab },
+    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("additionalInfo");
 
@@ -474,6 +530,8 @@ export default defineComponent({
         const router = useRouter();
         const currentRoute = useRoute();
 
+        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+
         const person = ref<PersonResponse>();
         const country = ref<Country>();
         const countryPrivate = ref<Country>();
@@ -489,9 +547,20 @@ export default defineComponent({
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
 
+        const projects = ref<ProjectIndex[]>([]);
+        const totalProjects = ref<number>(0);
+        const projectsPage = ref(0);
+        const projectsSize = ref(10);
+        const projectsSort = ref("");
+        const projectsDirection = ref("");
+        const projectSearchParams = ref("tokens=*");
+        const selectedProjectStatuses = ref<ProjectStatus[]>([]);
+        const returnOnlyActiveProjects = ref(false);
+        const projectsRef = ref<typeof ProjectTableComponent>();
+
         const i18n = useI18n();
 
-        const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
+        const { isAdmin, isResearcher, isInstitutionalEditor, canReviewDataQuality } = useUserRole();
 
         const researcherName = ref("");
 
@@ -506,6 +575,7 @@ export default defineComponent({
         const memberships = ref<Membership[]>([]);
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
 
         const personIndicators = ref<EntityIndicatorResponse[]>();
 
@@ -555,6 +625,13 @@ export default defineComponent({
             }
 
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.PERSON,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 PersonService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -642,7 +719,8 @@ export default defineComponent({
                     });
                 });
 
-                fetchPublications(switchTab);                
+                fetchPublications(switchTab);
+                fetchProjects();
                 populateData();
             }).catch(() => {
                 router.push({ name: "notFound" });
@@ -712,6 +790,45 @@ export default defineComponent({
                     }
                 }
             );
+        };
+
+        const switchProjectsPage = (nextPage: number, pageSize: number, sortField?: string, sortDir?: string) => {
+            projectsPage.value = nextPage;
+            projectsSize.value = pageSize;
+            projectsSort.value = sortField ?? "";
+            projectsDirection.value = sortDir ?? "";
+            fetchProjects();
+        };
+
+        const fetchProjects = () => {
+            if (!person.value?.id) {
+                return;
+            }
+
+            ProjectService.findProjectsForResearcher(
+                person.value.id as number,
+                `${projectSearchParams.value}&page=${projectsPage.value}&size=${projectsSize.value}&sort=${projectsSort.value},${projectsDirection.value}`,
+                returnOnlyActiveProjects.value,
+                selectedProjectStatuses.value
+            ).then((response) => {
+                projects.value = response.data.content;
+                totalProjects.value = response.data.totalElements;
+            });
+        };
+
+        watch([selectedProjectStatuses, returnOnlyActiveProjects], () => {
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            fetchProjects();
+        });
+
+        const clearSortAndPerformProjectSearch = (tokenParams: string) => {
+            projectSearchParams.value = tokenParams;
+            projectsRef.value?.setSortAndPageOption([], 1);
+            projectsPage.value = 0;
+            projectsSort.value = "";
+            projectsDirection.value = "";
+            fetchProjects();
         };
 
         const searchKeyword = (keyword: string) => {
@@ -853,6 +970,13 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
+        const addProject = () => {
+            router.push({
+                name: "submitProject",
+                query: isResearcher.value ? {} : {researcherId: personId.value}
+            });
+        };
+
         const clearSortAndPerformPublicationSearch = (tokenParams: string) => {
             publicationSearchParams.value = tokenParams;
             publicationsRef.value?.setSortAndPageOption([], 1);
@@ -883,6 +1007,8 @@ export default defineComponent({
         };
 
         return {
+            canAssessDataQuality,
+            canReviewDataQuality,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
@@ -901,7 +1027,17 @@ export default defineComponent({
             dataQualityTabsRef, showAssessmentDetails,
             personUpdateModalRef, profileImageModalRef, personProfileImageRef, personOtherNameModalRef,
             researchAreaModalRef, visibilityConfigModalRef, openModal, academicTitle, primaryEmployment,
-            PersonUpdateForm, PersonProfileImageForm, updateProfileImage
+            PersonUpdateForm, PersonProfileImageForm, updateProfileImage,
+
+            isAssessmentModuleEnabled,
+            projects,
+            totalProjects,
+            projectsRef,
+            switchProjectsPage,
+            selectedProjectStatuses,
+            returnOnlyActiveProjects,
+            clearSortAndPerformProjectSearch,
+            addProject,
         };
 }});
 </script>

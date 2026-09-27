@@ -1,8 +1,8 @@
 <template>
     <v-container>
         <h1>{{ $t("simpleSearchLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <v-tabs
             v-model="searchTab"
             bg-color="blue-grey-lighten-5"
@@ -35,8 +35,7 @@
                     :search-fields="getSearchFieldsForTable()"
                     :preset-search-input="advancedSearchPresetInput"
                     @search="clearSortAndPerformSearch($event)"
-                    @reset="resetFiltersAndSearch">
-                </query-input-component>
+                    @reset="resetFiltersAndSearch" />
             </v-tabs-window-item>
         </v-tabs-window>
 
@@ -68,8 +67,7 @@
                             enable-export
                             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.PERSON_SEARCH : ExportableEndpointType.PERSON_SEARCH_ADVANCED"
                             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
-                            @switch-page="switchPage">
-                        </person-table-component>
+                            @switch-page="switchPage" />
                     </v-window-item>
   
                     <v-window-item value="organisationUnits" eager>
@@ -80,8 +78,7 @@
                             enable-export
                             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.ORGANISATION_UNIT_SEARCH : ExportableEndpointType.ORGANISATION_UNIT_SEARCH_ADVANCED"
                             :endpoint-token-parameters="[searchParams, 'null']"
-                            @switch-page="switchPage">
-                        </organisation-unit-table-component>
+                            @switch-page="switchPage" />
                     </v-window-item>
   
                     <v-window-item value="publications" eager>
@@ -98,8 +95,7 @@
                                     institutionId: null,
                                     commissionId: null
                                 }"
-                            @switch-page="switchPage">
-                        </publication-table-component>
+                            @switch-page="switchPage" />
                     </v-window-item>
                 </v-window>
             </v-card-text>

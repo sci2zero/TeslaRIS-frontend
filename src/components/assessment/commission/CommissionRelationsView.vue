@@ -27,7 +27,7 @@
                             <v-row>
                                 <v-col>
                                     <div class="d-flex flex-row justify-between">
-                                        <v-icon class="mt-1" icon="mdi-mouse-move-vertical"></v-icon>
+                                        <v-icon class="mt-1" icon="mdi-mouse-move-vertical" />
                                         <h2>{{ `${$t("relationGroupLabel")} ${relationIndex + 1} - ${getResultCalculationMethodTitleFromValueAutoLocale(relation.resultCalculationMethod)}` }}</h2>
                                     </div>
                                 </v-col>

@@ -5,7 +5,7 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftPerformanceRelatedOutput?.title) }}
                 </h2>
-                <br />
+                <br>
 
                 <performance-related-output-update-form
                     ref="updateLeftRef"
@@ -15,7 +15,7 @@
                     @update="updateLeft"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateLeftDescriptionRef"
@@ -29,7 +29,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Left Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">
@@ -69,7 +69,7 @@
                     {{ returnCurrentLocaleContent(rightPerformanceRelatedOutput?.title) }}
                 </h2>
 
-                <br />
+                <br>
 
                 <performance-related-output-update-form
                     ref="updateRightRef"
@@ -79,7 +79,7 @@
                     @update="updateRight"
                 />
 
-                <br />
+                <br>
 
                 <description-or-biography-update-form
                     ref="updateRightDescriptionRef"
@@ -93,7 +93,7 @@
                     @update="updateRightKeywords"
                 />
 
-                <br />
+                <br>
 
                 <!-- Right Contributions Table -->
                 <v-card class="pa-3" variant="flat" color="grey-lighten-5">

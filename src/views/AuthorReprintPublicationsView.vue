@@ -5,8 +5,7 @@
         <div class="d-flex flex-row justify-space-between mt-15 mb-15">
             <search-bar-component
                 class="search-bar"
-                @search="clearSortAndPerformSearch($event)">
-            </search-bar-component>
+                @search="clearSortAndPerformSearch($event)" />
         </div>
 
         <span class="d-flex align-center">
@@ -15,14 +14,14 @@
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-3"
-            ></v-checkbox>
+            />
 
             <v-checkbox
                 v-if="isCommission"
                 v-model="returnOnlyUnassessedEntities"
                 :label="$t('showUnassessedLabel')"
                 class="ml-4 mt-3"
-            ></v-checkbox>
+            />
         </span>
 
         <v-select
@@ -32,7 +31,7 @@
             return-object
             class="publication-type-select no-empty-outline mt-3"
             multiple
-        ></v-select>
+        />
 
         <tab-content-loader
             v-if="loading"
@@ -55,8 +54,7 @@
                     institutionId: null,
                     commissionId: null
                 }"
-            @switch-page="switchPage">
-        </publication-table-component>
+            @switch-page="switchPage" />
     </v-container>
 </template>
 

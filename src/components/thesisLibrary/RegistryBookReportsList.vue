@@ -19,7 +19,7 @@
                         <v-btn
                             icon variant="outlined" size="x-small" color="primary"
                             class="inline-action" @click="deleteReport(generatedReport)">
-                            <v-icon size="x-large" icon="mdi-delete"></v-icon>
+                            <v-icon size="x-large" icon="mdi-delete" />
                         </v-btn>
                     </v-col>
                 </v-row>

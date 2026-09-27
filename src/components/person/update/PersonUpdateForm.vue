@@ -9,8 +9,7 @@
                             v-model="selectedSex"
                             :items="sexes"
                             :label="$t('sexLabel')"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -24,7 +23,7 @@
                             v-model="birthdate"
                             :label="$t('birthdateLabel')"
                             color="primary"
-                        ></date-picker>
+                        />
                     </v-col>
                 </v-row>
                 <v-row>

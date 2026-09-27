@@ -1,0 +1,337 @@
+<template>
+    <table-toolbar :selected-count="selectedProjects.length" :can-act="allowBulkActions">
+        <template #top-left>
+            <slot name="top-left" />
+        </template>
+        <template #action-items>
+            <v-list-item
+                v-if="allowUnbinding"
+                class="action-menu-item"
+                @click="displayUnbindDialog = true"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-link-variant-off
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ isInstitutionalEditor ? $t("removeInstitutionFromProjectLabel") : $t("removeFromProjectLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+            <v-list-item
+                v-else-if="allowBulkActions"
+                class="action-menu-item"
+                @click="startDeletionProcess"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("deleteLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #actions>
+            <slot name="actions" />
+        </template>
+    </table-toolbar>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <v-data-table-server
+            v-model="selectedProjects"
+            :sort-by="tableOptions.sortBy"
+            :items="projects"
+            :headers="headers"
+            item-value="row"
+            :items-length="totalProjects"
+            :show-select="allowBulkActions"
+            return-object
+            :items-per-page-text="$t('itemsPerPageLabel')"
+            :items-per-page-options="[5, 10, 25, 50]"
+            :no-data-text="$t('noDataInTableMessage')"
+            :page="tableOptions.page"
+            @update:options="refreshTable">
+            <template #[`header.status`]="{ isSorted, column, toggleSort, getSortIcon }">
+                <div class="group flex items-center gap-2" @click="toggleSort(column)">
+                    <span>{{ column.title }}</span>
+                    <v-menu v-if="$slots['status-filter-menu']" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-icon
+                                v-bind="props"
+                                :title="hasActiveStatusFilters ? $t('filterActiveLabel') : $t('filterLabel')"
+                                :class="hasActiveStatusFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
+                                icon="mdi-filter"
+                                @click.stop
+                            />
+                        </template>
+                        <div class="p-3 bg-white rounded-lg shadow-lg">
+                            <slot name="status-filter-menu" :column="column" />
+                        </div>
+                    </v-menu>
+                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
+                </div>
+            </template>
+            <template #item="row">
+                <tr>
+                    <td v-if="allowBulkActions">
+                        <v-checkbox
+                            v-model="selectedProjects"
+                            :value="row.item"
+                            class="table-checkbox"
+                            hide-details
+                        />
+                    </td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        <localized-link :to="'project/' + row.item.databaseId">
+                            {{ row.item.nameSr }}
+                        </localized-link>
+                    </td>
+                    <td v-else>
+                        <localized-link :to="'project/' + row.item.databaseId">
+                            {{ row.item.nameOther }}
+                        </localized-link>
+                    </td>
+                    <td v-if="$i18n.locale.startsWith('sr')">
+                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
+                            {{ row.item.coordinatorNameSr }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameSr) }}</span>
+                    </td>
+                    <td v-else>
+                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
+                            {{ row.item.coordinatorNameOther }}
+                        </localized-link>
+                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameOther) }}</span>
+                    </td>
+                    <td>
+                        <v-chip
+                            v-if="row.item.status"
+                            size="small"
+                            :color="getProjectStatusColor(row.item.status)"
+                            variant="flat"
+                        >
+                            {{ getProjectStatusTitleFromValueAutoLocale(row.item.status) }}
+                        </v-chip>
+                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
+                    </td>
+                    <td>
+                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    </td>
+                </tr>
+            </template>
+        </v-data-table-server>
+    </div>
+    <div class="notificationContainer">
+        <v-slide-y-transition group>
+            <v-alert
+                v-for="notification in notifications"
+                :key="notification[0]"
+                theme="dark"
+            >
+                {{ notification[1] }}
+            </v-alert>
+        </v-slide-y-transition>
+    </div>
+
+    <persistent-question-dialog
+        v-model="displayPersistentDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmDeletionMessage')"
+        :entity-names="selectedProjects.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="deleteSelection" />
+
+    <persistent-question-dialog
+        v-model="displayUnbindDialog"
+        :title="$t('areYouSureLabel')"
+        :message="$t('confirmUnbindingMessage')"
+        :entity-names="selectedProjects.map(entity => $i18n.locale.startsWith('sr') ? entity.nameSr : entity.nameOther)"
+        @continue="unbindSelection" />
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { ProjectIndex } from '@/models/ProjectModel';
+import ProjectService from '@/services/project/ProjectService';
+import LocalizedLink from '../localization/LocalizedLink.vue';
+import TableToolbar from '@/components/core/TableToolbar.vue';
+import { displayTextOrPlaceholder } from '@/utils/StringUtil';
+import { localiseDate } from '@/utils/DateUtil';
+import { useUserRole } from '@/composables/useUserRole';
+import { isEqual } from 'lodash';
+import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
+import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from '@/i18n/projectStatus';
+
+
+const tableProps = withDefaults(defineProps<{
+    projects: ProjectIndex[];
+    totalProjects: number;
+    hasActiveStatusFilters?: boolean;
+    hideBulkActions?: boolean;
+    allowUnbinding?: boolean;
+}>(), {
+    hasActiveStatusFilters: false,
+    hideBulkActions: false,
+    allowUnbinding: false
+});
+
+const emit = defineEmits<{
+    (e: "switchPage", page: number, size: number, sort: string | undefined, direction: string | undefined): void;
+}>();
+
+const selectedProjects = ref<ProjectIndex[]>([]);
+
+const i18n = useI18n();
+
+const notifications = ref<Map<string, string>>(new Map());
+
+const nameLabel = computed(() => i18n.t("nameLabel"));
+const coordinatorLabel = computed(() => i18n.t("coordinatorLabel"));
+const statusLabel = computed(() => i18n.t("statusLabel"));
+const dateFromLabel = computed(() => i18n.t("dateFromLabel"));
+const dateToLabel = computed(() => i18n.t("dateToLabel"));
+
+const { isAdmin, isResearcher, isInstitutionalEditor } = useUserRole();
+
+const allowUnbinding = computed(() =>
+    tableProps.allowUnbinding && (isResearcher.value || isInstitutionalEditor.value));
+const allowBulkActions = computed(() =>
+    (isAdmin.value && !tableProps.hideBulkActions) || allowUnbinding.value);
+
+const nameColumn = computed(() => i18n.t("nameColumn"));
+const coordinatorNameColumn = computed(() => i18n.t("coordinatorNameColumn"));
+
+const tableOptions = ref<any>({initialCustomConfiguration: true, page: 1, itemsPerPage: 10, sortBy:[{key: nameColumn, order: "asc"}]});
+
+const headers = ref<any>([
+    { title: nameLabel, align: "start", sortable: true, key: nameColumn},
+    { title: coordinatorLabel, align: "start", sortable: true, key: coordinatorNameColumn},
+    { title: statusLabel, align: "start", sortable: true, key: "status"},
+    { title: dateFromLabel, align: "start", sortable: true, key: "dateFrom"},
+    { title: dateToLabel, align: "start", sortable: true, key: "dateTo"}
+]);
+
+const headersSortableMappings: Map<string, string> = new Map([
+    ["nameSr", "name_sr_sortable"],
+    ["nameOther", "name_other_sortable"],
+    ["coordinatorNameSr", "coordinator_name_sr_sortable"],
+    ["coordinatorNameOther", "coordinator_name_other_sortable"],
+    ["dateFrom", "date_from"],
+    ["dateTo", "date_to"],
+    ["status", "status"]
+]);
+
+const refreshTable = (event: any) => {
+    if (tableOptions.value.initialCustomConfiguration) {
+        tableOptions.value.initialCustomConfiguration = false;
+        event = tableOptions.value;
+    }
+    tableOptions.value = event;
+    let sortField: string | undefined = "";
+    let sortDir: string | undefined = "";
+    if (event.sortBy.length > 0) {
+        sortField = headersSortableMappings.get(event.sortBy[0].key);
+        sortDir = event.sortBy[0].order.toUpperCase();
+    }
+    emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
+};
+
+const addNotification = (message: string) => {
+    const notificationId = self.crypto.randomUUID();
+
+    notifications.value.set(notificationId, message);
+    setTimeout(() => removeNotification(notificationId), 2000);
+};
+
+const removeNotification = (notificationId: string) => {
+    notifications.value.delete(notificationId);
+};
+
+const deleteSelection = () => {
+    Promise.all(selectedProjects.value.map((project: ProjectIndex) => {
+        return ProjectService.deleteProject(project.databaseId)
+            .then(() => {
+                if (i18n.locale.value.startsWith("sr")) {
+                    addNotification(i18n.t("deleteSuccessNotification", { name: project.nameSr }));
+                } else {
+                    addNotification(i18n.t("deleteSuccessNotification", { name: project.nameOther }));
+                }
+            })
+            .catch(() => {
+                if (i18n.locale.value.startsWith("sr")) {
+                    addNotification(i18n.t("deleteFailedNotification", { name: project.nameSr }));
+                } else {
+                    addNotification(i18n.t("deleteFailedNotification", { name: project.nameOther }));
+                }
+                return project;
+            });
+    })).then((failedDeletions) => {
+        selectedProjects.value = selectedProjects.value.filter((project) => failedDeletions.includes(project));
+        refreshTable(tableOptions.value);
+    });
+};
+
+const unbindSelection = () => {
+    const unbind = isInstitutionalEditor.value ?
+        (projectId: number) => ProjectService.unbindInstitutionResearchersFromProject(projectId) :
+        (projectId: number) => ProjectService.unbindResearcherFromProject(projectId);
+
+    const successMessage = isInstitutionalEditor.value ?
+        "massInstitutionProjectUnbindSuccessMessage" : "massProjectUnbindSuccessMessage";
+
+    Promise.all(selectedProjects.value.map((project: ProjectIndex) => {
+        const name = i18n.locale.value.startsWith("sr") ? project.nameSr : project.nameOther;
+
+        return unbind(project.databaseId)
+            .then(() => {
+                addNotification(i18n.t(successMessage, { name }));
+            })
+            .catch(() => {
+                addNotification(i18n.t("projectUnbindFailedMessage", { name }));
+                return project;
+            });
+    })).then((failedUnbindings) => {
+        selectedProjects.value = selectedProjects.value.filter((project) => failedUnbindings.includes(project));
+        refreshTable(tableOptions.value);
+    });
+};
+
+const setSortAndPageOption = (sortBy: {key: string, order: string}[], page: number) => {
+    if (
+        (
+            isEqual([{key: nameColumn.value, order: "asc"}], tableOptions.value.sortBy) ||
+            tableOptions.value.sortBy.length === 0
+        ) &&
+        page == tableOptions.value.page
+    ) {
+        tableOptions.value.sortBy.splice(0);
+        return;
+    }
+
+    tableOptions.value.initialCustomConfiguration = true;
+    if (sortBy.length === 0) {
+        tableOptions.value.sortBy.splice(0);
+    } else {
+        tableOptions.value.sortBy = sortBy;
+    }
+    tableOptions.value.page = page;
+};
+
+const displayPersistentDialog = ref(false);
+const displayUnbindDialog = ref(false);
+const startDeletionProcess = () => {
+    displayPersistentDialog.value = true;
+};
+
+defineExpose({
+    setSortAndPageOption
+});
+</script>
+
+<style scoped>
+</style>

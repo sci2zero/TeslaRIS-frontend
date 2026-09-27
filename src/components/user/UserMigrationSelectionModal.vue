@@ -20,8 +20,7 @@
                                     <user-autocomplete-search
                                         v-model="selectedUser"
                                         required
-                                        :allowed-roles="allowedRoles">
-                                    </user-autocomplete-search>
+                                        :allowed-roles="allowedRoles" />
                                 </v-col>
                             </v-row>
 
@@ -34,7 +33,7 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

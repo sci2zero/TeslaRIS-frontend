@@ -18,7 +18,7 @@
                         :label="$t('applicableTypeLabel') + '*'"
                         :rules="requiredStringSelectionRules"
                         return-object
-                    ></v-select>
+                    />
                 </v-col>
             </v-row>
             <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.JOURNAL_PUBLICATION" justify="center" class="mt-5">
@@ -26,8 +26,7 @@
                     <journal-autocomplete-search
                         v-model="selectedJournal"
                         required
-                        disable-submission>
-                    </journal-autocomplete-search>
+                        disable-submission />
                 </v-col>
             </v-row>
             <v-row v-if="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION" justify="center" class="mt-5">
@@ -36,8 +35,7 @@
                         v-model="selectedEvent"
                         required
                         disable-submission
-                        return-only-non-serial-events>
-                    </event-autocomplete-search>
+                        return-only-non-serial-events />
                 </v-col>
             </v-row>
   
@@ -58,7 +56,7 @@
                         :label="$t('researchAreaLabel') + '*'"
                         :rules="requiredStringSelectionRules"
                         return-object
-                    ></v-select>
+                    />
                 </v-col>
             </v-row>
   
@@ -71,7 +69,7 @@
                         :placeholder="$t('yearOfPublicationLabel') + '*'"
                         :rules="requiredNumericGreaterThanZeroFieldRules"
                         :readonly="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION"
-                    ></v-text-field>
+                    />
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                     <v-text-field
@@ -80,7 +78,7 @@
                         :label="$t('authorCountLabel') + '*'"
                         :placeholder="$t('authorCountLabel') + '*'"
                         :rules="requiredNumericGreaterThanZeroFieldRules"
-                    ></v-text-field>
+                    />
                 </v-col>
             </v-row>
             <v-row justify="center" class="mt-5">
@@ -92,7 +90,7 @@
                         :label="$t('typeOfPublicationLabel') + '*'"
                         :rules="requiredStringSelectionRules"
                         return-object
-                    ></v-select>
+                    />
                     <v-select
                         v-if="selectedApplicableType.value === MServiceApplicableTypes.PROCEEDINGS_PUBLICATION"
                         v-model="selectedProceedingsPublicationType"
@@ -100,7 +98,7 @@
                         :label="$t('typeOfPublicationLabel') + '*'"
                         :rules="requiredStringSelectionRules"
                         return-object
-                    ></v-select>
+                    />
                 </v-col>
                 <v-col cols="12" sm="6" md="3">
                     <v-radio-group
@@ -111,17 +109,17 @@
                             :label="$t('experimentalPublicationLabel')"
                             value="experimental"
                             color="primary"
-                        ></v-radio>
+                        />
                         <v-radio
                             :label="$t('theoreticalPublicationLabel')"
                             value="theoretical"
                             color="primary"
-                        ></v-radio>
+                        />
                         <v-radio
                             :label="$t('simulationPublicationLabel')"
                             value="simulation"
                             color="primary"
-                        ></v-radio>
+                        />
                     </v-radio-group>
                 </v-col>
             </v-row>
@@ -137,8 +135,7 @@
                         :loading-timeout="30000"
                         @verify="handleVerifyCallback"
                         @expire="resetChallenge"
-                        @error="resetChallenge">
-                    </vue-recaptcha>
+                        @error="resetChallenge" />
                 </v-col>
             </v-row>
 

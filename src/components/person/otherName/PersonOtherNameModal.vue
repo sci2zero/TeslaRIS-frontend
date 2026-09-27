@@ -45,8 +45,7 @@
                                         v-model="primaryName.otherName"
                                         :label="$t('middleNameLabel')"
                                         :placeholder="$t('middleNameLabel')" outlined
-                                        :readonly="readOnly">
-                                    </v-text-field>
+                                        :readonly="readOnly" />
                                 </v-col>
                                 <v-col cols="3">
                                     <v-text-field
@@ -54,8 +53,7 @@
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
                                         :placeholder="$t('surnameLabel')" outlined
                                         :rules="requiredFieldRules" 
-                                        :readonly="readOnly">
-                                    </v-text-field>
+                                        :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
                                     <v-select
@@ -103,8 +101,7 @@
                                         v-model="element.otherName"
                                         :label="$t('middleNameLabel')"
                                         :placeholder="$t('middleNameLabel')" outlined
-                                        :readonly="readOnly">
-                                    </v-text-field>
+                                        :readonly="readOnly" />
                                 </v-col>
                                 <v-col cols="3">
                                     <v-text-field
@@ -112,8 +109,7 @@
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
                                         :placeholder="$t('surnameLabel')" outlined
                                         :rules="requiredFieldRules"
-                                        :readonly="readOnly">
-                                    </v-text-field>
+                                        :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
                                     <v-select
@@ -169,7 +165,7 @@
                     </p>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="blue darken-1" @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>

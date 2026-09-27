@@ -29,8 +29,7 @@
                             multiple
                             :label="$t('thesisTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -40,8 +39,7 @@
                             :items="fileSections"
                             multiple
                             :label="$t('fileSectionsLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :rules="requiredSelectionRules" />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -51,8 +49,7 @@
                             disable-submission
                             required
                             :top-level-institution-id="isAdmin ? undefined : loggedInUser?.organisationUnitId"
-                            label="topLevelInstitutionLabel">
-                        </organisation-unit-autocomplete-search>
+                            label="topLevelInstitutionLabel" />
                     </v-col>    
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -61,14 +58,14 @@
                             v-model="thesesGroups.defended"
                             :label="$t('defendedLabel')"
                             :rules="conditionalRule"
-                        ></v-checkbox>
+                        />
                     </v-col>
                     <v-col cols="12" sm="4" md="2">
                         <v-checkbox
                             v-model="thesesGroups.putOnReview"
                             :label="$t('publicReviewThesesLabel')"
                             :rules="conditionalRule"
-                        ></v-checkbox>
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -78,8 +75,7 @@
                             :items="langItems"
                             :label="$t('languageLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <v-select
@@ -87,8 +83,7 @@
                             :items="exportFileFormats"
                             :label="$t('metadataFormatLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -98,7 +93,7 @@
                             :label="$t('fromLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker-split>
+                        />
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <date-picker-split
@@ -106,7 +101,7 @@
                             :label="$t('toLabel') + '*'"
                             color="primary"
                             required
-                        ></date-picker-split>
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -125,8 +120,7 @@
                             :items="recurrenceTypes"
                             :label="$t('recurrenceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -141,11 +135,10 @@
         <v-window-item value="scheduledBackups">
             <scheduled-tasks-list
                 :scheduled-tasks="scheduledTasks"
-                @delete="deleteScheduledBackupTask">
-            </scheduled-tasks-list>
+                @delete="deleteScheduledBackupTask" />
         </v-window-item>
         <v-window-item value="generatedBackupList">
-            <backup-list backup-type="thesis"></backup-list>
+            <backup-list backup-type="thesis" />
         </v-window-item>
     </v-window>
 

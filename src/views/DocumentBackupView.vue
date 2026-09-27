@@ -28,19 +28,21 @@
                             :items="documentTypes"
                             multiple
                             :label="$t('typeOfPublicationLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :rules="requiredSelectionRules"
+                        />
                     </v-col>
                 </v-row>
-                <v-row class="d-flex flex-row justify-center">
+                <v-row
+                    v-if="isDigitalRepositoryEnabled"    
+                    class="d-flex flex-row justify-center">
                     <v-col cols="12" md="4" lg="4">
                         <v-select
                             v-model="selectedFileSections"
                             :items="fileSections"
                             multiple
                             :label="$t('fileSectionsLabel') + '*'"
-                            :rules="requiredSelectionRules">
-                        </v-select>
+                            :rules="requiredSelectionRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -50,8 +52,8 @@
                             disable-submission
                             required
                             :top-level-institution-id="isAdmin ? undefined : loggedInUser?.organisationUnitId"
-                            label="topLevelInstitutionLabel">
-                        </organisation-unit-autocomplete-search>
+                            label="topLevelInstitutionLabel"
+                        />
                     </v-col>    
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -61,8 +63,8 @@
                             :items="langItems"
                             :label="$t('languageLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object
+                        />
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <v-select
@@ -70,8 +72,8 @@
                             :items="exportFileFormats"
                             :label="$t('metadataFormatLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -82,7 +84,7 @@
                             :label="$t('fromLabel') + '*'"
                             :placeholder="$t('fromLabel') + '*'"
                             :rules="requiredNumericFieldRules"
-                        ></v-text-field>
+                        />
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <v-text-field
@@ -91,7 +93,7 @@
                             :label="$t('toLabel') + '*'"
                             :placeholder="$t('toLabel') + '*'"
                             :rules="requiredNumericFieldRules"
-                        ></v-text-field>
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -110,8 +112,8 @@
                             :items="recurrenceTypes"
                             :label="$t('recurrenceTypeLabel') + '*'"
                             :rules="requiredSelectionRules"
-                            return-object>
-                        </v-select>
+                            return-object
+                        />
                     </v-col>
                 </v-row>
                 <v-row class="d-flex flex-row justify-center">
@@ -126,11 +128,11 @@
         <v-window-item value="scheduledBackups">
             <scheduled-tasks-list
                 :scheduled-tasks="scheduledTasks"
-                @delete="deleteScheduledBackupTask">
-            </scheduled-tasks-list>
+                @delete="deleteScheduledBackupTask"
+            />
         </v-window-item>
         <v-window-item value="generatedBackupList">
-            <backup-list backup-type="document"></backup-list>
+            <backup-list backup-type="document" />
         </v-window-item>
     </v-window>
 
@@ -138,7 +140,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { PublicationType } from '@/models/PublicationModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
@@ -163,6 +165,7 @@ import { useRoute } from 'vue-router';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { serverTimeToLocalTime } from '@/utils/DateUtil';
+import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 
 
 export default defineComponent({
@@ -175,6 +178,10 @@ export default defineComponent({
         const snackbar = ref(false);
         const message = ref("");
         const { loggedInUser, isAdmin } = useUserRole();
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useFeatureModuleToggles();
 
         const route = useRoute();
 
@@ -204,11 +211,6 @@ export default defineComponent({
                 selectedDocumentTypes.value.push(documentType);
             });
 
-            selectedFileSections.value.splice(0);
-            fileSections.value?.forEach(fileSection => {
-                selectedFileSections.value.push(fileSection);
-            });
-
             document.title = i18n.t("routeLabel.documentBackup");
             fetchScheduledTasks();
 
@@ -220,6 +222,20 @@ export default defineComponent({
                 });
             }
         });
+
+        watch(
+            isDigitalRepositoryEnabled, 
+            (enabled) => {
+                selectedFileSections.value.splice(0);
+                
+                if (enabled) {
+                    fileSections.value?.forEach(fileSection => {
+                        selectedFileSections.value.push(fileSection);
+                    });
+                }
+            },
+            { immediate: true }
+        );
 
         const generateBackupRequest = () => {
             let params = `from=${startYear.value}&to=${endYear.value}&institutionId=${selectedOU.value?.value}&lang=${selectedLang.value.value}`;
@@ -283,7 +299,8 @@ export default defineComponent({
             selectedFileSections, isAdmin, currentTab,
             exportFileFormats, selectedExportFileFormat,
             recurrenceTypes, selectedRecurrenceType,
-            scheduledTasks, deleteScheduledBackupTask
+            scheduledTasks, deleteScheduledBackupTask,
+            isDigitalRepositoryEnabled
         };
     }
 });

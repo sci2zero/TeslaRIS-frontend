@@ -34,7 +34,7 @@
         <td>
             <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi"></identifier-menu>
         </td>
-        <td>
+        <td v-if="showDocumentDownload">
             <v-menu
                 v-if="richResultsView"
                 :close-on-content-click="true"
@@ -117,6 +117,7 @@ const props = defineProps<{
     showClassification?: boolean;
     isCommission?: boolean;
     loggedInCommissionId?: number | null;
+    showDocumentDownload?: boolean;
 }>();
 
 defineEmits<{

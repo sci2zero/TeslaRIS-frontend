@@ -69,10 +69,10 @@
             <v-tab v-show="(eventClassifications && eventClassifications.length > 0) || canClassify" value="classifications">
                 {{ $t("classificationsLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-            <v-tab v-show="isAdmin" value="dataQuality">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
@@ -182,7 +182,7 @@
                     @update="fetchClassifications"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="revisions">
+            <v-tabs-window-item value="revisions">
                 <revision-history-table-component
                     class="mt-5"
                     :entity-type="EntityType.CONFERENCE"
@@ -191,7 +191,7 @@
                     @show-assessment-details="showAssessmentDetails"
                 />
             </v-tabs-window-item>
-            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+            <v-tabs-window-item value="dataQuality">
                 <data-quality-tabs-component
                     ref="dataQualityTabsRef"
                     class="mt-5"
@@ -215,6 +215,7 @@ import { useRoute, useRouter } from 'vue-router';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import type { DocumentPublicationIndex } from '@/models/PublicationModel';
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Conference, PersonEventContribution } from "@/models/EventModel";
 import EventService from '@/services/EventService';
@@ -255,7 +256,7 @@ export default defineComponent({
     name: "ConferenceLandingPage",
     components: { LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
-        const { isAdmin } = useUserRole();
+        const { isAdmin, canReviewDataQuality } = useUserRole();
 
         const currentTab = ref("overview");
 
@@ -294,6 +295,7 @@ export default defineComponent({
         const router = useRouter();
 
         const canEdit = ref(false);
+        const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
         const country = ref<Country>();
 
@@ -305,6 +307,13 @@ export default defineComponent({
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
+                DataQualityService.canAssessDataQuality(
+                    EntityType.CONFERENCE,
+                    parseInt(currentRoute.params.id as string)
+                ).then((response) => {
+                    canAssessDataQuality.value = response.data;
+                });
+
                 EventService.canEdit(parseInt(currentRoute.params.id as string)).then((response) => {
                     canEdit.value = response.data;
                 });
@@ -449,7 +458,7 @@ export default defineComponent({
         };
 
         return {
-            conference, publications,
+            conference, publications, canAssessDataQuality, canReviewDataQuality,
             totalPublications, switchPublicationsPage,
             keywords, localiseDateRange, updateBasicInfo,
             canEdit, returnCurrentLocaleContent,

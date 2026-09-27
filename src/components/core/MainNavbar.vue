@@ -10,12 +10,11 @@
                     class="mr-4 hover:bg-gray-100 transition-colors"
                     aria-label="Toggle menu"
                     @click="toggleSidebar"
-                >
-                </v-btn>
+                />
                 <breadcrumbs v-else v-model="navigationDepth" />
             </div>
 
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <div
                 v-if="maintenanceModeOn || nextScheduledMaintenance"
@@ -48,7 +47,7 @@
                 </div>
             </div>
 
-            <v-spacer></v-spacer>
+            <v-spacer />
 
             <div class="flex items-center gap-1">
                 <template v-for="(item, index) in menuItems">

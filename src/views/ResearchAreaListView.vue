@@ -1,12 +1,12 @@
 <template>
     <v-container>
         <h1>{{ $t("researchAreaListLabel") }}</h1>
-        <br />
-        <br />
+        <br>
+        <br>
         <search-bar-component @search="clearSortAndPerformSearch" />
-        <br />
-        <br />
-        <br />
+        <br>
+        <br>
+        <br>
         <tab-content-loader
             v-if="loading"
             button-header

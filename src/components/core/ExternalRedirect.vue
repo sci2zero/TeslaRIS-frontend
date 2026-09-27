@@ -12,7 +12,7 @@
                 :width="7"
                 color="blue"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-row>
         <v-row class="d-flex flex-row justify-center">
             <h3>{{ $t("doNotCloseMessage") }}</h3>

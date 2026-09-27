@@ -24,7 +24,7 @@
             alt="Image Preview"
             max-height="350"
             max-width="500"
-        ></v-img>
+        />
         <v-icon v-else size="x-large" class="large-institution-icon">
             {{ accountIcon }}
         </v-icon>

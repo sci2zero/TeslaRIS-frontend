@@ -7,8 +7,7 @@
                     :items="assessmentClassifications"
                     :label="$t(entityType === ApplicableEntityType.DOCUMENT ? 'assessmentLabel' : 'classificationLabel') + '*'"
                     :rules="requiredSelectionRules"
-                    return-object>
-                </v-select>
+                    return-object />
             </v-col>
         </v-row>
         <v-row
@@ -17,7 +16,7 @@
                 <v-checkbox
                     v-model="showAllForEntityType"
                     :label="$t('showAllCategoriesLabel')"
-                ></v-checkbox>
+                />
             </v-col>
         </v-row>
         <v-row v-if="entityType !== 'EVENT' && entityType !== 'DOCUMENT' && entityType !== 'PRIZE'">
@@ -27,8 +26,7 @@
                     type="number"
                     :label="$t('classificationYearLabel') + '*'"
                     :placeholder="$t('classificationYearLabel') + '*'"
-                    :rules="requiredNumericFieldRules">
-                </v-text-field>
+                    :rules="requiredNumericFieldRules" />
             </v-col>
         </v-row>
         <v-row v-if="!isCommission && !isViceDeanForScience">

@@ -7,8 +7,7 @@
                     :rules="requiredFieldRules"
                     :label="$t('titleLabel') + '*'"
                     :initial-value="toMultilingualTextInput(presetTitle, languageTags)"
-                    is-area>
-                </multilingual-text-input>
+                    is-area />
             </v-col>
         </v-row>
         <v-row>
@@ -17,8 +16,7 @@
                     v-model="alternateTitle"
                     :label="$t('alternateTitleLabel')"
                     :initial-value="toMultilingualTextInput(presetAlternateTitle, languageTags)"
-                    is-area>
-                </multilingual-text-input>
+                    is-area />
             </v-col>
         </v-row>
 

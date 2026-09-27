@@ -51,7 +51,7 @@
                                         :color="heroTheme === 'dark' ? 'white' : '#320f9b'"
                                         :size="28"
                                         :width="3"
-                                    ></v-progress-circular>
+                                    />
                                 </div>
                                 <div v-else>
                                     <span class="frosted-number">
@@ -109,6 +109,7 @@ import PersonService from "@/services/PersonService";
 import { onMounted } from "vue";
 import OrganisationUnitService from "@/services/OrganisationUnitService";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
+import ProjectService from "@/services/project/ProjectService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import Navbar from "@/components/core/MainNavbar.vue";
 import LandingFeatures from "@/components/landing/LandingFeatures.vue";
@@ -117,7 +118,6 @@ import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
-
 
 export default defineComponent({
     name: "HomeView",
@@ -153,7 +153,8 @@ export default defineComponent({
             Promise.all([
                 PersonService.getResearcherCount().then((response) => researcherCount.value = response.data),
                 OrganisationUnitService.getOUCount().then((response) => ouCount.value = response.data),
-                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data)
+                DocumentPublicationService.getDocumentCount().then((response) => publicationCount.value = response.data),
+                ProjectService.getProjectCount().then((response) => projectsCount.value = response.data)
             ]).finally(() => {
                 isLoadingCounts.value = false;
             });
@@ -170,7 +171,7 @@ export default defineComponent({
             {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain'},
             {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple'},
             {name: activitiesLabel, value: activitiesCount, icon: 'mdi-calendar-star'},
-            {name: projectsLabel, value: projectsCount, icon: 'mdi-briefcase-variant'},
+            {name: projectsLabel, value: projectsCount, path:'project', icon: 'mdi-briefcase-variant'},
             {name: fundingsLabel, value: fundingsCount, icon: 'mdi-cash-multiple'},
         ]);
 

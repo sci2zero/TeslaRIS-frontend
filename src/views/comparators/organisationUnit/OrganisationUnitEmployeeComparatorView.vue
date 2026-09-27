@@ -5,11 +5,11 @@
                 <h2 class="d-flex flex-row justify-center">
                     {{ returnCurrentLocaleContent(leftOU?.name) }}
                 </h2>
-                <br />
+                <br>
                 <!-- Left Employee Table -->
                 <person-table-component
                     :persons="leftEmployees" :total-persons="leftTotalEmployees" in-comparator @switch-page="switchPageLeft"
-                    @dragged="handleDrag"></person-table-component>
+                    @dragged="handleDrag" />
             </v-col>
 
             <v-col cols="1">
@@ -26,9 +26,9 @@
                     {{ returnCurrentLocaleContent(rightOU?.name) }}
                 </h2>
 
-                <br />
+                <br>
                 <!-- Right Employee Table -->
-                <person-table-component :persons="rightEmployees" :total-persons="rightTotalEmployees" in-comparator @switch-page="switchPageRight"></person-table-component>
+                <person-table-component :persons="rightEmployees" :total-persons="rightTotalEmployees" in-comparator @switch-page="switchPageRight" />
             </v-col>
         </v-row>
 
@@ -38,7 +38,7 @@
                 :width="7"
                 color="blue"
                 indeterminate
-            ></v-progress-circular>
+            />
         </v-row>
 
         <v-row class="d-flex flex-row justify-center mt-10">

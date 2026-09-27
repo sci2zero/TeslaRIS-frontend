@@ -104,7 +104,7 @@
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')"></v-text-field>
+                    :placeholder="$t('numberOfPagesLabel')" />
             </v-col>
         </v-row>
         <v-row>

@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewProceedingsLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <proceedings-submission-form ref="submissionFormRef"></proceedings-submission-form>
+        <br>
+        <br>
+        <proceedings-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">

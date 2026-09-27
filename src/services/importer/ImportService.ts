@@ -33,7 +33,7 @@ export class ImportService extends BaseService {
     }
 
     async scheduleAuthorCentricInstitutionHarvest(timestamp: string, recurrence: RecurrenceType, dateFrom: string, dateTo: string, request: AuthorCentricInstitutionHarvestRequest): Promise<AxiosResponse<number>> {
-        return super.sendRequest(axios.post, `import-common/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, request);
+        return super.sendRequest(axios.post, `import-common/schedule/author-centric-for-institution?dateFrom=${dateFrom.split("T")[0]}&dateTo=${dateTo.split("T")[0]}&timestamp=${toUtcLocalDateTimeString(timestamp)}&recurrence=${recurrence}`, request);
     }
 
     async uploadBibiographicFiles(files: File[]): Promise<AxiosResponse<number>> {

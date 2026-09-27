@@ -57,6 +57,15 @@ import SubmitMonographPublicationView from "@/views/SubmitMonographPublicationVi
 import MonographPublicationLandingView from "@/views/landingPages/MonographPublicationLandingView.vue";
 import SubmitThesisView from "@/views/SubmitThesisView.vue";
 import ThesisLandingView from "@/views/landingPages/ThesisLandingView.vue";
+import FundingLandingView from "@/views/landingPages/FundingLandingView.vue";
+import FundingApplicationLandingView from "@/views/landingPages/FundingApplicationLandingView.vue";
+import FundingCallLandingView from "@/views/landingPages/FundingCallLandingView.vue";
+import SubmitFundingCallView from "@/views/SubmitFundingCallView.vue";
+import FundingProgramLandingView from "@/views/landingPages/FundingProgramLandingView.vue";
+import SubmitFundingProgramView from "@/views/SubmitFundingProgramView.vue";
+import FundingCallListView from "@/views/FundingCallListView.vue";
+import ProjectLandingView from "@/views/landingPages/ProjectLandingView.vue";
+import ProjectListView from "@/views/ProjectListView.vue";
 import NotificationsView from "@/views/NotificationsView.vue";
 import DeduplicationView from "@/views/DeduplicationView.vue";
 import IntangibleProductMetadataComparatorView from "@/views/comparators/documents/IntangibleProductMetadataComparatorView.vue";
@@ -87,6 +96,7 @@ import ReportsView from "@/views/reporting/ReportsView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
+import FeatureModuleTogglesView from "@/views/FeatureModuleTogglesView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
@@ -126,6 +136,10 @@ import IdentifiersListView from "@/views/IdentifiersListView.vue";
 import PerformanceRelatedOutputLandingView from "@/views/landingPages/PerformanceRelatedOutputLandingView.vue";
 import SubmitPerformanceRelatedOutputView from "@/views/SubmitPerformanceRelatedOutputView.vue";
 import PerformanceRelatedOutputMetadataComparatorView from "@/views/comparators/documents/PerformanceRelatedOutputMetadataComparatorView.vue";
+import FundingProgramListView from "@/views/FundingProgramListView.vue";
+import SubmitProjectView from "@/views/SubmitProjectView.vue";
+import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
+import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
 
 
 const roles = {
@@ -246,6 +260,133 @@ const router = createRouter({
                         authenticated: true,
                         authorities: [roles.admin],
                     },
+                },
+                {
+                    path: "funding",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingLandingPage",
+                            component: FundingLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "funding-call",
+                    name: "fundingCallsParent",
+                    children: [
+                        {
+                            path: "",
+                            name: "fundingCalls",
+                            component: FundingCallListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "fundingCallLandingPage",
+                            component: FundingCallLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "submit-funding-call",
+                            name: "submitFundingCall",
+                            component: SubmitFundingCallView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "funding-application",
+                    children: [
+                        {
+                            path: ":id",
+                            name: "fundingApplicationLandingPage",
+                            component: FundingApplicationLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "funding-program",
+                    name: "fundingProgramsParent",
+                    children: [
+                        {
+                            path: "",
+                            name: "fundingPrograms",
+                            component: FundingProgramListView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "fundingProgramLandingPage",
+                            component: FundingProgramLandingView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                        {
+                            path: "submit-funding-program",
+                            name: "submitFundingProgram",
+                            component: SubmitFundingProgramView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin],
+                            },
+                        },
+                    ]
+                },
+                {
+                    path: "project",
+                    name: "projectsParent",
+                    children: [
+                        {
+                            path: "",
+                            name: "projects",
+                            component: ProjectListView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: ":id",
+                            name: "projectLandingPage",
+                            component: ProjectLandingView,
+                            meta: {
+                                authenticated: false,
+                                authorities: [],
+                            },
+                        },
+                        {
+                            path: "submit-project",
+                            name: "submitProject",
+                            component: SubmitProjectView,
+                            meta: {
+                                authenticated: true,
+                                authorities: [roles.admin, roles.institutionalEditor, roles.researcher],
+                            },
+                        },
+                    ]
                 },
                 {
                     path: "events",
@@ -1230,7 +1371,19 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "assessment",                 
+                    path: "feature-module-toggles",
+                    name: "featureModuleToggles",
+                    component: FeatureModuleTogglesView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "assessment",
+                    meta: {
+                        requiredModule: "ASSESSMENT"
+                    },
                     children: [
                         {
                             path: "indicators",
@@ -1323,6 +1476,7 @@ const router = createRouter({
                     name: "thesisLibraryReporting",
                     component: ThesisLibraryReportView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.headOfLibrary, roles.admin],
                     },
@@ -1332,6 +1486,7 @@ const router = createRouter({
                     name: "thesisLibrarySearch",
                     component: ThesisLibrarySearchView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1341,6 +1496,7 @@ const router = createRouter({
                     name: "thesisLibraryBackup",
                     component: ThesisLibraryBackupView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1350,6 +1506,7 @@ const router = createRouter({
                     name: "publicDissertationsReport",
                     component: PublicReviewDissertationsView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: false,
                         authorities: [],
                     },
@@ -1368,6 +1525,7 @@ const router = createRouter({
                     name: "promotions",
                     component: PromotionListView,
                     meta: {
+                        requiredModule: "DIGITAL_LIBRARY",
                         authenticated: true,
                         authorities: [roles.admin, roles.promotionRegistryAdministrator, roles.institutionalLibrarian, roles.headOfLibrary],
                     },
@@ -1384,6 +1542,9 @@ const router = createRouter({
                 {
                     path: "registry-book",
                     name: "registryBookListParent",
+                    meta: {
+                        requiredModule: "DIGITAL_LIBRARY"
+                    },
                     children: [
                         {
                             path: "",
@@ -1412,6 +1573,24 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "repository-analytics",
+                    name: "repositoryAnalytics",
+                    component: RepositoryAnalyticsView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "issue-explorer",
+                    name: "issueExplorer",
+                    component: IssueExplorerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
                     },
                 }
             ]

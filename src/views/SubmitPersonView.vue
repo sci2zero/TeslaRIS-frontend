@@ -3,9 +3,9 @@
         <v-sheet class="text-center">
             <h1>{{ $t("createNewPersonLabel") }}</h1>
         </v-sheet>
-        <br />
-        <br />
-        <person-submission-form ref="submissionFormRef"></person-submission-form>
+        <br>
+        <br>
+        <person-submission-form ref="submissionFormRef" />
         <v-row justify="center">
             <v-col cols="1">
                 <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">
