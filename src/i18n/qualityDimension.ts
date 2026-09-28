@@ -7,7 +7,7 @@ export const qualityDimensionSr = [
     { title: "Doslednost", value: QualityDimension.CONSISTENCY },
     { title: "Poreklo", value: QualityDimension.LINEAGE },
     { title: "Strukturna doslednost", value: QualityDimension.STRUCTURAL_CONSISTENCY },
-    { title: "Kvalitativnost", value: QualityDimension.QUALITATIVE },
+    { title: "Kvalitet", value: QualityDimension.QUALITATIVE },
     { title: "Semantika", value: QualityDimension.SEMANTIC },
     { title: "Ažurnost", value: QualityDimension.CURRENCY }
 ];

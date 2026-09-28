@@ -10,7 +10,7 @@ export const trendMetricSr = [
     { title: "Doslednost", value: TrendMetric.CONSISTENCY },
     { title: "Poreklo", value: TrendMetric.LINEAGE },
     { title: "Strukturna doslednost", value: TrendMetric.STRUCTURAL_CONSISTENCY },
-    { title: "Kvalitativnost", value: TrendMetric.QUALITATIVE },
+    { title: "Kvalitet", value: TrendMetric.QUALITATIVE },
     { title: "Semantika", value: TrendMetric.SEMANTIC },
     { title: "Ažurnost", value: TrendMetric.CURRENCY }
 ];
