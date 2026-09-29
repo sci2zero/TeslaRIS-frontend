@@ -33,6 +33,18 @@
                     </v-col>
                     <v-col cols="12" md="2">
                         <v-select
+                            v-model="filters.metric"
+                            :items="metricOptions"
+                            item-title="title"
+                            item-value="value"
+                            :label="$t('metricLabel')"
+                            density="compact"
+                            clearable
+                            hide-details
+                        />
+                    </v-col>
+                    <v-col cols="12" md="2">
+                        <v-select
                             v-model="filters.severity"
                             :items="severityOptions"
                             item-title="title"
@@ -43,7 +55,7 @@
                             hide-details
                         />
                     </v-col>
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="2">
                         <v-autocomplete
                             v-model="filters.constraintKey"
                             :items="constraintOptions"
@@ -55,7 +67,7 @@
                             hide-details
                         />
                     </v-col>
-                    <v-col cols="12" md="3" class="d-flex gap-2">
+                    <v-col cols="12" md="2" class="d-flex gap-2">
                         <v-btn color="primary" variant="outlined" @click="clearFilters">
                             {{ $t("clearLabel") }}
                         </v-btn>
@@ -88,6 +100,7 @@
                                 <th>{{ $t("targetEntityTypeLabel") }}</th>
                                 <th>{{ $t("constraintLabel") }}</th>
                                 <th>{{ $t("dimensionLabel") }}</th>
+                                <th>{{ $t("metricLabel") }}</th>
                                 <th>{{ $t("severityLabel") }}</th>
                                 <th>{{ $t("actionLabel") }}</th>
                             </tr>
@@ -104,6 +117,7 @@
                                 <td>{{ issue.target }}</td>
                                 <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(issue.title) as string) }}</td>
                                 <td>{{ getQualityDimensionTitleFromValueAutoLocale(issue.dimension) }}</td>
+                                <td>{{ metricTitle(issue.metric) }}</td>
                                 <td>
                                     <v-chip
                                         :color="severityColors[issue.severity]"
@@ -165,7 +179,8 @@ import {
     SEVERITY_COLORS,
     type ConstraintSummary,
     type DataQualityIssue,
-    type IssueFilters
+    type IssueFilters,
+    type MetricSummary
 } from "@/models/RevisionModel";
 import { EntityType } from "@/models/MergeModel";
 import DataQualityService from "@/services/revision/DataQualityService";
@@ -195,7 +210,8 @@ const EMPTY_FILTERS: IssueFilters = {
     target: undefined,
     dimension: undefined,
     severity: undefined,
-    constraintKey: undefined
+    constraintKey: undefined,
+    metric: undefined
 };
 
 const PAGE_SIZE = 50;
@@ -257,6 +273,50 @@ export default defineComponent({
 
         // Constraints are profile configuration, so they are fetched apart from the issues.
         const constraints = ref<ConstraintSummary[]>([]);
+        const metrics = ref<MetricSummary[]>([]);
+
+        // Each list is narrowed by the other, so a pair that no rule carries cannot be chosen.
+        const metricOptions = computed(() =>
+            metrics.value
+                .filter(metric => !filters.value.dimension ||
+                    metric.dimensions.includes(filters.value.dimension))
+                .map(metric => ({
+                    title: displayTextOrPlaceholder(
+                        returnCurrentLocaleContent(metric.title) as string),
+                    value: metric.key
+                })));
+
+        const metricTitle = (key: string | undefined) => {
+            const metric = metrics.value.find(candidate => candidate.key === key);
+
+            return metric
+                ? displayTextOrPlaceholder(returnCurrentLocaleContent(metric.title) as string)
+                : displayTextOrPlaceholder(key as string);
+        };
+
+        const dimensionsOfSelectedMetric = computed(() =>
+            metrics.value.find(metric => metric.key === filters.value.metric)?.dimensions);
+
+        const narrowedDimensionOptions = computed(() => {
+            const allowed = dimensionsOfSelectedMetric.value;
+
+            return allowed
+                ? dimensionOptions.value.filter(option => allowed.includes(option.value))
+                : dimensionOptions.value;
+        });
+
+        const fetchMetrics = () => {
+            if (!props.profileName) {
+                metrics.value = [];
+                return;
+            }
+
+            DataQualityService.listProfileMetrics(props.profileName).then(response => {
+                metrics.value = response.data;
+            }).catch(() => {
+                metrics.value = [];
+            });
+        };
 
         const constraintOptions = computed(() =>
             constraints.value
@@ -274,7 +334,8 @@ export default defineComponent({
             }
 
             DataQualityService.listProfileConstraints(
-                props.profileName, filters.value.target
+                props.profileName, filters.value.target, filters.value.dimension,
+                filters.value.metric
             ).then(response => {
                 constraints.value = response.data;
                 dropUnknownConstraint();
@@ -321,11 +382,12 @@ export default defineComponent({
                 ? DataQualityService.getIssuesForEntity(
                     scope.value.entityType, scope.value.entityId, props.profileName,
                     filters.value.target, filters.value.dimension, filters.value.severity,
-                    filters.value.constraintKey, props.assessmentDate, cursor, PAGE_SIZE)
+                    filters.value.constraintKey, filters.value.metric, props.assessmentDate,
+                    cursor, PAGE_SIZE)
                 : DataQualityService.getRepositoryIssues(
                     props.profileName, filters.value.target, filters.value.dimension,
-                    filters.value.severity, filters.value.constraintKey, props.assessmentDate,
-                    cursor, PAGE_SIZE);
+                    filters.value.severity, filters.value.constraintKey, filters.value.metric,
+                    props.assessmentDate, cursor, PAGE_SIZE);
 
             request.then(response => {
                 if (requestId !== latestRequest) {
@@ -426,11 +488,46 @@ export default defineComponent({
         watch(() => [
             props.profileName, props.personId, props.organisationUnitId, props.assessmentDate
         ], () => {
+            fetchMetrics();
             fetchConstraints();
             resetAndFetch();
         }, { immediate: true });
 
-        watch(() => filters.value.target, fetchConstraints);
+        watch(
+            () => [filters.value.target, filters.value.dimension, filters.value.metric],
+            fetchConstraints);
+
+        // Each side drops a selection the other rules out, and takes it when only one remains.
+        watch(() => filters.value.metric, () => {
+            const allowed = dimensionsOfSelectedMetric.value;
+
+            if (!allowed) {
+                return;
+            }
+
+            if (filters.value.dimension && !allowed.includes(filters.value.dimension)) {
+                filters.value.dimension = undefined;
+            }
+
+            if (allowed.length === 1) {
+                filters.value.dimension = allowed[0];
+            }
+        });
+
+        watch(() => filters.value.dimension, dimension => {
+            if (!dimension) {
+                return;
+            }
+
+            if (filters.value.metric &&
+                !metricOptions.value.some(option => option.value === filters.value.metric)) {
+                filters.value.metric = undefined;
+            }
+
+            if (metricOptions.value.length === 1) {
+                filters.value.metric = metricOptions.value[0].value;
+            }
+        });
 
         watch(filters, () => {
             emit("update:filters", { ...filters.value });
@@ -440,7 +537,9 @@ export default defineComponent({
         return {
             issues, loading, loadingMore, nextCursor, totalIssues, filters, scope, loadMore,
             PAGE_SIZE,
-            severityColors: SEVERITY_COLORS, targetOptions, dimensionOptions, severityOptions, constraintOptions,
+            severityColors: SEVERITY_COLORS, targetOptions, severityOptions,
+            dimensionOptions: narrowedDimensionOptions, constraintOptions, metricOptions,
+            metricTitle,
             clearFilters, resetAndFetch, filterByTarget, applyFilters, showIssueDetails,
             detailsDialog, detailsAssessmentId, detailsRuleKey,
             detailsRecordNameSr, detailsRecordNameOther,

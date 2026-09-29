@@ -6,6 +6,16 @@
                     <v-progress-circular indeterminate color="primary" />
                 </div>
 
+                <div v-else-if="loadFailed" class="d-flex flex-column align-center py-10">
+                    <v-icon color="error" size="40" icon="mdi-alert-circle-outline" />
+                    <div class="mt-3 text-medium-emphasis">
+                        {{ $t("issueDetailsUnavailableMessage") }}
+                    </div>
+                    <v-btn class="mt-4" color="primary" variant="tonal" @click="fetchDetails">
+                        {{ $t("refreshLabel") }}
+                    </v-btn>
+                </div>
+
                 <template v-else-if="details">
                     <div class="issue-details-header">
                         <h2 class="issue-details-title">
@@ -203,7 +213,7 @@
                                             {{ $t("qualityDimensionLabel") }}
                                         </div>
                                         <div class="issue-details-value">
-                                            {{ details.dimension }}
+                                            {{ getQualityDimensionTitleFromValueAutoLocale(details.dimension) }}
                                         </div>
                                     </div>
 
@@ -213,6 +223,24 @@
                                         </div>
                                         <div class="issue-details-value issue-details-definition">
                                             {{ displayTextOrPlaceholder(returnCurrentLocaleContent(details.dimensionDefinition) as string) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="issue-details-field">
+                                        <div class="issue-details-label">
+                                            {{ $t("metricLabel") }}
+                                        </div>
+                                        <div class="issue-details-value">
+                                            {{ displayTextOrPlaceholder(returnCurrentLocaleContent(details.metricTitle) as string) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="issue-details-field">
+                                        <div class="issue-details-label">
+                                            {{ $t("metricDefinitionLabel") }}
+                                        </div>
+                                        <div class="issue-details-value issue-details-definition">
+                                            {{ displayTextOrPlaceholder(returnCurrentLocaleContent(details.metricDefinition) as string) }}
                                         </div>
                                     </div>
                                 </v-card-text>
@@ -250,6 +278,7 @@ import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import { getLandingPageBasePath } from "@/utils/PathResolutionUtil";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
+import { getQualityDimensionTitleFromValueAutoLocale } from "@/i18n/qualityDimension";
 
 
 export default defineComponent({
@@ -287,9 +316,16 @@ export default defineComponent({
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
-        const dialog = ref(props.modelValue);
+        // Writable computed rather than a mirrored ref: a local copy can drift out of step with
+        // the parent's flag, and then reopening the same row toggles nothing and fetches nothing.
+        const dialog = computed({
+            get: () => props.modelValue,
+            set: (value: boolean) => emit("update:modelValue", value)
+        });
         const loading = ref(false);
+        const loadFailed = ref(false);
         const details = ref<DataQualityIssueDetails | null>(null);
+        let latestRequest = 0;
 
         const i18n = useI18n();
 
@@ -326,39 +362,54 @@ export default defineComponent({
 
         const fetchDetails = () => {
             if (!props.assessmentId || !props.ruleKey) {
+                loading.value = false;
+                loadFailed.value = true;
+                details.value = null;
                 return;
             }
 
+            const requestId = ++latestRequest;
+
             loading.value = true;
+            loadFailed.value = false;
             details.value = null;
 
             DataQualityService.getIssueDetails(props.assessmentId, props.ruleKey)
                 .then(response => {
+                    if (requestId !== latestRequest) {
+                        return;
+                    }
+
                     details.value = response.data;
                 })
-                .catch(() => {
+                .catch(error => {
+                    if (requestId !== latestRequest) {
+                        return;
+                    }
+
+                    console.error("Unable to load issue details.", error);
                     details.value = null;
+                    loadFailed.value = true;
                 })
                 .finally(() => {
-                    loading.value = false;
+                    if (requestId === latestRequest) {
+                        loading.value = false;
+                    }
                 });
         };
 
-        watch(() => props.modelValue, (value) => {
-            dialog.value = value;
-
+        // The identifiers are watched alongside the flag, so reopening on a different row
+        // re-fetches even when the dialog never closed in between.
+        watch(() => [props.modelValue, props.assessmentId, props.ruleKey], ([value]) => {
             if (value) {
                 fetchDetails();
             }
         });
 
-        watch(dialog, (value) => {
-            emit("update:modelValue", value);
-        });
-
         return {
             dialog, loading, details, recordName, landingPagePath, isForeignRecord,
-            returnCurrentLocaleContent, displayTextOrPlaceholder, localiseDate
+            returnCurrentLocaleContent, displayTextOrPlaceholder, localiseDate,
+            getQualityDimensionTitleFromValueAutoLocale
         };
     }
 });

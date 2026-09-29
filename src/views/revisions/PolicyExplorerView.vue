@@ -54,7 +54,19 @@
                             hide-details
                         />
                     </v-col>
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="2">
+                        <v-select
+                            v-model="filters.metric"
+                            :items="metricOptions"
+                            item-title="title"
+                            item-value="value"
+                            :label="$t('metricLabel')"
+                            density="compact"
+                            clearable
+                            hide-details
+                        />
+                    </v-col>
+                    <v-col cols="12" md="2">
                         <v-select
                             v-model="filters.target"
                             :items="targetOptions"
@@ -78,7 +90,7 @@
                             hide-details
                         />
                     </v-col>
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="2">
                         <v-text-field
                             v-model="filters.search"
                             :label="$t('searchConstraintsLabel')"
@@ -118,6 +130,7 @@
                             <tr>
                                 <th>{{ $t("constraintLabel") }}</th>
                                 <th>{{ $t("dimensionLabel") }}</th>
+                                <th>{{ $t("metricLabel") }}</th>
                                 <th>{{ $t("targetObjectLabel") }}</th>
                                 <th>{{ $t("severityLabel") }}</th>
                                 <th>{{ $t("affectedRecordsLabel") }}</th>
@@ -140,6 +153,14 @@
                                     </div>
                                     <a class="details-link" @click="showDimensionDetails(constraint.dimension)">
                                         {{ $t("viewDimensionDetailsLabel") }}
+                                    </a>
+                                </td>
+                                <td class="py-2">
+                                    <div class="context-value">
+                                        {{ metricTitle(constraint.metric) }}
+                                    </div>
+                                    <a class="details-link" @click="showMetricDetails(constraint.metric)">
+                                        {{ $t("viewMetricDetailsLabel") }}
                                     </a>
                                 </td>
                                 <td>{{ constraint.target }}</td>
@@ -258,6 +279,21 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog v-model="metricDialog" max-width="560">
+            <v-card v-if="selectedMetric">
+                <v-card-title>{{ metricTitle(selectedMetric) }}</v-card-title>
+                <v-card-text>
+                    {{ displayTextOrPlaceholder(metricDescription) }}
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn color="primary" @click="metricDialog = false">
+                        {{ $t("closeLabel") }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
         <v-dialog v-model="dimensionDialog" max-width="560">
             <v-card v-if="selectedDimension">
                 <v-card-title>
@@ -309,6 +345,7 @@ const PAGE_SIZE = 5;
 
 interface PolicyFilters {
     dimension?: QualityDimension;
+    metric?: string;
     target?: string;
     severity?: IssueSeverity;
     search?: string;
@@ -336,6 +373,7 @@ const parseQuery = (query: LocationQuery): ExplorerState => ({
     page: Math.max(1, parseInt(single(query.page) ?? "1") || 1),
     filters: {
         dimension: oneOf(single(query.dimension), Object.values(QualityDimension)),
+        metric: single(query.metric),
         target: oneOf(single(query.target), ISSUE_TARGETS),
         severity: oneOf(single(query.severity), Object.values(IssueSeverity)),
         search: single(query.search)
@@ -355,6 +393,10 @@ const toQuery = (state: ExplorerState): LocationQueryRaw => {
 
     if (state.filters.dimension) {
         query.dimension = state.filters.dimension;
+    }
+
+    if (state.filters.metric) {
+        query.metric = state.filters.metric;
     }
 
     if (state.filters.target) {
@@ -402,8 +444,32 @@ export default defineComponent({
         const selectedConstraint = ref<PolicyConstraint | undefined>(undefined);
         const dimensionDialog = ref(false);
         const selectedDimension = ref<QualityDimension | undefined>(undefined);
+        const metricDialog = ref(false);
+        const selectedMetric = ref<string | undefined>(undefined);
 
-        const dimensionOptions = computed(() => getQualityDimensionsForGivenLocale());
+        // Each list is narrowed by the other, so a pair that no rule carries cannot be chosen.
+        const metricOptions = computed(() =>
+            (policy.value?.metrics ?? [])
+                .filter(metric => !filters.value.dimension ||
+                    metric.dimensions.includes(filters.value.dimension))
+                .map(metric => ({
+                    title: displayTextOrPlaceholder(
+                        returnCurrentLocaleContent(metric.title) as string),
+                    value: metric.key
+                })));
+
+        const dimensionsOfSelectedMetric = computed(() =>
+            policy.value?.metrics?.find(metric => metric.key === filters.value.metric)
+                ?.dimensions);
+
+        const dimensionOptions = computed(() => {
+            const allowed = dimensionsOfSelectedMetric.value;
+            const options = getQualityDimensionsForGivenLocale() ?? [];
+
+            return allowed
+                ? options.filter(option => allowed.includes(option.value))
+                : options;
+        });
         const severityOptions = computed(() => getIssueSeveritiesForGivenLocale());
         const targetOptions = computed(() => getIssueTargetsForGivenLocale(ISSUE_TARGETS));
 
@@ -415,6 +481,10 @@ export default defineComponent({
 
             return (policy.value?.constraints ?? []).filter(constraint => {
                 if (filters.value.dimension && constraint.dimension !== filters.value.dimension) {
+                    return false;
+                }
+
+                if (filters.value.metric && constraint.metric !== filters.value.metric) {
                     return false;
                 }
 
@@ -449,6 +519,20 @@ export default defineComponent({
 
         const pageEnd = computed(() =>
             Math.min(page.value * PAGE_SIZE, filteredConstraints.value.length));
+
+        const metricOf = (key: string | undefined) =>
+            policy.value?.metrics?.find(metric => metric.key === key);
+
+        const metricTitle = (key: string | undefined) => {
+            const metric = metricOf(key);
+
+            return metric
+                ? displayTextOrPlaceholder(returnCurrentLocaleContent(metric.title) as string)
+                : displayTextOrPlaceholder(key as string);
+        };
+
+        const metricDescription = computed(() => returnCurrentLocaleContent(
+            metricOf(selectedMetric.value)?.description ?? []) as string);
 
         const dimensionDefinition = computed(() => selectedDimension.value
             ? returnCurrentLocaleContent(
@@ -500,6 +584,11 @@ export default defineComponent({
             dimensionDialog.value = true;
         };
 
+        const showMetricDetails = (metric: string) => {
+            selectedMetric.value = metric;
+            metricDialog.value = true;
+        };
+
         const openIssues = (constraint: PolicyConstraint) => {
             const query: LocationQueryRaw = { constraint: constraint.key };
 
@@ -518,6 +607,38 @@ export default defineComponent({
             page.value = 1;
             mirrorToUrl();
         }, { deep: true });
+
+        // Each side drops a selection the other rules out, and takes it when only one remains.
+        watch(() => filters.value.metric, () => {
+            const allowed = dimensionsOfSelectedMetric.value;
+
+            if (!allowed) {
+                return;
+            }
+
+            if (filters.value.dimension && !allowed.includes(filters.value.dimension)) {
+                filters.value.dimension = undefined;
+            }
+
+            if (allowed.length === 1) {
+                filters.value.dimension = allowed[0];
+            }
+        });
+
+        watch(() => filters.value.dimension, dimension => {
+            if (!dimension) {
+                return;
+            }
+
+            if (filters.value.metric &&
+                !metricOptions.value.some(option => option.value === filters.value.metric)) {
+                filters.value.metric = undefined;
+            }
+
+            if (metricOptions.value.length === 1) {
+                filters.value.metric = metricOptions.value[0].value;
+            }
+        });
 
         watch(page, mirrorToUrl);
 
@@ -566,10 +687,11 @@ export default defineComponent({
         return {
             profileNames, selectedProfileName, selectedAssessmentDate,
             policy, loading, page, filters,
-            dimensionOptions, severityOptions, targetOptions,
+            dimensionOptions, metricOptions, severityOptions, targetOptions,
             filteredConstraints, pagedConstraints, pageCount, pageStart, pageEnd,
             constraintDialog, selectedConstraint, dimensionDialog, selectedDimension,
-            dimensionDefinition,
+            dimensionDefinition, metricDialog, selectedMetric, metricDescription,
+            metricTitle, showMetricDetails,
             severityColors: SEVERITY_COLORS,
             titleOf, clearFilters, fetchPolicy, showConstraintDetails, showDimensionDetails,
             openIssues,
