@@ -162,6 +162,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import BrandingService from '@/services/BrandingService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import { useBrandingStore } from '@/stores/brandingStore';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
@@ -210,6 +211,8 @@ const langChangeItem = shallowRef(LangChangeItem);
 const notificationItem = shallowRef(NotificationItem);
 
 const { isCommission, isUserBoundToOU } = useUserRole();
+
+const { isRegistrationEnabled } = useCrisContextInformation();
 
 const i18n = useI18n();
 const personId = ref(-1);
@@ -303,7 +306,7 @@ const menuItems = ref<MenuItem[]>([
     { title: undefined, type: 'lang_component', icon: 'mdi-web', condition: true, component: langChangeItem },
     { type: 'divider' },
     { title: undefined, type: 'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
-    { title: registerTitle, type: 'icon-link', pathName: `register`, icon: 'mdi-clipboard-account-outline', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+    { title: registerTitle, type: 'icon-link', pathName: `register`, icon: 'mdi-clipboard-account-outline', condition: computed(() => isRegistrationEnabled.value && !loginStore.userLoggedIn), variant: 'text' },
     { title: loginTitle, type: 'icon-link', pathName: `login`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color: 'primary' },
     { type: 'user_profile', pathName: 'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn) },
     { title: logoutTitle, type: 'icon', variant: 'text', click: logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }

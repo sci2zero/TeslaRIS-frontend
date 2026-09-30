@@ -35,8 +35,11 @@
                         <a href="#" class="forgot-password-link" @click="forgotPasswordForm = false;">{{ $t("knowPasswordLabel") }}</a>
                     </div>
                     <br>
-                    <localized-link to="register">
+                    <localized-link v-if="isRegistrationEnabled" to="register">
                         {{ $t("registerFromLoginLabel") }}
+                    </localized-link>
+                    <localized-link v-else to="contact">
+                        {{ $t("contactUsFromLoginLabel") }}
                     </localized-link>
                 </v-form>
                 <div v-else>
@@ -76,6 +79,7 @@ import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
 import UserService from "@/services/UserService";
 import { useInterval } from "@/composables/useInterval";
+import { useCrisContextInformation } from "@/composables/useCrisContextInformation";
 import OAuth2ButtonsSection from "@/components/user/oauth2/OAuth2ButtonsSection.vue";
 
 
@@ -84,6 +88,8 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink, Toast, OAuth2ButtonsSection },
         setup() {
+            const { isRegistrationEnabled } = useCrisContextInformation();
+
             const route = useRoute();
             const router = useRouter();
 
@@ -189,6 +195,7 @@ export default defineComponent(
             };
 
             return {
+                isRegistrationEnabled,
                 email, emailFieldRules, 
                 password, passwordFieldRules, 
                 snackbar, message, isFormValid, login,

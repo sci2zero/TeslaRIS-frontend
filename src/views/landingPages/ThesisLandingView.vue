@@ -355,7 +355,7 @@
                     v-if="canCreateRegistryBookEntry"
                     class="ml-2"
                     :form-component="RegistryBookEntryForm"
-                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string), canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate), cannotSaveReason: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) ? '' : $t('registryEntryThesisNotEligibleMessage') }"
+                    :form-props="{ thesisId: parseInt(currentRoute.params.id as string), presetAuthorName: thesisAuthorName, canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate), cannotSaveReason: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) ? '' : $t('registryEntryThesisNotEligibleMessage') }"
                     entity-name="RegistryBookEntry"
                     :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
                     primary-color compact
@@ -704,6 +704,10 @@ export default defineComponent({
         });
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
+
+        const thesisAuthorName = computed(() => thesis.value?.contributions
+            ?.find(contribution => contribution.contributionType === DocumentContributionType.AUTHOR)
+            ?.personName);
 
         const documentClassifications = ref<EntityClassificationResponse[]>();
         const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
@@ -1103,6 +1107,7 @@ export default defineComponent({
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
+            thesisAuthorName,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution, AlternateTitleForm,

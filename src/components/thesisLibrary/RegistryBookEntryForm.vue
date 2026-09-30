@@ -102,6 +102,7 @@
 import { computed, defineComponent, nextTick, onMounted, type PropType } from 'vue';
 import { ref } from 'vue';
 import { AcademicTitle, type RegistryBookEntry } from '@/models/ThesisLibraryModel';
+import type { PersonName } from '@/models/PersonModel';
 import RegistryBookService from '@/services/thesisLibrary/RegistryBookService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import PreviousTitleInformationForm from './PreviousTitleInformationForm.vue';
@@ -122,6 +123,10 @@ export default defineComponent({
         },
         presetRegistryBookEntry: {
             type: Object as PropType<RegistryBookEntry>,
+            default: undefined
+        },
+        presetAuthorName: {
+            type: Object as PropType<PersonName>,
             default: undefined
         },
         canSave: {
@@ -201,6 +206,23 @@ export default defineComponent({
             }
         );
 
+        const isAuthorNameMissing = (authorName?: PersonName | null) =>
+            !authorName || (!authorName.firstname?.trim() && !authorName.lastname?.trim());
+
+        // The name inputs bind straight to authorName.firstname/lastname, so a null authorName
+        // crashes them out of the form and leaves no way to fill the name in. Keep it an object,
+        // seeded from the thesis author when the prefill endpoint has nothing to offer.
+        const ensureAuthorName = () => {
+            const personalInformation = registryEntry.value?.personalInformation;
+            if (!personalInformation || !isAuthorNameMissing(personalInformation.authorName)) {
+                return;
+            }
+
+            personalInformation.authorName = props.presetAuthorName
+                ? {...props.presetAuthorName}
+                : {firstname: "", otherName: "", lastname: ""};
+        };
+
         onMounted(() => {
             step.value = 1;
             loading.value = true;
@@ -213,11 +235,13 @@ export default defineComponent({
                     }
 
                     registryEntry.value = response.data;
+                    ensureAuthorName();
                     findLastValidStep();
                 }).finally(() => loading.value = false);
             } else {
                 isUpdate.value = true;
                 registryEntry.value = props.presetRegistryBookEntry;
+                ensureAuthorName();
                 findLastValidStep();
             }
         });
@@ -225,7 +249,8 @@ export default defineComponent({
         const prepopulateMetadata = () => {
             RegistryBookService.getEntryPrePopulatedData(props.thesisId)
                 .then(response => {
-                    registryEntry.value.personalInformation.authorName = response.data.personName;
+                    registryEntry.value.personalInformation.authorName =
+                        response.data.personName ?? registryEntry.value.personalInformation.authorName;
                     registryEntry.value.personalInformation.localBirthDate = response.data.localBirthDate;
                     registryEntry.value.personalInformation.placeOfBrith = response.data.placeOfBirth;
                     registryEntry.value.contactInformation.place = returnCurrentLocaleContent(response.data.postalAddress.city) as string;
@@ -238,7 +263,13 @@ export default defineComponent({
                     registryEntry.value.dissertationInformation.institutionPlace = response.data.place;
                     registryEntry.value.dissertationInformation.organisationUnitId = response.data.institutionId;
                     registryEntry.value.dissertationInformation.dissertationTitle = response.data.title;
-                }).finally(() => loading.value = false);
+                }).catch(() => {
+                    message.value = i18n.t("registryEntryPrepopulationFailedMessage");
+                    snackbar.value = true;
+                }).finally(() => {
+                    ensureAuthorName();
+                    loading.value = false;
+                });
         };
 
         const findLastValidStep = () => {

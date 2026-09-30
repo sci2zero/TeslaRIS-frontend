@@ -340,6 +340,7 @@ import MonographAutocompleteSearch from "@/components/publication/MonographAutoc
 import { QualityAssessmentTarget } from "@/models/RevisionModel";
 import { getQualityAssessmentTargetsForGivenLocale } from "@/i18n/qualityAssessmentTarget";
 import DataQualityService from "@/services/revision/DataQualityService";
+import { useCrisContextInformation } from "@/composables/useCrisContextInformation";
 
 
 export default defineComponent({
@@ -376,8 +377,49 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const scheduledTaskTypes = ref(getScheduledTaskTypeForGivenLocale());
+        const { isAssessmentModuleEnabled, isDigitalLibraryEnabled } = useCrisContextInformation();
+
+        const assessmentOnlyTaskTypes = [
+            ScheduledTaskType.INDICATOR_LOAD,
+            ScheduledTaskType.IF5_JCI_COMPUTATION,
+            ScheduledTaskType.CLASSIFICATION_COMPUTATION,
+            ScheduledTaskType.CLASSIFICATION_LOAD,
+            ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT,
+            ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT,
+            ScheduledTaskType.THESES_ASSESSMENT,
+            ScheduledTaskType.MONOGRAPH_PUBLICATIONS_ASSESSMENT,
+        ];
+
+        const digitalLibraryOnlyTaskTypes = [
+            ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK
+        ];
+
+        const allScheduledTaskTypes = ref(getScheduledTaskTypeForGivenLocale());
+        const scheduledTaskTypes = computed(() => {
+            const hiddenTaskTypes = [
+                ...(isAssessmentModuleEnabled.value ? [] : assessmentOnlyTaskTypes),
+                ...(isDigitalLibraryEnabled.value ? [] : digitalLibraryOnlyTaskTypes)
+            ];
+
+            if (hiddenTaskTypes.length === 0) {
+                return allScheduledTaskTypes.value;
+            }
+
+            return allScheduledTaskTypes.value?.filter(
+                taskType => !hiddenTaskTypes.includes(taskType.value));
+        });
+
         const selectedScheduledTaskType = ref<ScheduledTaskType>(ScheduledTaskType.INDICATOR_LOAD);
+
+        // The default selection is itself hideable, so fall back to whatever remains available.
+        watch(scheduledTaskTypes, taskTypes => {
+            if (!taskTypes?.length ||
+                taskTypes.some(taskType => taskType.value === selectedScheduledTaskType.value)) {
+                return;
+            }
+
+            selectedScheduledTaskType.value = taskTypes[0].value;
+        }, { immediate: true });
 
         const reportTypes = ref(getReportTypesForGivenLocale());
         const selectedReportType = ref<ReportType>(ReportType.TABLE_63);
@@ -501,7 +543,7 @@ export default defineComponent({
         const { startInterval } = useInterval(fetchScheduledTasks, 1000 * 60);
 
         const populateSelectionData = () => {
-            scheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
+            allScheduledTaskTypes.value = getScheduledTaskTypeForGivenLocale();
             reportTypes.value = getReportTypesForGivenLocale();
             entityTypes.value = getEntityTypeForGivenLocale() as { title: string; value: EntityType; }[];
             backfillTargets.value = getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[];

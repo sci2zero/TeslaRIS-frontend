@@ -242,6 +242,7 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                        requiredModule: "REGISTRATION",
                     },
                 },
                 {

@@ -76,7 +76,8 @@ import type { CrisContextInformation } from "@/models/Common";
 const moduleEnabled: Record<string, (toggles: CrisContextInformation) => boolean> = {
     ASSESSMENT: toggles => toggles.toggleAssessmentModule,
     DIGITAL_LIBRARY: toggles => toggles.toggleDigitalLibrary,
-    DIGITAL_REPOSITORY: toggles => toggles.toggleDigitalRepository
+    DIGITAL_REPOSITORY: toggles => toggles.toggleDigitalRepository,
+    REGISTRATION: toggles => toggles.toggleRegistration
 };
 
 

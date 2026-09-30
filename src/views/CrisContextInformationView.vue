@@ -33,6 +33,12 @@
                                 :label="$t('toggleDigitalRepositoryLabel')"
                             />
                         </v-col>
+                        <v-col cols="12" md="4">
+                            <v-checkbox
+                                v-model="toggleRegistration"
+                                :label="$t('toggleRegistrationLabel')"
+                            />
+                        </v-col>
                     </v-row>
                 </v-card>
 
@@ -143,6 +149,7 @@ export default defineComponent({
         const toggleAssessmentModule = ref(true);
         const toggleDigitalLibrary = ref(true);
         const toggleDigitalRepository = ref(true);
+        const toggleRegistration = ref(false);
         const personNationalIdRegularExpression = ref(".*");
         const projectNationalIdRegularExpression = ref(".*");
         const organisationUnitNationalIdRegularExpression = ref(".*");
@@ -172,6 +179,7 @@ export default defineComponent({
             toggleAssessmentModule.value = configuration.toggleAssessmentModule;
             toggleDigitalLibrary.value = configuration.toggleDigitalLibrary;
             toggleDigitalRepository.value = configuration.toggleDigitalRepository;
+            toggleRegistration.value = configuration.toggleRegistration;
             personNationalIdRegularExpression.value = configuration.personNationalIdRegularExpression;
             projectNationalIdRegularExpression.value = configuration.projectNationalIdRegularExpression;
             organisationUnitNationalIdRegularExpression.value =
@@ -191,12 +199,14 @@ export default defineComponent({
                 toggleAssessmentModule: toggleAssessmentModule.value,
                 toggleDigitalLibrary: toggleDigitalLibrary.value,
                 toggleDigitalRepository: toggleDigitalRepository.value,
+                toggleRegistration: toggleRegistration.value,
                 personNationalIdRegularExpression: personNationalIdRegularExpression.value,
                 projectNationalIdRegularExpression: projectNationalIdRegularExpression.value,
                 organisationUnitNationalIdRegularExpression:
                     organisationUnitNationalIdRegularExpression.value,
                 documentNationalIdRegularExpression: documentNationalIdRegularExpression.value,
-                metadataLicense: selectedMetadataLicense.value.value
+                metadataLicense: selectedMetadataLicense.value.value,
+                orcidLoginToggle: crisContextInformation.value.orcidLoginToggle
             };
 
             CrisContextInformationService.saveConfigurationForSystem(configuration)
@@ -215,6 +225,7 @@ export default defineComponent({
             toggleAssessmentModule,
             toggleDigitalLibrary,
             toggleDigitalRepository,
+            toggleRegistration,
             personNationalIdRegularExpression,
             projectNationalIdRegularExpression,
             organisationUnitNationalIdRegularExpression,

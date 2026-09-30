@@ -10,11 +10,13 @@ const crisContextInformation = ref<CrisContextInformation>({
     toggleAssessmentModule: true,
     toggleDigitalLibrary: true,
     toggleDigitalRepository: true,
+    toggleRegistration: false,
     personNationalIdRegularExpression: ".*",
     projectNationalIdRegularExpression: ".*",
     organisationUnitNationalIdRegularExpression: ".*",
     documentNationalIdRegularExpression: ".*",
-    metadataLicense: License.CC0
+    metadataLicense: License.CC0,
+    orcidLoginToggle: false
 });
 const loaded = ref(false);
 
@@ -36,6 +38,8 @@ export function useCrisContextInformation() {
     const isAssessmentModuleEnabled = computed(() => crisContextInformation.value.toggleAssessmentModule);
     const isDigitalLibraryEnabled = computed(() => crisContextInformation.value.toggleDigitalLibrary);
     const isDigitalRepositoryEnabled = computed(() => crisContextInformation.value.toggleDigitalRepository);
+    const isRegistrationEnabled = computed(() => crisContextInformation.value.toggleRegistration);
+    const isOrcidLoginEnabled = computed(() => crisContextInformation.value.orcidLoginToggle);
 
     const personNationalIdPattern = computed(() => crisContextInformation.value.personNationalIdRegularExpression);
     const projectNationalIdPattern = computed(() => crisContextInformation.value.projectNationalIdRegularExpression);
@@ -48,6 +52,7 @@ export function useCrisContextInformation() {
     return {
         crisContextInformation, loaded, fetchCrisContextInformation,
         isAssessmentModuleEnabled, isDigitalLibraryEnabled, isDigitalRepositoryEnabled,
+        isRegistrationEnabled, isOrcidLoginEnabled,
         personNationalIdPattern, projectNationalIdPattern,
         organisationUnitNationalIdPattern, documentNationalIdPattern, metadataLicense
     };

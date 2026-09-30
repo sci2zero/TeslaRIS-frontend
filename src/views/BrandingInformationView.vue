@@ -26,6 +26,7 @@ import BrandingService from '@/services/BrandingService';
 import { type BrandingInformation } from '@/models/Common';
 import { useRouter } from 'vue-router';
 import { useBrandingStore } from '@/stores/brandingStore';
+import { useBrandingInformation } from '@/composables/useBrandingInformation';
 
 
 export default defineComponent({
@@ -34,7 +35,9 @@ export default defineComponent({
     setup() {
         const formRef = ref<typeof BrandingInformationForm>();
 
-        const savedBrandingInformation = ref();
+        const {
+            brandingInformation: savedBrandingInformation, fetchBrandingInformation
+        } = useBrandingInformation();
 
         const i18n = useI18n();
         const router = useRouter();
@@ -43,14 +46,11 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("updateBrandingInformationLabel");
-            
-            BrandingService.fetchBrandingInfo().then(response => {
-                savedBrandingInformation.value = response.data;
-            });
         });
 
         const updateBrandingInfo = (brandingInfo: BrandingInformation) => {
-            BrandingService.updateBrandingInfo(brandingInfo).then(() => {
+            BrandingService.updateBrandingInfo(brandingInfo).then(async () => {
+                await fetchBrandingInformation();
                 brandingStore.isRebranded(brandingInfo.title);
                 router.push({ name: "home" });
             });

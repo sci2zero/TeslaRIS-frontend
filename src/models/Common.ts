@@ -1,7 +1,7 @@
 import { License } from "@/models/DocumentFileModel";
 import { RecurrenceType } from "./LoadModel";
-import { type OrganisationUnitIndex } from "./OrganisationUnitModel";
-import { type PersonIndex } from "./PersonModel";
+import { type GeoLocation, type OrganisationUnitIndex } from "./OrganisationUnitModel";
+import { type PersonIndex, type PostalAddress } from "./PersonModel";
 import type { DocumentPublicationIndex, PersonDocumentContribution, PublicationType } from "./PublicationModel";
 
 export interface Page<Type> {
@@ -161,6 +161,9 @@ export enum ScheduledTaskType {
 export interface BrandingInformation {
     title: MultilingualContent[];
     description: MultilingualContent[];
+    location?: GeoLocation;
+    postalAddress?: PostalAddress;
+    phoneNumber?: string;
 }
 
 export enum ApiKeyType {
@@ -419,11 +422,13 @@ export interface CrisContextInformation {
     toggleAssessmentModule: boolean;
     toggleDigitalLibrary: boolean;
     toggleDigitalRepository: boolean;
+    toggleRegistration: boolean;
     personNationalIdRegularExpression: string;
     projectNationalIdRegularExpression: string;
     organisationUnitNationalIdRegularExpression: string;
     documentNationalIdRegularExpression: string;
     metadataLicense: License;
+    orcidLoginToggle: boolean;
 }
 
 export interface Currency {

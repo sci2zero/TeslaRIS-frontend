@@ -78,15 +78,24 @@
     <v-row class="d-flex justify-center align-center mt-15">
         <v-col cols="12" md="6">
             <h2>{{ $t("locationLabel") }}</h2>
+
+            <p v-if="formattedAddress" class="d-flex align-center mt-3 mb-1">
+                <v-icon icon="mdi-map-marker" class="mr-2" size="18" />
+                {{ formattedAddress }}
+            </p>
+            <p v-if="phoneNumber" class="d-flex align-center mb-1">
+                <v-icon icon="mdi-phone" class="mr-2" size="18" />
+                <a :href="`tel:${phoneNumber}`">{{ phoneNumber }}</a>
+            </p>
         </v-col>
     </v-row>
 
-    <v-row class="d-flex justify-center align-center mt-2 mb-2">
+    <v-row v-if="hasLocation" class="d-flex justify-center align-center mt-2 mb-2">
         <v-col cols="12" md="6">
             <open-layers-map
                 ref="mapRef"
                 height="450px"
-                :init-coordinates="[19.84729726232776, 45.2445057070595]" 
+                :init-coordinates="[location!.longitude, location!.latitude]"
                 :read-only="true"
             />
         </v-col>
@@ -103,6 +112,7 @@ import FeedbackService from '@/services/FeedbackService';
 import Toast from './Toast.vue';
 import { useI18n } from 'vue-i18n';
 import VueRecaptcha from 'vue3-recaptcha2';
+import { useBrandingInformation } from '@/composables/useBrandingInformation';
 
 
 export default defineComponent({
@@ -112,6 +122,10 @@ export default defineComponent({
         const isFormValid = ref(false);
         const snackbar = ref(false);
         const message = ref("");
+
+        const {
+            location, phoneNumber, formattedAddress, hasLocation
+        } = useBrandingInformation();
 
         const i18n = useI18n();
         const locale = computed(() => i18n.locale.value);
@@ -164,7 +178,8 @@ export default defineComponent({
             snackbar, message,
             locale, resetChallenge,
             handleVerifyCallback,
-            vueRecaptcha, token
+            vueRecaptcha, token,
+            location, phoneNumber, formattedAddress, hasLocation
         };
     }
 });

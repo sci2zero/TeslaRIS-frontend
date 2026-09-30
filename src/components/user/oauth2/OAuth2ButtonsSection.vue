@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-5 mb-5">
+    <div v-if="isOrcidLoginEnabled" class="mt-5 mb-5">
         <a
             :href="`${basePath}oauth2/authorization/orcid`"
             class="orcid-btn"
@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
   export default defineComponent({
@@ -26,8 +27,10 @@ import { defineComponent } from 'vue';
             .replace("api/", "")
             .replace("localhost", "127.0.0.1"); // used only for local development
 
+        const { isOrcidLoginEnabled } = useCrisContextInformation();
+
         return {
-            basePath
+            basePath, isOrcidLoginEnabled
         };
     }
   });

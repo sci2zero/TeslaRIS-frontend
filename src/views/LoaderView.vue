@@ -257,9 +257,6 @@ export default defineComponent({
         
         const stepperRef = ref<any>(null);
 
-        // The stepper header is a horizontally scrollable flex row and Vuetify never scrolls the
-        // active item into view, so steps past the visible width are unreachable on publications
-        // with many authors.
         watch(stepperValue, async () => {
             await nextTick();
             (stepperRef.value?.$el as HTMLElement | undefined)
