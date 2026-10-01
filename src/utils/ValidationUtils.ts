@@ -1,5 +1,6 @@
 import { useI18n } from 'vue-i18n';
 import { computed, type Ref } from 'vue';
+import { crisContextInformationState } from '@/composables/useCrisContextInformation';
 
 export const useValidationUtils = () => {
     const i18n = useI18n();
@@ -14,6 +15,7 @@ export const useValidationUtils = () => {
     const invalidENaukaIdMessage = computed(() => i18n.t("eNaukaIdFormatError"));
     const invalidOrcidIdMessage = computed(() => i18n.t("orcidIdFormatError"));
     const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
+    const invalidNationalIdMessage = computed(() => i18n.t("nationalIdFormatError"));
     const invalidScopusAfidMessage = computed(() => i18n.t("scopusAfidFormatError"));
     const invalidOpenAlexIdMessage = computed(() => i18n.t("openAlexIdFormatError"));
     const invalidWebOfScienceIdMessage = computed(() => i18n.t("webOfScienceIdFormatError"));
@@ -237,6 +239,62 @@ export const useValidationUtils = () => {
             if (!value || value.trim() === "") return true;
             if (scopusAuthorIdPattern.test(value)) return true;
             return invalidScopusAuthorIdMessage.value;
+        }
+    ];
+
+    // The pattern is configured per deployment in the CRIS context information, so it is read
+    // at validation time rather than captured once. Wrapped in ^(?:...)$ so it behaves like a
+    // full match, matching the backend's String.matches() semantics.
+    const matchesConfiguredPattern = (value: string, pattern: string) => {
+        try {
+            return new RegExp(`^(?:${pattern})$`).test(value);
+        } catch (_e) {
+            // A misconfigured pattern must not block data entry.
+            return true;
+        }
+    };
+
+    const personNationalIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (matchesConfiguredPattern(
+                value,
+                crisContextInformationState.value.personNationalIdRegularExpression
+            )) return true;
+            return invalidNationalIdMessage.value;
+        }
+    ];
+
+    const organisationUnitNationalIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (matchesConfiguredPattern(
+                value,
+                crisContextInformationState.value.organisationUnitNationalIdRegularExpression
+            )) return true;
+            return invalidNationalIdMessage.value;
+        }
+    ];
+
+    const documentNationalIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (matchesConfiguredPattern(
+                value,
+                crisContextInformationState.value.documentNationalIdRegularExpression
+            )) return true;
+            return invalidNationalIdMessage.value;
+        }
+    ];
+
+    const projectNationalIdValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (matchesConfiguredPattern(
+                value,
+                crisContextInformationState.value.projectNationalIdRegularExpression
+            )) return true;
+            return invalidNationalIdMessage.value;
         }
     ];
 
@@ -521,6 +579,8 @@ export const useValidationUtils = () => {
         ringgoldValidationRules, fundrefValidationRules, isniValidationRules,
         taxNumberValidationRules, fctIdValidationRules, regexValidationRules,
         handleIdValidationRules, arxivIdValidationRules, pubmedIdValidationRules,
-        ssrnIdValidationRules, gridValidationRules, wikidataValidationRules
+        ssrnIdValidationRules, gridValidationRules, wikidataValidationRules,
+        personNationalIdValidationRules, organisationUnitNationalIdValidationRules,
+        documentNationalIdValidationRules, projectNationalIdValidationRules
     };
 };

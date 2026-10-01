@@ -227,6 +227,7 @@ import { getTitleFromValueAutoLocale } from '@/i18n/userType';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 
@@ -306,6 +307,8 @@ export default defineComponent(
 
             const loginTitle = computed(() => i18n.t("loginLabel"));
             const registerLabel = computed(() => i18n.t("registerLabel"));
+
+            const { isRegistrationEnabled } = useCrisContextInformation();
             
             const publicConfigurationStore = usePublicConfigurationStore();
             const loginStore = useLoginStore();
@@ -421,7 +424,7 @@ export default defineComponent(
                 { title: undefined, type:'lang_component', icon: 'mdi-translate', condition: true, component: langChangeItem },
                 { type:'divider' },
                 { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
-                { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => !loginStore.userLoggedIn), variant: 'text' },
+                { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => isRegistrationEnabled.value && !loginStore.userLoggedIn), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
                 { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
                 { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }

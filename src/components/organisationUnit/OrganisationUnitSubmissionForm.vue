@@ -83,7 +83,11 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <ui-input v-model="nationalId" :label="$t('nationalIdLabel')" />
+                            <ui-input
+                                v-model="nationalId"
+                                :label="$t('nationalIdLabel')"
+                                :rules="organisationUnitNationalIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
@@ -481,7 +485,8 @@ export default defineComponent({
             requiredSelectionRules, ringgoldValidationRules,
             fundrefValidationRules, isniValidationRules,
             fctIdValidationRules, taxNumberValidationRules,
-            gridValidationRules, wikidataValidationRules
+            gridValidationRules, wikidataValidationRules,
+            organisationUnitNationalIdValidationRules
         } = useValidationUtils();
 
         const submit = (stayOnPage: boolean) => {
@@ -624,7 +629,8 @@ export default defineComponent({
             stateRef, countries, selectedCountry, active,
             postalNumber, taxNumberValidationRules,
             grid, wikidata, nationalId, dateDissolved,
-            gridValidationRules, wikidataValidationRules
+            gridValidationRules, wikidataValidationRules,
+            organisationUnitNationalIdValidationRules
         };
     }
 });

@@ -96,7 +96,7 @@ import ReportsView from "@/views/reporting/ReportsView.vue";
 import BrandingInformationView from "@/views/BrandingInformationView.vue";
 import MassInstitutionAssignmentView from "@/views/MassInstitutionAssignmentView.vue";
 import ApiKeysManagementView from "@/views/ApiKeysManagementView.vue";
-import FeatureModuleTogglesView from "@/views/FeatureModuleTogglesView.vue";
+import CrisContextInformationView from "@/views/CrisContextInformationView.vue";
 import MServiceView from "@/views/MServiceView.vue";
 import ThesisLibraryReportView from "@/views/thesisLibrary/ThesisLibraryReportView.vue";
 import ThesisLibrarySearchView from "@/views/thesisLibrary/ThesisLibrarySearchView.vue";
@@ -140,6 +140,7 @@ import FundingProgramListView from "@/views/FundingProgramListView.vue";
 import SubmitProjectView from "@/views/SubmitProjectView.vue";
 import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
 import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
+import PolicyExplorerView from "@/views/revisions/PolicyExplorerView.vue";
 
 
 const roles = {
@@ -241,6 +242,7 @@ const router = createRouter({
                     meta: {
                         authenticated: false,
                         authorities: [],
+                        requiredModule: "REGISTRATION",
                     },
                 },
                 {
@@ -1371,9 +1373,9 @@ const router = createRouter({
                     },
                 },
                 {
-                    path: "feature-module-toggles",
-                    name: "featureModuleToggles",
-                    component: FeatureModuleTogglesView,
+                    path: "cris-context-information",
+                    name: "crisContextInformation",
+                    component: CrisContextInformationView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
@@ -1588,6 +1590,15 @@ const router = createRouter({
                     path: "issue-explorer",
                     name: "issueExplorer",
                     component: IssueExplorerView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "policy-explorer",
+                    name: "policyExplorer",
+                    component: PolicyExplorerView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],

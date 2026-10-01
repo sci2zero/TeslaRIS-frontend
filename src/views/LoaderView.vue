@@ -79,6 +79,7 @@
         </v-btn>
 
         <v-stepper
+            ref="stepperRef"
             v-model="stepperValue" :items="steps"
             :next-text="$t('nextLabel')"
             :prev-text="$t('previousLabel')">
@@ -187,7 +188,7 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import type { JournalPublicationLoad, ProceedingsPublicationLoad } from "@/models/LoadModel";
 import ImportService from "@/services/importer/ImportService";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { onMounted } from "vue";
 import { defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
@@ -254,6 +255,15 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         
+        const stepperRef = ref<any>(null);
+
+        watch(stepperValue, async () => {
+            await nextTick();
+            (stepperRef.value?.$el as HTMLElement | undefined)
+                ?.querySelector(".v-stepper-header .v-stepper-item--selected")
+                ?.scrollIntoView({behavior: "smooth", inline: "center", block: "nearest"});
+        });
+
         const nextStep = () => {
             stepperValue.value += 1;
         };
@@ -809,7 +819,7 @@ export default defineComponent({
             isFormValid, snackbar, isAdmin,
             errorMessage, currentLoadRecord,
             returnCurrentLocaleContent, showAll,
-            localiseDate, stepperValue, steps,
+            localiseDate, stepperValue, steps, stepperRef,
             nextStep, previousStep, canAdvance,
             skipDocument, importAuthorsRef, smartSkip,
             loadingJournalPublication, updateRecord,
@@ -847,6 +857,10 @@ export default defineComponent({
 
 .same-line {
     margin-left: 20px;
+}
+
+:deep(.v-stepper-header) {
+    scroll-behavior: smooth;
 }
 
 .metadata-import {

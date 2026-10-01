@@ -43,7 +43,11 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" />
+                        <ui-input
+                            v-model="nationalScienceId"
+                            :label="$t('nationalScienceIdLabel')"
+                            :rules="personNationalIdValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -430,7 +434,7 @@ export default defineComponent({
         const {
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, personOpenAlexIdValidationRules,
-            orcidValidationRules, scopusAuthorIdValidationRules,
+            orcidValidationRules, scopusAuthorIdValidationRules, personNationalIdValidationRules,
             personWebOfScienceIdValidationRules, scholarIdValidationRules,
             personAuthenticusIdValidationRules, lattesIdValidationRules
         } = useValidationUtils();
@@ -574,7 +578,7 @@ export default defineComponent({
             toMultilingualTextInput, languageTags, submit, message,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
-            orcidValidationRules, scopusAuthorIdValidationRules, cityRef,
+            orcidValidationRules, scopusAuthorIdValidationRules, personNationalIdValidationRules, cityRef,
             streetAndNumberRef, refreshForm, uris, urisRef, displayTitle,
             personOpenAlexIdValidationRules, openAlex, webOfScienceId,
             personWebOfScienceIdValidationRules, state, stateRef, postalNumber,

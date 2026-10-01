@@ -42,7 +42,7 @@
                 <ui-input
                     v-model="localNationalId"
                     :label="$t('nationalIdLabel')"
-                   
+                    :rules="documentNationalIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
             </v-col>
@@ -158,7 +158,8 @@ export default defineComponent({
             handleIdValidationRules,
             arxivIdValidationRules,
             pubmedIdValidationRules,
-            ssrnIdValidationRules
+            ssrnIdValidationRules,
+            documentNationalIdValidationRules
         } = useValidationUtils();
 
         const localHandleId = ref(props.modelValue?.handleId || props.presetData?.handleId || "");
@@ -332,6 +333,7 @@ export default defineComponent({
             arxivIdValidationRules,
             pubmedIdValidationRules,
             ssrnIdValidationRules,
+            documentNationalIdValidationRules,
             emitUpdate, refreshForm,
             clearInputs, localNationalId
         };

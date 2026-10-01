@@ -489,7 +489,7 @@ import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionH
 import { EntityType } from '@/models/MergeModel';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { UiButton } from '@/components/ui/button';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import UiInput from '@/components/ui/input/Input.vue';
@@ -532,7 +532,7 @@ export default defineComponent({
         const router = useRouter();
         const currentRoute = useRoute();
 
-        const { isAssessmentModuleEnabled } = useFeatureModuleToggles();
+        const { isAssessmentModuleEnabled } = useCrisContextInformation();
 
         const person = ref<PersonResponse>();
         const country = ref<Country>();

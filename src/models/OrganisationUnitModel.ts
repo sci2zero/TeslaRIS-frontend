@@ -164,7 +164,7 @@ interface Contact {
     phoneNumber: string;
 }
 
-interface GeoLocation {
+export interface GeoLocation {
     longitude: number;
     latitude: number;
     address?: string;

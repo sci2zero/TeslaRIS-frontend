@@ -151,7 +151,7 @@
                         ref="registryModalRef"
                         hide-activator
                         :form-component="RegistryBookEntryForm"
-                        :form-props="{ thesisId: thesisId, canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) }"
+                        :form-props="{ thesisId: thesisId, presetAuthorName: thesisAuthorName, canSave: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate), cannotSaveReason: (thesis?.publicReviewCompleted && !!thesis?.thesisDefenceDate) ? '' : $t('registryEntryThesisNotEligibleMessage') }"
                         entity-name="RegistryBookEntry"
                         :read-only="(!canCreateRegistryBookEntry) || thesis?.isOnPublicReview"
                         disable-submission
@@ -602,7 +602,7 @@ import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "ThesisLandingPage",
@@ -623,7 +623,7 @@ export default defineComponent({
         const {
             isDigitalLibraryEnabled,
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -663,6 +663,10 @@ export default defineComponent({
         });
         const canCreateRegistryBookEntry = ref(false);
         const registryBookEntryId = ref(-1);
+
+        const thesisAuthorName = computed(() => thesis.value?.contributions
+            ?.find(contribution => contribution.contributionType === DocumentContributionType.AUTHOR)
+            ?.personName);
 
         const documentClassifications = ref<EntityClassificationResponse[]>();
         const documentIdentifiers = ref<EntityIdentifierResponse[]>([]);
@@ -1160,6 +1164,7 @@ export default defineComponent({
             changePublicReviewState, canBePutOnPublicReview, userCanPutOnPublicReview,
             isHeadOfLibrary, commitThesisStatusChange, changeArchiveState, updateTitle,
             RegistryBookEntryForm, createRegistryBookEntry, canCreateRegistryBookEntry,
+            thesisAuthorName,
             fetchValidationStatus, fetchThesis, PublicationType, displayConfiguration,
             continueLastReview, shortenedReview, isCommission, ThesisSubstitutionForm,
             DocumentContributionType, removeSubstitution,

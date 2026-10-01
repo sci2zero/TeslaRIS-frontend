@@ -247,7 +247,7 @@ import { getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { ThesisType } from '@/models/PublicationModel';
 import DigitalLibraryLeaderboardService from '@/services/visualization/DigitalLibraryLeaderboardService';
 import { useUserRole } from '@/composables/useUserRole';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles.js';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 const props = defineProps({
@@ -294,7 +294,7 @@ const currentTab = ref("publicationCount");
 const { 
     isAssessmentModuleEnabled,
     isDigitalLibraryEnabled
- } = useFeatureModuleToggles();
+ } = useCrisContextInformation();
 
 const {
     isInstitutionalLibrarian,

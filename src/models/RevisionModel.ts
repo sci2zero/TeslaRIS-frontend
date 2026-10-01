@@ -133,6 +133,7 @@ export interface IssueFilters {
     dimension?: QualityDimension;
     severity?: IssueSeverity;
     constraintKey?: string;
+    metric?: string;
 }
 
 export interface ProfileRelatedQuality {
@@ -161,6 +162,7 @@ export interface DataQualityIssue {
     assessmentDate: string;
     ruleKey: string;
     dimension: QualityDimension;
+    metric: string;
     severity: IssueSeverity;
     blocking: boolean;
     title: MultilingualContent[];
@@ -202,6 +204,36 @@ export interface DataQualityIssueOccurrence {
     message: MultilingualContent[];
 }
 
+export interface MetricSummary {
+    key: string;
+    title: MultilingualContent[];
+    description: MultilingualContent[];
+    dimensions: QualityDimension[];
+}
+
+export interface PolicyConstraint {
+    key: string;
+    title: MultilingualContent[];
+    target: string;
+    targetWeight: number;
+    dimension: QualityDimension;
+    metric: string;
+    severity: IssueSeverity;
+    blocking: boolean;
+    points: number;
+    usedForFairCompliance: boolean;
+    constraints: Record<string, unknown>;
+    affectedRecords: number;
+}
+
+export interface PolicyExplorer {
+    profileName: string;
+    version: string;
+    constraints: PolicyConstraint[];
+    dimensionDefinitions: Record<QualityDimension, MultilingualContent[]>;
+    metrics: MetricSummary[];
+}
+
 export interface DataQualityIssuePage {
     content: DataQualityIssue[];
     totalIssues: number;
@@ -230,6 +262,9 @@ export interface DataQualityIssueDetails {
     policyVersion: string;
     dimension: QualityDimension;
     dimensionDefinition: MultilingualContent[];
+    metric: string;
+    metricTitle: MultilingualContent[];
+    metricDefinition: MultilingualContent[];
 }
 
 export enum QualityAssessmentTarget {

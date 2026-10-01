@@ -34,6 +34,7 @@ import BrandingService from '@/services/BrandingService';
 import { type BrandingInformation } from '@/models/Common';
 import { useRouter } from 'vue-router';
 import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
+import { fetchBrandingInformation } from '@/composables/useBrandingInformation';
 
 
 export default defineComponent({
@@ -59,7 +60,7 @@ export default defineComponent({
 
         onMounted(() => {
             document.title = i18n.t("updateBrandingInformationLabel");
-            
+
             BrandingService.fetchBrandingInfo().then(response => {
                 savedBrandingInformation.value = response.data;
             });
@@ -68,7 +69,10 @@ export default defineComponent({
         const updateBrandingInfo = async (payload: BrandingFormPayload) => {
             const brandingInfo: BrandingInformation = {
                 title: payload.title,
-                description: payload.description
+                description: payload.description,
+                location: payload.location,
+                phoneNumber: payload.phoneNumber,
+                postalAddress: payload.postalAddress
             };
 
             await BrandingService.updateBrandingInfo(brandingInfo);
@@ -85,6 +89,7 @@ export default defineComponent({
                 await BrandingService.updateBackground(payload.backgroundFile);
             }
 
+            await fetchBrandingInformation();
             await publicConfigurationStore.refreshFromBackend();
             router.push({ name: "home" });
         };

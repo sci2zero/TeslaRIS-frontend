@@ -57,7 +57,13 @@
                             <div class="footer-contact">
                                 <p class="text-white/80 text-sm flex items-center mb-2">
                                     <v-icon icon="mdi-map-marker" class="mr-2" size="16" />
-                                    {{ $t('footer.location') }}
+                                    {{ formattedAddress || $t('footer.location') }}
+                                </p>
+                                <p v-if="phoneNumber" class="text-white/80 text-sm flex items-center mb-2">
+                                    <v-icon icon="mdi-phone" class="mr-2" size="16" />
+                                    <a :href="`tel:${phoneNumber}`" class="text-white/90 no-underline transition-colors duration-300 hover:text-white hover:underline">
+                                        {{ phoneNumber }}
+                                    </a>
                                 </p>
                                 <!-- <p class="text-white/80 text-sm flex items-center mb-2">
                                     <v-icon icon="mdi-email" class="mr-2" size="16"></v-icon>
@@ -108,6 +114,7 @@ import { useI18n } from 'vue-i18n';
 import VersionLink from './VersionLink.vue';
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
+import { useBrandingInformation } from '@/composables/useBrandingInformation';
 
 
 const i18n = useI18n();
@@ -122,6 +129,7 @@ const logoUrl = computed(() => publicConfigurationStore.logoDisplayUrl);
 const hasCustomLogo = computed(() => publicConfigurationStore.hasCustomLogo);
 const localizedTitle = computed(() => returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS");
 const localizedDescription = computed(() => returnCurrentLocaleContent(publicConfigurationStore.description) || "");
+const { phoneNumber, formattedAddress } = useBrandingInformation();
 
 const quickLinks = ref([
     { title: homeLabel, path: "" },

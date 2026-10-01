@@ -137,7 +137,7 @@
                                 <ui-input
                                     v-model="nationalScienceId"
                                     :label="$t('nationalScienceIdLabel')"
-                                   
+                                    :rules="personNationalIdValidationRules"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
@@ -321,7 +321,8 @@ export default defineComponent({
             requiredFieldRules, requiredSelectionRules,
             apvntValidationRules, eCrisIdValidationRules,
             eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, personOpenAlexIdValidationRules,
+            scopusAuthorIdValidationRules, personNationalIdValidationRules,
+            personOpenAlexIdValidationRules,
             personWebOfScienceIdValidationRules, scholarIdValidationRules,
             personAuthenticusIdValidationRules, lattesIdValidationRules
         } = useValidationUtils();
@@ -415,7 +416,8 @@ export default defineComponent({
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
             apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
-            scopusAuthorIdValidationRules, loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
+            scopusAuthorIdValidationRules, personNationalIdValidationRules,
+            loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
             personWebOfScienceIdValidationRules, webOfScienceId, returnToParent, scholarIdValidationRules,
             personAuthenticusIdValidationRules, lattesIdValidationRules, nationalScienceId, scholarId,
             authenticusId, lattesId

@@ -80,7 +80,8 @@ const parseQuery = (query: LocationQuery): ExplorerState => ({
         target: oneOf(single(query.target), ISSUE_TARGETS),
         dimension: oneOf(single(query.dimension), Object.values(QualityDimension)),
         severity: oneOf(single(query.severity), Object.values(IssueSeverity)),
-        constraintKey: single(query.constraint)
+        constraintKey: single(query.constraint),
+        metric: single(query.metric)
     }
 });
 
@@ -109,6 +110,10 @@ const toQuery = (state: ExplorerState): LocationQueryRaw => {
 
     if (state.filters.constraintKey) {
         query.constraint = state.filters.constraintKey;
+    }
+
+    if (state.filters.metric) {
+        query.metric = state.filters.metric;
     }
 
     return query;

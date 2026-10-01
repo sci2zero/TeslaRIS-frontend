@@ -319,7 +319,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
@@ -350,7 +350,7 @@ export default defineComponent({
 
         const {
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);

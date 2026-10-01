@@ -95,7 +95,11 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <ui-input v-model="nationalId" :label="$t('nationalIdLabel')" />
+                        <ui-input
+                            v-model="nationalId"
+                            :label="$t('nationalIdLabel')"
+                            :rules="organisationUnitNationalIdValidationRules"
+                        />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -428,7 +432,8 @@ export default defineComponent({
             nonMandatoryEmailFieldRules, institutionOpenAlexIdValidationRules,
             requiredSelectionRules, ringgoldValidationRules, fundrefValidationRules,
             isniValidationRules, fctIdValidationRules, taxNumberValidationRules,
-            gridValidationRules, wikidataValidationRules
+            gridValidationRules, wikidataValidationRules,
+            organisationUnitNationalIdValidationRules
         } = useValidationUtils();
 
         const fetchCountries = () => {
@@ -607,7 +612,7 @@ export default defineComponent({
             state, stateRef, countries, selectedCountry, grid,
             postalNumber, gridValidationRules, wikidataValidationRules,
             wikidata, nationalId, numberOfEmployees, dateDissolved,
-            active
+            active, organisationUnitNationalIdValidationRules
         };
     }
 });

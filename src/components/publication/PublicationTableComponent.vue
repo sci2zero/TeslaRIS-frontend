@@ -251,7 +251,7 @@ import ResponsiveDataTable from '../core/ResponsiveDataTable.vue';
 import PublicationTableRow from './PublicationTableRow.vue';
 import PublicationCard from './PublicationCard.vue';
 import PublicationQuickGlance from './PublicationQuickGlance.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
 export default defineComponent({
@@ -357,7 +357,7 @@ export default defineComponent({
 
         const {
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
         onMounted(() => {
             if ((props.inClaimer ||
                 isAdmin.value ||

@@ -116,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import { useUserRole } from '@/composables/useUserRole';
 import AuthenticationService from '@/services/AuthenticationService';
 import PersonService from '@/services/PersonService';
@@ -144,7 +144,7 @@ const {
 const {
     isAssessmentModuleEnabled,
     isDigitalLibraryEnabled
-} = useFeatureModuleToggles();
+} = useCrisContextInformation();
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
@@ -276,7 +276,7 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'deduplication', label: computed(() => i18n.t('routeLabel.deduplication')), to: '/deduplication', icon: 'mdi-content-duplicate', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'branding', label: computed(() => i18n.t('brandingLabel')), to: '/branding', icon: 'mdi-palette' },
     { key: 'api-key-management', label: computed(() => i18n.t('apiKeyManagementLabel')), to: '/api-key-management', icon: 'mdi-key' },
-    { key: 'feature-module-toggles', label: computed(() => i18n.t('routeLabel.featureModuleToggles')), to: '/feature-module-toggles', icon: 'mdi-toggle-switch-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
+    { key: 'cris-context-information', label: computed(() => i18n.t('routeLabel.crisContextInformation')), to: '/cris-context-information', icon: 'mdi-cog-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'language-tags', label: computed(() => i18n.t('routeLabel.languageTags')), to: '/language-tags', icon: 'mdi-tag-multiple-outline' },
     { key: 'health-check', label: computed(() => i18n.t('routeLabel.healthCheck')), to: '/health-check', icon: 'mdi-heart-pulse' },
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
@@ -372,6 +372,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
     { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
+    { key: 'policy-explorer', label: computed(() => i18n.t('routeLabel.policyExplorer')), to: '/policy-explorer', icon: 'mdi-shield-check-outline', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     {
       key: 'fundings',
       label: computed(() => i18n.t('fundingsLabel')),

@@ -95,10 +95,15 @@
                             <a href="#" class="forgot-password-link" @click.prevent="forgotPasswordForm = false">{{ $t("knowPasswordLabel") }}</a>
                         </div>
 
-                        <p class="register-prompt">
+                        <p v-if="isRegistrationEnabled" class="register-prompt">
                             {{ $t("noAccountLabel") }}
                             <localized-link to="register" class="register-link">
                                 {{ $t("registerActionLabel") }}
+                            </localized-link>
+                        </p>
+                        <p v-else class="register-prompt">
+                            <localized-link to="contact" class="register-link">
+                                {{ $t("contactUsFromLoginLabel") }}
                             </localized-link>
                         </p>
                     </v-form>
@@ -143,6 +148,7 @@ import { useValidationUtils } from "@/utils/ValidationUtils";
 import Toast from "@/components/core/Toast.vue";
 import UserService from "@/services/UserService";
 import { useInterval } from "@/composables/useInterval";
+import { useCrisContextInformation } from "@/composables/useCrisContextInformation";
 import OAuth2ButtonsSection from "@/components/user/oauth2/OAuth2ButtonsSection.vue";
 import UiInput from "@/components/ui/input/Input.vue";
 import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
@@ -154,6 +160,8 @@ export default defineComponent(
         name: "LoginView",
         components: { LocalizedLink, Toast, OAuth2ButtonsSection, UiInput },
         setup() {
+            const { isRegistrationEnabled } = useCrisContextInformation();
+
             const route = useRoute();
             const router = useRouter();
 
@@ -283,6 +291,7 @@ export default defineComponent(
             };
 
             return {
+                isRegistrationEnabled,
                 email, emailFieldRules, 
                 password, passwordFieldRules, showPassword,
                 snackbar, message, isFormValid, login,

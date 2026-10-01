@@ -281,7 +281,7 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
-import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "PerformanceRelatedOutputLandingPage",
@@ -316,7 +316,7 @@ export default defineComponent({
 
         const {
             isDigitalRepositoryEnabled
-        } = useFeatureModuleToggles();
+        } = useCrisContextInformation();
 
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
