@@ -46,13 +46,6 @@
                 <template #title>
                     <rich-title-renderer :title="returnCurrentLocaleContent(thesis?.title)" />
                 </template>
-                <template #edit-menu>
-                    <v-list-item
-                        prepend-icon="mdi-format-title"
-                        :title="$t('updateTitleLabel')"
-                        @click="openModal(titleUpdateModalRef)"
-                    />
-                </template>
                 <template #subtitle>
                     <p
                         v-if="thesis?.alternateTitle && thesis.alternateTitle.length > 0"

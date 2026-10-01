@@ -77,6 +77,7 @@ import { usePublicConfigurationStore } from "./stores/publicConfigurationStore";
 import PublicConfigurationOverlay from "./components/core/PublicConfigurationOverlay.vue";
 import FeatureModuleTogglesService from "@/services/FeatureModuleTogglesService";
 import type { FeatureModuleToggles } from "@/models/Common";
+import { providePluginAuth } from "@/plugin-system/auth";
 
 const moduleEnabled: Record<string, (toggles: FeatureModuleToggles) => boolean> = {
     ASSESSMENT: toggles => toggles.toggleAssessmentModule,
@@ -125,6 +126,7 @@ export default defineComponent({
         const tutorialStore = useTutorialStore();
         const loginStore = useLoginStore();
         loginStore.initialize();
+        providePluginAuth();
 
         watch(
             () => [route.name, loginStore.userLoggedIn],

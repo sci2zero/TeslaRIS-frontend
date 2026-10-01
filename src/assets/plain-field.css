@@ -43,8 +43,45 @@
     min-height: 2.75rem;
     padding-block: 0.45rem;
     align-items: center;
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
     font-size: 0.95rem;
     color: #0f172a;
+}
+
+.plain-field__control .v-field__append-inner,
+.plain-field__control .v-field__clearable,
+.plain-field__control .v-field__prepend-inner {
+    color: #64748b;
+}
+
+.plain-field__control.v-input .v-field.v-field--variant-plain > .v-field__append-inner,
+.plain-field__control.v-input .v-field.v-field--variant-plain > .v-field__prepend-inner,
+.plain-field__control.v-input .v-field.v-field--variant-plain > .v-field__clearable {
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.plain-field__control .v-field__append-inner {
+    padding-inline-end: 0.7rem;
+}
+
+.plain-field__control .v-select__selection,
+.plain-field__control .v-autocomplete__selection {
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.plain-field__control .v-chip {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-radius: 0.5rem;
+    height: 1.65rem;
+}
+
+.plain-field__control .v-chip .v-chip__close {
+    color: #64748b;
 }
 
 .plain-field__control .v-field__input::placeholder,
@@ -82,4 +119,34 @@
 .plain-field__control textarea {
     margin-top: 0.15rem;
     align-self: stretch;
+}
+
+.plain-field__menu.v-overlay__content {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+}
+
+.plain-field__menu .v-list {
+    background: #fff;
+    border-radius: 0.75rem;
+    padding: 0.35rem;
+}
+
+.plain-field__menu .v-list-item {
+    border-radius: 0.5rem;
+    min-height: 2.4rem;
+    color: #0f172a;
+}
+
+.plain-field__menu .v-list-item-title {
+    font-size: 0.925rem;
+}
+
+.plain-field__menu .v-list-item--active {
+    background: #f1f5f9;
+}
+
+.plain-field__menu .v-list-item--active > .v-list-item__overlay {
+    opacity: 0;
 }

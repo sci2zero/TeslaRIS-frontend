@@ -11,3 +11,17 @@ declare namespace NodeJS {
     }
 }
 
+interface ImportMetaEnv {
+    readonly VITE_PLUGIN_PROFILE?: string;
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv;
+}
+
+declare module "virtual:teslaris-plugins" {
+    import type { FrontendPlugin } from "./src/plugin-system/types";
+
+    export const pluginLoaders: Record<string, () => Promise<{ default: FrontendPlugin }>>;
+    export const pluginProfiles: Record<string, readonly string[]>;
+}

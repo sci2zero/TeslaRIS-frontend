@@ -11,6 +11,7 @@ import i18n from './i18n';
 import { createHead } from "@vueuse/head";
 import { initializeLanguageDetector } from "./utils/LanguageDetector";
 import { usePublicConfigurationStore } from "./stores/publicConfigurationStore";
+import { registerProfilePlugins } from "./plugin-system/profiles";
 
 
 async function bootstrap() {
@@ -21,6 +22,7 @@ async function bootstrap() {
 
     loadFonts();
     i18n.setup();
+    await registerProfilePlugins();
 
     const publicConfigurationStore = usePublicConfigurationStore(pinia);
     publicConfigurationStore.hydrateFromCacheOrDefault();

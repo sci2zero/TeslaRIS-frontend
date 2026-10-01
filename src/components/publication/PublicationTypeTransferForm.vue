@@ -32,31 +32,29 @@
             </v-col>
         </v-row>
 
-        <v-row v-if="transferTo === PublicationType.PROCEEDINGS_PUBLICATION">
-            <v-col cols="10">
-                <v-select
-                    v-model="selectedProceedings"
-                    :items="availableProceedings"
-                    :label="$t('proceedingsLabel') + '*'"
-                    :no-data-text="(selectedEvent && selectedEvent.value === -1) ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
-                    :rules="requiredSelectionRules"
-                    return-object
-                />
-            </v-col>
-            <v-col>
-                <generic-crud-modal
-                    :form-component="ProceedingsSubmissionForm"
-                    :form-props="{
-                        conference: selectedEvent ? selectedEvent : searchPlaceholder,
-                        presetName: `Proceedings of: ${selectedEvent.title.split('|')[0].trim()}`
-                    }"
-                    entity-name="Proceedings"
-                    is-submission
-                    :read-only="!selectedEvent || selectedEvent.value === -1"
-                    @create="selectNewlyAddedProceedings"
-                />
-            </v-col>
-        </v-row>
+        <div v-if="transferTo === PublicationType.PROCEEDINGS_PUBLICATION" class="flex items-start gap-2">
+            <v-select
+                v-model="selectedProceedings"
+                class="min-w-0 flex-1"
+                :items="availableProceedings"
+                :label="$t('proceedingsLabel') + '*'"
+                :no-data-text="(selectedEvent && selectedEvent.value === -1) ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
+                :rules="requiredSelectionRules"
+                return-object
+            />
+            <generic-crud-modal
+                class="w-fit shrink-0 self-center"
+                :form-component="ProceedingsSubmissionForm"
+                :form-props="{
+                    conference: selectedEvent ? selectedEvent : searchPlaceholder,
+                    presetName: `Proceedings of: ${selectedEvent.title.split('|')[0].trim()}`
+                }"
+                entity-name="Proceedings"
+                is-submission
+                :read-only="!selectedEvent || selectedEvent.value === -1"
+                @create="selectNewlyAddedProceedings"
+            />
+        </div>
     </v-form>
 </template>
 

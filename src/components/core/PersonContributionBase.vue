@@ -28,46 +28,45 @@
                     </v-radio-group>
                 </v-col>
             </v-row>
-            <v-row v-if="!selectExternalAssociate">
-                <v-col :cols="canUserAddPersons ? 11 : 12">
-                    <ui-input
-                        v-model="selectedPerson"
-                        control="autocomplete"
-                        :label="allowExternalAssociate ? $t('searchInSystemLabel') : ($t('personLabel') + (required ? '*' : ''))"
-                        :items="persons"
-                        :custom-filter="filterPersons"
-                        :rules="required ? requiredSelectionRules : []"
-                        :no-data-text="$t('noDataMessage')"
-                        return-object
-                        :readonly="lockSearchField"
-                        @update:search="searchPersons($event)"
-                        @update:model-value="onPersonSelect($event)"
-                        @blur="onAutocompleteBlur"
-                    >
-                        <template #item="{ item, props }">
-                            <v-list-item
-                                v-bind="{ ...props, title: undefined }">
-                                <person-publications-tooltip
-                                    :person-id="item.raw.value"
-                                    :show="showLatestPublications">
-                                    {{ item.raw.title }}
-                                </person-publications-tooltip>
-                            </v-list-item>
-                        </template>
-                    </ui-input>
-                </v-col>
-                <v-col v-if="canUserAddPersons" cols="1">
-                    <generic-crud-modal
-                        :form-component="PersonSubmissionForm"
-                        :form-props="{ inModal: true, presetPersonName: presetPersonNameForCreation }"
-                        entity-name="Person"
-                        is-submission
-                        :read-only="false"
-                        @create="selectNewlyAddedPerson"
-                        @selected="selectExistingSelectedPerson"
-                    />
-                </v-col>
-            </v-row>
+            <div v-if="!selectExternalAssociate" class="flex items-start gap-2">
+                <ui-input
+                    v-model="selectedPerson"
+                    class="min-w-0 flex-1"
+                    control="autocomplete"
+                    :label="allowExternalAssociate ? $t('searchInSystemLabel') : ($t('personLabel') + (required ? '*' : ''))"
+                    :items="persons"
+                    :custom-filter="filterPersons"
+                    :rules="required ? requiredSelectionRules : []"
+                    :no-data-text="$t('noDataMessage')"
+                    return-object
+                    :readonly="lockSearchField"
+                    @update:search="searchPersons($event)"
+                    @update:model-value="onPersonSelect($event)"
+                    @blur="onAutocompleteBlur"
+                >
+                    <template #item="{ item, props }">
+                        <v-list-item
+                            v-bind="{ ...props, title: undefined }">
+                            <person-publications-tooltip
+                                :person-id="item.raw.value"
+                                :show="showLatestPublications">
+                                {{ item.raw.title }}
+                            </person-publications-tooltip>
+                        </v-list-item>
+                    </template>
+                </ui-input>
+                <generic-crud-modal
+                    v-if="canUserAddPersons"
+                    class="mt-[1.31rem] w-fit shrink-0 self-start"
+                    :form-component="PersonSubmissionForm"
+                    :form-props="{ inModal: true, presetPersonName: presetPersonNameForCreation }"
+                    entity-name="Person"
+                    is-submission
+                    :read-only="false"
+                    @create="selectNewlyAddedPerson"
+                    @selected="selectExistingSelectedPerson"
+                />
+            </div>
             <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
                 <v-chip
                     v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined

@@ -253,7 +253,7 @@
                                     size="small"
                                     @search="clearSortAndPerformPublicationSearch($event)"
                                 />
-                                <v-select
+                                <ui-input control="select"
                                     v-model="selectedPublicationTypes"
                                     :items="publicationTypes"
                                     :label="$t('typeOfPublicationLabel')"
@@ -262,7 +262,7 @@
                                     density="comfortable"
                                     class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
                                     multiple
-                                ></v-select>
+                                ></ui-input>
                             </div>
 
                             <publication-table-component
@@ -314,7 +314,7 @@
                                 </v-btn>
                             </template>
                             <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
-                                <v-checkbox
+                                <ui-checkbox
                                     v-model="returnOnlyActiveProjects"
                                     :label="$t('showOnlyActiveLabel')"
                                     hide-details
@@ -492,10 +492,12 @@ import { UiButton } from '@/components/ui/button';
 import { useFeatureModuleToggles } from '@/composables/useFeatureModuleToggles';
 import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter },
+    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter, UiInput, UiCheckbox },
     setup() {
         const currentTab = ref("additionalInfo");
 

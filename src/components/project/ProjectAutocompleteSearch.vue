@@ -1,45 +1,44 @@
 <template>
-    <v-row>
-        <v-col :cols="disableSubmission ? 12 : 11">
-            <v-autocomplete
-                v-model="selectedProject"
-                :label="(label ? $t(label) : $t('projectLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : projects"
-                :custom-filter="(() => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :readonly="readOnly"
-                return-object
-                @update:search="searchProjects($event)"
-                @update:model-value="sendContentToParent"
-            >
-                <template #item="{ item, props: itemProps }">
-                    <v-list-item v-bind="{ ...itemProps, title: undefined }">
-                        {{ item.raw.listTitle }}
-                        <v-chip
-                            v-if="item.raw.status"
-                            size="small"
-                            class="ml-2"
-                            :color="getProjectStatusColor(item.raw.status)"
-                            variant="flat"
-                        >
-                            {{ getProjectStatusTitleFromValueAutoLocale(item.raw.status) }}
-                        </v-chip>
-                    </v-list-item>
-                </template>
-            </v-autocomplete>
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="ProjectSubmissionForm"
-                entity-name="Project"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedProject"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <v-autocomplete
+            v-model="selectedProject"
+            class="min-w-0 flex-1"
+            :label="(label ? $t(label) : $t('projectLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : projects"
+            :custom-filter="(() => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :readonly="readOnly"
+            return-object
+            @update:search="searchProjects($event)"
+            @update:model-value="sendContentToParent"
+        >
+            <template #item="{ item, props: itemProps }">
+                <v-list-item v-bind="{ ...itemProps, title: undefined }">
+                    {{ item.raw.listTitle }}
+                    <v-chip
+                        v-if="item.raw.status"
+                        size="small"
+                        class="ml-2"
+                        :color="getProjectStatusColor(item.raw.status)"
+                        variant="flat"
+                    >
+                        {{ getProjectStatusTitleFromValueAutoLocale(item.raw.status) }}
+                    </v-chip>
+                </v-list-item>
+            </template>
+        </v-autocomplete>
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="w-fit shrink-0 self-center"
+            :form-component="ProjectSubmissionForm"
+            entity-name="Project"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedProject"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">

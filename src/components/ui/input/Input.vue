@@ -9,7 +9,7 @@
             :is="controlIs"
             :id="inputId"
             ref="fieldRef"
-            v-bind="forwardedAttrs"
+            v-bind="fieldBindings"
             :model-value="modelValue"
             class="plain-field__control"
             variant="plain"
@@ -106,9 +106,38 @@ const controlIs = computed(() => {
 const wrapperClass = computed(() => attrs.class as string | undefined);
 
 const forwardedAttrs = computed(() => {
-    const { class: _class, "aria-label": _ariaLabel, ...rest } = attrs;
+    const { class: _class, "aria-label": _ariaLabel, "menu-props": _menuProps, ...rest } = attrs;
     return rest;
 });
+
+const isMenuControl = computed(
+    () => props.control === "select" || props.control === "autocomplete"
+);
+
+const isMultiple = computed(() => attrs.multiple === true || attrs.multiple === "");
+
+const menuBindings = computed(() => {
+    if (!isMenuControl.value) {
+        return {};
+    }
+
+    const incoming = attrs["menu-props"];
+    const incomingProps = incoming && typeof incoming === "object" ? incoming : {};
+
+    return {
+        menuProps: {
+            contentClass: "plain-field__menu",
+            offset: 6,
+            ...incomingProps,
+        },
+        ...(isMultiple.value ? { chips: true, closableChips: true } : {}),
+    };
+});
+
+const fieldBindings = computed(() => ({
+    ...forwardedAttrs.value,
+    ...menuBindings.value,
+}));
 
 const computedPlaceholder = computed(() => props.placeholder ?? "");
 

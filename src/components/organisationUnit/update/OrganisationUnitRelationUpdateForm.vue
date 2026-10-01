@@ -7,7 +7,7 @@
             @change="onDropCallback">
             <v-row v-for="(relation, index) in data" :key="relation.id">
                 <v-col cols="3">
-                    <v-select
+                    <ui-input control="select"
                         v-model="relation.relationType"
                         :items="relationTypes"
                         :label="$t('relationTypeLabel')"
@@ -40,11 +40,12 @@ import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/orga
 import OrganisationUnitAutocompleteSearch from '../OrganisationUnitAutocompleteSearch.vue';
 import { VueDraggableNext } from 'vue-draggable-next';
 import { watch } from 'vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitRelationUpdateForm",
-    components: { OrganisationUnitAutocompleteSearch, draggable: VueDraggableNext },
+    components: { OrganisationUnitAutocompleteSearch, draggable: VueDraggableNext, UiInput },
     props: {
         sourceOU: {
             type: Object as PropType<OrganisationUnitResponse | undefined>,

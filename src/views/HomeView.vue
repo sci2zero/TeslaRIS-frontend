@@ -28,10 +28,10 @@
                     </div>
                 </div>
             </div>
-            <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4 py-6 pb-10 px-4 sm:px-6">
+            <div class="mx-auto">
+                <div class="flex flex-wrap justify-center gap-3 lg:gap-4 py-6 pb-10 px-4 sm:px-6">
                     <!-- Cards -->
-                    <div v-for="(item, index) in cardsData" :key="index" class="">
+                    <div v-for="(item, index) in cardsData" :key="index" class="hero-stat-card">
                         <div
                             class="frosted-glass-card transition-all duration-300"
                             :class="item.path !== undefined ? 'cursor-pointer hover:scale-105' : ''"
@@ -63,35 +63,9 @@
                     </div>
                 </div>
             </div>
-
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
-                <div class="frosted-glass-card data-quality-panel">
-                    <h3 class="hero-card-title text-lg sm:text-xl font-semibold mb-1">
-                        {{ $t('dataQualityLabel') }}
-                    </h3>
-                    <p class="hero-muted text-sm mb-5">
-                        {{ $t('landingDataQuality.description') }}
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
-                        <div
-                            v-for="option in dataQualityOptions"
-                            :key="option.titleKey"
-                            class="data-quality-option"
-                        >
-                            <h4 class="hero-card-title text-sm sm:text-base font-semibold mb-1">
-                                {{ $t(option.titleKey) }}
-                            </h4>
-                            <p class="hero-muted text-xs sm:text-sm mb-3 leading-relaxed">
-                                {{ $t(option.descriptionKey) }}
-                            </p>
-                            <span class="data-quality-open">
-                                {{ $t('landingDataQuality.open') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+
+        <plugin-extensions name="home.dataQuality" />
 
         <!-- Features Section -->
         <landing-features />
@@ -118,10 +92,12 @@ import { type OrganisationUnitIndex } from "@/models/OrganisationUnitModel";
 import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
+import { getExtensions } from "@/plugin-system/registry";
+import PluginExtensions from "@/plugin-system/PluginExtensions.vue";
 
 export default defineComponent({
     name: "HomeView",
-    components: { SearchBarComponent, Navbar, LandingFeatures },
+    components: { SearchBarComponent, Navbar, LandingFeatures, PluginExtensions },
     setup() {
         const publicConfigurationStore = usePublicConfigurationStore();
         const title = computed(() => publicConfigurationStore.title);
@@ -137,16 +113,12 @@ export default defineComponent({
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
         const scientificResultsListLabel = computed(() => i18n.t("scientificResultsListLabel"));
-        const activitiesLabel = computed(() => i18n.t("activitiesLabel"));
         const projectsLabel = computed(() => i18n.t("projectsLabel"));
-        const fundingsLabel = computed(() => i18n.t("fundingsLabel"));
 
         const researcherCount = ref(0);
         const ouCount = ref(0);
         const publicationCount = ref(0);
-        const activitiesCount = ref(0);
         const projectsCount = ref(0);
-        const fundingsCount = ref(0);
         const isLoadingCounts = ref(true);
 
         onMounted(() => {
@@ -167,13 +139,24 @@ export default defineComponent({
         const mostCitedPublicationsLabel = computed(() => i18n.t("mostCitedPublicationsLabel"));
 
         const cardsData = ref([
-            {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, path:'persons', icon: 'mdi-account-group'},
-            {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain'},
-            {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple'},
-            {name: activitiesLabel, value: activitiesCount, icon: 'mdi-calendar-star'},
-            {name: projectsLabel, value: projectsCount, path:'project', icon: 'mdi-briefcase-variant'},
-            {name: fundingsLabel, value: fundingsCount, icon: 'mdi-cash-multiple'},
+            {name: personListLabel, value: researcherCount, topResultsTitle: mostCitedResearchersLabel, path:'persons', icon: 'mdi-account-group', order: 10},
+            {name: ouListLabel, value: ouCount, topResultsTitle: mostCitedInstitutionsLabel, path: 'organisation-units', icon: 'mdi-domain', order: 20},
+            {name: scientificResultsListLabel, value: publicationCount, topResultsTitle: mostCitedPublicationsLabel, path:'scientific-results', icon: 'mdi-file-document-multiple', order: 30},
+            {name: projectsLabel, value: projectsCount, path:'project', icon: 'mdi-briefcase-variant', order: 50},
         ]);
+
+        for (const extension of getExtensions("home.cards")) {
+            const data = (extension.data ?? {}) as { icon?: string; path?: string; value?: number };
+            cardsData.value.push({
+                name: computed(() => extension.titleKey ? i18n.t(extension.titleKey) : extension.id),
+                value: ref(data.value ?? 0),
+                path: data.path,
+                icon: data.icon ?? "mdi-card-outline",
+                order: extension.order ?? 100,
+            });
+        }
+
+        cardsData.value.sort((left, right) => left.order - right.order);
 
         const search = (tokenParams: string) => {
             let token = tokenParams;
@@ -222,17 +205,6 @@ export default defineComponent({
             router.push({ name: pageName, params: {id: item.databaseId} });
         };
 
-        const dataQualityOptions = [
-            {
-                titleKey: "landingDataQuality.repositoryAnalytics.title",
-                descriptionKey: "landingDataQuality.repositoryAnalytics.description",
-            },
-            {
-                titleKey: "landingDataQuality.issueExplorer.title",
-                descriptionKey: "landingDataQuality.issueExplorer.description",
-            },
-        ];
-
         return {
             search, cardsData,
             title, description,
@@ -241,7 +213,6 @@ export default defineComponent({
             navigateToItemPage,
             getItemName,
             isLoadingCounts,
-            dataQualityOptions,
             heroTheme,
             heroBackgroundStyle
         };
@@ -332,6 +303,12 @@ export default defineComponent({
     z-index: 2;
 }
 
+.hero-stat-card {
+    flex: 1 1 9rem;
+    max-width: 12rem;
+    min-width: 9rem;
+}
+
 .frosted-glass-card {
     background: var(--hero-card-bg);
     backdrop-filter: blur(10px);
@@ -371,37 +348,6 @@ export default defineComponent({
 .icon-wrapper .v-icon {
     color: var(--hero-primary);
     filter: var(--hero-icon-filter);
-}
-
-.data-quality-panel {
-    padding: 20px 24px;
-}
-
-.data-quality-option {
-    background: var(--hero-option-bg);
-    border: 1px solid var(--hero-option-border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    display: flex;
-    flex-direction: column;
-    transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.data-quality-option:hover {
-    background: var(--hero-option-hover-bg);
-    border-color: var(--hero-option-hover-border);
-}
-
-.data-quality-open {
-    margin-top: auto;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--hero-open-color);
-}
-
-.hero-card-title {
-    color: var(--hero-primary);
 }
 
 .hero-card-label {

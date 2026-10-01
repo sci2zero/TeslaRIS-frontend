@@ -5,7 +5,7 @@
                 <v-col cols="12" :sm="inModal ? 12 : 8">
                     <v-row>
                         <v-col cols="12" md="6">
-                            <v-text-field
+                            <ui-input
                                 v-model="firstName"
                                 :label="$t('firstNameLabel') + '*'"
                                 :placeholder="$t('firstNameLabel')"
@@ -13,7 +13,7 @@
                             />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field
+                            <ui-input
                                 v-model="lastName"
                                 :label="$t('surnameLabel') + '*'"
                                 :placeholder="$t('surnameLabel')"
@@ -54,17 +54,17 @@
                     <v-container v-if="additionalFields">
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="middleName"
                                     :label="$t('middleNameLabel')"
-                                    :placeholder="$t('middleNameLabel')"
+                                   
                                 />
                             </v-col>
                         </v-row>
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-select
+                                <ui-input control="select"
                                     v-model="selectedEmploymentPosition"
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel')"
@@ -72,7 +72,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-select
+                                <ui-input control="select"
                                     v-model="selectedSex"
                                     :items="sexes"
                                     :label="$t('sexLabel')"
@@ -83,17 +83,17 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="email"
                                     :label="$t('emailLabel')"
-                                    :placeholder="$t('emailLabel')"
+                                   
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="phoneNumber"
                                     :label="$t('phoneNumberLabel')"
-                                    :placeholder="$t('phoneNumberLabel')"
+                                   
                                 />
                             </v-col>
                         </v-row>
@@ -107,10 +107,9 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="orcid"
                                     label="ORCID"
-                                    placeholder="ORCID"
                                     :rules="orcidValidationRules"
                                 />
                             </v-col>
@@ -118,18 +117,16 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="eCrisId"
                                     label="eCRIS-ID"
-                                    placeholder="eCRIS-ID"
                                     :rules="eCrisIdValidationRules"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="eNaukaId"
                                     label="enaukaID"
-                                    placeholder="enaukaID"
                                     :rules="eNaukaIdValidationRules"
                                 />
                             </v-col>
@@ -137,17 +134,16 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="nationalScienceId"
                                     :label="$t('nationalScienceIdLabel')"
-                                    :placeholder="$t('nationalScienceIdLabel')"
+                                   
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="scholarId"
                                     label="Google Scholar ID"
-                                    placeholder="Google Scholar ID"
                                     :rules="scholarIdValidationRules"
                                 />
                             </v-col>
@@ -155,18 +151,16 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="apvnt"
                                     label="APVNT"
-                                    placeholder="APVNT"
                                     :rules="apvntValidationRules"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="scopus"
                                     label="Scopus Author ID"
-                                    placeholder="Scopus Author ID"
                                     :rules="scopusAuthorIdValidationRules"
                                 />
                             </v-col>
@@ -174,15 +168,14 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="openAlex"
                                     label="Open Alex ID"
-                                    placeholder="Open Alex ID"
                                     :rules="personOpenAlexIdValidationRules"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="webOfScienceId"
                                     label="ReearcherID (WoS)"
                                     placeholder="ResearcherID (WoS)"
@@ -193,18 +186,16 @@
 
                         <v-row>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="authenticusId"
                                     label="Authenticus ID"
-                                    placeholder="Authenticus ID"
                                     :rules="personAuthenticusIdValidationRules"
                                 />
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-text-field
+                                <ui-input
                                     v-model="lattesId"
                                     label="Lattes ID"
-                                    placeholder="Lattes ID"
                                     :rules="lattesIdValidationRules"
                                 />
                             </v-col>
@@ -253,11 +244,12 @@ import Toast from '../core/Toast.vue';
 import UserService from '@/services/UserService';
 import { type UserResponse } from '@/models/UserModel';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput },
     props: {
         inModal: {
             type: Boolean,
@@ -402,7 +394,6 @@ export default defineComponent({
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
                     deduplicationTableRef.value?.resetTable();
-                    
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
                 } else {

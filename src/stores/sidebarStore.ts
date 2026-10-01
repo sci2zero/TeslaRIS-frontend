@@ -10,7 +10,7 @@ const getIsMobileViewport = () =>
   window.matchMedia(`(max-width: ${SIDEBAR_MOBILE_MAX_WIDTH}px)`).matches;
 
 export const useSidebarStore = defineStore('sidebar', () => {
-  const isOpen = ref(true);
+  const isOpen = ref(false);
   const route = useRoute();
   const isMobile = ref(getIsMobileViewport());
 

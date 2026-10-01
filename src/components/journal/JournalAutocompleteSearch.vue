@@ -1,37 +1,40 @@
 <template>
-    <v-row>
-        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
-            <v-autocomplete
-                v-model="selectedJournal"
-                v-model:search="searchInput"
-                :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
-                :items="readonly ? [] : journals"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
-                :no-data-text="$t('nameOrIssnMessage')"
-                :multiple="multiple"
-                return-object
-                @update:search="searchJournals($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="PublicationSeriesSubmissionForm"
-                :form-props="{inputType: inputType, presetName: lastSearchInput}"
-                entity-name="Journal"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedJournal"
-            />
-        </v-col>
-        <v-col v-if="allowManualClearing && hasSelection" cols="1">
-            <v-btn icon @click="clearInput()">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedJournal"
+            v-model:search="searchInput"
+            :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
+            :items="readonly ? [] : journals"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
+            :no-data-text="$t('nameOrIssnMessage')"
+            :multiple="multiple"
+            return-object
+            @update:search="searchJournals($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="PublicationSeriesSubmissionForm"
+            :form-props="{inputType: inputType, presetName: lastSearchInput}"
+            entity-name="Journal"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedJournal"
+        />
+        <v-btn
+            v-if="allowManualClearing && hasSelection"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput()"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
 </template>
 
 <script lang="ts">
@@ -47,11 +50,12 @@ import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PublicationSeriesSubmissionForm from '../publicationSeries/PublicationSeriesSubmissionForm.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "JournalAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,

@@ -1,48 +1,74 @@
 <template>
     <div>
-        <div>
-            <v-text-field
-                v-model="firstName"
-                :label="$t('firstNameLabel')"
-                :rules="requiredFieldRules"
-                @input="updatedFirstName"
+        <ui-input
+            v-model="firstName"
+            :label="$t('firstNameLabel')"
+            :placeholder="$t('firstNameLabel')"
+            :rules="requiredFieldRules"
+            class="register-field"
+            @update:model-value="updatedFirstName"
+        />
+        <ui-input
+            v-model="lastName"
+            :label="$t('surnameLabel')"
+            :placeholder="$t('surnameLabel')"
+            :rules="requiredFieldRules"
+            class="register-field"
+            @update:model-value="updatedLastName"
+        />
+
+        <div v-if="!isEmptyData" class="researcher-picker">
+            <v-progress-linear
+                v-if="searching && suggestions.length === 0"
+                indeterminate
+                color="#3b6fe0"
+                class="search-progress"
             />
-            <v-text-field
-                v-model="lastName"
-                :label="$t('surnameLabel')"
-                :rules="requiredFieldRules"
-                @input="updatedLastName"
-            />
-        </div>
 
+            <p v-if="suggestions.length" class="picker-label">
+                {{ $t("selectResearcherLabel") }}
+            </p>
 
-        <template v-if="isEmptyData">
-            <h2>{{ $t("enterYourNameLabel") }}</h2>
-        </template>
-        <template v-else>
-            <div class="select-user my-2">
-                <h3>Izaberi istraživača</h3>
-                <div class="my-1">
-                    <v-card
-                        v-for="personSuggestion in suggestions" :key="personSuggestion.id"
-                        class="mx-auto"
-                        :title="personSuggestion.name"
-                        :subtitle="personSuggestion.employmentsSr"
-                        link
-                        @click="personClick(personSuggestion)"
-                    />
-                </div>
-
-                <v-card
-                    v-if="newResearcherCreationAllowed"
-                    class="mx-auto"
-                    :title="$t('noneOfTheOfferedLabel')"
-                    :subtitle="newFirstNameTitle"
-                    link
-                    @click="registrationNextStep"
-                />
+            <div v-if="suggestions.length" class="researcher-list">
+                <button
+                    v-for="personSuggestion in suggestions"
+                    :key="personSuggestion.id"
+                    type="button"
+                    class="researcher-option"
+                    @click="personClick(personSuggestion)">
+                    <v-icon icon="mdi-account-outline" class="researcher-icon" />
+                    <span class="researcher-copy">
+                        <span class="researcher-name">{{ personSuggestion.name }}</span>
+                        <span v-if="employmentLabel(personSuggestion)" class="researcher-meta">
+                            {{ employmentLabel(personSuggestion) }}
+                        </span>
+                    </span>
+                </button>
             </div>
-        </template>
+
+            <p v-if="showNoMatchNote" class="no-match-note">
+                {{ $t("noMatchingResearchersMessage") }}
+                <template v-if="!newResearcherCreationAllowed">
+                    {{ $t("noResearcherSelectionMessage") }}
+                </template>
+            </p>
+
+            <button
+                v-if="newResearcherCreationAllowed"
+                type="button"
+                class="researcher-option researcher-option-create"
+                @click="registrationNextStep">
+                <v-icon icon="mdi-account-plus-outline" class="researcher-icon" />
+                <span class="researcher-copy">
+                    <span class="researcher-name">
+                        {{ suggestions.length ? $t("noneOfTheOfferedLabel") : newFirstNameTitle }}
+                    </span>
+                    <span v-if="suggestions.length" class="researcher-meta">
+                        {{ newFirstNameTitle }}
+                    </span>
+                </span>
+            </button>
+        </div>
 
         <toast v-model="snackbar" :message="message" />
     </div>
@@ -59,10 +85,13 @@ import { watch } from "vue";
 import { type PersonIndex } from "@/models/PersonModel";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import UserService from "@/services/UserService";
+import Toast from "@/components/core/Toast.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
     name: "RegistrationFirstStep",
+    components: { Toast, UiInput },
     emits: ["registration-next-step", "field-update"],
     setup(_, { emit }) {
         const message = ref("");
@@ -78,11 +107,20 @@ export default defineComponent({
 
         const registerStore = useRegisterStore();
         const suggestions = ref<PersonIndex[]>([]);
+        const searching = ref(false);
+        const searchCompleted = ref(false);
+        let requestSerial = 0;
 
         const { requiredFieldRules } = useValidationUtils();
         
         const isEmptyData = computed(() => firstName.value == "" && lastName.value == "");
         const newFirstNameTitle = computed(() => i18n.t("createNewAccount") + " " + firstName.value + " " + lastName.value);
+        const showNoMatchNote = computed(() =>
+            searchCompleted.value &&
+            !searching.value &&
+            suggestions.value.length === 0 &&
+            !isEmptyData.value
+        );
 
         onMounted(() => {
             UserService.isRegisterResearcherCreationAllowed().then(response => {
@@ -103,16 +141,22 @@ export default defineComponent({
         });
 
         const updatedData = () => {
-            const token: string = firstName.value + " " + lastName.value;
+            const token = `${firstName.value} ${lastName.value}`.trim();
+            if (token.length < 2) {
+                searchResearchers.cancel();
+                requestSerial += 1;
+                suggestions.value = [];
+                searching.value = false;
+                searchCompleted.value = false;
+                return;
+            }
+
+            searching.value = true;
             searchResearchers(token);
         };
 
         const searchResearchers = lodash.debounce((input: string) => {
-            if (!input || input.trim().length < 2) {
-                return;
-            }
-
-            const tokens = input.trim().split(" ").filter(t => t !== " " && t !== "");
+            const tokens = input.trim().split(" ").filter(token => token !== "");
 
             let searchTokens = "";
             tokens.forEach(token => {
@@ -120,17 +164,37 @@ export default defineComponent({
             });
 
             const params = `${searchTokens}page=0&size=7`;
+            const requestId = ++requestSerial;
             PersonService.searchResearchers(params, false, null).then((response) => {
+                if (requestId !== requestSerial) {
+                    return;
+                }
+
                 suggestions.value = response.data.content;
+                searching.value = false;
+                searchCompleted.value = true;
+            }).catch(() => {
+                if (requestId !== requestSerial) {
+                    return;
+                }
+
+                suggestions.value = [];
+                searching.value = false;
+                searchCompleted.value = true;
             });
         }, 300);
+
+        const employmentLabel = (person: PersonIndex) => {
+            const value = i18n.locale.value.startsWith("sr") ? person.employmentsSr : person.employmentsOther;
+            return (value || "").replace(/\s*\|\s*/g, " · ").replace(/(?:\s*·\s*)+$/g, "").trim();
+        };
 
         const registrationNextStep = () => {
             emit("registration-next-step", {firstName: firstName.value, lastName: lastName.value});
             registerStore.clearRegisterPersonData();
         };
 
-        const personClick = (person : any) => {
+        const personClick = (person: PersonIndex) => {
             PersonService.getPersonWithUser(person.databaseId).then(response => {
                 if (response.data.user) {
                     const email = response.data.user.email;
@@ -156,12 +220,103 @@ export default defineComponent({
             suggestions, isEmptyData, message,
             newFirstNameTitle, registrationNextStep,
             personClick, newResearcherCreationAllowed,
-            snackbar
+            snackbar, searching, showNoMatchNote, employmentLabel
         }
     }
 })
 </script>
 
-<style>
+<style scoped>
+    .register-field {
+        margin-bottom: 1rem;
+    }
 
+    .researcher-picker {
+        margin-top: 0.5rem;
+    }
+
+    .search-progress {
+        margin-bottom: 0.75rem;
+    }
+
+    .picker-label {
+        margin: 0.25rem 0 0.65rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #8a94ad;
+    }
+
+    .researcher-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .researcher-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.8rem 0.9rem;
+        text-align: left;
+        background: #f7f9fd;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .researcher-list .researcher-option {
+        margin-top: 0;
+    }
+
+    .researcher-option:hover,
+    .researcher-option:focus-visible {
+        background: #f3f7ff;
+        border-color: #3b6fe0;
+        outline: none;
+    }
+
+    .researcher-option-create {
+        background: #ffffff;
+        border-style: dashed;
+    }
+
+    .researcher-icon {
+        margin-top: 0.1rem;
+        color: #3b6fe0;
+    }
+
+    .researcher-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-width: 0;
+    }
+
+    .researcher-name {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        line-height: 1.4;
+        color: #1f2d52;
+    }
+
+    .researcher-meta {
+        font-size: 0.8125rem;
+        line-height: 1.4;
+        color: #7b859c;
+    }
+
+    .no-match-note {
+        margin: 0.75rem 0 0;
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        background: #f4f7fc;
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        color: #556080;
+    }
 </style>

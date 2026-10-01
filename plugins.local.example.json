@@ -1,0 +1,8 @@
+{
+  "plugins": {
+    "portugal": "../teslaris-portugal"
+  },
+  "profiles": {
+    "portugal": ["portugal"]
+  }
+}

@@ -26,14 +26,23 @@
                 </v-card-text>
                 <template #actions>
                     <v-spacer />
-  
-                    <v-btn @click="cancelOperation">
-                        {{ $t("cancelLabel") }}
-                    </v-btn>
-  
-                    <v-btn @click="continueOperation">
-                        {{ $t("continueLabel") }}
-                    </v-btn>
+
+                    <template v-if="emphasizeCancel">
+                        <v-btn variant="text" @click="continueOperation">
+                            {{ continueText || $t("continueLabel") }}
+                        </v-btn>
+                        <v-btn color="primary" variant="flat" @click="cancelOperation">
+                            {{ cancelText || $t("cancelLabel") }}
+                        </v-btn>
+                    </template>
+                    <template v-else>
+                        <v-btn @click="cancelOperation">
+                            {{ cancelText || $t("cancelLabel") }}
+                        </v-btn>
+                        <v-btn @click="continueOperation">
+                            {{ continueText || $t("continueLabel") }}
+                        </v-btn>
+                    </template>
                 </template>
             </v-card>
         </v-dialog>
@@ -69,6 +78,18 @@ export default defineComponent({
         radioOptions: {
             type: Object as PropType<{title: string, value: number}[]>,
             default: () => [] as {title: string, value: number}[]
+        },
+        cancelText: {
+            type: String,
+            default: ""
+        },
+        continueText: {
+            type: String,
+            default: ""
+        },
+        emphasizeCancel: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["continue", "update:modelValue"],

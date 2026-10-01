@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" persistent scrollable max-width="960px">
+    <v-dialog v-model="dialog" :persistent="edited" scrollable max-width="960px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
         <template #activator="scope">
             <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
@@ -15,7 +15,13 @@
                 </div>
             </slot>
         </template>
-        <v-card>
+        <v-card
+            ref="cardRef"
+            @pointerdown.capture="onPointerDown"
+            @keydown.capture="onKeyDown"
+            @input.capture="onFieldEvent"
+            @change.capture="onFieldEvent"
+        >
             <v-card-title class="pb-1">
                 <span class="text-h5">{{ $t("updateContributionsLabel") }}</span>
             </v-card-title>
@@ -44,6 +50,15 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <persistent-question-dialog
+        v-model="confirmClose"
+        :title="$t('areYouSureLabel')"
+        :message="$t('unsavedChangesMessage')"
+        :cancel-text="$t('keepEditingLabel')"
+        :continue-text="$t('closeLabel')"
+        emphasize-cancel
+        @continue="discardChanges"
+    />
 </template>
 
 <script lang="ts">
@@ -52,11 +67,13 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { DocumentContributionType, PersonDocumentContribution } from "@/models/PublicationModel";
 import PersonPublicationContribution from "@/components/publication/PersonPublicationContribution.vue";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 
 
 export default defineComponent({
     name: "PublicationContributionUpdateModal",
-    components: { PersonPublicationContribution },
+    components: { PersonPublicationContribution, PersistentQuestionDialog },
     props: {
         readOnly: {
             type: Boolean,
@@ -88,6 +105,11 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const dialog = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null
+        );
 
         const contributions = ref<any[]>([]);
 
@@ -124,7 +146,7 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, updateFormRef, emitToParent, contributions, isFormValid};
+        return {dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges, updateFormRef, emitToParent, contributions, isFormValid};
     }
 });
 </script>

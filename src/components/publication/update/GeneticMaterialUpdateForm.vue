@@ -31,12 +31,12 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
+                <ui-input v-model="doi" label="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-select
+                <ui-input control="select"
                     v-model="selectedGeneticMaterialType"
                     :label="$t('geneticMaterialTypeLabel') + '*'"
                     :items="geneticMaterialTypes"
@@ -47,10 +47,10 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
+                <ui-input
                     v-model="geneticMaterialNumber"
                     :label="$t('internalNumberLabel')"
-                    :placeholder="$t('internalNumberLabel')"
+                   
                 />
             </v-col>
         </v-row>
@@ -70,26 +70,23 @@
         </v-row>
         <v-row>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="scopus"
                     label="Scopus ID"
-                    placeholder="Scopus ID"
                     :rules="scopusIdValidationRules"
                 />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="openAlexId"
                     label="Open Alex ID"
-                    placeholder="Open Alex ID" 
                     :rules="workOpenAlexIdValidationRules"
                 />
             </v-col>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="webOfScienceId"
                     label="Web of Science ID"
-                    placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules"
                 />
             </v-col>
@@ -133,11 +130,12 @@ import { getGeneticMaterialTypesForGivenLocale, getGeneticMaterialTypeTitleFromV
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "GeneticMaterialUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetGeneticMaterial: {
             type: Object as PropType<GeneticMaterial | undefined>,

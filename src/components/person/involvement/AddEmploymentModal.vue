@@ -8,7 +8,7 @@
                 {{ $t("addEmployeeLabel") }}
             </v-btn>
         </template>
-        <v-card>
+        <v-card class="bg-slate-100">
             <v-card-title>
                 <span class="text-h5">{{ $t("addEmployeeLabel") }}</span>
             </v-card-title>
@@ -25,7 +25,7 @@
                         </v-row>
                         <v-row>
                             <v-col>
-                                <v-select
+                                <ui-input control="select"
                                     v-model="selectedEmploymentPosition"
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel') + '*'"
@@ -58,11 +58,12 @@ import InvolvementService from "@/services/InvolvementService";
 import { getEmploymentPositionsForGivenLocale } from "@/i18n/employmentPosition";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import PersonAutocompleteSearch from "../PersonAutocompleteSearch.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
     name: "AddEmploymentModal",
-    components: { PersonAutocompleteSearch },
+    components: { PersonAutocompleteSearch, UiInput },
     props: {
         institutionId: {
             type: Number,

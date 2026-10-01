@@ -1,35 +1,37 @@
 <template>
-    <v-row v-if="!allowAuthorReprint || (allowAuthorReprint && !authorReprint)">
-        <v-col :cols="allowManualClearing && selectedPublisher.value !== -1 ? 10 : 11">
-            <ui-input
-                v-model="selectedPublisher"
-                control="autocomplete"
-                :label="$t('publisherLabel')"
-                :items="readonly ? [] : publishers"
-                :custom-filter="((): boolean => true)"
-                :no-data-text="$t('noDataMessage')"
-                return-object
-                @update:search="searchPublishers($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="PublisherSubmissionForm"
-                :form-props="{presetName: lastSearchInput}"
-                entity-name="Publisher"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedPublisher"
-            />
-        </v-col>
-        <v-col v-if="allowManualClearing && selectedPublisher.value !== -1" cols="1">
-            <v-btn icon @click="clearInput()">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div v-if="!allowAuthorReprint || (allowAuthorReprint && !authorReprint)" class="flex items-start gap-2">
+        <ui-input
+            v-model="selectedPublisher"
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            :label="$t('publisherLabel')"
+            :items="readonly ? [] : publishers"
+            :custom-filter="((): boolean => true)"
+            :no-data-text="$t('noDataMessage')"
+            return-object
+            @update:search="searchPublishers($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="PublisherSubmissionForm"
+            :form-props="{presetName: lastSearchInput}"
+            entity-name="Publisher"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedPublisher"
+        />
+        <v-btn
+            v-if="allowManualClearing && selectedPublisher.value !== -1"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput()"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
     <v-row v-if="allowAuthorReprint">
         <v-col cols="12">
             <v-checkbox

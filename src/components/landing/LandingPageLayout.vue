@@ -181,6 +181,7 @@ onBeforeUnmount(() => {
 }
 
 .landing-tabs-bar {
+    height: auto;
     background-color: #f8fafc;
     border: 1px solid rgb(226 232 240 / 0.9);
     border-radius: 0.75rem;
@@ -189,13 +190,16 @@ onBeforeUnmount(() => {
 
 .landing-tabs-bar :deep(.v-slide-group__container) {
     padding: 0.25rem;
+    contain: none;
 }
 
 .landing-tabs-bar :deep(.v-slide-group__content) {
+    align-items: center;
     gap: 0.125rem;
 }
 
-.landing-tabs-bar :deep(.v-tab) {
+.landing-tabs.landing-tabs-bar :deep(.v-tab.v-btn) {
+    height: 2.375rem;
     min-height: 2.375rem;
     padding-inline: 0.9rem;
     font-size: 0.875rem;
@@ -295,7 +299,8 @@ onBeforeUnmount(() => {
         padding: 0.1875rem;
     }
 
-    .landing-tabs-bar :deep(.v-tab) {
+    .landing-tabs.landing-tabs-bar :deep(.v-tab.v-btn) {
+        height: 2.25rem;
         min-height: 2.25rem;
         padding-inline: 0.75rem;
         font-size: 0.8125rem;

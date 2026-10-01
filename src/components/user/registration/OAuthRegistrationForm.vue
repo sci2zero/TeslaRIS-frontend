@@ -16,36 +16,48 @@
                 </v-btn>
             </div>
             
-            <v-text-field
+            <ui-input
                 v-model="firstName"
                 :label="$t('firstNameLabel') + '*'"
+                :placeholder="$t('firstNameLabel')"
                 :rules="requiredFieldRules"
+                class="register-field"
             />
-            <v-text-field
+            <ui-input
                 v-model="lastName"
                 :label="$t('surnameLabel') + '*'"
+                :placeholder="$t('surnameLabel')"
                 :rules="requiredFieldRules"
+                class="register-field"
             />
-            <organisation-unit-autocomplete-search
-                ref="ouAutocompleteRef"
-                v-model="selectedOrganisationUnit"
-                required
-                only-client-institutions-cris
-                :readonly="disableOUSelection" />
-            <v-select
+            <div class="register-ou">
+                <organisation-unit-autocomplete-search
+                    ref="ouAutocompleteRef"
+                    v-model="selectedOrganisationUnit"
+                    required
+                    only-client-institutions-cris
+                    :readonly="disableOUSelection" />
+            </div>
+            <ui-input
                 v-model="selectedLanguage"
+                control="select"
                 :label="$t('preferredLanguageLabel') + '*'"
                 :items="languages"
                 return-object
+                class="register-field"
             />
-            <v-text-field
+            <ui-input
                 v-model="email"
                 :label="$t('emailLabel') + '*'"
+                :placeholder="$t('emailLabel')"
                 :rules="emailFieldRules"
+                class="register-field"
             />
         </v-form>
 
-        <v-btn block color="blue darken-1 large" :disabled="!isFormValid" @click="register">
+        <v-btn
+            class="register-submit" block size="large"
+            rounded="lg" color="#3b6fe0" :disabled="!isFormValid" @click="register">
             {{ $t("registerLabel") }}
         </v-btn>
 
@@ -70,11 +82,12 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import LanguageService from "@/services/LanguageService";
 import { type LanguageTagResponse } from "@/models/Common";
 import { type AxiosResponse } from "axios";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
     name: "OAuthRegistrationForm",
-    components: { OrganisationUnitAutocompleteSearch, PersonAutocompleteSearch, Toast },
+    components: { OrganisationUnitAutocompleteSearch, PersonAutocompleteSearch, Toast, UiInput },
     props: {
         newResearcherCreationAllowed: {
             type: Boolean,
@@ -197,3 +210,24 @@ export default defineComponent({
     }
 })
 </script>
+
+<style scoped>
+    .register-field {
+        margin-bottom: 1rem;
+    }
+
+    .register-ou {
+        margin-bottom: 1rem;
+    }
+
+    .register-submit {
+        margin-top: 0.75rem;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .register-submit:not(.v-btn--disabled) {
+        box-shadow: 0 10px 24px rgba(59, 111, 224, 0.28);
+    }
+</style>

@@ -34,7 +34,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-checkbox
+                        <ui-checkbox
                             v-model="favorite"
                             :label="$t('favoriteLabel')"
                         />
@@ -79,11 +79,12 @@ import type { ExpertiseOrSkill } from '@/models/PersonModel';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "ExpertiseOrSkillForm",
-    components: { MultilingualTextInput, ResearchAreasSelection },
+    components: { MultilingualTextInput, ResearchAreasSelection, UiCheckbox },
     props: {
         edit: {
             type: Boolean,

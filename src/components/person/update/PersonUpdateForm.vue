@@ -5,7 +5,7 @@
                 <h3>{{ $t('personalInfoLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedSex"
                             :items="sexes"
                             :label="$t('sexLabel')"
@@ -14,7 +14,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="placeOfBirth" :label="$t('placeOfBirthLabel')" :placeholder="$t('placeOfBirthLabel')" />
+                        <ui-input v-model="placeOfBirth" :label="$t('placeOfBirthLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -28,57 +28,57 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="orcid" label="ORCID" placeholder="ORCID" :rules="orcidValidationRules" />
+                        <ui-input v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="eCrisId" label="eCRIS-ID" placeholder="eCRIS-ID" :rules="eCrisIdValidationRules" />
+                        <ui-input v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="eNaukaId" label="enaukaID" placeholder="enaukaID" :rules="eNaukaIdValidationRules" />
+                        <ui-input v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" :placeholder="$t('nationalScienceIdLabel')" />
+                        <ui-input v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="apvnt" label="APVNT" placeholder="APVNT" :rules="apvntValidationRules" />
+                        <ui-input v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="scopus" label="Scopus Author ID" placeholder="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
+                        <ui-input v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="openAlex" label="Open Alex ID" placeholder="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
+                        <ui-input v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="webOfScienceId" label="ResearcherID (WoS)" placeholder="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules" />
+                        <ui-input v-model="webOfScienceId" label="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="scholarId" label="Google Scholar ID" placeholder="Google Scholar ID" :rules="scholarIdValidationRules" />
+                        <ui-input v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="authenticusId" label="Authenticus ID" placeholder="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
+                        <ui-input v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field v-model="lattesId" label="Lattes ID" placeholder="Lattes ID" :rules="lattesIdValidationRules" />
+                        <ui-input v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -103,81 +103,81 @@
                 <h3>{{ $t('professionalContactLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="email"
                             :label="$t('emailLabel')"
-                            :placeholder="$t('emailLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="phoneNumber"
                             :label="$t('phoneNumberLabel')"
-                            :placeholder="$t('phoneNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="faxNumber"
                             :label="$t('faxNumberLabel')"
-                            :placeholder="$t('faxNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="mobilePhoneNumber"
                             :label="$t('mobilePhoneNumberLabel')"
-                            :placeholder="$t('mobilePhoneNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <h3>{{ $t('privateContactLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="emailPrivate"
                             :label="$t('emailLabel')"
-                            :placeholder="$t('emailLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="phoneNumberPrivate"
                             :label="$t('phoneNumberLabel')"
-                            :placeholder="$t('phoneNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="faxNumberPrivate"
                             :label="$t('faxNumberLabel')"
-                            :placeholder="$t('faxNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="mobilePhoneNumberPrivate"
                             :label="$t('mobilePhoneNumberLabel')"
-                            :placeholder="$t('mobilePhoneNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <h3>{{ $t('professionalAddressLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedCountry"
                             hide-details="auto"
                             :items="countries"
@@ -218,17 +218,17 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="postalNumber"
                             :label="$t('postalNumberLabel')"
-                            :placeholder="$t('postalNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
                 <h3>{{ $t('privateAddressLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedCountryPrivate"
                             hide-details="auto"
                             :items="countries"
@@ -269,10 +269,10 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-text-field
+                        <ui-input
                             v-model="postalNumberPrivate"
                             :label="$t('postalNumberLabel')"
-                            :placeholder="$t('postalNumberLabel')"
+                           
                         />
                     </v-col>
                 </v-row>
@@ -302,11 +302,12 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import PersonService from '@/services/PersonService';
 import Toast from '@/components/core/Toast.vue';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast, UiInput },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,

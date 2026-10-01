@@ -7,6 +7,7 @@
 }
 
 @import "tailwindcss";
+@source "../../../teslaris-portugal";
 
 #app {
     margin: 0 auto;
@@ -78,8 +79,9 @@ label {
 }
 
 .section-box {
-    border: 2px solid lightskyblue;
-    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #fff;
 }
 
 /* Update modals */

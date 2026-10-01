@@ -22,3 +22,6 @@ dist/
 **/.DS_Store
 
 .idea/
+
+# Local plugin checkout paths (machine-specific; do not commit)
+plugins.local.json

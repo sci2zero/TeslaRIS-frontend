@@ -1,6 +1,6 @@
 <template>
     <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="800px">
+        <v-dialog v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
             <template #activator="scope">
                 <div v-if="!readOnly" :class="edit ? 'mt-3' : 'edit-pen'">
                     <v-btn
@@ -22,7 +22,13 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card>
+            <v-card
+                ref="cardRef"
+                @pointerdown.capture="onPointerDown"
+                @keydown.capture="onKeyDown"
+                @input.capture="onFieldEvent"
+                @change.capture="onFieldEvent"
+            >
                 <v-card-title>
                     <span class="text-h5">{{ edit ? $t("updateExpertiseOrSkillLabel") : $t("addExpertiseOrSkillLabel") }}</span>
                 </v-card-title>
@@ -44,6 +50,15 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <persistent-question-dialog
+            v-model="confirmClose"
+            :title="$t('areYouSureLabel')"
+            :message="$t('unsavedChangesMessage')"
+            :cancel-text="$t('keepEditingLabel')"
+            :continue-text="$t('closeLabel')"
+            emphasize-cancel
+            @continue="discardChanges"
+        />
     </v-row>
 </template>
 
@@ -52,12 +67,14 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import ExpertiseOrSkillForm from "./ExpertiseOrSkillForm.vue";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import type { ExpertiseOrSkillResponse, ExpertiseOrSkill } from "@/models/PersonModel";
 
 
 export default defineComponent({
     name: "ExpertiseOrSkillModal",
-    components: { ExpertiseOrSkillForm },
+    components: { ExpertiseOrSkillForm, PersistentQuestionDialog },
     props: {
         edit: {
             type: Boolean,
@@ -75,6 +92,11 @@ export default defineComponent({
     emits: ["update", "create"],
     setup(_, { emit }) {
         const dialog = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null
+        );
 
         const formRef = ref<typeof ExpertiseOrSkillForm>();
 
@@ -88,7 +110,7 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, formRef, emitCreateToParent, emitUpdateToParent};
+        return {dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges, formRef, emitCreateToParent, emitUpdateToParent};
     }
 });
 </script>

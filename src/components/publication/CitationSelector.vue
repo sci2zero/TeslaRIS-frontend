@@ -17,9 +17,9 @@
                 </UiButton>
             </template>
 
-            <div class="bg-slate-100 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="flex items-start gap-3 px-5 pt-5 pb-4 border-b border-slate-100">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <div class="flex max-h-[calc(100dvh-3rem)] min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm">
+                <div class="flex shrink-0 items-start gap-3 border-b border-slate-100 px-5 pt-5 pb-4">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600">
                         <span class="mdi mdi-format-quote-close text-xl" aria-hidden="true"></span>
                     </div>
                     <div class="min-w-0 flex-1">
@@ -41,11 +41,11 @@
                     </UiButton>
                 </div>
 
-                <div class="px-5 py-4 max-h-[min(70vh,36rem)] overflow-y-auto">
+                <div class="min-h-0 overflow-y-auto px-5 py-4">
                     <citation-formats :citation="citation" />
                 </div>
 
-                <div class="px-5 py-4 border-t border-slate-100 flex justify-end">
+                <div class="flex shrink-0 justify-end border-t border-slate-100 px-5 py-4">
                     <UiButton
                         variant="outline"
                         size="sm"

@@ -1,6 +1,6 @@
 <template>
     <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="800px">
+        <v-dialog v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
             <template #activator="scope">
                 <div v-if="!readOnly" class="edit-pen!">
                     <v-btn
@@ -22,7 +22,14 @@
                     </v-btn>
                 </div>
             </template>
-            <v-card>
+            <v-card
+                ref="cardRef"
+                class="bg-slate-100"
+                @pointerdown.capture="onPointerDown"
+                @keydown.capture="onKeyDown"
+                @input.capture="onFieldEvent"
+                @change.capture="onFieldEvent"
+            >
                 <v-card-title>
                     <span class="text-h5">{{ edit ? $t("updateInvolvementLabel") : $t("addInvolvementLabel") }}</span>
                 </v-card-title>
@@ -53,6 +60,15 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <persistent-question-dialog
+            v-model="confirmClose"
+            :title="$t('areYouSureLabel')"
+            :message="$t('unsavedChangesMessage')"
+            :cancel-text="$t('keepEditingLabel')"
+            :continue-text="$t('closeLabel')"
+            emphasize-cancel
+            @continue="discardChanges"
+        />
     </v-row>
 </template>
 
@@ -61,12 +77,14 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import PersonInvolvementForm from "./PersonInvolvementForm.vue";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import type { Education, Employment, Membership } from "@/models/InvolvementModel";
 
 
 export default defineComponent({
     name: "PersonInvolvementModal",
-    components: { PersonInvolvementForm },
+    components: { PersonInvolvementForm, PersistentQuestionDialog },
     props: {
         edit: {
             type: Boolean,
@@ -88,6 +106,11 @@ export default defineComponent({
     emits: ["update", "create"],
     setup(_, { emit }) {
         const dialog = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null
+        );
 
         const formRef = ref<typeof PersonInvolvementForm>();
 
@@ -102,7 +125,7 @@ export default defineComponent({
         };
 
         return {
-            dialog, formRef,
+            dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges, formRef,
             emitCreateToParent,
             emitUpdateToParent
         };

@@ -55,7 +55,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedInvolvementType"
                             hide-details="auto"
                             :items="involvementTypes"
@@ -161,7 +161,7 @@
                 </div>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedDegreeType"
                             hide-details="auto"
                             :items="degreeTypes"
@@ -172,7 +172,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedEducationStatus"
                             hide-details="auto"
                             :items="educationStatuses"
@@ -225,7 +225,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedMembershipType"
                             hide-details="auto"
                             :items="membershipTypes"
@@ -241,7 +241,7 @@
             <v-col>
                 <v-row v-if="!useHierarchy">
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedEmploymentPosition"
                             :items="employmentPositions"
                             :label="$t('employmentPositionLabel')"
@@ -282,7 +282,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="favorite"
                     :label="$t('favoriteLabel')"
                 />
@@ -343,11 +343,13 @@ import PublicationAutocompleteSearch from '@/components/publication/PublicationA
 import { type Document, PublicationType } from '@/models/PublicationModel';
 import PersonAutocompleteSearch from '../PersonAutocompleteSearch.vue';
 import EmploymentPositionSelection from '@/components/core/employmentPosition/EmploymentPositionSelection.vue';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "PersonInvolvementForm",
-    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput, PublicationAutocompleteSearch, PersonAutocompleteSearch, EmploymentPositionSelection },
+    components: { MultilingualTextInput, OrganisationUnitAutocompleteSearch, DatePicker, ResearchAreasSelection, UriInput, PublicationAutocompleteSearch, PersonAutocompleteSearch, EmploymentPositionSelection, UiInput, UiCheckbox },
     props: {
         edit: {
             type: Boolean,

@@ -1,35 +1,38 @@
 <template>
-    <v-row>
-        <v-col :cols="allowManualClearing && selectedBookSeries.value !== -1 ? 10 : 11">
-            <v-autocomplete
-                v-model="selectedBookSeries"
-                :label="$t('bookSeriesLabel') + (required ? '*' : '')"
-                :items="readonly ? [] : bookSeries"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
-                :no-data-text="$t('noDataMessage')"
-                return-object
-                @update:search="searchBookSeries($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="PublicationSeriesSubmissionForm"
-                :form-props="{inputType: inputType}"
-                entity-name="BookSeries"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedBookSeries"
-            />
-        </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedBookSeries.value !== -1" icon @click="clearInput()">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedBookSeries"
+            :label="$t('bookSeriesLabel') + (required ? '*' : '')"
+            :items="readonly ? [] : bookSeries"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? [...requiredSelectionRules, ...externalValidationRules] : externalValidationRules"
+            :no-data-text="$t('noDataMessage')"
+            return-object
+            @update:search="searchBookSeries($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="PublicationSeriesSubmissionForm"
+            :form-props="{inputType: inputType}"
+            entity-name="BookSeries"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedBookSeries"
+        />
+        <v-btn
+            v-if="allowManualClearing && selectedBookSeries.value !== -1"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput()"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
 </template>
 
 <script lang="ts">
@@ -46,11 +49,12 @@ import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import PublicationSeriesSubmissionForm from '../publicationSeries/PublicationSeriesSubmissionForm.vue';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "BookSeriesAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,

@@ -1,39 +1,42 @@
 <template>
-    <v-row>
-        <v-col :cols="calculateAutocompleteWidth()">
-            <v-autocomplete
-                v-model="selectedOrganisationUnit"
-                v-model:search="searchInput"
-                :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
-                :items="readonly ? [] : organisationUnits"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
-                :no-data-text="$t('noDataMessage')"
-                :multiple="multiple"
-                return-object
-                :class="comfortable ? 'comfortable' : ''"
-                :readonly="readonly"
-                @update:search="searchOUs($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission && isAdmin" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="OrganisationUnitSubmissionForm"
-                :form-props="{ presetName: lastSearchInput }"
-                entity-name="OU"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedOU"
-            />
-        </v-col>
-        <v-col v-if="allowManualClearing && hasSelection" cols="1">
-            <v-btn icon @click="clearInput">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedOrganisationUnit"
+            v-model:search="searchInput"
+            :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
+            :items="readonly ? [] : organisationUnits"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
+            :no-data-text="$t('noDataMessage')"
+            :multiple="multiple"
+            return-object
+            :class="comfortable ? 'comfortable' : ''"
+            :readonly="readonly"
+            @update:search="searchOUs($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission && isAdmin"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="OrganisationUnitSubmissionForm"
+            :form-props="{ presetName: lastSearchInput }"
+            entity-name="OU"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedOU"
+        />
+        <v-btn
+            v-if="allowManualClearing && hasSelection"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
     <p v-if="showThesisTypeError" class="text-red">
         {{ $t("thesisTypeNotAllowedMessage") }}
     </p>
@@ -52,11 +55,12 @@ import OrganisationUnitSubmissionForm from './OrganisationUnitSubmissionForm.vue
 import { useUserRole } from '@/composables/useUserRole';
 import { ThesisType } from '@/models/PublicationModel';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,
@@ -265,14 +269,6 @@ export default defineComponent({
             sendContentToParent();
         };
 
-        const calculateAutocompleteWidth = () => {
-            let numberOfColumns = props.allowManualClearing && hasSelection.value ? 10 : 11;
-            if (props.disableSubmission || !isAdmin.value) {
-                numberOfColumns += 1;
-            }
-            return numberOfColumns;
-        };
-
         const selectNewlyAddedOU = (organisationUnit: OrganisationUnitResponse) => {
             let title = organisationUnit.name.find(multilingualContent => multilingualContent.languageTag === i18n.locale.value.toUpperCase())?.content;
             if (!title && organisationUnit.name.length > 0) {
@@ -294,7 +290,7 @@ export default defineComponent({
 
         return {
             organisationUnits, selectedOrganisationUnit, searchOUs, modalRef,
-            requiredSelectionRules, calculateAutocompleteWidth, lastSearchInput,
+            requiredSelectionRules, lastSearchInput,
             sendContentToParent, clearInput, isAdmin, OrganisationUnitSubmissionForm,
             selectNewlyAddedOU, hasSelection, requiredMultiSelectionRules,
             showThesisTypeError, searchInput
