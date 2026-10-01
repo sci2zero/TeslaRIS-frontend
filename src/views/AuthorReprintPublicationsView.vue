@@ -10,7 +10,7 @@
 
         <span class="d-flex align-center">
             <v-checkbox
-                v-if="isUserBoundToOU"
+                v-if="hasInstitution"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-3"
@@ -103,7 +103,7 @@ export default defineComponent({
 
         const {
             isAdmin, isInstitutionalEditor, isCommission,
-            isUserBoundToOU, loggedInUser,
+            isUserBoundToOU, hasInstitution, loggedInUser,
             returnOnlyInstitutionRelatedEntities,
             isInstitutionalLibrarian, isHeadOfLibrary
         } = useUserRole();
@@ -180,7 +180,7 @@ export default defineComponent({
             search, publications, searchParams,
             switchPage, isAdmin, totalPublications,
             tableRef, clearSortAndPerformSearch,
-            isUserBoundToOU, isCommission,
+            isUserBoundToOU, isCommission, hasInstitution,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, loggedInUser,
             loading, navigateToValidationPage,

@@ -24,10 +24,12 @@ export interface EmployeeRegistrationRequest {
     email: string;
     note: string;
     preferredLanguageId: number;
-    organisationUnitId: number;
+    // Optional only for roles that may operate across the whole repository.
+    organisationUnitId?: number;
 }
 
 export interface CommissionRegistrationRequest extends EmployeeRegistrationRequest {
+    organisationUnitId: number;
     commissionId: number;
 }
 

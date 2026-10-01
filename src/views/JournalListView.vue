@@ -16,7 +16,7 @@
         </span>
         <span class="d-flex align-center">
             <v-checkbox
-                v-if="isUserBoundToOU"
+                v-if="hasInstitution"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4"
@@ -89,7 +89,7 @@ export default defineComponent({
         const router = useRouter();
         const tableRef = ref<typeof JournalTableComponent>();
 
-        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, isCommission, loggedInUser } = useUserRole();
+        const { isAdmin, isUserBoundToOU, hasInstitution, returnOnlyInstitutionRelatedEntities, isCommission, loggedInUser } = useUserRole();
 
         const commissions = ref<{title: string, value: number}[]>([]);
         const selectedCommission = ref({ title: '', value: -1 });
@@ -172,7 +172,7 @@ export default defineComponent({
 
         return {
             search, journals, totalJournals, isAdmin,
-            switchPage, addJournal, isUserBoundToOU,
+            switchPage, addJournal, isUserBoundToOU, hasInstitution,
             tableRef, clearSortAndPerformSearch,
             returnOnlyInstitutionRelatedEntities,
             loading, isCommission, commissions,

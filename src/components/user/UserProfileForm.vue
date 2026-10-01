@@ -35,7 +35,7 @@
                     :rules="emailFieldRules"
                 />
             </v-col>
-            <v-col v-if="!isAdmin && !isResearcher" cols="12" md="6">
+            <v-col v-if="!isAdmin && !isResearcher && hasInstitution" cols="12" md="6">
                 <v-autocomplete
                     v-model="selectedOrganisationUnit"
                     :label="$t('organisationUnitLabel')"
@@ -237,7 +237,7 @@ export default defineComponent({
             isResearcher, isAdmin, isCommission, 
             isViceDeanForScience, isInstitutionalLibrarian, 
             isHeadOfLibrary, isInstitutionalEditor, 
-            isPromotionRegistryAdministrator
+            isPromotionRegistryAdministrator, hasInstitution
         } = useUserRole();
 
         const i18n = useI18n();
@@ -325,12 +325,13 @@ export default defineComponent({
         };
 
         const updateUser = () => {
-            let organisationUnitId = -1;
-            if (typeof selectedOrganisationUnit.value === "number") {
-                organisationUnitId = selectedOrganisationUnit.value;
-            } else {
-                organisationUnitId = selectedOrganisationUnit.value.value;
-            }
+            const selectedInstitutionId =
+                typeof selectedOrganisationUnit.value === "number"
+                    ? selectedOrganisationUnit.value
+                    : selectedOrganisationUnit.value.value;
+
+            const organisationUnitId =
+                selectedInstitutionId > 0 ? selectedInstitutionId : undefined;
 
             const userUpdateRequest: UserUpdateRequest = {
                 firstname: name.value,
@@ -406,7 +407,7 @@ export default defineComponent({
             filterOUs, allowAccountTakeover, isInstitutionalEditor,
             updateUser, setNewPassword, selectedNotificationPeriod,
             emailFieldRules, requiredFieldRules, requiredSelectionRules,
-            isFormValid, notificationPeriods, oldPassword, newPassword,
+            isFormValid, notificationPeriods, oldPassword, newPassword, hasInstitution,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
             isViceDeanForScience, isInstitutionalLibrarian, isHeadOfLibrary,

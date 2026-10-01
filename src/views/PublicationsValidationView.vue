@@ -2,7 +2,7 @@
     <v-container>
         <div class="d-flex flex-row justify-center">
             <organisation-unit-autocomplete-search
-                v-if="isAdmin"
+                v-if="!hasInstitution"
                 ref="ouAutocompleteRef"
                 v-model:model-value="selectedOrganisationUnit"
                 class="entity-select"
@@ -12,7 +12,7 @@
         </div>
 
         <div
-            v-if="(isAdmin && selectedOrganisationUnit && selectedOrganisationUnit.value > 0) || isInstitutionalEditor"
+            v-if="hasInstitution || (selectedOrganisationUnit && selectedOrganisationUnit.value > 0)"
             class="mt-15">
             <v-select
                 v-model="selectedPublicationTypes"
@@ -93,7 +93,8 @@ export default defineComponent({
 
         const {
             isInstitutionalEditor,
-            loggedInUser, isAdmin
+            loggedInUser, isAdmin,
+            hasInstitution, userInstitutionid
         } = useUserRole();
 
         const {
@@ -121,8 +122,8 @@ export default defineComponent({
         });
 
         const search = (tokenParams: string) => {
-            if ((isAdmin.value && selectedOrganisationUnit.value.value <= 0) ||
-                (isInstitutionalEditor.value && !loggedInUser.value)) {
+            if (!loggedInUser.value ||
+                (!hasInstitution.value && selectedOrganisationUnit.value.value <= 0)) {
                 return;
             }
 
@@ -133,8 +134,9 @@ export default defineComponent({
             previousFilterValues.value.metadata = nonValidMetadata.value;
             previousFilterValues.value.files = nonValidFiles.value;
 
-            const organisationUnitId = isInstitutionalEditor.value
-                ? (loggedInUser.value?.organisationUnitId as number)
+            // Whoever has no institution of their own picks one, as an admin always has.
+            const organisationUnitId = hasInstitution.value
+                ? (userInstitutionid.value as number)
                 : selectedOrganisationUnit.value.value;
 
             OrganisationUnitTrustConfigurationService.fetchNonValidatedDocuments(
@@ -175,7 +177,7 @@ export default defineComponent({
 
         return {
             search, publications, totalPublications,
-            switchPage, isInstitutionalEditor,
+            switchPage, isInstitutionalEditor, hasInstitution,
             tableRef, clearSortAndPerformSearch,
             publicationTypes, selectedPublicationTypes,
             ExportableEndpointType, searchParams,

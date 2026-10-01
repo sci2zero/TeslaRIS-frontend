@@ -8,7 +8,7 @@
             <div>
                 <v-section v-if="currentTab === 'externalSources'">
                     <v-row
-                        v-if="isAdmin"
+                        v-if="!hasInstitution"
                         class="d-flex flex-row justify-center"
                     >
                         <v-col cols="12" md="8">
@@ -28,11 +28,11 @@
                         </v-col>
                     </v-row>
                     <loading-configuration-form
-                        v-if="isInstitutionalEditor || (isAdmin && selectedOrganisationUnit.value > 0)"
+                        v-if="hasInstitution || selectedOrganisationUnit.value > 0"
                         :top-level-institution-id="selectedOrganisationUnit.value"
                     />
                     <v-row
-                        v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && researcherSelection"
+                        v-if="canPerformHarvest && (hasInstitution || selectedOrganisationUnit.value > 0) && researcherSelection"
                         class="d-flex flex-row justify-center"
                     >
                         <v-col cols="8">
@@ -54,7 +54,7 @@
                         </v-col>
                     </v-row>
                     <v-row
-                        v-if="canPerformHarvest && ((isAdmin && selectedOrganisationUnit.value > 0) || isInstitutionalEditor) && !researcherSelection"
+                        v-if="canPerformHarvest && (hasInstitution || selectedOrganisationUnit.value > 0) && !researcherSelection"
                         class="d-flex flex-row justify-center">
                         <v-col cols="2">
                             <v-btn
@@ -315,7 +315,7 @@ export default defineComponent({
 
         const selectedOrganisationUnit = ref<{ title: string, value: number }>({title: "", value: -1});
         const selectedPersons = ref<{title: string, value: number}[]>([]);
-        const { isAdmin, isInstitutionalEditor, isResearcher, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isResearcher, hasInstitution, userInstitutionid } = useUserRole();
 
         const { requiredSelectionRules } = useValidationUtils();
 
@@ -329,7 +329,11 @@ export default defineComponent({
 
             if (isInstitutionalEditor.value) {
                 UserService.getLoggedInUser().then(response => {
-                    selectedOrganisationUnit.value.value = response.data.organisationUnitId as number;
+                    const institutionId = response.data.organisationUnitId;
+
+                    if (institutionId && institutionId > 0) {
+                        selectedOrganisationUnit.value.value = institutionId;
+                    }
                 });
             }
 
@@ -338,7 +342,7 @@ export default defineComponent({
             ImportService.canPerformHarvest().then(response => {
                 canPerformHarvest.value = response.data;
                 if (isInstitutionalEditor.value && !response.data) {
-                    OrganisationUnitImportSourceService.fetchConfigurationForOrganisationUnit(loggedInUser.value?.organisationUnitId as number)
+                    OrganisationUnitImportSourceService.fetchConfigurationForOrganisationUnit(userInstitutionid.value as number)
                     .then(response => {
                         if (response.data.importScopus || response.data.importOpenAlex || response.data.importWebOfScience) {
                             mustHarvestUsingResearcherIds.value = true;
@@ -603,7 +607,7 @@ export default defineComponent({
             numberOfHarvestedDocuments, newDocumentsHarvested,
             harvestComplete, isAdmin, isFormValid, snackbar, files,
             errorMessage, canPerformHarvest, selectedOrganisationUnit,
-            isInstitutionalEditor, isResearcher, currentTab,
+            isInstitutionalEditor, isResearcher, currentTab, hasInstitution,
             uploadBibliographicFiles, isCSVFileSelected,
             requiredSelectionRules, requiredFieldsDescription,
             supportedFieldsDescription, searchHarvestableInstitutions,

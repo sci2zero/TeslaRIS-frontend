@@ -51,7 +51,7 @@
                             v-model="selectedOU"
                             disable-submission
                             required
-                            :top-level-institution-id="isAdmin ? undefined : loggedInUser?.organisationUnitId"
+                            :top-level-institution-id="userInstitutionid"
                             label="topLevelInstitutionLabel"
                         />
                     </v-col>    
@@ -177,7 +177,7 @@ export default defineComponent({
         const i18n = useI18n();
         const snackbar = ref(false);
         const message = ref("");
-        const { loggedInUser, isAdmin } = useUserRole();
+        const { loggedInUser, isAdmin, userInstitutionid } = useUserRole();
 
         const {
             isDigitalRepositoryEnabled
@@ -296,7 +296,7 @@ export default defineComponent({
             endYear, generateBackupRequest,
             fileSections, langItems, selectedLang,
             snackbar, message, loggedInUser,
-            selectedFileSections, isAdmin, currentTab,
+            selectedFileSections, isAdmin, currentTab, userInstitutionid,
             exportFileFormats, selectedExportFileFormat,
             recurrenceTypes, selectedRecurrenceType,
             scheduledTasks, deleteScheduledBackupTask,
