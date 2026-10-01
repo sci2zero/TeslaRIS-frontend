@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "portugal": "../teslaris-portugal"
+    "portugal": "../TeslaRIS-plugin-ptcris/frontend"
   },
   "profiles": {
     "portugal": ["portugal"]
