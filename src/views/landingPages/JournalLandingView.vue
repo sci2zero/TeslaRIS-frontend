@@ -1,122 +1,61 @@
 <template>
-    <v-container id="journal">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!journal"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="d-flex justify-center align-center"
-                        >
-                            <p class="text-h5">
-                                {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
-                            </p>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(journal?.subtitle) }}
-                        <br v-if="journal?.subtitle && journal.subtitle.length > 0">
-                        {{ $t("journalLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <landing-page-layout
+        id="journal"
+        v-model="currentTab"
+        :loading="!journal"
+        loader-layout="list"
+        :tab-number="3"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!journal"
+                :subtitle="returnCurrentLocaleContent(journal?.subtitle)"
+                :entity-label="$t('journalLabel')"
+                :badge="journal?.type ? getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal.type) : ''"
+                icon="mdi-book-open-blank-variant"
+                :can-edit="canEdit"
+                :edit-label="$t('updateJournalLabel')"
+                :entity-type="EntityType.JOURNAL"
+                :entity-id="journal?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="PublicationSeriesUpdateForm"
+                        :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
+                        entity-name="Journal"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(journal?.title) + (journal?.nameAbbreviation && journal?.nameAbbreviation.length > 0 ? " (" + returnCurrentLocaleContent(journal?.nameAbbreviation) + ")" : "") }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="journal?.eissn" label="eISSN" abbrev="eISSN" tone="blue">
+                        {{ journal.eissn }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="journal?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
+                        {{ journal.printISSN }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <!-- Journal Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-journal-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="PublicationSeriesUpdateForm"
-                            :form-props="{ presetPublicationSeries: journal, inputType: 'JOURNAL' }"
-                            entity-name="Journal"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <!-- Basic Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!journal" :citation-button="false" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div>{{ $t("articleCollectionSeriesTypeLabel") }}:</div>
-                                <div class="response">
-                                    {{ getArticleCollectionSeriesTypeTitleFromValueAutoLocale(journal?.type) }}
-                                </div>
-                                <div>eISSN:</div>
-                                <div class="response">
-                                    {{ journal?.eissn ? journal.eissn : $t("notYetSetMessage") }}
-                                </div>
-                                <div>Print ISSN:</div>
-                                <div class="response">
-                                    {{ journal?.printISSN ? journal.printISSN : $t("notYetSetMessage") }}
-                                </div>
-                                <div v-if="journal?.openAlexId">
-                                    Open Alex ID:
-                                </div>
-                                <div v-if="journal?.openAlexId" class="response">
-                                    <identifier-link :identifier="journal.openAlexId" type="open_alex" />
-                                </div>
-                                <div v-if="journal?.languageIds && journal?.languageIds.length > 0">
-                                    {{ $t("languageLabel") }}:
-                                </div>
-                                <div>
-                                    <v-chip v-for="(languageId, index) in journal?.languageIds" :key="index" outlined>
-                                        {{ returnCurrentLocaleContent(languageMap.get(languageId)?.name) }}
-                                    </v-chip>
-                                </div>
-                                <div v-if="journal?.uris && journal?.uris.length > 0">
-                                    {{ $t("uriInputLabel") }}:
-                                </div>
-                                <div class="response">
-                                    <uri-list :uris="journal?.uris" />
-                                </div>
-                                <div>
-                                    <entity-identifiers-list
-                                        :entity-identifiers="publicationSeriesIdentifiers"
-                                        :can-edit="canEdit" 
-                                        :entity-id="journal?.id" 
-                                        :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
-                                        :concrete-entity-type="ApplicableEntityType.JOURNAL"
-                                        @updated="fetchIdentifiers"
-                                    />
-                                </div>
-                            </v-col>
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="EntityType.JOURNAL"
-                                    :entity-id="journal?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <br>
-        <tab-content-loader v-if="!journal" :tab-number="3" layout="list" />
-        <v-tabs
-            v-show="journal"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="publications">
                 {{ $t("scientificResultsListLabel") }}
+            </v-tab>
+            <v-tab value="additionalInfo">
+                {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab value="contributions">
                 {{ $t("boardAndReviewersLabel") }}
@@ -133,14 +72,18 @@
             <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="journal"
-            v-model="currentTab"
-        >
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    :contributions="journal?.contributions"
+                    :contribution-types="['EDITOR']"
+                    :contributors-label="$t('editorsLabel')"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <!-- Publications Table -->
                 <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
                 <publication-table-component
                     :publications="publications"
@@ -148,6 +91,40 @@
                     in-comparator
                     show-publication-concrete-type
                     @switch-page="switchPage" />
+            </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <landing-additional-info-tab :show-remark="false">
+                    <template #details>
+                        <landing-detail-field v-if="journal?.languageIds && journal.languageIds.length > 0" :label="$t('languageLabel')">
+                            {{ journal.languageIds.map(id => returnCurrentLocaleContent(languageMap.get(id)?.name)).filter(Boolean).join(', ') }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="journal?.openAlexId" label="Open Alex ID">
+                            <identifier-link :identifier="journal.openAlexId" type="open_alex" compact />
+                        </landing-detail-field>
+                        <landing-detail-field v-if="journal?.uris && journal.uris.length > 0" :label="$t('uriInputLabel')">
+                            <a
+                                v-for="uri in journal.uris"
+                                :key="uri"
+                                :href="uri"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="underline block"
+                            >
+                                {{ uri }}
+                            </a>
+                        </landing-detail-field>
+                        <div class="md:col-span-2">
+                            <entity-identifiers-list
+                                :entity-identifiers="publicationSeriesIdentifiers"
+                                :can-edit="canEdit"
+                                :entity-id="journal?.id"
+                                :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                                :concrete-entity-type="ApplicableEntityType.JOURNAL"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-publication-series-contribution-tabs
@@ -197,10 +174,12 @@
                     :entity-id="journal?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
@@ -224,7 +203,6 @@ import PersonPublicationSeriesContributionTabs from '@/components/core/PersonPub
 import type { PersonPublicationSeriesContribution } from '@/models/PublicationSeriesModel';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import PublicationSeriesUpdateForm from '@/components/publicationSeries/update/PublicationSeriesUpdateForm.vue';
-import UriList from '@/components/core/UriList.vue';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
 import type { EntityClassificationResponse, EntityIndicatorResponse, PublicationSeriesAssessmentClassification } from '@/models/AssessmentModel';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
@@ -232,8 +210,6 @@ import Toast from '@/components/core/Toast.vue';
 import EntityClassificationService from '@/services/assessment/EntityClassificationService';
 import EntityClassificationView from '@/components/assessment/classifications/EntityClassificationView.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
@@ -241,19 +217,23 @@ import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
 import { getArticleCollectionSeriesTypeTitleFromValueAutoLocale } from '@/i18n/articleCollectionSeriesType';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import { EntityType } from '@/models/MergeModel';
 import { useUserRole } from '@/composables/useUserRole';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
-
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, UriList, IndicatorsSection, Toast, EntityClassificationView, BasicInfoLoader, TabContentLoader, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -283,8 +263,6 @@ export default defineComponent({
         const i18n = useI18n();
         const router = useRouter();
 
-        const icon = ref("mdi-book-open-blank-variant");
-
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
         const canClassify = ref(false);
@@ -294,6 +272,14 @@ export default defineComponent({
         const publicationSeriesIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const loginStore = useLoginStore();
+
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         onMounted(() => {
             if (loginStore.userLoggedIn) {
@@ -423,12 +409,8 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if(totalPublications.value > 0) {
-                currentTab.value = "publications";
-            } else if ((journal.value?.contributions?.length && journal.value?.contributions?.length > 0) || canEdit.value) {
-                currentTab.value = "contributions";
-            } else {
-                currentTab.value = "indicators";
+            if (currentTab.value !== "dataQuality") {
+                currentTab.value = "overview";
             }
         };
 
@@ -439,9 +421,7 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality,
-            canReviewDataQuality,
-            journal, icon, publications, totalPublications,
+            journal, publications, totalPublications, canAssessDataQuality, canReviewDataQuality,
             switchPage, canEdit, returnCurrentLocaleContent,
             languageMap, updateBasicInfo, canClassify,
             snackbar, snackbarMessage, journalIndicators,
@@ -452,24 +432,9 @@ export default defineComponent({
             getArticleCollectionSeriesTypeTitleFromValueAutoLocale,
             fetchIdentifiers, isViceDeanForScience,
             isAdmin, EntityType, fetchJournal,
-            dataQualityTabsRef, showAssessmentDetails
+            dataQualityTabsRef, showAssessmentDetails,
+            updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #journal .large-journal-icon {
-        font-size: 10em;
-    }
-
-    #journal .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

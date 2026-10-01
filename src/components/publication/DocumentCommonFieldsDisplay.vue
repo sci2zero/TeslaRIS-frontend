@@ -1,118 +1,120 @@
 <template>
-    <v-col :cols="cols">
-        <div v-if="document?.scopusId">
-            Scopus ID:
-        </div>
-        <div v-if="document?.scopusId" class="response">
-            <identifier-link :identifier="document.scopusId" type="scopus" />
+    <v-col :cols="cols" class="pa-0">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-if="document?.scopusId">
+                <label class="block text-sm font-medium text-gray-700">Scopus ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.scopusId" type="scopus" />
+                </p>
+            </div>
+
+            <div v-if="document?.doi">
+                <label class="block text-sm font-medium text-gray-700">DOI</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.doi" />
+                </p>
+            </div>
+
+            <div v-if="document?.openAlexId">
+                <label class="block text-sm font-medium text-gray-700">Open Alex ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.openAlexId" type="open_alex" />
+                </p>
+            </div>
+
+            <div v-if="document?.webOfScienceId">
+                <label class="block text-sm font-medium text-gray-700">Web of Science ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.webOfScienceId" type="web_of_science" />
+                </p>
+            </div>
+
+            <div v-if="document?.handleId">
+                <label class="block text-sm font-medium text-gray-700">Handle ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.handleId" type="handle" />
+                </p>
+            </div>
+
+            <div v-if="document?.arxivId">
+                <label class="block text-sm font-medium text-gray-700">ArXiv ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.arxivId" type="arxiv" />
+                </p>
+            </div>
+
+            <div v-if="document?.pubmedId">
+                <label class="block text-sm font-medium text-gray-700">PubMed ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.pubmedId" type="pubmed" />
+                </p>
+            </div>
+
+            <div v-if="document?.ssrnId">
+                <label class="block text-sm font-medium text-gray-700">SSRN ID</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    <identifier-link :identifier="document.ssrnId" type="ssrn" />
+                </p>
+            </div>
+
+            <div v-if="document?.uris && document.uris.length > 0">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("uriInputLabel") }}</label>
+                <div class="mt-1 text-sm text-gray-900">
+                    <uri-list :uris="document.uris" />
+                </div>
+            </div>
+
+            <div v-if="document?.city && document.city.length > 0">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("cityLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ returnCurrentLocaleContent(document.city) }}
+                </p>
+            </div>
+
+            <div v-if="document?.geoSpaceDescription && document.geoSpaceDescription.length > 0">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("geoSpaceDescriptionLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ returnCurrentLocaleContent(document.geoSpaceDescription) }}
+                </p>
+            </div>
+
+            <div v-if="document?.chronologicalSpaceDescription && document.chronologicalSpaceDescription.length > 0">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("chronologicalSpaceDescriptionLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ returnCurrentLocaleContent(document.chronologicalSpaceDescription) }}
+                </p>
+            </div>
+
+            <div v-if="document?.edition && document.edition.length > 0">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("editionLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ returnCurrentLocaleContent(document.edition) }}
+                </p>
+            </div>
+
+            <div v-if="isAdmin && document?.peerReviewed !== undefined">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("peerReviewedLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ document.peerReviewed ? $t('yesLabel') : $t('noLabel') }}
+                </p>
+            </div>
+
+            <div v-if="isAdmin && document?.openAccess !== undefined">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("isOpenAccessLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ document.openAccess ? $t('yesLabel') : $t('noLabel') }}
+                </p>
+            </div>
+
+            <div v-if="document?.publicationStatus">
+                <label class="block text-sm font-medium text-gray-700">{{ $t("publicationStatusLabel") }}</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {{ getPublicationStatusTitleFromValueAutoLocale(document.publicationStatus) }}
+                </p>
+            </div>
         </div>
 
-        <div v-if="document?.doi">
-            DOI:
-        </div>
-        <div v-if="document?.doi" class="response">
-            <identifier-link :identifier="document.doi" />
-        </div>
-
-        <div v-if="document?.openAlexId">
-            Open Alex ID:
-        </div>
-        <div v-if="document?.openAlexId" class="response">
-            <identifier-link :identifier="document.openAlexId" type="open_alex" />
-        </div>
-
-        <div v-if="document?.webOfScienceId">
-            Web of Science ID:
-        </div>
-        <div v-if="document?.webOfScienceId" class="response">
-            <identifier-link :identifier="document.webOfScienceId" type="web_of_science" />
-        </div>
-
-        <div v-if="document?.handleId">
-            Handle ID:
-        </div>
-        <div v-if="document?.handleId" class="response">
-            <identifier-link :identifier="document.handleId" type="handle" />
-        </div>
-
-        <div v-if="document?.arxivId">
-            ArXiv ID:
-        </div>
-        <div v-if="document?.arxivId" class="response">
-            <identifier-link :identifier="document.arxivId" type="arxiv" />
-        </div>
-
-        <div v-if="document?.pubmedId">
-            PubMed ID:
-        </div>
-        <div v-if="document?.pubmedId" class="response">
-            <identifier-link :identifier="document.pubmedId" type="pubmed" />
-        </div>
-
-        <div v-if="document?.ssrnId">
-            SSRN ID:
-        </div>
-        <div v-if="document?.ssrnId" class="response">
-            <identifier-link :identifier="document.ssrnId" type="ssrn" />
-        </div>
-
-        <div v-if="document?.uris && document.uris.length > 0">
-            {{ $t("uriInputLabel") }}:
-        </div>
-        <div v-if="document?.uris && document.uris.length > 0" class="response">
-            <uri-list :uris="document.uris" />
-        </div>
-
-        <div v-if="document?.city && document.city.length > 0">
-            {{ $t("cityLabel") }}:
-        </div>
-        <div v-if="document?.city && document.city.length > 0" class="response">
-            {{ returnCurrentLocaleContent(document.city) }}
-        </div>
-
-        <div v-if="document?.geoSpaceDescription && document.geoSpaceDescription.length > 0">
-            {{ $t("geoSpaceDescriptionLabel") }}:
-        </div>
-        <div v-if="document?.geoSpaceDescription && document.geoSpaceDescription.length > 0" class="response">
-            {{ returnCurrentLocaleContent(document.geoSpaceDescription) }}
-        </div>
-
-        <div v-if="document?.chronologicalSpaceDescription && document.chronologicalSpaceDescription.length > 0">
-            {{ $t("chronologicalSpaceDescriptionLabel") }}:
-        </div>
-        <div v-if="document?.chronologicalSpaceDescription && document.chronologicalSpaceDescription.length > 0" class="response">
-            {{ returnCurrentLocaleContent(document.chronologicalSpaceDescription) }}
-        </div>
-
-        <div v-if="document?.edition && document.edition.length > 0">
-            {{ $t("editionLabel") }}:
-        </div>
-        <div v-if="document?.edition && document.edition.length > 0" class="response">
-            {{ returnCurrentLocaleContent(document.edition) }}
-        </div>
-
-        <div v-if="isAdmin && document?.peerReviewed !== undefined">
-            {{ $t("peerReviewedLabel") }}:
-        </div>
-        <div v-if="isAdmin && document?.peerReviewed !== undefined" class="response">
-            {{ document.peerReviewed ? $t('yesLabel') : $t('noLabel') }}
-        </div>
-
-        <div v-if="isAdmin && document?.openAccess !== undefined">
-            {{ $t("isOpenAccessLabel") }}:
-        </div>
-        <div v-if="isAdmin && document?.openAccess !== undefined" class="response">
-            {{ document.openAccess ? $t('yesLabel') : $t('noLabel') }}
-        </div>
-
-        <div v-if="document?.publicationStatus">
-            {{ $t("publicationStatusLabel") }}:
-        </div>
-        <div v-if="document?.publicationStatus" class="response">
-            {{ getPublicationStatusTitleFromValueAutoLocale(document.publicationStatus) }}
-        </div>
-
-        <div>
+        <div class="mt-4">
             <entity-identifiers-list
                 :entity-identifiers="documentIdentifiers"
                 :can-edit="canEdit"
@@ -183,13 +185,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-
-.response {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-</style>

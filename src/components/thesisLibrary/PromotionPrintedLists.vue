@@ -4,8 +4,7 @@
             <template #activator="scope">
                 <v-btn
                     v-bind="scope.props"
-                    class="inline-action"
-                    v-on="scope.isActive">
+                    class="inline-action">
                     {{ $t("printListLabel") }}
                 </v-btn>
             </template>

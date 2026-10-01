@@ -5,8 +5,7 @@
                 <v-list-item
                     v-if="isListItem"
                     v-bind="scope.props"
-                    class="inline-action"
-                    v-on="scope.isActive">
+                    class="inline-action">
                     <v-list-item-title>{{ $t("filesForDownloadLabel") }}</v-list-item-title>
                 </v-list-item>
                 <v-btn
@@ -14,8 +13,7 @@
                     min-width="70"
                     density="compact"
                     :disabled="!containsFiles"
-                    v-bind="scope.props"
-                    v-on="scope.isActive">
+                    v-bind="scope.props">
                     ...
                 </v-btn>
             </template>

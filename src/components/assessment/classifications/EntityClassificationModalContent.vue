@@ -5,8 +5,7 @@
                 <v-btn
                     density="compact"
                     :disabled="disabled"
-                    v-bind="scope.props"
-                    v-on="scope.isActive">
+                    v-bind="scope.props">
                     {{ title() }}
                 </v-btn>
             </template>

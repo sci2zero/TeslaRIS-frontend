@@ -1,48 +1,52 @@
 <template>
-    <v-row>
-        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + (disableSubmission ? 1 : 0)">
-            <v-autocomplete
-                v-model="selectedPerson"
-                v-model:search="searchInput"
-                :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
-                :items="readOnly ? [] : persons"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
-                :no-data-text="$t('noDataMessage')"
-                :multiple="multiple"
-                return-object
-                :readonly="readOnly"
-                @update:search="searchPersons($event)"
-                @update:model-value="sendContentToParent">
-                <template #item="{ item, props }">
-                    <v-list-item
-                        v-bind="{ ...props, title: undefined }"
-                    >
-                        <person-publications-tooltip
-                            :person-id="item.raw.value"
-                            :show="showLatestPublications">
-                            {{ item.raw.title }}
-                        </person-publications-tooltip>
-                    </v-list-item>
-                </template>
-            </v-autocomplete>
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="PersonSubmissionForm"
-                entity-name="Person"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedPerson"
-            />
-        </v-col>
-        <v-col v-if="allowManualClearing && hasSelection" cols="1">
-            <v-btn icon @click="clearInput">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedPerson"
+            v-model:search="searchInput"
+            :label="(label ? $t(label) : (multiple ? $t('personListLabel') : $t('personLabel'))) + (required ? '*' : '')"
+            :items="readOnly ? [] : persons"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
+            :no-data-text="$t('noDataMessage')"
+            :multiple="multiple"
+            return-object
+            :readonly="readOnly"
+            @update:search="searchPersons($event)"
+            @update:model-value="sendContentToParent"
+        >
+            <template #item="{ item, props }">
+                <v-list-item
+                    v-bind="{ ...props, title: undefined }"
+                >
+                    <person-publications-tooltip
+                        :person-id="item.raw.value"
+                        :show="showLatestPublications">
+                        {{ item.raw.title }}
+                    </person-publications-tooltip>
+                </v-list-item>
+            </template>
+        </ui-input>
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="PersonSubmissionForm"
+            entity-name="Person"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedPerson"
+        />
+        <v-btn
+            v-if="allowManualClearing && hasSelection"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
 </template>
 
 <script lang="ts">
@@ -59,11 +63,12 @@ import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import PersonSubmissionForm from './PersonSubmissionForm.vue';
 import PersonPublicationsTooltip from './PersonPublicationsTooltip.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PersonAutocompleteSearch",
-    components: { GenericCrudModal, PersonPublicationsTooltip },
+    components: { GenericCrudModal, PersonPublicationsTooltip, UiInput },
     props: {
         required: {
             type: Boolean,

@@ -1,36 +1,35 @@
 <template>
-    <v-row>
-        <v-col :cols="disableSubmission ? 12 : 11">
-            <v-autocomplete
-                v-model="selectedFundingCall"
-                :label="(label ? $t(label) : $t('fundingCallLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : fundingCalls"
-                :custom-filter="(() => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :readonly="readOnly"
-                return-object
-                @update:search="searchFundingCalls($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="FundingCallSubmissionForm"
-                :form-props="{
-                    presetFundingProgramId: presetFundingProgramId,
-                    presetKeywords: presetKeywords,
-                    presetDateFrom: presetDateFrom,
-                    presetDateTo: presetDateTo
-                }"
-                entity-name="FundingCall"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedFundingCall"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <v-autocomplete
+            v-model="selectedFundingCall"
+            class="min-w-0 flex-1"
+            :label="(label ? $t(label) : $t('fundingCallLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : fundingCalls"
+            :custom-filter="(() => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :readonly="readOnly"
+            return-object
+            @update:search="searchFundingCalls($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="w-fit shrink-0 self-center"
+            :form-component="FundingCallSubmissionForm"
+            :form-props="{
+                presetFundingProgramId: presetFundingProgramId,
+                presetKeywords: presetKeywords,
+                presetDateFrom: presetDateFrom,
+                presetDateTo: presetDateTo
+            }"
+            entity-name="FundingCall"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedFundingCall"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">

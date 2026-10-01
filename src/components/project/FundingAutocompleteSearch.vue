@@ -1,31 +1,29 @@
 <template>
-    <v-row>
-        <v-col cols="11">
-            <v-autocomplete
-                v-model="selectedFunding"
-                :label="(label ? $t(label) : $t('fundingLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : fundings"
-                :custom-filter="(() => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :readonly="readOnly"
-                return-object
-                @update:search="searchFundings($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="FundingSubmissionForm"
-                :form-props="{ presetFundingCallId: presetFundingCallId, presetProject: presetProject }"
-                entity-name="Funding"
-                is-submission
-                :read-only="false"
-                @create="onFundingCreated"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <v-autocomplete
+            v-model="selectedFunding"
+            class="min-w-0 flex-1"
+            :label="(label ? $t(label) : $t('fundingLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : fundings"
+            :custom-filter="(() => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :readonly="readOnly"
+            return-object
+            @update:search="searchFundings($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            ref="modalRef"
+            class="w-fit shrink-0 self-center"
+            :form-component="FundingSubmissionForm"
+            :form-props="{ presetFundingCallId: presetFundingCallId, presetProject: presetProject }"
+            entity-name="Funding"
+            is-submission
+            :read-only="false"
+            @create="onFundingCreated"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">

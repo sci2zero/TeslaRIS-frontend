@@ -1,5 +1,6 @@
 <template>
     <v-btn
+        v-if="!hideActivator"
         density="compact"
         class="ml-2"
         color="primary"
@@ -23,6 +24,10 @@ export default defineComponent({
         documentId: {
             type: Number,
             required: true
+        },
+        hideActivator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["unbind"],

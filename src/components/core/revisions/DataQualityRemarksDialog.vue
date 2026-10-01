@@ -1,117 +1,116 @@
 <template>
-    <template v-if="isAdmin && remarksPresent">
-        <v-card
-            v-for="(profile, index) in reports"
-            :key="profile.profileName"
-            class="quality-summary-card mb-3"
-            :class="{
-                'quality-summary-card--prominent': prominent,
-                'quality-summary-card--clickable': hasRemarks(profile)
-            }"
-            variant="flat"
-            :color="prominent ? 'blue-grey-lighten-5' : 'grey-lighten-4'"
-            @click="openDialog(index, profile)">
-            <v-card-text>
-                <div class="quality-summary-title">
+    <button
+        v-if="isAdmin && remarksPresent"
+        type="button"
+        class="w-fit max-w-full inline-flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-5 py-3 text-left"
+        :class="[
+            prominent ? 'shadow-sm' : '',
+            hasAnyRemarks
+                ? 'cursor-pointer hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2'
+                : 'cursor-default'
+        ]"
+        :disabled="!hasAnyRemarks"
+        :aria-label="`${$t('dataQualitySummaryTitleLabel')}: ${totalIssueCount}, ${qualityScore.toFixed(1)}%`"
+        @click="openSummary">
+        <span
+            class="mdi text-4xl leading-none shrink-0"
+            :class="hasError ? 'mdi-alert-circle text-red-500' : 'mdi-alert text-amber-500'"
+            aria-hidden="true">
+        </span>
+
+        <div class="min-w-0 flex items-center gap-2">
+            <div>
+                <span class="block text-xs font-semibold text-slate-600">
                     {{ $t("dataQualitySummaryTitleLabel") }}
-                </div>
-
-                <div
-                    class="quality-summary-score"
-                    :class="scoreColorClass(profile.qualityScore)">
-                    {{ profile.qualityScore.toFixed(1) }}%
-                </div>
-
-                <v-chip
-                    :color="profile.publicationCandidate ? 'success' : 'warning'"
-                    variant="tonal"
-                    size="small"
-                    class="quality-summary-chip">
-                    {{ profile.publicationCandidate
-                        ? $t("publicationCandidateLabel")
-                        : $t("needsRevisionLabel") }}
-                </v-chip>
-
-                <div
-                    class="quality-summary-issues"
-                    :class="profile.issueCount > 0 ? 'text-error' : 'text-success'">
-                    {{ profile.issueCount }} {{ $t("failedConstraintsLabel") }}
-                </div>
-
-                <div class="quality-summary-policy">
-                    {{ profile.profileName }}
-                </div>
-
-                <div class="quality-summary-date text-medium-emphasis">
-                    {{ $t("assessmentDateLabel") }}: {{ localiseDate(profile.assessmentDate) }}
-                </div>
-            </v-card-text>
-        </v-card>
-    </template>
+                </span>
+                <span class="flex items-baseline gap-1.5 mt-0.5 text-lg font-bold text-slate-800 tabular-nums leading-tight">
+                    <span>{{ totalIssueCount }}</span>
+                    <span class="text-slate-300 font-medium">·</span>
+                    <span>{{ qualityScore.toFixed(1) }}%</span>
+                    
+                </span>
+                
+            </div>
+            <span
+                v-if="hasAnyRemarks"
+                class="text-sm font-medium text-slate-400 self-center">
+                <span class="mdi mdi-chevron-right"></span>
+            </span>
+        </div>
+    </button>
 
     <v-dialog
         v-model="dialog"
-        max-width="1000">
-        <v-card
-            prepend-icon="mdi-alert"
-            :title="$t('dataQualityReportLabel')">
-            <v-card-text>
-                <v-tabs
-                    v-model="selectedTab"
-                    color="primary">
-                    <v-tab
-                        v-for="(profile, index) in reports"
-                        :key="profile.profileName"
-                        :value="index">
-                        {{ profile.profileName }}
-                    </v-tab>
-                </v-tabs>
+        max-width="720">
+        <div class="bg-slate-100 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-5 pt-5 pb-1">
+                <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-800">
+                    {{ $t("dataQualityReportLabel") }}
+                </h2>
+            </div>
 
-                <v-window
-                    v-model="selectedTab"
-                    class="mt-5">
-                    <v-window-item
-                        v-for="(profile, index) in reports"
-                        :key="profile.profileName"
-                        :value="index">
-                        <template
-                            v-for="pair in profile.report"
-                            :key="pair.a">
-                            <v-alert
-                                class="mb-3"
-                                variant="tonal"
-                                :icon="severityIcons[pair.a]"
-                                :type="severityColors[pair.a] as ('success' | 'info' | 'warning' | 'error') ?? 'info'">
+            <v-tabs
+                v-model="selectedTab"
+                color="deep-purple-accent-4"
+                align-tabs="start"
+                show-arrows
+                class="landing-tabs px-2">
+                <v-tab
+                    v-for="(profile, index) in reports"
+                    :key="profile.profileName"
+                    :value="index">
+                    {{ profile.profileName }}
+                </v-tab>
+            </v-tabs>
+
+            <v-window
+                v-model="selectedTab"
+                class="px-5 py-4">
+                <v-window-item
+                    v-for="(profile, index) in reports"
+                    :key="profile.profileName"
+                    :value="index">
+                    <div class="space-y-3">
+                        <div
+                            v-for="(pair, remarkIndex) in profile.report"
+                            :key="`${profile.profileName}-${remarkIndex}`"
+                            class="border border-slate-200 rounded-lg px-4 py-3">
+                            <div class="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
+                                {{ pair.a }}
+                            </div>
+                            <p class="text-sm text-slate-700 mt-1 leading-relaxed">
                                 {{ returnCurrentLocaleContent(pair.b) }}
-                            </v-alert>
-                        </template>
-                    </v-window-item>
-                </v-window>
-            </v-card-text>
+                            </p>
+                        </div>
+                    </div>
+                </v-window-item>
+            </v-window>
 
-            <template #actions>
-                <v-btn
-                    class="ms-auto"
-                    :text="$t('closeLabel')"
-                    @click="dialog = false"
-                />
-            </template>
-        </v-card>
+            <div class="px-5 py-4 border-t border-slate-100 flex justify-end">
+                <UiButton
+                    variant="outline"
+                    size="sm"
+                    @click="dialog = false">
+                    {{ $t("closeLabel") }}
+                </UiButton>
+            </div>
+        </div>
     </v-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import { IssueSeverity, type QualityReportResponse } from "@/models/RevisionModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import DataQualityService from "@/services/revision/DataQualityService";
-import { localiseDate } from "@/utils/DateUtil";
 import { useUserRole } from "@/composables/useUserRole";
+import { UiButton } from "@/components/ui/button";
 
 
 export default defineComponent({
     name: "QualityReportDialog",
+    components: { UiButton },
     props: {
         entityType: {
             type: String,
@@ -133,17 +132,7 @@ export default defineComponent({
         const reports = ref<QualityReportResponse[]>([]);
         const selectedTab = ref(0);
 
-        const severityIcons = {
-            [IssueSeverity.ERROR]: "mdi-alert-circle",
-            [IssueSeverity.WARNING]: "mdi-alert",
-            [IssueSeverity.INFO]: "mdi-information"
-        };
-
-        const severityColors = {
-            [IssueSeverity.ERROR]: "error",
-            [IssueSeverity.WARNING]: "warning",
-            [IssueSeverity.INFO]: "info"
-        };
+        const { isAdmin } = useUserRole();
 
         const getContent = () => {
             if (!props.entityId || !isAdmin.value) {
@@ -165,25 +154,34 @@ export default defineComponent({
         const hasRemarks = (profile: QualityReportResponse) =>
             (profile.report?.length ?? 0) > 0;
 
-        const openDialog = (index: number, profile: QualityReportResponse) => {
-            if (!hasRemarks(profile)) {
+        const totalIssueCount = computed(() =>
+            reports.value.reduce((sum, profile) => sum + (profile.issueCount ?? 0), 0)
+        );
+
+        const qualityScore = computed(() => {
+            if (reports.value.length === 0) {
+                return 0;
+            }
+
+            return Math.min(...reports.value.map(profile => profile.qualityScore));
+        });
+
+        const hasError = computed(() =>
+            reports.value.some(profile =>
+                profile.report?.some(pair => pair.a === IssueSeverity.ERROR)
+            )
+        );
+
+        const hasAnyRemarks = computed(() => reports.value.some(hasRemarks));
+
+        const openSummary = () => {
+            if (!hasAnyRemarks.value) {
                 return;
             }
 
-            selectedTab.value = index;
+            const index = reports.value.findIndex(hasRemarks);
+            selectedTab.value = index >= 0 ? index : 0;
             dialog.value = true;
-        };
-
-        const scoreColorClass = (score: number) => {
-            if (score < 40) {
-                return "text-error";
-            }
-
-            if (score < 70) {
-                return "text-warning";
-            }
-
-            return "text-success";
         };
 
         onMounted(() => getContent());
@@ -193,72 +191,20 @@ export default defineComponent({
             getContent
         );
 
-        const { isAdmin } = useUserRole();
-
         return {
             dialog, remarksPresent,
             reports, selectedTab,
-            severityIcons, severityColors,
             returnCurrentLocaleContent,
-            openDialog, scoreColorClass, hasRemarks,
-            localiseDate, isAdmin
+            openSummary, hasAnyRemarks,
+            totalIssueCount, qualityScore, hasError,
+            isAdmin
         };
     }
 });
 </script>
 
 <style scoped>
-.quality-summary-card {
-    transition: box-shadow 0.2s ease;
-}
-
-.quality-summary-card--clickable {
-    cursor: pointer;
-}
-
-.quality-summary-card--clickable:hover {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-}
-
-.quality-summary-card--prominent {
-    border: 1px solid rgba(var(--v-theme-primary), 0.25);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10);
-}
-
-.quality-summary-card--prominent.quality-summary-card--clickable:hover {
-    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.16);
-}
-
-.quality-summary-title {
-    font-weight: 700;
-    color: rgb(var(--v-theme-primary));
-    margin-bottom: 8px;
-}
-
-.quality-summary-score {
-    font-size: 2.25rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.quality-summary-chip {
-    margin-top: 8px;
-    font-weight: 600;
-}
-
-.quality-summary-issues {
-    font-weight: 600;
-    margin-top: 16px;
-}
-
-.quality-summary-policy {
-    font-weight: 600;
-    color: rgb(var(--v-theme-primary));
-    margin-top: 4px;
-}
-
-.quality-summary-date {
-    font-size: 0.85rem;
-    margin-top: 4px;
+.font-serif {
+    font-family: 'Georgia', 'Times New Roman', serif;
 }
 </style>

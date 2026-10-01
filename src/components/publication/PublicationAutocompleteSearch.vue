@@ -1,32 +1,36 @@
 <template>
-    <v-row>
-        <v-col :cols="allowManualClearing && selectedDocumentPublication.value !== -1 ? 10 : 11">
-            <v-autocomplete
-                v-model="selectedDocumentPublication"
-                :label="label ? $t(label) : $t('documentLabel')"
-                :items="readonly ? [] : documentPublications"
-                :custom-filter="((): boolean => true)"
-                :no-data-text="$t('noDataMessage')"
-                :rules="required ? requiredSelectionRules : []"
-                return-object
-                @update:search="searchDocuments($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col cols="1">
-            <v-btn v-show="allowManualClearing && selectedDocumentPublication.value !== -1" icon @click="clearInput()">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-            <generic-crud-modal
-                v-if="allowCreation && allowedTypes.length == 1 && selectedDocumentPublication.value === -1"
-                :form-component="getSubmissionFormBasedOnType()"
-                :form-props="formProps"
-                :entity-name="allowedTypes[0].toLowerCase().replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase()).replaceAll(' ', '')"
-                is-submission
-                @create="newDocumentCreated"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedDocumentPublication"
+            :label="label ? $t(label) : $t('documentLabel')"
+            :items="readonly ? [] : documentPublications"
+            :custom-filter="((): boolean => true)"
+            :no-data-text="$t('noDataMessage')"
+            :rules="required ? requiredSelectionRules : []"
+            return-object
+            @update:search="searchDocuments($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <v-btn
+            v-if="allowManualClearing && selectedDocumentPublication.value !== -1"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput()"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+        <generic-crud-modal
+            v-if="allowCreation && allowedTypes.length == 1 && selectedDocumentPublication.value === -1"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="getSubmissionFormBasedOnType()"
+            :form-props="formProps"
+            :entity-name="allowedTypes[0].toLowerCase().replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase()).replaceAll(' ', '')"
+            is-submission
+            @create="newDocumentCreated"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -50,11 +54,12 @@ import MonographPublicationSubmissionForm from './MonographPublicationSubmission
 import MaterialProductSubmissionForm from './MaterialProductSubmissionForm.vue';
 import GeneticMaterialSubmissionForm from './GeneticMaterialSubmissionForm.vue';
 import PerformanceRelatedOutputSubmissionForm from './PerformanceRelatedOutputSubmissionForm.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PublicationAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,

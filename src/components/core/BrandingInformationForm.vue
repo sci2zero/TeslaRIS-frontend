@@ -16,10 +16,65 @@
         </v-row>
 
         <v-row>
+            <v-col cols="12" md="6">
+                <h3 class="text-subtitle-1 font-weight-medium mb-3">
+                    {{ $t("brandingLogoLabel") }}
+                </h3>
+                <v-file-input
+                    v-model="logoFile"
+                    :label="$t('brandingLogoLabel')"
+                    accept="image/png,image/jpeg"
+                    prepend-icon="mdi-image"
+                    show-size
+                    clearable
+                ></v-file-input>
+                <img
+                    v-if="logoPreviewUrl"
+                    :src="logoPreviewUrl"
+                    alt=""
+                    class="branding-preview-image mb-3"
+                />
+                <v-btn
+                    v-if="hasExistingLogo && !removeLogo"
+                    density="compact"
+                    variant="outlined"
+                    @click="removeLogo = true; logoFile = null">
+                    {{ $t("removeLogoLabel") }}
+                </v-btn>
+            </v-col>
+            <v-col cols="12" md="6">
+                <h3 class="text-subtitle-1 font-weight-medium mb-3">
+                    {{ $t("brandingBackgroundLabel") }}
+                </h3>
+                <v-file-input
+                    v-model="backgroundFile"
+                    :label="$t('brandingBackgroundLabel')"
+                    accept="image/png,image/jpeg"
+                    prepend-icon="mdi-image-area"
+                    show-size
+                    clearable
+                ></v-file-input>
+                <img
+                    v-if="backgroundPreviewUrl"
+                    :src="backgroundPreviewUrl"
+                    alt=""
+                    class="branding-preview-image branding-preview-image--wide mb-3"
+                />
+                <v-btn
+                    v-if="hasExistingBackground && !removeBackground"
+                    density="compact"
+                    variant="outlined"
+                    @click="removeBackground = true; backgroundFile = null">
+                    {{ $t("removeBackgroundLabel") }}
+                </v-btn>
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col>
-                <v-select
+                <ui-input
                     v-model="selectedCountry"
-                    hide-details="auto"
+                    control="select"
                     :items="countries"
                     :label="$t('countryLabel')"
                     return-object
@@ -58,19 +113,17 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field
+                <ui-input
                     v-model="postalNumber"
                     :label="$t('postalNumberLabel')"
-                    :placeholder="$t('postalNumberLabel')"
                 />
             </v-col>
         </v-row>
         <v-row>
             <v-col>
-                <v-text-field
+                <ui-input
                     v-model="phoneNumber"
                     :label="$t('phoneNumberLabel')"
-                    :placeholder="$t('phoneNumberLabel')"
                 />
             </v-col>
         </v-row>
@@ -94,9 +147,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, watch } from 'vue';
+import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 import { ref } from 'vue';
 import { type BrandingInformation, type Country } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
@@ -107,13 +161,48 @@ import lodash from 'lodash';
 import type { AxiosResponse } from 'axios';
 
 
+export interface BrandingFormPayload {
+    title: any;
+    description: any;
+    logoFile: File | null;
+    backgroundFile: File | null;
+    removeLogo: boolean;
+    removeBackground: boolean;
+    location: BrandingInformation["location"];
+    phoneNumber?: string;
+    postalAddress: BrandingInformation["postalAddress"];
+}
+
+function toFile(value: File | File[] | null | undefined): File | null {
+    if (!value) {
+        return null;
+    }
+    return Array.isArray(value) ? value[0] ?? null : value;
+}
+
 export default defineComponent({
     name: "BrandingInformationForm",
-    components: { MultilingualTextInput, OpenLayersMap },
+    components: { MultilingualTextInput, OpenLayersMap, UiInput },
     props: {
         presetInformation: {
             type: Object as PropType<BrandingInformation | undefined>,
             default: undefined
+        },
+        logoUrl: {
+            type: String,
+            default: ""
+        },
+        backgroundUrl: {
+            type: String,
+            default: ""
+        },
+        hasExistingLogo: {
+            type: Boolean,
+            default: false
+        },
+        hasExistingBackground: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -131,6 +220,10 @@ export default defineComponent({
 
         const title = ref<any>([]);
         const description = ref<any>([]);
+        const logoFile = ref<File | File[] | null>(null);
+        const backgroundFile = ref<File | File[] | null>(null);
+        const removeLogo = ref(false);
+        const removeBackground = ref(false);
         const city = ref<any>([]);
         const streetAndNumber = ref<any>([]);
         const state = ref<any>([]);
@@ -141,6 +234,48 @@ export default defineComponent({
         const selectedCountry = ref<{title: string, value: number}>({ title: "", value: -1 });
 
         const { requiredFieldRules } = useValidationUtils();
+
+        const selectedLogoFile = computed(() => toFile(logoFile.value));
+        const selectedBackgroundFile = computed(() => toFile(backgroundFile.value));
+
+        const logoObjectUrl = ref<string | null>(null);
+        const backgroundObjectUrl = ref<string | null>(null);
+
+        watch(selectedLogoFile, (file) => {
+            if (logoObjectUrl.value) {
+                URL.revokeObjectURL(logoObjectUrl.value);
+                logoObjectUrl.value = null;
+            }
+            if (file) {
+                logoObjectUrl.value = URL.createObjectURL(file);
+                removeLogo.value = false;
+            }
+        });
+
+        watch(selectedBackgroundFile, (file) => {
+            if (backgroundObjectUrl.value) {
+                URL.revokeObjectURL(backgroundObjectUrl.value);
+                backgroundObjectUrl.value = null;
+            }
+            if (file) {
+                backgroundObjectUrl.value = URL.createObjectURL(file);
+                removeBackground.value = false;
+            }
+        });
+
+        const logoPreviewUrl = computed(() => {
+            if (removeLogo.value && !selectedLogoFile.value) {
+                return "";
+            }
+            return logoObjectUrl.value || props.logoUrl;
+        });
+
+        const backgroundPreviewUrl = computed(() => {
+            if (removeBackground.value && !selectedBackgroundFile.value) {
+                return "";
+            }
+            return backgroundObjectUrl.value || props.backgroundUrl;
+        });
 
         const fetchCountries = () => {
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
@@ -216,9 +351,13 @@ export default defineComponent({
         );
 
         const submit = () => {
-            const brandingInformation: BrandingInformation = {
+            const payload: BrandingFormPayload = {
                 title: title.value,
                 description: description.value,
+                logoFile: selectedLogoFile.value,
+                backgroundFile: selectedBackgroundFile.value,
+                removeLogo: removeLogo.value && !selectedLogoFile.value,
+                removeBackground: removeBackground.value && !selectedBackgroundFile.value,
                 location: {
                     latitude: mapRef.value?.currentPosition.lat,
                     longitude: mapRef.value?.currentPosition.lon,
@@ -234,7 +373,7 @@ export default defineComponent({
                 }
             };
 
-            emit("update", brandingInformation);
+            emit("update", payload);
         };
 
         return {
@@ -245,8 +384,27 @@ export default defineComponent({
             countries, selectedCountry, mapRef,
             toMultilingualTextInput,
             requiredFieldRules,
-            languageTags, submit
+            languageTags, submit,
+            logoFile, backgroundFile,
+            logoPreviewUrl, backgroundPreviewUrl,
+            removeLogo, removeBackground
         };
     }
 });
 </script>
+
+<style scoped>
+.branding-preview-image {
+    display: block;
+    max-height: 96px;
+    width: auto;
+    object-fit: contain;
+}
+
+.branding-preview-image--wide {
+    max-height: 140px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+</style>

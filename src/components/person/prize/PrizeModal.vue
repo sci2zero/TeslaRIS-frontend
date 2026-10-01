@@ -1,29 +1,34 @@
 <template>
     <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="800px">
+        <v-dialog v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
             <template #activator="scope">
                 <div v-if="!readOnly" :class="edit ? 'mt-3' : 'edit-pen'">
                     <v-btn
                         v-if="!edit"
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-plus" />
+                        :disabled="readOnly" size="small">
+                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
                     </v-btn>
                     <!-- <v-list-item
-                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action"
-                        v-on="scope.isActive">
+                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action">
                         <v-list-item-title>{{ $t("updatePrizeLabel") }}</v-list-item-title>
                     </v-list-item> -->
                     <v-btn
                         v-else icon variant="outlined"
                         color="primary" v-bind="scope.props"
-                        :disabled="readOnly" size="medium" v-on="scope.isActive">
-                        <v-icon size="large" icon="mdi-pen" />
+                        :disabled="readOnly" size="medium">
+                        <v-icon size="large" icon="mdi-pen"></v-icon>
                     </v-btn>
                 </div>
             </template>
-            <v-card>
+            <v-card
+                ref="cardRef"
+                @pointerdown.capture="onPointerDown"
+                @keydown.capture="onKeyDown"
+                @input.capture="onFieldEvent"
+                @change.capture="onFieldEvent"
+            >
                 <v-card-title>
                     <span class="text-h5">{{ edit ? $t("updatePrizeLabel") : $t("addPrizeLabel") }}</span>
                 </v-card-title>
@@ -49,6 +54,15 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <persistent-question-dialog
+            v-model="confirmClose"
+            :title="$t('areYouSureLabel')"
+            :message="$t('unsavedChangesMessage')"
+            :cancel-text="$t('keepEditingLabel')"
+            :continue-text="$t('closeLabel')"
+            emphasize-cancel
+            @continue="discardChanges"
+        />
     </v-row>
 </template>
 
@@ -57,12 +71,14 @@ import { ref } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import PrizeForm from "./PrizeForm.vue";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import type { PrizeResponse, Prize } from "@/models/PersonModel";
 
 
 export default defineComponent({
     name: "PrizeModal",
-    components: { PrizeForm },
+    components: { PrizeForm, PersistentQuestionDialog },
     props: {
         edit: {
             type: Boolean,
@@ -80,6 +96,11 @@ export default defineComponent({
     emits: ["update", "create"],
     setup(_, { emit }) {
         const dialog = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null
+        );
 
         const formRef = ref<typeof PrizeForm>();
 
@@ -93,7 +114,7 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, formRef, emitCreateToParent, emitUpdateToParent};
+        return {dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges, formRef, emitCreateToParent, emitUpdateToParent};
     }
 });
 </script>

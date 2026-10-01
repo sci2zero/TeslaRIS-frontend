@@ -36,71 +36,70 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="email" :label="$t('emailLabel')" :placeholder="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules" />
+                            <ui-input v-model="email" :label="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="phoneNumber" :label="$t('phoneNumberLabel')" :placeholder="$t('phoneNumberLabel')" />
+                            <ui-input v-model="phoneNumber" :label="$t('phoneNumberLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12" md="6">
-                            <v-text-field v-model="scopusAfid" label="Scopus AFID" placeholder="Scopus AFID" :rules="scopusAfidValidationRules" />
+                            <ui-input v-model="scopusAfid" label="Scopus AFID" :rules="scopusAfidValidationRules" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field v-model="openAlexId" label="Open Alex ID" placeholder="Open Alex ID" :rules="institutionOpenAlexIdValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="ringgold" label="Ringgold ID" placeholder="Ringgold ID" :rules="ringgoldValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="fundref" label="FundRef" placeholder="FundRef" :rules="fundrefValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="isni" label="ISNI" placeholder="ISNI" :rules="isniValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="fctId" label="FCT ID" placeholder="FCT ID" :rules="fctIdValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="grid" label="GRID" placeholder="GRID" :rules="gridValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="wikidata" label="Wikidata ID" placeholder="Wikidata ID" :rules="wikidataValidationRules" />
+                            <ui-input v-model="openAlexId" label="Open Alex ID" :rules="institutionOpenAlexIdValidationRules" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field
+                            <ui-input v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="ringgold" label="Ringgold ID" :rules="ringgoldValidationRules" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="fundref" label="FundRef" :rules="fundrefValidationRules" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="isni" label="ISNI" :rules="isniValidationRules" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="fctId" label="FCT ID" :rules="fctIdValidationRules" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="grid" label="GRID" :rules="gridValidationRules" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <ui-input v-model="wikidata" label="Wikidata ID" :rules="wikidataValidationRules" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <ui-input
                                 v-model="nationalId"
                                 :label="$t('nationalIdLabel')"
-                                :placeholder="$t('nationalIdLabel')"
-                                :rules="organisationUnitNationalIdValidationRules" />
+                                :rules="organisationUnitNationalIdValidationRules"
+                            />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" :placeholder="$t('numberOfEmployeesLabel')" />
+                            <ui-input v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field
+                            <ui-input
                                 v-model="taxNumber"
                                 :label="$t('taxNumberLabel')"
-                                :placeholder="$t('taxNumberLabel')"
                                 :rules="taxNumberValidationRules"
                             />
                         </v-col>
@@ -117,7 +116,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-select
+                            <ui-input control="select"
                                 v-model="selectedThesisType"
                                 :label="$t('thesisTypeLabel') + '*'"
                                 :items="thesisTypes"
@@ -129,7 +128,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-select
+                            <ui-input control="select"
                                 v-model="selectedOuSector"
                                 :label="$t('organisationUnitSectorLabel')"
                                 :items="ouSectors"
@@ -139,7 +138,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-checkbox
+                            <ui-checkbox
                                 v-model="startup"
                                 :label="$t('startupLabel')"
                             />
@@ -163,7 +162,7 @@
                     </v-row>
                     <v-row v-if="isAdmin">
                         <v-col>
-                            <v-checkbox
+                            <ui-checkbox
                                 v-model="active"
                                 :label="$t('activeLabel')"
                             />
@@ -171,7 +170,7 @@
                     </v-row>
                     <v-row v-if="isAdmin">
                         <v-col>
-                            <v-checkbox
+                            <ui-checkbox
                                 v-model="legalEntity"
                                 :label="$t('legalEntityLabel')"
                             />
@@ -180,7 +179,7 @@
                     <v-container class="section-box">
                         <v-row v-if="isAdmin">
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-model="clientInstitutionCris"
                                     :label="$t('clientInstitutionCrisLabel')"
                                 />
@@ -188,13 +187,13 @@
                         </v-row>
                         <v-row v-if="isAdmin && clientInstitutionCris">
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-model="validatingEmailDomainCris"
                                     :label="$t('validatingEmailDomainLabel')"
                                 />
                             </v-col>
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-if="validatingEmailDomainCris"
                                     v-model="allowingSubdomainsCris"
                                     :label="$t('allowingSubdomainsLabel')"
@@ -203,10 +202,9 @@
                         </v-row>
                         <v-row v-if="isAdmin && clientInstitutionCris && validatingEmailDomainCris">
                             <v-col cols="12">
-                                <v-text-field
+                                <ui-input
                                     v-model="institutionEmailDomainCris"
                                     :label="$t('institutionEmailDomainLabel') + '*'"
-                                    :placeholder="$t('institutionEmailDomainLabel') + '*'"
                                     :rules="requiredFieldRules"
                                 />
                             </v-col>
@@ -215,7 +213,7 @@
                     <v-container class="section-box mt-2 mb-2">
                         <v-row>
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-model="clientInstitutionDl"
                                     :label="$t('clientInstitutionDlLabel')"
                                 />
@@ -223,13 +221,13 @@
                         </v-row>
                         <v-row v-if="isAdmin && clientInstitutionDl">
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-model="validatingEmailDomainDl"
                                     :label="$t('validatingEmailDomainLabel')"
                                 />
                             </v-col>
                             <v-col>
-                                <v-checkbox
+                                <ui-checkbox
                                     v-if="validatingEmailDomainDl"
                                     v-model="allowingSubdomainsDl"
                                     :label="$t('allowingSubdomainsLabel')"
@@ -238,10 +236,9 @@
                         </v-row>
                         <v-row v-if="isAdmin && clientInstitutionDl && validatingEmailDomainDl">
                             <v-col cols="12">
-                                <v-text-field
+                                <ui-input
                                     v-model="institutionEmailDomainDl"
                                     :label="$t('institutionEmailDomainLabel') + '*'"
-                                    :placeholder="$t('institutionEmailDomainLabel') + '*'"
                                     :rules="requiredFieldRules"
                                 />
                             </v-col>
@@ -250,7 +247,7 @@
                     <h3>{{ $t('addressLabel') }}</h3>
                     <v-row>
                         <v-col>
-                            <v-select
+                            <ui-input control="select"
                                 v-model="selectedCountry"
                                 hide-details="auto"
                                 :items="countries"
@@ -288,10 +285,10 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field
+                            <ui-input
                                 v-model="postalNumber"
                                 :label="$t('postalNumberLabel')"
-                                :placeholder="$t('postalNumberLabel')"
+                               
                             />
                         </v-col>
                     </v-row>
@@ -313,7 +310,6 @@
             </p>
         </v-row>
     </v-form>
-    
     <toast v-model="snackbar" :message="message" />
 </template>
 
@@ -341,11 +337,13 @@ import CountryService from '@/services/CountryService';
 import { type AxiosResponse } from 'axios';
 import { detectLanguage } from '@/utils/LanguageDetector.js';
 import { useUserRole } from '@/composables/useUserRole.js';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
-    components: {MultilingualTextInput, OpenLayersMap, UriInput, Toast, DatePicker},
+    components: { MultilingualTextInput, OpenLayersMap, UriInput, Toast, DatePicker, UiInput, UiCheckbox },
     props: {
         inModal: {
             type: Boolean,

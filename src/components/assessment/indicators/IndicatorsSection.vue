@@ -19,7 +19,7 @@
             @create="createIndicator"
         />
         <v-row v-if="indicators && indicators.length > 0">
-            <v-col v-if="showStatistics && (!viewIndicatorsEmpty || !downloadIndicatorsEmpty)">
+            <v-col v-if="showStatistics && (!viewIndicatorsEmpty || !downloadIndicatorsEmpty)" cols="12" md="6">
                 <div
                     v-show="(viewsRef && viewsRef.statisticsEntityIndicators.length > 0) || (downloadsRef && downloadsRef.statisticsEntityIndicators.length > 0)"
                     class="statistics mt-3">
@@ -39,7 +39,7 @@
                     />
                 </div>
             </v-col>
-            <v-col>
+            <v-col cols="12" md="6">
                 <div class="statistics">
                     <indicators-view 
                         :entity-indicators="indicators" 

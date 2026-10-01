@@ -1,22 +1,30 @@
 <template>
-    <div justify="start">
+    <div justify="start" :class="{ 'contents': hideActivator }">
         <v-dialog
             v-model="dialog"
-            :persistent="!readOnly"
-            max-width="1200px">
-            <template #activator="scope">
+            :persistent="!readOnly && edited"
+            max-width="1200px"
+            @click:outside="onClickOutside"
+            @keydown.esc="onClickOutside">
+            <template v-if="!hideActivator" #activator="scope">
                 <v-btn
                     color="primary" dark
                     density="compact"
                     variant="outlined"
                     v-bind="scope.props"
                     :class="readOnly ? 'bottom-spacer' : ''"
-                    :disabled="readOnly && otherNames.length === 0"
-                    v-on="scope.isActive">
+                    :disabled="readOnly && otherNames.length === 0">
                     {{ $t("viewAllPersonNamesLabel") }}
                 </v-btn>
             </template>
-            <v-card>
+            <v-card
+                ref="cardRef"
+                class="bg-slate-100"
+                @pointerdown.capture="onPointerDown"
+                @keydown.capture="onKeyDown"
+                @input.capture="onFieldEvent"
+                @change.capture="onFieldEvent"
+            >
                 <v-card-title>
                     <span class="text-h5">{{ $t("otherNamesLabel") }}</span>
                 </v-card-title>
@@ -25,10 +33,10 @@
                         <v-form v-model="isFormValid" @submit.prevent>
                             <v-row>
                                 <v-col cols="3">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="primaryName.firstname"
                                         :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
-                                        :placeholder="$t('firstNameLabel')" outlined
+                                        :placeholder="$t('firstNameLabel')"
                                         :rules="requiredFieldRules" :readonly="readOnly">
                                         <template #append-inner>
                                             <v-btn 
@@ -39,25 +47,24 @@
                                                 <v-icon>mdi-swap-horizontal</v-icon>
                                             </v-btn>
                                         </template>
-                                    </v-text-field>
+                                    </ui-input>
                                 </v-col>
                                 <v-col v-if="readOnly ? primaryName.otherName : true" :cols="readOnly ? 3 : 2">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="primaryName.otherName"
                                         :label="$t('middleNameLabel')"
-                                        :placeholder="$t('middleNameLabel')" outlined
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col cols="3">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="primaryName.lastname"
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
-                                        :placeholder="$t('surnameLabel')" outlined
+                                        :placeholder="$t('surnameLabel')"
                                         :rules="requiredFieldRules" 
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
-                                    <v-select
+                                    <ui-input control="select"
                                         v-model="primaryName.personNameType"
                                         :items="nameTypes"
                                         :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
@@ -73,7 +80,7 @@
                                                 :subtitle="undefined"
                                             />
                                         </template>
-                                    </v-select>
+                                    </ui-input>
                                 </v-col>
                             </v-row>
                             <h3 v-if="readOnly && presetPerson && presetPerson.personOtherNames.length === 0">
@@ -81,10 +88,10 @@
                             </h3>
                             <v-row v-for="(element, index) in otherNames" v-else :key="index">
                                 <v-col cols="3">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="element.firstname"
                                         :label="$t('firstNameLabel') + (readOnly ? '' : '*')"
-                                        :placeholder="$t('firstNameLabel')" outlined
+                                        :placeholder="$t('firstNameLabel')"
                                         :rules="requiredFieldRules" :readonly="readOnly">
                                         <template #append-inner>
                                             <v-btn 
@@ -95,25 +102,24 @@
                                                 <v-icon>mdi-swap-horizontal</v-icon>
                                             </v-btn>
                                         </template>
-                                    </v-text-field>
+                                    </ui-input>
                                 </v-col>
                                 <v-col v-if="readOnly ? element.otherName : true" :cols="readOnly ? 3 : 2">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="element.otherName"
                                         :label="$t('middleNameLabel')"
-                                        :placeholder="$t('middleNameLabel')" outlined
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col cols="3">
-                                    <v-text-field
+                                    <ui-input
                                         v-model="element.lastname"
                                         :label="$t('surnameLabel') + (readOnly ? '' : '*')"
-                                        :placeholder="$t('surnameLabel')" outlined
+                                        :placeholder="$t('surnameLabel')"
                                         :rules="requiredFieldRules"
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
-                                    <v-select
+                                    <ui-input control="select"
                                         v-model="element.personNameType"
                                         :items="nameTypes"
                                         :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
@@ -129,7 +135,7 @@
                                                 :subtitle="undefined"
                                             />
                                         </template>
-                                    </v-select>
+                                    </ui-input>
                                 </v-col>
                                 <v-col cols="2" class="d-flex align-center">
                                     <v-btn
@@ -176,20 +182,34 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <persistent-question-dialog
+            v-if="!readOnly"
+            v-model="confirmClose"
+            :title="$t('areYouSureLabel')"
+            :message="$t('unsavedChangesMessage')"
+            :cancel-text="$t('keepEditingLabel')"
+            :continue-text="$t('closeLabel')"
+            emphasize-cancel
+            @continue="discardChanges"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { defineComponent } from "vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import type { PropType } from "vue";
 import { PersonNameType, type PersonName, type PersonResponse } from "@/models/PersonModel";
 import { watch } from "vue";
 import { getPersonNameTypesForGivenLocale } from "@/i18n/personNameType";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
+    components: { UiInput, PersistentQuestionDialog },
     name: "PersonOtherNameModal",
     props: {
         presetPerson: {
@@ -199,12 +219,22 @@ export default defineComponent({
         readOnly: {
             type: Boolean,
             default: true,
+        },
+        hideActivator: {
+            type: Boolean,
+            default: false,
         }
     },
     emits: ["selectPrimary", "update"],
     setup(props, {emit}) {
         const dialog = ref(false);
         const isFormValid = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null,
+            computed(() => !props.readOnly)
+        );
 
         const primaryName = ref<PersonName>({firstname: "", lastname: "", otherName: "", personNameType: PersonNameType.DISPLAY_NAME});
         const otherNames = ref<PersonName[]>([]);
@@ -266,7 +296,8 @@ export default defineComponent({
         };
 
         return { 
-            dialog, isFormValid, requiredFieldRules,
+            dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges,
+            isFormValid, requiredFieldRules,
             addOtherName, otherNames, removeOtherName,
             update, selectOtherName, primaryName,
             nameTypes, requiredSelectionRules

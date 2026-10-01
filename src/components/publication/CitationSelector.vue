@@ -1,76 +1,117 @@
 <template>
-    <div justify="start">
-        <v-dialog v-model="dialog" class="narrow">
-            <template #activator="scope">
-                <v-btn
-                    color="primary"
-                    density="compact" class="bottom-spacer" v-bind="scope.props"
-                    v-on="scope.isActive">
+    <div :class="{ 'contents': hideActivator }">
+        <v-dialog
+            v-model="dialog"
+            max-width="640"
+            @keydown.esc="dialog = false"
+        >
+            <template v-if="!hideActivator" #activator="{ props: activatorProps }">
+                <UiButton
+                    variant="outline"
+                    size="md"
+                    class="w-full sm:w-auto"
+                    v-bind="activatorProps"
+                >
+                    <span class="mdi mdi-format-quote-close" aria-hidden="true"></span>
                     {{ $t("citePublicationLabel") }}
-                </v-btn>
+                </UiButton>
             </template>
-            
-            <v-card class="d-flex flex-column align-right pa-4">
-                <v-card-title>{{ $t("citePublicationLabel") }}</v-card-title>
-                <v-card-text class="text-right">
+
+            <div class="flex max-h-[calc(100dvh-3rem)] min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm">
+                <div class="flex shrink-0 items-start gap-3 border-b border-slate-100 px-5 pt-5 pb-4">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600">
+                        <span class="mdi mdi-format-quote-close text-xl" aria-hidden="true"></span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h2 class="citation-title text-xl sm:text-2xl font-bold text-slate-800 leading-tight">
+                            {{ $t("citePublicationLabel") }}
+                        </h2>
+                        <p class="mt-1 text-sm text-slate-500">
+                            {{ $t("citePublicationHintLabel") }}
+                        </p>
+                    </div>
+                    <UiButton
+                        variant="ghost"
+                        size="icon-sm"
+                        class="shrink-0 -mt-0.5"
+                        :aria-label="$t('closeLabel')"
+                        @click="dialog = false"
+                    >
+                        <span class="mdi mdi-close text-lg" aria-hidden="true"></span>
+                    </UiButton>
+                </div>
+
+                <div class="min-h-0 overflow-y-auto px-5 py-4">
                     <citation-formats :citation="citation" />
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn color="blue darken-1" @click="dialog = false">
+                </div>
+
+                <div class="flex shrink-0 justify-end border-t border-slate-100 px-5 py-4">
+                    <UiButton
+                        variant="outline"
+                        size="sm"
+                        @click="dialog = false"
+                    >
                         {{ $t("closeLabel") }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
+                    </UiButton>
+                </div>
+            </div>
         </v-dialog>
     </div>
 </template>
 
-<script lang="ts">
-import { type CitationResponse } from "@/models/PublicationModel";
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import type { CitationResponse } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
-import { onMounted, ref } from "vue";
-import { defineComponent } from "vue";
 import CitationFormats from "./CitationFormats.vue";
+import { UiButton } from "@/components/ui/button";
 
-
-export default defineComponent({
+defineOptions({
     name: "CitationSelector",
-    components: { CitationFormats },
-    props: {
-        documentId: {
-            type: Number,
-            required: true
-        }
-    },
-    setup(props) {
-        const dialog = ref(false);
-        const citation = ref<CitationResponse>();
+});
 
-        onMounted(() => {
-            fetchCitations();
+const props = withDefaults(defineProps<{
+    documentId: number;
+    hideActivator?: boolean;
+}>(), {
+    hideActivator: false,
+});
+
+const dialog = ref(false);
+const citation = ref<CitationResponse>();
+
+const fetchCitations = () => {
+    DocumentPublicationService.fetchCitations(props.documentId)
+        .then((response) => {
+            citation.value = response.data;
+        })
+        .catch(() => {
+            citation.value = {
+                apa: "",
+                mla: "",
+                chicago: "",
+                harvard: "",
+                vancouver: "",
+            };
         });
+};
 
-        const fetchCitations = () => {
-            DocumentPublicationService.fetchCitations(props.documentId).then(response => {
-                citation.value = response.data;
-            });
-        };
+watch(() => props.documentId, fetchCitations, { immediate: true });
 
-        return {
-            dialog,
-            citation,
-            fetchCitations
-        };
+watch(dialog, (isOpen) => {
+    if (isOpen && !citation.value) {
+        fetchCitations();
     }
+});
+
+defineExpose({
+    dialog,
+    fetchCitations,
 });
 </script>
 
 <style scoped>
-
-.narrow {
-    width: 100%;
-    max-width: 650px;
+.citation-title {
+    font-family: "Georgia", "Times New Roman", serif;
 }
-
 </style>

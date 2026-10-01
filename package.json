@@ -11,6 +11,8 @@
     "build": "vite build",
     "build-only": "vite build",
     "dev": "vite",
+    "dev:core": "vite --mode core",
+    "dev:portugal": "vite --mode portugal",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint --ext .ts,.vue --ignore-path .gitignore src",

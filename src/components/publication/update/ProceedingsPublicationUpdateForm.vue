@@ -10,28 +10,27 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols="10">
-                <v-select
-                    v-model="selectedProceedings"
-                    :items="availableProceedings"
-                    :label="$t('proceedingsLabel') + '*'"
-                    :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
-                    :rules="requiredSelectionRules"
-                    return-object
-                />
-            </v-col>
-            <v-col class="proceedings-submission">
-                <generic-crud-modal
-                    :form-component="ProceedingsSubmissionForm"
-                    :form-props="{conference: selectedEvent}"
-                    entity-name="Proceedings"
-                    is-submission
-                    :read-only="false"
-                    @create="selectNewlyAddedProceedings"
-                />
-            </v-col>
-        </v-row>
+        <div class="flex items-start gap-2">
+            <ui-input
+                v-model="selectedProceedings"
+                class="min-w-0 flex-1"
+                control="select"
+                :items="availableProceedings"
+                :label="$t('proceedingsLabel') + '*'"
+                :no-data-text="selectedEvent.value === -1 ? $t('selectConferenceMessage') : $t('noAvailableProceedingsMessage')"
+                :rules="requiredSelectionRules"
+                return-object
+            />
+            <generic-crud-modal
+                class="mt-[1.31rem] w-fit shrink-0 self-start"
+                :form-component="ProceedingsSubmissionForm"
+                :form-props="{conference: selectedEvent}"
+                entity-name="Proceedings"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedProceedings"
+            />
+        </div>
 
         <v-row>
             <v-col>
@@ -46,33 +45,32 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="startPage"
                     :label="$t('startPageLabel')"
-                    :placeholder="$t('startPageLabel')"
+                   
                 />
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="endPage"
                     :label="$t('endPageLabel')"
-                    :placeholder="$t('endPageLabel')"
+                   
                 />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
+                <ui-input
                     v-model="doi"
                     label="DOI"
-                    placeholder="DOI"
                     :rules="doiValidationRules"
                 />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-select
+                <ui-input control="select"
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel') + '*'"
@@ -93,18 +91,18 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="articleNumber"
                     :label="$t('articleNumberLabel')"
-                    :placeholder="$t('articleNumberLabel')"
+                   
                 />
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
@@ -124,26 +122,23 @@
         </v-row>
         <v-row>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="scopus"
                     label="Scopus ID"
-                    placeholder="Scopus ID"
                     :rules="scopusIdValidationRules"
                 />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="openAlexId"
                     label="Open Alex ID"
-                    placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules"
                 />
             </v-col>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="webOfScienceId"
                     label="Web of Science ID"
-                    placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules"
                 />
             </v-col>
@@ -191,11 +186,12 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import { localiseFlexibleDate } from '@/utils/DateUtil.js';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "ProceedingsPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, GenericCrudModal, Toast, DocumentCommonFields, UiInput },
     props: {
         presetProceedingsPublication: {
             type: Object as PropType<ProceedingsPublication | undefined>,
@@ -447,10 +443,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-.proceedings-submission {
-    margin-top: 15px;
-}
-
-</style>

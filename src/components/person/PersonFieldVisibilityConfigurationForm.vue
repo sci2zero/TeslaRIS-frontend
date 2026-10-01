@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="phoneNumberVisible"
                     :label="$t('phoneNumberVisibleLabel')"
                 />
@@ -10,7 +10,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="contactEmailVisible"
                     :label="$t('contactEmailVisibleLabel')"
                 />
@@ -18,7 +18,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="dateOfBirthVisible"
                     :label="$t('dateOfBirthVisibleLabel')"
                 />
@@ -26,7 +26,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="birthplaceVisible"
                     :label="$t('birthplaceVisibleLabel')"
                 />
@@ -34,7 +34,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="sexVisible"
                     :label="$t('sexVisibleLabel')"
                 />
@@ -42,7 +42,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-checkbox
+                <ui-checkbox
                     v-model="biographyVisible"
                     :label="$t('biographyVisibleLabel')"
                 />
@@ -56,9 +56,11 @@ import { defineComponent, onMounted, watch } from 'vue';
 import { ref } from 'vue';
 import PersonFieldVisibilityService from '@/services/configuration/PersonFieldVisibilityService';
 import { type PersonFieldVisibility } from '@/models/PersonModel';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
+    components: { UiCheckbox },
     name: "PersonFieldVisibilityConfigurationForm",
     props: {
         personId: {

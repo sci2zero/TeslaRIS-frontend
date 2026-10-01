@@ -1,145 +1,187 @@
 <template>
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
-            <div v-if="selectedPublications.length > 0" class="action-menu-container">
-                <v-menu offset-y>
-                    <template #activator="{ props }">
-                        <v-btn
-                            v-bind="props"
-                            color="white"
-                            variant="elevated"
-                            height="48"
-                            prepend-icon="mdi-dots-vertical"
-                            class="action-menu-trigger"
-                        >
-                            {{ $t("actions") }} <template v-if="selectedPublications.length > 0">
-                                ({{ selectedPublications.length }})
-                            </template>
-                        </v-btn>
-                    </template>
+    <responsive-data-table
+        v-model="selectedPublications"
+        :items="publications"
+        :headers="headers"
+        :extra-sort-headers="[yearHeader]"
+        :items-length="totalPublications"
+        :show-select="showSelect"
+        :page="tableOptions.page"
+        :items-per-page="tableOptions.itemsPerPage"
+        :sort-by="tableOptions.sortBy"
+        :in-comparator="inComparator"
+        :container-class="embedded ? 'bg-transparent' : undefined"
+        draggable-group="publications"
+        :has-active-filters="hasActiveTypeFilters"
+        filter-header-key="type"
+        @update:options="refreshTable"
+        @dragged="onDropCallback"
+    >
+        <template v-if="$slots['top-left']" #top-left>
+            <slot name="top-left"></slot>
+        </template>
+        <template #actions>
+            <slot name="actions"></slot>
+        </template>
+        <template #selection-menu>
+            <v-list-item
+                v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
+                :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
+                class="action-menu-item"
+                @click="startDeletionProcess"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ allowResearcherUnbinding ? $t("unbindLabel") : $t("deleteLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                    <v-list class="action-menu-list" density="compact">
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison || allowResearcherUnbinding)"
-                            :disabled="allowResearcherUnbinding ? (!canPerformUnbinding() || selectedPublications.length === 0) : selectedPublications.length === 0"
-                            class="action-menu-item"
-                            @click="startDeletionProcess"
-                        >
-                            <template #prepend>
-                                <v-icon color="error" size="18">
-                                    mdi-delete
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ allowResearcherUnbinding ? $t("unbindLabel") : $t("deleteLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
+            <v-list-item
+                v-if="showsResearchOutputs && canRemoveResearchOutputs"
+                :disabled="selectedPublications.length === 0"
+                class="action-menu-item"
+                @click="removeResearchOutputs"
+            >
+                <template #prepend>
+                    <v-icon color="warning" size="18">
+                        mdi-playlist-remove
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("removeLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                        <v-list-item
-                            v-if="showsResearchOutputs && canRemoveResearchOutputs"
-                            :disabled="selectedPublications.length === 0"
-                            class="action-menu-item"
-                            @click="removeResearchOutputs"
-                        >
-                            <template #prepend>
-                                <v-icon color="warning" size="18">
-                                    mdi-playlist-remove
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("removeLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
+            <v-list-item
+                v-if="(isAdmin || allowComparison) && !inComparator"
+                :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
+                class="action-menu-item"
+                @click="startMetadataComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-database-search
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("compareMetadataLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison) && !inComparator"
-                            :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type"
-                            class="action-menu-item"
-                            @click="startMetadataComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-database-search
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("compareMetadataLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
+            <v-list-item
+                v-if="isAdmin && !inComparator"
+                :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
+                class="action-menu-item"
+                @click="startPublicationComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-file-compare
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("comparePublicationsLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                        <v-list-item
-                            v-if="isAdmin && !inComparator"
-                            :disabled="selectedPublications.length !== 2 || selectedPublications[0]?.type !== selectedPublications[1]?.type || (selectedPublications[0]?.type !== 'PROCEEDINGS' && selectedPublications[0]?.type !== 'MONOGRAPH')"
-                            class="action-menu-item"
-                            @click="startPublicationComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-file-compare
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("comparePublicationsLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
+            <v-list-item
+                v-if="validationView"
+                :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
+                class="action-menu-item"
+                @click="validateSectionForAll(true)"
+            >
+                <template #prepend>
+                    <v-icon color="success" size="18">
+                        mdi-check-decagram
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("validateMetadataLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                        <v-list-item
-                            v-if="validationView"
-                            :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.isApproved === true)"
-                            class="action-menu-item"
-                            @click="validateSectionForAll(true)"
-                        >
-                            <template #prepend>
-                                <v-icon color="success" size="18">
-                                    mdi-check-decagram
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("validateMetadataLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
+            <v-list-item
+                v-if="validationView"
+                :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
+                class="action-menu-item"
+                @click="validateSectionForAll(false)"
+            >
+                <template #prepend>
+                    <v-icon color="success" size="18">
+                        mdi-file-check
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("validateUploadedFilesLabel") }}
+                </v-list-item-title>
+            </v-list-item>
 
-                        <v-list-item
-                            v-if="validationView"
-                            :disabled="selectedPublications.length === 0 || selectedPublications.some(p => p.areFilesValid === true)"
-                            class="action-menu-item"
-                            @click="validateSectionForAll(false)"
-                        >
-                            <template #prepend>
-                                <v-icon color="success" size="18">
-                                    mdi-file-check
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("validateUploadedFilesLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-
-                        <v-list-item
-                            v-if="enableExport"
-                            class="action-menu-item"
-                            @click="openExportModal"
-                        >
-                            <template #prepend>
-                                <v-icon color="success" size="18">
-                                    mdi-download
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("exportLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+            <v-list-item
+                v-if="enableExport"
+                class="action-menu-item"
+                @click="openExportModal"
+            >
+                <template #prepend>
+                    <v-icon color="success" size="18">
+                        mdi-download
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("exportLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template v-if="$slots['type-filter-menu']" #filter="{ column }">
+            <slot name="type-filter-menu" :column="column"></slot>
+        </template>
+        <template #[`header.`+titleColumn]="{ isSorted, column, toggleSort, getSortIcon }">
+            <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
+                <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
+                    <span>{{ column.title }}</span>
+                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                </div>
+                <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
+                    <span>{{ yearHeader.title }}</span>
+                    <v-icon :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)"></v-icon>
+                </div>
             </div>
-            <div :class="[selectedPublications.length > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
-                <slot name="top-left" />
-            </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <slot name="actions" />
-        </div>
-    </div>
+        </template>
+        <template #compact-item="{ item }">
+            <publication-card
+                :item="item"
+                :selected-publications="selectedPublications"
+                :show-select="showSelect"
+                :show-publication-concrete-type="showPublicationConcreteType"
+                @update:selected-publications="selectedPublications = $event"
+                @open="openGlance(item)"
+            />
+        </template>
+        <template #row="{ item }">
+            <publication-table-row
+                :item="item"
+                :selected-publications="selectedPublications"
+                :show-select="showSelect"
+                :show-publication-concrete-type="showPublicationConcreteType"
+                :rich-results-view="richResultsView"
+                :validation-view="validationView"
+                :in-claimer="inClaimer"
+                :show-classification="showClassification"
+                :is-commission="isCommission"
+                :logged-in-commission-id="loggedInUser?.commissionId"
+                :show-document-download="isDigitalRepositoryEnabled"
+                @update:selected-publications="selectedPublications = $event"
+                @claim="claimPublication"
+                @decline-claim="declinePublicationClaim"
+                @classified="documentClassified"
+                @refresh="refreshTable(tableOptions)"
+                @validate="validateSection"
+            />
+        </template>
+    </responsive-data-table>
     <table-export-modal
         v-if="enableExport"
         ref="exportModal"
@@ -153,220 +195,22 @@
         :endpoint-body-parameters="endpointBodyParameters"
         :hide-activation-button="true" />
 
-    <div ref="tableWrapper" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table-server
-            v-model="selectedPublications"
-            :sort-by="tableOptions.sortBy"
-            :items="publications"
-            :headers="headers"
-            item-value="row"
-            :items-length="totalPublications"
-            :show-select="isAdmin || allowSelection || enableExport"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :page="tableOptions.page"
-            @update:options="refreshTable">
-            <template #[`header.`+titleColumn]="{ isSorted, column, toggleSort, getSortIcon }">
-                <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
-                    <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
-                        <span>{{ column.title }}</span>
-                        <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
-                    </div>
-
-                    <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
-                        <span>{{ yearHeader.title }}</span>
-                        <v-icon class="" :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)" />
-                    </div>
-                </div>
-            </template>
-            <template #[`header.type`]="{ isSorted, column, toggleSort, getSortIcon }">
-                <div class="group flex items-center gap-2" @click="toggleSort(column)">
-                    <span>{{ column.title }}</span>
-                    <v-menu v-if="$slots['type-filter-menu']" :close-on-content-click="false">
-                        <template #activator="{ props }">
-                            <v-icon 
-                                v-bind="props" 
-                                :title="hasActiveTypeFilters ? $t('filterActiveLabel') : $t('filterLabel')"
-                                :class="hasActiveTypeFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
-                                icon="mdi-filter"
-                            />
-                        </template>
-                        <div class="p-3 bg-white rounded-lg shadow-lg">
-                            <slot name="type-filter-menu" :column="column" />
-                        </div>
-                    </v-menu>
-                    <v-icon class="" :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
-                </div>
-            </template>
-            <template #body="properties">
-                <draggable
-                    :list="(properties.items as unknown as any[])"
-                    tag="tbody"
-                    :disabled="!inComparator"
-                    group="publications"
-                    handle=".handle"
-                    @change="onDropCallback"
-                >
-                    <tr v-if="properties.items?.length === 0">
-                        <td colspan="10" class="text-center">
-                            <p>{{ $t("noDataInTableMessage") }}</p>
-                        </td>
-                    </tr>
-                    <tr v-for="item in properties.items" :key="item.id" class="handle">
-                        <td v-if="isAdmin || allowSelection || enableExport" class="px-2!">
-                            <v-checkbox
-                                v-model="selectedPublications"
-                                :value="item"
-                                class="table-checkbox"
-                                hide-details
-                            />
-                        </td>
-                        <td class="py-2!">
-                            <div class="flex gap-2">
-                                <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId" class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center hover:bg-purple-200 transition-colors flex-shrink-0">
-                                    <v-icon color="primary" size="20">
-                                        {{ getPublicationTypeIcon(item.type) }}
-                                    </v-icon>
-                                </localized-link>
-                                <div>
-                                    <div class="flex items-baseline gap-2">
-                                        <div class="text-gray-800! hover:text-blue-900! font-semibold text-base flex">
-                                            <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId">
-                                                <rich-title-renderer v-if="$i18n.locale.startsWith('sr')" :title="item.titleSr" />
-                                                <rich-title-renderer v-else :title="item.titleOther" />
-                                            </localized-link>
-                                            <span v-if="item.year && item.year > 0">, </span>
-                                        </div>
-                                        <span v-if="item.year && item.year > 0" class="text-xs text-gray-600">{{ item.year }}</span>
-                                    </div>
-                                    <div v-if="item.authorNames.trim() !== ''" class="mt-1 ml-1 text-sm text-gray-600">
-                                        <div v-for="(author, index) in getDisplayedAuthors(item)" :key="index">
-                                            <localized-link
-                                                v-if="item.authorIds[index] !== -1"
-                                                :to="'persons/' + item.authorIds[index]"
-                                                class="flex items-center gap-1"
-                                            >
-                                                <v-icon size="14" class="text-gray-500">
-                                                    mdi-account
-                                                </v-icon>
-                                                {{ `${author.trim()}` }}
-                                            </localized-link>
-                                            <span v-else class="flex items-center gap-1">
-                                                <v-icon size="14" class="text-gray-500">mdi-account-outline</v-icon>
-                                                {{ `${author.trim()}` }}
-                                            </span>
-                                        </div>
-                                        <v-btn
-                                            v-if="shouldShowMoreButton(item)"
-                                            variant="text"
-                                            size="x-small"
-                                            color="primary"
-                                            class="mt-1"
-                                            @click="toggleShowAllAuthors(item.databaseId as number)"
-                                        >
-                                            {{ getShowMoreText(item) }}
-                                        </v-btn>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <v-chip size="small" color="primary" variant="flat" :prepend-icon="getPublicationTypeIcon(item.type)">
-                                {{ showPublicationConcreteType ? getConcretePublicationType(item.publicationType) : getPublicationTypeTitleFromValueAutoLocale(item.type) }}
-                            </v-chip>
-                        </td>
-                        <td>
-                            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi" />
-                        </td>
-                        <td v-if="isDigitalRepositoryEnabled">
-                            <v-menu
-                                v-if="richResultsView"
-                                :close-on-content-click="true"
-                                location="bottom"
-                            >
-                                <template #activator="{ props }">
-                                    <div class="edit-pen">
-                                        <v-btn
-                                            v-bind="props"
-                                            compact>
-                                            ...
-                                        </v-btn>
-                                    </div>
-                                </template>
-
-                                <v-list min-width="150">
-                                    <publication-reference-formats
-                                        :document-id="(item.databaseId as number)"
-                                    />
-                                    <publication-file-download-modal
-                                        :document-id="(item.databaseId as number)"
-                                    />
-                                </v-list>
-                            </v-menu>
-                            <div
-                                v-else
-                                class="d-flex flex-row justify-center">
-                                <publication-file-download-modal
-                                    :document-id="(item.databaseId as number)"
-                                    :show-thesis-sections="item.type === 'THESIS'"
-                                    :is-thesis-section="item.type === 'THESIS'"
-                                    hide-empty-sections
-                                    :persistent="false"
-                                    :is-list-item="false"
-                                    :contains-files="item.containsFiles"
-                                />
-                            </div>
-                        </td>
-                        <td>
-                            <v-btn
-                                v-if="inClaimer"
-                                size="small"
-                                color="primary"
-                                @click="claimPublication(item.databaseId as number)">
-                                {{ $t("claimLabel") }}
-                            </v-btn>
-                            <v-btn
-                                v-if="inClaimer" class="ml-1" size="small" color="primary"
-                                @click="declinePublicationClaim(item.databaseId as number)">
-                                {{ $t("declineClaimLabel") }}
-                            </v-btn>
-                            <entity-classification-modal-content
-                                v-if="(isAdmin || isCommission) && !richResultsView && !validationView"
-                                :entity-id="(item.databaseId as number)"
-                                :entity-type="ApplicableEntityType.DOCUMENT"
-                                :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
-                                :disabled="!item.year || item.year < 0"
-                                @classified="documentClassified(item)"
-                                @update="refreshTable(tableOptions)"
-                            />
-                            <v-btn
-                                v-if="validationView"
-                                size="small"
-                                color="primary"
-                                :disabled="item.isApproved"
-                                @click="validateSection(item.databaseId as number, true)">
-                                {{ $t("validateMetadataLabel") }}
-                            </v-btn>
-                            <v-btn
-                                v-if="validationView"
-                                class="ml-1"
-                                size="small"
-                                color="primary"
-                                :disabled="item.areFilesValid"
-                                @click="validateSection(item.databaseId as number, false)">
-                                {{ $t("validateUploadedFilesLabel") }}
-                            </v-btn>
-                        </td>
-                        <td v-if="isCommission">
-                            <v-icon v-if="item.assessedBy?.includes(loggedInUser?.commissionId as number)" icon="mdi-check" />
-                            <v-icon v-else icon="mdi-close" />
-                        </td>
-                    </tr>
-                </draggable>
-            </template>
-        </v-data-table-server>
-    </div>
+    <publication-quick-glance
+        v-model="glanceOpen"
+        :item="glancedPublication"
+        :show-publication-concrete-type="showPublicationConcreteType"
+        :rich-results-view="richResultsView"
+        :validation-view="validationView"
+        :in-claimer="inClaimer"
+        :show-classification="showClassification"
+        :is-commission="isCommission"
+        :logged-in-commission-id="loggedInUser?.commissionId"
+        @claim="claimPublication"
+        @decline-claim="declinePublicationClaim"
+        @classified="documentClassified"
+        @refresh="refreshTable(tableOptions)"
+        @validate="validateSection"
+    />
 
     <div class="notificationContainer">
         <v-slide-y-transition group>
@@ -390,38 +234,29 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, type PropType } from 'vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
-import { getPublicationTypeTitleFromValueAutoLocale } from '@/i18n/publicationType';
-import { VueDraggableNext } from 'vue-draggable-next';
-import { watch } from 'vue';
-import { getDocumentLandingPageBasePath, getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
+import { getMetadataComparisonPageName, getPublicationComparisonPageName } from '@/utils/PathResolutionUtil';
 import { useRouter } from 'vue-router';
-import RichTitleRenderer from '../core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import EntityClassificationModalContent from '../assessment/classifications/EntityClassificationModalContent.vue';
-import { ApplicableEntityType, ExportableEndpointType, ExportEntity } from '@/models/Common';
-import PublicationReferenceFormats from './PublicationReferenceFormats.vue';
-import PublicationFileDownloadModal from './PublicationFileDownloadModal.vue';
+import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
-import { getTitleFromValueAutoLocale as getJournalPublicationTypeTitle } from '@/i18n/journalPublicationType';
-import { getTitleFromValueAutoLocale as getProceedingsPublicationTypeTitle } from '@/i18n/proceedingsPublicationType';
-import { getTitleFromValueAutoLocale as getMonographPublicationTypeTitle } from '@/i18n/monographPublicationType';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
-import IdentifierMenu from '../core/IdentifierMenu.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
-import { getApplicableEntityTypeForDocumentType } from '@/i18n/applicableEntityType';
-import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
+import ResponsiveDataTable from '../core/ResponsiveDataTable.vue';
+import PublicationTableRow from './PublicationTableRow.vue';
+import PublicationCard from './PublicationCard.vue';
+import PublicationQuickGlance from './PublicationQuickGlance.vue';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
 export default defineComponent({
     name: "PublicationTableComponent",
-    components: { LocalizedLink, draggable: VueDraggableNext, RichTitleRenderer, EntityClassificationModalContent, PublicationReferenceFormats, PublicationFileDownloadModal, TableExportModal, IdentifierMenu, PersistentQuestionDialog },
+    components: { ResponsiveDataTable, TableExportModal, PersistentQuestionDialog, PublicationTableRow, PublicationCard, PublicationQuickGlance },
     props: {
         publications: {
             type: Array<DocumentPublicationIndex>,
@@ -502,13 +337,17 @@ export default defineComponent({
         limitOneSelection: {
             type: Boolean,
             default: false
+        },
+        embedded: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["switchPage", "dragged", "claim", "declineClaim", "selectionUpdated", "removeResearchOutputs"],
     setup(props, {emit}) {
         const selectedPublications = ref<DocumentPublicationIndex[]>([]);
-        const expandedAuthors = ref<Set<number>>(new Set());
-        const MAX_AUTHORS_DISPLAYED = 4;
+        const glanceOpen = ref(false);
+        const glancedPublication = ref<DocumentPublicationIndex | null>(null);
 
         const i18n = useI18n();
         const router = useRouter();
@@ -516,12 +355,9 @@ export default defineComponent({
         const notifications = ref<Map<string, string>>(new Map());
         const exportModal = ref<any>(null);
 
-        const tableWrapper = ref<any>(null);
-
         const {
             isDigitalRepositoryEnabled
         } = useCrisContextInformation();
-
         onMounted(() => {
             if ((props.inClaimer ||
                 isAdmin.value ||
@@ -537,16 +373,6 @@ export default defineComponent({
             }
 
             tableOptions.value.sortBy = [{key: "year", order: "desc"}];
-        });
-
-        watch(tableWrapper, () => {
-            if (tableWrapper.value) {
-                const table = tableWrapper.value;
-                const sortableTbody = table.querySelector('.v-table__wrapper > table > tbody > tbody')
-                const tbody = table.querySelector('.v-table__wrapper > table > tbody')
-                tbody!.parentNode!.append(sortableTbody!)
-                tbody!.remove()
-            }
         });
 
         let isUpdatingSeelction = false;
@@ -579,6 +405,9 @@ export default defineComponent({
             isUserLoggedIn,
             isResearcher
         } = useUserRole();
+
+        const showSelect = computed(() => isAdmin.value || props.allowSelection || props.enableExport);
+        const showClassification = computed(() => (isAdmin.value || isCommission.value) && !props.richResultsView && !props.validationView);
 
         const titleColumn = computed(() => i18n.t("titleColumn"));
 
@@ -623,7 +452,7 @@ export default defineComponent({
         }, { immediate: true });
 
         // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
-        const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year"})
+        const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year", defaultOrder: "desc" })
 
         const headersSortableMappings: Map<string, string> = new Map([
             ["titleSr", "title_sr_sortable"],
@@ -796,43 +625,6 @@ export default defineComponent({
             emit("removeResearchOutputs", selectedPublications.value.map(selectedPublication => selectedPublication.databaseId));
         };
 
-        const getConcretePublicationType = (publicationType: string) => {
-            const possibleValues = [
-                getJournalPublicationTypeTitle(publicationType),
-                getProceedingsPublicationTypeTitle(publicationType),
-                getMonographPublicationTypeTitle(publicationType)
-            ];
-            
-            return possibleValues.find(publicationType => publicationType);
-        };
-
-        const getPublicationTypeIcon = (type: string) => {
-            switch(type) {
-                case 'JOURNAL_PUBLICATION':
-                    return 'mdi-book-open-page-variant';
-                case 'PROCEEDINGS':
-                    return 'mdi-presentation';
-                case 'INTELLECTUAL_PROPERTY':
-                    return 'mdi-shield-check';
-                case 'INTANGIBLE_PRODUCT':
-                    return 'mdi-code-tags';
-                case 'MONOGRAPH':
-                    return 'mdi-book';
-                case 'MONOGRAPH_PUBLICATION':
-                    return 'mdi-book-open';
-                case 'THESIS':
-                    return 'mdi-school';
-                case 'MATERIAL_PRODUCT':
-                    return 'mdi-hammer-wrench';
-                case 'GENETIC_MATERIAL':
-                    return 'mdi-sprout';
-                case 'PERFORMANCE_RELATED_OUTPUT':
-                    return 'mdi-drama-masks';
-                default:
-                    return 'mdi-file-document';
-            }
-        };
-
         const validateSection = async (documentId: number, metadata: boolean) => {
             const validationMethod = metadata ? 
                 () => OrganisationUnitTrustConfigurationService.validateDocumentMetadata(documentId) :
@@ -885,40 +677,9 @@ export default defineComponent({
             }
         };
 
-        const toggleShowAllAuthors = (publicationId: number) => {
-            if (expandedAuthors.value.has(publicationId)) {
-                expandedAuthors.value.delete(publicationId);
-            } else {
-                expandedAuthors.value.add(publicationId);
-            }
-        };
-
-        const getDisplayedAuthors = (item: DocumentPublicationIndex) => {
-            const authors = item.authorNames.split(';');
-            const isExpanded = expandedAuthors.value.has(item.databaseId as number);
-            
-            if (authors.length <= MAX_AUTHORS_DISPLAYED || isExpanded) {
-                return authors;
-            }
-            
-            return authors.slice(0, MAX_AUTHORS_DISPLAYED);
-        };
-
-        const shouldShowMoreButton = (item: DocumentPublicationIndex) => {
-            const authors = item.authorNames.split(';');
-            return authors.length > MAX_AUTHORS_DISPLAYED;
-        };
-
-        const getShowMoreText = (item: DocumentPublicationIndex) => {
-            const authors = item.authorNames.split(';');
-            const isExpanded = expandedAuthors.value.has(item.databaseId as number);
-            
-            if (isExpanded) {
-                return i18n.t("showLessLabel");
-            }
-            
-            const remainingCount = authors.length - MAX_AUTHORS_DISPLAYED;
-            return i18n.t("showMoreAuthorsLabel", { count: remainingCount });
+        const openGlance = (item: DocumentPublicationIndex) => {
+            glancedPublication.value = item;
+            glanceOpen.value = true;
         };
 
         const displayPersistentDialog = ref(false);
@@ -928,34 +689,28 @@ export default defineComponent({
 
         return {
             selectedPublications, headers, notifications,
-            refreshTable, isAdmin, deleteSelection, tableWrapper,
+            refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder, onDropCallback,
-            getPublicationTypeTitleFromValueAutoLocale, isCommission,
-            startMetadataComparison, getDocumentLandingPageBasePath,
+            isCommission, startMetadataComparison,
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
-            ApplicableEntityType, removeResearchOutputs, ExportEntity,
-            getConcretePublicationType, isUserLoggedIn, validateSection,
+            removeResearchOutputs, ExportEntity,
+            isUserLoggedIn, validateSection,
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
-            toggleShowAllAuthors, getDisplayedAuthors, shouldShowMoreButton, getShowMoreText,
-            getPublicationTypeIcon, titleColumn, yearHeader, displayPersistentDialog,
-            startDeletionProcess, getApplicableEntityTypeForDocumentType,
-            isDigitalRepositoryEnabled
+            titleColumn, yearHeader, displayPersistentDialog, startDeletionProcess, showSelect, showClassification, glanceOpen, glancedPublication, openGlance, isDigitalRepositoryEnabled,
         };
     }
 });
 </script>
 
 <style scoped>
-
-.action-menu-trigger {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+.action-menu-item {
+    border-radius: 6px;
+    margin: 2px 4px;
+    transition: all 0.2s ease;
 }
 
-.action-menu-list {
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+.action-menu-item:hover {
+    background-color: rgba(25, 118, 210, 0.08);
 }
 </style>

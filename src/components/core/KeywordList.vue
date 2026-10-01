@@ -1,29 +1,50 @@
 <template>
-    <v-row>
-        <v-col cols="12">
-            <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                <v-card-text class="edit-pen-container">
-                    <generic-crud-modal
-                        :form-component="KeywordUpdateForm"
-                        :form-props="{ presetKeywords: keywords ? keywords : [] }"
-                        entity-name="Keywords"
-                        is-update
-                        is-section-update
-                        :read-only="!canEdit"
-                        @update="emitToParent"
-                    />
+    <landing-section-card
+        :title="$t('keywordsLabel')"
+        :count="parsedKeywords.length"
+        icon="mdi-tag-multiple-outline"
+        icon-class="bg-amber-50 text-amber-700"
+        padded
+    >
+        <template v-if="canEdit" #action>
+            <generic-crud-modal
+                :form-component="KeywordUpdateForm"
+                :form-props="{ presetKeywords: keywords ? keywords : [] }"
+                entity-name="Keywords"
+                is-update
+                is-section-update
+                @update="emitToParent"
+            >
+                <template #activator="{ props: activatorProps }">
+                    <v-btn
+                        v-bind="activatorProps"
+                        variant="outlined"
+                        size="small"
+                        class="text-none"
+                        prepend-icon="mdi-pencil-outline">
+                        {{ $t("editActionLabel") }}
+                    </v-btn>
+                </template>
+            </generic-crud-modal>
+        </template>
 
-                    <div class="mb-2">
-                        <b>{{ $t("keywordsLabel") }}</b>
-                    </div>
-                    <strong v-if="!parsedKeywords || parsedKeywords.length === 0">{{ $t("notYetSetMessage") }}</strong>
-                    <v-chip v-for="(keyword, index) in parsedKeywords" :key="index" outlined @click="searchKeyword(keyword)">
-                        {{ keyword }}
-                    </v-chip>
-                </v-card-text>
-            </v-card>
-        </v-col>
-    </v-row>
+        <p
+            v-if="parsedKeywords.length === 0"
+            class="text-sm text-slate-500">
+            {{ $t("notYetSetMessage") }}
+        </p>
+        <div v-else class="flex flex-wrap gap-2">
+            <v-chip
+                v-for="(keyword, index) in parsedKeywords"
+                :key="index"
+                size="small"
+                variant="tonal"
+                color="amber"
+                @click="searchKeyword(keyword)">
+                {{ keyword }}
+            </v-chip>
+        </div>
+    </landing-section-card>
 </template>
 
 <script lang="ts">
@@ -35,11 +56,12 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import KeywordUpdateForm from './update/KeywordUpdateForm.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 
 
 export default defineComponent({
     name: "KeywordList",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, LandingSectionCard },
     props: {
         canEdit: {
             type: Boolean,
@@ -74,14 +96,17 @@ export default defineComponent({
 
         const displayKeywords = () => {
             if (!props.keywords) {
+                parsedKeywords.value = [];
                 return;
             }
 
-            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
+            parsedKeywords.value = (returnCurrentLocaleContent(props.keywords)?.split("\n") || [])
+                .map((keyword) => keyword.trim())
+                .filter(Boolean);
         };
 
         watch(i18n.locale, () => {
-            parsedKeywords.value = returnCurrentLocaleContent(props.keywords)?.split("\n") as string[];
+            displayKeywords();
         });
 
         return { 
@@ -91,26 +116,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped>
-    .edit-pen-container {
-        position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
-</style>

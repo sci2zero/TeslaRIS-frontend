@@ -1,109 +1,77 @@
 <template>
-    <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-        <v-card-text class="edit-pen-container">
+    <div :class="embedded ? undefined : 'overflow-hidden rounded-xl border border-slate-200 bg-white'">
+        <div
+            v-if="canEdit && !embedded"
+            class="flex justify-end border-b border-slate-100 px-4 py-2">
             <document-file-submission-modal
-                v-if="canEdit"
                 :is-proof="isProof"
                 :allow-licence-selection="allowLicenceSelection"
                 :always-open-access="alwaysOpenAccess"
                 :disable-resource-type-selection="disableResourceTypeSelection"
                 :allowed-resource-types="allowedResourceTypes"
-                @create="sendDataToParent"
-            />
+                @create="sendDataToParent">
+                <template #activator="{ props: activatorProps }">
+                    <v-btn
+                        v-bind="activatorProps"
+                        variant="outlined"
+                        size="small"
+                        class="text-none"
+                        prepend-icon="mdi-upload">
+                        {{ isProof ? $t("addProofLabel") : $t("addDocumentFileLabel") }}
+                    </v-btn>
+                </template>
+            </document-file-submission-modal>
+        </div>
 
-            <v-row>
-                <v-list
-                    :lines="false"
-                    density="compact"
-                    class="pa-0 overflow-hidden"
-                >
-                    <draggable 
-                        :list="attachments" item-key="id"
-                        :group="isProof ? 'proofs' : 'fileItems'" 
-                        :disabled="false"
-                    >
-                        <v-list-item
-                            v-for="(attachment, attachmentIndex) in attachments" :key="attachmentIndex"
-                            :value="attachment.serverFilename"
-                            color="primary"
-                        >
-                            <template #prepend>
-                                <v-icon icon="mdi-file-document-outline" />
-                            </template>
+        <div
+            v-if="!attachments || attachments.length === 0"
+            class="px-4 py-5 text-sm text-slate-500">
+            {{ $t("noFilesUploadedMessage") }}
+        </div>
 
-                            <v-list-item-title @click="download(attachment)">
-                                {{ attachment.isArchived ? `(${$t("archivedDocumentFileLabel")}) ` : "" }}{{ getResourceTypeTitleFromValueAutoLocale(attachment.resourceType) }}: {{ attachment.fileName }} ({{ attachment.sizeInMb > 0 ? attachment.sizeInMb : "<1" }}MB)
-                            </v-list-item-title>
-
-                            <v-list-item-subtitle>
-                                {{ returnCurrentLocaleContent(attachment.description) }}
-                            </v-list-item-subtitle>
-
-                            <template #append>
-                                <c-c-license-badge
-                                    v-if="attachment.accessRights.toString() === 'OPEN_ACCESS' && attachment.license"
-                                    :license="attachment.license.toLowerCase()"
-                                />
-                                <v-row v-if="canEdit">
-                                    <v-col v-if="!disableUpdates || isInstitutionalLibrarian || isAdmin || isHeadOfLibrary">
-                                        <v-btn
-                                            icon variant="outlined" size="x-small" color="primary"
-                                            class="inline-action" @click="sendDeleteRequestToParent(attachment.id)">
-                                            <v-icon size="x-large" icon="mdi-delete" />
-                                        </v-btn>
-                                    </v-col>
-                                    <v-col v-if="!disableUpdates">
-                                        <document-file-submission-modal
-                                            :is-proof="isProof" edit :preset-document-file="attachment"
-                                            :allow-licence-selection="allowLicenceSelection"
-                                            :disable-resource-type-selection="disableResourceTypeSelection"
-                                            :allowed-resource-types="allowedResourceTypes"
-                                            :can-be-archived="canBeArchived"
-                                            @update="sendUpdateRequestToParent($event, attachment.id)"
-                                        />
-                                    </v-col>
-                                    <v-col v-if="(canMakeOfficial && canEdit) && (isAdmin || isInstitutionalLibrarian)">
-                                        <v-btn
-                                            icon variant="outlined" size="x-small" color="primary"
-                                            class="inline-action" @click="moveToOfficial(attachment)">
-                                            <v-icon size="x-large" icon="mdi-file-move-outline" />
-                                        </v-btn>
-                                    </v-col>
-                                </v-row>
-                            </template>
-                        </v-list-item>
-                    </draggable>
-                </v-list>
-                <h4 v-if="attachments && attachments.length === 0">
-                    {{ $t("noFilesUploadedMessage") }}
-                </h4>
-            </v-row>
-        </v-card-text>
-    </v-card>
-
-    <toast v-model="snackbar" :message="errorMessage" />
+        <draggable
+            v-else
+            :list="attachments"
+            item-key="id"
+            tag="ul"
+            class="divide-y divide-slate-100"
+            :group="isProof ? 'proofs' : 'fileItems'"
+            :disabled="false">
+            <li
+                v-for="(attachment, attachmentIndex) in attachments"
+                :key="attachment.id ?? attachmentIndex">
+                <attachment-element
+                    :attachment="attachment"
+                    :can-edit="canEdit"
+                    :is-proof="isProof"
+                    :allow-licence-selection="allowLicenceSelection"
+                    :disable-updates="disableUpdates"
+                    :disable-resource-type-selection="disableResourceTypeSelection"
+                    :allowed-resource-types="allowedResourceTypes"
+                    :can-make-official="canMakeOfficial"
+                    :can-be-archived="canBeArchived"
+                    @delete="sendDeleteRequestToParent(attachment.id)"
+                    @update="sendUpdateRequestToParent($event, attachment.id)"
+                    @make-official="moveToOfficial(attachment)"
+                />
+            </li>
+        </draggable>
+    </div>
 </template>
 
 <script lang="ts">
-import { License, type DocumentFile, type DocumentFileResponse, type ResourceType } from '@/models/DocumentFileModel';
-import DocumentFileService from '@/services/DocumentFileService';
-import { defineComponent, type PropType } from 'vue';
-import DocumentFileSubmissionModal from '../documentFile/DocumentFileSubmissionModal.vue';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { VueDraggableNext } from 'vue-draggable-next';
-import { getResourceTypeTitleFromValueAutoLocale } from '@/i18n/resourceType';
-import Toast from './Toast.vue';
-import { useUserRole } from '@/composables/useUserRole';
-import { getNameFromOrdinal } from '@/utils/EnumUtil';
-import CCLicenseBadge from './CCLicenseBadge.vue';
-import { useRoute } from 'vue-router';
+import type { DocumentFile, DocumentFileResponse, ResourceType } from "@/models/DocumentFileModel";
+import DocumentFileService from "@/services/DocumentFileService";
+import { defineComponent, type PropType } from "vue";
+import DocumentFileSubmissionModal from "../documentFile/DocumentFileSubmissionModal.vue";
+import { VueDraggableNext } from "vue-draggable-next";
+import AttachmentElement from "./AttachmentElement.vue";
+import { useRoute } from "vue-router";
 
 
 export default defineComponent({
     name: "AttachmentList",
-    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext, Toast, CCLicenseBadge },
+    components: { DocumentFileSubmissionModal, draggable: VueDraggableNext, AttachmentElement },
     props: {
         attachments: {
             type: Object as PropType<DocumentFileResponse[]>,
@@ -145,6 +113,10 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
+        embedded: {
+            type: Boolean,
+            default: false
+        },
         allowedResourceTypes: {
             type: Array as PropType<ResourceType[]>,
             default: undefined
@@ -152,29 +124,7 @@ export default defineComponent({
     },
     emits: ["create", "delete", "update", "made-official"],
     setup(_, { emit }) {
-        const errorMessage = ref("");
-        const snackbar = ref(false);
-
-        const { isAdmin, isHeadOfLibrary, isInstitutionalLibrarian } = useUserRole();
-
         const currentRoute = useRoute();
-        const i18n = useI18n();
-
-        const download = (attachment: DocumentFileResponse) => {
-            DocumentFileService.downloadDocumentFile(
-                attachment.serverFilename,
-                attachment.fileName,
-                attachment.serverFilename.split(".").pop() as string,
-                false
-            ).catch((error) => {
-                if(error.response.status === 451) {
-                    errorMessage.value = i18n.t("loginToViewDocumentMessage");
-                } else {
-                    errorMessage.value = i18n.t("genericErrorMessage");
-                }
-                snackbar.value = true;
-            });
-        };
 
         const sendDataToParent = (documentFile: DocumentFile) => {
             emit("create", documentFile);
@@ -199,18 +149,11 @@ export default defineComponent({
         };
 
         return {
-            download, sendDataToParent, sendDeleteRequestToParent, 
-            sendUpdateRequestToParent, returnCurrentLocaleContent, isAdmin,
-            errorMessage, snackbar, getResourceTypeTitleFromValueAutoLocale,
-            isHeadOfLibrary, License, getNameFromOrdinal, moveToOfficial,
-            isInstitutionalLibrarian
+            sendDataToParent,
+            sendDeleteRequestToParent,
+            sendUpdateRequestToParent,
+            moveToOfficial
         };
     }
 });
 </script>
-
-<style scoped>
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

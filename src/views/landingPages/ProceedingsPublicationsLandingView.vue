@@ -1,162 +1,95 @@
 <template>
-    <v-container id="proceedingsPublication">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5">
-                        <v-skeleton-loader
-                            :loading="!proceedingsPublication"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)" />
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ returnCurrentLocaleContent(proceedingsPublication?.subTitle) }}
-                        <br>
-                        {{ $t("proceedingsPublicationLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <landing-page-layout
+        id="proceedingsPublication"
+        v-model="currentTab"
+        :loading="!proceedingsPublication"
+        loader-layout="list"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!proceedingsPublication"
+                :subtitle="returnCurrentLocaleContent(proceedingsPublication?.subTitle)"
+                :entity-label="$t('proceedingsPublicationLabel')"
+                :badge="proceedingsPublication?.proceedingsPublicationType ? getTitleFromValueAutoLocale(proceedingsPublication.proceedingsPublicationType) : ''"
+                :year="proceedingsPublication?.documentDate?.year"
+                icon="mdi-newspaper-variant"
+                :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                :edit-label="$t('updateProceedingsPublicationLabel')"
+                :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                :entity-id="proceedingsPublication?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit && !proceedingsPublication?.isArchived"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="ProceedingsPublicationUpdateForm"
+                        :form-props="{ presetProceedingsPublication: proceedingsPublication}"
+                        entity-name="ProceedingsPublication"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit || proceedingsPublication?.isArchived"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="returnCurrentLocaleContent(proceedingsPublication?.title)" />
+                </template>
+                <template #affiliation>
+                    <p v-if="proceedingsPublication?.proceedingsId" class="text-lg sm:text-xl font-semibold text-slate-600">
+                        <localized-link :to="'proceedings/' + proceedingsPublication.proceedingsId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(proceedings?.title) }}
+                        </localized-link>
+                    </p>
+                    <p v-if="proceedingsPublication?.eventId" class="text-base sm:text-lg text-slate-600">
+                        <localized-link :to="'events/conference/' + proceedingsPublication.eventId" class="font-medium text-gray-900 underline">
+                            {{ returnCurrentLocaleContent(event?.name) }}
+                        </localized-link>
+                    </p>
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="proceedingsPublication?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
+                        {{ localiseFlexibleDate(proceedingsPublication.documentDate) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="proceedingsPublication?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="proceedingsPublication.doi" compact />
+                    </landing-meta-item>
+                </template>
+                <template #actions>
+                    <document-action-box
+                        ref="actionsRef"
+                        embedded
+                        :doi="proceedingsPublication?.doi"
+                        :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                        :could-archive="canEdit"
+                        :metadata-valid="proceedingsPublication?.isMetadataValid"
+                        :files-valid="proceedingsPublication?.areFilesValid"
+                        :document-id="parseInt(currentRoute.params.id as string)"
+                        :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
+                        :document="proceedingsPublication"
+                        :handle-researcher-unbind="handleResearcherUnbind"
+                        :transfer-to="PublicationType.JOURNAL_PUBLICATION"
+                        type-transfer-suffix="Journal"
+                        @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
+                    />
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <!-- ProceedingsPublication Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon v-if="!proceedingsPublication" size="x-large" class="large-proceedingsPublication-icon">
-                    {{ icon }}
-                </v-icon>
-                <wordcloud
-                    v-else
-                    :for-document-id="proceedingsPublication?.id"
-                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
-                    compact-icon
-                />
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="ProceedingsPublicationUpdateForm"
-                            :form-props="{ presetProceedingsPublication: proceedingsPublication}"
-                            entity-name="ProceedingsPublication"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit || proceedingsPublication?.isArchived"
-                            @update="updateBasicInfo"
-                        />
+        <template #before-tabs>
+            <publication-badge-section
+                class="mb-8"
+                :preloaded-doi="proceedingsPublication?.doi"
+                :document-id="parseInt(currentRoute.params.id as string)"
+                :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
+            />
+        </template>
 
-                        <!-- Basic Info -->
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-                        <basic-info-loader v-if="!proceedingsPublication" />
-                        <v-row v-else>
-                            <v-col cols="3">
-                                <div v-if="proceedingsPublication?.proceedingsPublicationType">
-                                    {{ $t("concretePublicationTypeLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.proceedingsPublicationType" class="response">
-                                    {{ getTitleFromValue(proceedingsPublication.proceedingsPublicationType, publicationTypes) }}
-                                </div>
-                                <div v-if="proceedingsPublication?.eventId">
-                                    {{ $t("conferenceLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.eventId" class="response">
-                                    <localized-link :to="'events/conference/' + proceedingsPublication?.eventId">
-                                        {{ returnCurrentLocaleContent(event?.name) }}
-                                    </localized-link>
-                                </div>
-                                <div v-if="proceedingsPublication?.proceedingsId">
-                                    {{ $t("proceedingsLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.proceedingsId" class="response">
-                                    <localized-link :to="'proceedings/' + proceedingsPublication?.proceedingsId">
-                                        {{ returnCurrentLocaleContent(proceedings?.title) }}
-                                    </localized-link>
-                                </div>
-                                <div v-if="proceedingsPublication?.documentDate">
-                                    {{ $t("dateOfPublicationLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.documentDate" class="response">
-                                    {{ localiseFlexibleDate(proceedingsPublication.documentDate) }}
-                                </div>
-                                <div v-if="proceedingsPublication?.startPage">
-                                    {{ $t("startPageLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.startPage" class="response">
-                                    {{ proceedingsPublication.startPage }}
-                                </div>
-                                <div v-if="proceedingsPublication?.endPage">
-                                    {{ $t("endPageLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.endPage" class="response">
-                                    {{ proceedingsPublication.endPage }}
-                                </div>
-                                <div v-if="proceedingsPublication?.numberOfPages">
-                                    {{ $t("numberOfPagesLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.articleNumber">
-                                    {{ $t("articleNumberLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.articleNumber" class="response">
-                                    {{ proceedingsPublication.articleNumber }}
-                                </div>
-                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0">
-                                    {{ $t("sectionLabel") }}:
-                                </div>
-                                <div v-if="proceedingsPublication?.section?.length ?? 0 > 0" class="response">
-                                    {{ returnCurrentLocaleContent(proceedingsPublication.section) }}
-                                </div>
-                            </v-col>
-
-                            <document-common-fields-display
-                                :document="proceedingsPublication"
-                                :can-edit="canEdit"
-                                :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                                :concrete-entity-type="ApplicableEntityType.PROCEEDINGS_PUBLICATION"
-                                :document-identifiers="documentIdentifiers"
-                                @identifiers-updated="fetchIdentifiers"
-                            />
-
-                            <v-col cols="3">
-                                <data-quality-remarks-dialog
-                                    :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
-                                    :entity-id="proceedingsPublication?.id"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <document-action-box
-            ref="actionsRef"
-            :doi="proceedingsPublication?.doi"
-            :can-edit="canEdit && !proceedingsPublication?.isArchived"
-            :could-archive="canEdit"
-            :metadata-valid="proceedingsPublication?.isMetadataValid"
-            :files-valid="proceedingsPublication?.areFilesValid"
-            :document-id="parseInt(currentRoute.params.id as string)"
-            :description="returnCurrentLocaleContent(proceedingsPublication?.description)"
-            :document="proceedingsPublication"
-            :handle-researcher-unbind="handleResearcherUnbind"
-            :transfer-to="PublicationType.JOURNAL_PUBLICATION"
-            type-transfer-suffix="Journal"
-            @update="fetchValidationStatus(proceedingsPublication?.id as number, proceedingsPublication as _Document)"
-        />
-
-        <tab-content-loader v-if="!proceedingsPublication" layout="list" />
-        <v-tabs
-            v-show="proceedingsPublication"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-        >
+        <template #tabs>
+            <v-tab value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
@@ -181,30 +114,17 @@
             <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
                 {{ $t("dataQualityLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window
-            v-show="proceedingsPublication"
-            v-model="currentTab">
-            <v-tabs-window-item value="additionalInfo">
-                <!-- Keywords -->
-                <keyword-list
-                    :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
-                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords" />
-
-                <!-- Description -->
-                <description-section
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
                     :description="proceedingsPublication?.description"
-                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    @update="updateDescription" />
-
-                <description-section
-                    :description="proceedingsPublication?.remark"
-                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
-                    is-remark
-                    @update="updateRemark"
+                    :contributions="proceedingsPublication?.contributions"
+                    :contribution-types="['AUTHOR']"
+                    :for-document-id="proceedingsPublication?.id"
+                    :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+                    @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
@@ -223,6 +143,33 @@
                     :can-edit="canEdit && !proceedingsPublication?.isArchived"
                     :proofs="proceedingsPublication?.proofs"
                     :file-items="proceedingsPublication?.fileItems" />  
+            </v-tabs-window-item>
+            <v-tabs-window-item value="additionalInfo">
+                <landing-additional-info-tab
+                    :keywords="proceedingsPublication?.keywords ? proceedingsPublication.keywords : []"
+                    :description="proceedingsPublication?.description"
+                    :remark="proceedingsPublication?.remark"
+                    :can-edit="canEdit && !proceedingsPublication?.isArchived"
+                    :document="proceedingsPublication"
+                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                    :concrete-entity-type="ApplicableEntityType.PROCEEDINGS_PUBLICATION"
+                    :document-identifiers="documentIdentifiers"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                    @update-remark="updateRemark"
+                    @identifiers-updated="fetchIdentifiers"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="proceedingsPublication?.startPage" :label="$t('startPageLabel')" :value="proceedingsPublication.startPage" />
+                        <landing-detail-field v-if="proceedingsPublication?.endPage" :label="$t('endPageLabel')" :value="proceedingsPublication.endPage" />
+                        <landing-detail-field v-if="proceedingsPublication?.articleNumber" :label="$t('articleNumberLabel')" :value="proceedingsPublication.articleNumber" />
+                        <landing-detail-field v-if="proceedingsPublication?.numberOfPages" :label="$t('numberOfPagesLabel')" :value="proceedingsPublication.numberOfPages" />
+                        <landing-detail-field v-if="proceedingsPublication?.section?.length" :label="$t('sectionLabel')">
+                            {{ returnCurrentLocaleContent(proceedingsPublication.section) }}
+                        </landing-detail-field>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <indicators-section 
@@ -276,43 +223,43 @@
                     :entity-id="proceedingsPublication?.id"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
+        </template>
 
-        <share-buttons
-            v-if="proceedingsPublication && isResearcher && canEdit"
-            :title="(returnCurrentLocaleContent(proceedingsPublication.title) as string)"
-            :document-id="(proceedingsPublication.id as number)"
-            :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
-        />
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+            <share-buttons
+                v-if="proceedingsPublication && isResearcher && canEdit"
+                :title="(returnCurrentLocaleContent(proceedingsPublication.title) as string)"
+                :document-id="(proceedingsPublication.id as number)"
+                :document-type="PublicationType.PROCEEDINGS_PUBLICATION"
+            />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
-import { computed, onMounted, nextTick } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { watch } from 'vue';
-import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution, type ProceedingsPublicationType } from '@/models/PublicationModel';
+import { PublicationType, type Document as _Document, type DocumentPublicationIndex, type PersonDocumentContribution } from '@/models/PublicationModel';
 import LanguageService from '@/services/LanguageService';
 import DataQualityService from '@/services/revision/DataQualityService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { ProceedingsPublication } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
-import KeywordList from '@/components/core/KeywordList.vue';
-import DescriptionSection from '@/components/core/DescriptionSection.vue';
 import type { Conference } from '@/models/EventModel';
 import EventService from '@/services/EventService';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { ProceedingsResponse } from '@/models/ProceedingsModel';
 import ProceedingsService from '@/services/ProceedingsService';
-import { getTitleFromValue, getTypesForGivenLocale } from "@/i18n/proceedingsPublicationType";
+import { getTitleFromValueAutoLocale } from "@/i18n/proceedingsPublicationType";
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
-import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
+import { localiseFlexibleDate } from '@/utils/DateUtil';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import ProceedingsPublicationUpdateForm from '@/components/publication/update/ProceedingsPublicationUpdateForm.vue';
@@ -326,12 +273,11 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import AssessmentClassificationService from '@/services/assessment/AssessmentClassificationService';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
-import Wordcloud from '@/components/core/Wordcloud.vue';
-import BasicInfoLoader from '@/components/core/BasicInfoLoader.vue';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
+import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
 import { useTrustConfigurationActions } from '@/composables/useTrustConfigurationActions';
 import ShareButtons from '@/components/core/ShareButtons.vue';
 import { type AxiosResponseHeaders } from 'axios';
@@ -340,19 +286,22 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
-import DocumentCommonFieldsDisplay from '@/components/publication/DocumentCommonFieldsDisplay.vue';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
-import DataQualityRemarksDialog from '@/components/core/revisions/DataQualityRemarksDialog.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
+import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
+import LandingDetailField from '@/components/landing/LandingDetailField.vue';
+import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
+import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
-
 
 export default defineComponent({
     name: "ProceedingsPublicationLandingPage",
-    components: { AttachmentSection, PersonDocumentContributionTabs, Toast, KeywordList, DescriptionSection, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, Wordcloud, BasicInfoLoader, TabContentLoader, DocumentActionBox, IndicatorsSection, ShareButtons, DocumentVisualizations, DocumentCommonFieldsDisplay, RevisionHistoryTableComponent, DataQualityRemarksDialog, DataQualityTabsComponent },
+    components: { LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
     setup() {
-        const currentTab = ref("contributions");
+        const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
@@ -372,7 +321,7 @@ export default defineComponent({
 
         const {
             isResearcher, isAdmin,
-            isCommission, isViceDeanForScience,
+            isCommission,
             canReviewDataQuality
         } = useUserRole();
 
@@ -394,9 +343,6 @@ export default defineComponent({
         const totalPublications = ref<number>(0);
 
         const i18n = useI18n();
-        const publicationTypes = computed((): { title: string, value: ProceedingsPublicationType }[] => (getTypesForGivenLocale() as { title: string; value: ProceedingsPublicationType; }[]));
-
-        const icon = ref("mdi-newspaper-variant");
 
         const documentIndicators = ref<EntityIndicatorResponse[]>();
         const documentClassifications = ref<EntityClassificationResponse[]>();
@@ -405,6 +351,13 @@ export default defineComponent({
         const loginStore = useLoginStore();
 
         const actionsRef = ref<typeof DocumentActionBox>();
+        const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+        const openModal = (modal: { dialog: boolean } | null) => {
+            if (modal) {
+                modal.dialog = true;
+            }
+        };
 
         const displayConfiguration = useDocumentChartDisplay(parseInt(currentRoute.params.id as string));
 
@@ -501,10 +454,6 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
-        const goToURL = (uri: string) => {
-            window.open(uri, "_blank");
-        };
-
         const updateKeywords = (keywords: MultilingualContent[]) => {
             proceedingsPublication.value!.keywords = keywords;
             performUpdate(false);
@@ -582,11 +531,10 @@ export default defineComponent({
         };
 
         return {
-            canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
-            proceedingsPublication, icon, publications, event, displayConfiguration,
+            proceedingsPublication, publications, event, displayConfiguration, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
             totalPublications, returnCurrentLocaleContent, isResearcher,
-            languageTagMap, localiseDate, ProceedingsPublicationUpdateForm,
-            searchKeyword, goToURL, canEdit, proceedings, getTitleFromValue,
+            languageTagMap, ProceedingsPublicationUpdateForm,
+            searchKeyword, canEdit, proceedings, getTitleFromValueAutoLocale,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
@@ -594,26 +542,11 @@ export default defineComponent({
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,
             fetchValidationStatus, PublicationType, updateRemark, isAdmin,
-            isCommission, publicationTypes, fetchIdentifiers, documentIdentifiers,
-            localiseFlexibleDate, fetchProceedingsPublication,
-            dataQualityTabsRef, showAssessmentDetails, isViceDeanForScience
+            isCommission, fetchIdentifiers, documentIdentifiers,
+            localiseFlexibleDate,
+            fetchProceedingsPublication,
+            dataQualityTabsRef, showAssessmentDetails, updateModalRef, openModal
         };
 }})
 
 </script>
-
-<style scoped>
-    #proceedingsPublication .large-proceedingsPublication-icon {
-        font-size: 10em;
-    }
-
-    #proceedingsPublication .response {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .edit-pen-container {
-        position:relative;
-    }
-</style>

@@ -8,41 +8,46 @@
     
     <aside
         :class="[
-            'fixed w-24 z-40 h-screen bg-gray-900 text-white flex flex-col items-center py-6 border-r border-gray-800 transition-all duration-300 shadow-lg',
+            'sidebar',
             sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
         ]">
-        <div class="flex items-center justify-center w-full">
+        <div class="sidebar-header">
             <router-link
                 to="/"
-                class="group relative flex flex-col items-center justify-center rounded-xl p-3 hover:bg-gray-800 transition-colors"
+                class="sidebar-item sidebar-item--brand"
                 aria-label="Logo">
-                <img src="/logov1.svg" alt="Logo" class="size-10">
                 <span
-                    class="mt-2 px-2 py-1 text-xs text-white text-center font-medium">TeslaRIS</span>
+                    v-if="!hasCustomLogo"
+                    class="sidebar-logo"
+                    aria-hidden="true"></span>
+                <img
+                    v-else
+                    :src="logoUrl"
+                    alt=""
+                    class="sidebar-logo-img"
+                />
+                <span class="sidebar-brand">{{ brandTitle }}</span>
             </router-link>
         </div>
 
-        <div class="mt-3 h-px w-12 bg-gray-800" />
+        <div class="sidebar-divider"></div>
 
-        <!-- Scroll up button -->
         <button
             v-show="canScrollUp"
-            class="mt-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
+            class="sidebar-scroll-btn"
             aria-label="Scroll up"
             @click="scrollUp"
         >
             <span class="mdi mdi-chevron-up text-sm" />
         </button>
 
-        <!-- Menu with scrollable container -->
-        <nav class="side-menu mt-4 flex flex-1 flex-col items-center gap-4 relative min-h-0">
-            <div 
+        <nav class="side-menu">
+            <div
                 ref="scrollContainer"
-                class="flex flex-col items-center gap-2 overflow-y-auto scrollbar-hide w-full px-2"
-                style="height: calc(100vh - 280px);"
+                class="sidebar-scroll scrollbar-hide"
                 @scroll="handleScroll"
             >
-                <div v-for="item in filteredMenuItems" :key="item.key" class="relative">
+                <div v-for="item in filteredMenuItems" :key="item.key" class="sidebar-entry">
                     <template v-if="!item.condition || item.condition">
                         <v-menu
                             v-if="item.subItems && item.subItems.length > 0"
@@ -55,16 +60,17 @@
                             <template #activator="{ props }">
                                 <div
                                     v-bind="props"
-                                    class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20 cursor-pointer"
-                                    :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
+                                    class="sidebar-item"
+                                    :class="{ 'sidebar-item--active': isActive(item.to) }"
                                     :aria-label="item.label"
                                 >
-                                    <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
-                                    <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
+                                    <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                                    <span class="sidebar-item-label">{{ item.label }}</span>
+                                    <span class="mdi mdi-chevron-right sidebar-item-chevron"></span>
                                 </div>
                             </template>
                             
-                            <v-list class="sidebar-menu-list" color="rgb(31, 41, 55)">
+                            <v-list class="sidebar-menu-list" theme="dark">
                                 <v-list-item
                                     v-for="subItem in item.subItems"
                                     v-show="!subItem.condition || subItem.condition"
@@ -73,7 +79,7 @@
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
-                                        <v-icon :icon="subItem.icon" class="text-gray-300" />
+                                        <v-icon :icon="subItem.icon" class="sidebar-menu-icon"></v-icon>
                                     </template>
                                     <v-list-item-title class="text-sm">
                                         {{ subItem.label }}
@@ -85,23 +91,22 @@
                         <router-link
                             v-else
                             :to="'/' + $i18n.locale + item.to + (item.dynamicValue ? item.dynamicValue : '')"
-                            class="group relative flex flex-col items-center justify-center rounded-xl p-3 transition-colors w-20"
-                            :class="isActive(item.to) ? 'bg-gray-800 text-rose-300' : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
+                            class="sidebar-item"
+                            :class="{ 'sidebar-item--active': isActive(item.to) }"
                             :aria-label="item.label"
                             :data-tutorial="item.key === 'persons' || item.key === 'organisation-units' ? `nav-${item.key}` : undefined"
                         >
-                            <span :class="['mdi', item.icon, 'text-2xl mb-2']" />
-                            <span class="text-xs text-center font-medium leading-tight">{{ item.label }}</span>
+                            <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                            <span class="sidebar-item-label">{{ item.label }}</span>
                         </router-link>
                     </template>
                 </div>
             </div>
         </nav>
 
-        <!-- Scroll down button -->
         <button
             v-show="canScrollDown"
-            class="mb-4 p-1 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
+            class="sidebar-scroll-btn"
             aria-label="Scroll down"
             @click="scrollDown"
         >
@@ -117,7 +122,9 @@ import AuthenticationService from '@/services/AuthenticationService';
 import PersonService from '@/services/PersonService';
 import UserService from '@/services/UserService';
 import { useLoginStore } from '@/stores/loginStore';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { SIDEBAR_MOBILE_MAX_WIDTH, useSidebarStore } from '@/stores/sidebarStore';
+import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { computed, ref, onMounted, nextTick, onUnmounted, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -141,9 +148,13 @@ const {
 
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
+const publicConfigurationStore = usePublicConfigurationStore();
 const personId = ref(-1);
 const commissionId = ref(-1);
 const institutionId = ref(-1);
+const logoUrl = computed(() => publicConfigurationStore.logoDisplayUrl);
+const hasCustomLogo = computed(() => publicConfigurationStore.hasCustomLogo);
+const brandTitle = computed(() => returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS");
 
 const scrollContainer = ref<HTMLElement>();
 const canScrollUp = ref(false);
@@ -225,14 +236,8 @@ watch(() => loginStore.userLoggedIn, () => {
 });
 
 const checkScreenSize = () => {
-    const isMobileView = window.innerWidth < 768;
-    const isVerySmall = window.innerWidth < 640;
-    
+    const isMobileView = window.matchMedia(`(max-width: ${SIDEBAR_MOBILE_MAX_WIDTH}px)`).matches;
     sidebarStore.setMobile(isMobileView);
-    
-    if (isVerySmall && sidebarStore.isVisible) {
-        sidebarStore.close();
-    }
 };
 
 onUnmounted(() => {
@@ -416,54 +421,235 @@ const isActive = (path: string): boolean => {
 <style scoped>
 @reference "@/assets/main.css";
 
-/* Hide scrollbar but maintain scroll functionality */
-.scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;     /* Firefox */
+.sidebar {
+    --sidebar-primary: #c4b5fd;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #f8fafc;
+    --sidebar-text-muted: #cbd5e1;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+    --sidebar-active-bg: rgba(196, 181, 253, 0.18);
+    --sidebar-divider: rgba(248, 250, 252, 0.12);
+    --sidebar-border: rgba(15, 23, 42, 0.6);
+    --sidebar-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --sidebar-scroll-bg: rgba(255, 255, 255, 0.08);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 16rem;
+    height: 100vh;
+    padding: 1.25rem 0.75rem;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--sidebar-shadow);
+    transition: width 0.3s ease, transform 0.3s ease, padding 0.3s ease;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;             /* Safari and Chrome */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 0.25rem;
 }
 
-/* Ensure smooth scrolling behavior */
+.sidebar-logo {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    background-color: var(--sidebar-text);
+    mask: url('/logov1.svg') center / contain no-repeat;
+    -webkit-mask: url('/logov1.svg') center / contain no-repeat;
+}
+
+.sidebar-logo-img {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.sidebar-brand {
+    color: var(--sidebar-text);
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: left;
+    margin-top: 0;
+}
+
+.sidebar-item--brand {
+    color: var(--sidebar-text);
+}
+
+.sidebar-item--brand:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
+}
+
+.sidebar-divider {
+    height: 1px;
+    width: auto;
+    margin: 1rem 0.5rem;
+    background: var(--sidebar-divider);
+    flex-shrink: 0;
+}
+
+.sidebar-item {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    color: var(--sidebar-text-muted);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-primary);
+}
+
+.sidebar-item--active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-primary);
+}
+
+.sidebar-item-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.sidebar-item-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-item-chevron {
+    display: block;
+    margin-left: auto;
+    font-size: 1rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.sidebar-scroll-btn {
+    margin: 0.5rem 0;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    background: var(--sidebar-scroll-bg);
+    color: var(--sidebar-text-muted);
+    transition: background 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-scroll-btn:hover {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-primary);
+}
+
+.side-menu {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+}
+
+.sidebar-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    overflow-y: auto;
+    width: 100%;
+    padding: 0 0.5rem;
+    min-height: 0;
+    flex: 1;
+}
+
+.sidebar-entry {
+    position: relative;
+    width: 100%;
+}
+
 .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     scroll-behavior: smooth;
 }
 
-/* Ensure the scroll container is properly sized */
-nav {
-    min-height: 0;
-    flex: 1;
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 
-/* Make sure the scroll container takes available space */
-.scrollbar-hide {
-    min-height: 0;
-    flex: 1;
-}
-
-
-.side-menu button,
 .side-menu a {
     transition: all 0.2s ease-in-out;
 }
 
-
 .side-menu a:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: none;
 }
 </style>
 
 <style>
-@reference "@/assets/main.css";
-
 .sidebar-menu-list {
-    @apply !bg-gray-800 text-white min-w-48;
+    --sidebar-primary: #c4b5fd;
+    --sidebar-text: #f8fafc;
+    --sidebar-menu-bg: #1e293b;
+    --sidebar-menu-hover: rgba(255, 255, 255, 0.08);
+    --sidebar-menu-border: rgba(248, 250, 252, 0.12);
+
+    background: var(--sidebar-menu-bg) !important;
+    color: var(--sidebar-text) !important;
+    min-width: 12rem;
+    border: 1px solid var(--sidebar-menu-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .sidebar-menu-list-item {
-    @apply hover:bg-gray-700 text-white;
+    color: var(--sidebar-text) !important;
+}
+
+.sidebar-menu-list-item .v-list-item-title {
+    color: var(--sidebar-text) !important;
+}
+
+.sidebar-menu-list-item:hover {
+    background: var(--sidebar-menu-hover) !important;
+    color: var(--sidebar-primary) !important;
+}
+
+.sidebar-menu-list-item:hover .v-list-item-title {
+    color: var(--sidebar-primary) !important;
+}
+
+.sidebar-menu-icon {
+    color: #cbd5e1 !important;
+}
+
+.sidebar-menu-list-item:hover .sidebar-menu-icon {
+    color: var(--sidebar-primary) !important;
 }
 </style>

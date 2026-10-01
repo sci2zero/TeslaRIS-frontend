@@ -1,38 +1,41 @@
 <template>
-    <v-row>
-        <v-col :cols="(allowManualClearing && hasSelection ? 10 : 11) + ((disableSubmission || readOnly) ? 1 : 0)">
-            <v-autocomplete
-                v-model="selectedEvent"
-                v-model:search="searchInput"
-                :readonly="readOnly"
-                :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : events"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :multiple="multiple"
-                return-object
-                @update:search="searchEvents($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission && !readOnly" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="ConferenceSubmissionForm"
-                :form-props="{readOnly: readOnly, presetName: lastSearchInput}"
-                entity-name="Conference"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedEvent"
-            />
-        </v-col>
-        <v-col v-if="allowManualClearing && hasSelection" cols="1">
-            <v-btn icon @click="clearInput">
-                <v-icon>mdi-delete</v-icon>
-            </v-btn>
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedEvent"
+            v-model:search="searchInput"
+            :readonly="readOnly"
+            :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : events"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :multiple="multiple"
+            return-object
+            @update:search="searchEvents($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission && !readOnly"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="ConferenceSubmissionForm"
+            :form-props="{readOnly: readOnly, presetName: lastSearchInput}"
+            entity-name="Conference"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedEvent"
+        />
+        <v-btn
+            v-if="allowManualClearing && hasSelection"
+            class="mt-[1.31rem] shrink-0"
+            icon
+            @click="clearInput"
+        >
+            <v-icon>mdi-delete</v-icon>
+        </v-btn>
+    </div>
 </template>
 
 <script lang="ts">
@@ -45,11 +48,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import ConferenceSubmissionForm from './ConferenceSubmissionForm.vue';
 import { localiseDate } from '@/utils/DateUtil';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "EventAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,

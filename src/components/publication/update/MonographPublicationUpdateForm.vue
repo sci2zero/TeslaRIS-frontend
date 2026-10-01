@@ -1,7 +1,7 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
-            <v-col cols="10">
+            <v-col>
                 <monograph-autocomplete-search
                     ref="monographAutocompleteRef"
                     v-model="selectedMonograph"
@@ -33,34 +33,33 @@
         </v-row>
 
         <v-row>
-            <v-col cols="5">
-                <v-text-field
+            <v-col>
+                <ui-input
                     v-model="startPage"
                     :label="$t('startPageLabel')"
-                    :placeholder="$t('startPageLabel')"
+                   
                 />
             </v-col>
-            <v-col cols="5">
-                <v-text-field
+            <v-col>
+                <ui-input
                     v-model="endPage"
                     :label="$t('endPageLabel')"
-                    :placeholder="$t('endPageLabel')"
+                   
                 />
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
-                <v-text-field
+            <v-col cols="12">
+                <ui-input
                     v-model="doi"
                     label="DOI"
-                    placeholder="DOI"
                     :rules="doiValidationRules"
                 />
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
-                <v-select
+            <v-col cols="12">
+                <ui-input control="select"
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel') + '*'"
@@ -70,19 +69,19 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="5">
-                <v-text-field
+            <v-col cols="6">
+                <ui-input
                     v-model="articleNumber"
                     :label="$t('articleNumberLabel')"
-                    :placeholder="$t('articleNumberLabel')"
+                   
                 />
             </v-col>
-            <v-col cols="5">
-                <v-text-field
+            <v-col cols="6">
+                <ui-input
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')"
+                   
                 />
             </v-col>
         </v-row>
@@ -102,7 +101,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="12">
                 <event-autocomplete-search
                     ref="eventAutocompleteRef"
                     v-model="selectedEvent"
@@ -110,27 +109,24 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="3">
-                <v-text-field
+            <v-col>
+                <ui-input
                     v-model="scopus"
                     label="Scopus ID"
-                    placeholder="Scopus ID"
                     :rules="scopusIdValidationRules"
                 />
             </v-col>
-            <v-col cols="4">
-                <v-text-field
+            <v-col>
+                <ui-input
                     v-model="openAlexId"
                     label="Open Alex ID"
-                    placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules"
                 />
             </v-col>
-            <v-col cols="3">
-                <v-text-field
+            <v-col>
+                <ui-input
                     v-model="webOfScienceId"
                     label="Web of Science ID"
-                    placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules"
                 />
             </v-col>
@@ -167,6 +163,7 @@ import type { Monograph } from '@/models/PublicationModel';
 import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale } from '@/i18n/monographPublicationType';
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
+import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { watch } from 'vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
@@ -174,11 +171,12 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "MonographPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast, DocumentCommonFields },
+    components: { MultilingualTextInput, UriInput, MonographAutocompleteSearch, EventAutocompleteSearch, Toast, DocumentCommonFields, UiInput },
     props: {
         presetMonographPublication: {
             type: Object as PropType<MonographPublication | undefined>,

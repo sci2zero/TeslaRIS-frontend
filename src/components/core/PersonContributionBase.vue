@@ -1,183 +1,255 @@
 <template>
-    <v-row v-if="!selectExternalAssociate">
-        <v-col :cols="canUserAddPersons ? 11 : 12">
-            <v-autocomplete
-                v-model="selectedPerson"
-                :label="$t('personLabel') + (required ? '*' : '')"
-                :items="persons"
-                :custom-filter="filterPersons"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                return-object
-                :readonly="lockSearchField"
-                @update:search="searchPersons($event)"
-                @update:model-value="onPersonSelect($event)"
-                @blur="onAutocompleteBlur">
-                <template #item="{ item, props }">
-                    <v-list-item
-                        v-bind="{ ...props, title: undefined }">
-                        <person-publications-tooltip
-                            :person-id="item.raw.value"
-                            :show="showLatestPublications">
-                            {{ item.raw.title }}
-                        </person-publications-tooltip>
-                    </v-list-item>
-                </template>
-            </v-autocomplete>
-        </v-col>
-        <v-col v-if="canUserAddPersons" cols="1">
-            <generic-crud-modal
-                :form-component="PersonSubmissionForm"
-                :form-props="{ inModal: true, presetPersonName: presetPersonNameForCreation }"
-                entity-name="Person"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedPerson"
-                @selected="selectExistingSelectedPerson"
-            />
-        </v-col>
-    </v-row>
-    <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
-        <v-chip
-            v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined
-            @click="setContributor(contributor)">
-            {{ contributor.a }}
-        </v-chip>
-    </v-row>
-    <!-- <v-btn
-        v-if="allowExternalAssociate && !selectExternalAssociate"
-        color="primary"
-        class="text-body-2 mb-2"
-        @click="toggleExternalSelection">
-        {{ $t("addExternalAssociateLabel") }}
-    </v-btn> -->
-    <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
-        <v-col v-if="!customNameInput && !selectExternalAssociate" cols="10">
-            <v-select
-                v-model="selectedOtherName"
-                :label="$t('personOtherNamesLabel')"
-                :items="personOtherNames"
-                :auto-select-first="true"
-                :no-data-text="$t('noDataMessage')"
-                return-object
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="customNameInput || selectExternalAssociate" cols="4">
-            <v-text-field
-                v-model="firstName"
-                :label="$t('firstNameLabel') + '*'"
-                :placeholder="$t('firstNameLabel')"
-                :rules="requiredFieldRules"
-                append-inner-icon="mdi-swap-horizontal"
-                @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
-            <v-text-field v-model="middleName" :label="$t('middleNameLabel')" :placeholder="$t('middleNameLabel')" @update:model-value="sendContentToParent" />
-        </v-col>
-        <v-col v-if="customNameInput || selectExternalAssociate" cols="3">
-            <v-text-field
-                v-model="lastName" :label="$t('surnameLabel') + '*'" :placeholder="$t('surnameLabel')" :rules="requiredFieldRules"
-                @update:model-value="sendContentToParent" />
-        </v-col>
-        <v-col v-if="!selectExternalAssociate" cols="2" class="custom-label">
-            <v-btn color="primary" class="text-body-2" @click="customNameInput = !customNameInput">
-                {{ !customNameInput ? $t("addCustomLabel") : $t("selectFromListLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-    <v-btn
-        v-if="selectExternalAssociate"
-        color="primary"
-        class="text-body-2 mb-2"
-        @click="toggleExternalSelection">
-        {{ $t("selectAssociateFromSystemLabel") }}
-    </v-btn>
-    <v-row v-show="personOtherNames.length > 0 && !enterExternalOU">
-        <v-col cols="10">
-            <v-select
-                v-if="!selectExternalAssociate"
-                v-model="selectedAffiliations"
-                :label="$t('personAffiliationsLabel')"
-                :items="personAffiliations"
-                :no-data-text="$t('noAffiliationsMessage')"
-                return-object
-                multiple
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-    </v-row>
-    <v-row v-show="(personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate">
-        <v-col>
-            <multilingual-text-input
-                ref="affiliationStatementRef"
-                v-model="affiliationStatement"
-                :label="$t('affiliationStatementLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                @update:model-value="sendContentToParent" />
-        </v-col>
-    </v-row>
-    <v-row v-show="((personOtherNames.length > 0 && enterExternalOU) || selectExternalAssociate) && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
-        <v-chip
-            v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" class="ml-2" outlined
-            @click="affiliationStatementRef?.setNewInputValue(toMultilingualTextInput(suggestion, languageTags))">
-            {{ returnCurrentLocaleContent(suggestion) }}
-        </v-chip>
-    </v-row>
-    <v-row v-if="personOtherNames.length > 0 && personAffiliations.length > 0 && !selectExternalAssociate">
-        <v-col>
-            <v-btn color="primary" class="text-body-2 mb-2" @click="enterExternalOU = !enterExternalOU; sendContentToParent();">
-                {{ enterExternalOU ? $t("chooseFromListLabel") : $t("enterExternalOULabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
-    <v-row v-if="!basic">
-        <v-col>
-            <date-picker
-                v-model="dateFrom"
-                :label="$t('fromLabel')"
-                color="primary"
-            />
-        </v-col>
-        <v-col>
-            <date-picker
-                v-model="dateTo"
-                :label="$t('toLabel')"
-                color="primary"
-            />
-        </v-col>
-    </v-row>
-    <div v-if="!basic">
-        <h2
-            class="mt-5!">
-            {{ $t("researchAreasLabel") }}
-        </h2>
-        <v-row>
-            <v-col cols="12">
-                <research-areas-selection
-                    ref="researchAreasSelectionRef"
-                    :research-areas-hierarchy="presetResearchAreas"
-                    submit-on-click
-                    @update="saveResearchAreas"
+    <div class="contribution-segments">
+        <section class="editor-section">
+            <h3 class="editor-section-title">
+                {{ $t("personLabel") }}
+            </h3>
+            <v-row v-if="allowExternalAssociate">
+                <v-col cols="12" class="pb-1">
+                    <v-radio-group
+                        v-model="associateSource"
+                        inline
+                        hide-details
+                        density="compact"
+                        color="primary"
+                        class="mode-radio-group"
+                        :disabled="lockSearchField"
+                    >
+                        <v-radio
+                            :label="$t('selectAssociateFromSystemLabel')"
+                            value="internal"
+                            color="primary"
+                        />
+                        <v-radio
+                            :label="$t('addExternalAssociateLabel')"
+                            value="external"
+                            color="primary"
+                        />
+                    </v-radio-group>
+                </v-col>
+            </v-row>
+            <div v-if="!selectExternalAssociate" class="flex items-start gap-2">
+                <ui-input
+                    v-model="selectedPerson"
+                    class="min-w-0 flex-1"
+                    control="autocomplete"
+                    :label="allowExternalAssociate ? $t('searchInSystemLabel') : ($t('personLabel') + (required ? '*' : ''))"
+                    :items="persons"
+                    :custom-filter="filterPersons"
+                    :rules="required ? requiredSelectionRules : []"
+                    :no-data-text="$t('noDataMessage')"
+                    return-object
+                    :readonly="lockSearchField"
+                    @update:search="searchPersons($event)"
+                    @update:model-value="onPersonSelect($event)"
+                    @blur="onAutocompleteBlur"
+                >
+                    <template #item="{ item, props }">
+                        <v-list-item
+                            v-bind="{ ...props, title: undefined }">
+                            <person-publications-tooltip
+                                :person-id="item.raw.value"
+                                :show="showLatestPublications">
+                                {{ item.raw.title }}
+                            </person-publications-tooltip>
+                        </v-list-item>
+                    </template>
+                </ui-input>
+                <generic-crud-modal
+                    v-if="canUserAddPersons"
+                    class="mt-[1.31rem] w-fit shrink-0 self-start"
+                    :form-component="PersonSubmissionForm"
+                    :form-props="{ inModal: true, presetPersonName: presetPersonNameForCreation }"
+                    entity-name="Person"
+                    is-submission
+                    :read-only="false"
+                    @create="selectNewlyAddedPerson"
+                    @selected="selectExistingSelectedPerson"
                 />
+            </div>
+            <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
+                <v-chip
+                    v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined
+                    @click="setContributor(contributor)">
+                    {{ contributor.a }}
+                </v-chip>
+            </v-row>
+            <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
+                <v-col v-if="!selectExternalAssociate" cols="12" class="pb-1">
+                    <div class="name-source">
+                        <span class="mode-switch-label">{{ $t("personOtherNamesLabel") }}</span>
+                        <v-btn-toggle
+                            v-model="nameSource"
+                            mandatory
+                            divided
+                            density="compact"
+                            variant="outlined"
+                            color="primary"
+                            class="name-source-toggle"
+                        >
+                            <v-btn value="list" size="small">
+                                {{ $t("selectFromListLabel") }}
+                            </v-btn>
+                            <v-btn value="custom" size="small">
+                                {{ $t("addCustomLabel") }}
+                            </v-btn>
+                        </v-btn-toggle>
+                    </div>
+                </v-col>
+                <v-col v-if="!customNameInput && !selectExternalAssociate" cols="12">
+                    <ui-input
+                        v-model="selectedOtherName"
+                        control="select"
+                        :items="personOtherNames"
+                        :auto-select-first="true"
+                        :no-data-text="$t('noDataMessage')"
+                        :aria-label="$t('personOtherNamesLabel')"
+                        return-object
+                        @update:model-value="sendContentToParent"
+                    />
+                </v-col>
+                <template v-if="customNameInput || selectExternalAssociate">
+                    <v-col cols="12" sm="4">
+                        <ui-input
+                            v-model="firstName"
+                            :label="$t('firstNameLabel') + '*'"
+                            :placeholder="$t('firstNameLabel')"
+                            :rules="requiredFieldRules"
+                            append-inner-icon="mdi-swap-horizontal"
+                            @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
+                            @update:model-value="onNamePartUpdate('firstName', $event)"
+                        />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                        <ui-input
+                            v-model="middleName"
+                            :label="$t('middleNameLabel')"
+                            :placeholder="$t('middleNameLabel')"
+                            @update:model-value="onNamePartUpdate('middleName', $event)"
+                        />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                        <ui-input
+                            v-model="lastName"
+                            :label="$t('surnameLabel') + '*'"
+                            :placeholder="$t('surnameLabel')"
+                            :rules="requiredFieldRules"
+                            @update:model-value="onNamePartUpdate('lastName', $event)"
+                        />
+                    </v-col>
+                </template>
+            </v-row>
+            <v-row v-if="!basic">
+                <v-col>
+                    <date-picker
+                        v-model="dateFrom"
+                        :label="$t('fromLabel')"
+                        color="primary"
+                    />
+                </v-col>
+                <v-col>
+                    <date-picker
+                        v-model="dateTo"
+                        :label="$t('toLabel')"
+                        color="primary"
+                    />
+                </v-col>
+            </v-row>
+        </section>
+
+        <section v-if="showAffiliationSection" class="editor-section">
+            <h3 class="editor-section-title">
+                {{ $t("personAffiliationsLabel") }}
+            </h3>
+            <v-row>
+                <v-col cols="12" class="pb-1">
+                    <v-radio-group
+                        v-model="affiliationSource"
+                        inline
+                        hide-details
+                        density="compact"
+                        color="primary"
+                        class="mode-radio-group"
+                    >
+                        <v-radio
+                            :label="$t('searchInSystemLabel')"
+                            value="list"
+                            color="primary"
+                        />
+                        <v-radio
+                            :label="$t('addCustomLabel')"
+                            value="external"
+                            color="primary"
+                        />
+                    </v-radio-group>
+                </v-col>
+            </v-row>
+            <v-row v-show="!enterExternalOU">
+                <v-col v-if="usePersonAffiliationList" cols="12">
+                    <ui-input
+                        v-model="selectedAffiliations"
+                        control="select"
+                        :items="personAffiliations"
+                        :no-data-text="$t('noAffiliationsMessage')"
+                        :aria-label="$t('personAffiliationsLabel')"
+                        return-object
+                        multiple
+                        @update:model-value="sendContentToParent"
+                    />
+                </v-col>
+                <v-col v-else cols="12">
+                    <organisation-unit-autocomplete-search
+                        v-model="selectedAffiliations"
+                        multiple
+                        disable-submission
+                        @update:model-value="sendContentToParent"
+                    />
+                </v-col>
+            </v-row>
+            <v-row v-show="enterExternalOU">
+                <v-col>
+                    <multilingual-text-input
+                        ref="affiliationStatementRef"
+                        v-model="affiliationStatement"
+                        :label="$t('affiliationStatementLabel')"
+                        :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                        @update:model-value="sendContentToParent" />
+                </v-col>
+            </v-row>
+            <v-row v-show="enterExternalOU && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
+                <v-chip
+                    v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" class="ml-2" outlined
+                    @click="affiliationStatementRef?.setNewInputValue(toMultilingualTextInput(suggestion, languageTags))">
+                    {{ returnCurrentLocaleContent(suggestion) }}
+                </v-chip>
+            </v-row>
+        </section>
+
+        <section v-if="!basic" class="editor-section">
+            <h3 class="editor-section-title">
+                {{ $t("researchAreasLabel") }}
+            </h3>
+            <research-areas-selection
+                ref="researchAreasSelectionRef"
+                :research-areas-hierarchy="presetResearchAreas"
+                submit-on-click
+                @update="saveResearchAreas"
+            />
+        </section>
+        <!-- <v-row>
+            <v-col>
+                <multilingual-text-input
+                    v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
+                    :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
+                    is-area
+                    @update:model-value="sendContentToParent"></multilingual-text-input>
             </v-col>
-        </v-row>
+        </v-row> -->
     </div>
-    <!-- <v-row>
-        <v-col>
-            <multilingual-text-input
-                v-if="!basic" ref="descriptionRef" v-model="contributionDescription" :label="$t('abstractLabel')"
-                :initial-value="toMultilingualTextInput(presetContributionValue.description, languageTags)"
-                is-area
-                @update:model-value="sendContentToParent"></multilingual-text-input>
-        </v-col>
-    </v-row> -->
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { defineComponent } from "vue";
 import PersonService from "@/services/PersonService";
 import { PersonNameType, type BasicPerson, type PersonIndex } from "@/models/PersonModel";
@@ -206,11 +278,13 @@ import PersonPublicationsTooltip from "../person/PersonPublicationsTooltip.vue";
 import { type ResearchArea } from "@/models/OrganisationUnitModel.js";
 import ResearchAreasSelection from "./ResearchAreasSelection.vue";
 import DatePicker from "./DatePicker.vue";
+import UiInput from "@/components/ui/input/Input.vue";
+import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip, ResearchAreasSelection, DatePicker },
+    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip, ResearchAreasSelection, DatePicker, UiInput, OrganisationUnitAutocompleteSearch },
     props: {
         basic: {
             type: Boolean,
@@ -266,7 +340,7 @@ export default defineComponent({
         const contributionDescription = ref([]);
         const affiliationStatement = ref<any>([]);
 
-        const enterExternalOU = ref(true);
+        const enterExternalOU = ref(false);
 
         const customNameInput = ref(false);
         const firstName = ref("");
@@ -300,10 +374,10 @@ export default defineComponent({
 
         const languageTags = ref<LanguageTagResponse[]>([]);
 
-        const valueSet = ref(false);
+        const valueSet = ref(!props.isUpdate);
 
         const selectExternalAssociate = ref(false);
-        const lastSearchInput = ref();
+        const lastSearchInput = ref("");
         const presetPersonNameForCreation = ref<PersonName>();
 
         const topContributors = ref<Record<string, number>[]>([]);
@@ -425,6 +499,27 @@ export default defineComponent({
 
         const searchingName = ref(false);
 
+        const namePart = (value: unknown): string =>
+            typeof value === "string" ? value : "";
+
+        const composeName = (...parts: unknown[]): string =>
+            parts
+                .map((part) => namePart(part).trim())
+                .filter((part) => part && part.toLowerCase() !== "null")
+                .join(" ");
+
+        const onNamePartUpdate = (field: "firstName" | "middleName" | "lastName", value: unknown) => {
+            const normalized = namePart(value);
+            if (field === "firstName") {
+                firstName.value = normalized;
+            } else if (field === "middleName") {
+                middleName.value = normalized;
+            } else {
+                lastName.value = normalized;
+            }
+            sendContentToParent();
+        };
+
         watch(() => props.presetContributionValue, () => {
             if(props.presetContributionValue && !valueSet.value) {
                 valueSet.value = true;
@@ -434,21 +529,27 @@ export default defineComponent({
                 dateFrom.value = props.presetContributionValue.dateFrom;
                 dateTo.value = props.presetContributionValue.dateTo;
 
-                if (props.presetContributionValue.affiliationStatement?.length === 0) {
+                if (props.presetContributionValue.affiliationStatement?.length > 0) {
+                    enterExternalOU.value = true;
+                } else {
                     enterExternalOU.value = false;
                 }
 
-                const selectedPersonName = 
-                    props.presetContributionValue.selectedOtherName[0] + 
-                    (props.presetContributionValue.selectedOtherName[1] && props.presetContributionValue.selectedOtherName[1].toLowerCase() !== "null" ? 
-                        ` ${props.presetContributionValue.selectedOtherName[1]}` : "") + ` ${props.presetContributionValue.selectedOtherName[2]}`;
+                const otherNameParts = Array.isArray(props.presetContributionValue.selectedOtherName)
+                    ? props.presetContributionValue.selectedOtherName
+                    : [];
+                const selectedPersonName = composeName(
+                    otherNameParts[0],
+                    otherNameParts[1],
+                    otherNameParts[2]
+                );
                 presetAffiliations.value = props.presetContributionValue.institutionIds;
 
-                firstName.value = props.presetContributionValue.selectedOtherName[0];
-                middleName.value = props.presetContributionValue.selectedOtherName[1];
-                lastName.value = props.presetContributionValue.selectedOtherName[2];
+                firstName.value = namePart(otherNameParts[0]);
+                middleName.value = namePart(otherNameParts[1]).toLowerCase() === "null" ? "" : namePart(otherNameParts[1]);
+                lastName.value = namePart(otherNameParts[2]);
 
-                if(props.presetContributionValue.personId > 0) {
+                if(props.presetContributionValue.personId && !isNaN(props.presetContributionValue.personId) && props.presetContributionValue.personId > 0) {
                     PersonService.readPerson(props.presetContributionValue.personId).then((personResponse) => {
                         personPrimaryName.value = personResponse.data.personName;
                         
@@ -498,7 +599,7 @@ export default defineComponent({
                     selectExternalAssociate.value = true;
                 }
             }
-        }, { deep: true });
+        }, { deep: true, immediate: true });
 
         watch(customNameInput, () => {
             if (customNameInput.value && personPrimaryName.value) {
@@ -549,11 +650,15 @@ export default defineComponent({
         };
 
         const constructDisplayName = (name: PersonName): string => {
-            if (name.otherName && name.otherName.trim() !== "") {
-                return `${name.firstname} (${name.otherName}) ${name.lastname}`;
+            const first = namePart(name.firstname);
+            const last = namePart(name.lastname);
+            const other = namePart(name.otherName).trim();
+
+            if (other) {
+                return composeName(first, `(${other})`, last);
             }
 
-            return `${name.firstname} ${name.lastname}`;
+            return composeName(first, last);
         };
 
         const constructExternalCollaboratorFromInput = (selectionTitle: string) => {
@@ -646,10 +751,10 @@ export default defineComponent({
             }
 
             if (customNameInput.value) {
-                otherName = [firstName.value, middleName.value, lastName.value, null, null]
+                otherName = [namePart(firstName.value), namePart(middleName.value), namePart(lastName.value), null, null]
             }
 
-            const unmangedAffiliations = (selectExternalAssociate.value || enterExternalOU.value);
+            const unmangedAffiliations = enterExternalOU.value;
             
             const returnObject = {
                 personId: selectExternalAssociate.value ? -1 : selectedPerson.value.value,
@@ -718,7 +823,7 @@ export default defineComponent({
                     sendContentToParent();
                 }
 
-                if (personAffiliations.value.length === 0 || ((affiliationStatement.value?.length || 0) > 0)) {
+                if ((affiliationStatement.value?.length || 0) > 0) {
                     enterExternalOU.value = true;
                 } else {
                     enterExternalOU.value = false;
@@ -775,28 +880,76 @@ export default defineComponent({
             sendContentToParent();
         };
 
-        const toggleExternalSelection = () => {
-            selectExternalAssociate.value = !selectExternalAssociate.value;
-
-            customNameInput.value = selectExternalAssociate.value;
-            enterExternalOU.value = selectExternalAssociate.value;
-
-            if (!selectExternalAssociate.value) {
-                let searchInput = lastSearchInput.value ? lastSearchInput.value : (lastName.value + " " + firstName.value);
-                if (searchInput.startsWith("(") && searchInput.endsWith(")")) {
-                    searchInput = searchInput.slice(1, -1);
-                }
-                
-                selectedPerson.value = {
-                    title: searchInput, value: -1
-                };
+        const setExternalSelection = (isExternal: boolean) => {
+            if (selectExternalAssociate.value === isExternal) {
+                return;
             }
-            
+
+            selectExternalAssociate.value = isExternal;
+            customNameInput.value = isExternal;
+
+            if (isExternal) {
+                if (!namePart(firstName.value) && !namePart(lastName.value)) {
+                    constructExternalCollaboratorFromInput(lastSearchInput.value);
+                }
+            } else if (!(selectedPerson.value?.value > 0)) {
+                let searchInput = namePart(lastSearchInput.value).trim();
+                if (searchInput.startsWith("(") && searchInput.endsWith(")")) {
+                    searchInput = searchInput.slice(1, -1).trim();
+                }
+                if (!searchInput) {
+                    searchInput = composeName(lastName.value, firstName.value);
+                }
+
+                selectedPerson.value = searchInput
+                    ? { title: searchInput, value: -1 }
+                    : { ...personPlaceholder };
+                persons.value = [];
+            }
+
             sendContentToParent();
         };
 
+        const associateSource = computed({
+            get: (): "internal" | "external" =>
+                selectExternalAssociate.value ? "external" : "internal",
+            set: (value: "internal" | "external") => {
+                if (value !== "internal" && value !== "external") {
+                    return;
+                }
+                setExternalSelection(value === "external");
+            }
+        });
+
+        const showAffiliationSection = computed(() =>
+            !props.basic ||
+            personOtherNames.value.length > 0 ||
+            selectExternalAssociate.value
+        );
+
+        const usePersonAffiliationList = computed(() =>
+            !selectExternalAssociate.value && personAffiliations.value.length > 0
+        );
+
+        const affiliationSource = computed({
+            get: (): "list" | "external" =>
+                enterExternalOU.value ? "external" : "list",
+            set: (value: "list" | "external") => {
+                enterExternalOU.value = value === "external";
+            }
+        });
+
+        const nameSource = computed({
+            get: (): "list" | "custom" =>
+                customNameInput.value ? "custom" : "list",
+            set: (value: "list" | "custom") => {
+                customNameInput.value = value === "custom";
+                nextTick(() => sendContentToParent());
+            }
+        });
+
         const switchToExternalAuthor = () => {
-            if (selectedPerson.value.value <= 0) {
+            if (selectedPerson.value && selectedPerson.value.value <= 0) {
                 selectExternalAssociate.value = true;
                 customNameInput.value = true;
                 constructExternalCollaboratorFromInput(lastSearchInput.value);
@@ -871,12 +1024,12 @@ export default defineComponent({
             searchPersons, filterPersons, persons, requiredFieldRules,
             requiredSelectionRules, contributionDescription, affiliationStatement,
             sendContentToParent, clearInput, onPersonSelect, displayTopCollaboratorPicks,
-            descriptionRef, affiliationStatementRef, toggleExternalSelection,
-            personOtherNames, selectedOtherName, selectExternalAssociate,
+            descriptionRef, affiliationStatementRef, associateSource, affiliationSource, nameSource,
+            showAffiliationSection, usePersonAffiliationList, personOtherNames, selectedOtherName, selectExternalAssociate,
             selectNewlyAddedPerson, toMultilingualTextInput, topContributors,
             languageTags, valueSet, selectedAffiliations, personAffiliations,
             PersonSubmissionForm, enterExternalOU, canUserAddPersons,
-            constructExternalCollaboratorFromInput, onAutocompleteBlur,
+            constructExternalCollaboratorFromInput, onAutocompleteBlur, onNamePartUpdate,
             presetPersonNameForCreation, setContributor, selectExistingSelectedPerson,
             externalInstitutionSuggestions, returnCurrentLocaleContent,
             dateFrom, dateTo, presetResearchAreas, saveResearchAreas
@@ -886,9 +1039,78 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-.custom-label {
-    margin-top: 10px;
+.contribution-segments {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
+.editor-section {
+    padding: 12px 14px 8px;
+    border-radius: 10px;
+    background: rgba(var(--v-theme-on-surface), 0.03);
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.editor-section-title {
+    margin: 0 0 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(var(--v-theme-on-surface), 0.55);
+}
+
+.mode-radio-group {
+    margin: 0;
+}
+
+.mode-radio-group :deep(.v-selection-control-group) {
+    flex-wrap: wrap;
+    column-gap: 4px;
+}
+
+.mode-radio-group :deep(.v-selection-control) {
+    min-height: 32px;
+}
+
+.mode-radio-group :deep(.v-label) {
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 1;
+}
+
+.mode-switch-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #64748b;
+    padding-left: 0.15rem;
+}
+
+.name-source {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.name-source-toggle {
+    flex: 0 0 auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #fff;
+}
+
+.name-source-toggle :deep(.v-btn) {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    min-width: 0;
+    height: 32px;
+}
 </style>

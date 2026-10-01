@@ -52,7 +52,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-select
+                        <ui-input control="select"
                             v-model="selectedPrizeType"
                             :items="prizeTypes"
                             :label="$t('prizeTypeLabel')"
@@ -62,7 +62,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-checkbox
+                        <ui-checkbox
                             v-model="favorite"
                             :label="$t('favoriteLabel')"
                         />
@@ -105,11 +105,13 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { getPrizeTypesForGivenLocale, getPrizeTypeTitleFromValueAutoLocale } from '@/i18n/prizeType';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import { type ResearchArea } from '@/models/OrganisationUnitModel';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "PrizeForm",
-    components: { MultilingualTextInput, DatePicker, ResearchAreasSelection },
+    components: { MultilingualTextInput, DatePicker, ResearchAreasSelection, UiInput, UiCheckbox },
     props: {
         edit: {
             type: Boolean,

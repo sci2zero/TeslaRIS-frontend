@@ -1,30 +1,29 @@
 <template>
-    <v-row>
-        <v-col :cols="disableSubmission ? 12 : 11">
-            <v-autocomplete
-                v-model="selectedFundingProgram"
-                :label="(label ? $t(label) : $t('fundingProgramLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : fundingPrograms"
-                :custom-filter="(() => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :readonly="readOnly"
-                return-object
-                @update:search="searchFundingPrograms($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="FundingProgramSubmissionForm"
-                entity-name="FundingProgram"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedFundingProgram"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <v-autocomplete
+            v-model="selectedFundingProgram"
+            class="min-w-0 flex-1"
+            :label="(label ? $t(label) : $t('fundingProgramLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : fundingPrograms"
+            :custom-filter="(() => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :readonly="readOnly"
+            return-object
+            @update:search="searchFundingPrograms($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="w-fit shrink-0 self-center"
+            :form-component="FundingProgramSubmissionForm"
+            entity-name="FundingProgram"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedFundingProgram"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">

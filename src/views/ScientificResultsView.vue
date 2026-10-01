@@ -58,9 +58,10 @@
                 }"
             @switch-page="switchPage">
             <template #top-left>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 w-full">
                     <search-bar-component
                         v-if="currentTab === 'simpleSearch'"
+                        class="w-full min-w-48 max-w-none!"
                         :transparent="false"
                         size="small"
                         @search="clearSortAndPerformSearch($event)"
@@ -69,6 +70,7 @@
                         v-if="currentTab === 'simpleSearch'"
                         variant="text"
                         icon="mdi-tune"
+                        class="shrink-0"
                         @click="toggleAdvancedSearch"
                     />
                 </div>

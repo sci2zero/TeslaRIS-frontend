@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import "./plain-field.css";
 
 @layer base {
   @import "./reset.scss";
@@ -6,6 +7,7 @@
 }
 
 @import "tailwindcss";
+@source "../../../teslaris-portugal";
 
 #app {
     margin: 0 auto;
@@ -21,15 +23,15 @@ a,
 }
 
 
-@media (min-width: 1024px) {
-    body {
-        display: flex;
-        place-items: center;
-    }
+.v-main.sidebar-offset {
+    --v-layout-left: 16rem;
+    padding-left: 16rem;
+}
 
-    #app {
-        display: grid;
-        padding: 0;
+@media (max-width: 1023px) {
+    .v-main.sidebar-offset {
+        --v-layout-left: 0px;
+        padding-left: 0;
     }
 }
 
@@ -77,8 +79,9 @@ label {
 }
 
 .section-box {
-    border: 2px solid lightskyblue;
-    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #fff;
 }
 
 /* Update modals */
@@ -202,6 +205,10 @@ label {
     max-height: 250px;
 }
 
+.v-overlay.v-dialog > .v-overlay__content > .v-card {
+    background: #f1f5f9;
+}
+
 .serif {
     font-family: 'Libre Baskerville', serif;
 }
@@ -231,25 +238,16 @@ label {
 h1 {
   font-size: 2rem;
   font-weight: 500;
-  line-height: 1.3;
-  margin-bottom: 0.5rem;
-  margin-top: 1.5rem;
 }
 
 h2 {
   font-size: 1.75rem;
   font-weight: 500;
-  line-height: 1.4;
-  margin-bottom: 0.5rem;
-  margin-top: 1.25rem;
 }
 
 h3 {
   font-size: 1.25rem;
   font-weight: 500;
-  line-height: 1.4;
-  margin-bottom: 0.5rem;
-  margin-top: 1rem;
 }
 
 /* LINKS */
@@ -269,4 +267,23 @@ h3 {
 
 .clickable-link:active {
   transform: translateY(1px);
+}
+
+/* Landing page tabs */
+.landing-tabs {
+    width: 100%;
+    max-width: 100%;
+}
+
+.landing-tabs .v-tab {
+    min-width: unset;
+    flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+    .landing-tabs .v-tab {
+        padding-inline: 0.75rem;
+        font-size: 0.8125rem;
+        letter-spacing: 0;
+    }
 }

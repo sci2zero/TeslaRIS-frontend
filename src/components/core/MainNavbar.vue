@@ -6,7 +6,7 @@
                     v-if="!showBreadcrumbs || sidebarStore.isMobile"
                     :icon="sidebarStore.isVisible ? 'mdi-menu-open' : 'mdi-menu'"
                     variant="text"
-                    :color="variant === 'general' ? '#000' : '#fff'"
+                    :color="foregroundColor"
                     class="mr-4 hover:bg-gray-100 transition-colors"
                     aria-label="Toggle menu"
                     @click="toggleSidebar"
@@ -54,13 +54,13 @@
                     <template v-if="item.type == 'divider'">
                         <v-divider
                             :key="index" inset class="ms-2" vertical
-                            :color="variant === 'general' ? '#000' : 'white'" />
+                            :color="foregroundColor"></v-divider>
                     </template>
                     <template v-else-if="item.type == 'lang_component'">
-                        <component :is="item.component" :key="index" :variant="variant" />
+                        <component :is="item.component" :key="index" :variant="variant" :theme="theme"></component>
                     </template>
                     <template v-else-if="item.type == 'notification_component' && item.condition">
-                        <component :is="item.component" :key="index" :variant="variant" />
+                        <component :is="item.component" :key="index" :variant="variant" :theme="theme"></component>
                     </template>
                     <template v-else-if="item.type == 'user_profile'">
                         <span :key="index">
@@ -69,10 +69,13 @@
                                 :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
                                 :class="[
                                     'user-profile-link flex items-center px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer',
-                                    variant === 'general' 
-                                        ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100' 
-                                        : 'text-white hover:text-gray-200 hover:bg-white/10'
-                                ]">
+                                    variant === 'home' && theme === 'light'
+                                        ? 'hover:bg-[rgba(50,15,155,0.08)]'
+                                        : isLightChrome
+                                            ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                                            : 'text-white hover:text-gray-200 hover:bg-white/10'
+                                ]"
+                                :style="variant === 'home' && theme === 'light' ? { color: '#334155' } : undefined">
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <v-avatar size="32" color="primary" class="text-white">
@@ -99,14 +102,14 @@
                             :key="index"
                             size="small"
                             :to="item.pathName !== undefined ? '/' + $i18n.locale + '/' + item.pathName : undefined"
-                            :variant="item.variant" :color="variant === 'general' ? '#222' : '#fff'" class="no-uppercase"
+                            :variant="item.variant" :color="foregroundColor" class="no-uppercase"
                             :icon="item.type == 'icon'"
                             exact
                             @click="item.click"
                         >
                             <v-tooltip v-if="item.icon && item.title" location="top">
                                 <template #activator="{ props: iconProps }">
-                                    <v-icon v-bind="iconProps" left :class="variant === 'general' ? 'text-dark' : 'dark'">
+                                    <v-icon v-bind="iconProps" left :style="{ color: foregroundColor }">
                                         {{ item.icon }}
                                     </v-icon>
                                 </template>
@@ -122,14 +125,14 @@
                             variant="text"
                                 
                             :class="[
-                                'hover:text-gray-200 cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
-                                variant === 'general' 
-                                    ? 'text-dark hover:text-gray-700' 
+                                'cursor-pointer px-3 py-2 transition-colors duration-200 flex items-center',
+                                isLightChrome
+                                    ? 'text-dark hover:text-gray-700'
                                     : 'text-white hover:text-gray-200'
                             ]"
                             @click="item.click">
                             <v-badge :content="item.badge" :model-value="false">
-                                <v-icon left :class="variant === 'general' ? 'text-dark' : 'text-white'">
+                                <v-icon left :style="{ color: foregroundColor }">
                                     {{ item.icon }}
                                 </v-icon>
                             </v-badge>
@@ -159,11 +162,8 @@ import { shallowRef } from 'vue';
 import NotificationItem from './NotificationItem.vue';
 import PersonService from "@/services/PersonService";
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
-import BrandingService from '@/services/BrandingService';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import { useUserRole } from '@/composables/useUserRole';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
-import { useBrandingStore } from '@/stores/brandingStore';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import ApplicationConfigurationService from '@/services/ApplicationConfigurationService';
@@ -187,15 +187,16 @@ interface MenuItem {
 
 interface Props {
     variant?: 'general' | 'home';
+    theme?: 'dark' | 'light';
     showBreadcrumbs?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     variant: 'home',
+    theme: 'dark',
     showBreadcrumbs: false
 });
 
-const appTitle = ref("");
 const navigationDepth = ref(0);
 
 const { userRole } = useUserRole();
@@ -203,8 +204,18 @@ const { userRole } = useUserRole();
 const navbarClasses = computed(() => {
     return {
         'navbar-general': props.variant === 'general',
-        'navbar-home': props.variant === 'home'
+        'navbar-home': props.variant === 'home',
+        'navbar-home-light': props.variant === 'home' && props.theme === 'light'
     };
+});
+
+const isLightChrome = computed(() => props.variant === 'general' || props.theme === 'light');
+
+const foregroundColor = computed(() => {
+    if (props.variant === 'home' && props.theme === 'light') {
+        return '#334155';
+    }
+    return isLightChrome.value ? '#222' : '#fff';
 });
 
 const langChangeItem = shallowRef(LangChangeItem);
@@ -223,7 +234,6 @@ const loginTitle = computed(() => i18n.t("loginLabel"));
 const registerTitle = computed(() => i18n.t("registerLabel"));
 const logoutTitle = computed(() => i18n.t("logoutLabel"));
 
-const brandingStore = useBrandingStore();
 const loginStore = useLoginStore();
 const sidebarStore = useSidebarStore();
 const userName = ref("");
@@ -261,13 +271,6 @@ const toggleSidebar = () => {
     sidebarStore.toggle();
 };
 
-watch(() => brandingStore.rebranded, () => {
-    if (brandingStore.rebranded) {
-        appTitle.value = returnCurrentLocaleContent(brandingStore.newTitle) as string;
-        brandingStore.rebrandingHandled();
-    }
-});
-
 watch(() => loginStore.userLoggedIn, () => {
     if (loginStore.userLoggedIn) {
         populateUserData();
@@ -279,10 +282,6 @@ watch(() => loginStore.usernameReloadRequests, () => {
 });
 
 onMounted(() => {
-    BrandingService.fetchBrandingInfo().then((response) => {
-        appTitle.value = returnCurrentLocaleContent(response.data.title) as string;
-    });
-
     if (AuthenticationService.userLoggedIn()) {
         populateUserData();
     }

@@ -1,45 +1,88 @@
 <template>
     <div>
         <v-form v-model="isFormValid" @submit.prevent>
+            <ui-input
+                v-if="!inModal"
+                v-model="firstName"
+                :label="$t('firstNameLabel') + '*'"
+                :placeholder="$t('firstNameLabel')"
+                :rules="requiredFieldRules"
+                :disabled="isPersonSelected()"
+                class="register-field"
+            />
             <v-text-field
+                v-else
                 v-model="firstName"
                 :label="$t('firstNameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             />
+            <ui-input
+                v-if="!inModal"
+                v-model="lastName"
+                :label="$t('surnameLabel') + '*'"
+                :placeholder="$t('surnameLabel')"
+                :rules="requiredFieldRules"
+                :disabled="isPersonSelected()"
+                class="register-field"
+            />
             <v-text-field
+                v-else
                 v-model="lastName"
                 :label="$t('surnameLabel') + '*'"
                 :rules="requiredFieldRules"
                 :disabled="isPersonSelected()"
             />
-            <organisation-unit-autocomplete-search
-                ref="ouAutocompleteRef"
-                v-model="selectedOrganisationUnit"
-                :disabled="isPersonSelected()"
-                required
-                only-client-institutions-cris />
+            <div :class="{ 'register-ou': !inModal }">
+                <organisation-unit-autocomplete-search
+                    ref="ouAutocompleteRef"
+                    v-model="selectedOrganisationUnit"
+                    :disabled="isPersonSelected()"
+                    required
+                    only-client-institutions-cris />
+            </div>
+            <ui-input
+                v-if="!inModal"
+                v-model="selectedLanguage"
+                control="select"
+                :label="$t('preferredLanguageLabel') + '*'"
+                :items="languages"
+                class="register-field"
+            />
             <v-select
+                v-else
                 v-model="selectedLanguage"
                 :label="$t('preferredLanguageLabel') + '*'"
                 :items="languages"
             />
+            <ui-input
+                v-if="!inModal"
+                v-model="email"
+                :label="$t('emailLabel') + '*'"
+                :placeholder="$t('emailLabel')"
+                :rules="emailFieldRules"
+                class="register-field"
+            />
             <v-text-field
+                v-else
                 v-model="email"
                 :label="$t('emailLabel') + '*'"
                 :rules="emailFieldRules"
             />
             <password-input-with-meter
                 v-if="!inModal"
+                embedded
                 :label="$t('newPasswordLabel') + '*'"
-                @password-change="setNewPassword($event)"
-                @show-repeated-password="true" />
+                @password-change="setNewPassword($event)" />
         </v-form>
 
         <v-btn
             v-if="!inModal"
+            class="register-submit"
             block
-            color="blue darken-1 large"
+            size="large"
+            rounded="lg"
+            color="#3b6fe0"
             :disabled="!isFormValid"
             @click="register">
             {{ $t("registerLabel") }}
@@ -65,11 +108,12 @@ import { useRouter } from "vue-router";
 import Toast from "@/components/core/Toast.vue";
 import { type ResearcherRegistrationRequest } from "@/models/AuthenticationModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
     name: "RegistrationSecondStep",
-    components: {OrganisationUnitAutocompleteSearch, PasswordInputWithMeter, Toast},
+    components: {OrganisationUnitAutocompleteSearch, PasswordInputWithMeter, Toast, UiInput},
     props: {
         firstname: {
             type: String,
@@ -213,3 +257,24 @@ export default defineComponent({
     }
 })
 </script>
+
+<style scoped>
+    .register-field {
+        margin-bottom: 1rem;
+    }
+
+    .register-ou {
+        margin-bottom: 1rem;
+    }
+
+    .register-submit {
+        margin-top: 0.75rem;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .register-submit:not(.v-btn--disabled) {
+        box-shadow: 0 10px 24px rgba(59, 111, 224, 0.28);
+    }
+</style>

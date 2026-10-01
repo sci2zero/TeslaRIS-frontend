@@ -1,31 +1,67 @@
 <template>
-    <v-col>
-        <v-text-field
-            ref="passwordRef"
-            v-model="password"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="rules"
-            :type="showPassword ? 'text' : 'password'"
-            :label="label"
-            class="mb-6"
-            @input="$emit('passwordChange', password)"
-            @click:append="showPassword = !showPassword;"
-        />
-        <v-progress-linear
-            :color="score().color"
-            :model-value="score().value"
-            :bg-opacity="0.1"
-            class="progress"
-        />
-    </v-col>
-    <v-col v-if="repeatPassword" class="bg-blue-grey-lighten-5">
-        <v-text-field
-            v-model="repeatNewPassword"
-            :label="$t('repeatNewPasswordLabel')"
-            :rules="repeatPasswordRules"
-            :type="showPassword ? 'text' : 'password'"
-        />
-    </v-col>
+    <template v-if="embedded">
+        <div class="password-embedded">
+            <ui-input
+                ref="passwordRef"
+                v-model="password"
+                :rules="rules"
+                :type="showPassword ? 'text' : 'password'"
+                :label="label"
+                :placeholder="label.replace(/\*$/, '')"
+                @update:model-value="$emit('passwordChange', $event)"
+            >
+                <template #append-inner>
+                    <v-icon
+                        :icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                        @click="showPassword = !showPassword" />
+                </template>
+            </ui-input>
+            <v-progress-linear
+                :color="score().color"
+                :model-value="score().value"
+                :bg-opacity="0.1"
+                class="progress-embedded"
+            />
+        </div>
+        <div v-if="repeatPassword" class="password-embedded">
+            <ui-input
+                v-model="repeatNewPassword"
+                :label="$t('repeatNewPasswordLabel')"
+                :placeholder="$t('repeatNewPasswordLabel')"
+                :rules="repeatPasswordRules"
+                :type="showPassword ? 'text' : 'password'"
+            />
+        </div>
+    </template>
+    <template v-else>
+        <v-col>
+            <v-text-field
+                ref="passwordRef"
+                v-model="password"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :rules="rules"
+                :type="showPassword ? 'text' : 'password'"
+                :label="label"
+                class="mb-6"
+                @input="$emit('passwordChange', password)"
+                @click:append="showPassword = !showPassword;"
+            />
+            <v-progress-linear
+                :color="score().color"
+                :model-value="score().value"
+                :bg-opacity="0.1"
+                class="progress"
+            />
+        </v-col>
+        <v-col v-if="repeatPassword" class="bg-blue-grey-lighten-5">
+            <v-text-field
+                v-model="repeatNewPassword"
+                :label="$t('repeatNewPasswordLabel')"
+                :rules="repeatPasswordRules"
+                :type="showPassword ? 'text' : 'password'"
+            />
+        </v-col>
+    </template>
 </template>
 
 <script lang="ts">
@@ -35,16 +71,22 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VTextField } from 'vuetify/lib/components/index.mjs';
 import zxcvbn from 'zxcvbn';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "PasswordInputWithMeter",
+    components: { UiInput },
     props: {
         label: {
             type: String,
             required: true
         },
         repeatPassword: {
+            type: Boolean,
+            default: false
+        },
+        embedded: {
             type: Boolean,
             default: false
         }
@@ -144,6 +186,11 @@ export default defineComponent({
     
     .progress {
         margin-top: -15px;
+    }
+
+    .progress-embedded {
+        margin-top: 0.35rem;
+        margin-bottom: 1rem;
     }
 
 </style>

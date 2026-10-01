@@ -2,19 +2,17 @@
     <div>
         <v-row>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="localHandleId"
                     label="Handle ID"
-                    placeholder="Handle ID"
                     :rules="handleIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="localArxivId"
                     label="ArXiv ID"
-                    placeholder="ArXiv ID"
                     :rules="arxivIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
@@ -23,19 +21,17 @@
         
         <v-row>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="localPubmedId"
                     label="PubMed ID"
-                    placeholder="PubMed ID"
                     :rules="pubmedIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="localSsrnId"
                     label="SSRN ID"
-                    placeholder="SSRN ID"
                     :rules="ssrnIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
@@ -43,10 +39,9 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field
+                <ui-input
                     v-model="localNationalId"
                     :label="$t('nationalIdLabel')"
-                    :placeholder="$t('nationalIdLabel')"
                     :rules="documentNationalIdValidationRules"
                     @update:model-value="emitUpdate"
                 />
@@ -99,14 +94,14 @@
 
         <v-row>
             <v-col cols="5">
-                <v-checkbox
+                <ui-checkbox
                     v-model="localPeerReviewed"
                     :label="$t('peerReviewedLabel')"
                     @update:model-value="emitUpdate"
                 />
             </v-col>
             <v-col cols="5">
-                <v-checkbox
+                <ui-checkbox
                     v-model="localOpenAccess"
                     :label="$t('isOpenAccessLabel')"
                     @update:model-value="emitUpdate"
@@ -116,7 +111,7 @@
 
         <v-row>
             <v-col>
-                <v-select
+                <ui-input control="select"
                     v-model="localPublicationStatus"
                     :items="publicationStatuses"
                     :label="$t('publicationStatusLabel')"
@@ -138,11 +133,13 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { type CommonFieldsData, PublicationStatus } from '@/models/PublicationModel';
 import { getPublicationStatusesForGivenLocale, getPublicationStatusTitleFromValueAutoLocale } from '@/i18n/publicationStatus';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "DocumentCommonFields",
-    components: { MultilingualTextInput },
+    components: { MultilingualTextInput, UiInput, UiCheckbox },
     props: {
         modelValue: {
             type: Object as PropType<CommonFieldsData>,

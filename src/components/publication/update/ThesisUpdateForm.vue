@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <v-select
+                <ui-input control="select"
                     v-model="selectedThesisType"
                     :label="$t('thesisTypeLabel') + '*'"
                     :items="publicationTypes"
@@ -106,77 +106,75 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field
+                <ui-input
                     v-model="doi"
                     label="DOI"
-                    placeholder="DOI"
                     :rules="doiValidationRules"
                 />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="numberOfPages" type="number"
                     :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')"
+                   
                 />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="numberOfChapters" type="number"
                     :label="$t('numberOfChaptersLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfChaptersLabel')"
+                   
                 />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="numberOfReferences" type="number"
                     :label="$t('numberOfReferencesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfReferencesLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="numberOfGraphs" type="number"
                     :label="$t('numberOfGraphsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfGraphsLabel')" />
+                    />
             </v-col>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="numberOfIllustrations" type="number"
                     :label="$t('numberOfIllustrationsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfIllustrationsLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="numberOfTables" type="number"
                     :label="$t('numberOfTablesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfTablesLabel')" />
+                    />
             </v-col>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="numberOfAppendices" type="number"
                     :label="$t('numberOfAppendicesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfAppendicesLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="eIsbn"
                     label="E-ISBN"
-                    placeholder="E-ISBN"
                     :rules="isbnValidationRules" />
             </v-col>
             <v-col cols="2" class="text-center">
@@ -189,10 +187,9 @@
                 </v-btn>
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="printIsbn"
                     label="Print ISBN"
-                    placeholder="Print ISBN"
                     :rules="isbnValidationRules" />
             </v-col>
         </v-row>
@@ -207,10 +204,10 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <v-text-field
+                <ui-input
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    :placeholder="$t('udcLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
@@ -220,7 +217,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-select
+                <ui-input control="select"
                     v-model="selectedLanguage"
                     :label="$t('languageLabel')"
                     :items="languageList"
@@ -229,7 +226,7 @@
         </v-row>
         <v-row>
             <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)">
-                <v-select
+                <ui-input control="select"
                     v-model="selectedWritingLanguage"
                     :label="$t('writingLanguageLabel')"
                     :items="languageTagsList"
@@ -256,24 +253,21 @@
         </v-row>
         <v-row>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="scopus"
                     label="Scopus ID"
-                    placeholder="Scopus ID"
                     :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="openAlexId"
                     label="Open Alex ID"
-                    placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="webOfScienceId"
                     label="Web of Science ID"
-                    placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
@@ -323,11 +317,12 @@ import DatePicker from '@/components/core/DatePicker.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "ThesisUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, DocumentCommonFields, FlexibleDatePicker },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, OrganisationUnitAutocompleteSearch, Toast, DatePicker, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetThesis: {
             type: Object as PropType<Thesis | undefined>,

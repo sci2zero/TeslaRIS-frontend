@@ -1,117 +1,172 @@
 <template>
-    <v-list lines="two" class="w-full">
-        <v-list-item v-for="(value, key) in citation" :key="key">
-            <template #title>
-                <div class="citation-container">
-                    <div
-                        :ref="el => citations[key] = el"
-                        class="citation"
-                        @click="selectText($event)"
-                    >
-                        {{ value }}
-                    </div>
-                </div>
-            </template>
-            <template #subtitle>
-                <v-btn
-                    class="ml-5 copy-btn"
-                    icon
-                    size="x-small"
-                    variant="plain"
-                    @click="copyAndSelect(key, value)"
-                >
-                    <v-icon>mdi-content-copy</v-icon>
-                </v-btn>
-                <strong>{{ key.toUpperCase() }}</strong>
-            </template>
-        </v-list-item>
-    </v-list>
+    <div class="text-left">
+        <div v-if="!citation" class="space-y-2" aria-busy="true">
+            <div
+                v-for="index in 5"
+                :key="index"
+                class="h-20 rounded-lg bg-slate-100 animate-pulse"
+            ></div>
+        </div>
 
-    <toast v-model="snackbar" :message="$t('copiedLabel')" />
+        <p
+            v-else-if="!availableStyles.length"
+            class="text-sm text-slate-500"
+        >
+            {{ $t("citationsUnavailableLabel") }}
+        </p>
+
+        <div
+            v-else
+            class="space-y-3"
+        >
+            <article
+                v-for="style in availableStyles"
+                :key="style.key"
+                class="rounded-xl border border-slate-200 overflow-hidden"
+            >
+                <div class="flex items-center gap-2 min-h-8 px-3 bg-slate-50">
+                    <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+                        {{ style.label }}
+                    </span>
+                    <UiButton
+                        variant="ghost"
+                        size="icon-sm"
+                        class="ml-auto shrink-0 size-7 text-slate-500 hover:text-slate-800"
+                        :aria-label="copiedKey === style.key ? $t('copiedLabel') : $t('copyCitationLabel')"
+                        :title="copiedKey === style.key ? $t('copiedLabel') : $t('copyCitationLabel')"
+                        @click="copyAndSelect(style.key)"
+                    >
+                        <span
+                            class="mdi text-base"
+                            :class="copiedKey === style.key ? 'mdi-check' : 'mdi-content-copy'"
+                            aria-hidden="true"
+                        ></span>
+                    </UiButton>
+                </div>
+
+                <div
+                    :ref="(el) => setPreview(style.key, el)"
+                    class="citation-preview px-3 py-2.5 text-sm leading-relaxed text-slate-800 bg-white"
+                    tabindex="0"
+                    @click="selectText(style.key)"
+                    @keydown.enter.prevent="selectText(style.key)"
+                >
+                    {{ citation[style.key] }}
+                </div>
+            </article>
+        </div>
+
+        <toast v-model="snackbar" :message="$t('copiedLabel')" />
+    </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import type { PropType } from "vue";
+<script setup lang="ts">
+import { computed, onUnmounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import type { CitationResponse } from "@/models/PublicationModel";
 import Toast from "../core/Toast.vue";
+import { UiButton } from "@/components/ui/button";
 
-
-export default defineComponent({
+defineOptions({
     name: "CitationFormats",
-    components: { Toast },
-    props: {
-        citation: {
-        type: Object as PropType<CitationResponse | undefined>,
-        required: true
+});
+
+const props = defineProps<{
+    citation?: CitationResponse;
+}>();
+
+const { t } = useI18n();
+
+const snackbar = ref(false);
+const copiedKey = ref<keyof CitationResponse | null>(null);
+const previewEls = ref<Partial<Record<keyof CitationResponse, HTMLElement>>>({});
+
+let copiedTimeout: ReturnType<typeof setTimeout> | undefined;
+
+const styles = computed(() => [
+    { key: "apa" as const, label: "APA" },
+    { key: "mla" as const, label: "MLA" },
+    { key: "chicago" as const, label: "Chicago" },
+    { key: "harvard" as const, label: "Harvard" },
+    { key: "vancouver" as const, label: "Vancouver" },
+]);
+
+const availableStyles = computed(() =>
+    styles.value.filter((style) => Boolean(props.citation?.[style.key]?.trim()))
+);
+
+const setPreview = (key: keyof CitationResponse, el: unknown) => {
+    if (el instanceof HTMLElement) {
+        previewEls.value[key] = el;
+        return;
+    }
+
+    delete previewEls.value[key];
+};
+
+const highlightPreview = (key: keyof CitationResponse) => {
+    const target = previewEls.value[key];
+    if (!target) {
+        return;
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(target);
+
+    const selection = window.getSelection();
+    if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+};
+
+const selectText = (key: keyof CitationResponse) => {
+    highlightPreview(key);
+};
+
+const copyAndSelect = async (key: keyof CitationResponse) => {
+    const text = props.citation?.[key];
+    if (!text) {
+        return;
+    }
+
+    highlightPreview(key);
+
+    try {
+        await navigator.clipboard.writeText(text);
+        copiedKey.value = key;
+        snackbar.value = true;
+
+        if (copiedTimeout) {
+            clearTimeout(copiedTimeout);
         }
-    },
-    setup() {
-        const snackbar = ref(false);
-        const citations = ref<any | null>({});
 
-        const selectText = (event: Event) => {
-            const target = event.currentTarget as HTMLElement;
-            if (!target) return;
+        copiedTimeout = setTimeout(() => {
+            copiedKey.value = null;
+        }, 2000);
+    } catch {
+        highlightPreview(key);
+    }
+};
 
-            const range = document.createRange();
-            range.selectNodeContents(target);
-
-            const selection = window.getSelection();
-            if (selection) {
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        };
-
-        const copyAndSelect = (key: string, text: string) => {
-            const el = citations.value[key];
-            if (!el) return;
-
-            const range = document.createRange();
-            range.selectNodeContents(el);
-
-            const selection = window.getSelection();
-            if (selection) {
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-
-            navigator.clipboard.writeText(text);
-            snackbar.value = true;
-        };
-
-        return {
-            citations,
-            selectText,
-            copyAndSelect,
-            snackbar
-        };
+onUnmounted(() => {
+    if (copiedTimeout) {
+        clearTimeout(copiedTimeout);
     }
 });
 </script>
 
 <style scoped>
-    .citation {
-        white-space: normal;
-        word-wrap: break-word;
-        text-align: justify;
-        cursor: pointer;
-        user-select: text;
-    }
+.citation-preview {
+    font-family: "Georgia", "Times New Roman", serif;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    cursor: text;
+    user-select: text;
+}
 
-    .citation-container {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .copy-btn {
-        opacity: 0.5;
-        transition: opacity 0.2s ease-in-out;
-    }
-
-    .copy-btn:hover {
-        opacity: 1;
-    }
+.citation-preview:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px rgb(148 163 184 / 0.7);
+}
 </style>

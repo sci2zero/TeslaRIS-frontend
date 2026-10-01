@@ -1,49 +1,53 @@
 <template>
     <v-app class="bg-slate-100">
-        <SideBar v-if="!hideLayout" class="h-full" />
-        <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
-            <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
+        <public-configuration-overlay />
 
-            <v-overlay
-                :model-value="globalLoading"
-                persistent
-                scrim="rgba(0,0,0,0.6)"
-                class="fixed inset-0 flex items-center justify-center z-50">
-                <div class="flex items-center gap-4">
-                    <span class="text-white text-xl">
-                        {{ globalLoadingMessage }}
-                    </span>
+        <template v-if="showApplication">
+            <SideBar v-if="!hideLayout" class="h-full" />
+            <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
+                <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
 
-                    <v-progress-circular
-                        indeterminate
-                        size="120"
-                        width="12"
-                        color="white"
-                    />
-                </div>
-            </v-overlay>
+                <v-overlay
+                    :model-value="globalLoading"
+                    persistent
+                    scrim="rgba(0,0,0,0.6)"
+                    class="fixed inset-0 flex items-center justify-center z-50">
+                    <div class="flex items-center gap-4">
+                        <span class="text-white text-xl">
+                            {{ globalLoadingMessage }}
+                        </span>
 
-            <router-view
-                :key="$route.path"
-                class="flex-1"
-            />
+                        <v-progress-circular
+                            indeterminate
+                            size="120"
+                            width="12"
+                            color="white"
+                        />
+                    </div>
+                </v-overlay>
 
-            <footerbar v-if="!hideLayout" />
-            
-            <cookie-consent
-                v-if="!hideLayout"
-            />
+                <router-view
+                    :key="$route.path"
+                    class="flex-1"
+                />
 
-            <download-progress
-                ref="downloadProgressRef"
-            />
+                <footerbar v-if="!hideLayout" />
+                
+                <cookie-consent
+                    v-if="!hideLayout"
+                />
+            </v-main>
+        </template>
 
-            <upload-progress
-                ref="uploadProgressRef"
-            />
+        <download-progress
+            ref="downloadProgressRef"
+        />
 
-            <tutorial-overlay />
-        </v-main>
+        <upload-progress
+            ref="uploadProgressRef"
+        />
+
+        <tutorial-overlay />
     </v-app>
 </template>
 
@@ -69,9 +73,11 @@ import TutorialOverlay from "@/components/core/TutorialOverlay.vue";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useTutorialStore } from "@/stores/tutorialStore";
 import { useGlobalLoading } from "./composables/useGlobalLoading";
+import { usePublicConfigurationStore } from "./stores/publicConfigurationStore";
+import PublicConfigurationOverlay from "./components/core/PublicConfigurationOverlay.vue";
 import CrisContextInformationService from "@/services/CrisContextInformationService";
 import type { CrisContextInformation } from "@/models/Common";
-
+import { providePluginAuth } from "@/plugin-system/auth";
 
 const moduleEnabled: Record<string, (toggles: CrisContextInformation) => boolean> = {
     ASSESSMENT: toggles => toggles.toggleAssessmentModule,
@@ -83,11 +89,24 @@ const moduleEnabled: Record<string, (toggles: CrisContextInformation) => boolean
 
 export default defineComponent({
     name: "App",
-    components: { CookieConsent, DownloadProgress, UploadProgress, Navbar, Footerbar, SideBar, TutorialOverlay },
+    components: {
+        CookieConsent,
+        DownloadProgress,
+        UploadProgress,
+        Navbar,
+        Footerbar,
+        SideBar,
+        PublicConfigurationOverlay,
+        TutorialOverlay
+    },
     setup() {
         const route = useRoute();
 
         const { globalLoading, globalLoadingMessage } = useGlobalLoading()
+        const publicConfigurationStore = usePublicConfigurationStore();
+        const showApplication = computed(() =>
+            !publicConfigurationStore.loading && !publicConfigurationStore.backendUnavailable
+        );
 
         const downloadProgressRef = ref<typeof DownloadProgress>();
         const uploadProgressRef = ref<typeof UploadProgress>();
@@ -108,6 +127,7 @@ export default defineComponent({
         const tutorialStore = useTutorialStore();
         const loginStore = useLoginStore();
         loginStore.initialize();
+        providePluginAuth();
 
         watch(
             () => [route.name, loginStore.userLoggedIn],
@@ -137,7 +157,8 @@ export default defineComponent({
             isHome,
             sidebarStore,
             globalLoading,
-            globalLoadingMessage
+            globalLoadingMessage,
+            showApplication
         };
     },
     beforeMount() {
@@ -298,10 +319,11 @@ export default defineComponent({
     height: 100vh;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
     .v-main {
+        --v-layout-left: 0px;
         margin-left: 0 !important;
+        padding-left: 0 !important;
     }
 }
 </style>

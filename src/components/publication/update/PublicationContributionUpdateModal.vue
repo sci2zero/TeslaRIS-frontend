@@ -1,47 +1,64 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" persistent max-width="800px">
-            <template #activator="scope">
+    <v-dialog v-model="dialog" :persistent="edited" scrollable max-width="960px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
+        <template #activator="scope">
+            <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
                     <v-btn
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
+                        icon
+                        variant="outlined"
+                        color="grey-lighten"
+                        v-bind="scope.props"
+                        class="bottom-spacer"
+                        size="small">
+                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                     </v-btn>
                 </div>
-            </template>
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ $t("updateContributionsLabel") }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form v-model="isFormValid" @submit.prevent>
-                        <v-container>
-                            <person-publication-contribution
-                                ref="updateFormRef"
-                                :preset-contributions="presetDocumentContributions"
-                                :board-members-allowed="boardMembersAllowed"
-                                :board-member-ids="boardMemberIds"
-                                is-update
-                                :limit-one="limitOne"
-                                :lock-contribution-type="lockContributionType"
-                                @set-input="contributions = $event" />
-                        </v-container>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn color="blue darken-1" @click="dialog = false">
-                        {{ $t("closeLabel") }}
-                    </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!isFormValid" @click="emitToParent">
-                        {{ $t("updateLabel") }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </v-row>
+            </slot>
+        </template>
+        <v-card
+            ref="cardRef"
+            @pointerdown.capture="onPointerDown"
+            @keydown.capture="onKeyDown"
+            @input.capture="onFieldEvent"
+            @change.capture="onFieldEvent"
+        >
+            <v-card-title class="pb-1">
+                <span class="text-h5">{{ $t("updateContributionsLabel") }}</span>
+            </v-card-title>
+            <v-card-text class="pt-2">
+                <v-form v-model="isFormValid" @submit.prevent>
+                    <person-publication-contribution
+                        ref="updateFormRef"
+                        :preset-contributions="presetDocumentContributions"
+                        :board-members-allowed="boardMembersAllowed"
+                        :board-member-ids="boardMemberIds"
+                        is-update
+                        :limit-one="limitOne"
+                        :lock-contribution-type="lockContributionType"
+                        @set-input="contributions = $event">
+                    </person-publication-contribution>
+                </v-form>
+            </v-card-text>
+            <v-card-actions class="px-6 pb-4">
+                <v-spacer></v-spacer>
+                <v-btn variant="text" @click="dialog = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+                <v-btn color="primary" variant="flat" :disabled="!isFormValid" @click="emitToParent">
+                    {{ $t("updateLabel") }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+    <persistent-question-dialog
+        v-model="confirmClose"
+        :title="$t('areYouSureLabel')"
+        :message="$t('unsavedChangesMessage')"
+        :cancel-text="$t('keepEditingLabel')"
+        :continue-text="$t('closeLabel')"
+        emphasize-cancel
+        @continue="discardChanges"
+    />
 </template>
 
 <script lang="ts">
@@ -50,11 +67,13 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { DocumentContributionType, PersonDocumentContribution } from "@/models/PublicationModel";
 import PersonPublicationContribution from "@/components/publication/PersonPublicationContribution.vue";
+import { usePersistentWhenEdited } from "@/composables/usePersistentWhenEdited";
+import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 
 
 export default defineComponent({
     name: "PublicationContributionUpdateModal",
-    components: { PersonPublicationContribution },
+    components: { PersonPublicationContribution, PersistentQuestionDialog },
     props: {
         readOnly: {
             type: Boolean,
@@ -86,6 +105,11 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const dialog = ref(false);
+        const cardRef = ref<{ $el?: HTMLElement } | null>(null);
+        const { edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges } = usePersistentWhenEdited(
+            dialog,
+            () => cardRef.value?.$el ?? null
+        );
 
         const contributions = ref<any[]>([]);
 
@@ -122,7 +146,7 @@ export default defineComponent({
             dialog.value = false;
         };
 
-        return {dialog, updateFormRef, emitToParent, contributions, isFormValid};
+        return {dialog, cardRef, edited, confirmClose, onPointerDown, onKeyDown, onFieldEvent, onClickOutside, discardChanges, updateFormRef, emitToParent, contributions, isFormValid};
     }
 });
 </script>

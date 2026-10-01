@@ -34,18 +34,18 @@
 
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')" />
+                <ui-input v-model="volume" :label="$t('volumeLabel')" />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')" />
+                <ui-input v-model="issue" :label="$t('issueLabel')" />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
+                <ui-input v-model="startPage" :label="$t('startPageLabel')" />
             </v-col>
             <v-col cols="5">
-                <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
+                <ui-input v-model="endPage" :label="$t('endPageLabel')" />
             </v-col>
         </v-row>
         <v-row>
@@ -57,7 +57,7 @@
                 />
             </v-col>
             <v-col :cols="disableYearInput ? 10 : 2">
-                <v-checkbox
+                <ui-checkbox
                     v-model="disableYearInput"
                     :label="$t('yearUnknownLabel')"
                 />
@@ -65,12 +65,12 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-text-field v-model="doi" label="DOI" placeholder="DOI" :rules="doiValidationRules" />
+                <ui-input v-model="doi" label="DOI" :rules="doiValidationRules" />
             </v-col>
         </v-row>
         <v-row>
             <v-col cols="10">
-                <v-select
+                <ui-input control="select"
                     v-model="selectedpublicationType"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel')"
@@ -80,14 +80,14 @@
         </v-row>
         <v-row>
             <v-col cols="5">
-                <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
+                <ui-input v-model="articleNumber" :label="$t('articleNumberLabel')" />
             </v-col>
             <v-col cols="5">
-                <v-text-field
+                <ui-input
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    :placeholder="$t('numberOfPagesLabel')" />
+                    />
             </v-col>
         </v-row>
         <v-row>
@@ -112,24 +112,21 @@
         </v-row>
         <v-row>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="scopus"
                     label="Scopus ID"
-                    placeholder="Scopus ID"
                     :rules="scopusIdValidationRules" />
             </v-col>
             <v-col cols="4">
-                <v-text-field
+                <ui-input
                     v-model="openAlexId"
                     label="Open Alex ID"
-                    placeholder="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules" />
             </v-col>
             <v-col cols="3">
-                <v-text-field
+                <ui-input
                     v-model="webOfScienceId"
                     label="Web of Science ID"
-                    placeholder="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules" />
             </v-col>
         </v-row>
@@ -166,6 +163,7 @@ import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import { watch } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
+import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -173,11 +171,13 @@ import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, EventAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput, UiCheckbox },
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,

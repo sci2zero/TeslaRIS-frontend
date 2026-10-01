@@ -6,8 +6,8 @@
                     <v-btn
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        size="small" v-on="scope.isActive">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
+                        size="small">
+                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
                     </v-btn>
                 </div>
             </template>

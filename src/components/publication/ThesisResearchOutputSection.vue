@@ -1,33 +1,47 @@
 <template>
-    <v-row class="mt-5">
-        <v-col>
-            <generic-crud-modal
-                :form-component="ThesisResearchOutputForm"
-                :form-props="{ thesisId: thesisId, researcherId: researcherId }"
-                entity-name="ResearchOutput"
-                is-update
-                wide
-                :read-only="!canEdit"
-                @update="fetchResearchOutput"
-                @update-persist="fetchResearchOutput"
-            />
-        </v-col>
-    </v-row>
-    <h2>{{ $t("researchOutputLabel") }}</h2>
-    <v-row>
-        <v-col>
-            <publication-table-component
-                ref="tableRef"
-                :publications="publications"
-                :total-publications="totalPublications"
-                shows-research-outputs
-                allow-selection
-                :can-remove-research-outputs="canEdit"
-                @remove-research-outputs="removeSelectedOutputs"
-                @switch-page="switchPage"
-            />
-        </v-col>
-    </v-row>
+    <div class="mt-4">
+        <landing-section-card
+            :title="$t('researchOutputLabel')"
+            :count="totalPublications"
+            icon="mdi-book-open-page-variant"
+            icon-class="bg-indigo-50 text-indigo-600">
+            <template v-if="canEdit" #action>
+                <generic-crud-modal
+                    :form-component="ThesisResearchOutputForm"
+                    :form-props="{ thesisId: thesisId, researcherId: researcherId }"
+                    entity-name="ResearchOutput"
+                    is-update
+                    wide
+                    @update="fetchResearchOutput"
+                    @update-persist="fetchResearchOutput">
+                    <template #activator="{ props: activatorProps }">
+                        <v-btn
+                            v-bind="activatorProps"
+                            variant="outlined"
+                            size="small"
+                            class="text-none"
+                            prepend-icon="mdi-plus">
+                            {{ $t("updateResearchOutputLabel") }}
+                        </v-btn>
+                    </template>
+                </generic-crud-modal>
+            </template>
+
+            <div class="px-4 py-4">
+                <publication-table-component
+                    ref="tableRef"
+                    embedded
+                    :publications="publications"
+                    :total-publications="totalPublications"
+                    shows-research-outputs
+                    allow-selection
+                    :can-remove-research-outputs="canEdit"
+                    @remove-research-outputs="removeSelectedOutputs"
+                    @switch-page="switchPage"
+                />
+            </div>
+        </landing-section-card>
+    </div>
 </template>
 
 <script lang="ts">
@@ -38,11 +52,12 @@ import { type DocumentPublicationIndex } from "@/models/PublicationModel";
 import ThesisResearchOutputService from "@/services/ThesisResearchOutputService";
 import GenericCrudModal from "../core/GenericCrudModal.vue";
 import ThesisResearchOutputForm from "./ThesisResearchOutputForm.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 
 
 export default defineComponent({
     name: "ThesisResearchOutputSection",
-    components: { PublicationTableComponent, GenericCrudModal },
+    components: { PublicationTableComponent, GenericCrudModal, LandingSectionCard },
     props: {
         thesisId: {
             type: Object as PropType<number | undefined>,

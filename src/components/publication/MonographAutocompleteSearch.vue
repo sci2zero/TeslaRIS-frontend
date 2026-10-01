@@ -1,32 +1,32 @@
 <template>
-    <v-row>
-        <v-col :cols="!disableSubmission ? 10 : 12">
-            <v-autocomplete
-                v-model="selectedMonograph"
-                :readonly="readOnly"
-                :label="(multiple ? $t('monographListLabel') : $t('monographLabel')) + (required ? '*' : '')"
-                :items="readOnly ? [] : monographs"
-                :custom-filter="((): boolean => true)"
-                :rules="required ? requiredSelectionRules : []"
-                :no-data-text="$t('noDataMessage')"
-                :multiple="multiple"
-                return-object
-                @update:search="searchMonographs($event)"
-                @update:model-value="sendContentToParent"
-            />
-        </v-col>
-        <v-col v-if="!disableSubmission" cols="1">
-            <generic-crud-modal
-                ref="modalRef"
-                :form-component="MonographSubmissionForm"
-                :form-props="{readOnly: readOnly, inModal: true, presetName: lastSearchInput}"
-                entity-name="Monograph"
-                is-submission
-                :read-only="false"
-                @create="selectNewlyAddedMonograph"
-            />
-        </v-col>
-    </v-row>
+    <div class="flex items-start gap-2">
+        <ui-input
+            class="min-w-0 flex-1"
+            control="autocomplete"
+            v-model="selectedMonograph"
+            :readonly="readOnly"
+            :label="(multiple ? $t('monographListLabel') : $t('monographLabel')) + (required ? '*' : '')"
+            :items="readOnly ? [] : monographs"
+            :custom-filter="((): boolean => true)"
+            :rules="required ? requiredSelectionRules : []"
+            :no-data-text="$t('noDataMessage')"
+            :multiple="multiple"
+            return-object
+            @update:search="searchMonographs($event)"
+            @update:model-value="sendContentToParent"
+        />
+        <generic-crud-modal
+            v-if="!disableSubmission"
+            ref="modalRef"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
+            :form-component="MonographSubmissionForm"
+            :form-props="{readOnly: readOnly, inModal: true, presetName: lastSearchInput}"
+            entity-name="Monograph"
+            is-submission
+            :read-only="false"
+            @create="selectNewlyAddedMonograph"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -40,11 +40,12 @@ import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import GenericCrudModal from '../core/GenericCrudModal.vue';
 import MonographSubmissionForm from './MonographSubmissionForm.vue';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "MonographAutocompleteSearch",
-    components: { GenericCrudModal },
+    components: { GenericCrudModal, UiInput },
     props: {
         required: {
             type: Boolean,

@@ -45,10 +45,11 @@ const hideNavbar = computed(() => {
     height: 100vh;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
     .v-main {
+        --v-layout-left: 0px;
         margin-left: 0 !important;
+        padding-left: 0 !important;
     }
 }
 </style>

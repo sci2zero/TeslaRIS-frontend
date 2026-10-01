@@ -6,8 +6,7 @@
                     :disabled="disabled"
                     density="compact"
                     class="bottom-spacer"
-                    v-bind="scope.props"
-                    v-on="scope.isActive">
+                    v-bind="scope.props">
                     {{ $t("exportTableLabel") }}
                 </v-btn>
             </template>
