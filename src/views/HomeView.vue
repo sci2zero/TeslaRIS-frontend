@@ -22,7 +22,14 @@
                         <div class="text-center">
                             <!-- Search bar -->
                             <div class="flex justify-center">
-                                <search-bar-component :dark="heroTheme === 'dark'" :transparent="heroTheme === 'dark'" :search-when-typing="false" @search="search"></search-bar-component>
+                                <search-bar-component
+                                    variant="featured"
+                                    :dark="heroTheme === 'dark'"
+                                    :transparent="heroTheme === 'dark'"
+                                    :placeholder="$t('homeSearchPlaceholder')"
+                                    :search-when-typing="false"
+                                    @search="search"
+                                />
                             </div>
                         </div>
                     </div>
@@ -75,6 +82,7 @@
 <script lang="ts">
 import { ref } from "vue";
 import { defineComponent } from "vue";
+import { useHomeTheme } from "@/composables/useHomeTheme";
 import { useI18n } from "vue-i18n";
 import SearchBarComponent from "../components/core/SearchBarComponent.vue";
 import { computed } from "vue";
@@ -108,7 +116,7 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const heroTheme = ref<'dark' | 'light'>('dark');
+        const { homeTheme: heroTheme } = useHomeTheme();
 
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));
@@ -265,9 +273,9 @@ export default defineComponent({
     --hero-text: #1e293b;
     --hero-text-muted: #64748b;
     --hero-overlay: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.94) 0%,
-            rgba(255, 255, 255, 0.88) 45%,
-            rgba(255, 255, 255, 0.92) 100%);
+            rgba(255, 255, 255, 0.72) 0%,
+            rgba(255, 255, 255, 0.55) 45%,
+            rgba(255, 255, 255, 0.65) 100%);
     --hero-backdrop: brightness(1.12);
     --hero-card-bg: rgba(255, 255, 255, 0.82);
     --hero-card-border: rgba(50, 15, 155, 0.12);

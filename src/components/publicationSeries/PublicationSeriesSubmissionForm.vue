@@ -1,101 +1,73 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="titleRef"
-                            v-model="title"
-                            :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="abbreviationsRef"
-                            v-model="nameAbbreviations"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="eIssn"
-                            label="E-ISSN"
-                            placeholder="E-ISSN"
-                            :rules="eIssnValidationRules"
-                        />
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="printIssn"
-                            label="Print ISSN"
-                            placeholder="Print ISSN"
-                            :rules="printIssnValidationRules"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row v-if="inputType === PublicationSeriesType.JOURNAL.toString()">
-                    <v-col>
-                        <v-select
-                            v-model="selectedArticleCollectionSeriesType"
-                            :label="$t('articleCollectionSeriesTypeLabel')"
-                            :items="articleCollectionSeriesTypes"
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="subtitleRef"
-                                v-model="subtitle"
-                                :label="$t('subtitleLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="sourceOpenAlexIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-select
-                                v-model="selectedLanguages"
-                                :label="$t('languageLabel')"
-                                :items="languageList"
-                                multiple
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-book-multiple"
+            :title="$t('publicationSeriesLabel')"
+        >
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="abbreviationsRef"
+                v-model="nameAbbreviations"
+                :label="$t('nameAbbreviationLabel')"
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input
+                    v-model="eIssn"
+                    label="E-ISSN"
+                    placeholder="E-ISSN"
+                    :rules="eIssnValidationRules"
+                />
+                <ui-input
+                    v-model="printIssn"
+                    label="Print ISSN"
+                    placeholder="Print ISSN"
+                    :rules="printIssnValidationRules"
+                />
+            </div>
+            <ui-input
+                v-if="inputType === PublicationSeriesType.JOURNAL.toString()"
+                control="select"
+                v-model="selectedArticleCollectionSeriesType"
+                :label="$t('articleCollectionSeriesTypeLabel')"
+                :items="articleCollectionSeriesTypes"
+                return-object
+            />
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                />
+                <ui-input
+                    v-model="openAlexId"
+                    label="Open Alex ID"
+                    placeholder="Open Alex ID"
+                    :rules="sourceOpenAlexIdValidationRules"
+                />
+                <ui-input control="select"
+                    v-model="selectedLanguages"
+                    :label="$t('languageLabel')"
+                    :items="languageList"
+                    multiple
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+            </template>
+        </form-section>
+
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     
     <toast v-model="snackbar" :message="message" />
@@ -125,9 +97,13 @@ import { ArticleCollectionSeriesType, type Journal } from '@/models/JournalModel
 import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
+import UiInput from '@/components/ui/input/Input.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
+
 export default defineComponent({
     name: "SubmitPublicationSeries",
-    components: { MultilingualTextInput, UriInput, Toast },
+    components: {MultilingualTextInput, UriInput, Toast, UiInput, FormSection, UiButton},
     props: {
         inputType: {
             type: String,

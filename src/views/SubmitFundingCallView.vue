@@ -1,29 +1,29 @@
 <template>
-    <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("addFundingCallLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <submission-page plain :title="$t('addFundingCallLabel')">
         <funding-call-submission-form ref="submissionFormRef" />
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitFundingCall(false)">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitFundingCall(true)">
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+        <template #actions>
+            <ui-button
+                variant="outline"
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitFundingCall(true)"
+            >
+                {{ $t("saveAndAddAnotherLabel") }}
+            </ui-button>
+            <ui-button
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitFundingCall(false)"
+            >
+                {{ $t("saveLabel") }}
+            </ui-button>
+        </template>
+    </submission-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import SubmissionPage from '@/components/core/SubmissionPage.vue';
+import { UiButton } from '@/components/ui/button';
 import FundingCallSubmissionForm from "@/components/project/FundingCallSubmissionForm.vue";
 
 const submissionFormRef = ref<typeof FundingCallSubmissionForm>();

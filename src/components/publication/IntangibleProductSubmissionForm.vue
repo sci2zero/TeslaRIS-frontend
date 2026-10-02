@@ -1,192 +1,132 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 10">
-                <v-row>
-                    <v-col cols="11">
-                        <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.INTANGIBLE_PRODUCT"
-                            @metadata-fetched="popuateMetadata"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="titleRef"
-                            v-model="title"
-                            :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-file-document-outline"
+            :title="$t('publicationDetailsLabel')"
+        >
+            <i-d-f-metadata-prepopulator
+                :document-type="PublicationType.INTANGIBLE_PRODUCT"
+                @metadata-fetched="popuateMetadata"
+            />
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+            />
+            <publication-deduplication-table
+                ref="deduplicationTableRef"
+                :title="title"
+                :doi="doi"
+                :scopus-id="scopus"
+                :web-of-science-id="webOfScienceId"
+                :open-alex-id="openAlexId"
+            />
+            <flexible-date-picker
+                v-model="publicationDate"
+                :label="$t('yearOfPublicationLabel') + '*'"
+                required
+            />
+            <ui-input control="select"
+                v-model="selectedIntangibleProductType"
+                :label="$t('intangibleProductTypeLabel') + '*'"
+                :items="intangibleProductTypes"
+                :rules="requiredSelectionRules"
+                :disabled="inModal"
+                return-object
+            />
+            <ui-input
+                v-model="intangibleProductNumber"
+                :label="$t('internalNumberLabel')"
+                :placeholder="$t('internalNumberLabel')"
+            />
+        </form-section>
 
-                <v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <publication-deduplication-table
-                                ref="deduplicationTableRef"
-                                :title="title"
-                                :doi="doi"
-                                :scopus-id="scopus"
-                                :web-of-science-id="webOfScienceId"
-                                :open-alex-id="openAlexId"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-row>
+        <form-section
+            icon="mdi-account-multiple-outline"
+            :title="$t('authorsLabel')"
+            :description="$t('contributionAccordionHint')"
+        >
+            <person-publication-contribution
+                ref="contributionsRef"
+                basic
+                @set-input="contributions = $event"
+            />
+        </form-section>
 
-                <v-row>
-                    <v-col cols="10">
-                        <flexible-date-picker
-                            v-model="publicationDate"
-                            :label="$t('yearOfPublicationLabel') + '*'"
-                            required
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedIntangibleProductType"
-                            :label="$t('intangibleProductTypeLabel') + '*'"
-                            :items="intangibleProductTypes"
-                            :rules="requiredSelectionRules"
-                            :disabled="inModal"
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-text-field
-                            v-model="intangibleProductNumber"
-                            :label="$t('internalNumberLabel')"
-                            :placeholder="$t('internalNumberLabel')"
-                        />
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col>
-                        <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution
-                            ref="contributionsRef"
-                            basic
-                            @set-input="contributions = $event"
-                        />
-                    </v-col>
-                </v-row>
-
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="subtitleRef"
-                                v-model="subtitle"
-                                :label="$t('subtitleLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                is-area
-                                :label="$t('abstractLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                :label="$t('keywordsLabel')"
-                                is-area
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <publisher-autocomplete-search
-                                ref="publisherAutocompleteRef"
-                                v-model="selectedPublisher"
-                                allow-author-reprint
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="scopus"
-                                label="Scopus ID"
-                                placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules"
-                            />
-                        </v-col>
-                        <v-col cols="4">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules"
-                            />
-                        </v-col>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <multilingual-text-input
-                                ref="usersRef"
-                                v-model="productUsers"
-                                :label="$t('productUsersLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <h2 class="mt-5!">
-                        {{ $t("researchAreasLabel") }}
-                    </h2>
-                    <v-row>
-                        <v-col cols="10">
-                            <research-areas-selection
-                                ref="researchAreasSelectionRef"
-                                :research-areas-hierarchy="[]"
-                                submit-on-click
-                                @update="saveResearchAreas"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <document-common-fields
-                        ref="commonFieldsRef"
-                        v-model="commonFieldsData"
-                        :preset-data="presetCommonFieldsData"
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                />
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('abstractLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    :label="$t('keywordsLabel')"
+                    is-area
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+                <publisher-autocomplete-search
+                    ref="publisherAutocompleteRef"
+                    v-model="selectedPublisher"
+                    allow-author-reprint
+                />
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <ui-input
+                        v-model="scopus"
+                        label="Scopus ID"
+                        placeholder="Scopus ID"
+                        :rules="scopusIdValidationRules"
                     />
-                </v-container>
-            </v-col>
-        </v-row>
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+                    <ui-input
+                        v-model="openAlexId"
+                        label="Open Alex ID"
+                        placeholder="Open Alex ID"
+                        :rules="workOpenAlexIdValidationRules"
+                    />
+                    <ui-input
+                        v-model="webOfScienceId"
+                        label="Web of Science ID"
+                        placeholder="Web of Science ID"
+                        :rules="documentWebOfScienceIdValidationRules"
+                    />
+                </div>
+                <multilingual-text-input
+                    ref="usersRef"
+                    v-model="productUsers"
+                    :label="$t('productUsersLabel')"
+                />
+                <h2 class="mt-5!">
+                    {{ $t("researchAreasLabel") }}
+                </h2>
+                <research-areas-selection
+                    ref="researchAreasSelectionRef"
+                    :research-areas-hierarchy="[]"
+                    submit-on-click
+                    @update="saveResearchAreas"
+                />
+                <document-common-fields
+                    ref="commonFieldsRef"
+                    v-model="commonFieldsData"
+                    :preset-data="presetCommonFieldsData"
+                />
+            </template>
+        </form-section>
+
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
@@ -217,9 +157,13 @@ import DocumentCommonFields from './DocumentCommonFields.vue';
 import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
+import UiInput from '@/components/ui/input/Input.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
+
 export default defineComponent({
     name: "SubmitIntangibleProduct",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker },
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,

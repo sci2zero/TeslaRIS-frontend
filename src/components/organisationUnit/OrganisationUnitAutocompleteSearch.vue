@@ -1,45 +1,47 @@
 <template>
-    <div class="flex items-start gap-2">
-        <ui-input
-            class="min-w-0 flex-1"
-            control="autocomplete"
-            v-model="selectedOrganisationUnit"
-            v-model:search="searchInput"
-            :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
-            :items="readonly ? [] : organisationUnits"
-            :custom-filter="((): boolean => true)"
-            :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
-            :no-data-text="$t('noDataMessage')"
-            :multiple="multiple"
-            return-object
-            :class="comfortable ? 'comfortable' : ''"
-            :readonly="readonly"
-            @update:search="searchOUs($event)"
-            @update:model-value="sendContentToParent"
-        />
-        <generic-crud-modal
-            v-if="!disableSubmission && isAdmin"
-            ref="modalRef"
-            class="mt-[1.31rem] w-fit shrink-0 self-start"
-            :form-component="OrganisationUnitSubmissionForm"
-            :form-props="{ presetName: lastSearchInput }"
-            entity-name="OU"
-            is-submission
-            :read-only="false"
-            @create="selectNewlyAddedOU"
-        />
-        <v-btn
-            v-if="allowManualClearing && hasSelection"
-            class="mt-[1.31rem] shrink-0"
-            icon
-            @click="clearInput"
-        >
-            <v-icon>mdi-delete</v-icon>
-        </v-btn>
+    <div class="w-full min-w-0">
+        <div class="flex w-full items-start gap-2">
+            <ui-input
+                class="min-w-0 flex-1"
+                control="autocomplete"
+                v-model="selectedOrganisationUnit"
+                v-model:search="searchInput"
+                :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
+                :items="readonly ? [] : organisationUnits"
+                :custom-filter="((): boolean => true)"
+                :rules="required ? (multiple ? requiredMultiSelectionRules : requiredSelectionRules) : []"
+                :no-data-text="$t('noDataMessage')"
+                :multiple="multiple"
+                return-object
+                :class="comfortable ? 'comfortable' : ''"
+                :readonly="readonly"
+                @update:search="searchOUs($event)"
+                @update:model-value="sendContentToParent"
+            />
+            <generic-crud-modal
+                v-if="!disableSubmission && isAdmin"
+                ref="modalRef"
+                class="mt-[1.31rem] w-fit shrink-0 self-start"
+                :form-component="OrganisationUnitSubmissionForm"
+                :form-props="{ presetName: lastSearchInput }"
+                entity-name="OU"
+                is-submission
+                :read-only="false"
+                @create="selectNewlyAddedOU"
+            />
+            <v-btn
+                v-if="allowManualClearing && hasSelection"
+                class="mt-[1.31rem] shrink-0"
+                icon
+                @click="clearInput"
+            >
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
+        </div>
+        <p v-if="showThesisTypeError" class="text-red">
+            {{ $t("thesisTypeNotAllowedMessage") }}
+        </p>
     </div>
-    <p v-if="showThesisTypeError" class="text-red">
-        {{ $t("thesisTypeNotAllowedMessage") }}
-    </p>
 </template>
 
 <script lang="ts">

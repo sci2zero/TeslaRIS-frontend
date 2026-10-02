@@ -9,9 +9,33 @@ import srCyrOverride from "./sr-cyr-override";
 import { toCyrillic } from './serbianTransliteration';
 
 
-export const defaultLocale = "sr";
+const bundledLocales = ["sr", "sr-cyr", "en"];
+
+export let defaultLocale = "sr";
 export const fallbackLocale = "en";
-export const supportedLocales = ["sr", "sr-cyr", "en"];
+export let supportedLocales = [...bundledLocales];
+
+export function configureLocales(options: { defaultLocale?: string; supportedLocales?: string[] }) {
+    if (options.supportedLocales) {
+        const next = options.supportedLocales.filter((locale) => bundledLocales.includes(locale));
+        if (next.length === 0) {
+            return;
+        }
+        supportedLocales = next;
+    }
+
+    if (options.defaultLocale && supportedLocales.includes(options.defaultLocale)) {
+        defaultLocale = options.defaultLocale;
+    }
+
+    if (!supportedLocales.includes(defaultLocale)) {
+        defaultLocale = supportedLocales[0];
+    }
+
+    if (_i18n) {
+        setLocale(defaultLocale);
+    }
+}
 
 let _i18n: I18n;
 

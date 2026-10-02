@@ -3,7 +3,7 @@
         <public-configuration-overlay />
 
         <template v-if="showApplication">
-            <SideBar v-if="!hideLayout" class="h-full" />
+            <SideBar v-if="!hideLayout" class="h-full" :theme="homeTheme" />
             <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
                 <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
 
@@ -31,7 +31,7 @@
                     class="flex-1"
                 />
 
-                <footerbar v-if="!hideLayout" />
+                <footerbar v-if="!hideLayout" :theme="homeTheme" />
                 
                 <cookie-consent
                     v-if="!hideLayout"
@@ -78,6 +78,7 @@ import PublicConfigurationOverlay from "./components/core/PublicConfigurationOve
 import CrisContextInformationService from "@/services/CrisContextInformationService";
 import type { CrisContextInformation } from "@/models/Common";
 import { providePluginAuth } from "@/plugin-system/auth";
+import { useHomeTheme } from "@/composables/useHomeTheme";
 
 const moduleEnabled: Record<string, (toggles: CrisContextInformation) => boolean> = {
     ASSESSMENT: toggles => toggles.toggleAssessmentModule,
@@ -123,6 +124,7 @@ export default defineComponent({
         const isHome = computed(() => {
             return route.name === "home";
         });
+        const { homeTheme } = useHomeTheme();
         const sidebarStore = useSidebarStore();
         const tutorialStore = useTutorialStore();
         const loginStore = useLoginStore();
@@ -155,6 +157,7 @@ export default defineComponent({
             downloadProgressRef,
             uploadProgressRef,
             isHome,
+            homeTheme,
             sidebarStore,
             globalLoading,
             globalLoadingMessage,

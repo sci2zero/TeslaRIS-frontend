@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <h1 class="d-flex justify-center text-center">
+        <h1 class="mb-2 text-3xl font-bold tracking-tight text-slate-800">
             {{ $t("mServiceLabel") }}
         </h1>
         <div class="d-flex justify-center text-center mb-5">

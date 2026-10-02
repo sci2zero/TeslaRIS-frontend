@@ -1,14 +1,19 @@
 <template>
-    <v-btn
+    <a
         v-if="identifier"
-        variant="plain"
-        :density="compact ? 'compact' : 'default'"
-        :class="compact ? 'text-slate-700 text-sm font-mono max-w-full whitespace-normal h-auto' : 'no-uppercase m-0 p-0 h-auto semi-transparent'"
-        :style="{ fontSize: compact ? '0.875rem' : '1.2rem', fontWeight: 'bold', marginLeft: (compact && type !== 'researcher_id') ? '-12px' : '-17px' }"
         :href="`${computeBaseURL()}${identifier}`"
-        target="_blank">
-        {{ identifier }}
-    </v-btn>
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group inline-flex max-w-full items-baseline gap-1 text-sm font-medium leading-5 text-slate-800 break-all rounded-sm transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
+    >
+        <span class="underline decoration-slate-400 underline-offset-2 group-hover:decoration-blue-700">
+            {{ identifier }}
+        </span>
+        <span
+            class="mdi mdi-open-in-new shrink-0 text-[0.75em] text-slate-400 group-hover:text-blue-700"
+            aria-hidden="true"
+        ></span>
+    </a>
 </template>
 
 <script lang="ts">

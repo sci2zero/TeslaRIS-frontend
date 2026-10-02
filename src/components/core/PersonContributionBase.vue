@@ -4,31 +4,16 @@
             <h3 class="editor-section-title">
                 {{ $t("personLabel") }}
             </h3>
-            <v-row v-if="allowExternalAssociate">
-                <v-col cols="12" class="pb-1">
-                    <v-radio-group
-                        v-model="associateSource"
-                        inline
-                        hide-details
-                        density="compact"
-                        color="primary"
-                        class="mode-radio-group"
-                        :disabled="lockSearchField"
-                    >
-                        <v-radio
-                            :label="$t('selectAssociateFromSystemLabel')"
-                            value="internal"
-                            color="primary"
-                        />
-                        <v-radio
-                            :label="$t('addExternalAssociateLabel')"
-                            value="external"
-                            color="primary"
-                        />
-                    </v-radio-group>
-                </v-col>
-            </v-row>
-            <div v-if="!selectExternalAssociate" class="flex items-start gap-2">
+            <choice-cards
+                v-if="allowExternalAssociate"
+                v-model="associateSource"
+                :disabled="lockSearchField"
+                :options="[
+                    { value: 'internal', title: $t('selectAssociateFromSystemLabel') },
+                    { value: 'external', title: $t('addExternalAssociateLabel') },
+                ]"
+            />
+            <div v-if="!selectExternalAssociate" class="flex w-full min-w-0 items-start gap-2">
                 <ui-input
                     v-model="selectedPerson"
                     class="min-w-0 flex-1"
@@ -67,162 +52,147 @@
                     @selected="selectExistingSelectedPerson"
                 />
             </div>
-            <v-row v-if="showTopSuggestions && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)">
+            <div
+                v-if="showTopSuggestions && topContributors.length > 0 && !selectExternalAssociate && (!selectedPerson || selectedPerson.value <= 0)"
+                class="mt-2 flex flex-wrap gap-2"
+            >
                 <v-chip
-                    v-for="contributor in topContributors" :key="contributor.b" class="ml-2" outlined
+                    v-for="contributor in topContributors" :key="contributor.b" variant="outlined"
                     @click="setContributor(contributor)">
                     {{ contributor.a }}
                 </v-chip>
-            </v-row>
-            <v-row v-if="personOtherNames.length > 0 || selectExternalAssociate">
-                <v-col v-if="!selectExternalAssociate" cols="12" class="pb-1">
-                    <div class="name-source">
-                        <span class="mode-switch-label">{{ $t("personOtherNamesLabel") }}</span>
-                        <v-btn-toggle
-                            v-model="nameSource"
-                            mandatory
-                            divided
-                            density="compact"
-                            variant="outlined"
-                            color="primary"
-                            class="name-source-toggle"
-                        >
-                            <v-btn value="list" size="small">
-                                {{ $t("selectFromListLabel") }}
-                            </v-btn>
-                            <v-btn value="custom" size="small">
-                                {{ $t("addCustomLabel") }}
-                            </v-btn>
-                        </v-btn-toggle>
-                    </div>
-                </v-col>
-                <v-col v-if="!customNameInput && !selectExternalAssociate" cols="12">
+            </div>
+            <div v-if="personOtherNames.length > 0 || selectExternalAssociate" class="mt-3 flex flex-col gap-3">
+                <div v-if="!selectExternalAssociate" class="name-source">
+                    <span class="mode-switch-label">{{ $t("personOtherNamesLabel") }}</span>
+                    <v-btn-toggle
+                        v-model="nameSource"
+                        mandatory
+                        divided
+                        density="compact"
+                        variant="outlined"
+                        color="primary"
+                        class="name-source-toggle"
+                    >
+                        <v-btn value="list" size="small">
+                            {{ $t("selectFromListLabel") }}
+                        </v-btn>
+                        <v-btn value="custom" size="small">
+                            {{ $t("addCustomLabel") }}
+                        </v-btn>
+                    </v-btn-toggle>
+                </div>
+                <ui-input
+                    v-if="!customNameInput && !selectExternalAssociate"
+                    v-model="selectedOtherName"
+                    control="select"
+                    :items="personOtherNames"
+                    :auto-select-first="true"
+                    :no-data-text="$t('noDataMessage')"
+                    :aria-label="$t('personOtherNamesLabel')"
+                    return-object
+                    @update:model-value="sendContentToParent"
+                />
+                <div v-if="customNameInput || selectExternalAssociate" class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <ui-input
-                        v-model="selectedOtherName"
-                        control="select"
-                        :items="personOtherNames"
-                        :auto-select-first="true"
-                        :no-data-text="$t('noDataMessage')"
-                        :aria-label="$t('personOtherNamesLabel')"
-                        return-object
-                        @update:model-value="sendContentToParent"
+                        v-model="firstName"
+                        :label="$t('firstNameLabel') + '*'"
+                        :placeholder="$t('firstNameLabel')"
+                        :rules="requiredFieldRules"
+                        append-inner-icon="mdi-swap-horizontal"
+                        @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
+                        @update:model-value="onNamePartUpdate('firstName', $event)"
                     />
-                </v-col>
-                <template v-if="customNameInput || selectExternalAssociate">
-                    <v-col cols="12" sm="4">
-                        <ui-input
-                            v-model="firstName"
-                            :label="$t('firstNameLabel') + '*'"
-                            :placeholder="$t('firstNameLabel')"
-                            :rules="requiredFieldRules"
-                            append-inner-icon="mdi-swap-horizontal"
-                            @click:append-inner="[firstName, lastName] = [lastName, firstName]; sendContentToParent();"
-                            @update:model-value="onNamePartUpdate('firstName', $event)"
-                        />
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                        <ui-input
-                            v-model="middleName"
-                            :label="$t('middleNameLabel')"
-                            :placeholder="$t('middleNameLabel')"
-                            @update:model-value="onNamePartUpdate('middleName', $event)"
-                        />
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                        <ui-input
-                            v-model="lastName"
-                            :label="$t('surnameLabel') + '*'"
-                            :placeholder="$t('surnameLabel')"
-                            :rules="requiredFieldRules"
-                            @update:model-value="onNamePartUpdate('lastName', $event)"
-                        />
-                    </v-col>
-                </template>
-            </v-row>
-            <v-row v-if="!basic">
-                <v-col>
-                    <date-picker
-                        v-model="dateFrom"
-                        :label="$t('fromLabel')"
-                        color="primary"
+                    <ui-input
+                        v-model="middleName"
+                        :label="$t('middleNameLabel')"
+                        :placeholder="$t('middleNameLabel')"
+                        @update:model-value="onNamePartUpdate('middleName', $event)"
                     />
-                </v-col>
-                <v-col>
-                    <date-picker
-                        v-model="dateTo"
-                        :label="$t('toLabel')"
-                        color="primary"
+                    <ui-input
+                        v-model="lastName"
+                        :label="$t('surnameLabel') + '*'"
+                        :placeholder="$t('surnameLabel')"
+                        :rules="requiredFieldRules"
+                        @update:model-value="onNamePartUpdate('lastName', $event)"
                     />
-                </v-col>
-            </v-row>
+                </div>
+            </div>
+            <div v-if="!basic" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <date-picker
+                    v-model="dateFrom"
+                    :label="$t('fromLabel')"
+                    color="primary"
+                />
+                <date-picker
+                    v-model="dateTo"
+                    :label="$t('toLabel')"
+                    color="primary"
+                />
+            </div>
         </section>
 
         <section v-if="showAffiliationSection" class="editor-section">
             <h3 class="editor-section-title">
                 {{ $t("personAffiliationsLabel") }}
             </h3>
-            <v-row>
-                <v-col cols="12" class="pb-1">
-                    <v-radio-group
-                        v-model="affiliationSource"
-                        inline
-                        hide-details
-                        density="compact"
-                        color="primary"
-                        class="mode-radio-group"
-                    >
-                        <v-radio
-                            :label="$t('searchInSystemLabel')"
-                            value="list"
-                            color="primary"
-                        />
-                        <v-radio
-                            :label="$t('addCustomLabel')"
-                            value="external"
-                            color="primary"
-                        />
-                    </v-radio-group>
-                </v-col>
-            </v-row>
-            <v-row v-show="!enterExternalOU">
-                <v-col v-if="usePersonAffiliationList" cols="12">
-                    <ui-input
-                        v-model="selectedAffiliations"
-                        control="select"
-                        :items="personAffiliations"
-                        :no-data-text="$t('noAffiliationsMessage')"
-                        :aria-label="$t('personAffiliationsLabel')"
-                        return-object
-                        multiple
-                        @update:model-value="sendContentToParent"
-                    />
-                </v-col>
-                <v-col v-else cols="12">
-                    <organisation-unit-autocomplete-search
-                        v-model="selectedAffiliations"
-                        multiple
-                        disable-submission
-                        @update:model-value="sendContentToParent"
-                    />
-                </v-col>
-            </v-row>
-            <v-row v-show="enterExternalOU">
-                <v-col>
-                    <multilingual-text-input
-                        ref="affiliationStatementRef"
-                        v-model="affiliationStatement"
-                        :label="$t('affiliationStatementLabel')"
-                        :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
-                        @update:model-value="sendContentToParent" />
-                </v-col>
-            </v-row>
-            <v-row v-show="enterExternalOU && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))">
+            <v-radio-group
+                v-model="affiliationSource"
+                inline
+                hide-details
+                density="compact"
+                color="primary"
+                class="mode-radio-group"
+            >
+                <v-radio
+                    :label="$t('searchInSystemLabel')"
+                    value="list"
+                    color="primary"
+                />
+                <v-radio
+                    :label="$t('addCustomLabel')"
+                    value="external"
+                    color="primary"
+                />
+            </v-radio-group>
+            <div v-show="!enterExternalOU" class="mt-2 min-w-0">
+                <ui-input
+                    v-if="usePersonAffiliationList"
+                    v-model="selectedAffiliations"
+                    control="select"
+                    :items="personAffiliations"
+                    :no-data-text="$t('noAffiliationsMessage')"
+                    :aria-label="$t('personAffiliationsLabel')"
+                    return-object
+                    multiple
+                    @update:model-value="sendContentToParent"
+                />
+                <organisation-unit-autocomplete-search
+                    v-else
+                    v-model="selectedAffiliations"
+                    multiple
+                    disable-submission
+                    @update:model-value="sendContentToParent"
+                />
+            </div>
+            <div v-show="enterExternalOU" class="mt-2 min-w-0">
+                <multilingual-text-input
+                    ref="affiliationStatementRef"
+                    v-model="affiliationStatement"
+                    :label="$t('affiliationStatementLabel')"
+                    :initial-value="toMultilingualTextInput(presetContributionValue.affiliationStatement, languageTags)"
+                    @update:model-value="sendContentToParent" />
+            </div>
+            <div
+                v-if="enterExternalOU && externalInstitutionSuggestions.length > 0 && (affiliationStatement && (affiliationStatement.length === 0 || affiliationStatement[0].text === ''))"
+                class="mt-2 flex flex-wrap gap-2"
+            >
                 <v-chip
-                    v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" class="ml-2" outlined
+                    v-for="(suggestion, index) in externalInstitutionSuggestions" :key="index" variant="outlined"
                     @click="affiliationStatementRef?.setNewInputValue(toMultilingualTextInput(suggestion, languageTags))">
                     {{ returnCurrentLocaleContent(suggestion) }}
                 </v-chip>
-            </v-row>
+            </div>
         </section>
 
         <section v-if="!basic" class="editor-section">
@@ -280,11 +250,12 @@ import ResearchAreasSelection from "./ResearchAreasSelection.vue";
 import DatePicker from "./DatePicker.vue";
 import UiInput from "@/components/ui/input/Input.vue";
 import OrganisationUnitAutocompleteSearch from "@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue";
+import ChoiceCards from "@/components/ui/choice-cards/ChoiceCards.vue";
 
 
 export default defineComponent({
     name: "PersonContributionBase",
-    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip, ResearchAreasSelection, DatePicker, UiInput, OrganisationUnitAutocompleteSearch },
+    components: { MultilingualTextInput, GenericCrudModal, PersonPublicationsTooltip, ResearchAreasSelection, DatePicker, UiInput, OrganisationUnitAutocompleteSearch, ChoiceCards },
     props: {
         basic: {
             type: Boolean,
@@ -1046,6 +1017,7 @@ export default defineComponent({
 }
 
 .editor-section {
+    min-width: 0;
     padding: 12px 14px 8px;
     border-radius: 10px;
     background: rgba(var(--v-theme-on-surface), 0.03);

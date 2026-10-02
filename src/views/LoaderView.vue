@@ -172,12 +172,12 @@
         <toast v-model="snackbar" :message="errorMessage" />
     </v-container>
     <v-container v-else-if="isAdmin && selectedOrganisationUnit && selectedOrganisationUnit.value <= 0 && !showAll">
-        <h1 class="d-flex flex-row justify-center">
+        <h1 class="text-3xl font-bold tracking-tight text-slate-800">
             {{ $t("selectInstitutionMessage") }}
         </h1>
     </v-container>
     <v-container v-else>
-        <h1 class="d-flex flex-row justify-center">
+        <h1 class="text-3xl font-bold tracking-tight text-slate-800">
             {{ $t("noRecordsRemainingMessage") }}
         </h1>
     </v-container>

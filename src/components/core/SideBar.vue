@@ -9,11 +9,12 @@
     <aside
         :class="[
             'sidebar',
+            theme === 'light' ? 'sidebar--light' : '',
             sidebarStore.isVisible ? 'translate-x-0' : '-translate-x-full'
         ]">
         <div class="sidebar-header">
             <router-link
-                to="/"
+                :to="{ name: 'home', params: { locale: $i18n.locale } }"
                 class="sidebar-item sidebar-item--brand"
                 aria-label="Logo">
                 <span
@@ -32,16 +33,16 @@
 
         <div class="sidebar-divider"></div>
 
-        <button
-            v-show="canScrollUp"
-            class="sidebar-scroll-btn"
-            aria-label="Scroll up"
-            @click="scrollUp"
-        >
-            <span class="mdi mdi-chevron-up text-sm" />
-        </button>
-
         <nav class="side-menu">
+            <button
+                v-show="canScrollUp"
+                class="sidebar-scroll-btn sidebar-scroll-btn--up"
+                aria-label="Scroll up"
+                @click="scrollUp"
+            >
+                <span class="mdi mdi-chevron-up text-sm" />
+            </button>
+
             <div
                 ref="scrollContainer"
                 class="sidebar-scroll scrollbar-hide"
@@ -70,12 +71,15 @@
                                 </div>
                             </template>
                             
-                            <v-list class="sidebar-menu-list" theme="dark">
+                            <v-list
+                                class="sidebar-menu-list"
+                                :class="{ 'sidebar-menu-list--light': theme === 'light' }"
+                                :theme="theme === 'light' ? 'light' : 'dark'">
                                 <v-list-item
                                     v-for="subItem in item.subItems"
                                     v-show="!subItem.condition || subItem.condition"
                                     :key="subItem.key"
-                                    :to="{path: '/' + $i18n.locale + subItem.to}"
+                                    :to="localizedTo(subItem.to)"
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
@@ -90,7 +94,7 @@
                         
                         <router-link
                             v-else
-                            :to="'/' + $i18n.locale + item.to + (item.dynamicValue ? item.dynamicValue : '')"
+                            :to="localizedTo(item.to, item.dynamicValue)"
                             class="sidebar-item"
                             :class="{ 'sidebar-item--active': isActive(item.to) }"
                             :aria-label="item.label"
@@ -102,16 +106,16 @@
                     </template>
                 </div>
             </div>
-        </nav>
 
-        <button
-            v-show="canScrollDown"
-            class="sidebar-scroll-btn"
-            aria-label="Scroll down"
-            @click="scrollDown"
-        >
-            <span class="mdi mdi-chevron-down text-sm" />
-        </button>
+            <button
+                v-show="canScrollDown"
+                class="sidebar-scroll-btn sidebar-scroll-btn--down"
+                aria-label="Scroll down"
+                @click="scrollDown"
+            >
+                <span class="mdi mdi-chevron-down text-sm" />
+            </button>
+        </nav>
     </aside>
 </template>
 
@@ -130,6 +134,11 @@ import type { Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
+withDefaults(defineProps<{
+    theme?: "dark" | "light";
+}>(), {
+    theme: "dark",
+});
 
 const route = useRoute();
 const i18n = useI18n();
@@ -155,6 +164,10 @@ const institutionId = ref(-1);
 const logoUrl = computed(() => publicConfigurationStore.logoDisplayUrl);
 const hasCustomLogo = computed(() => publicConfigurationStore.hasCustomLogo);
 const brandTitle = computed(() => returnCurrentLocaleContent(publicConfigurationStore.title) || "TeslaRIS");
+
+const localizedTo = (path: string, dynamicValue?: string | number) => ({
+    path: `/${i18n.locale.value}${path}${dynamicValue ?? ""}`,
+});
 
 const scrollContainer = ref<HTMLElement>();
 const canScrollUp = ref(false);
@@ -478,8 +491,15 @@ const isActive = (path: string): boolean => {
     color: var(--sidebar-text);
     font-weight: 600;
     font-size: 1rem;
+    line-height: 1.25;
     text-align: left;
     margin-top: 0;
+    min-width: 0;
+}
+
+.sidebar--light {
+    --sidebar-bg: #1e293b;
+    --sidebar-border: rgba(30, 41, 59, 0.8);
 }
 
 .sidebar-item--brand {
@@ -553,13 +573,27 @@ const isActive = (path: string): boolean => {
 }
 
 .sidebar-scroll-btn {
-    margin: 0.5rem 0;
-    padding: 0.25rem;
+    position: absolute;
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0.125rem 0.75rem;
     border-radius: 9999px;
-    background: var(--sidebar-scroll-bg);
+    background: var(--sidebar-bg);
     color: var(--sidebar-text-muted);
+    border: 1px solid var(--sidebar-divider);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease;
-    flex-shrink: 0;
+}
+
+.sidebar-scroll-btn--up {
+    top: 0.25rem;
+}
+
+.sidebar-scroll-btn--down {
+    bottom: 0.25rem;
 }
 
 .sidebar-scroll-btn:hover {
@@ -651,5 +685,9 @@ const isActive = (path: string): boolean => {
 
 .sidebar-menu-list-item:hover .sidebar-menu-icon {
     color: var(--sidebar-primary) !important;
+}
+
+.sidebar-menu-list--light {
+    --sidebar-menu-bg: #334155;
 }
 </style>

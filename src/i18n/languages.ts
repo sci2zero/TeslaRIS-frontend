@@ -1,3 +1,5 @@
+import { supportedLocales } from "./index";
+
 const langItems = [
     {
         title: "Srpski",
@@ -14,5 +16,8 @@ const langItems = [
 ];
 
 export const getLangItems = () => {
-    return langItems;
+    return supportedLocales.flatMap((locale) => {
+        const item = langItems.find((lang) => lang.value === locale);
+        return item ? [item] : [];
+    });
 };

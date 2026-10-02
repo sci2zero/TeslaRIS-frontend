@@ -1,32 +1,22 @@
 <template>
-    <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("addGeneticMaterialLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <submission-page plain :title="$t('addGeneticMaterialLabel')">
         <genetic-material-submission-form ref="submissionFormRef" />
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn
-                    color="blue darken-1"
-                    :disabled="!submissionFormRef?.isFormValid"
-                    class="submission-action"
-                    @click="submissionFormRef?.submitGeneticMaterial(false)">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn
-                    color="blue darken-1"
-                    :disabled="!submissionFormRef?.isFormValid"
-                    class="submission-action"
-                    @click="submissionFormRef?.submitGeneticMaterial(true)">
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+        <template #actions>
+            <ui-button
+                variant="outline"
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitGeneticMaterial(true)"
+            >
+                {{ $t("saveAndAddAnotherLabel") }}
+            </ui-button>
+            <ui-button
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitGeneticMaterial(false)"
+            >
+                {{ $t("saveLabel") }}
+            </ui-button>
+        </template>
+    </submission-page>
 </template>
 
 <script lang="ts">
@@ -35,11 +25,12 @@ import GeneticMaterialSubmissionForm from "@/components/publication/GeneticMater
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-
+import SubmissionPage from '@/components/core/SubmissionPage.vue';
+import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "SubmitGeneticMaterialView",
-    components: { GeneticMaterialSubmissionForm },
+    components: {GeneticMaterialSubmissionForm, SubmissionPage, UiButton},
     setup() {
         const submissionFormRef = ref<typeof GeneticMaterialSubmissionForm>();
 

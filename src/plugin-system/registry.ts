@@ -1,6 +1,6 @@
 import { markRaw, reactive, shallowReactive, type Component } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import i18n from "@/i18n";
+import i18n, { configureLocales } from "@/i18n";
 import router from "@/router";
 import type { ExtensionContribution, ExtensionInput, FrontendPlugin, PluginRoute } from "./types";
 
@@ -43,6 +43,7 @@ export function registerPlugin(plugin: FrontendPlugin) {
 
     if (plugin.config) {
         deepMerge(config, plugin.config);
+        applyLocaleConfig(plugin.config);
     }
 
     if (plugin.constants) {
@@ -151,6 +152,22 @@ function isComponentShorthand(value: ExtensionInput): value is Component {
         typeof candidate.render === "function" ||
         typeof candidate.template === "string"
     );
+}
+
+function applyLocaleConfig(source: Record<string, unknown>) {
+    const defaultLocale = source.defaultLocale;
+    const supportedLocales = source.supportedLocales;
+
+    if (typeof defaultLocale !== "string" && !Array.isArray(supportedLocales)) {
+        return;
+    }
+
+    configureLocales({
+        defaultLocale: typeof defaultLocale === "string" ? defaultLocale : undefined,
+        supportedLocales: Array.isArray(supportedLocales)
+            ? supportedLocales.filter((locale): locale is string => typeof locale === "string")
+            : undefined,
+    });
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

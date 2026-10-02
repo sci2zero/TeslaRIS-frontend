@@ -1,5 +1,5 @@
 <template>
-    <h1 class="d-flex flex-row justify-center mb-10">
+    <h1 class="mb-10 text-3xl font-bold tracking-tight text-slate-800">
         {{ $t("routeLabel.thesisLibrarySearch") }}
     </h1>
     

@@ -1,225 +1,100 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-container>
-            <v-row>
-                <v-col cols="12" :sm="inModal ? 12 : 8">
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <ui-input
-                                v-model="firstName"
-                                :label="$t('firstNameLabel') + '*'"
-                                :placeholder="$t('firstNameLabel')"
-                                :rules="requiredFieldRules"
-                            />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <ui-input
-                                v-model="lastName"
-                                :label="$t('surnameLabel') + '*'"
-                                :placeholder="$t('surnameLabel')"
-                                :rules="requiredFieldRules"
-                            />
-                        </v-col>
-                    </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-account-outline"
+            :title="$t('personLabel')"
+            :description="$t('researcherDetailsHint')"
+        >
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input
+                    v-model="firstName"
+                    :label="$t('firstNameLabel') + '*'"
+                    :placeholder="$t('firstNameLabel')"
+                    :rules="requiredFieldRules"
+                />
+                <ui-input
+                    v-model="lastName"
+                    :label="$t('surnameLabel') + '*'"
+                    :placeholder="$t('surnameLabel')"
+                    :rules="requiredFieldRules"
+                />
+            </div>
+            <person-deduplication-table
+                ref="deduplicationTableRef"
+                :person-first-name="firstName"
+                :person-last-name="lastName"
+                :return-selected="inModal"
+                @selected="returnToParent"
+            />
+            <organisation-unit-autocomplete-search
+                ref="ouAutocompleteRef"
+                v-model:model-value="selectedOrganisationUnit"
+                :top-level-institution-id="role === 'INSTITUTIONAL_EDITOR' ? loggedInUser?.organisationUnitId : undefined"
+            />
+        </form-section>
 
-                    <v-row>
-                        <v-col cols="12">
-                            <person-deduplication-table
-                                ref="deduplicationTableRef"
-                                :person-first-name="firstName"
-                                :person-last-name="lastName"
-                                :return-selected="inModal"
-                                @selected="returnToParent"
-                            />
-                        </v-col>
-                    </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button block variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <ui-input v-model="middleName" :label="$t('middleNameLabel')" />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input
+                        v-model="selectedEmploymentPosition"
+                        control="select"
+                        :items="employmentPositions"
+                        :label="$t('employmentPositionLabel')"
+                        return-object
+                    />
+                    <ui-input
+                        v-model="selectedSex"
+                        control="select"
+                        :items="sexes"
+                        :label="$t('sexLabel')"
+                        return-object
+                    />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="email" :label="$t('emailLabel')" />
+                    <ui-input v-model="phoneNumber" :label="$t('phoneNumberLabel')" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <date-picker v-model="birthdate" :label="$t('birthdateLabel')" color="primary" />
+                    <ui-input v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
+                    <ui-input v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" :rules="personNationalIdValidationRules" />
+                    <ui-input v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
+                    <ui-input v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
+                    <ui-input
+                        v-model="webOfScienceId"
+                        label="ResearcherID (WoS)"
+                        placeholder="ResearcherID (WoS)"
+                        :rules="personWebOfScienceIdValidationRules"
+                    />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
+                    <ui-input v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
+                </div>
+                <multilingual-text-input v-model="displayTitle" :label="$t('displayTitleLabel')" />
+            </template>
+        </form-section>
 
-                    <v-row>
-                        <v-col cols="12">
-                            <organisation-unit-autocomplete-search
-                                ref="ouAutocompleteRef"
-                                v-model:model-value="selectedOrganisationUnit"
-                                :top-level-institution-id="role === 'INSTITUTIONAL_EDITOR' ? loggedInUser?.organisationUnitId : undefined"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <v-row class="d-flex align-center justify-space-between">
-                        <v-spacer />
-                        <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                            {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                        </v-btn>
-                    </v-row>
-
-                    <v-container v-if="additionalFields">
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="middleName"
-                                    :label="$t('middleNameLabel')"
-                                   
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input control="select"
-                                    v-model="selectedEmploymentPosition"
-                                    :items="employmentPositions"
-                                    :label="$t('employmentPositionLabel')"
-                                    return-object
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input control="select"
-                                    v-model="selectedSex"
-                                    :items="sexes"
-                                    :label="$t('sexLabel')"
-                                    return-object
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="email"
-                                    :label="$t('emailLabel')"
-                                   
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="phoneNumber"
-                                    :label="$t('phoneNumberLabel')"
-                                   
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <date-picker
-                                    v-model="birthdate"
-                                    :label="$t('birthdateLabel')"
-                                    color="primary"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="orcid"
-                                    label="ORCID"
-                                    :rules="orcidValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="eCrisId"
-                                    label="eCRIS-ID"
-                                    :rules="eCrisIdValidationRules"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="eNaukaId"
-                                    label="enaukaID"
-                                    :rules="eNaukaIdValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="nationalScienceId"
-                                    :label="$t('nationalScienceIdLabel')"
-                                    :rules="personNationalIdValidationRules"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="scholarId"
-                                    label="Google Scholar ID"
-                                    :rules="scholarIdValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="apvnt"
-                                    label="APVNT"
-                                    :rules="apvntValidationRules"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="scopus"
-                                    label="Scopus Author ID"
-                                    :rules="scopusAuthorIdValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="openAlex"
-                                    label="Open Alex ID"
-                                    :rules="personOpenAlexIdValidationRules"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="webOfScienceId"
-                                    label="ReearcherID (WoS)"
-                                    placeholder="ResearcherID (WoS)"
-                                    :rules="personWebOfScienceIdValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="authenticusId"
-                                    label="Authenticus ID"
-                                    :rules="personAuthenticusIdValidationRules"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="6">
-                                <ui-input
-                                    v-model="lattesId"
-                                    label="Lattes ID"
-                                    :rules="lattesIdValidationRules"
-                                />
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="12">
-                                <multilingual-text-input
-                                    v-model="displayTitle"
-                                    :label="$t('displayTitleLabel')" />
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-col>
-            </v-row>
-
-            <v-row>
-                <v-col cols="12">
-                    <p class="required-fields-message">
-                        {{ $t("requiredFieldsMessage") }}
-                    </p>
-                </v-col>
-            </v-row>
-        </v-container>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 
     <toast v-model="snackbar" :message="message" />
@@ -245,11 +120,13 @@ import UserService from '@/services/UserService';
 import { type UserResponse } from '@/models/UserModel';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import UiInput from '@/components/ui/input/Input.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput, FormSection, UiButton },
     props: {
         inModal: {
             type: Boolean,

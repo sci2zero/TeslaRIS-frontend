@@ -1,24 +1,22 @@
 <template>
-    <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("addProceedingsPublicationLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <submission-page plain :title="$t('addProceedingsPublicationLabel')">
         <proceedings-publication-submission-form ref="submissionFormRef" />
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitProceedingsPublication(false)">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submitProceedingsPublication(true)">
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+        <template #actions>
+            <ui-button
+                variant="outline"
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitProceedingsPublication(true)"
+            >
+                {{ $t("saveAndAddAnotherLabel") }}
+            </ui-button>
+            <ui-button
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submitProceedingsPublication(false)"
+            >
+                {{ $t("saveLabel") }}
+            </ui-button>
+        </template>
+    </submission-page>
 </template>
 
 <script lang="ts">
@@ -27,9 +25,12 @@ import ProceedingsPublicationSubmissionForm from "@/components/publication/Proce
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import SubmissionPage from '@/components/core/SubmissionPage.vue';
+import { UiButton } from '@/components/ui/button';
+
 export default defineComponent({
     name: "SubmitProceedingsPublicationView",
-    components: {ProceedingsPublicationSubmissionForm},
+    components: {ProceedingsPublicationSubmissionForm, SubmissionPage, UiButton},
     setup() {
         const submissionFormRef = ref<typeof ProceedingsPublicationSubmissionForm>();
 

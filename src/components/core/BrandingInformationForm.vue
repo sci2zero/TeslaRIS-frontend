@@ -17,56 +17,40 @@
 
         <v-row>
             <v-col cols="12" md="6">
-                <h3 class="text-subtitle-1 font-weight-medium mb-3">
-                    {{ $t("brandingLogoLabel") }}
-                </h3>
-                <v-file-input
+                <ui-file-input
                     v-model="logoFile"
                     :label="$t('brandingLogoLabel')"
                     accept="image/png,image/jpeg"
-                    prepend-icon="mdi-image"
-                    show-size
-                    clearable
-                ></v-file-input>
-                <img
-                    v-if="logoPreviewUrl"
-                    :src="logoPreviewUrl"
-                    alt=""
-                    class="branding-preview-image mb-3"
+                    :preview-url="logoPreviewUrl"
+                    :show-remove="hasExistingLogo && !removeLogo && !logoFile"
+                    :remove-label="$t('removeLogoLabel')"
+                    @remove="removeLogo = true; logoFile = null"
                 />
-                <v-btn
-                    v-if="hasExistingLogo && !removeLogo"
-                    density="compact"
-                    variant="outlined"
-                    @click="removeLogo = true; logoFile = null">
-                    {{ $t("removeLogoLabel") }}
-                </v-btn>
             </v-col>
             <v-col cols="12" md="6">
-                <h3 class="text-subtitle-1 font-weight-medium mb-3">
-                    {{ $t("brandingBackgroundLabel") }}
-                </h3>
-                <v-file-input
+                <ui-file-input
                     v-model="backgroundFile"
                     :label="$t('brandingBackgroundLabel')"
                     accept="image/png,image/jpeg"
-                    prepend-icon="mdi-image-area"
-                    show-size
-                    clearable
-                ></v-file-input>
-                <img
-                    v-if="backgroundPreviewUrl"
-                    :src="backgroundPreviewUrl"
-                    alt=""
-                    class="branding-preview-image branding-preview-image--wide mb-3"
+                    :preview-url="backgroundPreviewUrl"
+                    preview-wide
+                    :show-remove="hasExistingBackground && !removeBackground && !backgroundFile"
+                    :remove-label="$t('removeBackgroundLabel')"
+                    @remove="removeBackground = true; backgroundFile = null"
                 />
-                <v-btn
-                    v-if="hasExistingBackground && !removeBackground"
-                    density="compact"
-                    variant="outlined"
-                    @click="removeBackground = true; backgroundFile = null">
-                    {{ $t("removeBackgroundLabel") }}
-                </v-btn>
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
+                <ui-input
+                    v-model="selectedHomeTheme"
+                    control="select"
+                    :items="themeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :label="$t('homeThemeLabel')"
+                />
             </v-col>
         </v-row>
 
@@ -130,11 +114,21 @@
 
         <v-row>
             <v-col cols="12">
-                <open-layers-map
-                    ref="mapRef"
-                    :read-only="false"
-                    :init-address="presetInformation?.location?.address"
-                    :init-coordinates="[presetInformation?.location?.longitude as number, presetInformation?.location?.latitude as number]" />
+                <ui-input
+                    v-model="mapAddress"
+                    :label="$t('addressLabel')"
+                    :placeholder="$t('addressLabel')"
+                />
+                <div v-if="mapEmbedUrl" class="mt-4 overflow-hidden rounded-xl border border-slate-200">
+                    <iframe
+                        class="h-80 w-full border-0"
+                        :src="mapEmbedUrl"
+                        :title="$t('locationLabel')"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen
+                    ></iframe>
+                </div>
             </v-col>
         </v-row>
 
@@ -149,9 +143,10 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
-import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UiInput from '@/components/ui/input/Input.vue';
+import UiFileInput from '@/components/ui/file-input/FileInput.vue';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { type BrandingInformation, type Country } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -159,6 +154,7 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import CountryService from '@/services/CountryService';
 import lodash from 'lodash';
 import type { AxiosResponse } from 'axios';
+import { useHomeTheme, type HomeTheme } from '@/composables/useHomeTheme';
 
 
 export interface BrandingFormPayload {
@@ -171,18 +167,12 @@ export interface BrandingFormPayload {
     location: BrandingInformation["location"];
     phoneNumber?: string;
     postalAddress: BrandingInformation["postalAddress"];
-}
-
-function toFile(value: File | File[] | null | undefined): File | null {
-    if (!value) {
-        return null;
-    }
-    return Array.isArray(value) ? value[0] ?? null : value;
+    homeTheme: HomeTheme;
 }
 
 export default defineComponent({
     name: "BrandingInformationForm",
-    components: { MultilingualTextInput, OpenLayersMap, UiInput },
+    components: { MultilingualTextInput, UiInput, UiFileInput },
     props: {
         presetInformation: {
             type: Object as PropType<BrandingInformation | undefined>,
@@ -216,12 +206,39 @@ export default defineComponent({
         const cityRef = ref<typeof MultilingualTextInput>();
         const streetAndNumberRef = ref<typeof MultilingualTextInput>();
         const stateRef = ref<typeof MultilingualTextInput>();
-        const mapRef = ref<typeof OpenLayersMap>();
+        const mapAddress = ref(props.presetInformation?.location?.address ?? "");
+        const latitude = ref<number | undefined>(props.presetInformation?.location?.latitude);
+        const longitude = ref<number | undefined>(props.presetInformation?.location?.longitude);
+        const embedQuery = ref(mapAddress.value);
+
+        const i18n = useI18n();
+        const { homeTheme } = useHomeTheme();
+        const selectedHomeTheme = ref<HomeTheme>(homeTheme.value);
+        const themeOptions = computed(() => [
+            { title: i18n.t("lightThemeLabel"), value: "light" },
+            { title: i18n.t("darkThemeLabel"), value: "dark" },
+        ]);
+        const mapEmbedUrl = computed(() => {
+            const query = embedQuery.value.trim()
+                || (latitude.value && longitude.value ? `${latitude.value},${longitude.value}` : "");
+            if (!query) {
+                return "";
+            }
+
+            const params = new URLSearchParams({
+                q: query,
+                z: "16",
+                hl: i18n.locale.value,
+                output: "embed",
+            });
+
+            return `https://maps.google.com/maps?${params.toString()}`;
+        });
 
         const title = ref<any>([]);
         const description = ref<any>([]);
-        const logoFile = ref<File | File[] | null>(null);
-        const backgroundFile = ref<File | File[] | null>(null);
+        const logoFile = ref<File | null>(null);
+        const backgroundFile = ref<File | null>(null);
         const removeLogo = ref(false);
         const removeBackground = ref(false);
         const city = ref<any>([]);
@@ -235,47 +252,20 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const selectedLogoFile = computed(() => toFile(logoFile.value));
-        const selectedBackgroundFile = computed(() => toFile(backgroundFile.value));
-
-        const logoObjectUrl = ref<string | null>(null);
-        const backgroundObjectUrl = ref<string | null>(null);
-
-        watch(selectedLogoFile, (file) => {
-            if (logoObjectUrl.value) {
-                URL.revokeObjectURL(logoObjectUrl.value);
-                logoObjectUrl.value = null;
-            }
+        watch(logoFile, (file) => {
             if (file) {
-                logoObjectUrl.value = URL.createObjectURL(file);
                 removeLogo.value = false;
             }
         });
 
-        watch(selectedBackgroundFile, (file) => {
-            if (backgroundObjectUrl.value) {
-                URL.revokeObjectURL(backgroundObjectUrl.value);
-                backgroundObjectUrl.value = null;
-            }
+        watch(backgroundFile, (file) => {
             if (file) {
-                backgroundObjectUrl.value = URL.createObjectURL(file);
                 removeBackground.value = false;
             }
         });
 
-        const logoPreviewUrl = computed(() => {
-            if (removeLogo.value && !selectedLogoFile.value) {
-                return "";
-            }
-            return logoObjectUrl.value || props.logoUrl;
-        });
-
-        const backgroundPreviewUrl = computed(() => {
-            if (removeBackground.value && !selectedBackgroundFile.value) {
-                return "";
-            }
-            return backgroundObjectUrl.value || props.backgroundUrl;
-        });
+        const logoPreviewUrl = computed(() => removeLogo.value ? "" : props.logoUrl);
+        const backgroundPreviewUrl = computed(() => removeBackground.value ? "" : props.backgroundUrl);
 
         const fetchCountries = () => {
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
@@ -305,7 +295,22 @@ export default defineComponent({
 
         onMounted(fetchCountries);
 
-        watch(() => props.presetInformation, setAddressInfo);
+        const skipLocationWatch = ref(false);
+
+        watch(() => props.presetInformation, (preset) => {
+            setAddressInfo();
+
+            const presetLocation = preset?.location;
+            if (!presetLocation || mapAddress.value) {
+                return;
+            }
+
+            skipLocationWatch.value = true;
+            mapAddress.value = presetLocation.address ?? "";
+            embedQuery.value = mapAddress.value;
+            latitude.value = presetLocation.latitude;
+            longitude.value = presetLocation.longitude;
+        });
 
         const composeAddress = () => {
             const cityLine = [postalNumber.value, returnCurrentLocaleContent(city.value)]
@@ -324,12 +329,26 @@ export default defineComponent({
         // on the map survives further edits to the postal fields.
         const lastDerivedAddress = ref("");
 
-        const syncAddressFromPostalFields = lodash.debounce(() => {
-            if (!mapRef.value) {
+        const geocodeAddress = lodash.debounce((address: string) => {
+            if (!address.trim()) {
                 return;
             }
 
-            const currentAddress = mapRef.value.address ?? "";
+            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const result = data[0];
+                    if (!result) {
+                        return;
+                    }
+
+                    latitude.value = parseFloat(result.lat);
+                    longitude.value = parseFloat(result.lon);
+                });
+        }, 800);
+
+        const syncAddressFromPostalFields = lodash.debounce(() => {
+            const currentAddress = mapAddress.value ?? "";
             if (currentAddress && currentAddress !== lastDerivedAddress.value) {
                 return;
             }
@@ -340,9 +359,23 @@ export default defineComponent({
             }
 
             lastDerivedAddress.value = derivedAddress;
-            mapRef.value.address = derivedAddress;
-            mapRef.value.onAddressChange();
+            mapAddress.value = derivedAddress;
         }, 800);
+
+        const updateEmbedQuery = lodash.debounce((address: string) => {
+            embedQuery.value = address;
+        }, 600);
+
+        watch(mapAddress, (address) => {
+            if (skipLocationWatch.value) {
+                skipLocationWatch.value = false;
+                return;
+            }
+
+            const nextAddress = address ?? "";
+            updateEmbedQuery(nextAddress);
+            geocodeAddress(nextAddress);
+        });
 
         watch(
             [city, streetAndNumber, state, postalNumber, selectedCountry],
@@ -351,17 +384,19 @@ export default defineComponent({
         );
 
         const submit = () => {
+            const theme = selectedHomeTheme.value === "light" ? "light" : "dark";
+
             const payload: BrandingFormPayload = {
                 title: title.value,
                 description: description.value,
-                logoFile: selectedLogoFile.value,
-                backgroundFile: selectedBackgroundFile.value,
-                removeLogo: removeLogo.value && !selectedLogoFile.value,
-                removeBackground: removeBackground.value && !selectedBackgroundFile.value,
+                logoFile: logoFile.value,
+                backgroundFile: backgroundFile.value,
+                removeLogo: removeLogo.value && !logoFile.value,
+                removeBackground: removeBackground.value && !backgroundFile.value,
                 location: {
-                    latitude: mapRef.value?.currentPosition.lat,
-                    longitude: mapRef.value?.currentPosition.lon,
-                    address: mapRef.value?.address
+                    latitude: latitude.value,
+                    longitude: longitude.value,
+                    address: mapAddress.value
                 },
                 phoneNumber: phoneNumber.value,
                 postalAddress: {
@@ -370,7 +405,8 @@ export default defineComponent({
                     streetAndNumber: streetAndNumber.value,
                     state: state.value,
                     postalNumber: postalNumber.value as string
-                }
+                },
+                homeTheme: theme
             };
 
             emit("update", payload);
@@ -381,30 +417,16 @@ export default defineComponent({
             description, descriptionRef,
             city, cityRef, streetAndNumber, streetAndNumberRef,
             state, stateRef, postalNumber, phoneNumber,
-            countries, selectedCountry, mapRef,
+            countries, selectedCountry, mapAddress, mapEmbedUrl,
             toMultilingualTextInput,
             requiredFieldRules,
             languageTags, submit,
             logoFile, backgroundFile,
             logoPreviewUrl, backgroundPreviewUrl,
-            removeLogo, removeBackground
+            removeLogo, removeBackground,
+            selectedHomeTheme, themeOptions
         };
     }
 });
 </script>
 
-<style scoped>
-.branding-preview-image {
-    display: block;
-    max-height: 96px;
-    width: auto;
-    object-fit: contain;
-}
-
-.branding-preview-image--wide {
-    max-height: 140px;
-    width: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-</style>

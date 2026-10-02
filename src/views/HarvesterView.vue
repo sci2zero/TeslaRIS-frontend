@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-form v-model="isFormValid" @submit.prevent>
-            <h1 class="d-flex flex-row justify-center">
+            <h1 class="mb-6 text-3xl font-bold tracking-tight text-slate-800">
                 {{ $t("harvestDataLabel") }}
             </h1>
             <br>

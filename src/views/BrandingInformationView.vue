@@ -1,10 +1,10 @@
 <template>
     <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("updateBrandingInformationLabel") }}</h1>
-        </v-sheet>
-        <br />
-        <br />
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">
+                {{ $t("updateBrandingInformationLabel") }}
+            </h1>
+        </header>
         <branding-information-form
             ref="formRef"
             :preset-information="savedBrandingInformation"
@@ -35,6 +35,7 @@ import { type BrandingInformation } from '@/models/Common';
 import { useRouter } from 'vue-router';
 import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
 import { fetchBrandingInformation } from '@/composables/useBrandingInformation';
+import { setHomeTheme } from '@/composables/useHomeTheme';
 
 
 export default defineComponent({
@@ -91,6 +92,7 @@ export default defineComponent({
 
             await fetchBrandingInformation();
             await publicConfigurationStore.refreshFromBackend();
+            setHomeTheme(payload.homeTheme);
             router.push({ name: "home" });
         };
 

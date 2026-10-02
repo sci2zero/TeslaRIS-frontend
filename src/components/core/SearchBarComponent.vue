@@ -1,29 +1,22 @@
 <template>
-    <div
-        class="search-card" :class="{ 
-            'search-card--light': !dark,
-            'search-card--transparent': transparent,
-            'search-card--solid': !transparent,
-            [`search-card--${size}`]: true
-        }">
-        <div class="search-input-wrapper">
+    <div :class="rootClasses">
+        <div :class="{ 'search-input-wrapper': isFeatured }">
             <v-text-field
                 ref="searchField"
                 v-model="searchInput"
-                density="comfortable"
-                variant="outlined"
-                class="search-input"
-                :class="{ 
-                    'search-input--light': !dark,
-                    [`search-input--${size}`]: true
-                }"
-                :label="$t('searchBarPlaceholder')"
+                :density="isFeatured ? 'comfortable' : 'compact'"
+                :variant="isFeatured ? 'outlined' : 'plain'"
+                :class="inputClasses"
+                :placeholder="resolvedPlaceholder"
+                :aria-label="resolvedPlaceholder"
+                persistent-placeholder
                 single-line
                 hide-details
-                :color="dark ? 'white' : 'black'"
+                :center-affix="!isFeatured"
+                :color="isFeatured ? (dark ? 'white' : 'black') : undefined"
                 @keydown.enter="onSearch"
             >
-                <template #append-inner>
+                <template v-if="isFeatured" #append-inner>
                     <v-icon 
                         icon="mdi-magnify" 
                         :color="dark ? 'white' : 'black'" 
@@ -33,14 +26,23 @@
                         @click="onSearch"
                     />
                 </template>
+                <template v-else #prepend-inner>
+                    <v-icon
+                        icon="mdi-magnify"
+                        size="20"
+                        class="search-bar-plain__icon"
+                        @click="onSearch"
+                    />
+                </template>
             </v-text-field>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { onMounted, watch, ref } from 'vue';
+import { computed, onMounted, watch, ref } from 'vue';
 import { defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
 import lodash from "lodash";
 
 
@@ -76,12 +78,56 @@ export default defineComponent(
                 type: String,
                 default: "medium",
                 validator: (value: string) => ["small", "medium", "large"].includes(value)
+            },
+            variant: {
+                type: String,
+                default: "plain",
+                validator: (value: string) => ["featured", "plain"].includes(value)
+            },
+            placeholder: {
+                type: String,
+                default: ""
             }
         },
         emits: ["search"],
         setup(props, { emit }) {
+            const i18n = useI18n();
             const searchInput = ref("");
             const searchField = ref();
+            const isFeatured = computed(() => props.variant === "featured");
+            const resolvedPlaceholder = computed(() => props.placeholder || i18n.t("searchBarPlaceholder"));
+            const rootClasses = computed(() => {
+                if (!isFeatured.value) {
+                    return [
+                        "plain-field",
+                        "search-bar-plain",
+                        `search-bar-plain--${props.size}`
+                    ];
+                }
+
+                return [
+                    "search-card",
+                    {
+                        "search-card--light": !props.dark,
+                        "search-card--transparent": props.transparent,
+                        "search-card--solid": !props.transparent
+                    },
+                    `search-card--${props.size}`
+                ];
+            });
+            const inputClasses = computed(() => {
+                if (!isFeatured.value) {
+                    return ["plain-field__control", "search-bar-plain__input"];
+                }
+
+                return [
+                    "search-input",
+                    {
+                        "search-input--light": !props.dark
+                    },
+                    `search-input--${props.size}`
+                ];
+            });
 
             const onSearch = () => {
             if (searchInput.value === undefined) {
@@ -157,7 +203,9 @@ export default defineComponent(
 
         return {
             searchInput, onSearch,
-            searchField, clearInput
+            searchField, clearInput,
+            isFeatured, resolvedPlaceholder,
+            rootClasses, inputClasses
         };
     }
 });
@@ -244,8 +292,12 @@ export default defineComponent(
     letter-spacing: 0.5px;
 }
 
-.search-input :deep(.v-field__input::placeholder) {
-    color: rgba(255, 255, 255, 0.7) !important;
+.search-input :deep(.v-field__input::placeholder),
+.search-input :deep(input::placeholder) {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-weight: 500 !important;
+    opacity: 1;
+    text-overflow: ellipsis;
 }
 
 .search-icon {
@@ -333,8 +385,10 @@ export default defineComponent(
     color: black !important;
 }
 
-.search-input--light :deep(.v-field__input::placeholder) {
-    color: rgba(0, 0, 0, 0.7) !important;
+.search-input--light :deep(.v-field__input::placeholder),
+.search-input--light :deep(input::placeholder) {
+    color: rgba(0, 0, 0, 0.55) !important;
+    font-weight: 500 !important;
 }
 
 .search-input--light :deep(.v-field--focused .v-label) {
@@ -443,5 +497,42 @@ export default defineComponent(
 
 .search-input--large :deep(.v-label) {
     @apply text-lg;
+}
+
+.search-bar-plain {
+    width: 100%;
+    max-width: 36rem;
+}
+
+.search-bar-plain--small {
+    max-width: none;
+}
+
+.search-bar-plain--large {
+    max-width: 42rem;
+}
+
+.search-bar-plain :deep(.v-field.v-field--variant-plain > .v-field__prepend-inner) {
+    align-items: center;
+    align-self: stretch;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline-start: 0.85rem;
+}
+
+.search-bar-plain :deep(.v-field__input) {
+    padding-inline-start: 0.35rem;
+}
+
+.search-bar-plain__icon {
+    cursor: pointer;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-bar-plain__icon:hover {
+    color: #0f172a;
 }
 </style>

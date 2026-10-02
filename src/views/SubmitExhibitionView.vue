@@ -1,34 +1,22 @@
 <template>
-    <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("createNewExhibitionLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <submission-page plain :title="$t('createNewExhibitionLabel')">
         <exhibition-submission-form ref="submissionFormRef" />
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn
-                    color="blue darken-1"
-                    :disabled="!submissionFormRef?.isFormValid || !submissionFormRef?.manualValidationsPassed"
-                    class="submission-action"
-                    @click="submissionFormRef?.submit(false)"
-                >
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn
-                    color="blue darken-1"
-                    :disabled="!submissionFormRef?.isFormValid || !submissionFormRef?.manualValidationsPassed"
-                    class="submission-action"
-                    @click="submissionFormRef?.submit(true)"
-                >
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+        <template #actions>
+            <ui-button
+                variant="outline"
+                :disabled="!submissionFormRef?.isFormValid || !submissionFormRef?.manualValidationsPassed"
+                @click="submissionFormRef?.submit(true)"
+            >
+                {{ $t("saveAndAddAnotherLabel") }}
+            </ui-button>
+            <ui-button
+                :disabled="!submissionFormRef?.isFormValid || !submissionFormRef?.manualValidationsPassed"
+                @click="submissionFormRef?.submit(false)"
+            >
+                {{ $t("saveLabel") }}
+            </ui-button>
+        </template>
+    </submission-page>
 </template>
 
 <script lang="ts">
@@ -36,11 +24,12 @@ import { defineComponent, onMounted } from 'vue';
 import ExhibitionSubmissionForm from "@/components/event/ExhibitionSubmissionForm.vue";
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-
+import SubmissionPage from '@/components/core/SubmissionPage.vue';
+import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "SubmitExhibitionView",
-    components: {ExhibitionSubmissionForm},
+    components: {ExhibitionSubmissionForm, SubmissionPage, UiButton},
     setup() {
         const submissionFormRef = ref<typeof ExhibitionSubmissionForm>();
 

@@ -1,202 +1,144 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 10">
-                <v-row>
-                    <v-col cols="10">
-                        <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.JOURNAL_PUBLICATION"
-                            @metadata-fetched="popuateMetadata"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <journal-autocomplete-search
-                            ref="journalAutocompleteRef"
-                            v-model="selectedJournal"
-                            required
-                        />
-                    </v-col>
-                </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-file-document-outline"
+            :title="$t('publicationDetailsLabel')"
+            :description="$t('journalPublicationDetailsHint')"
+        >
+            <i-d-f-metadata-prepopulator
+                :document-type="PublicationType.JOURNAL_PUBLICATION"
+                @metadata-fetched="popuateMetadata"
+            />
+            <journal-autocomplete-search
+                ref="journalAutocompleteRef"
+                v-model="selectedJournal"
+                required
+            />
 
-                <v-row v-if="selectedJournal && selectedJournal.value > 0 && myPublications.length > 0">
-                    <v-col>
-                        <h3>{{ $t("recentPublicationsLabel") }}</h3>
-                        <p
-                            v-for="(publicationIndex, i) in myPublications"
-                            :key="i"
-                            :value="publicationIndex">
-                            {{ $i18n.locale.startsWith("sr") ? publicationIndex.titleSr : publicationIndex.titleOther }}
-                        </p>
-                    </v-col>
-                </v-row>
-                <v-row v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && isResearcher">
-                    <v-col><h3>{{ $t("noRecentPublicationsJournalLabel") }}</h3></v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="titleRef"
-                            v-model="title"
-                            :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <publication-deduplication-table
-                                ref="deduplicationTableRef"
-                                :title="title"
-                                :doi="doi"
-                                :scopus-id="scopus"
-                                :web-of-science-id="webOfScienceId"
-                                :open-alex-id="openAlexId"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="volume" :label="$t('volumeLabel')" :placeholder="$t('volumeLabel')" />
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field v-model="issue" :label="$t('issueLabel')" :placeholder="$t('issueLabel')" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col v-if="!disableYearInput" cols="8">
-                        <flexible-date-picker
-                            v-model="publicationDate"
-                            :label="$t('yearOfPublicationLabel') + '*'"
-                            required
-                        />
-                    </v-col>
-                    <v-col :cols="disableYearInput ? 10 : 2">
-                        <v-checkbox
-                            v-model="disableYearInput"
-                            :label="$t('yearUnknownLabel')"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedpublicationType"
-                            :items="publicationTypes"
-                            :label="$t('concretePublicationTypeLabel')"
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col cols="10">
-                        <h2>{{ $t("authorsLabel") }}</h2>
-                        <person-publication-contribution
-                            ref="contributionsRef"
-                            basic
-                            @set-input="contributions = $event"
-                        />
-                    </v-col>
-                </v-row>
-
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field v-model="articleNumber" :label="$t('articleNumberLabel')" :placeholder="$t('articleNumberLabel')" />
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="numberOfPages" type="number"
-                                :min="0" :label="$t('numberOfPagesLabel')"
-                                :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="sectionRef"
-                                v-model="section"
-                                :label="$t('sectionLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="scopus"
-                                label="Scopus ID"
-                                placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules" />
-                        </v-col>
-                        <v-col cols="4">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules" />
-                        </v-col>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules" />
-                        </v-col>
-                    </v-row>
-
-                    <document-common-fields
-                        ref="commonFieldsRef"
-                        v-model="commonFieldsData"
-                        :preset-data="presetCommonFieldsData"
-                    />
-                </v-container>
-            </v-col>
-        </v-row>
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
+            <div v-if="selectedJournal && selectedJournal.value > 0 && myPublications.length > 0">
+                <p class="text-sm font-semibold text-slate-700">
+                    {{ $t("recentPublicationsLabel") }}
+                </p>
+                <p
+                    v-for="(publicationIndex, i) in myPublications"
+                    :key="i"
+                    class="text-sm text-slate-600"
+                >
+                    {{ $i18n.locale.startsWith("sr") ? publicationIndex.titleSr : publicationIndex.titleOther }}
+                </p>
+            </div>
+            <p
+                v-if="selectedJournal && selectedJournal.value != -1 && myPublications.length == 0 && isResearcher"
+                class="text-sm text-slate-600"
+            >
+                {{ $t("noRecentPublicationsJournalLabel") }}
             </p>
-        </v-row>
+
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+            />
+            <publication-deduplication-table
+                ref="deduplicationTableRef"
+                :title="title"
+                :doi="doi"
+                :scopus-id="scopus"
+                :web-of-science-id="webOfScienceId"
+                :open-alex-id="openAlexId"
+            />
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input v-model="volume" :label="$t('volumeLabel')" placeholder="e.g. 12" />
+                <ui-input v-model="issue" :label="$t('issueLabel')" placeholder="e.g. 3" />
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input v-model="startPage" :label="$t('startPageLabel')" placeholder="e.g. 101" />
+                <ui-input v-model="endPage" :label="$t('endPageLabel')" placeholder="e.g. 120" />
+            </div>
+
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-semibold text-slate-800">
+                    {{ $t("publicationDateSectionLabel") }}
+                </p>
+                <p class="mb-3 text-sm text-slate-500">
+                    {{ $t("publicationDateSectionHint") }}
+                </p>
+                <choice-cards
+                    :model-value="disableYearInput ? 'unknown' : 'known'"
+                    :options="[
+                        { value: 'known', title: $t('knownDateLabel'), description: $t('knownDateHint') },
+                        { value: 'unknown', title: $t('dateUnknownLabel'), description: $t('dateUnknownHint') },
+                    ]"
+                    @update:model-value="disableYearInput = $event === 'unknown'"
+                />
+                <flexible-date-picker
+                    v-if="!disableYearInput"
+                    v-model="publicationDate"
+                    class="mt-4"
+                    :label="$t('yearLabel') + '*'"
+                    required
+                />
+            </div>
+
+            <ui-input
+                v-model="selectedpublicationType"
+                control="select"
+                :items="publicationTypes"
+                :label="$t('concretePublicationTypeLabel')"
+                return-object
+            />
+        </form-section>
+
+        <form-section
+            icon="mdi-account-multiple-outline"
+            :title="$t('authorsLabel')"
+            :description="$t('contributionAccordionHint')"
+        >
+            <person-publication-contribution
+                ref="contributionsRef"
+                basic
+                @set-input="contributions = $event"
+            />
+        </form-section>
+
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input ref="subtitleRef" v-model="subtitle" :label="$t('subtitleLabel')" />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="articleNumber" :label="$t('articleNumberLabel')" />
+                    <ui-input
+                        v-model="numberOfPages"
+                        type="number"
+                        :min="0"
+                        :label="$t('numberOfPagesLabel')"
+                        :rules="optionalNumericZeroOrGreaterFieldRules"
+                    />
+                </div>
+                <multilingual-text-input ref="descriptionRef" v-model="description" is-area :label="$t('abstractLabel')" />
+                <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
+                <multilingual-text-input ref="sectionRef" v-model="section" :label="$t('sectionLabel')" />
+                <uri-input ref="urisRef" v-model="uris" />
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <ui-input v-model="scopus" label="Scopus ID" :rules="scopusIdValidationRules" />
+                    <ui-input v-model="openAlexId" label="Open Alex ID" :rules="workOpenAlexIdValidationRules" />
+                    <ui-input v-model="webOfScienceId" label="Web of Science ID" :rules="documentWebOfScienceIdValidationRules" />
+                </div>
+                <document-common-fields
+                    ref="commonFieldsRef"
+                    v-model="commonFieldsData"
+                    :preset-data="presetCommonFieldsData"
+                />
+            </template>
+        </form-section>
+
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
@@ -227,11 +169,15 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
 import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
+import UiInput from '@/components/ui/input/Input.vue';
+import { UiButton } from '@/components/ui/button';
 
 
 export default defineComponent({
     name: "SubmitJournalPublication",
-    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker },
+    components: { MultilingualTextInput, UriInput, PersonPublicationContribution, JournalAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker, FormSection, ChoiceCards, UiInput, UiButton },
     props: {
         inModal: {
             type: Boolean,

@@ -1,24 +1,22 @@
 <template>
-    <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("createNewBookSeriesLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <submission-page plain :title="$t('createNewBookSeriesLabel')">
         <publication-series-submission-form ref="submissionFormRef" :input-type="inputType" />
-        <v-row justify="center">
-            <v-col cols="1">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(false)">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="3">
-                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" class="submission-action" @click="submissionFormRef?.submit(true)">
-                    {{ $t("saveAndAddAnotherLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-container>
+        <template #actions>
+            <ui-button
+                variant="outline"
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submit(true)"
+            >
+                {{ $t("saveAndAddAnotherLabel") }}
+            </ui-button>
+            <ui-button
+                :disabled="!submissionFormRef?.isFormValid"
+                @click="submissionFormRef?.submit(false)"
+            >
+                {{ $t("saveLabel") }}
+            </ui-button>
+        </template>
+    </submission-page>
 </template>
 
 <script lang="ts">
@@ -28,9 +26,12 @@ import { ref } from 'vue';
 import { PublicationSeriesType } from '@/models/PublicationSeriesModel';
 import { useI18n } from 'vue-i18n';
 
+import SubmissionPage from '@/components/core/SubmissionPage.vue';
+import { UiButton } from '@/components/ui/button';
+
 export default defineComponent({
     name: "SubmitBookSeriesView",
-    components: {PublicationSeriesSubmissionForm},
+    components: {PublicationSeriesSubmissionForm, SubmissionPage, UiButton},
     setup() {
         const submissionFormRef = ref<typeof PublicationSeriesSubmissionForm>();
         const inputType = PublicationSeriesType.BOOK_SERIES.toString();

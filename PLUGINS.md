@@ -31,7 +31,7 @@ A plugin is a default export from `src/index.ts`:
 | `extensions` | Add items to a named slot. Same `id` replaces the previous item. `order` sorts them. |
 | `routes` | Add a route. Same route name replaces the previous one. |
 | `i18n` | Merge translation messages into the existing locales. |
-| `config`, `constants` | Deep-merge plain objects. Later plugins overwrite the same keys. |
+| `config`, `constants` | Deep-merge plain objects. Later plugins overwrite the same keys. `config.defaultLocale` and `config.supportedLocales` replace the core language defaults. Supported values are `sr`, `sr-cyr`, and `en`. |
 
 The host reads these through `src/plugin-system/`:
 

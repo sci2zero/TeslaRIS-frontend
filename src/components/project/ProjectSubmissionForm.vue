@@ -1,233 +1,151 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col cols="10">
-                <v-row>
-                    <v-col cols="12">
-                        <i-d-f-project-metadata-prepopulator
-                            @metadata-fetched="populateMetadata"
-                            @update:doi="(value: string) => doi = value"
-                        />
-                    </v-col>
-                </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-folder-star"
+            :title="$t('projectLabel')"
+        >
+            <i-d-f-project-metadata-prepopulator
+                @metadata-fetched="populateMetadata"
+                @update:doi="(value: string) => doi = value"
+            />
+            <ui-input
+                v-model="raid"
+                :label="$t('raidLabel')"
+                :placeholder="$t('raidLabel')"
+            />
+            <multilingual-text-input
+                ref="nameRef"
+                v-model="name"
+                :rules="requiredFieldRules"
+                :label="$t('nameLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="nameAbbreviationRef"
+                v-model="nameAbbreviation"
+                :label="$t('nameAbbreviationLabel')"
+            />
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <ui-input control="select"
+                    v-model="status"
+                    :label="$t('statusLabel') + '*'"
+                    :items="projectStatusOptions"
+                    item-title="title"
+                    item-value="value"
+                    :rules="requiredSelectionValueRules"
+                />
+                <ui-input control="select"
+                    v-model="collaborationType"
+                    :label="$t('collaborationTypeLabel') + '*'"
+                    :items="projectCollaborationTypeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :rules="requiredSelectionValueRules"
+                />
+                <ui-input control="select"
+                    v-model="researchType"
+                    :label="$t('researchTypeLabel') + '*'"
+                    :items="projectResearchTypeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :rules="requiredSelectionValueRules"
+                />
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <date-picker
+                    v-model="dateFrom"
+                    :label="$t('dateFromLabel')"
+                    color="primary"
+                />
+                <date-picker
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                    color="primary"
+                />
+            </div>
+        </form-section>
 
-                <!-- RAiD -->
-                <v-row>
-                    <v-col cols="11">
-                        <v-text-field
-                            v-model="raid"
-                            :label="$t('raidLabel')"
-                            :placeholder="$t('raidLabel')"
-                        />
-                    </v-col>
-                </v-row>
+        <form-section
+            icon="mdi-account-multiple-outline"
+            :title="$t('teamLabel')"
+        >
+            <person-project-contribution-form
+                ref="personsRef"
+                allow-external-associate
+                @set-input="persons = $event"
+            />
+        </form-section>
 
-                <!-- Name* -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameRef"
-                            v-model="name"
-                            :rules="requiredFieldRules"
-                            :label="$t('nameLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
+        <form-section
+            icon="mdi-domain"
+            :title="$t('consortiumLabel')"
+        >
+            <organisation-unit-project-contribution-form
+                ref="organisationsRef"
+                @set-input="organisations = $event"
+            />
+        </form-section>
 
-                <!-- Name Abbreviation -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameAbbreviationRef"
-                            v-model="nameAbbreviation"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('descriptionLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    is-area
+                    :label="$t('keywordsLabel')"
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+                <ui-input
+                    v-model="nationalId"
+                    :label="$t('nationalIdLabel')"
+                    :placeholder="$t('nationalIdLabel')"
+                    :rules="projectNationalIdValidationRules"
+                />
+                <choice-cards
+                    :model-value="notFunded ? 'none' : 'costs'"
+                    :options="[
+                        { value: 'costs', title: $t('hasCostsLabel') },
+                        { value: 'none', title: $t('noCostsLabel') },
+                    ]"
+                    @update:model-value="notFunded = $event === 'none'"
+                />
+                <monetary-amount-input
+                    v-if="!notFunded"
+                    ref="costsRef"
+                    v-model="costs"
+                    :amount-label="$t('costsLabel')"
+                />
+                <p class="text-sm font-semibold text-slate-800">
+                    {{ $t("relatedProjectsLabel") }}
+                </p>
+                <projects-relation-form
+                    ref="relationsRef"
+                    @set-input="relations = $event"
+                />
+            </template>
+        </form-section>
 
-
-
-                <!-- Status* / CollaborationType* / ResearchType* -->
-                <v-row>
-                    <v-col cols="4">
-                        <v-select
-                            v-model="status"
-                            :label="$t('statusLabel') + '*'"
-                            :items="projectStatusOptions"
-                            item-title="title"
-                            item-value="value"
-                            :rules="requiredSelectionValueRules"
-                        />
-                    </v-col>
-                    <v-col cols="4">
-                        <v-select
-                            v-model="collaborationType"
-                            :label="$t('collaborationTypeLabel') + '*'"
-                            :items="projectCollaborationTypeOptions"
-                            item-title="title"
-                            item-value="value"
-                            :rules="requiredSelectionValueRules"
-                        />
-                    </v-col>
-                    <v-col cols="4">
-                        <v-select
-                            v-model="researchType"
-                            :label="$t('researchTypeLabel') + '*'"
-                            :items="projectResearchTypeOptions"
-                            item-title="title"
-                            item-value="value"
-                            :rules="requiredSelectionValueRules"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Start Date / End Date -->
-                <v-row>
-                    <v-col cols="6">
-                        <date-picker
-                            v-model="dateFrom"
-                            :label="$t('dateFromLabel')"
-                            color="primary"
-                        />
-                    </v-col>
-                    <v-col cols="6">
-                        <date-picker
-                            v-model="dateTo"
-                            :label="$t('dateToLabel')"
-                            color="primary"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Team -->
-                <v-row>
-                    <v-col>
-                        <h2>{{ $t("teamLabel") }}</h2>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <person-project-contribution-form
-                            ref="personsRef"
-                            allow-external-associate
-                            @set-input="persons = $event"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Consortium -->
-                <v-row>
-                    <v-col>
-                        <h2>{{ $t("consortiumLabel") }}</h2>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <organisation-unit-project-contribution-form
-                            ref="organisationsRef"
-                            @set-input="organisations = $event"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Additional Fields Toggle -->
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-
-                <v-container v-if="additionalFields">
-                    <!-- Description -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                is-area
-                                :label="$t('descriptionLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Keywords -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                is-area
-                                :label="$t('keywordsLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- URIs -->
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-
-                    <!-- National ID -->
-                    <v-row>
-                        <v-col>
-                            <v-text-field
-                                v-model="nationalId"
-                                :label="$t('nationalIdLabel')"
-                                :placeholder="$t('nationalIdLabel')"
-                                :rules="projectNationalIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Not Funded / Costs -->
-                    <v-row>
-                        <v-col cols="6">
-                            <v-checkbox
-                                v-model="notFunded"
-                                :label="$t('noCostsLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <v-row v-if="!notFunded">
-                        <v-col>
-                            <monetary-amount-input
-                                ref="costsRef"
-                                v-model="costs"
-                                :amount-label="$t('costsLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Related Projects -->
-                    <v-row>
-                        <v-col>
-                            <h2>{{ $t("relatedProjectsLabel") }}</h2>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <projects-relation-form
-                                ref="relationsRef"
-                                @set-input="relations = $event"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script setup lang="ts">
+import UiInput from '@/components/ui/input/Input.vue';
+import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 import { ref, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

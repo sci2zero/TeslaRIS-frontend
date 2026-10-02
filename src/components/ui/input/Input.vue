@@ -153,5 +153,6 @@ defineExpose({
     validate: () => fieldRef.value?.validate?.(),
     reset: () => fieldRef.value?.reset?.(),
     resetValidation: () => fieldRef.value?.resetValidation?.(),
+    focus: () => (fieldRef.value as { focus?: () => void } | null)?.focus?.(),
 });
 </script>

@@ -1,68 +1,89 @@
 <template>
-    <div class="mt-4">
-        <v-row v-for="(clause, index) in queryClauses" :key="clause.id" class="d-flex flex-row justify-left">
-            <v-col v-if="index > 0" cols="3">
-                <v-select v-model="clause.operation" :items="operations" :label="$t('operationLabel')" dense />
-            </v-col>
-  
-            <v-col cols="3">
-                <v-select 
-                    v-model="clause.field" 
-                    :items="fields"
-                    item-value="value"
-                    :label="$t('fieldLabel')" 
-                    dense
-                />
-            </v-col>
-  
-            <v-col cols="4">
-                <v-text-field 
-                    v-if="getFieldType(clause.field) === 'text'" 
-                    v-model="clause.value" 
-                    :label="$t('valueLabel')" 
-                    dense 
-                />
-                <v-text-field 
-                    v-else-if="getFieldType(clause.field) === 'number'" 
-                    v-model.number="clause.value" 
-                    :label="$t('valueLabel')" 
-                    type="number" 
-                    dense 
-                />
-                <date-picker
-                    v-else-if="getFieldType(clause.field) === 'date'"
-                    v-model="clause.value"
-                    :label="$t('dateLabel')"
-                    color="primary"
-                />
-            </v-col>
-  
-            <v-col cols="2" class="d-flex mb-5">
-                <v-btn icon color="primary" @click="addClause(index + 1)">
-                    <v-icon>mdi-plus</v-icon>
-                </v-btn>
-                <v-btn v-if="queryClauses.length > 1" icon color="red" @click="removeClause(clause.id)">
-                    <v-icon>mdi-minus</v-icon>
-                </v-btn>
-            </v-col>
-        </v-row>
+    <div class="flex flex-col gap-3">
+        <div
+            v-for="(clause, index) in queryClauses"
+            :key="clause.id"
+            class="grid grid-cols-1 items-end gap-3 lg:grid-cols-12"
+        >
+            <ui-input
+                v-if="index > 0"
+                v-model="clause.operation"
+                class="min-w-0 lg:col-span-2"
+                control="select"
+                :items="operations"
+                :label="$t('operationLabel')"
+            />
+            <ui-input
+                v-model="clause.field"
+                class="min-w-0 lg:col-span-4"
+                :class="index === 0 ? 'lg:col-start-3' : ''"
+                control="select"
+                :items="fields"
+                item-value="value"
+                :label="$t('fieldLabel')"
+            />
+            <ui-input
+                v-if="getFieldType(clause.field) === 'number'"
+                v-model.number="clause.value"
+                class="min-w-0 lg:col-span-4"
+                type="number"
+                :label="$t('valueLabel')"
+            />
+            <date-picker
+                v-else-if="getFieldType(clause.field) === 'date'"
+                v-model="clause.value"
+                class="min-w-0 lg:col-span-4"
+                :label="$t('dateLabel')"
+                color="primary"
+            />
+            <ui-input
+                v-else
+                v-model="clause.value"
+                class="min-w-0 lg:col-span-4"
+                :label="$t('valueLabel')"
+            />
+            <div class="flex shrink-0 gap-2 lg:col-span-2">
+                <ui-button type="button" variant="outline" size="icon" @click="addClause(index + 1)">
+                    <v-icon icon="mdi-plus" size="18" />
+                </ui-button>
+                <ui-button
+                    v-if="queryClauses.length > 1"
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    :aria-label="$t('deleteLabel')"
+                    @click="removeClause(clause.id)"
+                >
+                    <v-icon icon="mdi-minus" size="18" />
+                </ui-button>
+            </div>
+        </div>
 
-        <v-row>
-            <v-col class="d-flex justify-end">
-                <v-btn :disabled="(queryClauses.find(clause => !clause.field || !clause.value) ? true : false)" color="primary" @click="emitQuery">
-                    {{ $t("searchLabel") }}
-                </v-btn>
-                <v-btn class="ml-2" :disabled="((queryClauses.length == 1 && queryClauses.find(clause => !clause.field && !clause.value)) ? true : false)" color="primary" @click="resetQuery">
-                    {{ $t("newSearchLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
+        <div class="flex justify-end gap-2">
+            <ui-button
+                type="button"
+                variant="outline"
+                :disabled="queryClauses.length == 1 && !!queryClauses.find(clause => !clause.field && !clause.value)"
+                @click="resetQuery"
+            >
+                {{ $t("newSearchLabel") }}
+            </ui-button>
+            <ui-button
+                type="button"
+                :disabled="!!queryClauses.find(clause => !clause.field || !clause.value)"
+                @click="emitQuery"
+            >
+                {{ $t("searchLabel") }}
+            </ui-button>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { ref, onMounted, defineComponent, watch } from "vue";
 import DatePicker from "../core/DatePicker.vue";
+import UiInput from "@/components/ui/input/Input.vue";
+import { UiButton } from "@/components/ui/button";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { type SearchFieldsResponse } from "@/models/Common";
 import { useI18n } from "vue-i18n";
@@ -77,7 +98,7 @@ interface QueryClause {
 
 export default defineComponent({
     name: "QueryInputComponent",
-    components: { DatePicker },
+    components: { DatePicker, UiInput, UiButton },
     props: {
         searchFields: {
             type: Array<SearchFieldsResponse>,
