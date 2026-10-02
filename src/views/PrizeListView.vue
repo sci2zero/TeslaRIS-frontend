@@ -9,7 +9,7 @@
         <br>
         <span class="d-flex align-center">
             <v-checkbox
-                v-if="isUserBoundToOU"
+                v-if="hasInstitution"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4"
@@ -81,7 +81,7 @@ export default defineComponent({
         const i18n = useI18n();
         const tableRef = ref<typeof PrizeTableComponent>();
 
-        const { isAdmin, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, isCommission, loggedInUser } = useUserRole();
+        const { isAdmin, isUserBoundToOU, hasInstitution, returnOnlyInstitutionRelatedEntities, isCommission, loggedInUser } = useUserRole();
 
         const commissions = ref<{title: string, value: number}[]>([]);
         const selectedCommission = ref({ title: '', value: -1 });
@@ -159,7 +159,7 @@ export default defineComponent({
 
         return {
             search, prizes, totalPrizes, isAdmin,
-            switchPage, isUserBoundToOU,
+            switchPage, isUserBoundToOU, hasInstitution,
             tableRef, clearSortAndPerformSearch,
             returnOnlyInstitutionRelatedEntities,
             loading, isCommission, commissions,

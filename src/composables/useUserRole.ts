@@ -25,13 +25,22 @@ export function useUserRole() {
     const canAddSerialEvents = computed(() => isAdmin.value || isInstitutionalEditor.value);
 
     const isLibrarianUser = computed(() => isHeadOfLibrary.value || isInstitutionalLibrarian.value);
+
+    // The API reports -1 rather than null when a user is not bound to an institution, and -1 is
+    // truthy, so it has to be normalised here or every caller has to remember the sentinel.
     const userInstitutionid = computed(() => {
-        if (isUserLoggedIn.value) {
-            return loggedInUser.value?.organisationUnitId;
+        if (!isUserLoggedIn.value) {
+            return undefined;
         }
 
-        return undefined;
+        const institutionId = loggedInUser.value?.organisationUnitId;
+        return institutionId && institutionId > 0 ? institutionId : undefined;
     });
+
+    // Unlike isUserBoundToOU, which only looks at the role, this reflects whether the user
+    // actually has an institution. Roles such as VICE_DEAN_FOR_SCIENCE may have none, in which
+    // case they are not restricted to one.
+    const hasInstitution = computed(() => Boolean(userInstitutionid.value));
 
     const canUserAddPublications = computed(() => userRole.value && userRole.value !== 'COMMISSION' && userRole.value !== 'VICE_DEAN_FOR_SCIENCE');
     const canUserAddProjects = computed(() => isAdmin.value || isResearcher.value || isInstitutionalEditor.value);
@@ -47,6 +56,10 @@ export function useUserRole() {
         if (loginStore.userLoggedIn) {
             UserService.getLoggedInUser().then(response => {
                 loggedInUser.value = response.data;
+
+                if (!hasInstitution.value) {
+                    returnOnlyInstitutionRelatedEntities.value = false;
+                }
             });
 
             if (isResearcher.value) {
@@ -77,6 +90,7 @@ export function useUserRole() {
         canUserAddPersons, canAddSerialEvents,
         canReviewDataQuality,
         isUserLoggedIn, loggedResearcherId,
-        isLibrarianUser, userInstitutionid
+        isLibrarianUser, userInstitutionid,
+        hasInstitution
     };
 }

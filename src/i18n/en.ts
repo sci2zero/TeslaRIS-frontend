@@ -833,6 +833,7 @@ export default {
     researchOutputNotAddedNotification: "Document '{name}' Was not added. Reason: {error}",
     topicAcceptanceDateLabel: "Topic Acceptance Date",
     unauthorizedOrgUnitEditAttemptMessage: "You have to be employed at an institution to be able to edit it.",
+    noInstitutionBoundToAccountMessage: "This action requires your account to be bound to an institution.",
     unauthorizedPublicationEditAttemptByEmployeeMessage: "Publication has to have a relation toward your institution.",
     unauthorizedProjectEditAttemptByEmployeeMessage: "Project has to have a relation toward your institution, either through a team member or through the consortium.",
     defenceDateLabel: "Defence date",

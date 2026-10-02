@@ -70,6 +70,7 @@
                     <td>{{ row.item.email }}</td>
                     <td>
                         <localized-link
+                            v-if="row.item.organisationUnitId > 0"
                             :to="'organisation-units/' + row.item.organisationUnitId">
                             <template v-if="$i18n.locale.startsWith('sr')">
                                 {{ row.item.organisationUnitNameSr }}

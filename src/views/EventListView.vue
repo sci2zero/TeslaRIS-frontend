@@ -12,7 +12,7 @@
         </span>
         <span class="d-flex align-center">
             <v-checkbox
-                v-if="isUserBoundToOU"
+                v-if="hasInstitution"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
@@ -139,7 +139,7 @@ export default defineComponent({
         const commissions = ref<{title: string, value: number}[]>([]);
         const selectedCommission = ref({ title: '', value: -1 });
 
-        const { isAdmin, isCommission, isUserBoundToOU, returnOnlyInstitutionRelatedEntities } = useUserRole();
+        const { isAdmin, isCommission, isUserBoundToOU, hasInstitution, returnOnlyInstitutionRelatedEntities } = useUserRole();
 
         const eventTypes = computed(() => getEventTypesForGivenLocale());
         const selectedEventTypes = ref<{ title: string, value: EventType }[]>([]);
@@ -235,7 +235,7 @@ export default defineComponent({
         return {
             search, events, totalEvents, switchPage, isAdmin,
             presetSearchParams, returnSerialEvents, eventTypes,
-            tableRef, clearSortAndPerformSearch, isUserBoundToOU,
+            tableRef, clearSortAndPerformSearch, isUserBoundToOU, hasInstitution,
             returnOnlyInstitutionRelatedEntities, isCommission,
             returnOnlyUnclassifiedEntities, loading, commissions,
             selectedCommission, onClearCommission, toggleEventType,

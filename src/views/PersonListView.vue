@@ -6,7 +6,7 @@
         
         <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
             <v-checkbox
-                v-if="isUserBoundToOU"
+                v-if="hasInstitution"
                 v-model="returnOnlyInstitutionRelatedEntities"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-5"
@@ -96,7 +96,7 @@ export default defineComponent({
 
         const tableRef = ref<typeof PersonTableComponent>();
 
-        const { isAdmin, isInstitutionalEditor, isUserBoundToOU, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
+        const { isAdmin, isInstitutionalEditor, isUserBoundToOU, hasInstitution, returnOnlyInstitutionRelatedEntities, loggedInUser } = useUserRole();
 
         onMounted(() => {
             document.title = i18n.t("personListLabel");
@@ -161,7 +161,7 @@ export default defineComponent({
             search, persons, totalPersons,
             switchPage, addPerson, isAdmin,
             tableRef, clearSortAndPerformSearch,
-            isInstitutionalEditor, isUserBoundToOU,
+            isInstitutionalEditor, isUserBoundToOU, hasInstitution,
             returnOnlyInstitutionRelatedEntities,
             ExportableEndpointType, searchParams,
             loading, withNoInvolvements,

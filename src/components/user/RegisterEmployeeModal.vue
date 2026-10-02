@@ -49,7 +49,7 @@
                                     <organisation-unit-autocomplete-search
                                         ref="ouAutocompleteRef"
                                         v-model="selectedOrganisationUnit"
-                                        required
+                                        :required="institutionRequired"
                                         disable-submission
                                         :only-client-institutions-cris="!fetchOnlyDlClients"
                                         :only-client-institutions-dl="fetchOnlyDlClients"
@@ -126,6 +126,16 @@ export default defineComponent({
 
         const registeringCommission = computed(() => props.employeeRole === UserRole.COMMISSION);
 
+        // These roles may be registered without one, in which case they are not restricted to a
+        // single institution.
+        const rolesWithOptionalInstitution = [
+            UserRole.VICE_DEAN_FOR_SCIENCE,
+            UserRole.INSTITUTIONAL_EDITOR
+        ];
+
+        const institutionRequired = computed(
+            () => !rolesWithOptionalInstitution.includes(props.employeeRole));
+
         const fetchOnlyDlClients = computed(() => [
                 UserRole.INSTITUTIONAL_LIBRARIAN,
                 UserRole.HEAD_OF_LIBRARY,
@@ -177,7 +187,9 @@ export default defineComponent({
                 email: email.value,
                 note: note.value,
                 preferredLanguageId: selectedLanguage.value.value,
-                organisationUnitId: selectedOrganisationUnit.value.value
+                organisationUnitId: selectedOrganisationUnit.value.value > 0
+                    ? selectedOrganisationUnit.value.value
+                    : undefined
             };
 
             if (registeringCommission.value) {
@@ -251,7 +263,7 @@ export default defineComponent({
             languages, selectedLanguage, 
             registerEmployee, isFormValid,
             emailFieldRules, requiredFieldRules,
-            requiredSelectionRules, getTitleLabel,
+            requiredSelectionRules, getTitleLabel, institutionRequired,
             commissionAutocompleteRef,
             registeringCommission
         };

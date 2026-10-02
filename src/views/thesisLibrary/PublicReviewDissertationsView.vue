@@ -38,7 +38,7 @@
         </v-row>
         <v-row>
             <v-checkbox
-                v-if="!institutionId && isUserBoundToOU"
+                v-if="!institutionId && hasInstitution"
                 v-model="returnOnlyInstitutionRelatedTheses"
                 :label="$t('showEntitiesForMyInstitutionLabel')"
                 class="ml-4 mt-3"
@@ -143,7 +143,7 @@ export default defineComponent({
 
         const showingNotDefended = computed(() => (currentRoute.query.notYetDefended as string) === 'true');
 
-        const { isUserBoundToOU } = useUserRole();
+        const { isUserBoundToOU, hasInstitution } = useUserRole();
         const returnOnlyInstitutionRelatedTheses = ref(false);
 
         onMounted(() => {
@@ -257,7 +257,7 @@ export default defineComponent({
             navigateToSearch, navigateToThisView,
             showingNotDefended, PageContentType,
             institutionId, ThesisType, getPageType,
-            isUserBoundToOU, reviewType,
+            isUserBoundToOU, reviewType, hasInstitution,
             returnOnlyInstitutionRelatedTheses
         };
     }
