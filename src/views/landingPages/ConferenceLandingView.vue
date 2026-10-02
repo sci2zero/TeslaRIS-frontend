@@ -51,7 +51,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab v-show="!conference?.serialEvent" value="publications">
@@ -80,6 +80,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="conference?.description"
                     is-general-description
                     :contributions="conference?.contributions"
@@ -250,6 +252,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
@@ -282,6 +285,11 @@ export default defineComponent({
 
         const currentRoute = useRoute();
         const conference = ref<Conference>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            conference,
+            currentTab,
+            "contributions",
+        );
         const keywords = ref<string[]>([]);
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -466,7 +474,7 @@ export default defineComponent({
             snackbar, snackbarMessage, updateDescription,
             country, EventUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
-            currentTab, eventClassifications, createClassification,
+            currentTab, showOverview, showOverviewTab, onOverviewContent, eventClassifications, createClassification,
             fetchClassifications, canClassify, ExportableEndpointType,
             fetchIdentifiers, eventIdentifiers,
             isAdmin, EntityType, fetchConference,

@@ -87,7 +87,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -119,6 +119,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="proceedingsPublication?.description"
                     :contributions="proceedingsPublication?.contributions"
                     :contribution-types="['AUTHOR']"
@@ -274,6 +276,7 @@ import AssessmentClassificationService from '@/services/assessment/AssessmentCla
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
@@ -334,6 +337,11 @@ export default defineComponent({
         const canClassify = ref(false);
 
         const proceedingsPublication = ref<ProceedingsPublication>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            proceedingsPublication,
+            currentTab,
+            "contributions",
+        );
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         
         const event = ref<Conference>();
@@ -537,7 +545,7 @@ export default defineComponent({
             searchKeyword, canEdit, proceedings, getTitleFromValueAutoLocale,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
-            StatisticsType, documentIndicators, currentTab, ApplicableEntityType,
+            StatisticsType, documentIndicators, currentTab, showOverview, showOverviewTab, onOverviewContent, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,
             fetchClassifications, canClassify, createClassification,
             currentRoute, actionsRef, fetchIndicators, createIndicator,

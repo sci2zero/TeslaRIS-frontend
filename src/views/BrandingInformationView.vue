@@ -14,13 +14,11 @@
             :has-existing-background="hasExistingBackground"
             @update="updateBrandingInfo"
         ></branding-information-form>
-        <v-row justify="center">
-            <v-col>
-                <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
+        <div class="mt-6">
+            <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">
+                {{ $t("saveLabel") }}
+            </v-btn>
+        </div>
     </v-container>
 </template>
 
@@ -35,7 +33,6 @@ import { type BrandingInformation } from '@/models/Common';
 import { useRouter } from 'vue-router';
 import { usePublicConfigurationStore } from '@/stores/publicConfigurationStore';
 import { fetchBrandingInformation } from '@/composables/useBrandingInformation';
-import { setHomeTheme } from '@/composables/useHomeTheme';
 
 
 export default defineComponent({
@@ -73,7 +70,9 @@ export default defineComponent({
                 description: payload.description,
                 location: payload.location,
                 phoneNumber: payload.phoneNumber,
-                postalAddress: payload.postalAddress
+                postalAddress: payload.postalAddress,
+                chromeTheme: payload.chromeTheme,
+                heroTheme: payload.heroTheme
             };
 
             await BrandingService.updateBrandingInfo(brandingInfo);
@@ -92,7 +91,6 @@ export default defineComponent({
 
             await fetchBrandingInformation();
             await publicConfigurationStore.refreshFromBackend();
-            setHomeTheme(payload.homeTheme);
             router.push({ name: "home" });
         };
 

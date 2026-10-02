@@ -366,7 +366,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -403,6 +403,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="thesis?.description"
                     :contributions="thesis?.contributions"
                     :contribution-types="['AUTHOR']"
@@ -597,6 +599,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
 import AlternateTitleForm from '@/components/thesisLibrary/AlternateTitleForm.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
@@ -637,6 +640,11 @@ export default defineComponent({
         const dialogMessage = ref(i18n.t("putOnPublicReviewWarningMessage"));
 
         const thesis = ref<Thesis>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            thesis,
+            currentTab,
+            "contributions",
+        );
         const publisher = ref<Publisher>();
         const organisationUnit = ref<OrganisationUnitResponse>();
         const event = ref<Conference>();
@@ -1151,7 +1159,7 @@ export default defineComponent({
 
         return {
             thesis, publisher, createIndicator, languageTagMap, canAssessDataQuality, isDigitalLibraryEnabled, restoreBlockedReason,
-            returnCurrentLocaleContent, currentTab, fetchIndicators,
+            returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, fetchIndicators,
             languageMap, searchKeyword, canEdit, putOnPublicReview,
             updateKeywords, updateDescription, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,

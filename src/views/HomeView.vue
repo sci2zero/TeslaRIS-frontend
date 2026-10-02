@@ -116,7 +116,7 @@ export default defineComponent({
 
         const router = useRouter();
         const i18n = useI18n();
-        const { homeTheme: heroTheme } = useHomeTheme();
+        const { heroTheme } = useHomeTheme();
 
         const personListLabel = computed(() => i18n.t("personListLabel"));
         const ouListLabel = computed(() => i18n.t("ouListLabel"));

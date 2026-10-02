@@ -51,7 +51,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -77,6 +77,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="exhibition?.description"
                     is-general-description
                     :contributions="exhibition?.contributions"
@@ -217,6 +219,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
@@ -249,6 +252,11 @@ export default defineComponent({
 
         const currentRoute = useRoute();
         const exhibition = ref<Exhibition>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            exhibition,
+            currentTab,
+            "contributions",
+        );
         const keywords = ref<string[]>([]);
 
         const i18n = useI18n();
@@ -399,7 +407,7 @@ export default defineComponent({
             snackbar, snackbarMessage, updateDescription,
             country, ExhibitionUpdateForm, ApplicableEntityType,
             eventIndicators, fetchIndicators, createIndicator,
-            currentTab, eventClassifications, createClassification,
+            currentTab, showOverview, showOverviewTab, onOverviewContent, eventClassifications, createClassification,
             fetchClassifications, canClassify, EventType,
             eventIdentifiers, isViceDeanForScience,
             isAdmin, EntityType, fetchExhibition,

@@ -3,7 +3,7 @@
         <public-configuration-overlay />
 
         <template v-if="showApplication">
-            <SideBar v-if="!hideLayout" class="h-full" :theme="homeTheme" />
+            <SideBar v-if="!hideLayout" class="h-full" :theme="chromeTheme" />
             <v-main class="bg-slate-100" :class="['flex flex-col h-full transition-all duration-300', sidebarStore.mainMargin]">
                 <navbar v-if="!hideLayout && !isHome" variant="general" :show-breadcrumbs="!isHome" />
 
@@ -31,7 +31,7 @@
                     class="flex-1"
                 />
 
-                <footerbar v-if="!hideLayout" :theme="homeTheme" />
+                <footerbar v-if="!hideLayout" :theme="chromeTheme" />
                 
                 <cookie-consent
                     v-if="!hideLayout"
@@ -108,6 +108,30 @@ export default defineComponent({
         const showApplication = computed(() =>
             !publicConfigurationStore.loading && !publicConfigurationStore.backendUnavailable
         );
+        const DEFAULT_FAVICON = "/favicon.ico";
+
+        watch(
+            () => publicConfigurationStore.hasCustomLogo
+                ? publicConfigurationStore.logoDisplayUrl
+                : DEFAULT_FAVICON,
+            (href) => {
+                const current = document.getElementById("favicon") as HTMLLinkElement | null;
+                if (current?.getAttribute("href") === href) {
+                    return;
+                }
+
+                const link = document.createElement("link");
+                link.id = "favicon";
+                link.rel = "icon";
+                link.href = href;
+                if (current) {
+                    current.replaceWith(link);
+                } else {
+                    document.head.appendChild(link);
+                }
+            },
+            { immediate: true }
+        );
 
         const downloadProgressRef = ref<typeof DownloadProgress>();
         const uploadProgressRef = ref<typeof UploadProgress>();
@@ -124,7 +148,7 @@ export default defineComponent({
         const isHome = computed(() => {
             return route.name === "home";
         });
-        const { homeTheme } = useHomeTheme();
+        const { chromeTheme } = useHomeTheme();
         const sidebarStore = useSidebarStore();
         const tutorialStore = useTutorialStore();
         const loginStore = useLoginStore();
@@ -157,7 +181,7 @@ export default defineComponent({
             downloadProgressRef,
             uploadProgressRef,
             isHome,
-            homeTheme,
+            chromeTheme,
             sidebarStore,
             globalLoading,
             globalLoadingMessage,

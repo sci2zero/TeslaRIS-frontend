@@ -251,7 +251,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab v-show="showOutputs" value="publications">
@@ -289,6 +289,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="organisationUnit?.description"
                     is-general-description
                     description-tab="researchAreas"
@@ -682,6 +684,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import { UiButton } from '@/components/ui/button';
 
@@ -724,6 +727,11 @@ export default defineComponent({
         const currentRoute = useRoute();
 
         const organisationUnit = ref<OrganisationUnitResponse>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            organisationUnit,
+            currentTab,
+            "employees",
+        );
 
         const graphRef = ref<typeof RelationsGraph>();
         const relationChain = ref();
@@ -1036,7 +1044,7 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if (currentTab.value !== "dataQuality") {
+            if (currentTab.value !== "dataQuality" && showOverview.value) {
                 currentTab.value = "overview";
             }
         };
@@ -1284,7 +1292,7 @@ export default defineComponent({
         return {
             canAssessDataQuality,
             canReviewDataQuality,
-            organisationUnit, currentTab, isHeadOfLibrary,
+            organisationUnit, currentTab, showOverview, showOverviewTab, onOverviewContent, isHeadOfLibrary,
             publications, totalPublications, userInstitutionid,
             employees, totalEmployees, publicationsRef,
             switchPublicationsPage, publicationTypes,

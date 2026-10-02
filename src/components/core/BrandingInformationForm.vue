@@ -1,22 +1,33 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)" />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)" is-area />
-            </v-col>
-        </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-text-box-outline"
+            :title="$t('brandingIdentityLabel')"
+            :description="$t('brandingIdentityHint')"
+        >
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+                :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)"
+            />
+            <multilingual-text-input
+                ref="descriptionRef"
+                v-model="description"
+                :rules="requiredFieldRules"
+                :label="$t('descriptionLabel') + '*'"
+                :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)"
+                is-area
+            />
+        </form-section>
 
-        <v-row>
-            <v-col cols="12" md="6">
+        <form-section
+            icon="mdi-image-outline"
+            :title="$t('brandingAppearanceLabel')"
+            :description="$t('brandingAppearanceHint')"
+        >
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <ui-file-input
                     v-model="logoFile"
                     :label="$t('brandingLogoLabel')"
@@ -26,8 +37,6 @@
                     :remove-label="$t('removeLogoLabel')"
                     @remove="removeLogo = true; logoFile = null"
                 />
-            </v-col>
-            <v-col cols="12" md="6">
                 <ui-file-input
                     v-model="backgroundFile"
                     :label="$t('brandingBackgroundLabel')"
@@ -38,24 +47,64 @@
                     :remove-label="$t('removeBackgroundLabel')"
                     @remove="removeBackground = true; backgroundFile = null"
                 />
-            </v-col>
-        </v-row>
+            </div>
+        </form-section>
 
-        <v-row>
-            <v-col>
+        <form-section
+            icon="mdi-brightness-6"
+            :title="$t('homeThemeLabel')"
+            :description="$t('brandingThemeHint')"
+        >
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <ui-input
-                    v-model="selectedHomeTheme"
+                    v-model="selectedChromeTheme"
                     control="select"
                     :items="themeOptions"
                     item-title="title"
                     item-value="value"
-                    :label="$t('homeThemeLabel')"
+                    :label="$t('chromeThemeLabel')"
                 />
-            </v-col>
-        </v-row>
+                <ui-input
+                    v-model="selectedHeroTheme"
+                    control="select"
+                    :items="themeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :label="$t('heroThemeLabel')"
+                />
+            </div>
+        </form-section>
 
-        <v-row>
-            <v-col>
+        <form-section
+            icon="mdi-card-account-phone-outline"
+            :title="$t('contactLabel')"
+            :description="$t('brandingContactHint')"
+        >
+            <multilingual-text-input
+                ref="streetAndNumberRef"
+                v-model="streetAndNumber"
+                :label="$t('streetAndNumberLabel')"
+                :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.streetAndNumber, languageTags)"
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <multilingual-text-input
+                    ref="cityRef"
+                    v-model="city"
+                    :label="$t('cityLabel')"
+                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.city, languageTags)"
+                />
+                <ui-input
+                    v-model="postalNumber"
+                    :label="$t('postalNumberLabel')"
+                />
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <multilingual-text-input
+                    ref="stateRef"
+                    v-model="state"
+                    :label="$t('stateLabel')"
+                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.state, languageTags)"
+                />
                 <ui-input
                     v-model="selectedCountry"
                     control="select"
@@ -63,80 +112,39 @@
                     :label="$t('countryLabel')"
                     return-object
                 />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="cityRef"
-                    v-model="city"
-                    :label="$t('cityLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.city, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="streetAndNumberRef"
-                    v-model="streetAndNumber"
-                    :label="$t('streetAndNumberLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.streetAndNumber, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="stateRef"
-                    v-model="state"
-                    :label="$t('stateLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.state, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <ui-input
-                    v-model="postalNumber"
-                    :label="$t('postalNumberLabel')"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <ui-input
-                    v-model="phoneNumber"
-                    :label="$t('phoneNumberLabel')"
-                />
-            </v-col>
-        </v-row>
+            </div>
+            <ui-input
+                v-model="phoneNumber"
+                class="max-w-sm"
+                :label="$t('phoneNumberLabel')"
+            />
+        </form-section>
 
-        <v-row>
-            <v-col cols="12">
-                <ui-input
-                    v-model="mapAddress"
-                    :label="$t('addressLabel')"
-                    :placeholder="$t('addressLabel')"
-                />
-                <div v-if="mapEmbedUrl" class="mt-4 overflow-hidden rounded-xl border border-slate-200">
-                    <iframe
-                        class="h-80 w-full border-0"
-                        :src="mapEmbedUrl"
-                        :title="$t('locationLabel')"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        allowfullscreen
-                    ></iframe>
-                </div>
-            </v-col>
-        </v-row>
+        <form-section
+            icon="mdi-map-marker-outline"
+            :title="$t('locationLabel')"
+            :description="$t('brandingLocationHint')"
+        >
+            <ui-input
+                v-model="mapAddress"
+                :label="$t('addressLabel')"
+                :placeholder="$t('addressLabel')"
+            />
+            <div v-if="mapEmbedUrl" class="overflow-hidden rounded-xl border border-slate-200">
+                <iframe
+                    class="h-80 w-full border-0"
+                    :src="mapEmbedUrl"
+                    :title="$t('locationLabel')"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen
+                ></iframe>
+            </div>
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="required-fields-message">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 </template>
 
@@ -145,6 +153,7 @@ import { computed, defineComponent, onMounted, type PropType, watch } from 'vue'
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UiInput from '@/components/ui/input/Input.vue';
 import UiFileInput from '@/components/ui/file-input/FileInput.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { type BrandingInformation, type Country } from '@/models/Common';
@@ -154,7 +163,7 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import CountryService from '@/services/CountryService';
 import lodash from 'lodash';
 import type { AxiosResponse } from 'axios';
-import { useHomeTheme, type HomeTheme } from '@/composables/useHomeTheme';
+import { normalizeHomeTheme, useHomeTheme, type HomeTheme } from '@/composables/useHomeTheme';
 
 
 export interface BrandingFormPayload {
@@ -167,12 +176,13 @@ export interface BrandingFormPayload {
     location: BrandingInformation["location"];
     phoneNumber?: string;
     postalAddress: BrandingInformation["postalAddress"];
-    homeTheme: HomeTheme;
+    chromeTheme: HomeTheme;
+    heroTheme: HomeTheme;
 }
 
 export default defineComponent({
     name: "BrandingInformationForm",
-    components: { MultilingualTextInput, UiInput, UiFileInput },
+    components: { MultilingualTextInput, UiInput, UiFileInput, FormSection },
     props: {
         presetInformation: {
             type: Object as PropType<BrandingInformation | undefined>,
@@ -212,8 +222,15 @@ export default defineComponent({
         const embedQuery = ref(mapAddress.value);
 
         const i18n = useI18n();
-        const { homeTheme } = useHomeTheme();
-        const selectedHomeTheme = ref<HomeTheme>(homeTheme.value);
+        const { chromeTheme, heroTheme } = useHomeTheme();
+        const asTheme = (value: unknown, fallback: HomeTheme): HomeTheme =>
+            normalizeHomeTheme(value) ?? fallback;
+        const selectedChromeTheme = ref<HomeTheme>(
+            asTheme(props.presetInformation?.chromeTheme, chromeTheme.value)
+        );
+        const selectedHeroTheme = ref<HomeTheme>(
+            asTheme(props.presetInformation?.heroTheme, heroTheme.value)
+        );
         const themeOptions = computed(() => [
             { title: i18n.t("lightThemeLabel"), value: "light" },
             { title: i18n.t("darkThemeLabel"), value: "dark" },
@@ -299,6 +316,8 @@ export default defineComponent({
 
         watch(() => props.presetInformation, (preset) => {
             setAddressInfo();
+            selectedChromeTheme.value = asTheme(preset?.chromeTheme, chromeTheme.value);
+            selectedHeroTheme.value = asTheme(preset?.heroTheme, heroTheme.value);
 
             const presetLocation = preset?.location;
             if (!presetLocation || mapAddress.value) {
@@ -384,8 +403,6 @@ export default defineComponent({
         );
 
         const submit = () => {
-            const theme = selectedHomeTheme.value === "light" ? "light" : "dark";
-
             const payload: BrandingFormPayload = {
                 title: title.value,
                 description: description.value,
@@ -406,7 +423,8 @@ export default defineComponent({
                     state: state.value,
                     postalNumber: postalNumber.value as string
                 },
-                homeTheme: theme
+                chromeTheme: asTheme(selectedChromeTheme.value, "dark"),
+                heroTheme: asTheme(selectedHeroTheme.value, "dark")
             };
 
             emit("update", payload);
@@ -424,7 +442,7 @@ export default defineComponent({
             logoFile, backgroundFile,
             logoPreviewUrl, backgroundPreviewUrl,
             removeLogo, removeBackground,
-            selectedHomeTheme, themeOptions
+            selectedChromeTheme, selectedHeroTheme, themeOptions
         };
     }
 });

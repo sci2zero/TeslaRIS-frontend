@@ -164,6 +164,8 @@ export interface BrandingInformation {
     location?: GeoLocation;
     postalAddress?: PostalAddress;
     phoneNumber?: string;
+    chromeTheme?: "light" | "dark" | null;
+    heroTheme?: "light" | "dark" | null;
 }
 
 export enum ApiKeyType {

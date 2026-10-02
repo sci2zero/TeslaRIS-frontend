@@ -99,7 +99,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab v-show="monograph?.monographType === MonographType.EDITED_BOOK" value="publications">
@@ -137,6 +137,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="monograph?.description"
                     :contributions="monograph?.contributions"
                     :contribution-types="monograph?.monographType === MonographType.EDITED_BOOK ? ['EDITOR'] : ['AUTHOR']"
@@ -332,6 +334,7 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
@@ -377,6 +380,11 @@ export default defineComponent({
         const router = useRouter();
 
         const monograph = ref<Monograph>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            monograph,
+            currentTab,
+            "contributions",
+        );
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
         const {
@@ -566,7 +574,7 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if (currentTab.value !== "dataQuality") {
+            if (currentTab.value !== "dataQuality" && showOverview.value) {
                 currentTab.value = "overview";
             }
         };
@@ -667,7 +675,7 @@ export default defineComponent({
             switchPage, publications, totalPublications,
             handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType,
-            currentTab, updateResearchAreas,
+            currentTab, showOverview, showOverviewTab, onOverviewContent, updateResearchAreas,
             ApplicableEntityType, currentRoute,
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,

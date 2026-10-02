@@ -1,24 +1,16 @@
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { getConfig } from "@/plugin-system/registry";
+import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
 
 export type HomeTheme = "dark" | "light";
 
-const STORAGE_KEY = "teslaris-home-theme";
-
-function readStoredTheme(): HomeTheme | null {
-    if (typeof localStorage === "undefined") {
+export function normalizeHomeTheme(value: unknown): HomeTheme | null {
+    if (typeof value !== "string") {
         return null;
     }
 
-    const value = localStorage.getItem(STORAGE_KEY);
-    return value === "light" || value === "dark" ? value : null;
-}
-
-const storedHomeTheme = ref<HomeTheme | null>(readStoredTheme());
-
-export function setHomeTheme(theme: HomeTheme) {
-    storedHomeTheme.value = theme;
-    localStorage.setItem(STORAGE_KEY, theme);
+    const normalized = value.toLowerCase();
+    return normalized === "light" || normalized === "dark" ? normalized : null;
 }
 
 function pluginHomeTheme(): HomeTheme {
@@ -26,7 +18,14 @@ function pluginHomeTheme(): HomeTheme {
 }
 
 export function useHomeTheme() {
-    const homeTheme = computed<HomeTheme>(() => storedHomeTheme.value ?? pluginHomeTheme());
+    const publicConfigurationStore = usePublicConfigurationStore();
 
-    return { homeTheme };
+    const chromeTheme = computed<HomeTheme>(() =>
+        normalizeHomeTheme(publicConfigurationStore.config?.branding.chromeTheme) ?? pluginHomeTheme()
+    );
+    const heroTheme = computed<HomeTheme>(() =>
+        normalizeHomeTheme(publicConfigurationStore.config?.branding.heroTheme) ?? pluginHomeTheme()
+    );
+
+    return { chromeTheme, heroTheme };
 }
