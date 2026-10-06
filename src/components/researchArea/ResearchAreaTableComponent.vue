@@ -11,9 +11,6 @@
         </v-col>
 
         <v-col cols="auto">
-            <research-area-modal
-                :preset-research-area="undefined"
-                @submit="createNewResearchArea" />
             <generic-crud-modal
                 :form-component="ResearchAreaForm"
                 :form-props="{ presetResearchArea: undefined }"
@@ -41,10 +38,10 @@
             <tr>
                 <td>
                     <v-checkbox
-                        v-model="selectedResearchAreas"
-                        :value="row.item"
+                        :model-value="isSelected(row.item)"
                         class="table-checkbox"
                         hide-details
+                        @update:model-value="toggleSelection(row.item, $event as boolean)"
                     />
                 </td>
                 <td>{{ returnCurrentLocaleContent(row.item.name) }}</td>
@@ -91,7 +88,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { getTitleFromValueAutoLocale } from '@/i18n/userType';
@@ -118,7 +115,7 @@ export default defineComponent({
             required: true
         }},
     emits: ["switchPage"],
-    setup(_, {emit}) {
+    setup(props, {emit}) {
         const selectedResearchAreas = ref<ResearchAreaResponse[]>([]);
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -157,20 +154,133 @@ export default defineComponent({
             emit("switchPage", event.page - 1, event.itemsPerPage, sortField, sortDir);
         };
 
-        const deleteSelection = () => {
-            Promise.all(selectedResearchAreas.value.map((researchArea: ResearchAreaResponse) => {
-                return ResearchAreaService.deleteResearchArea(researchArea.id as number)
-                    .then(() => {
-                        addNotification(i18n.t("deleteSuccessNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
-                    })
-                    .catch(() => {
-                        addNotification(i18n.t("deleteFailedNotification", { name: returnCurrentLocaleContent(researchArea.name) }));
-                        return researchArea;
-                    });
-            })).then((failedDeletions) => {
-                selectedResearchAreas.value = selectedResearchAreas.value.filter((researchArea) => failedDeletions.includes(researchArea));
-                refreshTable(tableOptions.value);
+        const isSelected = (researchArea: ResearchAreaResponse) => {
+            return selectedResearchAreas.value.some((selected) => selected.id === researchArea.id);
+        };
+
+        const toggleSelection = (researchArea: ResearchAreaResponse, checked: boolean) => {
+            if (checked) {
+                if (!isSelected(researchArea)) {
+                    selectedResearchAreas.value = [...selectedResearchAreas.value, researchArea];
+                }
+            } else {
+                selectedResearchAreas.value = selectedResearchAreas.value.filter(
+                    (selected) => selected.id !== researchArea.id);
+            }
+        };
+
+        // Selection is remembered by id, never by row reference: refreshing the table
+        // replaces every row object, so keeping references would leave the delete button
+        // enabled over rows that are no longer rendered.
+        const idsToReselect = ref<Set<number>>(new Set());
+        watch(() => props.researchAreas, (researchAreas) => {
+            if (idsToReselect.value.size === 0) {
+                return;
+            }
+
+            selectedResearchAreas.value = researchAreas.filter(
+                (researchArea) => idsToReselect.value.has(researchArea.id as number));
+            idsToReselect.value = new Set();
+        });
+
+        const deleteSelection = async () => {
+            const byId = new Map<number, ResearchAreaResponse>();
+            selectedResearchAreas.value
+                .filter((researchArea) => researchArea.id !== undefined)
+                .forEach((researchArea) => byId.set(researchArea.id as number, researchArea));
+
+            // A research area cannot be deleted while it still has children, so the
+            // selection is deleted bottom-up: each round takes the areas that have no
+            // remaining selected child. Children of areas outside the selection are not
+            // touched - those deletions are supposed to be refused.
+            const selectedChildCount = new Map<number, number>();
+            byId.forEach((_, id) => selectedChildCount.set(id, 0));
+            byId.forEach((researchArea) => {
+                const superId = researchArea.superResearchAreaId;
+                if (superId !== undefined && selectedChildCount.has(superId)) {
+                    selectedChildCount.set(superId, (selectedChildCount.get(superId) as number) + 1);
+                }
             });
+
+            const remaining = new Set<number>(byId.keys());
+            const blocked = new Set<number>();
+            const failed = new Set<number>();
+
+            const attemptDeletion = async (id: number) => {
+                const researchArea = byId.get(id) as ResearchAreaResponse;
+                const name = returnCurrentLocaleContent(researchArea.name) as string;
+
+                if (blocked.has(id)) {
+                    failed.add(id);
+                    addNotification(i18n.t("deleteBlockedByDescendantNotification", { name }));
+                    return id;
+                }
+
+                try {
+                    await ResearchAreaService.deleteResearchArea(id);
+                    addNotification(i18n.t("deleteSuccessNotification", { name }));
+                } catch {
+                    failed.add(id);
+                    addNotification(i18n.t("deleteFailedNotification", { name }));
+                }
+
+                return id;
+            };
+
+            while (remaining.size > 0) {
+                const deletableNow = [...remaining].filter(
+                    (id) => selectedChildCount.get(id) === 0);
+
+                if (deletableNow.length === 0) {
+                    // Unreachable for a well-formed hierarchy; guards against a cycle in
+                    // the data leaving this loop spinning.
+                    remaining.forEach((id) => failed.add(id));
+                    break;
+                }
+
+                // Nothing inside one round is an ancestor of anything else in it, so the
+                // round itself can go out in parallel; rounds must stay sequential because
+                // every delete is its own transaction.
+                await Promise.all(deletableNow.map(attemptDeletion));
+
+                deletableNow.forEach((id) => {
+                    remaining.delete(id);
+
+                    const superId = byId.get(id)?.superResearchAreaId;
+                    if (superId === undefined || !selectedChildCount.has(superId)) {
+                        return;
+                    }
+
+                    // An ancestor of something that could not be deleted cannot be deleted
+                    // either - report that rather than letting it fail with a bare conflict.
+                    if (failed.has(id)) {
+                        blocked.add(superId);
+                    }
+
+                    selectedChildCount.set(superId, (selectedChildCount.get(superId) as number) - 1);
+                });
+            }
+
+            idsToReselect.value = failed;
+            selectedResearchAreas.value = [];
+
+            clampPageAfterDeletion(byId.size - failed.size);
+            refreshTable(tableOptions.value);
+        };
+
+        // Deleting the last rows of a page would otherwise refetch a page that no longer
+        // exists, showing an empty table until the table clamps itself a request later.
+        const clampPageAfterDeletion = (deletedCount: number) => {
+            const itemsPerPage = tableOptions.value.itemsPerPage;
+            if (!itemsPerPage || itemsPerPage < 1) {
+                return;
+            }
+
+            const remainingTotal = Math.max(props.totalResearchAreas - deletedCount, 0);
+            const lastPage = Math.max(Math.ceil(remainingTotal / itemsPerPage), 1);
+            if (tableOptions.value.page > lastPage) {
+                tableOptions.value.page = lastPage;
+            }
         };
 
         const addNotification = (message: string) => {
@@ -233,6 +343,7 @@ export default defineComponent({
 
         return {headers, snackbar, snackbarText, timeout, refreshTable,
             tableOptions, deleteSelection, displayTextOrPlaceholder,
+            isSelected, toggleSelection,
             getTitleFromValueAutoLocale, returnCurrentLocaleContent,
             selectedResearchAreas, notifications, createNewResearchArea,
             updateResearchArea, setSortAndPageOption, ResearchAreaForm,

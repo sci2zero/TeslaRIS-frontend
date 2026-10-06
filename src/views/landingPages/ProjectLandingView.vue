@@ -195,6 +195,9 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-show="project" v-model="currentTab">
@@ -291,6 +294,15 @@
                     @update="updateDescription"
                 />
             </v-tabs-window-item>
+
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.PROJECT"
+                    :entity-id="project?.id"
+                    @restored="fetchProject"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -325,7 +337,10 @@ import ProjectPersonsTableComponent from "@/components/project/ProjectPersonsTab
 import ProjectOrganisationsTableComponent from "@/components/project/ProjectOrganisationsTableComponent.vue";
 import ProjectDocumentsTableComponent from "@/components/project/ProjectDocumentsTableComponent.vue";
 import ProjectEventsTableComponent from "@/components/project/ProjectEventsTableComponent.vue";
+import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
 import Toast from "@/components/core/Toast.vue";
+import { EntityType } from "@/models/MergeModel";
+import { useUserRole } from "@/composables/useUserRole";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
 
@@ -340,6 +355,7 @@ const icon = ref("mdi-folder-star");
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
+const { canReviewDataQuality } = useUserRole();
 
 const snackbar = ref(false);
 const snackbarMessage = ref("");

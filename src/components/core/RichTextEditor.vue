@@ -184,14 +184,18 @@ export default defineComponent({
                 if (lastKeyCode.value === " ") return;
 
                 if (!props.editable) {
+                    // Read-only: normalise what is rendered, but never write back to the
+                    // parent. Emitting here mutates the caller's data (tables bind row
+                    // fields with v-model), which silently breaks selection comparisons.
                     editorInstance.commands.setContent(newVal, { emitUpdate: false });
-                } else {
-                    const { state } = editorInstance;
-                    const { from, to } = state.selection;
-
-                    editorInstance.commands.setContent(newVal, { emitUpdate: false });
-                    editorInstance.commands.setTextSelection({ from, to });
+                    return;
                 }
+
+                const { state } = editorInstance;
+                const { from, to } = state.selection;
+
+                editorInstance.commands.setContent(newVal, { emitUpdate: false });
+                editorInstance.commands.setTextSelection({ from, to });
 
                 emit('update:modelValue', newVal);
                 emit("input");

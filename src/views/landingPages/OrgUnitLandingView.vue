@@ -160,6 +160,7 @@
                     />
 
                     <UiButton
+                        v-if="isDigitalLibraryEnabled"
                         variant="outline"
                         size="md"
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
@@ -185,7 +186,7 @@
                                 @click="openModal(externalIndicatorsModalRef)"
                             />
                             <v-list-item
-                                v-if="canEdit"
+                                v-if="isDigitalLibraryEnabled && canEdit"
                                 prepend-icon="mdi-text-box-edit-outline"
                                 :title="$t('updatePublicReviewPageContentLabel')"
                                 @click="openModal(publicReviewModalRef)"
@@ -203,7 +204,7 @@
                                 @click="openModal(importSourceModalRef)"
                             />
                             <v-list-item
-                                v-if="canEditDefaultSubmissionContent"
+                                v-if="isDigitalLibraryEnabled && canEditDefaultSubmissionContent"
                                 prepend-icon="mdi-file-document-edit-outline"
                                 :title="$t('updateInstitutionDefaultSubmissionContentLabel')"
                                 @click="openModal(defaultSubmissionModalRef)"
@@ -221,7 +222,7 @@
                                 @click="openModal(chartDisplayModalRef)"
                             />
                             <v-list-item
-                                v-if="canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
+                                v-if="isDigitalLibraryEnabled && canEdit && (isAdmin || isInstitutionalLibrarian || isHeadOfLibrary)"
                                 prepend-icon="mdi-bookshelf"
                                 :title="$t('updateDLDisplayConfigurationLabel')"
                                 @click="openModal(dlDisplayModalRef)"
@@ -684,6 +685,7 @@ import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfo
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import { UiButton } from '@/components/ui/button';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 export default defineComponent({
     name: "OrgUnitLanding",
@@ -790,6 +792,8 @@ export default defineComponent({
             loggedInUser, userInstitutionid,
             isLibrarianUser, canReviewDataQuality
         } = useUserRole();
+
+        const { isDigitalLibraryEnabled } = useCrisContextInformation();
 
         const hasMoreInstitutionActions = computed(() =>
             canEdit.value
@@ -1324,14 +1328,9 @@ export default defineComponent({
             externalIndicatorsModalRef, publicReviewModalRef, trustConfigModalRef,
             importSourceModalRef, defaultSubmissionModalRef, outputConfigModalRef,
             chartDisplayModalRef, dlDisplayModalRef, hasMoreInstitutionActions,
-
-            projects,
-            totalProjects,
-            projectsRef,
-            switchProjectsPage,
-            selectedProjectStatuses,
-            returnOnlyActiveProjects,
-            clearSortAndPerformProjectSearch,
+            isDigitalLibraryEnabled, projects, totalProjects, projectsRef,
+            switchProjectsPage, selectedProjectStatuses, returnOnlyActiveProjects,
+            clearSortAndPerformProjectSearch
         };
 }})
 

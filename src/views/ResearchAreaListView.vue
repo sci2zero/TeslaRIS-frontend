@@ -82,6 +82,11 @@ export default defineComponent({
                 researchAreas.value = response.data.content;
                 totalCountries.value = response.data.totalElements;
             })
+            .catch((error) => {
+                // Without this the table silently keeps rendering pre-refresh rows,
+                // which reads as "the table did not refresh".
+                console.error("Failed to fetch research areas:", error);
+            })
             .finally(() => {
                 loading.value = false;
             });

@@ -241,6 +241,9 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
+            <v-tab v-show="canReviewDataQuality" value="revisions">
+                {{ $t("revisionHistoryLabel") }}
+            </v-tab>
         </v-tabs>
 
         <v-tabs-window v-show="funding" v-model="currentTab">
@@ -290,6 +293,15 @@
                     />
                 </div>
             </v-tabs-window-item>
+
+            <v-tabs-window-item value="revisions">
+                <revision-history-table-component
+                    class="mt-5"
+                    :entity-type="EntityType.FUNDING"
+                    :entity-id="funding?.id"
+                    @restored="fetchFunding"
+                />
+            </v-tabs-window-item>
         </v-tabs-window>
         <toast v-model="snackbar" :message="snackbarMessage" />
     </v-container>
@@ -307,7 +319,9 @@ import FundingService from "@/services/project/FundingService";
 import type { Funding, FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
+import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
 import Toast from "@/components/core/Toast.vue";
+import { EntityType } from "@/models/MergeModel";
 import type { MultilingualContent } from "@/models/Common";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
@@ -352,7 +366,7 @@ const fundingApplications = ref<FundingApplicationIndex[]>([]);
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
-const { isAdmin } = useUserRole();
+const { isAdmin, canReviewDataQuality } = useUserRole();
 
 const uploadStore = useUploadStore();
 
