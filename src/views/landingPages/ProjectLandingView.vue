@@ -1,179 +1,101 @@
 <template>
-    <v-container id="project">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center edit-pen-container">
-                        <v-skeleton-loader
-                            :loading="!project"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="title" />
-                            <div>
-                                <generic-crud-modal
-                                    class="mb-6"
-                                    :form-component="AlternateNameForm"
-                                    :form-props="{ presetName: project?.name, presetNameAbbreviation: project?.nameAbbreviation }"
-                                    entity-name="Name"
-                                    is-update
-                                    is-section-update
-                                    :read-only="!canEdit"
-                                    @update="updateName"
-                                />
-                            </div>
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("projectLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <landing-page-layout
+        id="project"
+        v-model="currentTab"
+        :loading="!project"
+        :tab-number="8"
+    >
+        <template #header>
+            <entity-landing-header
+                :loading="!project"
+                :entity-label="$t('projectLabel')"
+                :badge="project ? getProjectStatusTitleFromValueAutoLocale(project.status) : ''"
+                :year="project?.dateFrom ? project.dateFrom.substring(0, 4) : ''"
+                :icon="icon"
+                :can-edit="canEdit"
+                :edit-label="$t('updateProjectLabel')"
+                :entity-type="EntityType.PROJECT"
+                :entity-id="project?.id"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="ProjectUpdateForm"
+                        :form-props="{ presetProject: project }"
+                        entity-name="Project"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="nameModalRef"
+                        hide-activator
+                        :form-component="AlternateNameForm"
+                        :form-props="{ presetName: project?.name, presetNameAbbreviation: project?.nameAbbreviation }"
+                        entity-name="Name"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateName"
+                    />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="title" />
+                </template>
 
-        <!-- Basic Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-project-icon">
-                    {{ icon }}
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="ProjectUpdateForm"
-                            :form-props="{ presetProject: project }"
-                            entity-name="Project"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
+                <template #meta>
+                    <landing-meta-item v-if="project?.dateFrom" :label="$t('dateFromLabel')" icon="mdi-calendar-start" tone="slate">
+                        {{ localiseDate(project.dateFrom) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="project?.dateTo" :label="$t('dateToLabel')" icon="mdi-calendar-end" tone="amber">
+                        {{ localiseDate(project.dateTo) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="project?.doi" label="DOI" abbrev="DOI" tone="blue">
+                        <identifier-link :identifier="project.doi" type="doi" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="project?.raid" :label="$t('raidLabel')" abbrev="RAiD" tone="indigo">
+                        <identifier-link :identifier="project.raid" type="raid" compact />
+                    </landing-meta-item>
+                    <landing-meta-item v-if="project?.nationalId" :label="$t('nationalIdLabel')" icon="mdi-identifier" tone="violet">
+                        {{ project.nationalId }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="principleInvestigators.length > 0" :label="$t('principleInvestigatorLabel')" icon="mdi-account" tone="emerald">
+                        <div v-for="investigator in principleInvestigators" :key="investigator.id">
+                            <localized-link v-if="investigator.personId" :to="'persons/' + investigator.personId" class="underline">
+                                {{ personName(investigator) }}
+                            </localized-link>
+                            <span v-else>
+                                {{ personName(investigator) }}
+                            </span>
                         </div>
-
-                        <basic-info-loader v-if="!project" />
-                        <div v-else class="info-columns">
-                            <div v-if="project.doi" class="info-item">
-                                <div>DOI:</div>
-                                <div class="response">
-                                    <identifier-link :identifier="project.doi" type="doi" />
-                                </div>
-                            </div>
-
-                            <div v-if="project.raid" class="info-item">
-                                <div>{{ $t("raidLabel") }}:</div>
-                                <div class="response">
-                                    <identifier-link :identifier="project.raid" type="raid" />
-                                </div>
-                            </div>
-
-                            <div v-if="project.nationalId" class="info-item">
-                                <div>{{ $t("nationalIdLabel") }}:</div>
-                                <div class="response">
-                                    {{ project.nationalId }}
-                                </div>
-                            </div>
-
-                            <div v-if="project.dateFrom" class="info-item">
-                                <div>{{ $t("dateFromLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(project.dateFrom) }}
-                                </div>
-                            </div>
-
-                            <div v-if="project.dateTo" class="info-item">
-                                <div>{{ $t("dateToLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(project.dateTo) }}
-                                </div>
-                            </div>
-
-                            <div v-if="principleInvestigators.length > 0" class="info-item">
-                                <div>{{ $t("principleInvestigatorLabel") }}:</div>
-                                <div class="response">
-                                    <div v-for="investigator in principleInvestigators" :key="investigator.id">
-                                        <localized-link v-if="investigator.personId" :to="'persons/' + investigator.personId">
-                                            {{ personName(investigator) }}
-                                        </localized-link>
-                                        <span v-else>
-                                            {{ personName(investigator) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="institutionCoordinators.length > 0" class="info-item">
-                                <div>{{ $t("institutionCoordinatorLabel") }}:</div>
-                                <div class="response">
-                                    <div v-for="coordinator in institutionCoordinators" :key="coordinator.id">
-                                        <localized-link
-                                            v-if="coordinator.organisationUnitId"
-                                            :to="'organisation-units/' + coordinator.organisationUnitId">
-                                            {{ institutionName(coordinator) }}
-                                        </localized-link>
-                                        <span v-else>
-                                            {{ institutionName(coordinator) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div>{{ $t("statusLabel") }}:</div>
-                                <div class="response">
-                                    {{ getProjectStatusTitleFromValueAutoLocale(project.status) }}
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div>{{ $t("collaborationTypeLabel") }}:</div>
-                                <div class="response">
-                                    {{ getProjectCollaborationTypeTitleFromValueAutoLocale(project.collaborationType) }}
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div>{{ $t("researchTypeLabel") }}:</div>
-                                <div class="response">
-                                    {{ getProjectResearchTypeTitleFromValueAutoLocale(project.researchType) }}
-                                </div>
-                            </div>
-
-                            <div v-if="project.costs" class="info-item">
-                                <div>{{ $t("costsLabel") }}:</div>
-                                <div class="response">
-                                    {{ formatAmount(project.costs.amount, locale) }} {{ project.costs.currencyCode }}
-                                </div>
-                            </div>
-
-                            <div v-if="project.uris && project.uris.length > 0" class="info-item">
-                                <div>{{ $t("urisLabel") }}:</div>
-                                <div class="response">
-                                    <div v-for="uri in project.uris" :key="uri">
-                                        <a :href="uri" target="_blank">{{ uri }}</a>
-                                    </div>
-                                </div>
-                            </div>
+                    </landing-meta-item>
+                    <landing-meta-item v-if="institutionCoordinators.length > 0" :label="$t('institutionCoordinatorLabel')" icon="mdi-domain" tone="emerald">
+                        <div v-for="coordinator in institutionCoordinators" :key="coordinator.id">
+                            <localized-link
+                                v-if="coordinator.organisationUnitId"
+                                :to="'organisation-units/' + coordinator.organisationUnitId"
+                                class="underline"
+                            >
+                                {{ institutionName(coordinator) }}
+                            </localized-link>
+                            <span v-else>
+                                {{ institutionName(coordinator) }}
+                            </span>
                         </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
+        </template>
 
-        <!-- Tabs -->
-        <tab-content-loader v-if="!project" layout="sections" />
-        <v-tabs
-            v-show="project"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-        >
+        <template #tabs>
+            <v-tab v-if="showOverviewTab" value="overview">
+                {{ $t("overviewLabel") }}
+            </v-tab>
             <v-tab value="team">
                 {{ $t("teamLabel") }}
             </v-tab>
@@ -198,101 +120,124 @@
             <v-tab v-show="canReviewDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window v-show="project" v-model="currentTab">
+        <template #default>
+            <v-tabs-window-item value="overview">
+                <landing-overview-tab
+                    v-show="showOverview"
+                    :description="project?.description"
+                    is-general-description
+                    :contributions="project?.persons ?? []"
+                    :contributors-label="$t('teamLabel')"
+                    contributors-tab="team"
+                    @has-content="onOverviewContent"
+                    @see-all="currentTab = $event"
+                />
+            </v-tabs-window-item>
+
             <v-tabs-window-item value="team">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-persons-table-component
-                            v-if="project?.id"
-                            :project-id="project.id"
-                            :persons="project.persons ?? []"
-                            :can-edit="canEdit"
-                            @refresh="fetchProject"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-persons-table-component
+                        v-if="project?.id"
+                        :project-id="project.id"
+                        :persons="project.persons ?? []"
+                        :can-edit="canEdit"
+                        @refresh="fetchProject"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="consortium">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-organisations-table-component
-                            v-if="project?.id"
-                            :project-id="project.id"
-                            :organisations="project.organisations ?? []"
-                            :can-edit="canEdit"
-                            @refresh="fetchProject"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-organisations-table-component
+                        v-if="project?.id"
+                        :project-id="project.id"
+                        :organisations="project.organisations ?? []"
+                        :can-edit="canEdit"
+                        @refresh="fetchProject"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="fundings">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-fundings-table-component
-                            v-if="project?.id"
-                            :project="project"
-                            :can-edit="canEdit"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-fundings-table-component
+                        v-if="project?.id"
+                        :project="project"
+                        :can-edit="canEdit"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="fundingApplications">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-funding-applications-table-component
-                            v-if="project?.id"
-                            :project-id="project.id"
-                            :can-edit="canEdit"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-funding-applications-table-component
+                        v-if="project?.id"
+                        :project-id="project.id"
+                        :can-edit="canEdit"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="documents">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-documents-table-component
-                            v-if="project?.id"
-                            :project-id="project.id"
-                            :can-edit="canEdit"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-documents-table-component
+                        v-if="project?.id"
+                        :project-id="project.id"
+                        :can-edit="canEdit"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="events">
-                <v-row class="mt-10">
-                    <v-col cols="12">
-                        <project-events-table-component
-                            v-if="project?.id"
-                            :project-id="project.id"
-                            :can-edit="canEdit"
-                        />
-                    </v-col>
-                </v-row>
+                <div class="mt-4">
+                    <project-events-table-component
+                        v-if="project?.id"
+                        :project-id="project.id"
+                        :can-edit="canEdit"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="additionalInfo">
-                <!-- Keywords -->
-                <keyword-list
+                <landing-additional-info-tab
                     :keywords="project?.keywords ? project.keywords : []"
-                    :can-edit="canEdit"
-                    @search-keyword="searchKeyword($event)"
-                    @update="updateKeywords"
-                />
-
-                <!-- Description -->
-                <description-section
-                    is-general-description
                     :description="project?.description"
                     :can-edit="canEdit"
-                    @update="updateDescription"
-                />
+                    is-general-description
+                    :show-remark="false"
+                    @search-keyword="searchKeyword"
+                    @update-keywords="updateKeywords"
+                    @update-description="updateDescription"
+                >
+                    <template #details>
+                        <landing-detail-field v-if="project" :label="$t('statusLabel')">
+                            {{ getProjectStatusTitleFromValueAutoLocale(project.status) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="project" :label="$t('collaborationTypeLabel')">
+                            {{ getProjectCollaborationTypeTitleFromValueAutoLocale(project.collaborationType) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="project" :label="$t('researchTypeLabel')">
+                            {{ getProjectResearchTypeTitleFromValueAutoLocale(project.researchType) }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="project?.costs" :label="$t('costsLabel')">
+                            {{ formatAmount(project.costs.amount, locale) }} {{ project.costs.currencyCode }}
+                        </landing-detail-field>
+                        <landing-detail-field v-if="project?.uris && project.uris.length > 0" :label="$t('urisLabel')">
+                            <a
+                                v-for="uri in project.uris"
+                                :key="uri"
+                                :href="uri"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="underline block break-all"
+                            >
+                                {{ uri }}
+                            </a>
+                        </landing-detail-field>
+                    </template>
+                </landing-additional-info-tab>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="revisions">
@@ -303,9 +248,12 @@
                     @restored="fetchProject"
                 />
             </v-tabs-window-item>
-        </v-tabs-window>
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+        </template>
+
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script setup lang="ts">
@@ -313,8 +261,6 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
-import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
-import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
@@ -324,8 +270,6 @@ import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import { getProjectStatusTitleFromValueAutoLocale } from "@/i18n/projectStatus";
 import { getProjectCollaborationTypeTitleFromValueAutoLocale } from "@/i18n/projectCollaborationType";
 import { getProjectResearchTypeTitleFromValueAutoLocale } from "@/i18n/projectResearchType";
-import KeywordList from "@/components/core/KeywordList.vue";
-import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
@@ -343,6 +287,13 @@ import { EntityType } from "@/models/MergeModel";
 import { useUserRole } from "@/composables/useUserRole";
 import type { MultilingualContent } from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
+import EntityLandingHeader from "@/components/landing/EntityLandingHeader.vue";
+import LandingMetaItem from "@/components/landing/LandingMetaItem.vue";
+import LandingDetailField from "@/components/landing/LandingDetailField.vue";
+import LandingAdditionalInfoTab from "@/components/landing/LandingAdditionalInfoTab.vue";
+import LandingOverviewTab from "@/components/landing/LandingOverviewTab.vue";
+import LandingPageLayout from "@/components/landing/LandingPageLayout.vue";
+import { useLandingOverview } from "@/composables/useLandingOverview";
 
 const route = useRoute();
 const router = useRouter();
@@ -350,7 +301,12 @@ const i18n = useI18n();
 const { locale } = useI18n();
 
 const project = ref<Project>();
-const currentTab = ref("team");
+const currentTab = ref("overview");
+const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+    project,
+    currentTab,
+    "team",
+);
 const icon = ref("mdi-folder-star");
 
 const canEdit = ref(false);
@@ -359,6 +315,15 @@ const { canReviewDataQuality } = useUserRole();
 
 const snackbar = ref(false);
 const snackbarMessage = ref("");
+
+const updateModalRef = ref<{ dialog: boolean } | null>(null);
+const nameModalRef = ref<{ dialog: boolean } | null>(null);
+
+const openModal = (modal: { dialog: boolean } | null) => {
+    if (modal) {
+        modal.dialog = true;
+    }
+};
 
 const title = computed(() => {
     const name = returnCurrentLocaleContent(project.value?.name) ?? "";
@@ -457,34 +422,3 @@ const performUpdate = (reload: boolean) => {
     });
 };
 </script>
-
-<style scoped>
-#project .large-project-icon {
-    font-size: 10em;
-}
-
-#project .response {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-#project .info-columns {
-    columns: 2;
-    column-gap: 40px;
-}
-
-#project .info-item {
-    break-inside: avoid;
-}
-
-@media (max-width: 959px) {
-    #project .info-columns {
-        columns: 1;
-    }
-}
-
-.edit-pen-container {
-    position: relative;
-}
-</style>

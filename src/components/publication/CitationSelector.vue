@@ -1,9 +1,10 @@
 <template>
     <div :class="{ 'contents': hideActivator }">
-        <v-dialog
+        <scrollable-dialog
             v-model="dialog"
-            max-width="640"
-            @keydown.esc="dialog = false"
+            :max-width="640"
+            body-class="px-5 py-4"
+            @escape="dialog = false"
         >
             <template v-if="!hideActivator" #activator="{ props: activatorProps }">
                 <UiButton
@@ -17,8 +18,8 @@
                 </UiButton>
             </template>
 
-            <div class="flex max-h-[calc(100dvh-3rem)] min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm">
-                <div class="flex shrink-0 items-start gap-3 border-b border-slate-100 px-5 pt-5 pb-4">
+            <template #header>
+                <div class="flex items-start gap-3 px-5 pt-5 pb-4">
                     <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600">
                         <span class="mdi mdi-format-quote-close text-xl" aria-hidden="true"></span>
                     </div>
@@ -40,12 +41,12 @@
                         <span class="mdi mdi-close text-lg" aria-hidden="true"></span>
                     </UiButton>
                 </div>
+            </template>
 
-                <div class="min-h-0 overflow-y-auto px-5 py-4">
-                    <citation-formats :citation="citation" />
-                </div>
+            <citation-formats :citation="citation" />
 
-                <div class="flex shrink-0 justify-end border-t border-slate-100 px-5 py-4">
+            <template #footer>
+                <div class="flex justify-end px-5 py-4">
                     <UiButton
                         variant="outline"
                         size="sm"
@@ -54,8 +55,8 @@
                         {{ $t("closeLabel") }}
                     </UiButton>
                 </div>
-            </div>
-        </v-dialog>
+            </template>
+        </scrollable-dialog>
     </div>
 </template>
 
@@ -65,6 +66,7 @@ import type { CitationResponse } from "@/models/PublicationModel";
 import DocumentPublicationService from "@/services/DocumentPublicationService";
 import CitationFormats from "./CitationFormats.vue";
 import { UiButton } from "@/components/ui/button";
+import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
 
 defineOptions({
     name: "CitationSelector",

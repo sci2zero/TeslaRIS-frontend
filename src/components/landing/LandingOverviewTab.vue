@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, useSlots, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import RichTextEditor from "@/components/core/RichTextEditor.vue";
 import Wordcloud from "@/components/core/Wordcloud.vue";
@@ -117,16 +117,19 @@ const props = withDefaults(defineProps<{
     descriptionTab: "additionalInfo",
 });
 
-defineEmits<{
+const emit = defineEmits<{
     "see-all": [tab: string];
+    "has-content": [state: { visible: boolean; settled: boolean }];
 }>();
+
+const slots = useSlots();
 
 const { t, locale } = useI18n();
 const descriptionDisplay = ref("");
 const isWordcloudVisible = ref(false);
 const isWordcloudReady = ref(false);
 const isWordcloudPending = computed(() =>
-    Boolean(props.forDocumentId && props.documentType) && !isWordcloudReady.value
+    Boolean(props.documentType) && !isWordcloudReady.value
 );
 
 const onWordcloudVisible = (visible: boolean) => {
@@ -172,4 +175,19 @@ const matchingContributors = computed(() => {
 const previewContributors = computed(() =>
     matchingContributors.value.slice(0, props.previewCount)
 );
+
+const hasExtraContent = computed(() =>
+    hasDescription.value || isWordcloudVisible.value || Boolean(slots.default)
+);
+
+const contentSettled = computed(() =>
+    !isWordcloudPending.value || hasExtraContent.value
+);
+
+watch([hasExtraContent, contentSettled], () => {
+    emit("has-content", {
+        visible: hasExtraContent.value,
+        settled: contentSettled.value,
+    });
+}, { immediate: true });
 </script>

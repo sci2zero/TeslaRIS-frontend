@@ -84,7 +84,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -116,6 +116,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="intangibleProduct?.description"
                     :contributions="intangibleProduct?.contributions"
                     :contribution-types="['AUTHOR']"
@@ -267,6 +269,7 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
@@ -319,6 +322,11 @@ export default defineComponent({
         const router = useRouter();
 
         const intangibleProduct = ref<IntangibleProduct>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            intangibleProduct,
+            currentTab,
+            "contributions",
+        );
         const publisher = ref<Publisher>();
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
@@ -513,7 +521,7 @@ export default defineComponent({
 
         return {
             intangibleProduct, publisher, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
-            returnCurrentLocaleContent, currentTab, canClassify,
+            returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, canClassify,
             languageTagMap, searchKeyword, canEdit,
             updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,

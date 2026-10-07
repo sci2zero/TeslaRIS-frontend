@@ -120,7 +120,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="publications">
@@ -152,6 +152,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="proceedings?.description"
                     :contributions="proceedings?.contributions"
                     :contribution-types="['EDITOR']"
@@ -318,6 +320,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
@@ -356,6 +359,11 @@ export default defineComponent({
         const canAssessDataQuality = ref(false);
 
         const proceedings = ref<Proceedings>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            proceedings,
+            currentTab,
+            "publications",
+        );
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
         
         const publicationSeries = ref<PublicationSeries>();
@@ -565,7 +573,7 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if (currentTab.value !== "dataQuality") {
+            if (currentTab.value !== "dataQuality" && showOverview.value) {
                 currentTab.value = "overview";
             }
         };
@@ -596,7 +604,7 @@ export default defineComponent({
 
         return {
             proceedings, fetchIndicators, PublicationType, canAssessDataQuality, canReviewDataQuality,
-            publications, currentTab, createIndicator,
+            publications, currentTab, showOverview, showOverviewTab, onOverviewContent, createIndicator,
             totalPublications, switchPage, ApplicableEntityType,
             returnCurrentLocaleContent, localiseFlexibleDate, fetchIdentifiers,
             languageMap, publicationSeriesType, displayConfiguration,

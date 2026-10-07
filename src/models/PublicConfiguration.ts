@@ -8,6 +8,8 @@ export interface PublicBranding {
     description: MultilingualContent[];
     logoUrl: string | null;
     backgroundUrl: string | null;
+    chromeTheme?: "light" | "dark" | null;
+    heroTheme?: "light" | "dark" | null;
 }
 
 export interface PublicConfiguration {

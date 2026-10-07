@@ -1,178 +1,136 @@
 <template>
-    <v-form v-model="isFormInputValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameRef"
-                            v-model="name"
-                            :rules="requiredFieldRules"
-                            :label="$t('nameLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="abbreviationRef"
-                            v-model="nameAbbreviation"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
-                <div v-if="!serialEvent" class="mt-3">
-                    <h3>{{ $t("tookPlaceLabel") }}</h3>
-                    <v-row>
-                        <v-col v-if="timePeriodInput" cols="3">
-                            <date-picker
-                                ref="fromRef"
-                                v-model="dateFrom"
-                                :label="$t('fromLabel') + '*'"
-                                color="primary"
-                                required
-                            />
-                        </v-col>
-                        <v-col v-if="timePeriodInput" cols="3">
-                            <date-picker
-                                ref="toRef"
-                                v-model="dateTo"
-                                :label="$t('toLabel') + '*'"
-                                color="primary"
-                                required
-                            />
-                        </v-col>
-                        <v-col v-if="!timePeriodInput" cols="6">
-                            <v-text-field
-                                v-model="eventYear" type="number" :min="1950" :max="2030"
-                                :label="$t('eventYearLabel') + '*'" :rules="requiredFieldRules"
-                            />
-                        </v-col>
-                        <v-col>
-                            <v-btn color="blue darken-1" class="mt-2" compact @click="timePeriodInput = !timePeriodInput">
-                                {{ timePeriodInput ? $t("dontKnowExactDateLabel") : $t("knowExactDateLabel") }}
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                    <p v-show="dateRangeError" class="mb-2 text-red">
-                        {{ dateRangeFormatError }}
-                    </p>
+    <v-form v-model="isFormInputValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-school"
+            :title="$t('courseLabel')"
+        >
+            <multilingual-text-input
+                ref="nameRef"
+                v-model="name"
+                :rules="requiredFieldRules"
+                :label="$t('nameLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="abbreviationRef"
+                v-model="nameAbbreviation"
+                :label="$t('nameAbbreviationLabel')"
+            />
+            <div v-if="!serialEvent" class="mt-3 flex flex-col gap-4">
+                <p class="text-sm font-semibold text-slate-800">{{ $t("tookPlaceLabel") }}</p>
+                <choice-cards
+                    :model-value="timePeriodInput ? 'known' : 'unknown'"
+                    :options="[
+                        { value: 'known', title: $t('knowExactDateLabel'), description: $t('knowExactDateHint') },
+                        { value: 'unknown', title: $t('dontKnowExactDateLabel'), description: $t('dontKnowExactDateHint') },
+                    ]"
+                    @update:model-value="timePeriodInput = $event === 'known'"
+                />
+                <div v-if="timePeriodInput" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <date-picker
+                        ref="fromRef"
+                        v-model="dateFrom"
+                        :label="$t('fromLabel') + '*'"
+                        color="primary"
+                        required
+                    />
+                    <date-picker
+                        ref="toRef"
+                        v-model="dateTo"
+                        :label="$t('toLabel') + '*'"
+                        color="primary"
+                        required
+                    />
                 </div>
-                <v-row v-if="canAddSerialEvents && !inModal" class="serial-event">
-                    <v-checkbox v-model="serialEvent" :label="$t('serialEventLabel')" />
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedCountry"
-                            hide-details="auto"
-                            :items="countries"
-                            :label="$t('countryLabel')"
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-                <v-btn color="blue darken-1" class="mt-3" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="placeRef"
-                                v-model="place"
-                                :label="$t('placeLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                :is-area="true"
-                                :label="$t('abstractLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                :label="$t('keywordsLabel')"
-                                is-area
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="courseLevel"
-                                :label="$t('courseLevelLabel')"
-                            />
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="courseCode"
-                                :label="$t('courseCodeLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="!serialEvent">
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="numberOfCredits"
-                                :label="$t('numberOfCreditsLabel')"
-                            />
-                        </v-col>
-                        <v-col cols="4">
-                            <v-text-field
-                                v-model="academicYear"
-                                :label="$t('academicYearLabel')"
-                            />
-                        </v-col>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="numberOfStudents"
-                                type="number"
-                                :label="$t('numberOfStudentsLabel')"
-                                :placeholder="$t('numberOfStudentsLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="!serialEvent">
-                        <v-col>
-                            <multilingual-text-input
-                                ref="groupNameRef"
-                                v-model="groupName"
-                                :label="$t('groupNameLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="displayOrganizerRef"
-                                v-model="displayOrganizer"
-                                :label="$t('organizerLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
+                <ui-input
+                    v-else
+                    v-model="eventYear"
+                    type="number"
+                    :min="1950"
+                    :max="2030"
+                    :label="$t('eventYearLabel') + '*'"
+                    :rules="requiredFieldRules"
+                />
+                <p v-show="dateRangeError" class="text-sm text-red">
+                    {{ dateRangeFormatError }}
+                </p>
+            </div>
+            <ui-checkbox v-if="canAddSerialEvents && !inModal" v-model="serialEvent" :label="$t('serialEventLabel')" />
+            <ui-input
+                control="select"
+                v-model="selectedCountry"
+                hide-details="auto"
+                :items="countries"
+                :label="$t('countryLabel')"
+                return-object
+            />
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="placeRef"
+                    v-model="place"
+                    :label="$t('placeLabel')"
+                />
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    :is-area="true"
+                    :label="$t('abstractLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    :label="$t('keywordsLabel')"
+                    is-area
+                />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input
+                        v-model="courseLevel"
+                        :label="$t('courseLevelLabel')"
+                    />
+                    <ui-input
+                        v-model="courseCode"
+                        :label="$t('courseCodeLabel')"
+                    />
+                </div>
+                <div v-if="!serialEvent" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <ui-input
+                        v-model="numberOfCredits"
+                        :label="$t('numberOfCreditsLabel')"
+                    />
+                    <ui-input
+                        v-model="academicYear"
+                        :label="$t('academicYearLabel')"
+                    />
+                    <ui-input
+                        v-model="numberOfStudents"
+                        type="number"
+                        :label="$t('numberOfStudentsLabel')"
+                        :placeholder="$t('numberOfStudentsLabel')"
+                    />
+                </div>
+                <multilingual-text-input
+                    v-if="!serialEvent"
+                    ref="groupNameRef"
+                    v-model="groupName"
+                    :label="$t('groupNameLabel')"
+                />
+                <multilingual-text-input
+                    ref="displayOrganizerRef"
+                    v-model="displayOrganizer"
+                    :label="$t('organizerLabel')"
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+            </template>
+        </form-section>
+
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     
     <toast v-model="snackbar" :message="$t('savedMessage')" />
@@ -195,6 +153,11 @@ import CountryService from '@/services/CountryService';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import UriInput from '../core/UriInput.vue';
 import Toast from '../core/Toast.vue';
+import UiInput from '@/components/ui/input/Input.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
+import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 import { useUserRole } from '@/composables/useUserRole';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { detectLanguage } from '@/utils/LanguageDetector.js';
@@ -202,7 +165,7 @@ import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 export default defineComponent({
     name: "CourseSubmissionForm",
-    components: { MultilingualTextInput, DatePicker, UriInput, Toast },
+    components: {MultilingualTextInput, DatePicker, UriInput, Toast, UiInput, UiCheckbox, ChoiceCards, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,

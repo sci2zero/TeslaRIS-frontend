@@ -1,127 +1,85 @@
 <template>
-    <div>
-        <v-row>
-            <v-col cols="5">
-                <ui-input
-                    v-model="localHandleId"
-                    label="Handle ID"
-                    :rules="handleIdValidationRules"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-            <v-col cols="5">
-                <ui-input
-                    v-model="localArxivId"
-                    label="ArXiv ID"
-                    :rules="arxivIdValidationRules"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-        
-        <v-row>
-            <v-col cols="5">
-                <ui-input
-                    v-model="localPubmedId"
-                    label="PubMed ID"
-                    :rules="pubmedIdValidationRules"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-            <v-col cols="5">
-                <ui-input
-                    v-model="localSsrnId"
-                    label="SSRN ID"
-                    :rules="ssrnIdValidationRules"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="10">
-                <ui-input
-                    v-model="localNationalId"
-                    :label="$t('nationalIdLabel')"
-                    :rules="documentNationalIdValidationRules"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="cityRef"
-                    v-model="localCity"
-                    :label="$t('cityLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-        
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="geoSpaceDescriptionRef"
-                    v-model="localGeoSpaceDescription"
-                    :label="$t('geoSpaceDescriptionLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-        
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="chronologicalSpaceDescriptionRef"
-                    v-model="localChronologicalSpaceDescription"
-                    :label="$t('chronologicalSpaceDescriptionLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="editionRef"
-                    v-model="localEdition"
-                    :label="$t('editionLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col cols="5">
-                <ui-checkbox
-                    v-model="localPeerReviewed"
-                    :label="$t('peerReviewedLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-            <v-col cols="5">
-                <ui-checkbox
-                    v-model="localOpenAccess"
-                    :label="$t('isOpenAccessLabel')"
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col>
-                <ui-input control="select"
-                    v-model="localPublicationStatus"
-                    :items="publicationStatuses"
-                    :label="$t('publicationStatusLabel')"
-                    item-title="title"
-                    item-value="value"
-                    return-object
-                    @update:model-value="emitUpdate"
-                />
-            </v-col>
-        </v-row>
+    <div class="flex flex-col gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <ui-input
+                v-model="localHandleId"
+                label="Handle ID"
+                :rules="handleIdValidationRules"
+                @update:model-value="emitUpdate"
+            />
+            <ui-input
+                v-model="localArxivId"
+                label="ArXiv ID"
+                :rules="arxivIdValidationRules"
+                @update:model-value="emitUpdate"
+            />
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <ui-input
+                v-model="localPubmedId"
+                label="PubMed ID"
+                :rules="pubmedIdValidationRules"
+                @update:model-value="emitUpdate"
+            />
+            <ui-input
+                v-model="localSsrnId"
+                label="SSRN ID"
+                :rules="ssrnIdValidationRules"
+                @update:model-value="emitUpdate"
+            />
+        </div>
+        <ui-input
+            v-model="localNationalId"
+            :label="$t('nationalIdLabel')"
+            :rules="documentNationalIdValidationRules"
+            @update:model-value="emitUpdate"
+        />
+        <multilingual-text-input
+            ref="cityRef"
+            v-model="localCity"
+            :label="$t('cityLabel')"
+            @update:model-value="emitUpdate"
+        />
+        <multilingual-text-input
+            ref="geoSpaceDescriptionRef"
+            v-model="localGeoSpaceDescription"
+            :label="$t('geoSpaceDescriptionLabel')"
+            @update:model-value="emitUpdate"
+        />
+        <multilingual-text-input
+            ref="chronologicalSpaceDescriptionRef"
+            v-model="localChronologicalSpaceDescription"
+            :label="$t('chronologicalSpaceDescriptionLabel')"
+            @update:model-value="emitUpdate"
+        />
+        <multilingual-text-input
+            ref="editionRef"
+            v-model="localEdition"
+            :label="$t('editionLabel')"
+            @update:model-value="emitUpdate"
+        />
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <ui-checkbox
+                v-model="localPeerReviewed"
+                :label="$t('peerReviewedLabel')"
+                @update:model-value="emitUpdate"
+            />
+            <ui-checkbox
+                v-model="localOpenAccess"
+                :label="$t('isOpenAccessLabel')"
+                @update:model-value="emitUpdate"
+            />
+        </div>
+        <ui-input
+            v-model="localPublicationStatus"
+            control="select"
+            :items="publicationStatuses"
+            :label="$t('publicationStatusLabel')"
+            item-title="title"
+            item-value="value"
+            return-object
+            @update:model-value="emitUpdate"
+        />
     </div>
 </template>
 

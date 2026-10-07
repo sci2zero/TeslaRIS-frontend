@@ -1,77 +1,110 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="titleRef" v-model="title" :rules="requiredFieldRules" :label="$t('titleLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)" />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="descriptionRef" v-model="description" :rules="requiredFieldRules" :label="$t('descriptionLabel') + '*'"
-                    :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)" is-area />
-            </v-col>
-        </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-text-box-outline"
+            :title="$t('brandingIdentityLabel')"
+            :description="$t('brandingIdentityHint')"
+        >
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+                :initial-value="toMultilingualTextInput(presetInformation?.title, languageTags)"
+            />
+            <multilingual-text-input
+                ref="descriptionRef"
+                v-model="description"
+                :rules="requiredFieldRules"
+                :label="$t('descriptionLabel') + '*'"
+                :initial-value="toMultilingualTextInput(presetInformation?.description, languageTags)"
+                is-area
+            />
+        </form-section>
 
-        <v-row>
-            <v-col cols="12" md="6">
-                <h3 class="text-subtitle-1 font-weight-medium mb-3">
-                    {{ $t("brandingLogoLabel") }}
-                </h3>
-                <v-file-input
+        <form-section
+            icon="mdi-image-outline"
+            :title="$t('brandingAppearanceLabel')"
+            :description="$t('brandingAppearanceHint')"
+        >
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <ui-file-input
                     v-model="logoFile"
                     :label="$t('brandingLogoLabel')"
                     accept="image/png,image/jpeg"
-                    prepend-icon="mdi-image"
-                    show-size
-                    clearable
-                ></v-file-input>
-                <img
-                    v-if="logoPreviewUrl"
-                    :src="logoPreviewUrl"
-                    alt=""
-                    class="branding-preview-image mb-3"
+                    :preview-url="logoPreviewUrl"
+                    :show-remove="hasExistingLogo && !removeLogo && !logoFile"
+                    :remove-label="$t('removeLogoLabel')"
+                    @remove="removeLogo = true; logoFile = null"
                 />
-                <v-btn
-                    v-if="hasExistingLogo && !removeLogo"
-                    density="compact"
-                    variant="outlined"
-                    @click="removeLogo = true; logoFile = null">
-                    {{ $t("removeLogoLabel") }}
-                </v-btn>
-            </v-col>
-            <v-col cols="12" md="6">
-                <h3 class="text-subtitle-1 font-weight-medium mb-3">
-                    {{ $t("brandingBackgroundLabel") }}
-                </h3>
-                <v-file-input
+                <ui-file-input
                     v-model="backgroundFile"
                     :label="$t('brandingBackgroundLabel')"
                     accept="image/png,image/jpeg"
-                    prepend-icon="mdi-image-area"
-                    show-size
-                    clearable
-                ></v-file-input>
-                <img
-                    v-if="backgroundPreviewUrl"
-                    :src="backgroundPreviewUrl"
-                    alt=""
-                    class="branding-preview-image branding-preview-image--wide mb-3"
+                    :preview-url="backgroundPreviewUrl"
+                    preview-wide
+                    :show-remove="hasExistingBackground && !removeBackground && !backgroundFile"
+                    :remove-label="$t('removeBackgroundLabel')"
+                    @remove="removeBackground = true; backgroundFile = null"
                 />
-                <v-btn
-                    v-if="hasExistingBackground && !removeBackground"
-                    density="compact"
-                    variant="outlined"
-                    @click="removeBackground = true; backgroundFile = null">
-                    {{ $t("removeBackgroundLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
+            </div>
+        </form-section>
 
-        <v-row>
-            <v-col>
+        <form-section
+            icon="mdi-brightness-6"
+            :title="$t('homeThemeLabel')"
+            :description="$t('brandingThemeHint')"
+        >
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input
+                    v-model="selectedChromeTheme"
+                    control="select"
+                    :items="themeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :label="$t('chromeThemeLabel')"
+                />
+                <ui-input
+                    v-model="selectedHeroTheme"
+                    control="select"
+                    :items="themeOptions"
+                    item-title="title"
+                    item-value="value"
+                    :label="$t('heroThemeLabel')"
+                />
+            </div>
+        </form-section>
+
+        <form-section
+            icon="mdi-card-account-phone-outline"
+            :title="$t('contactLabel')"
+            :description="$t('brandingContactHint')"
+        >
+            <multilingual-text-input
+                ref="streetAndNumberRef"
+                v-model="streetAndNumber"
+                :label="$t('streetAndNumberLabel')"
+                :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.streetAndNumber, languageTags)"
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <multilingual-text-input
+                    ref="cityRef"
+                    v-model="city"
+                    :label="$t('cityLabel')"
+                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.city, languageTags)"
+                />
+                <ui-input
+                    v-model="postalNumber"
+                    :label="$t('postalNumberLabel')"
+                />
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <multilingual-text-input
+                    ref="stateRef"
+                    v-model="state"
+                    :label="$t('stateLabel')"
+                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.state, languageTags)"
+                />
                 <ui-input
                     v-model="selectedCountry"
                     control="select"
@@ -79,79 +112,50 @@
                     :label="$t('countryLabel')"
                     return-object
                 />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="cityRef"
-                    v-model="city"
-                    :label="$t('cityLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.city, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="streetAndNumberRef"
-                    v-model="streetAndNumber"
-                    :label="$t('streetAndNumberLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.streetAndNumber, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <multilingual-text-input
-                    ref="stateRef"
-                    v-model="state"
-                    :label="$t('stateLabel')"
-                    :initial-value="toMultilingualTextInput(presetInformation?.postalAddress?.state, languageTags)"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <ui-input
-                    v-model="postalNumber"
-                    :label="$t('postalNumberLabel')"
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <ui-input
-                    v-model="phoneNumber"
-                    :label="$t('phoneNumberLabel')"
-                />
-            </v-col>
-        </v-row>
+            </div>
+            <ui-input
+                v-model="phoneNumber"
+                class="max-w-sm"
+                :label="$t('phoneNumberLabel')"
+            />
+        </form-section>
 
-        <v-row>
-            <v-col cols="12">
-                <open-layers-map
-                    ref="mapRef"
-                    :read-only="false"
-                    :init-address="presetInformation?.location?.address"
-                    :init-coordinates="[presetInformation?.location?.longitude as number, presetInformation?.location?.latitude as number]" />
-            </v-col>
-        </v-row>
+        <form-section
+            icon="mdi-map-marker-outline"
+            :title="$t('locationLabel')"
+            :description="$t('brandingLocationHint')"
+        >
+            <ui-input
+                v-model="mapAddress"
+                :label="$t('addressLabel')"
+                :placeholder="$t('addressLabel')"
+            />
+            <div v-if="mapEmbedUrl" class="overflow-hidden rounded-xl border border-slate-200">
+                <iframe
+                    class="h-80 w-full border-0"
+                    :src="mapEmbedUrl"
+                    :title="$t('locationLabel')"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen
+                ></iframe>
+            </div>
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="required-fields-message">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, type PropType, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
-import OpenLayersMap from '@/components/core/OpenLayersMap.vue';
 import UiInput from '@/components/ui/input/Input.vue';
+import UiFileInput from '@/components/ui/file-input/FileInput.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { type BrandingInformation, type Country } from '@/models/Common';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
@@ -159,6 +163,7 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import CountryService from '@/services/CountryService';
 import lodash from 'lodash';
 import type { AxiosResponse } from 'axios';
+import { normalizeHomeTheme, useHomeTheme, type HomeTheme } from '@/composables/useHomeTheme';
 
 
 export interface BrandingFormPayload {
@@ -171,18 +176,13 @@ export interface BrandingFormPayload {
     location: BrandingInformation["location"];
     phoneNumber?: string;
     postalAddress: BrandingInformation["postalAddress"];
-}
-
-function toFile(value: File | File[] | null | undefined): File | null {
-    if (!value) {
-        return null;
-    }
-    return Array.isArray(value) ? value[0] ?? null : value;
+    chromeTheme: HomeTheme;
+    heroTheme: HomeTheme;
 }
 
 export default defineComponent({
     name: "BrandingInformationForm",
-    components: { MultilingualTextInput, OpenLayersMap, UiInput },
+    components: { MultilingualTextInput, UiInput, UiFileInput, FormSection },
     props: {
         presetInformation: {
             type: Object as PropType<BrandingInformation | undefined>,
@@ -216,12 +216,46 @@ export default defineComponent({
         const cityRef = ref<typeof MultilingualTextInput>();
         const streetAndNumberRef = ref<typeof MultilingualTextInput>();
         const stateRef = ref<typeof MultilingualTextInput>();
-        const mapRef = ref<typeof OpenLayersMap>();
+        const mapAddress = ref(props.presetInformation?.location?.address ?? "");
+        const latitude = ref<number | undefined>(props.presetInformation?.location?.latitude);
+        const longitude = ref<number | undefined>(props.presetInformation?.location?.longitude);
+        const embedQuery = ref(mapAddress.value);
+
+        const i18n = useI18n();
+        const { chromeTheme, heroTheme } = useHomeTheme();
+        const asTheme = (value: unknown, fallback: HomeTheme): HomeTheme =>
+            normalizeHomeTheme(value) ?? fallback;
+        const selectedChromeTheme = ref<HomeTheme>(
+            asTheme(props.presetInformation?.chromeTheme, chromeTheme.value)
+        );
+        const selectedHeroTheme = ref<HomeTheme>(
+            asTheme(props.presetInformation?.heroTheme, heroTheme.value)
+        );
+        const themeOptions = computed(() => [
+            { title: i18n.t("lightThemeLabel"), value: "light" },
+            { title: i18n.t("darkThemeLabel"), value: "dark" },
+        ]);
+        const mapEmbedUrl = computed(() => {
+            const query = embedQuery.value.trim()
+                || (latitude.value && longitude.value ? `${latitude.value},${longitude.value}` : "");
+            if (!query) {
+                return "";
+            }
+
+            const params = new URLSearchParams({
+                q: query,
+                z: "16",
+                hl: i18n.locale.value,
+                output: "embed",
+            });
+
+            return `https://maps.google.com/maps?${params.toString()}`;
+        });
 
         const title = ref<any>([]);
         const description = ref<any>([]);
-        const logoFile = ref<File | File[] | null>(null);
-        const backgroundFile = ref<File | File[] | null>(null);
+        const logoFile = ref<File | null>(null);
+        const backgroundFile = ref<File | null>(null);
         const removeLogo = ref(false);
         const removeBackground = ref(false);
         const city = ref<any>([]);
@@ -235,47 +269,20 @@ export default defineComponent({
 
         const { requiredFieldRules } = useValidationUtils();
 
-        const selectedLogoFile = computed(() => toFile(logoFile.value));
-        const selectedBackgroundFile = computed(() => toFile(backgroundFile.value));
-
-        const logoObjectUrl = ref<string | null>(null);
-        const backgroundObjectUrl = ref<string | null>(null);
-
-        watch(selectedLogoFile, (file) => {
-            if (logoObjectUrl.value) {
-                URL.revokeObjectURL(logoObjectUrl.value);
-                logoObjectUrl.value = null;
-            }
+        watch(logoFile, (file) => {
             if (file) {
-                logoObjectUrl.value = URL.createObjectURL(file);
                 removeLogo.value = false;
             }
         });
 
-        watch(selectedBackgroundFile, (file) => {
-            if (backgroundObjectUrl.value) {
-                URL.revokeObjectURL(backgroundObjectUrl.value);
-                backgroundObjectUrl.value = null;
-            }
+        watch(backgroundFile, (file) => {
             if (file) {
-                backgroundObjectUrl.value = URL.createObjectURL(file);
                 removeBackground.value = false;
             }
         });
 
-        const logoPreviewUrl = computed(() => {
-            if (removeLogo.value && !selectedLogoFile.value) {
-                return "";
-            }
-            return logoObjectUrl.value || props.logoUrl;
-        });
-
-        const backgroundPreviewUrl = computed(() => {
-            if (removeBackground.value && !selectedBackgroundFile.value) {
-                return "";
-            }
-            return backgroundObjectUrl.value || props.backgroundUrl;
-        });
+        const logoPreviewUrl = computed(() => removeLogo.value ? "" : props.logoUrl);
+        const backgroundPreviewUrl = computed(() => removeBackground.value ? "" : props.backgroundUrl);
 
         const fetchCountries = () => {
             CountryService.readAllCountries().then((response: AxiosResponse<Country[]>) => {
@@ -305,7 +312,24 @@ export default defineComponent({
 
         onMounted(fetchCountries);
 
-        watch(() => props.presetInformation, setAddressInfo);
+        const skipLocationWatch = ref(false);
+
+        watch(() => props.presetInformation, (preset) => {
+            setAddressInfo();
+            selectedChromeTheme.value = asTheme(preset?.chromeTheme, chromeTheme.value);
+            selectedHeroTheme.value = asTheme(preset?.heroTheme, heroTheme.value);
+
+            const presetLocation = preset?.location;
+            if (!presetLocation || mapAddress.value) {
+                return;
+            }
+
+            skipLocationWatch.value = true;
+            mapAddress.value = presetLocation.address ?? "";
+            embedQuery.value = mapAddress.value;
+            latitude.value = presetLocation.latitude;
+            longitude.value = presetLocation.longitude;
+        });
 
         const composeAddress = () => {
             const cityLine = [postalNumber.value, returnCurrentLocaleContent(city.value)]
@@ -324,12 +348,26 @@ export default defineComponent({
         // on the map survives further edits to the postal fields.
         const lastDerivedAddress = ref("");
 
-        const syncAddressFromPostalFields = lodash.debounce(() => {
-            if (!mapRef.value) {
+        const geocodeAddress = lodash.debounce((address: string) => {
+            if (!address.trim()) {
                 return;
             }
 
-            const currentAddress = mapRef.value.address ?? "";
+            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const result = data[0];
+                    if (!result) {
+                        return;
+                    }
+
+                    latitude.value = parseFloat(result.lat);
+                    longitude.value = parseFloat(result.lon);
+                });
+        }, 800);
+
+        const syncAddressFromPostalFields = lodash.debounce(() => {
+            const currentAddress = mapAddress.value ?? "";
             if (currentAddress && currentAddress !== lastDerivedAddress.value) {
                 return;
             }
@@ -340,9 +378,23 @@ export default defineComponent({
             }
 
             lastDerivedAddress.value = derivedAddress;
-            mapRef.value.address = derivedAddress;
-            mapRef.value.onAddressChange();
+            mapAddress.value = derivedAddress;
         }, 800);
+
+        const updateEmbedQuery = lodash.debounce((address: string) => {
+            embedQuery.value = address;
+        }, 600);
+
+        watch(mapAddress, (address) => {
+            if (skipLocationWatch.value) {
+                skipLocationWatch.value = false;
+                return;
+            }
+
+            const nextAddress = address ?? "";
+            updateEmbedQuery(nextAddress);
+            geocodeAddress(nextAddress);
+        });
 
         watch(
             [city, streetAndNumber, state, postalNumber, selectedCountry],
@@ -354,14 +406,14 @@ export default defineComponent({
             const payload: BrandingFormPayload = {
                 title: title.value,
                 description: description.value,
-                logoFile: selectedLogoFile.value,
-                backgroundFile: selectedBackgroundFile.value,
-                removeLogo: removeLogo.value && !selectedLogoFile.value,
-                removeBackground: removeBackground.value && !selectedBackgroundFile.value,
+                logoFile: logoFile.value,
+                backgroundFile: backgroundFile.value,
+                removeLogo: removeLogo.value && !logoFile.value,
+                removeBackground: removeBackground.value && !backgroundFile.value,
                 location: {
-                    latitude: mapRef.value?.currentPosition.lat,
-                    longitude: mapRef.value?.currentPosition.lon,
-                    address: mapRef.value?.address
+                    latitude: latitude.value,
+                    longitude: longitude.value,
+                    address: mapAddress.value
                 },
                 phoneNumber: phoneNumber.value,
                 postalAddress: {
@@ -370,7 +422,9 @@ export default defineComponent({
                     streetAndNumber: streetAndNumber.value,
                     state: state.value,
                     postalNumber: postalNumber.value as string
-                }
+                },
+                chromeTheme: asTheme(selectedChromeTheme.value, "dark"),
+                heroTheme: asTheme(selectedHeroTheme.value, "dark")
             };
 
             emit("update", payload);
@@ -381,30 +435,16 @@ export default defineComponent({
             description, descriptionRef,
             city, cityRef, streetAndNumber, streetAndNumberRef,
             state, stateRef, postalNumber, phoneNumber,
-            countries, selectedCountry, mapRef,
+            countries, selectedCountry, mapAddress, mapEmbedUrl,
             toMultilingualTextInput,
             requiredFieldRules,
             languageTags, submit,
             logoFile, backgroundFile,
             logoPreviewUrl, backgroundPreviewUrl,
-            removeLogo, removeBackground
+            removeLogo, removeBackground,
+            selectedChromeTheme, selectedHeroTheme, themeOptions
         };
     }
 });
 </script>
 
-<style scoped>
-.branding-preview-image {
-    display: block;
-    max-height: 96px;
-    width: auto;
-    object-fit: contain;
-}
-
-.branding-preview-image--wide {
-    max-height: 140px;
-    width: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-</style>

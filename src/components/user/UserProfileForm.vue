@@ -1,101 +1,149 @@
 <template>
-    <v-checkbox
+    <ui-checkbox
         v-if="!isAdmin"
         v-model="allowAccountTakeover"
         :label="$t('allowTakeoverLabel')"
+        class="mb-6 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2"
         @click="updateAccountTakeoverPermission"
     />
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="isCommission ? 12 : 6">
-                <v-text-field
+    <v-form v-model="isFormValid" class="space-y-8" @submit.prevent>
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <ui-input
                     v-model="name"
+                    :class="isCommission ? 'md:col-span-2' : ''"
                     :label="isCommission ? $t('nameLabel') : $t('firstNameLabel')"
+                    :placeholder="isCommission ? $t('nameLabel') : $t('firstNameLabel')"
                     :rules="requiredFieldRules"
                     :readonly="isResearcher"
                 />
-            </v-col>
-            <v-col v-if="!isCommission" cols="6">
-                <v-text-field
+                <ui-input
+                    v-if="!isCommission"
                     v-model="surname"
                     :label="$t('surnameLabel')"
+                    :placeholder="$t('surnameLabel')"
                     :rules="requiredFieldRules"
                     :readonly="isResearcher"
                 />
-            </v-col>
-        </v-row>
-        <v-btn v-if="isResearcher" color="blue darken-1" class="update-researcher" @click="navigateToResearcherPage()">
-            {{ $t("updateResearcherLabel") }}
-        </v-btn>
-        <v-row>
-            <v-col cols="12" md="6">
-                <v-text-field
+            </div>
+
+            <UiButton
+                v-if="isResearcher"
+                variant="outline"
+                @click="navigateToResearcherPage()"
+            >
+                <span class="mdi mdi-account-edit-outline" aria-hidden="true"></span>
+                {{ $t("updateResearcherLabel") }}
+            </UiButton>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <ui-input
                     v-model="email"
                     :label="$t('emailLabel')"
+                    :placeholder="$t('emailLabel')"
                     :rules="emailFieldRules"
                 />
-            </v-col>
-            <v-col v-if="!isAdmin && !isResearcher && hasInstitution" cols="12" md="6">
-                <v-autocomplete
+                <ui-input
+                    v-if="!isAdmin && !isResearcher && hasInstitution"
                     v-model="selectedOrganisationUnit"
+                    control="autocomplete"
                     :label="$t('organisationUnitLabel')"
                     :items="organisationUnits"
                     :custom-filter="filterOUs"
-                    :rules="(isResearcher || isInstitutionalEditor || isCommission || isViceDeanForScience || isInstitutionalLibrarian || isHeadOfLibrary || isPromotionRegistryAdministrator) ? requiredSelectionRules : []"
-                    :readonly="true"
+                    :rules="organisationUnitRules"
+                    readonly
                     :no-data-text="$t('noDataMessage')"
                     return-object
                 />
-            </v-col>
-            <v-col v-else cols="0" md="6" />
-            <v-col cols="12" md="6">
-                <v-select
+                <ui-input
                     v-model="selectedLanguage"
+                    control="select"
                     :label="$t('preferredLanguageLabel')"
                     :items="uiLanguages"
                     return-object
                 />
-            </v-col>
-            <v-col cols="12" md="6">
-                <v-select
+                <ui-input
                     v-model="selectedReferenceLanguage"
+                    control="select"
                     :label="$t('preferredReferenceLanguageLabel')"
                     :items="languages"
                     return-object
                 />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12" md="6">
-                <v-select
-                    v-model="selectedNotificationPeriod"
-                    :items="notificationPeriods"
-                    :label="$t('notificationPeriodLabel')"
-                    return-object />
-            </v-col>
-            <v-col cols="12" md="6">
-                <v-checkbox
-                    v-model="onlyNewNotifications"
-                    :label="$t('sendOnlyNewNotificationsLabel')"
-                />
-            </v-col>
-        </v-row>
-        <div class="d-flex flex-wrap align-center ga-2">
-            <v-btn color="blue darken-1" @click="changePassword = !changePassword">
-                {{ $t("changePasswordLabel") }} {{ changePassword ? "▲" : "▼" }}
-            </v-btn>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 items-end gap-4 border-t border-slate-200 pt-8 md:grid-cols-2">
+            <ui-input
+                v-model="selectedNotificationPeriod"
+                control="select"
+                :items="notificationPeriods"
+                :label="$t('notificationPeriodLabel')"
+                return-object
+            />
+            <ui-checkbox
+                v-model="onlyNewNotifications"
+                :label="$t('sendOnlyNewNotificationsLabel')"
+                class="md:mb-2"
+            />
+        </div>
+
+        <transition name="fade-slide">
+            <div
+                v-if="changePassword"
+                class="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+            >
+                <ui-input
+                    v-model="oldPassword"
+                    :label="$t('oldPasswordLabel')"
+                    :placeholder="$t('oldPasswordLabel')"
+                    :rules="requiredSelectionRules"
+                    validate-on="blur"
+                    :type="showOldPassword ? 'text' : 'password'"
+                    autocomplete="current-password"
+                >
+                    <template #append-inner>
+                        <v-icon
+                            :icon="showOldPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                            @click="showOldPassword = !showOldPassword"
+                        />
+                    </template>
+                </ui-input>
+                <div>
+                    <password-input-with-meter
+                        embedded
+                        :label="$t('newPasswordLabel')"
+                        repeat-password
+                        @password-change="setNewPassword($event)"
+                    />
+                </div>
+            </div>
+        </transition>
+
+        <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6">
+            <UiButton
+                variant="outline"
+                type="button"
+                @click="changePassword = !changePassword"
+            >
+                <span
+                    class="mdi"
+                    :class="changePassword ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                    aria-hidden="true"
+                ></span>
+                {{ $t("changePasswordLabel") }}
+            </UiButton>
             <v-menu location="bottom start">
                 <template #activator="{ props: menuProps }">
-                    <v-btn
+                    <UiButton
                         v-bind="menuProps"
-                        color="blue darken-1"
-                        variant="outlined"
-                        append-icon="mdi-chevron-down"
+                        variant="outline"
+                        type="button"
                     >
                         {{ $t("advancedOptionsLabel") }}
-                    </v-btn>
+                        <span class="mdi mdi-chevron-down" aria-hidden="true"></span>
+                    </UiButton>
                 </template>
-                <v-list density="compact">
+                <v-list density="compact" class="min-w-64 rounded-lg border border-slate-200 py-2">
                     <v-menu location="end" open-on-hover open-on-click :open-delay="100">
                         <template #activator="{ props: submenuProps }">
                             <v-list-item
@@ -108,7 +156,7 @@
                                 <v-list-item-title>{{ $t("tutorialOptionsLabel") }}</v-list-item-title>
                             </v-list-item>
                         </template>
-                        <v-list density="compact" min-width="280">
+                        <v-list density="compact" min-width="280" class="rounded-lg border border-slate-200 py-2">
                             <template v-if="isAdmin">
                                 <v-list-item
                                     v-for="tutorial in tutorialStore.availableTutorials"
@@ -138,42 +186,15 @@
                     </v-menu>
                 </v-list>
             </v-menu>
-        </div>
-
-        <transition name="fade-slide">
-            <v-container v-if="changePassword">
-                <v-row>
-                    <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                        <v-text-field
-                            v-model="oldPassword"
-                            :label="$t('oldPasswordLabel')"
-                            :rules="requiredSelectionRules"
-                            validate-on-blur
-                            :append-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                            :type="showOldPassword ? 'text' : 'password'"
-                            @click:append="showOldPassword = !showOldPassword"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12" sm="6" class="bg-blue-grey-lighten-5">
-                        <password-input-with-meter
-                            :label="$t('newPasswordLabel')"
-                            repeat-password
-                            @password-change="setNewPassword($event)" />
-                    </v-col>
-                </v-row>
-            </v-container>
-        </transition>
-        <v-row justify="center" class="mt-5">
-            <v-btn
-                color="blue darken-1"
+            <UiButton
+                class="sm:ml-auto"
+                type="button"
                 :disabled="!isFormValid"
-                class="submission-action"
-                @click="updateUser">
+                @click="updateUser"
+            >
                 {{ $t("saveLabel") }}
-            </v-btn>
-        </v-row>
+            </UiButton>
+        </div>
     </v-form>
     <toast v-model="snackbar" :message="snackbarText" />
 </template>
@@ -197,11 +218,14 @@ import Toast from "../core/Toast.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useTutorialStore, type TutorialKey } from "@/stores/tutorialStore";
 import { useUserRole } from "@/composables/useUserRole";
+import UiInput from "@/components/ui/input/Input.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
+import { UiButton } from "@/components/ui/button";
 
 
 export default defineComponent({
     name: "UserProfileForm",
-    components: { PasswordInputWithMeter, Toast },
+    components: { PasswordInputWithMeter, Toast, UiInput, UiCheckbox, UiButton },
     setup() {
         const snackbar = ref(false);
         const snackbarText = ref("");
@@ -249,6 +273,12 @@ export default defineComponent({
         const selectedNotificationPeriod = ref(selectionPlaceholder);
 
         const { requiredFieldRules, requiredSelectionRules, emailFieldRules } = useValidationUtils();
+
+        const organisationUnitRules = computed(() =>
+            (isResearcher.value || isInstitutionalEditor.value || isCommission.value || isViceDeanForScience.value || isInstitutionalLibrarian.value || isHeadOfLibrary.value || isPromotionRegistryAdministrator.value)
+                ? requiredSelectionRules
+                : []
+        );
 
         const populateUserData = () => {
             UserService.getLoggedInUser().then((response) => {
@@ -406,7 +436,7 @@ export default defineComponent({
             email, showOldPassword, languages, selectedLanguage, 
             filterOUs, allowAccountTakeover, isInstitutionalEditor,
             updateUser, setNewPassword, selectedNotificationPeriod,
-            emailFieldRules, requiredFieldRules, requiredSelectionRules,
+            emailFieldRules, requiredFieldRules, requiredSelectionRules, organisationUnitRules,
             isFormValid, notificationPeriods, oldPassword, newPassword, hasInstitution,
             updateAccountTakeoverPermission, snackbar, snackbarText, timeout,
             navigateToResearcherPage, isAdmin, isResearcher, isCommission,
@@ -419,11 +449,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-.update-researcher {
-    margin-top: -15px;
-    margin-bottom: 20px;
-}
 
 .fade-slide-enter-active,
 .fade-slide-leave-active {

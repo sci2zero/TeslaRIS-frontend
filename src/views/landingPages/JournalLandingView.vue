@@ -48,7 +48,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="publications">
@@ -77,6 +77,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :contributions="journal?.contributions"
                     :contribution-types="['EDITOR']"
                     :contributors-label="$t('editorsLabel')"
@@ -225,6 +227,7 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 
 export default defineComponent({
@@ -251,6 +254,11 @@ export default defineComponent({
         const currentRoute = useRoute();
 
         const journal = ref<Journal>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            journal,
+            currentTab,
+            "publications",
+        );
         const languageMap = ref<Map<number, LanguageResponse>>(new Map());
 
         const publications = ref<DocumentPublicationIndex[]>([]);
@@ -409,7 +417,7 @@ export default defineComponent({
         };
 
         const setStartTab = () => {
-            if (currentTab.value !== "dataQuality") {
+            if (currentTab.value !== "dataQuality" && showOverview.value) {
                 currentTab.value = "overview";
             }
         };
@@ -426,7 +434,7 @@ export default defineComponent({
             languageMap, updateBasicInfo, canClassify,
             snackbar, snackbarMessage, journalIndicators,
             updateContributions, ApplicableEntityType,
-            currentTab, PublicationSeriesUpdateForm,
+            currentTab, showOverview, showOverviewTab, onOverviewContent, PublicationSeriesUpdateForm,
             journalClassifications, createJournalClassification,
             fetchClassifications, publicationSeriesIdentifiers,
             getArticleCollectionSeriesTypeTitleFromValueAutoLocale,

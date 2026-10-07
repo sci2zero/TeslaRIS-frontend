@@ -1,63 +1,74 @@
 <template>
-    <v-container>
-        <h1>{{ $t("simpleSearchLabel") }}</h1>
-        <br>
-        <br>
-        <v-tabs
-            v-model="searchTab"
-            bg-color="blue-grey-lighten-5"
-            color="deep-purple-accent-4"
-            align-tabs="center"
-        >
-            <v-tab value="simpleSearch">
+    <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">
                 {{ $t("simpleSearchLabel") }}
-            </v-tab>
-            <v-tab value="advancedSearch">
-                {{ $t("advancedSearchLabel") }}
-            </v-tab>
-        </v-tabs>
+            </h1>
+            <p class="mt-2 max-w-2xl text-base text-slate-500">
+                {{ $t("searchPageHint") }}
+            </p>
+        </header>
 
-        <v-tabs-window v-model="searchTab">
-            <v-tabs-window-item value="simpleSearch">
-                <div class="flex flex-row justify-center mt-4">
-                    <search-bar-component
-                        ref="simpleSearchRef"
-                        class="mt-5"
-                        :preset-search-input="simpleSearchPresetInput"
-                        focus-automatically
-                        @search="clearSortAndPerformSearch"
-                    />
-                </div>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="advancedSearch">
-                <query-input-component
-                    ref="queryInputRef"
-                    :search-fields="getSearchFieldsForTable()"
-                    :preset-search-input="advancedSearchPresetInput"
-                    @search="clearSortAndPerformSearch($event)"
-                    @reset="resetFiltersAndSearch" />
-            </v-tabs-window-item>
-        </v-tabs-window>
+        <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div class="mb-5 inline-flex rounded-lg bg-slate-100 p-1">
+                <button
+                    type="button"
+                    class="rounded-md px-4 py-2 text-sm font-medium transition-colors"
+                    :class="searchTab === 'simpleSearch' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+                    @click="searchTab = 'simpleSearch'"
+                >
+                    {{ $t("simpleSearchLabel") }}
+                </button>
+                <button
+                    type="button"
+                    class="rounded-md px-4 py-2 text-sm font-medium transition-colors"
+                    :class="searchTab === 'advancedSearch' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+                    @click="searchTab = 'advancedSearch'"
+                >
+                    {{ $t("advancedSearchLabel") }}
+                </button>
+            </div>
 
-        <v-card class="mt-15">
-            <v-tabs
-                v-model="currentTab"
-                bg-color="blue-grey-lighten-5"
-                color="deep-purple-accent-4"
-                align-tabs="center"
-            >
-                <v-tab value="persons" @click="search(searchParams)">
-                    {{ $t("personListLabel") }}
-                </v-tab>
-                <v-tab value="organisationUnits" @click="search(searchParams)">
-                    {{ $t("ouListLabel") }}
-                </v-tab>
-                <v-tab value="publications" @click="search(searchParams)">
-                    {{ $t("scientificResultsListLabel") }}
-                </v-tab>
-            </v-tabs>
-  
-            <v-card-text>
+            <div v-if="searchTab === 'simpleSearch'" class="flex items-end gap-3">
+                <ui-input
+                    ref="simpleSearchFieldRef"
+                    v-model="simpleSearchInput"
+                    class="min-w-0 flex-1"
+                    :placeholder="$t('searchBarPlaceholder')"
+                    :aria-label="$t('searchBarPlaceholder')"
+                    @keydown.enter="runSimpleSearch"
+                />
+                <ui-button type="button" class="mb-0.5" @click="runSimpleSearch">
+                    {{ $t("searchLabel") }}
+                </ui-button>
+            </div>
+            <query-input-component
+                v-else
+                ref="queryInputRef"
+                :search-fields="getSearchFieldsForTable()"
+                :preset-search-input="advancedSearchPresetInput"
+                @search="clearSortAndPerformSearch($event)"
+                @reset="resetFiltersAndSearch"
+            />
+        </section>
+
+        <section class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 px-4 pt-4">
+                <button
+                    v-for="tab in resultTabs"
+                    :key="tab.value"
+                    type="button"
+                    class="border-b-2 px-3 pb-3 text-sm font-medium transition-colors"
+                    :class="currentTab === tab.value
+                        ? 'border-slate-800 text-slate-900'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'"
+                    @click="currentTab = tab.value; search(searchParams)"
+                >
+                    {{ $t(tab.label) }}
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5">
                 <v-window v-model="currentTab">
                     <v-window-item value="persons" eager>
                         <person-table-component
@@ -65,29 +76,31 @@
                             :persons="persons"
                             :total-persons="totalPersons"
                             enable-export
-                            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.PERSON_SEARCH : ExportableEndpointType.PERSON_SEARCH_ADVANCED"
+                            :endpoint-type="searchTab === 'simpleSearch' ? ExportableEndpointType.PERSON_SEARCH : ExportableEndpointType.PERSON_SEARCH_ADVANCED"
                             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
-                            @switch-page="switchPage" />
+                            @switch-page="switchPage"
+                        />
                     </v-window-item>
-  
+
                     <v-window-item value="organisationUnits" eager>
                         <organisation-unit-table-component
                             ref="ouTableRef"
                             :organisation-units="organisationUnits"
                             :total-o-us="totalOUs"
                             enable-export
-                            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.ORGANISATION_UNIT_SEARCH : ExportableEndpointType.ORGANISATION_UNIT_SEARCH_ADVANCED"
+                            :endpoint-type="searchTab === 'simpleSearch' ? ExportableEndpointType.ORGANISATION_UNIT_SEARCH : ExportableEndpointType.ORGANISATION_UNIT_SEARCH_ADVANCED"
                             :endpoint-token-parameters="[searchParams, 'null']"
-                            @switch-page="switchPage" />
+                            @switch-page="switchPage"
+                        />
                     </v-window-item>
-  
+
                     <v-window-item value="publications" eager>
                         <publication-table-component
                             ref="docTableRef"
                             :publications="publications"
                             :total-publications="totalPublications"
                             enable-export
-                            :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
+                            :endpoint-type="searchTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
                             :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
                             :endpoint-body-parameters="
                                 {
@@ -95,18 +108,19 @@
                                     institutionId: null,
                                     commissionId: null
                                 }"
-                            @switch-page="switchPage" />
+                            @switch-page="switchPage"
+                        />
                     </v-window-item>
                 </v-window>
-            </v-card-text>
-        </v-card>
-    </v-container>
+            </div>
+        </section>
+    </div>
 </template>
 
 <script lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { defineComponent } from "vue";
-import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
+import lodash from "lodash";
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
 import PersonTableComponent from '@/components/person/PersonTableComponent.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -121,11 +135,13 @@ import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { ExportableEndpointType, type SearchFieldsResponse } from "@/models/Common";
 import QueryInputComponent from "@/components/core/QueryInputComponent.vue";
+import UiInput from "@/components/ui/input/Input.vue";
+import { UiButton } from "@/components/ui/button";
 
 
 export default defineComponent({
     name: "AdvancedSearchVuew",
-    components: { SearchBarComponent, OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent, QueryInputComponent },
+    components: { OrganisationUnitTableComponent, PersonTableComponent, PublicationTableComponent, QueryInputComponent, UiInput, UiButton },
     setup() {
         const i18n = useI18n();
         const route = useRoute();
@@ -161,8 +177,15 @@ export default defineComponent({
         const ouSearchFields = ref<SearchFieldsResponse[]>([]);
         const documentSearchFields = ref<SearchFieldsResponse[]>([]);
 
-        const simpleSearchRef = ref<typeof SearchBarComponent>();
+        const simpleSearchInput = ref("");
+        const simpleSearchFieldRef = ref<{ focus?: () => void } | null>(null);
         const queryInputRef = ref<typeof QueryInputComponent>();
+
+        const resultTabs = [
+            { value: "persons", label: "personListLabel" },
+            { value: "organisationUnits", label: "ouListLabel" },
+            { value: "publications", label: "scientificResultsListLabel" },
+        ];
 
         onMounted(async () => {
             currentTab.value = route.query.tab as string;
@@ -187,6 +210,8 @@ export default defineComponent({
                 searchTab.value = "advancedSearch";
                 advancedSearchPresetInput.value = presetSearchInput;
             }
+
+            nextTick(() => simpleSearchFieldRef.value?.focus?.());
         });
 
         watch(currentTab, () => {
@@ -197,7 +222,7 @@ export default defineComponent({
         });
 
         watch(searchTab, () => {
-            simpleSearchRef.value?.clearInput();
+            simpleSearchInput.value = "";
             queryInputRef.value?.resetQuery();
 
             router.replace(
@@ -249,6 +274,52 @@ export default defineComponent({
             }
         };
     
+        const runSimpleSearch = () => {
+            const raw = simpleSearchInput.value ?? "";
+            let tokens: string[] = raw.trim().split(" ");
+            if (tokens.length === 1 && tokens[0] === "") {
+                tokens = ["*"];
+            }
+
+            let params = "";
+            let parsingPhrase = false;
+            let currentToken = "";
+            tokens.forEach(token => {
+                if (token === "") {
+                    return;
+                }
+
+                if (token.startsWith('"')) {
+                    parsingPhrase = true;
+                } else if (token.endsWith('"')) {
+                    parsingPhrase = false;
+                }
+
+                currentToken += token;
+                if (!parsingPhrase) {
+                    params += `tokens=${encodeURIComponent(currentToken)}&`;
+                    currentToken = "";
+                } else {
+                    currentToken += " ";
+                }
+            });
+
+            clearSortAndPerformSearch(params.slice(0, -1));
+        };
+
+        watch(simpleSearchInput, lodash.debounce(() => {
+            if (searchTab.value !== "simpleSearch") {
+                return;
+            }
+            runSimpleSearch();
+        }, 300));
+
+        watch(simpleSearchPresetInput, () => {
+            if (simpleSearchPresetInput.value && simpleSearchPresetInput.value !== "*") {
+                simpleSearchInput.value = simpleSearchPresetInput.value;
+            }
+        });
+
         const search = (tokenParams: string) => {
             tokenParams = decodeURIComponent(tokenParams);
 
@@ -356,10 +427,10 @@ export default defineComponent({
             searchParams, ExportableEndpointType,
             clearSortAndPerformSearch, ouTableRef,
             parsonTableRef, docTableRef, searchTab,
-            getSearchFieldsForTable, simpleSearchRef,
-            resetFiltersAndSearch, queryInputRef,
-            simpleSearchPresetInput,
-            advancedSearchPresetInput
+            getSearchFieldsForTable, queryInputRef,
+            resetFiltersAndSearch, simpleSearchPresetInput, simpleSearchInput,
+            simpleSearchFieldRef, runSimpleSearch,
+            advancedSearchPresetInput, resultTabs
         };
     }
 });

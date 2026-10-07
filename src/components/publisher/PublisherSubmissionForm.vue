@@ -1,41 +1,24 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col cols="12">
-                        <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedCountry"
-                            hide-details="auto"
-                            :items="countries"
-                            :label="$t('countryLabel')"
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <multilingual-text-input ref="stateRef" v-model="state" :label="$t('stateLabel')" />
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-domain"
+            :title="$t('publisherLabel')"
+        >
+            <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" />
+            <ui-input control="select"
+                v-model="selectedCountry"
+                hide-details="auto"
+                :items="countries"
+                :label="$t('countryLabel')"
+                return-object
+            />
+            <multilingual-text-input ref="placeRef" v-model="place" :label="$t('placeLabel')" />
+            <multilingual-text-input ref="stateRef" v-model="state" :label="$t('stateLabel')" />
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : $t('genericErrorMessage')" />
@@ -59,9 +42,12 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import { detectLanguage } from '@/utils/LanguageDetector.js';
 
 
+import UiInput from '@/components/ui/input/Input.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+
 export default defineComponent({
     name: "SubmitPublisher",
-    components: {MultilingualTextInput, Toast},
+    components: {MultilingualTextInput, Toast, UiInput, FormSection},
     props: {
         inModal: {
             type: Boolean,

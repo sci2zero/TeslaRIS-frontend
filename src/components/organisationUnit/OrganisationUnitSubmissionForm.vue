@@ -1,314 +1,147 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col cols="12">
-                        <multilingual-text-input
-                            ref="nameRef"
-                            v-model="name"
-                            :rules="requiredFieldRules"
-                            :label="$t('nameLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <multilingual-text-input
-                            ref="nameAbbreviationRef"
-                            v-model="nameAbbreviation"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                :label="$t('descriptionLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input v-model="email" :label="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input v-model="phoneNumber" :label="$t('phoneNumberLabel')" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="scopusAfid" label="Scopus AFID" :rules="scopusAfidValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="openAlexId" label="Open Alex ID" :rules="institutionOpenAlexIdValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="ringgold" label="Ringgold ID" :rules="ringgoldValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="fundref" label="FundRef" :rules="fundrefValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="isni" label="ISNI" :rules="isniValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="fctId" label="FCT ID" :rules="fctIdValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="grid" label="GRID" :rules="gridValidationRules" />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <ui-input v-model="wikidata" label="Wikidata ID" :rules="wikidataValidationRules" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input
-                                v-model="nationalId"
-                                :label="$t('nationalIdLabel')"
-                                :rules="organisationUnitNationalIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <ui-input
-                                v-model="taxNumber"
-                                :label="$t('taxNumberLabel')"
-                                :rules="taxNumberValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" is-website />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <ui-input control="select"
-                                v-model="selectedThesisType"
-                                :label="$t('thesisTypeLabel') + '*'"
-                                :items="thesisTypes"
-                                :rules="requiredSelectionRules"
-                                multiple
-                                return-object
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <ui-input control="select"
-                                v-model="selectedOuSector"
-                                :label="$t('organisationUnitSectorLabel')"
-                                :items="ouSectors"
-                                return-object
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <ui-checkbox
-                                v-model="startup"
-                                :label="$t('startupLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <date-picker
-                                v-model="dateEstablished"
-                                :label="$t('dateEstablishedLabel')"
-                                color="primary"
-                            />
-                        </v-col>
-                        <v-col>
-                            <date-picker
-                                v-model="dateDissolved"
-                                :label="$t('dateDissolvedLabel')"
-                                color="primary"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="isAdmin">
-                        <v-col>
-                            <ui-checkbox
-                                v-model="active"
-                                :label="$t('activeLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="isAdmin">
-                        <v-col>
-                            <ui-checkbox
-                                v-model="legalEntity"
-                                :label="$t('legalEntityLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-container class="section-box">
-                        <v-row v-if="isAdmin">
-                            <v-col>
-                                <ui-checkbox
-                                    v-model="clientInstitutionCris"
-                                    :label="$t('clientInstitutionCrisLabel')"
-                                />
-                            </v-col>
-                        </v-row>
-                        <v-row v-if="isAdmin && clientInstitutionCris">
-                            <v-col>
-                                <ui-checkbox
-                                    v-model="validatingEmailDomainCris"
-                                    :label="$t('validatingEmailDomainLabel')"
-                                />
-                            </v-col>
-                            <v-col>
-                                <ui-checkbox
-                                    v-if="validatingEmailDomainCris"
-                                    v-model="allowingSubdomainsCris"
-                                    :label="$t('allowingSubdomainsLabel')"
-                                />
-                            </v-col>
-                        </v-row>
-                        <v-row v-if="isAdmin && clientInstitutionCris && validatingEmailDomainCris">
-                            <v-col cols="12">
-                                <ui-input
-                                    v-model="institutionEmailDomainCris"
-                                    :label="$t('institutionEmailDomainLabel') + '*'"
-                                    :rules="requiredFieldRules"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                    <v-container class="section-box mt-2 mb-2">
-                        <v-row>
-                            <v-col>
-                                <ui-checkbox
-                                    v-model="clientInstitutionDl"
-                                    :label="$t('clientInstitutionDlLabel')"
-                                />
-                            </v-col>
-                        </v-row>
-                        <v-row v-if="isAdmin && clientInstitutionDl">
-                            <v-col>
-                                <ui-checkbox
-                                    v-model="validatingEmailDomainDl"
-                                    :label="$t('validatingEmailDomainLabel')"
-                                />
-                            </v-col>
-                            <v-col>
-                                <ui-checkbox
-                                    v-if="validatingEmailDomainDl"
-                                    v-model="allowingSubdomainsDl"
-                                    :label="$t('allowingSubdomainsLabel')"
-                                />
-                            </v-col>
-                        </v-row>
-                        <v-row v-if="isAdmin && clientInstitutionDl && validatingEmailDomainDl">
-                            <v-col cols="12">
-                                <ui-input
-                                    v-model="institutionEmailDomainDl"
-                                    :label="$t('institutionEmailDomainLabel') + '*'"
-                                    :rules="requiredFieldRules"
-                                />
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                    <h3>{{ $t('addressLabel') }}</h3>
-                    <v-row>
-                        <v-col>
-                            <ui-input control="select"
-                                v-model="selectedCountry"
-                                hide-details="auto"
-                                :items="countries"
-                                :label="$t('countryLabel')"
-                                return-object
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="cityRef"
-                                v-model="city"
-                                :label="$t('cityLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="streetAndNumberRef"
-                                v-model="streetAndNumber"
-                                :label="$t('streetAndNumberLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="stateRef"
-                                v-model="state"
-                                :label="$t('stateLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <ui-input
-                                v-model="postalNumber"
-                                :label="$t('postalNumberLabel')"
-                               
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12">
-                            <open-layers-map
-                                ref="mapRef"
-                                :read-only="false"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-domain"
+            :title="$t('organisationUnitLabel')"
+            :description="$t('organisationUnitDetailsHint')"
+        >
+            <multilingual-text-input
+                ref="nameRef"
+                v-model="name"
+                :rules="requiredFieldRules"
+                :label="$t('nameLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="nameAbbreviationRef"
+                v-model="nameAbbreviation"
+                :label="$t('nameAbbreviationLabel')"
+            />
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    :label="$t('descriptionLabel')"
+                />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="email" :label="$t('emailLabel')" :rules="nonMandatoryEmailFieldRules" />
+                    <ui-input v-model="phoneNumber" :label="$t('phoneNumberLabel')" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="scopusAfid" label="Scopus AFID" :rules="scopusAfidValidationRules" />
+                    <ui-input v-model="openAlexId" label="Open Alex ID" :rules="institutionOpenAlexIdValidationRules" />
+                </div>
+                <ui-input v-model="ror" label="ROR ID" placeholder="Research Organisation Registry ID" :rules="rorValidationRules" />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="ringgold" label="Ringgold ID" :rules="ringgoldValidationRules" />
+                    <ui-input v-model="fundref" label="FundRef" :rules="fundrefValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="isni" label="ISNI" :rules="isniValidationRules" />
+                    <ui-input v-model="fctId" label="FCT ID" :rules="fctIdValidationRules" />
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="grid" label="GRID" :rules="gridValidationRules" />
+                    <ui-input v-model="wikidata" label="Wikidata ID" :rules="wikidataValidationRules" />
+                </div>
+                <ui-input
+                    v-model="nationalId"
+                    :label="$t('nationalIdLabel')"
+                    :rules="organisationUnitNationalIdValidationRules"
+                />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input v-model="numberOfEmployees" :label="$t('numberOfEmployeesLabel')" />
+                    <ui-input v-model="taxNumber" :label="$t('taxNumberLabel')" :rules="taxNumberValidationRules" />
+                </div>
+                <multilingual-text-input ref="keywordsRef" v-model="keywords" :label="$t('keywordsLabel')" is-area />
+                <uri-input ref="urisRef" v-model="uris" is-website />
+                <ui-input
+                    v-model="selectedThesisType"
+                    control="select"
+                    :label="$t('thesisTypeLabel') + '*'"
+                    :items="thesisTypes"
+                    :rules="requiredSelectionRules"
+                    multiple
+                    return-object
+                />
+                <ui-input
+                    v-model="selectedOuSector"
+                    control="select"
+                    :label="$t('organisationUnitSectorLabel')"
+                    :items="ouSectors"
+                    return-object
+                />
+                <ui-checkbox v-model="startup" :label="$t('startupLabel')" />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <date-picker v-model="dateEstablished" :label="$t('dateEstablishedLabel')" color="primary" />
+                    <date-picker v-model="dateDissolved" :label="$t('dateDissolvedLabel')" color="primary" />
+                </div>
+                <ui-checkbox v-if="isAdmin" v-model="active" :label="$t('activeLabel')" />
+                <ui-checkbox v-if="isAdmin" v-model="legalEntity" :label="$t('legalEntityLabel')" />
+
+                <div v-if="isAdmin" class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <ui-checkbox v-model="clientInstitutionCris" :label="$t('clientInstitutionCrisLabel')" />
+                    <div v-if="clientInstitutionCris" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <ui-checkbox v-model="validatingEmailDomainCris" :label="$t('validatingEmailDomainLabel')" />
+                        <ui-checkbox
+                            v-if="validatingEmailDomainCris"
+                            v-model="allowingSubdomainsCris"
+                            :label="$t('allowingSubdomainsLabel')"
+                        />
+                    </div>
+                    <ui-input
+                        v-if="clientInstitutionCris && validatingEmailDomainCris"
+                        v-model="institutionEmailDomainCris"
+                        :label="$t('institutionEmailDomainLabel') + '*'"
+                        :rules="requiredFieldRules"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <ui-checkbox v-model="clientInstitutionDl" :label="$t('clientInstitutionDlLabel')" />
+                    <div v-if="isAdmin && clientInstitutionDl" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <ui-checkbox v-model="validatingEmailDomainDl" :label="$t('validatingEmailDomainLabel')" />
+                        <ui-checkbox
+                            v-if="validatingEmailDomainDl"
+                            v-model="allowingSubdomainsDl"
+                            :label="$t('allowingSubdomainsLabel')"
+                        />
+                    </div>
+                    <ui-input
+                        v-if="isAdmin && clientInstitutionDl && validatingEmailDomainDl"
+                        v-model="institutionEmailDomainDl"
+                        :label="$t('institutionEmailDomainLabel') + '*'"
+                        :rules="requiredFieldRules"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <p class="text-sm font-semibold text-slate-800">{{ $t('addressLabel') }}</p>
+                    <ui-input
+                        v-model="selectedCountry"
+                        control="select"
+                        hide-details="auto"
+                        :items="countries"
+                        :label="$t('countryLabel')"
+                        return-object
+                    />
+                    <multilingual-text-input ref="cityRef" v-model="city" :label="$t('cityLabel')" />
+                    <multilingual-text-input ref="streetAndNumberRef" v-model="streetAndNumber" :label="$t('streetAndNumberLabel')" />
+                    <multilingual-text-input ref="stateRef" v-model="state" :label="$t('stateLabel')" />
+                    <ui-input v-model="postalNumber" :label="$t('postalNumberLabel')" />
+                    <open-layers-map ref="mapRef" :read-only="false" />
+                </div>
+            </template>
+        </form-section>
+
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     <toast v-model="snackbar" :message="message" />
 </template>
@@ -339,11 +172,13 @@ import { detectLanguage } from '@/utils/LanguageDetector.js';
 import { useUserRole } from '@/composables/useUserRole.js';
 import UiInput from '@/components/ui/input/Input.vue';
 import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 
 
 export default defineComponent({
     name: "SubmitOrganizationUnit",
-    components: { MultilingualTextInput, OpenLayersMap, UriInput, Toast, DatePicker, UiInput, UiCheckbox },
+    components: { MultilingualTextInput, OpenLayersMap, UriInput, Toast, DatePicker, UiInput, UiCheckbox, FormSection, UiButton },
     props: {
         inModal: {
             type: Boolean,

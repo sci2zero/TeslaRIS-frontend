@@ -1,5 +1,9 @@
 <template>
     <v-container>
+        <h1 class="mb-10 text-3xl font-bold tracking-tight text-slate-800">
+            {{ $t("routeLabel.publicationsValidation") }}
+        </h1>
+
         <div class="d-flex flex-row justify-center">
             <organisation-unit-autocomplete-search
                 v-if="!hasInstitution"

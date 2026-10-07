@@ -164,7 +164,7 @@ const router = createRouter({
         {
             path: "/",
             name: "base",
-            redirect: { name: 'home', params: { locale: defaultLocale } },
+            redirect: () => ({ name: 'home', params: { locale: defaultLocale } }),
         },
         {
             path: "/record.jsf",

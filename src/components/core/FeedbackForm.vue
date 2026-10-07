@@ -1,123 +1,136 @@
 <template>
-    <v-row class="d-flex justify-center align-center mt-10">
-        <v-col cols="12" md="6">
-            <div class="text-start">
-                <h1>{{ $t("contactLabel") }}</h1>
-                <h3>{{ $t("feedbackMessage") }}</h3>
-            </div>
-        </v-col>
-    </v-row>
+    <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        <header class="mb-8 max-w-2xl">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
+                {{ $t("contactLabel") }}
+            </h1>
+            <p class="mt-3 text-base text-slate-600">
+                {{ $t("feedbackMessage") }}
+            </p>
+        </header>
 
-    <v-row class="d-flex justify-center align-center mt-10">
-        <v-col cols="12" md="6">
-            <v-form v-model="isFormValid" @submit.prevent>
-                <v-row>
-                    <v-col cols="12">
-                        <v-text-field
-                            v-model="name" :label="$t('fullNameLabel') + '*'" :placeholder="$t('fullNameLabel') + '*'"
-                            :rules="requiredFieldRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-text-field
-                            v-model="senderEmail" :label="$t('emailLabel') + '*'" :placeholder="$t('emailLabel') + '*'"
-                            :rules="emailFieldRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-text-field
-                            v-model="subject" :label="$t('subjectLabel') + '*'" :placeholder="$t('subjectLabel') + '*'"
-                            :rules="requiredFieldRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-textarea
-                            v-model="body" :label="$t('bodyLabel') + '*'" :placeholder="$t('bodyLabel') + '*'"
-                            :rules="requiredFieldRules" rows="15" />
-                    </v-col>
-                </v-row>
+        <div class="grid items-start gap-6 lg:grid-cols-5">
+            <section
+                class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
+                :class="showContactAside ? 'lg:col-span-3' : 'mx-auto w-full max-w-3xl lg:col-span-5'"
+            >
+                <v-form v-model="isFormValid" class="space-y-4" @submit.prevent="submitFeedback">
+                    <ui-input
+                        v-model="name"
+                        :label="$t('fullNameLabel') + '*'"
+                        :placeholder="$t('fullNameLabel')"
+                        :rules="requiredFieldRules"
+                    />
+                    <ui-input
+                        v-model="senderEmail"
+                        :label="$t('emailLabel') + '*'"
+                        :placeholder="$t('emailLabel')"
+                        :rules="emailFieldRules"
+                    />
+                    <ui-input
+                        v-model="subject"
+                        :label="$t('subjectLabel') + '*'"
+                        :placeholder="$t('subjectLabel')"
+                        :rules="requiredFieldRules"
+                    />
+                    <ui-input
+                        v-model="body"
+                        control="textarea"
+                        :label="$t('bodyLabel') + '*'"
+                        :placeholder="$t('bodyLabel')"
+                        :rules="requiredFieldRules"
+                        rows="8"
+                    />
 
-                <v-row>
-                    <p class="required-fields-message">
+                    <p class="text-xs text-slate-500">
                         {{ $t("requiredFieldsMessage") }}
                     </p>
-                </v-row>
-            </v-form>
-        </v-col>
-    </v-row>
 
-    <v-row class="d-flex justify-center align-start mt-5">
-        <v-col cols="12" md="6">
-            <vue-recaptcha
-                ref="vueRecaptcha"
-                :sitekey="siteKey"
-                size="normal"
-                theme="light"
-                :hl="locale"
-                :loading-timeout="30000"
-                @verify="handleVerifyCallback"
-                @expire="resetChallenge"
-                @error="resetChallenge" />
-        </v-col>
-    </v-row>
+                    <vue-recaptcha
+                        ref="vueRecaptcha"
+                        :sitekey="siteKey"
+                        size="normal"
+                        theme="light"
+                        :hl="locale"
+                        :loading-timeout="30000"
+                        @verify="handleVerifyCallback"
+                        @expire="resetChallenge"
+                        @error="resetChallenge"
+                    />
 
-    <v-row class="d-flex justify-center align-center">
-        <v-col cols="12" md="6">
-            <v-btn
-                color="blue darken-1"
-                :disabled="!isFormValid || !token"
-                @click="submitFeedback">
-                {{ $t("submitFeedbackLabel") }}
-            </v-btn>
-        </v-col>
-    </v-row>
+                    <UiButton
+                        type="submit"
+                        :disabled="!isFormValid || !token"
+                    >
+                        {{ $t("submitFeedbackLabel") }}
+                    </UiButton>
+                </v-form>
+            </section>
 
-    <v-row class="d-flex justify-center align-center mt-15">
-        <v-col cols="12" md="6">
-            <h2>{{ $t("locationLabel") }}</h2>
+            <aside
+                v-if="showContactAside"
+                class="space-y-4 lg:col-span-2"
+            >
+                <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <h2 class="text-lg font-semibold text-slate-800">
+                        {{ $t("locationLabel") }}
+                    </h2>
 
-            <p v-if="formattedAddress" class="d-flex align-center mt-3 mb-1">
-                <v-icon icon="mdi-map-marker" class="mr-2" size="18" />
-                {{ formattedAddress }}
-            </p>
-            <p v-if="phoneNumber" class="d-flex align-center mb-1">
-                <v-icon icon="mdi-phone" class="mr-2" size="18" />
-                <a :href="`tel:${phoneNumber}`">{{ phoneNumber }}</a>
-            </p>
-        </v-col>
-    </v-row>
+                    <div class="mt-4 space-y-4">
+                        <div v-if="formattedAddress" class="flex items-start gap-3">
+                            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-600 text-white">
+                                <span class="mdi mdi-map-marker text-sm" aria-hidden="true"></span>
+                            </span>
+                            <p class="pt-1 text-sm font-medium text-slate-800">
+                                {{ formattedAddress }}
+                            </p>
+                        </div>
+                        <div v-if="phoneNumber" class="flex items-start gap-3">
+                            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-600 text-white">
+                                <span class="mdi mdi-phone text-sm" aria-hidden="true"></span>
+                            </span>
+                            <a
+                                :href="`tel:${phoneNumber}`"
+                                class="pt-1 text-sm font-medium text-slate-800 underline decoration-slate-400 underline-offset-2 hover:text-blue-700"
+                            >
+                                {{ phoneNumber }}
+                            </a>
+                        </div>
+                    </div>
+                </section>
 
-    <v-row v-if="hasLocation" class="d-flex justify-center align-center mt-2 mb-2">
-        <v-col cols="12" md="6">
-            <open-layers-map
-                ref="mapRef"
-                height="450px"
-                :init-coordinates="[location!.longitude, location!.latitude]"
-                :read-only="true"
-            />
-        </v-col>
-    </v-row>
+                <div v-if="hasLocation" class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <iframe
+                        class="h-80 w-full border-0"
+                        :src="mapEmbedUrl"
+                        :title="$t('locationLabel')"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </aside>
+        </div>
+    </div>
 
     <toast v-model="snackbar" :message="message" />
 </template>
 
 <script lang="ts">
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import { computed, defineComponent, ref } from 'vue';
-import OpenLayersMap from './OpenLayersMap.vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import FeedbackService from '@/services/FeedbackService';
 import Toast from './Toast.vue';
 import { useI18n } from 'vue-i18n';
 import VueRecaptcha from 'vue3-recaptcha2';
 import { useBrandingInformation } from '@/composables/useBrandingInformation';
+import UiInput from '@/components/ui/input/Input.vue';
+import { UiButton } from '@/components/ui/button';
 
 
 export default defineComponent({
     name: "FeedbackForm",
-    components: { OpenLayersMap, Toast, VueRecaptcha },
+    components: { Toast, VueRecaptcha, UiInput, UiButton },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -127,8 +140,27 @@ export default defineComponent({
             location, phoneNumber, formattedAddress, hasLocation
         } = useBrandingInformation();
 
+        const showContactAside = computed(() =>
+            !!formattedAddress.value || !!phoneNumber.value || hasLocation.value
+        );
+
         const i18n = useI18n();
         const locale = computed(() => i18n.locale.value);
+
+        const mapEmbedUrl = computed(() => {
+            if (!location.value?.latitude || !location.value?.longitude) {
+                return "";
+            }
+
+            const params = new URLSearchParams({
+                q: `${location.value.address}`,
+                z: "16",
+                hl: locale.value,
+                output: "embed",
+            });
+
+            return `https://maps.google.com/maps?${params.toString()}`;
+        });
 
         const name = ref("");
         const senderEmail = ref("");
@@ -140,6 +172,10 @@ export default defineComponent({
         const token = ref("");
 
         const { emailFieldRules, requiredFieldRules } = useValidationUtils();
+
+        onMounted(() => {
+            document.title = i18n.t("contactLabel");
+        });
 
         const submitFeedback = () => {
             FeedbackService.submitFeedback(
@@ -179,7 +215,8 @@ export default defineComponent({
             locale, resetChallenge,
             handleVerifyCallback,
             vueRecaptcha, token,
-            location, phoneNumber, formattedAddress, hasLocation
+            phoneNumber, formattedAddress, hasLocation,
+            showContactAside, mapEmbedUrl
         };
     }
 });

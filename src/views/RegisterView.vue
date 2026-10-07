@@ -23,7 +23,7 @@
                         <img
                             v-else :src="logoUrl" alt=""
                             class="intro-logo-img">
-                        <h1 class="intro-title serif">
+                        <h1 class="intro-title">
                             {{ returnCurrentLocaleContent(title) }}
                         </h1>
                     </div>
@@ -370,6 +370,8 @@ export default defineComponent({
         display: flex;
         align-items: flex-start;
         min-height: 32rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
         padding-top: 4rem;
         padding-bottom: 4rem;
     }

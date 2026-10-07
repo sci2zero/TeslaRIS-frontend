@@ -88,7 +88,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -120,6 +120,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="journalPublication?.description"
                     :contributions="journalPublication?.contributions"
                     :contribution-types="['AUTHOR']"
@@ -280,6 +282,7 @@ import { useLoginStore } from '@/stores/loginStore';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
@@ -340,6 +343,11 @@ export default defineComponent({
         const canClassify = ref(false);
 
         const journalPublication = ref<JournalPublication>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            journalPublication,
+            currentTab,
+            "contributions",
+        );
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
         const event = ref<Conference>();
         const journal = ref<Journal>();
@@ -545,7 +553,7 @@ export default defineComponent({
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind, actionsRef,
             languageTagMap, journal, JournalPublicationUpdateForm,
-            StatisticsType, documentIndicators, currentTab, createIndicator,
+            StatisticsType, documentIndicators, currentTab, showOverview, showOverviewTab, onOverviewContent, createIndicator,
             searchKeyword, canEdit, fetchIndicators,
             updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,

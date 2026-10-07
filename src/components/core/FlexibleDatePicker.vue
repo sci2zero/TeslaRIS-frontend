@@ -1,69 +1,32 @@
 <template>
-    <div>
-        <div class="date-picker-container">
-            <v-text-field
-                ref="fieldRef"
-                v-model="yearString"
-                :label="label"
-                :rules="applyRules()"
-                type="number"
-                variant="solo"
-                :hide-details="additionalRules.length == 0"
-                class="flex-grow-1"
-            />
-
-            <v-select
-                v-model="month"
-                :items="months"
-                item-title="title"
-                item-value="value"
-                :label="$t('monthLabel')"
-                variant="solo"
-                clearable
-                class="flex-grow-1 mt-5"
-            />
-
-            <v-select
-                v-model="day"
-                :items="days"
-                :label="$t('dayLabel')"
-                variant="solo"
-                clearable
-                :disabled="!month"
-                class="flex-grow-1  mt-5"
-            />
-
-            <v-menu
-                v-model="isMenuOpen"
-                :close-on-content-click="false"
-            >
-                <template #activator="{ props }">
-                    <v-btn
-                        icon="mdi-calendar"
-                        v-bind="props"
-                        variant="text"
-                        color="primary"
-                        class="mt-1"
-                    />
-                </template>
-
-                <v-date-picker
-                    v-model="pickerDate"
-                    hide-actions
-                    title=""
-                    @click.stop>
-                    <template #header />
-                    <template #actions>
-                        <v-btn @click.stop="clearDate">
-                            {{ $t("deleteLabel") }}
-                        </v-btn>
-                        <v-btn @click.stop="isMenuOpen = false">
-                            {{ $t("saveLabel") }}
-                        </v-btn>
-                    </template>
-                </v-date-picker>
-            </v-menu>
-        </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <ui-input
+            ref="fieldRef"
+            v-model="yearString"
+            :label="label"
+            placeholder="YYYY"
+            :rules="applyRules()"
+            type="number"
+        />
+        <ui-input
+            v-model="month"
+            control="select"
+            :items="months"
+            item-title="title"
+            item-value="value"
+            :label="$t('monthLabel')"
+            :placeholder="$t('monthLabel')"
+            clearable
+        />
+        <ui-input
+            v-model="day"
+            control="select"
+            :items="dayItems"
+            :label="$t('dayLabel')"
+            :placeholder="$t('dayLabel')"
+            clearable
+            :disabled="!month"
+        />
     </div>
 </template>
 
@@ -73,10 +36,12 @@ import {VTextField} from "vuetify/lib/components/index.mjs";
 import {useValidationUtils} from "@/utils/ValidationUtils";
 import { type FlexibleDate } from "@/models/Common";
 import { useI18n } from "vue-i18n";
+import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
     name: "FlexibleDatePicker",
+    components: { UiInput },
     props: {
         label: {
             type: String,
@@ -151,6 +116,8 @@ export default defineComponent({
             return Array.from({length:max},(_,i)=>i+1);
         });
 
+        const dayItems = computed(() => days.value ?? []);
+
         const emitValue=()=>{
             if(!year.value){
                 emit("update:modelValue", undefined);
@@ -218,7 +185,7 @@ export default defineComponent({
         return{
             fieldRef, validate,
             yearString, month,
-            day, days, months,
+            day, days, dayItems, months,
             applyRules, isMenuOpen,
             pickerDate, clearDate
         };
@@ -226,23 +193,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.date-picker-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.flex-grow-1 {
-    flex-grow: 1;
-}
-
-:deep(.v-text-field),
-:deep(.v-select) {
-    min-width: 0;
-}
-
-.mt-1 {
-    margin-top: 4px;
-}
-</style>

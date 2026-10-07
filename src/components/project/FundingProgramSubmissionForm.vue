@@ -1,177 +1,118 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col cols="10">
-                <!-- Name* -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameRef"
-                            v-model="name"
-                            :rules="requiredFieldRules"
-                            :label="$t('nameLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Name Abbreviation -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameAbbreviationRef"
-                            v-model="nameAbbreviation"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Funder* -->
-                <v-row>
-                    <v-col cols="10">
-                        <organisation-unit-autocomplete-search
-                            ref="funderRef"
-                            v-model="selectedFunder"
-                            label="funderLabel"
-                            required
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Funding Types* -->
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedFundingTypes"
-                            :items="fundingTypes"
-                            :label="$t('fundingTypesLabel') + '*'"
-                            :rules="requiredMultiSelectionRules"
-                            multiple
-                            return-object
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Start Date / End Date -->
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="dateFrom"
-                            :label="$t('dateFromLabel')"
-                            type="date"
-                        />
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="dateTo"
-                            :label="$t('dateToLabel')"
-                            type="date"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Monetary Amount -->
-                <monetary-amount-input
-                    ref="totalAmountRef"
-                    v-model="totalAmount"
-                    :required="false"
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-file-tree"
+            :title="$t('fundingProgramLabel')"
+        >
+            <multilingual-text-input
+                ref="nameRef"
+                v-model="name"
+                :rules="requiredFieldRules"
+                :label="$t('nameLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="nameAbbreviationRef"
+                v-model="nameAbbreviation"
+                :label="$t('nameAbbreviationLabel')"
+            />
+            <organisation-unit-autocomplete-search
+                ref="funderRef"
+                v-model="selectedFunder"
+                label="funderLabel"
+                required
+            />
+            <ui-input control="select"
+                v-model="selectedFundingTypes"
+                :items="fundingTypes"
+                :label="$t('fundingTypesLabel') + '*'"
+                :rules="requiredMultiSelectionRules"
+                multiple
+                return-object
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input
+                    v-model="dateFrom"
+                    :label="$t('dateFromLabel')"
+                    type="date"
                 />
+                <ui-input
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                    type="date"
+                />
+            </div>
+            <monetary-amount-input
+                ref="totalAmountRef"
+                v-model="totalAmount"
+                :required="false"
+            />
+        </form-section>
 
-                <!-- Additional Fields Toggle -->
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('descriptionLabel')"
+                />
+                <multilingual-text-input
+                    ref="objectivesRef"
+                    v-model="objectives"
+                    is-area
+                    :label="$t('objectivesLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    is-area
+                    :label="$t('keywordsLabel')"
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+                <div>
+                    <div class="mb-2">
+                        <b>{{ $t("researchAreasLabel") }}</b>
+                    </div>
+                    <research-areas-selection
+                        ref="researchAreasSelectionRef"
+                        :research-areas-hierarchy="[]"
+                        submit-on-click
+                        @update="researchAreasId = $event"
+                    />
+                </div>
+                <choice-cards
+                    :model-value="oaMandated ? 'yes' : 'no'"
+                    :options="[
+                        { value: 'no', title: $t('noOaMandateLabel') },
+                        { value: 'yes', title: $t('oaMandatedLabel') },
+                    ]"
+                    @update:model-value="oaMandated = $event === 'yes'"
+                />
+                <ui-input
+                    v-if="oaMandated"
+                    v-model="oaMandateUrl"
+                    :label="$t('oaMandateUrlLabel')"
+                    :placeholder="$t('oaMandateUrlLabel')"
+                />
+            </template>
+        </form-section>
 
-                <v-container v-if="additionalFields">
-                    <!-- Description -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                is-area
-                                :label="$t('descriptionLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Objectives -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="objectivesRef"
-                                v-model="objectives"
-                                is-area
-                                :label="$t('objectivesLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Keywords -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                is-area
-                                :label="$t('keywordsLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- URIs -->
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Research Areas -->
-                    <v-row>
-                        <v-col>
-                            <div class="mb-2">
-                                <b>{{ $t("researchAreasLabel") }}</b>
-                            </div>
-                            <research-areas-selection
-                                ref="researchAreasSelectionRef"
-                                :research-areas-hierarchy="[]"
-                                submit-on-click
-                                @update="researchAreasId = $event"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- OA Mandated -->
-                    <v-row>
-                        <v-col cols="4">
-                            <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
-                        </v-col>
-                    </v-row>
-
-                    <!-- OA Mandate URL -->
-                    <v-row v-if="oaMandated">
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="oaMandateUrl"
-                                :label="$t('oaMandateUrlLabel')"
-                                :placeholder="$t('oaMandateUrlLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script setup lang="ts">
+import UiInput from '@/components/ui/input/Input.vue';
+import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

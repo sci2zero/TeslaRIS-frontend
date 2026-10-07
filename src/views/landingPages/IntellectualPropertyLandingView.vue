@@ -90,7 +90,7 @@
         </template>
 
         <template #tabs>
-            <v-tab value="overview">
+            <v-tab v-if="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="contributions">
@@ -122,6 +122,8 @@
         <template #default>
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
+                    v-show="showOverview"
+                    @has-content="onOverviewContent"
                     :description="intellectualProperty?.description"
                     :contributions="intellectualProperty?.contributions"
                     :contribution-types="['AUTHOR']"
@@ -270,6 +272,7 @@ import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSect
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import { useUserRole } from '@/composables/useUserRole';
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
+import { useLandingOverview } from '@/composables/useLandingOverview';
 import { useDocumentAssessmentActions } from '@/composables/useDocumentAssessmentActions';
 import DocumentActionBox from '@/components/publication/DocumentActionBox.vue';
 import PublicationBadgeSection from '@/components/publication/PublicationBadgeSection.vue';
@@ -318,6 +321,11 @@ export default defineComponent({
         const router = useRouter();
 
         const intellectualProperty = ref<IntellectualProperty>();
+        const { showOverview, showOverviewTab, onOverviewContent } = useLandingOverview(
+            intellectualProperty,
+            currentTab,
+            "contributions",
+        );
         const languageTagMap = ref<Map<number, LanguageTagResponse>>(new Map());
 
         const {
@@ -508,7 +516,7 @@ export default defineComponent({
         };
 
         return {
-            intellectualProperty, currentTab, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
+            intellectualProperty, currentTab, showOverview, showOverviewTab, onOverviewContent, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent, IntellectualPropertyUpdateForm, canClassify,
             languageTagMap, searchKeyword, canEdit, isResearcher,
             updateKeywords, updateDescription, snackbar, snackbarMessage,

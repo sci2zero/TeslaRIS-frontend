@@ -1,171 +1,110 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col cols="10">
-                <!-- Name* -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameRef"
-                            v-model="name"
-                            :rules="requiredFieldRules"
-                            :label="$t('nameLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Name Abbreviation -->
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="nameAbbreviationRef"
-                            v-model="nameAbbreviation"
-                            :label="$t('nameAbbreviationLabel')"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Funding Types* -->
-                <v-row>
-                    <v-col cols="10">
-                        <v-select
-                            v-model="selectedFundingTypes"
-                            :items="fundingTypeOptions"
-                            item-title="title"
-                            item-value="value"
-                            :label="$t('fundingTypesLabel') + '*'"
-                            :rules="requiredMultiSelectionRules"
-                            multiple
-                            chips
-                            closable-chips
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Start Date / End Date -->
-                <v-row>
-                    <v-col cols="5">
-                        <date-picker
-                            v-model="dateFrom"
-                            :label="$t('dateFromLabel')"
-                            color="primary"
-                        />
-                    </v-col>
-                    <v-col cols="5">
-                        <date-picker
-                            v-model="dateTo"
-                            :label="$t('dateToLabel')"
-                            color="primary"
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Funder -->
-                <v-row>
-                    <v-col cols="10">
-                        <organisation-unit-autocomplete-search
-                            v-model:model-value="selectedFunder"
-                            :label="$t('funderLabel')"
-                            allow-manual-clearing
-                        />
-                    </v-col>
-                </v-row>
-
-                <!-- Funding Program -->
-                <v-row v-if="!presetFundingProgramId">
-                    <v-col cols="10">
-                        <funding-program-autocomplete-search v-model="selectedFundingProgram" />
-                    </v-col>
-                </v-row>
-
-                <!-- Monetary Amount -->
-                <monetary-amount-input
-                    ref="monetaryAmountRef"
-                    @update:model-value="monetaryAmount = $event"
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-bullhorn"
+            :title="$t('fundingCallLabel')"
+        >
+            <multilingual-text-input
+                ref="nameRef"
+                v-model="name"
+                :rules="requiredFieldRules"
+                :label="$t('nameLabel') + '*'"
+            />
+            <multilingual-text-input
+                ref="nameAbbreviationRef"
+                v-model="nameAbbreviation"
+                :label="$t('nameAbbreviationLabel')"
+            />
+            <ui-input control="select"
+                v-model="selectedFundingTypes"
+                :items="fundingTypeOptions"
+                item-title="title"
+                item-value="value"
+                :label="$t('fundingTypesLabel') + '*'"
+                :rules="requiredMultiSelectionRules"
+                multiple
+                chips
+                closable-chips
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <date-picker
+                    v-model="dateFrom"
+                    :label="$t('dateFromLabel')"
+                    color="primary"
                 />
+                <date-picker
+                    v-model="dateTo"
+                    :label="$t('dateToLabel')"
+                    color="primary"
+                />
+            </div>
+            <organisation-unit-autocomplete-search
+                v-model:model-value="selectedFunder"
+                :label="$t('funderLabel')"
+                allow-manual-clearing
+            />
+            <funding-program-autocomplete-search v-if="!presetFundingProgramId" v-model="selectedFundingProgram" />
+            <monetary-amount-input
+                ref="monetaryAmountRef"
+                @update:model-value="monetaryAmount = $event"
+            />
+        </form-section>
 
-                <!-- Additional Fields Toggle -->
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('descriptionLabel')"
+                />
+                <multilingual-text-input
+                    ref="objectivesRef"
+                    v-model="objectives"
+                    is-area
+                    :label="$t('objectivesLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    is-area
+                    :label="$t('keywordsLabel')"
+                    :initial-value="toMultilingualTextInput(presetKeywords, languageTags)"
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+                <choice-cards
+                    :model-value="oaMandated ? 'yes' : 'no'"
+                    :options="[
+                        { value: 'no', title: $t('noOaMandateLabel') },
+                        { value: 'yes', title: $t('oaMandatedLabel') },
+                    ]"
+                    @update:model-value="oaMandated = $event === 'yes'"
+                />
+                <ui-input
+                    v-if="oaMandated"
+                    v-model="oaMandateUrl"
+                    :label="$t('oaMandateUrlLabel')"
+                    :placeholder="$t('oaMandateUrlLabel')"
+                />
+            </template>
+        </form-section>
 
-                <v-container v-if="additionalFields">
-                    <!-- Description -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                is-area
-                                :label="$t('descriptionLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Objectives -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="objectivesRef"
-                                v-model="objectives"
-                                is-area
-                                :label="$t('objectivesLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- Keywords -->
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                is-area
-                                :label="$t('keywordsLabel')"
-                                :initial-value="toMultilingualTextInput(presetKeywords, languageTags)"
-                            />
-                        </v-col>
-                    </v-row>
-
-                    <!-- URIs -->
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-
-                    <!-- OA mandated -->
-                    <v-row>
-                        <v-col cols="4">
-                            <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
-                        </v-col>
-                    </v-row>
-
-                    <!-- OA Mandate URL -->
-                    <v-row v-if="oaMandated">
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="oaMandateUrl"
-                                :label="$t('oaMandateUrlLabel')"
-                                :placeholder="$t('oaMandateUrlLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
 
     <toast v-model="snackbar" :message="!error ? $t('savedMessage') : errorMessage" />
 </template>
 
 <script setup lang="ts">
+import UiInput from '@/components/ui/input/Input.vue';
+import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

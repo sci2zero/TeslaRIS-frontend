@@ -1,10 +1,10 @@
 <template>
     <v-container>
-        <v-sheet class="text-center">
-            <h1>{{ $t("updateBrandingInformationLabel") }}</h1>
-        </v-sheet>
-        <br />
-        <br />
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">
+                {{ $t("updateBrandingInformationLabel") }}
+            </h1>
+        </header>
         <branding-information-form
             ref="formRef"
             :preset-information="savedBrandingInformation"
@@ -14,13 +14,11 @@
             :has-existing-background="hasExistingBackground"
             @update="updateBrandingInfo"
         ></branding-information-form>
-        <v-row justify="center">
-            <v-col>
-                <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">
-                    {{ $t("saveLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
+        <div class="mt-6">
+            <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">
+                {{ $t("saveLabel") }}
+            </v-btn>
+        </div>
     </v-container>
 </template>
 
@@ -72,7 +70,9 @@ export default defineComponent({
                 description: payload.description,
                 location: payload.location,
                 phoneNumber: payload.phoneNumber,
-                postalAddress: payload.postalAddress
+                postalAddress: payload.postalAddress,
+                chromeTheme: payload.chromeTheme,
+                heroTheme: payload.heroTheme
             };
 
             await BrandingService.updateBrandingInfo(brandingInfo);

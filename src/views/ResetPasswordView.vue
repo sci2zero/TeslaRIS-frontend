@@ -1,10 +1,10 @@
 <template>
-    <v-container class="text-center">
-        <v-sheet class="text-center">
-            <h1>{{ $t("resetPasswordLabel") }}</h1>
-        </v-sheet>
-        <br>
-        <br>
+    <v-container>
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">
+                {{ $t("resetPasswordLabel") }}
+            </h1>
+        </header>
         <v-row v-if="success === null">
             <v-col cols="12">
                 <v-form v-model="isFormValid" @submit.prevent>
@@ -27,14 +27,12 @@
                 </v-form>
             </v-col>
         </v-row>
-        <v-sheet class="text-center">
-            <h1 v-if="success === true">
-                {{ $t("resetPasswordSuccessMessage") }}
-            </h1>
-            <h1 v-if="success === false">
-                {{ $t("resetPasswordFailedMessage") }}
-            </h1>
-        </v-sheet>
+        <h1 v-if="success === true" class="text-3xl font-bold tracking-tight text-slate-800">
+            {{ $t("resetPasswordSuccessMessage") }}
+        </h1>
+        <h1 v-if="success === false" class="text-3xl font-bold tracking-tight text-slate-800">
+            {{ $t("resetPasswordFailedMessage") }}
+        </h1>
     </v-container>
 </template>
   

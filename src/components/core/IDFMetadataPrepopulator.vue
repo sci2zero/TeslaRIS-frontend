@@ -1,24 +1,27 @@
 <template>
-    <v-row>
-        <v-col cols="11">
-            <v-text-field
+    <div>
+        <div class="flex items-start gap-3">
+            <ui-input
                 ref="doiInputRef"
                 v-model="doi"
+                class="min-w-0 flex-1"
                 label="DOI"
-                placeholder="DOI"
-                :rules="doiValidationRules" />
-            <p v-if="errorMessage" class="text-red ml-1">
-                {{ errorMessage }} {{ harvestedDocumentType }}
-            </p>
-        </v-col>
-        <v-col v-if="isLoading" cols="1">
+                placeholder="e.g. 10.1000/j.journal.2020.01.001"
+                :rules="doiValidationRules"
+            />
             <v-progress-circular
+                v-if="isLoading"
                 color="primary"
                 indeterminate
-                class="mt-3"
+                class="mt-7"
+                size="24"
+                width="2"
             />
-        </v-col>
-    </v-row>
+        </div>
+        <p v-if="errorMessage" class="mt-1 text-sm text-red">
+            {{ errorMessage }} {{ harvestedDocumentType }}
+        </p>
+    </div>
 </template>
 
 <script lang="ts">
@@ -30,10 +33,12 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VTextField } from 'vuetify/lib/components/index.mjs';
+import UiInput from '@/components/ui/input/Input.vue';
 
 
 export default defineComponent({
     name: "IDFMetadataPrepopulator",
+    components: { UiInput },
     props: {
         documentType: {
             type: Object as PropType<PublicationType>,

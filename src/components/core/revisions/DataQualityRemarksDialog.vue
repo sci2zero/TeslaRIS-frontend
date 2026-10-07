@@ -39,10 +39,11 @@
         </div>
     </button>
 
-    <v-dialog
+    <scrollable-dialog
         v-model="dialog"
-        max-width="720">
-        <div class="bg-slate-100 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        :max-width="720"
+        body-class="px-5 py-4">
+        <template #header>
             <div class="px-5 pt-5 pb-1">
                 <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-800">
                     {{ $t("dataQualityReportLabel") }}
@@ -62,31 +63,31 @@
                     {{ profile.profileName }}
                 </v-tab>
             </v-tabs>
+        </template>
 
-            <v-window
-                v-model="selectedTab"
-                class="px-5 py-4">
-                <v-window-item
-                    v-for="(profile, index) in reports"
-                    :key="profile.profileName"
-                    :value="index">
-                    <div class="space-y-3">
-                        <div
-                            v-for="(pair, remarkIndex) in profile.report"
-                            :key="`${profile.profileName}-${remarkIndex}`"
-                            class="border border-slate-200 rounded-lg px-4 py-3">
-                            <div class="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                                {{ pair.a }}
-                            </div>
-                            <p class="text-sm text-slate-700 mt-1 leading-relaxed">
-                                {{ returnCurrentLocaleContent(pair.b) }}
-                            </p>
+        <v-window v-model="selectedTab">
+            <v-window-item
+                v-for="(profile, index) in reports"
+                :key="profile.profileName"
+                :value="index">
+                <div class="space-y-3">
+                    <div
+                        v-for="(pair, remarkIndex) in profile.report"
+                        :key="`${profile.profileName}-${remarkIndex}`"
+                        class="border border-slate-200 rounded-lg px-4 py-3">
+                        <div class="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
+                            {{ pair.a }}
                         </div>
+                        <p class="text-sm text-slate-700 mt-1 leading-relaxed">
+                            {{ returnCurrentLocaleContent(pair.b) }}
+                        </p>
                     </div>
-                </v-window-item>
-            </v-window>
+                </div>
+            </v-window-item>
+        </v-window>
 
-            <div class="px-5 py-4 border-t border-slate-100 flex justify-end">
+        <template #footer>
+            <div class="flex justify-end px-5 py-4">
                 <UiButton
                     variant="outline"
                     size="sm"
@@ -94,8 +95,8 @@
                     {{ $t("closeLabel") }}
                 </UiButton>
             </div>
-        </div>
-    </v-dialog>
+        </template>
+    </scrollable-dialog>
 </template>
 
 <script lang="ts">
@@ -106,11 +107,12 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import DataQualityService from "@/services/revision/DataQualityService";
 import { useUserRole } from "@/composables/useUserRole";
 import { UiButton } from "@/components/ui/button";
+import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
 
 
 export default defineComponent({
     name: "QualityReportDialog",
-    components: { UiButton },
+    components: { UiButton, ScrollableDialog },
     props: {
         entityType: {
             type: String,

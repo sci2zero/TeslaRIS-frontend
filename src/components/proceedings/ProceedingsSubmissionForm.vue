@@ -1,211 +1,142 @@
 <template>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col :cols="inModal ? 12 : 8">
-                <v-row>
-                    <v-col cols="11">
-                        <i-d-f-metadata-prepopulator
-                            :document-type="PublicationType.PROCEEDINGS"
-                            @metadata-fetched="popuateMetadata"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            ref="titleRef"
-                            v-model="title"
-                            :rules="requiredFieldRules"
-                            :label="$t('titleLabel') + '*'"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <event-autocomplete-search
-                            ref="eventAutocompleteRef"
-                            v-model="selectedEvent"
-                            required
-                            :read-only="conference.value > 0"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <flexible-date-picker
-                            v-model="publicationDate"
-                            :label="$t('yearOfPublicationLabel') + '*'"
-                            required
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="10">
-                        <publisher-autocomplete-search
-                            ref="publisherAutocompleteRef"
-                            v-model="selectedPublisher"
-                            allow-author-reprint
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="eIsbn"
-                            label="E-ISBN"
-                            placeholder="E-ISBN"
-                            :rules="isbnValidationRules"
-                        />
-                    </v-col>
-                    <v-col cols="5">
-                        <v-text-field
-                            v-model="printIsbn"
-                            label="Print ISBN"
-                            placeholder="Print ISBN"
-                            :rules="isbnValidationRules"
-                        />
-                    </v-col>
-                </v-row>
+    <v-form v-model="isFormValid" class="flex flex-col gap-6" @submit.prevent>
+        <form-section
+            icon="mdi-file-document-outline"
+            :title="$t('publicationDetailsLabel')"
+        >
+            <i-d-f-metadata-prepopulator
+                :document-type="PublicationType.PROCEEDINGS"
+                @metadata-fetched="popuateMetadata"
+            />
+            <multilingual-text-input
+                ref="titleRef"
+                v-model="title"
+                :rules="requiredFieldRules"
+                :label="$t('titleLabel') + '*'"
+            />
+            <event-autocomplete-search
+                ref="eventAutocompleteRef"
+                v-model="selectedEvent"
+                required
+                :read-only="conference.value > 0"
+            />
+            <flexible-date-picker
+                v-model="publicationDate"
+                :label="$t('yearOfPublicationLabel') + '*'"
+                required
+            />
+            <publisher-autocomplete-search
+                ref="publisherAutocompleteRef"
+                v-model="selectedPublisher"
+                allow-author-reprint
+            />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ui-input
+                    v-model="eIsbn"
+                    label="E-ISBN"
+                    placeholder="E-ISBN"
+                    :rules="isbnValidationRules"
+                />
+                <ui-input
+                    v-model="printIsbn"
+                    label="Print ISBN"
+                    placeholder="Print ISBN"
+                    :rules="isbnValidationRules"
+                />
+            </div>
+        </form-section>
 
-                <v-btn color="blue darken-1" @click="additionalFields = !additionalFields">
-                    {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
-                </v-btn>
-                <v-container v-if="additionalFields">
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="subtitleRef"
-                                v-model="subtitle"
-                                :label="$t('subtitleLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="acronymRef"
-                                v-model="acronym"
-                                :label="$t('nameAbbreviationLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="descriptionRef"
-                                v-model="description"
-                                is-area
-                                :label="$t('abstractLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <multilingual-text-input
-                                ref="keywordsRef"
-                                v-model="keywords"
-                                :label="$t('keywordsLabel')"
-                                is-area
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <uri-input ref="urisRef" v-model="uris" />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-select
-                                v-model="selectedLanguages"
-                                :label="$t('languageLabel')"
-                                :items="languageList"
-                                multiple
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <v-text-field
-                                v-model="numberOfPages"
-                                type="number"
-                                :label="$t('numberOfPagesLabel')"
-                                :rules="optionalNumericZeroOrGreaterFieldRules"
-                                :placeholder="$t('numberOfPagesLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <journal-autocomplete-search
-                                ref="journalAutocompleteRef"
-                                v-model="selectedJournal"
-                                allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="10">
-                            <book-series-autocomplete-search
-                                ref="bookSeriesAutocompleteRef"
-                                v-model="selectedBookSeries"
-                                allow-manual-clearing
-                                :external-validation="publicationSeriesExternalValidation"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="publicationSeriesVolume"
-                                :label="$t('publicationSeriesVolumeLabel')"
-                                :placeholder="$t('publicationSeriesVolumeLabel')"
-                            />
-                        </v-col>
-                        <v-col cols="5">
-                            <v-text-field
-                                v-model="publicationSeriesIssue"
-                                :label="$t('publicationSeriesIssueLabel')"
-                                :placeholder="$t('publicationSeriesIssueLabel')"
-                            />
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="scopus"
-                                label="Scopus ID"
-                                placeholder="Scopus ID"
-                                :rules="scopusIdValidationRules"
-                            />
-                        </v-col>
-                        <v-col cols="4">
-                            <v-text-field
-                                v-model="openAlexId"
-                                label="Open Alex ID"
-                                placeholder="Open Alex ID"
-                                :rules="workOpenAlexIdValidationRules"
-                            />
-                        </v-col>
-                        <v-col cols="3">
-                            <v-text-field
-                                v-model="webOfScienceId"
-                                label="Web of Science ID"
-                                placeholder="Web of Science ID"
-                                :rules="documentWebOfScienceIdValidationRules"
-                            />
-                        </v-col>
-                    </v-row>
-                </v-container>
-            </v-col>
-        </v-row>
+        <form-section :title="$t('additionalFieldsLabel')">
+            <ui-button variant="outline" type="button" @click="additionalFields = !additionalFields">
+                {{ $t("additionalFieldsLabel") }} {{ additionalFields ? "▲" : "▼" }}
+            </ui-button>
+            <template v-if="additionalFields">
+                <multilingual-text-input
+                    ref="subtitleRef"
+                    v-model="subtitle"
+                    :label="$t('subtitleLabel')"
+                />
+                <multilingual-text-input
+                    ref="acronymRef"
+                    v-model="acronym"
+                    :label="$t('nameAbbreviationLabel')"
+                />
+                <multilingual-text-input
+                    ref="descriptionRef"
+                    v-model="description"
+                    is-area
+                    :label="$t('abstractLabel')"
+                />
+                <multilingual-text-input
+                    ref="keywordsRef"
+                    v-model="keywords"
+                    :label="$t('keywordsLabel')"
+                    is-area
+                />
+                <uri-input ref="urisRef" v-model="uris" />
+                <ui-input control="select"
+                    v-model="selectedLanguages"
+                    :label="$t('languageLabel')"
+                    :items="languageList"
+                    multiple
+                />
+                <ui-input
+                    v-model="numberOfPages"
+                    type="number"
+                    :label="$t('numberOfPagesLabel')"
+                    :rules="optionalNumericZeroOrGreaterFieldRules"
+                    :placeholder="$t('numberOfPagesLabel')"
+                />
+                <journal-autocomplete-search
+                    ref="journalAutocompleteRef"
+                    v-model="selectedJournal"
+                    allow-manual-clearing
+                    :external-validation="publicationSeriesExternalValidation"
+                />
+                <book-series-autocomplete-search
+                    ref="bookSeriesAutocompleteRef"
+                    v-model="selectedBookSeries"
+                    allow-manual-clearing
+                    :external-validation="publicationSeriesExternalValidation"
+                />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ui-input
+                        v-model="publicationSeriesVolume"
+                        :label="$t('publicationSeriesVolumeLabel')"
+                        :placeholder="$t('publicationSeriesVolumeLabel')"
+                    />
+                    <ui-input
+                        v-model="publicationSeriesIssue"
+                        :label="$t('publicationSeriesIssueLabel')"
+                        :placeholder="$t('publicationSeriesIssueLabel')"
+                    />
+                </div>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <ui-input
+                        v-model="scopus"
+                        label="Scopus ID"
+                        placeholder="Scopus ID"
+                        :rules="scopusIdValidationRules"
+                    />
+                    <ui-input
+                        v-model="openAlexId"
+                        label="Open Alex ID"
+                        placeholder="Open Alex ID"
+                        :rules="workOpenAlexIdValidationRules"
+                    />
+                    <ui-input
+                        v-model="webOfScienceId"
+                        label="Web of Science ID"
+                        placeholder="Web of Science ID"
+                        :rules="documentWebOfScienceIdValidationRules"
+                    />
+                </div>
+            </template>
+        </form-section>
 
-        <v-row>
-            <p class="required-fields-message">
-                {{ $t("requiredFieldsMessage") }}
-            </p>
-        </v-row>
+        <p class="text-sm text-slate-500">
+            {{ $t("requiredFieldsMessage") }}
+        </p>
     </v-form>
     
     <toast v-model="snackbar" :message="message" />
@@ -243,9 +174,13 @@ import { detectLanguage } from '@/utils/LanguageDetector.js';
 import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
 
+import UiInput from '@/components/ui/input/Input.vue';
+import FormSection from '@/components/ui/form-section/FormSection.vue';
+import { UiButton } from '@/components/ui/button';
+
 export default defineComponent({
     name: "SubmitProceedings",
-    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, FlexibleDatePicker },
+    components: {MultilingualTextInput, UriInput, EventAutocompleteSearch, JournalAutocompleteSearch, PublisherAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, FlexibleDatePicker, UiInput, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,
