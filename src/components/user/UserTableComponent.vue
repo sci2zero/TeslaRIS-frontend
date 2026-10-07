@@ -80,7 +80,7 @@
                             </template>
                         </localized-link>
                     </td>
-                    <td>{{ getTitleFromValueAutoLocale(row.item.userRole) }}</td>
+                    <td>{{ getTitleFromValueAutoLocale(row.item.userRole, row.item.organisationUnitId > 0) }}</td>
                     <td>
                         <div class="d-flex flex-row justify-start">
                             <v-btn

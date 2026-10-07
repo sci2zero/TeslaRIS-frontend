@@ -316,7 +316,7 @@ export default defineComponent(
             const router = useRouter();
             const appTitle = computed(() => publicConfigurationStore.title);
             const sidebar = ref(false);
-            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
+            const { isAdmin, isResearcher, isCommission, isViceDeanForScience, isHeadOfLibrary, isUserBoundToOU, hasInstitution, userRole, isInstitutionalEditor, isInstitutionalLibrarian, isPromotionRegistryAdministrator } = useUserRole();
 
             const populateUserData = () => {
                 UserService.getLoggedInUser().then((response) => {
@@ -426,7 +426,7 @@ export default defineComponent(
                 { title: undefined, type:'notification_component', icon: 'mdi-bell', condition: computed(() => loginStore.userLoggedIn), component: notificationItem },
                 { title: registerLabel, type:'icon-link', pathName: `register`, icon: 'mdi-login', condition: computed(() => isRegistrationEnabled.value && !loginStore.userLoggedIn), variant: 'text' },
                 { title: loginTitle, type:'icon-link', pathName: `login`, icon: 'mdi-lock-open', condition: computed(() => !loginStore.userLoggedIn), variant: 'outlined', color:'primary' },
-                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
+                { title: computed(() => userName.value + " (" + getTitleFromValueAutoLocale(userRole.value as string, hasInstitution.value) + ")"), type:'icon-link', pathName:'user-profile', icon: 'mdi-account', condition: computed(() => loginStore.userLoggedIn), variant: 'flat', color:'primary' },
                 { title: undefined, type:'icon', click:logout, icon: 'mdi-logout', condition: computed(() => loginStore.userLoggedIn) }
             ]);
 

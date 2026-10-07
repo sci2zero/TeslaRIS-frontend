@@ -92,7 +92,7 @@ export default defineComponent({
                 UserService.searchUsers(params, props.allowedRoles).then((response) => {
                     const listOfUsers: { title: string, value: number }[] = [];
                     response.data.content.forEach((user: UserAccountIndex) => {
-                        listOfUsers.push({title: `${user.fullName} | ${user.email} | ${getTitleFromValueAutoLocale(user.userRole)}`, value: user.databaseId});
+                        listOfUsers.push({title: `${user.fullName} | ${user.email} | ${getTitleFromValueAutoLocale(user.userRole, user.organisationUnitId > 0)}`, value: user.databaseId});
                     })
                     users.value = listOfUsers;
                 });

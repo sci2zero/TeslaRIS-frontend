@@ -748,6 +748,7 @@ export default {
     reportYearLabel: "Report year",
     topLevelInstitutionLabel: "Top level institution",
     addViceDeanForScienceLabel: "Vice dean for science",
+    addResearchInformationManagerLabel: "Research information manager",
     reportingLabel: "Reporting",
     alreadyGeneratedReportsLabel: "Already generated for this commission",
     unauthorizedReportGenerationAttemptMessage: "Zou can't generate report for an institution where you are not employed.",

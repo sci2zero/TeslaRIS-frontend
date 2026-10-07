@@ -89,7 +89,7 @@
                                             {{ userName }}
                                         </span>
                                         <span class="text-xs opacity-75 truncate">
-                                            {{ userRole ? getTitleFromValueAutoLocale(userRole as string) : 'User' }}
+                                            {{ userRole ? getTitleFromValueAutoLocale(userRole as string, hasInstitution) : 'User' }}
                                         </span>
                                     </div>
                                 </div>
@@ -199,7 +199,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const navigationDepth = ref(0);
 
-const { userRole } = useUserRole();
+const { userRole, hasInstitution } = useUserRole();
 
 const navbarClasses = computed(() => {
     return {

@@ -1,3 +1,4 @@
+import type { Composer } from "vue-i18n";
 import { UserRole } from "@/models/UserModel";
 import i18n from ".";
 import { transliterateContentToCyrillic } from "@/utils/StringUtil";
@@ -24,7 +25,23 @@ export const userTypesEn = [
     { title: "Promotion registry admin", value: UserRole.PROMOTION_REGISTRY_ADMINISTRATOR }
 ];
 
-export const getTitleFromValueAutoLocale = (value: UserRole | string) => {
+/**
+ * Labels that the same role carries when the user it belongs to has no institution. The role is
+ * unchanged, only what it is called: a vice dean answers for one faculty, whereas the same account
+ * without an institution covers the whole repository.
+ */
+const unboundRoleLabelKeys: Partial<Record<UserRole | string, string>> = {
+    [UserRole.VICE_DEAN_FOR_SCIENCE]: "addResearchInformationManagerLabel"
+};
+
+export const getTitleFromValueAutoLocale = (value: UserRole | string,
+                                            boundToInstitution: boolean = true) => {
+    if (!boundToInstitution && unboundRoleLabelKeys[value]) {
+        // Read through i18n rather than the arrays below, so the Cyrillic form comes from the
+        // transliteration the message bundles already do.
+        return (i18n.vueI18n.global as Composer).t(unboundRoleLabelKeys[value] as string);
+    }
+
     const locale = i18n.vueI18n.global.locale;
 
     let userTypeArray = userTypesEn;

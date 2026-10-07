@@ -749,6 +749,7 @@ export default {
     reportYearLabel: "Godina izveštavanja",
     topLevelInstitutionLabel: "Vrhovna institucija",
     addViceDeanForScienceLabel: "Prodekan za nauku",
+    addResearchInformationManagerLabel: "Menadžer istraživačkih informacija",
     reportingLabel: "Izveštavanje",
     alreadyGeneratedReportsLabel: "Već generisano za ovu komisiju",
     unauthorizedReportGenerationAttemptMessage: "Ne možete generisati izveštaj za instituciju na kojoj niste zaposleni",

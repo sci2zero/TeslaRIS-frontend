@@ -228,7 +228,11 @@ export default defineComponent({
                 case UserRole.COMMISSION:
                     return i18n.t("addCommissionLabel");
                 case UserRole.VICE_DEAN_FOR_SCIENCE:
-                    return i18n.t("addViceDeanForScienceLabel");
+                    // Same role either way, but without an institution it is not a vice dean of
+                    // anything, it answers for the whole repository.
+                    return selectedOrganisationUnit.value.value > 0
+                        ? i18n.t("addViceDeanForScienceLabel")
+                        : i18n.t("addResearchInformationManagerLabel");
                 case UserRole.INSTITUTIONAL_LIBRARIAN:
                     return i18n.t("addInstitutionLibrarianLabel");
                 case UserRole.HEAD_OF_LIBRARY:
