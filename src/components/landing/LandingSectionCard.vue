@@ -4,7 +4,7 @@
             <div
                 class="flex size-8 shrink-0 items-center justify-center rounded-lg"
                 :class="iconClass">
-                <span class="mdi text-lg" :class="icon" aria-hidden="true"></span>
+                <span class="mdi text-lg" :class="icon" aria-hidden="true" />
             </div>
             <h3 class="min-w-0 flex-1 text-sm font-semibold text-slate-800">
                 {{ title }}
@@ -15,11 +15,11 @@
                 </span>
             </h3>
             <div v-if="$slots.action" class="shrink-0">
-                <slot name="action"></slot>
+                <slot name="action" />
             </div>
         </header>
         <div :class="padded ? 'px-4 py-4' : undefined">
-            <slot></slot>
+            <slot />
         </div>
     </section>
 </template>

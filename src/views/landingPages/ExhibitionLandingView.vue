@@ -7,9 +7,9 @@
         <template #header>
             <entity-landing-header
                 :loading="!exhibition"
-            :entity-label="$t('exhibitionLabel')"
-            :year="!exhibition?.serialEvent && exhibition?.dateFrom ? exhibition.dateFrom.substring(0, 4) : ''"
-            icon="mdi-panorama"
+                :entity-label="$t('exhibitionLabel')"
+                :year="!exhibition?.serialEvent && exhibition?.dateFrom ? exhibition.dateFrom.substring(0, 4) : ''"
+                icon="mdi-panorama"
                 :can-edit="canEdit"
                 :edit-label="$t('updateExhibitionLabel')"
                 :entity-type="EntityType.EXHIBITION"
@@ -78,11 +78,11 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="exhibition?.description"
                     is-general-description
                     :contributions="exhibition?.contributions"
                     :contributors-label="$t('participationsLabel')"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

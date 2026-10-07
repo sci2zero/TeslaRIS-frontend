@@ -54,13 +54,13 @@
                     <template v-if="item.type == 'divider'">
                         <v-divider
                             :key="index" inset class="ms-2" vertical
-                            :color="foregroundColor"></v-divider>
+                            :color="foregroundColor" />
                     </template>
                     <template v-else-if="item.type == 'lang_component'">
-                        <component :is="item.component" :key="index" :variant="variant" :theme="theme"></component>
+                        <component :is="item.component" :key="index" :variant="variant" :theme="theme" />
                     </template>
                     <template v-else-if="item.type == 'notification_component' && item.condition">
-                        <component :is="item.component" :key="index" :variant="variant" :theme="theme"></component>
+                        <component :is="item.component" :key="index" :variant="variant" :theme="theme" />
                     </template>
                     <template v-else-if="item.type == 'user_profile'">
                         <span :key="index">

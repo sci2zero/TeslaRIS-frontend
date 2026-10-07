@@ -27,16 +27,18 @@
                 :label="$t('yearOfPublicationLabel') + '*'"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedIntellectualPropertyType"
+                control="select"
                 :label="$t('intellectualPropertyTypeLabel') + '*'"
                 :items="intellectualPropertyTypes"
                 :rules="requiredSelectionRules"
                 :disabled="inModal"
                 return-object
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedIntellectualPropertyApplicationStatusType"
+                control="select"
                 :label="$t('intellectualPropertyApplicationStatusLabel')"
                 :items="intellectualPropertyApplicationStatuses"
                 :disabled="inModal"

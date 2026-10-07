@@ -25,9 +25,8 @@
                 v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mb-4"
                 :institution-id="employmentInstitutionId"
-                @update="notifyUserAndRefreshTable">
-            </add-employment-modal>
-            <slot name="actions"></slot>
+                @update="notifyUserAndRefreshTable" />
+            <slot name="actions" />
         </template>
         <template #selection-menu>
             <v-list-item
@@ -153,8 +152,7 @@
         :total-results="totalPersons"
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
 
     <person-quick-glance
         v-model="glanceOpen"

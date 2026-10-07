@@ -118,8 +118,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedOuSector"
+                            control="select"
                             :label="$t('organisationUnitSectorLabel')"
                             :items="ouSectors"
                             return-object
@@ -216,8 +217,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedThesisType"
+                            control="select"
                             :label="$t('thesisTypeLabel')"
                             :items="thesisTypes"
                             :rules="requiredSelectionRules"
@@ -230,8 +232,9 @@
                 <h3>{{ $t('addressLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedCountry"
+                            control="select"
                             hide-details="auto"
                             :items="countries"
                             :label="$t('countryLabel')"

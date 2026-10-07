@@ -6,7 +6,7 @@
             class="person-avatar-image"
             alt=""
             @error="imageFailed = true"
-        />
+        >
         <span
             v-else-if="initials"
             class="person-avatar-initials">

@@ -56,11 +56,11 @@
                         <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">
                             {{ $t("notYetSetMessage") }}
                         </strong>
-                        <br />
+                        <br>
                         <div v-if="employments.length > 0">
                             <h3>{{ $t("employmentsLabel") }}</h3>
                         </div>
-                        <br />
+                        <br>
                         <involvement-list
                             :involvements="employments"
                             :person="person"
@@ -68,9 +68,9 @@
                             @refresh-involvements="emit('refresh')"
                         />
                         <div v-if="education.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("educationLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
                         </div>
-                        <br />
+                        <br>
                         <involvement-list
                             :involvements="education"
                             :person="person"
@@ -78,9 +78,9 @@
                             @refresh-involvements="emit('refresh')"
                         />
                         <div v-if="memberships.length > 0">
-                            <v-divider class="mb-5"></v-divider><h3>{{ $t("membershipsLabel") }}</h3>
+                            <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
                         </div>
-                        <br />
+                        <br>
                         <involvement-list
                             :involvements="memberships"
                             :person="person"

@@ -25,8 +25,9 @@
                         </v-row>
                         <v-row>
                             <v-col>
-                                <ui-input control="select"
+                                <ui-input
                                     v-model="selectedEmploymentPosition"
+                                    control="select"
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel') + '*'"
                                     :rules="requiredSelectionRules"

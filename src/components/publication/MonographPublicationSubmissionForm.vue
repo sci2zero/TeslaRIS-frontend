@@ -51,8 +51,9 @@
                 <ui-input v-model="startPage" :label="$t('startPageLabel')" :placeholder="$t('startPageLabel')" />
                 <ui-input v-model="endPage" :label="$t('endPageLabel')" :placeholder="$t('endPageLabel')" />
             </div>
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedpublicationType"
+                control="select"
                 :items="publicationTypes"
                 :label="$t('concretePublicationTypeLabel') + '*'"
                 :rules="requiredSelectionRules"

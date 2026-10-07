@@ -27,8 +27,9 @@
                 :label="$t('yearOfPublicationLabel') + '*'"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedMonographType"
+                control="select"
                 :label="$t('monographTypeLabel') + '*'"
                 :items="monographTypes"
                 :rules="requiredSelectionRules"
@@ -87,15 +88,17 @@
                     is-area
                 />
                 <uri-input ref="urisRef" v-model="uris" />
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedResearchArea"
+                    control="select"
                     :label="$t('researchAreaLabel')"
                     :placeholder="$t('researchAreaLabel')"
                     :items="researchAreasSelectable"
                     return-object
                 />
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguages"
+                    control="select"
                     :label="$t('languageLabel')"
                     :items="languageList"
                     multiple

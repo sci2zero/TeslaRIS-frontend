@@ -2,8 +2,9 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedThesisType"
+                    control="select"
                     :label="$t('thesisTypeLabel') + '*'"
                     :items="publicationTypes"
                     :rules="requiredSelectionRules"
@@ -135,7 +136,7 @@
                     v-model="numberOfReferences" type="number"
                     :label="$t('numberOfReferencesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -144,14 +145,14 @@
                     v-model="numberOfGraphs" type="number"
                     :label="$t('numberOfGraphsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
             <v-col cols="6">
                 <ui-input
                     v-model="numberOfIllustrations" type="number"
                     :label="$t('numberOfIllustrationsLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -160,14 +161,14 @@
                     v-model="numberOfTables" type="number"
                     :label="$t('numberOfTablesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
             <v-col cols="6">
                 <ui-input
                     v-model="numberOfAppendices" type="number"
                     :label="$t('numberOfAppendicesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -207,7 +208,7 @@
                 <ui-input
                     v-model="udc"
                     :label="$t('udcLabel')"
-                    />
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -217,8 +218,9 @@
         </v-row>
         <v-row>
             <v-col>
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguage"
+                    control="select"
                     :label="$t('languageLabel')"
                     :items="languageList"
                 />
@@ -226,8 +228,9 @@
         </v-row>
         <v-row>
             <v-col v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedWritingLanguage"
+                    control="select"
                     :label="$t('writingLanguageLabel')"
                     :items="languageTagsList"
                     return-object

@@ -16,7 +16,9 @@
                 :label="$t('nameAbbreviationLabel')"
             />
             <div v-if="!serialEvent" class="mt-3 flex flex-col gap-4">
-                <p class="text-sm font-semibold text-slate-800">{{ $t("tookPlaceLabel") }}</p>
+                <p class="text-sm font-semibold text-slate-800">
+                    {{ $t("tookPlaceLabel") }}
+                </p>
                 <choice-cards
                     :model-value="timePeriodInput ? 'known' : 'unknown'"
                     :options="[
@@ -56,8 +58,8 @@
             </div>
             <ui-checkbox v-if="canAddSerialEvents && !inModal" v-model="serialEvent" :label="$t('serialEventLabel')" />
             <ui-input
-                control="select"
                 v-model="selectedCountry"
+                control="select"
                 hide-details="auto"
                 :items="countries"
                 :label="$t('countryLabel')"

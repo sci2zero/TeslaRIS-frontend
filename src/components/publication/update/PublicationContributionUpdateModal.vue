@@ -1,5 +1,7 @@
 <template>
-    <v-dialog v-model="dialog" :persistent="edited" scrollable max-width="960px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
+    <v-dialog
+        v-model="dialog" :persistent="edited" scrollable max-width="960px"
+        @click:outside="onClickOutside" @keydown.esc="onClickOutside">
         <template #activator="scope">
             <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
@@ -10,7 +12,7 @@
                         v-bind="scope.props"
                         class="bottom-spacer"
                         size="small">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
                     </v-btn>
                 </div>
             </slot>
@@ -35,12 +37,11 @@
                         is-update
                         :limit-one="limitOne"
                         :lock-contribution-type="lockContributionType"
-                        @set-input="contributions = $event">
-                    </person-publication-contribution>
+                        @set-input="contributions = $event" />
                 </v-form>
             </v-card-text>
             <v-card-actions class="px-6 pb-4">
-                <v-spacer></v-spacer>
+                <v-spacer />
                 <v-btn variant="text" @click="dialog = false">
                     {{ $t("closeLabel") }}
                 </v-btn>

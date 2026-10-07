@@ -1453,6 +1453,7 @@ export default {
     updateResearchAreasLabel: "Ažuriraj oblasti istraživanja",
     updateResearchSubAreasLabel: "Ažuriraj pod-oblasti istraživanja",
     selectSubAreasLabel: "Izaberite pod-oblasti istraživanja:",
+    assessmentResearchAreaNeededForPointsInfo: "Oblasti istraživanja ispod se čuvaju u svakom slučaju, ali je potrebno izabrati oblast istraživanja za vrednovanje ovde kako bi se bodovi obračunavali.",
     calculateIf5RankLabel: "Izračunaj IF5 rank",
     calculateJciRankLabel: "Izračunaj JCI rank",
     showOnlyWithoutProceedingsLabel: "Prikaži samo one bez zbornika",

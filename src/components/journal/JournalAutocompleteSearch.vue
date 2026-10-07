@@ -1,10 +1,10 @@
 <template>
     <div class="flex items-start gap-2">
         <ui-input
-            class="min-w-0 flex-1"
-            control="autocomplete"
             v-model="selectedJournal"
             v-model:search="searchInput"
+            class="min-w-0 flex-1"
+            control="autocomplete"
             :label="(multiple ? $t('journalListLabel') : $t('journalLabel')) + (required ? '*' : '')"
             :items="readonly ? [] : journals"
             :custom-filter="((): boolean => true)"

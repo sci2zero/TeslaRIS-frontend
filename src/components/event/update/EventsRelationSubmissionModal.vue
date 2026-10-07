@@ -6,7 +6,7 @@
                     <v-btn
                         icon color="primary" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly">
-                        <v-icon icon="mdi-pencil-plus-outline"></v-icon>
+                        <v-icon icon="mdi-pencil-plus-outline" />
                     </v-btn>
                 </div>
             </template>

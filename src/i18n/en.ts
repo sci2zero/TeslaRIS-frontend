@@ -1445,6 +1445,7 @@ export default {
     updateResearchAreasLabel: "Update research areas",
     updateResearchSubAreasLabel: "Update research sub areas",
     selectSubAreasLabel: "Choose research sub areas:",
+    assessmentResearchAreaNeededForPointsInfo: "The research areas below are saved either way, but an assessment research area has to be chosen here for assessment points to be calculated.",
     calculateIf5RankLabel: "Calculate IF5 rank",
     calculateJciRankLabel: "Calculate JCI rank",
     showOnlyWithoutProceedingsLabel: "Show only those without proceedings",

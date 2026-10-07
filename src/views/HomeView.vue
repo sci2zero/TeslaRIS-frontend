@@ -45,7 +45,7 @@
                             @click="item.path !== undefined ? $router.push('/' + $i18n.locale + '/' + item.path) : undefined">
                             <div class="text-center mb-2">
                                 <div class="icon-wrapper">
-                                    <v-icon :icon="item.icon" :size="$vuetify.display.xs ? '24' : $vuetify.display.sm ? '28' : '32'"></v-icon>
+                                    <v-icon :icon="item.icon" :size="$vuetify.display.xs ? '24' : $vuetify.display.sm ? '28' : '32'" />
                                 </div>
                             </div>
                             <h3 class="hero-card-label text-center text-xs sm:text-sm font-medium mb-1 px-1 leading-tight">

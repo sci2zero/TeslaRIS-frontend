@@ -105,12 +105,12 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="performanceRelatedOutput?.description"
                     :contributions="performanceRelatedOutput?.contributions"
                     :contribution-types="['AUTHOR']"
                     :for-document-id="performanceRelatedOutput?.id"
                     :document-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

@@ -166,16 +166,16 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="navigateToPublicTheses"
                     >
-                        <span class="mdi mdi-eye-outline"></span>
+                        <span class="mdi mdi-eye-outline" />
                         {{ $t("routeLabel.publicDissertationsReport") }}
                     </UiButton>
 
                     <v-menu v-if="hasMoreInstitutionActions" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                                <span class="mdi mdi-dots-horizontal"></span>
+                                <span class="mdi mdi-dots-horizontal" />
                                 {{ $t("moreActionsLabel") }}
-                                <span class="mdi mdi-chevron-down"></span>
+                                <span class="mdi mdi-chevron-down" />
                             </UiButton>
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -291,10 +291,10 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="organisationUnit?.description"
                     is-general-description
                     description-tab="researchAreas"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

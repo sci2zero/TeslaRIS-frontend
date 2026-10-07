@@ -64,8 +64,9 @@
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
-                                    <ui-input control="select"
+                                    <ui-input
                                         v-model="primaryName.personNameType"
+                                        control="select"
                                         :items="nameTypes"
                                         :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
                                         :rules="requiredSelectionRules"
@@ -119,8 +120,9 @@
                                         :readonly="readOnly" />
                                 </v-col>
                                 <v-col :cols="readOnly ? 3 : 2">
-                                    <ui-input control="select"
+                                    <ui-input
                                         v-model="element.personNameType"
+                                        control="select"
                                         :items="nameTypes"
                                         :label="$t('nameTypeLabel') + (readOnly ? '' : '*')"
                                         :rules="requiredSelectionRules"
@@ -209,8 +211,8 @@ import UiInput from "@/components/ui/input/Input.vue";
 
 
 export default defineComponent({
-    components: { UiInput, PersistentQuestionDialog },
     name: "PersonOtherNameModal",
+    components: { UiInput, PersistentQuestionDialog },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,

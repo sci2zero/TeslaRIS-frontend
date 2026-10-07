@@ -78,10 +78,10 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :contributions="journal?.contributions"
                     :contribution-types="['EDITOR']"
                     :contributors-label="$t('editorsLabel')"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

@@ -20,18 +20,18 @@
                 <span
                     v-if="!hasCustomLogo"
                     class="sidebar-logo"
-                    aria-hidden="true"></span>
+                    aria-hidden="true" />
                 <img
                     v-else
                     :src="logoUrl"
                     alt=""
                     class="sidebar-logo-img"
-                />
+                >
                 <span class="sidebar-brand">{{ brandTitle }}</span>
             </router-link>
         </div>
 
-        <div class="sidebar-divider"></div>
+        <div class="sidebar-divider" />
 
         <nav class="side-menu">
             <button
@@ -65,9 +65,9 @@
                                     :class="{ 'sidebar-item--active': isActive(item.to) }"
                                     :aria-label="item.label"
                                 >
-                                    <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                                    <span :class="['mdi', item.icon, 'sidebar-item-icon']" />
                                     <span class="sidebar-item-label">{{ item.label }}</span>
-                                    <span class="mdi mdi-chevron-right sidebar-item-chevron"></span>
+                                    <span class="mdi mdi-chevron-right sidebar-item-chevron" />
                                 </div>
                             </template>
                             
@@ -83,7 +83,7 @@
                                     class="sidebar-menu-list-item"
                                 >
                                     <template #prepend>
-                                        <v-icon :icon="subItem.icon" class="sidebar-menu-icon"></v-icon>
+                                        <v-icon :icon="subItem.icon" class="sidebar-menu-icon" />
                                     </template>
                                     <v-list-item-title class="text-sm">
                                         {{ subItem.label }}
@@ -100,7 +100,7 @@
                             :aria-label="item.label"
                             :data-tutorial="item.key === 'persons' || item.key === 'organisation-units' ? `nav-${item.key}` : undefined"
                         >
-                            <span :class="['mdi', item.icon, 'sidebar-item-icon']"></span>
+                            <span :class="['mdi', item.icon, 'sidebar-item-icon']" />
                             <span class="sidebar-item-label">{{ item.label }}</span>
                         </router-link>
                     </template>

@@ -102,11 +102,11 @@
                         ref="researchAreaModalRef"
                         hide-activator
                         :form-component="AssessmentResearchAreaForm"
-                        :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
+                        :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchAreasHierarchy }"
                         entity-name="ResearchArea"
                         is-update
                         :read-only="!canEdit"
-                        @update="fetchAssessmentResearchArea"
+                        @update="updateResearchAreas"
                     />
                     <generic-crud-modal
                         v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
@@ -127,16 +127,16 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="openModal(personOtherNameModalRef)"
                     >
-                        <span class="mdi mdi-account-multiple-outline"></span>
+                        <span class="mdi mdi-account-multiple-outline" />
                         {{ $t("viewAllPersonNamesLabel") }}
                     </UiButton>
 
                     <v-menu v-if="canEdit" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                                <span class="mdi mdi-dots-horizontal"></span>
+                                <span class="mdi mdi-dots-horizontal" />
                                 {{ $t("moreActionsLabel") }}
-                                <span class="mdi mdi-chevron-down"></span>
+                                <span class="mdi mdi-chevron-down" />
                             </UiButton>
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -253,8 +253,9 @@
                                     size="small"
                                     @search="clearSortAndPerformPublicationSearch($event)"
                                 />
-                                <ui-input control="select"
+                                <ui-input
                                     v-model="selectedPublicationTypes"
+                                    control="select"
                                     :items="publicationTypes"
                                     :label="$t('typeOfPublicationLabel')"
                                     return-object
@@ -262,7 +263,7 @@
                                     density="comfortable"
                                     class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
                                     multiple
-                                ></ui-input>
+                                />
                             </div>
 
                             <publication-table-component
@@ -280,8 +281,7 @@
                                         commissionId: null
                                     }"
                                 :allow-researcher-unbinding="canEdit && isResearcher"
-                                @switch-page="switchPage">
-                            </publication-table-component>
+                                @switch-page="switchPage" />
                         </div>
                     </landing-section-card>
                 </div>
@@ -373,8 +373,7 @@
                     <person-assessments-view
                         :assessments="personAssessments"
                         :is-loading="assessmentsLoading"
-                        @fetch="fetchAssessment">
-                    </person-assessments-view>
+                        @fetch="fetchAssessment" />
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
@@ -415,8 +414,7 @@
                 ref="dialogRef"
                 :title="$t('areYouSureLabel')"
                 :message="dialogMessage"
-                @continue="performMigrationToUnmanaged">
-            </persistent-question-dialog>
+                @continue="performMigrationToUnmanaged" />
 
             <toast v-model="snackbar" :message="snackbarMessage" />
         </template>
@@ -586,6 +584,14 @@ export default defineComponent({
         const researchArea = ref<AssessmentResearchArea>();
         const researchSubAreas = ref<ResearchArea[]>([]);
 
+        // The person owns the areas, the assessment sub-areas are its copy. The copy is only there
+        // when the person has an assessment research area at all, so the person comes first.
+        const researchAreasHierarchy = computed<ResearchArea[]>(() =>
+            person.value?.personalInfo?.researchAreas?.length
+                ? person.value.personalInfo.researchAreas
+                : researchSubAreas.value
+        );
+
         const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
 
         const assessmentsLoading = ref(false);
@@ -729,10 +735,52 @@ export default defineComponent({
             });
         };
 
+        /**
+         * The assessment research area only exists while the assessment module is on. With it off
+         * the person's own research areas are the only ones there are, and those arrive with the
+         * person, so there is nothing to ask the assessment side for.
+         */
         const fetchAssessmentResearchArea = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                researchArea.value = undefined;
+                researchSubAreas.value = [];
+                return;
+            }
+
             AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
                 researchArea.value = response.data;
                 researchSubAreas.value = response.data.researchSubAreas;
+            });
+        };
+
+        // The toggle is fetched asynchronously and defaults to on, so its real value can land after
+        // the first read above has already gone out.
+        watch(isAssessmentModuleEnabled, fetchAssessmentResearchArea);
+
+        /**
+         * The research areas themselves belong to the person, so they go through the ordinary
+         * personal info update; the assessment copy follows from there on the server side.
+         */
+        const updateResearchAreas = (payload?: { researchAreaIds: number[] }) => {
+            if (!payload || !person.value) {
+                fetchAssessmentResearchArea();
+                return;
+            }
+
+            // streetAndNumber is added to the personal info for display only, it is not part of the
+            // payload the server expects back.
+            const { streetAndNumber, ...personalInfoToSend } = person.value.personalInfo as PersonalInfo & { streetAndNumber?: unknown };
+
+            PersonService.updatePersonalInfo(person.value.id as number, {
+                ...personalInfoToSend,
+                researchAreasId: payload.researchAreaIds
+            }).then(() => {
+                fetchPerson();
+                fetchAssessmentResearchArea();
+                updateSuccess();
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
             });
         };
 
@@ -1013,10 +1061,11 @@ export default defineComponent({
             canReviewDataQuality,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
+            researchAreasHierarchy,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
+            snackbar, snackbarMessage, updatePersonalInfo, updateResearchAreas, addInvolvement, fetchPerson, localiseDate,
             currentTab, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,

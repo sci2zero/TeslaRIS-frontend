@@ -36,8 +36,9 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedGeneticMaterialType"
+                    control="select"
                     :label="$t('geneticMaterialTypeLabel') + '*'"
                     :items="geneticMaterialTypes"
                     :rules="requiredSelectionRules"

@@ -7,8 +7,9 @@
             @change="onDropCallback">
             <v-row v-for="(relation, index) in data" :key="relation.id">
                 <v-col cols="3">
-                    <ui-input control="select"
+                    <ui-input
                         v-model="relation.relationType"
+                        control="select"
                         :items="relationTypes"
                         :label="$t('relationTypeLabel')"
                         return-object />

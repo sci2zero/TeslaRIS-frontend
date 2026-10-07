@@ -79,7 +79,7 @@
                     <div class="mt-4 space-y-4">
                         <div v-if="formattedAddress" class="flex items-start gap-3">
                             <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-600 text-white">
-                                <span class="mdi mdi-map-marker text-sm" aria-hidden="true"></span>
+                                <span class="mdi mdi-map-marker text-sm" aria-hidden="true" />
                             </span>
                             <p class="pt-1 text-sm font-medium text-slate-800">
                                 {{ formattedAddress }}
@@ -87,7 +87,7 @@
                         </div>
                         <div v-if="phoneNumber" class="flex items-start gap-3">
                             <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-600 text-white">
-                                <span class="mdi mdi-phone text-sm" aria-hidden="true"></span>
+                                <span class="mdi mdi-phone text-sm" aria-hidden="true" />
                             </span>
                             <a
                                 :href="`tel:${phoneNumber}`"
@@ -107,7 +107,7 @@
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
                         allowfullscreen
-                    ></iframe>
+                    />
                 </div>
             </aside>
         </div>

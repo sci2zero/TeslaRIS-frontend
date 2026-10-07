@@ -13,8 +13,8 @@ const items = computed(() => getExtensions(props.name));
 <template>
     <slot :items="items">
         <component
-            v-for="item in items"
             :is="item.component"
+            v-for="item in items"
             v-bind="componentProps"
             :key="item.id" />
     </slot>

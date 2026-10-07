@@ -5,7 +5,7 @@
     >
         <v-card v-if="item" class="rounded-t-2xl max-h-[90vh] flex flex-col">
             <div class="flex justify-center pt-2 pb-1">
-                <div class="w-10 h-1 rounded-full bg-slate-300"></div>
+                <div class="w-10 h-1 rounded-full bg-slate-300" />
             </div>
             <v-card-title class="px-4 pt-1 pb-2 flex items-start gap-2">
                 <person-avatar
@@ -49,10 +49,10 @@
                         {{ $t("identifiersLabel") }}
                     </p>
                     <div class="flex flex-wrap gap-2">
-                        <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                        <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                        <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                        <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
+                        <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid" />
+                        <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus" />
+                        <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex" />
+                        <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience" />
                     </div>
                 </div>
 

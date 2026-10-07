@@ -13,7 +13,7 @@
                     class="w-full sm:w-auto"
                     v-bind="activatorProps"
                 >
-                    <span class="mdi mdi-format-quote-close" aria-hidden="true"></span>
+                    <span class="mdi mdi-format-quote-close" aria-hidden="true" />
                     {{ $t("citePublicationLabel") }}
                 </UiButton>
             </template>
@@ -21,7 +21,7 @@
             <template #header>
                 <div class="flex items-start gap-3 px-5 pt-5 pb-4">
                     <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600">
-                        <span class="mdi mdi-format-quote-close text-xl" aria-hidden="true"></span>
+                        <span class="mdi mdi-format-quote-close text-xl" aria-hidden="true" />
                     </div>
                     <div class="min-w-0 flex-1">
                         <h2 class="citation-title text-xl sm:text-2xl font-bold text-slate-800 leading-tight">
@@ -38,7 +38,7 @@
                         :aria-label="$t('closeLabel')"
                         @click="dialog = false"
                     >
-                        <span class="mdi mdi-close text-lg" aria-hidden="true"></span>
+                        <span class="mdi mdi-close text-lg" aria-hidden="true" />
                     </UiButton>
                 </div>
             </template>

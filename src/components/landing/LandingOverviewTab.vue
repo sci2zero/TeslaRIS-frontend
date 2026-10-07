@@ -74,7 +74,7 @@
             {{ $t("notYetSetMessage") }}
         </p>
 
-        <slot></slot>
+        <slot />
     </div>
 </template>
 

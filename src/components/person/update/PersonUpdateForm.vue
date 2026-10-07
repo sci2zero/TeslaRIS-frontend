@@ -5,8 +5,9 @@
                 <h3>{{ $t('personalInfoLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedSex"
+                            control="select"
                             :items="sexes"
                             :label="$t('sexLabel')"
                             return-object />
@@ -104,6 +105,17 @@
                         />
                     </v-col>
                 </v-row>
+                <h3>{{ $t('researchAreasLabel') }}</h3>
+                <v-row>
+                    <v-col>
+                        <research-areas-selection
+                            ref="researchAreasSelectionRef"
+                            :research-areas-hierarchy="presetResearchAreas"
+                            submit-on-click
+                            @update="saveResearchAreas"
+                        />
+                    </v-col>
+                </v-row>
                 <h3>{{ $t('professionalContactLabel') }}</h3>
                 <v-row>
                     <v-col>
@@ -181,8 +193,9 @@
                 <h3>{{ $t('professionalAddressLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedCountry"
+                            control="select"
                             hide-details="auto"
                             :items="countries"
                             :label="$t('countryLabel')"
@@ -232,8 +245,9 @@
                 <h3>{{ $t('privateAddressLabel') }}</h3>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedCountryPrivate"
+                            control="select"
                             hide-details="auto"
                             :items="countries"
                             :label="$t('countryLabel')"
@@ -307,11 +321,13 @@ import PersonService from '@/services/PersonService';
 import Toast from '@/components/core/Toast.vue';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import UiInput from '@/components/ui/input/Input.vue';
+import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
+import type { ResearchArea } from '@/models/OrganisationUnitModel';
 
 
 export default defineComponent({
     name: "PersonUpdateForm",
-    components: { MultilingualTextInput, DatePicker, UriInput, Toast, UiInput },
+    components: { MultilingualTextInput, DatePicker, UriInput, Toast, UiInput, ResearchAreasSelection },
     props: {
         presetPerson: {
             type: Object as PropType<PersonResponse | undefined>,
@@ -425,6 +441,16 @@ export default defineComponent({
         const uris = ref<string[]>(props.presetPerson?.personalInfo.uris as string[]);
         const displayTitle = ref<any>([]);
 
+        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
+        const presetResearchAreas = ref<ResearchArea[] | undefined>(props.presetPerson?.personalInfo.researchAreas);
+        const researchAreaIds = ref<number[]>(
+            props.presetPerson?.personalInfo.researchAreasId ?? []
+        );
+
+        const saveResearchAreas = (researchAreas: number[]) => {
+            researchAreaIds.value = researchAreas;
+        };
+
         const postalNumber = ref(props.presetPerson?.personalInfo.postalAddress?.postalNumber);
         const postalNumberPrivate = ref(props.presetPerson?.personalInfo.privatePostalAddress?.postalNumber);
 
@@ -506,7 +532,8 @@ export default defineComponent({
                 authenticusId: authenticusId.value,
                 lattesId: lattesId.value,
                 uris: uris.value,
-                displayTitle: displayTitle.value
+                displayTitle: displayTitle.value,
+                researchAreasId: researchAreaIds.value
             };
 
             emit("update", updatedPerson);
@@ -563,6 +590,11 @@ export default defineComponent({
             lattesId.value = props.presetPerson?.personalInfo.lattesId;
             urisRef.value?.refreshModelValue(uris.value);
 
+            // The hierarchy has to be in place before the tree rebuilds, it reads the prop as it goes.
+            presetResearchAreas.value = props.presetPerson?.personalInfo.researchAreas;
+            researchAreaIds.value = props.presetPerson?.personalInfo.researchAreasId ?? [];
+            researchAreasSelectionRef.value?.resetForm();
+
             cityRef.value?.forceRefreshModelValue(toMultilingualTextInput(city.value, languageTags.value));
             streetAndNumberRef.value?.forceRefreshModelValue(toMultilingualTextInput(streetAndNumber.value, languageTags.value));
             stateRef.value?.forceRefreshModelValue(toMultilingualTextInput(state.value, languageTags.value));
@@ -588,7 +620,8 @@ export default defineComponent({
             emailPrivate, phoneNumberPrivate, faxNumberPrivate,
             mobilePhoneNumberPrivate, cityPrivateRef, statePrivateRef,
             streetAndNumberPrivateRef, cityPrivate, statePrivate,
-            streetAndNumberPrivate, postalNumberPrivate, selectedCountryPrivate
+            streetAndNumberPrivate, postalNumberPrivate, selectedCountryPrivate,
+            researchAreasSelectionRef, presetResearchAreas, saveResearchAreas
         };
     }
 });

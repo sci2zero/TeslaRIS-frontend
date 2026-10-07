@@ -2,10 +2,10 @@
     <div class="w-full min-w-0">
         <div class="flex w-full items-start gap-2">
             <ui-input
-                class="min-w-0 flex-1"
-                control="autocomplete"
                 v-model="selectedOrganisationUnit"
                 v-model:search="searchInput"
+                class="min-w-0 flex-1"
+                control="autocomplete"
                 :label="(label ? $t(label) : (multiple ? $t('ouListLabel') : $t('organisationUnitLabel'))) + (required ? '*' : '')"
                 :items="readonly ? [] : organisationUnits"
                 :custom-filter="((): boolean => true)"

@@ -21,17 +21,17 @@
                                 </v-btn>
                             </template>
                             <v-list class="action-menu-list" density="compact">
-                                <slot name="selection-menu"></slot>
+                                <slot name="selection-menu" />
                             </v-list>
                         </v-menu>
                     </div>
                 </Teleport>
                 <div v-if="$slots['top-left']" class="min-w-0 w-full basis-full sm:basis-auto sm:flex-1 sm:max-w-3xl">
-                    <slot name="top-left"></slot>
+                    <slot name="top-left" />
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <slot name="actions"></slot>
+                <slot name="actions" />
             </div>
         </div>
 
@@ -63,10 +63,10 @@
                             </v-btn>
                         </template>
                         <div class="p-3 bg-white rounded-lg shadow-lg">
-                            <slot name="filter" :column="filterColumn"></slot>
+                            <slot name="filter" :column="filterColumn" />
                         </div>
                     </v-menu>
-                    <span v-else></span>
+                    <span v-else />
                     <v-menu v-if="sortColumns.length > 0">
                         <template #activator="{ props: menuProps }">
                             <v-btn
@@ -121,7 +121,7 @@
                             :item="item"
                             :selected="selected"
                             :show-select="showSelect"
-                        ></slot>
+                        />
                     </div>
                 </VueDraggableNext>
             </div>
@@ -146,7 +146,7 @@
                     :key="slotName"
                     #[slotName]="scope"
                 >
-                    <slot :name="slotName" v-bind="scope"></slot>
+                    <slot :name="slotName" v-bind="scope" />
                 </template>
                 <template
                     v-if="filterHeaderKey && hasFilterSlot && !headerSlotNames.includes('header.' + filterHeaderKey)"
@@ -162,13 +162,13 @@
                                     :class="hasActiveFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
                                     icon="mdi-filter"
                                     @click.stop
-                                ></v-icon>
+                                />
                             </template>
                             <div class="p-3 bg-white rounded-lg shadow-lg">
-                                <slot name="filter" :column="column"></slot>
+                                <slot name="filter" :column="column" />
                             </div>
                         </v-menu>
-                        <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                        <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                     </div>
                 </template>
                 <template #body="properties">
@@ -193,7 +193,7 @@
                                 :item="item"
                                 :selected="selected"
                                 :show-select="showSelect"
-                            ></slot>
+                            />
                         </template>
                     </VueDraggableNext>
                 </template>

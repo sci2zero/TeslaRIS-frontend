@@ -1,9 +1,9 @@
 <template>
     <div class="flex items-start gap-2">
         <ui-input
+            v-model="selectedMonograph"
             class="min-w-0 flex-1"
             control="autocomplete"
-            v-model="selectedMonograph"
             :readonly="readOnly"
             :label="(multiple ? $t('monographListLabel') : $t('monographLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : monographs"

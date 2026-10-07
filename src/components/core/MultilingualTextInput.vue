@@ -1,7 +1,9 @@
 <template>
     <div class="multi-lingual-input">
         <div v-if="label || unusedLanguages.length > 0" class="multi-lingual-input__header">
-            <div v-if="label" class="multi-lingual-input__label">{{ label }}</div>
+            <div v-if="label" class="multi-lingual-input__label">
+                {{ label }}
+            </div>
             <v-menu v-if="unusedLanguages.length > 0" location="bottom end">
                 <template #activator="{ props: menuProps }">
                     <button
@@ -9,7 +11,7 @@
                         type="button"
                         class="multi-lingual-input__add"
                     >
-                        <span class="mdi mdi-plus"></span>
+                        <span class="mdi mdi-plus" />
                         {{ $t("addLanguageLabel") }}
                     </button>
                 </template>
@@ -26,7 +28,7 @@
                                     :src="flagUrl(language) as string"
                                     :alt="displayName(language)"
                                     @error="onFlagError(language.title)"
-                                />
+                                >
                                 <span v-else>{{ languageInitials(language) }}</span>
                             </span>
                             <span>{{ displayName(language) }}</span>
@@ -72,14 +74,14 @@
                                             :src="flagUrl(input.language) as string"
                                             alt=""
                                             @error="onFlagError(input.language.title)"
-                                        />
+                                        >
                                         <span v-else>{{ languageInitials(input.language) }}</span>
                                         <span
                                             v-if="canRemove"
                                             class="multi-lingual-input__star mdi"
                                             :class="isPrimary(input) ? 'mdi-star' : 'mdi-star-outline'"
                                             aria-hidden="true"
-                                        ></span>
+                                        />
                                     </span>
                                     <span class="multi-lingual-input__lang-code">{{ input.language.title }}</span>
                                 </button>
@@ -97,7 +99,7 @@
                                                 :src="flagUrl(language) as string"
                                                 :alt="displayName(language)"
                                                 @error="onFlagError(language.title)"
-                                            />
+                                            >
                                             <span v-else>{{ languageInitials(language) }}</span>
                                         </span>
                                         <span>{{ displayName(language) }}</span>
@@ -129,14 +131,14 @@
                                         :src="flagUrl(input.language) as string"
                                         alt=""
                                         @error="onFlagError(input.language.title)"
-                                    />
+                                    >
                                     <span v-else>{{ languageInitials(input.language) }}</span>
                                     <span
                                         v-if="canRemove"
                                         class="multi-lingual-input__star mdi"
                                         :class="isPrimary(input) ? 'mdi-star' : 'mdi-star-outline'"
                                         aria-hidden="true"
-                                    ></span>
+                                    />
                                 </span>
                                 <span class="multi-lingual-input__lang-code">{{ input.language.title }}</span>
                             </button>
@@ -154,7 +156,7 @@
                                             :src="flagUrl(language) as string"
                                             :alt="displayName(language)"
                                             @error="onFlagError(language.title)"
-                                        />
+                                        >
                                         <span v-else>{{ languageInitials(language) }}</span>
                                     </span>
                                     <span>{{ displayName(language) }}</span>
@@ -172,13 +174,15 @@
             </div>
 
             <button
-                type="button"
                 v-if="canRemove"
+                type="button"
                 class="multi-lingual-input__remove"
                 :title="$t('removeLanguageLabel')"
                 :aria-label="$t('removeLanguageLabel')"
                 @click="removeLanguage(input)"
-            ><span class="mdi mdi-close"></span></button>
+            >
+                <span class="mdi mdi-close" />
+            </button>
         </div>
     </div>
 </template>

@@ -26,8 +26,9 @@
                 :label="$t('yearOfPublicationLabel') + '*'"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedGeneticMaterialType"
+                control="select"
                 :label="$t('geneticMaterialTypeLabel') + '*'"
                 :items="geneticMaterialTypes"
                 :rules="requiredSelectionRules"

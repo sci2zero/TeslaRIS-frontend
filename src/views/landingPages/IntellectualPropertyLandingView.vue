@@ -123,12 +123,12 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="intellectualProperty?.description"
                     :contributions="intellectualProperty?.contributions"
                     :contribution-types="['AUTHOR']"
                     :for-document-id="intellectualProperty?.id"
                     :document-type="PublicationType.INTELLECTUAL_PROPERTY"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

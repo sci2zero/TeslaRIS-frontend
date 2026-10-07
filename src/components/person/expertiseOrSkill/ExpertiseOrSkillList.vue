@@ -48,7 +48,7 @@
                                     color="primary"
                                     size="small"
                                     @click="deleteExpertiseOrSkill(expertiseOrSkill.id)">
-                                    <v-icon size="large" icon="mdi-delete"></v-icon>
+                                    <v-icon size="large" icon="mdi-delete" />
                                 </v-btn>
                                 <expertise-or-skill-modal
                                     :read-only="!canEdit"
@@ -64,7 +64,7 @@
                     
                     <div
                         v-if="expertiseOrSkill.keywords && expertiseOrSkill.keywords.length > 0">
-                        <br />
+                        <br>
                         <div class="flex flex-wrap gap-2">
                             <span
                                 v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(expertiseOrSkill.keywords)?.split('\n')"
@@ -76,8 +76,8 @@
                                 </v-chip>
                             </span>
                         </div>
-                        <br />
-                        <br />
+                        <br>
+                        <br>
                     </div>
 
                     <attachment-list

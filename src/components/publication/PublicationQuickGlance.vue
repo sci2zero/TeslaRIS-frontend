@@ -5,7 +5,7 @@
     >
         <v-card v-if="item" class="rounded-t-2xl max-h-[90vh] flex flex-col">
             <div class="flex justify-center pt-2 pb-1">
-                <div class="w-10 h-1 rounded-full bg-slate-300"></div>
+                <div class="w-10 h-1 rounded-full bg-slate-300" />
             </div>
             <v-card-title class="px-4 pt-1 pb-2 flex items-start gap-2">
                 <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
@@ -62,7 +62,7 @@
                     <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
                         DOI
                     </p>
-                    <identifier-menu :identifier="item.doi" type="doi"></identifier-menu>
+                    <identifier-menu :identifier="item.doi" type="doi" />
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 mb-4">

@@ -9,7 +9,7 @@
                 class="uri-input__add"
                 @click="addUri"
             >
-                <span class="mdi mdi-plus"></span>
+                <span class="mdi mdi-plus" />
                 {{ $t("addUriLabel") }}
             </button>
         </div>
@@ -34,7 +34,9 @@
                 :title="$t('removeUriLabel')"
                 :aria-label="$t('removeUriLabel')"
                 @click="removeUri(index)"
-            ><span class="mdi mdi-close"></span></button>
+            >
+                <span class="mdi mdi-close" />
+            </button>
         </div>
     </div>
 </template>

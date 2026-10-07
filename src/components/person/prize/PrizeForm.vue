@@ -52,8 +52,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedPrizeType"
+                            control="select"
                             :items="prizeTypes"
                             :label="$t('prizeTypeLabel')"
                             return-object

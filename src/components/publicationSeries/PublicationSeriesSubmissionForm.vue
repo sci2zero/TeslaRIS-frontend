@@ -31,8 +31,8 @@
             </div>
             <ui-input
                 v-if="inputType === PublicationSeriesType.JOURNAL.toString()"
-                control="select"
                 v-model="selectedArticleCollectionSeriesType"
+                control="select"
                 :label="$t('articleCollectionSeriesTypeLabel')"
                 :items="articleCollectionSeriesTypes"
                 return-object
@@ -55,8 +55,9 @@
                     placeholder="Open Alex ID"
                     :rules="sourceOpenAlexIdValidationRules"
                 />
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguages"
+                    control="select"
                     :label="$t('languageLabel')"
                     :items="languageList"
                     multiple

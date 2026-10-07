@@ -21,8 +21,9 @@
         </v-row>
         <v-row>
             <v-col>
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedMonographType"
+                    control="select"
                     :label="$t('monographTypeLabel') + '*'"
                     :items="monographTypes"
                     :rules="requiredSelectionRules"
@@ -46,8 +47,9 @@
         </v-row>
         <v-row>
             <v-col>
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedResearchArea"
+                    control="select"
                     :label="$t('researchAreaLabel')"
                     :items="researchAreasSelectable"
                     return-object
@@ -56,8 +58,9 @@
         </v-row>
         <v-row>
             <v-col>
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguages"
+                    control="select"
                     :label="$t('languageLabel')"
                     :items="languageList"
                     multiple

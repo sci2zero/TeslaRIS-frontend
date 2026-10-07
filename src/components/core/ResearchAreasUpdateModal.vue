@@ -1,5 +1,7 @@
 <template>
-    <v-dialog v-model="dialog" :persistent="edited" max-width="600px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
+    <v-dialog
+        v-model="dialog" :persistent="edited" max-width="600px" @click:outside="onClickOutside"
+        @keydown.esc="onClickOutside">
         <template #activator="scope">
             <slot name="activator" v-bind="scope">
                 <div v-if="!readOnly" class="edit-pen">
@@ -11,7 +13,7 @@
                         class="bottom-spacer"
                         :disabled="readOnly"
                         size="small">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
                     </v-btn>
                 </div>
             </slot>
@@ -35,7 +37,7 @@
                 />
             </v-card-text>
             <v-card-actions>
-                <v-spacer></v-spacer>
+                <v-spacer />
                 <v-btn color="blue darken-1" @click="dialog = false">
                     {{ $t("closeLabel") }}
                 </v-btn>

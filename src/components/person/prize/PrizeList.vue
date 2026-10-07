@@ -46,7 +46,7 @@
                         <div class="flex flex-row items-start justify-between gap-2">
                             <div class="min-w-0 break-words">
                                 <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                                <v-icon v-if="prize.date" icon="mdi-circle-small"></v-icon>
+                                <v-icon v-if="prize.date" icon="mdi-circle-small" />
                                 <strong>{{ localiseDate(prize.date) }}</strong>
                             </div>
                             <div v-if="canEdit" class="flex shrink-0 items-center">
@@ -72,7 +72,7 @@
                     
                     <div
                         v-if="prize.keywords && prize.keywords.length > 0">
-                        <br />
+                        <br>
                         <div class="flex flex-wrap gap-2">
                             <span
                                 v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
@@ -84,8 +84,8 @@
                                 </v-chip>
                             </span>
                         </div>
-                        <br />
-                        <br />
+                        <br>
+                        <br>
                     </div>
 
                     <attachment-list

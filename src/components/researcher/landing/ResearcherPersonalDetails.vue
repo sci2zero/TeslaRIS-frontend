@@ -13,7 +13,7 @@
         <div class="space-y-6">
             <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-account-circle mr-2 text-blue-600"></span>
+                    <span class="mdi mdi-account-circle mr-2 text-blue-600" />
                     {{ t('personalInfoLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -52,7 +52,7 @@
 
             <div v-if="person?.personalInfo?.postalAddress" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
+                    <span class="mdi mdi-map-marker mr-2 text-red-600" />
                     {{ t('professionalAddressLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -91,7 +91,7 @@
 
             <div v-if="person?.personalInfo?.privatePostalAddress" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
+                    <span class="mdi mdi-map-marker mr-2 text-red-600" />
                     {{ t('privateAddressLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,7 +130,7 @@
 
             <div v-if="person?.personalInfo?.contact" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-phone mr-2 text-green-600"></span>
+                    <span class="mdi mdi-phone mr-2 text-green-600" />
                     {{ t('professionalContactLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,7 +163,7 @@
 
             <div v-if="person?.personalInfo?.privateContact" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-phone mr-2 text-green-600"></span>
+                    <span class="mdi mdi-phone mr-2 text-green-600" />
                     {{ t('privateContactLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -196,7 +196,7 @@
 
             <div v-if="researchArea" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-domain mr-2 text-purple-600"></span>
+                    <span class="mdi mdi-domain mr-2 text-purple-600" />
                     {{ t('researchAreaLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 gap-4">
@@ -211,7 +211,7 @@
 
             <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-identifier mr-2 text-indigo-600"></span>
+                    <span class="mdi mdi-identifier mr-2 text-indigo-600" />
                     {{ t('identifiersLabel') }}
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,7 +224,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">eCRIS-ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris" />
                             <span v-else>-</span>
                         </p>
                     </div>
@@ -242,48 +242,48 @@
                     </div>
                     <div v-if="person?.personalInfo?.orcid">
                         <label class="block text-sm font-medium text-gray-700">ORCID</label>
-                        <identifier-link v-if="person?.personalInfo.orcid" :identifier="person?.personalInfo.orcid" type="orcid"></identifier-link>
+                        <identifier-link v-if="person?.personalInfo.orcid" :identifier="person?.personalInfo.orcid" type="orcid" />
                         <span v-else>-</span>
                     </div>
                     <div v-if="person?.personalInfo?.scopusAuthorId">
                         <label class="block text-sm font-medium text-gray-700">Scopus Author ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author" />
                             <span v-else>-</span>
                         </p>
                     </div>
                     <div v-if="person?.personalInfo?.openAlexId">
                         <label class="block text-sm font-medium text-gray-700">OpenAlex ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex" />
                             <span v-else>-</span>
                         </p>
                     </div>
                     <div v-if="person?.personalInfo?.webOfScienceResearcherId">
                         <label class="block text-sm font-medium text-gray-700">ResearcherID (WoS)</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id" />
                             <span v-else>-</span>
                         </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Google Scholar ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar" />
                             <span v-else>-</span>
                         </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Authenticus ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus" />
                             <span v-else>-</span>
                         </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Lattes ID</label>
                         <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes"></identifier-link>
+                            <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes" />
                             <span v-else>-</span>
                         </p>
                     </div>
@@ -302,12 +302,12 @@
 
             <div v-if="person?.personalInfo?.uris && person.personalInfo.uris.length > 0" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-web mr-2 text-blue-600"></span>
+                    <span class="mdi mdi-web mr-2 text-blue-600" />
                     {{ t('websiteLabel') }}
                 </h3>
                 <div class="space-y-2">
                     <div v-for="uri in person.personalInfo.uris" :key="uri" class="flex items-start min-w-0">
-                        <span class="mdi mdi-link text-gray-400 mr-2 mt-0.5 shrink-0"></span>
+                        <span class="mdi mdi-link text-gray-400 mr-2 mt-0.5 shrink-0" />
                         <a :href="uri" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline break-all">
                             {{ uri }}
                         </a>
@@ -317,7 +317,7 @@
 
             <div v-if="activeEmployments.length > 0" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-office-building mr-2 text-orange-600"></span>
+                    <span class="mdi mdi-office-building mr-2 text-orange-600" />
                     {{ t('employmentsLabel') }}
                 </h3>
                 <div class="space-y-3">
@@ -328,7 +328,7 @@
                             class="font-medium text-gray-900 underline"
                         >
                             <div class="font-medium text-gray-900">
-                                <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
+                                <v-icon icon="mdi-domain" size="16" class="mr-1" />
                                 {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
                             </div>
                         </localized-link>

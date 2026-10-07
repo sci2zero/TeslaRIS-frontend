@@ -1,6 +1,6 @@
 <template>
     <!-- eslint-disable vue/no-v-html -->
-    <div class="renderer" :class="{ 'renderer-inline': inline }" v-html="safeRenderedTitle"></div>
+    <div class="renderer" :class="{ 'renderer-inline': inline }" v-html="safeRenderedTitle" />
     <!-- eslint-enable vue/no-v-html -->
 </template>
   

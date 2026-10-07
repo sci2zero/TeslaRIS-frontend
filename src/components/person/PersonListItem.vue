@@ -48,10 +48,10 @@
                     </span>
                 </div>
                 <div v-if="hasIdentifiers(item)" class="mt-1.5 flex flex-wrap gap-2" @click.stop>
-                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
+                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid" />
+                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus" />
+                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex" />
+                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience" />
                 </div>
             </div>
         </div>

@@ -1,6 +1,8 @@
 <template>
     <v-row justify="start">
-        <v-dialog v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
+        <v-dialog
+            v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside"
+            @keydown.esc="onClickOutside">
             <template #activator="scope">
                 <div v-if="!readOnly" class="edit-pen!">
                     <v-btn
@@ -8,7 +10,7 @@
                         icon variant="outlined"
                         color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                         :disabled="readOnly" size="small">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        <v-icon size="x-large" icon="mdi-plus" />
                     </v-btn>
                     <!-- <v-list-item
                         v-else v-bind="scope.props" :disabled="readOnly" class="inline-action">

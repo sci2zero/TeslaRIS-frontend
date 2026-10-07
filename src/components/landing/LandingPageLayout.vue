@@ -1,7 +1,7 @@
 <template>
     <div class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <slot name="header"></slot>
-        <slot name="before-tabs"></slot>
+        <slot name="header" />
+        <slot name="before-tabs" />
 
         <tab-content-loader
             v-if="loading"
@@ -23,7 +23,7 @@
                 hide-slider
                 class="landing-tabs landing-tabs-bar"
             >
-                <slot name="tabs"></slot>
+                <slot name="tabs" />
             </v-tabs>
 
             <button
@@ -55,10 +55,10 @@
             v-model="currentTab"
             class="min-w-0"
         >
-            <slot></slot>
+            <slot />
         </v-tabs-window>
 
-        <slot name="footer"></slot>
+        <slot name="footer" />
     </div>
 </template>
 
