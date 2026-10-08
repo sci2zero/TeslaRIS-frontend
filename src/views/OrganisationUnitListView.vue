@@ -1,18 +1,5 @@
 <template>
-    <div class="container py-4 px-4 mx-auto">
-        <h1 class="text-2xl font-bold mb-4">
-            {{ $t("ouListLabel") }}
-        </h1>
-        
-        <span :class="'d-flex align-center ' + (isAdmin || isInstitutionalEditor ? 'mb-3' : '')">
-            <v-checkbox
-                v-if="hasInstitution"
-                v-model="returnOnlyInstitutionRelatedEntities"
-                :label="$t('showEntitiesForMyInstitutionLabel')"
-                class="ml-4 mt-5"
-            />
-        </span>
-
+    <entity-list-layout :title="$t('ouListLabel')" icon="mdi-office-building-outline">
         <tab-content-loader
             v-if="loading"
             button-header
@@ -33,6 +20,22 @@
                     <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
                 </template>
                 <template #actions>
+                    <v-menu v-if="hasInstitution" :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props }">
+                            <v-btn v-bind="props" variant="outlined" prepend-icon="mdi-tune" class="text-none">
+                                {{ $t('optionsLabel') }}
+                            </v-btn>
+                        </template>
+                        <div class="entity-filter-panel">
+                            <v-checkbox
+                                v-if="hasInstitution"
+                                v-model="returnOnlyInstitutionRelatedEntities"
+                                :label="$t('showEntitiesForMyInstitutionLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                        </div>
+                    </v-menu>
+
                     <v-btn
                         v-if="isAdmin"
                         data-tutorial="add-organisation-unit"
@@ -45,11 +48,12 @@
                 </template>
             </organisation-unit-table-component>
         </div>
-    </div>
+    </entity-list-layout>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, watch } from 'vue';
+import EntityListLayout from '@/components/landing/EntityListLayout.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import OrganisationUnitTableComponent from '@/components/organisationUnit/OrganisationUnitTableComponent.vue';
@@ -64,7 +68,7 @@ import TabContentLoader from '@/components/core/TabContentLoader.vue';
 
 export default defineComponent({
     name: "OrganisationUnitListView",
-    components: { SearchBarComponent, OrganisationUnitTableComponent, TabContentLoader },
+    components: { EntityListLayout, SearchBarComponent, OrganisationUnitTableComponent, TabContentLoader },
     setup() {
         const loading = ref(false);
 

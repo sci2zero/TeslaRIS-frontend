@@ -1,9 +1,5 @@
 <template>
-    <div class="container py-4 px-4 mx-auto">
-        <h1 class="text-2xl font-bold mb-4">
-            {{ $t("projectsLabel") }}
-        </h1>
-
+    <entity-list-layout :title="$t('projectsLabel')" icon="mdi-folder-outline">
         <tab-content-loader
             v-if="loading"
             button-header
@@ -26,19 +22,19 @@
                 />
             </template>
             <template #actions>
-                <div class="flex items-center gap-2">
-                    <v-menu>
+                <div class="flex flex-wrap items-center gap-2">
+                    <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props }">
                             <v-btn
                                 v-bind="props"
-                                color="white"
-                                prepend-icon="mdi-dots-vertical"
+                                variant="outlined"
+                                prepend-icon="mdi-tune"
                                 class="action-menu-trigger"
                             >
                                 {{ $t("optionsLabel") }}
                             </v-btn>
                         </template>
-                        <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                        <div class="entity-filter-panel">
                             <v-checkbox
                                 v-model="returnOnlyActiveProjects"
                                 :label="$t('showOnlyActiveLabel')"
@@ -58,47 +54,26 @@
                             />
                         </div>
                     </v-menu>
-                    <v-btn v-if="canUserAddProjects" color="primary" @click="addProject">
+                    <v-btn v-if="canUserAddProjects" prepend-icon="mdi-plus" color="primary" @click="addProject">
                         {{ $t("createNewProjectLabel") }}
                     </v-btn>
                 </div>
             </template>
             <template #status-filter-menu>
-                <div class="status-filter">
-                    <div class="filter-header">
-                        <span class="filter-title">{{ $t('statusLabel') }}</span>
-                    </div>
-                    <v-divider class="my-2" />
-                    <div class="checkbox-grid">
-                        <div
-                            v-for="status in projectStatuses"
-                            :key="status.value"
-                            class="checkbox-item"
-                        >
-                            <v-checkbox
-                                :model-value="selectedStatuses.some(s => s.value === status.value)"
-                                :label="status.title"
-                                density="compact"
-                                hide-details
-                                class="w-full"
-                                color="primary"
-                                @update:model-value="toggleStatus(status, !!$event)"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <project-status-filter v-model="selectedStatuses" />
             </template>
         </project-table-component>
-    </div>
+    </entity-list-layout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import EntityListLayout from '@/components/landing/EntityListLayout.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import ProjectService from '@/services/project/ProjectService';
 import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
 import type { ProjectIndex, ProjectStatus } from '@/models/ProjectModel';
-import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
+import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
@@ -115,8 +90,7 @@ const size = ref(1);
 const sort = ref("");
 const direction = ref("");
 
-const projectStatuses = computed(() => getProjectStatusesForGivenLocale() ?? []);
-const selectedStatuses = ref<{ title: string, value: ProjectStatus }[]>([]);
+const selectedStatuses = ref<ProjectStatus[]>([]);
 
 const returnOnlyActiveProjects = ref(false);
 const returnOnlyWithoutContributions = ref(false);
@@ -163,7 +137,7 @@ const search = (tokenParams: string) => {
     searchParams.value = tokenParams;
 
     const pageable = `${tokenParams}&page=${page.value}&size=${size.value}&sort=${sort.value},${direction.value}`;
-    const statuses = selectedStatuses.value.map(status => status.value);
+    const statuses = selectedStatuses.value;
 
     let request;
     if (returnOnlyMyProjects.value && isResearcher.value) {
@@ -205,64 +179,11 @@ const switchPage = (nextPage: number, pageSize: number, sortField: string, sortD
     search(searchParams.value);
 };
 
-const toggleStatus = (status: { title: string, value: ProjectStatus }, isSelected: boolean) => {
-    if (isSelected) {
-        selectedStatuses.value.push(status);
-    } else {
-        const index = selectedStatuses.value.findIndex(s => s.value === status.value);
-        if (index > -1) {
-            selectedStatuses.value.splice(index, 1);
-        }
-    }
-
-    search(searchParams.value);
-};
+watch(selectedStatuses, () => {
+    if (!initialLoad.value) clearSortAndPerformSearch(searchParams.value);
+});
 
 const addProject = () => {
     router.push({name: "submitProject"});
 };
 </script>
-
-<style scoped>
-.status-filter {
-    min-width: 280px;
-    padding: 12px;
-    background: #ffffff;
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-}
-
-.filter-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    letter-spacing: 0.01em;
-}
-
-.checkbox-grid {
-    display: grid;
-    gap: 8px;
-    padding: 4px 0;
-}
-
-.checkbox-item {
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-}
-
-.checkbox-item:hover {
-    background-color: #f5f5f5;
-}
-</style>
-
-<style>
-.checkbox-item .v-label--clickable {
-    width: 100%;
-}
-</style>

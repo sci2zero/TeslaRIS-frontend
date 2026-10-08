@@ -10,24 +10,23 @@
         :sort-by="tableOptions.sortBy"
         :in-comparator="inComparator"
         draggable-group="persons"
-        container-class="modern-table-container"
-        :table-class="selectedPersons.length > 0 ? 'modern-data-table has-selection' : 'modern-data-table'"
+        :container-class="embedded ? 'bg-white' : 'modern-table-container'"
+        :table-class="embedded ? '' : selectedPersons.length > 0 ? 'modern-data-table has-selection' : 'modern-data-table'"
         @update:options="refreshTable"
         @dragged="onDropCallback"
     >
         <template v-if="$slots['top-left']" #top-left>
-            <div :class="[selectedPersons.length > 0 ? 'w-64' : 'w-96']">
+            <div class="w-full min-w-0">
                 <slot name="top-left" />
             </div>
         </template>
         <template #actions>
             <add-employment-modal
-                v-if="employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
+                v-if="!hideAddEmployment && employmentInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
                 class="mb-4"
                 :institution-id="employmentInstitutionId"
-                @update="notifyUserAndRefreshTable">
-            </add-employment-modal>
-            <slot name="actions"></slot>
+                @update="notifyUserAndRefreshTable" />
+            <slot name="actions" />
         </template>
         <template #selection-menu>
             <v-list-item
@@ -153,8 +152,7 @@
         :total-results="totalPersons"
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
-        :hide-activation-button="true">
-    </table-export-modal>
+        :hide-activation-button="true" />
 
     <person-quick-glance
         v-model="glanceOpen"
@@ -205,6 +203,8 @@ export default defineComponent({
     name: "PersonTableComponent",
     components: { ResponsiveDataTable, AddEmploymentModal, TableExportModal, PersistentQuestionDialog, PersonTableRow, PersonListItem, PersonQuickGlance },
     props: {
+        embedded: { type: Boolean, default: false },
+        hideAddEmployment: { type: Boolean, default: false },
         persons: {
             type: Array<PersonIndex>,
             required: true

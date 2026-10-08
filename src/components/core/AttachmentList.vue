@@ -2,7 +2,8 @@
     <div :class="embedded ? undefined : 'overflow-hidden rounded-xl border border-slate-200 bg-white'">
         <div
             v-if="canEdit && !embedded"
-            class="flex justify-end border-b border-slate-100 px-4 py-2">
+            class="flex justify-end"
+            :class="isProof ? 'px-3 pt-1' : 'border-b border-slate-100 px-4 py-2'">
             <document-file-submission-modal
                 :is-proof="isProof"
                 :allow-licence-selection="allowLicenceSelection"
@@ -13,10 +14,12 @@
                 <template #activator="{ props: activatorProps }">
                     <v-btn
                         v-bind="activatorProps"
-                        variant="outlined"
-                        size="small"
+                        :variant="isProof ? 'text' : 'outlined'"
+                        :size="isProof ? 'x-small' : 'small'"
+                        :density="isProof ? 'compact' : 'default'"
                         class="text-none"
-                        prepend-icon="mdi-upload">
+                        :class="isProof ? 'text-slate-500' : undefined"
+                        :prepend-icon="isProof ? 'mdi-plus' : 'mdi-upload'">
                         {{ isProof ? $t("addProofLabel") : $t("addDocumentFileLabel") }}
                     </v-btn>
                 </template>

@@ -85,6 +85,10 @@ export class BaseService {
     requestBody: any = {},
     idempotencyKey: string = ""
   ): Promise<any> {
+    if (path.split("?")[0].includes("/schedule")) {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        path += `${path.includes("?") ? "&" : "?"}timezone=${encodeURIComponent(timezone)}`;
+    }
     const config = {
         headers: {
             "Content-Type": "application/json",

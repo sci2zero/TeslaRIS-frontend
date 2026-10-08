@@ -1,257 +1,270 @@
 <template>
-    <div ref="svgContainer" />
+    <section class="relations-hierarchy" :aria-label="$t('hierarchyTitle')" :aria-busy="loading">
+        <div ref="container" class="graph-canvas">
+            <svg
+                ref="svgElement" class="hierarchy-svg" :aria-label="$t('hierarchyTitle')" tabindex="0"
+                @pointerdown="focusGraph" @keydown="handleKeydown" />
+            <div v-if="loading" class="graph-message" role="status">
+                {{ $t('hierarchyLoadingLabel') }}
+            </div>
+            <div v-else-if="!nodes?.length" class="graph-message">
+                {{ $t('noDataInTableMessage') }}
+            </div>
+            <div v-if="nodes?.length" class="graph-controls">
+                <button type="button" :aria-label="$t('hierarchyZoomInLabel')" :title="$t('hierarchyZoomInLabel')" @click="zoomBy(1.25)">
+                    <span class="mdi mdi-plus" aria-hidden="true" />
+                </button>
+                <span class="zoom-level">{{ Math.round(zoomLevel * 100) }}%</span>
+                <button type="button" :aria-label="$t('hierarchyZoomOutLabel')" :title="$t('hierarchyZoomOutLabel')" @click="zoomBy(0.8)">
+                    <span class="mdi mdi-minus" aria-hidden="true" />
+                </button>
+                <span class="control-divider" />
+                <button type="button" :aria-label="$t('hierarchyFitLabel')" :title="$t('hierarchyFitLabel')" @click="fitGraph">
+                    <span class="mdi mdi-arrow-expand-all" aria-hidden="true" />
+                </button>
+            </div>
+            <span v-if="nodes?.length" class="canvas-hint">{{ $t('hierarchyPanHint') }}</span>
+        </div>
+        <footer class="hierarchy-footer">
+            <div class="hierarchy-legend">
+                <span><i class="legend-line" />{{ $t('belongsToLabel') }}</span>
+                <span><i class="legend-line membership" />{{ $t('memberOfLabel') }}</span>
+            </div>
+        </footer>
+    </section>
 </template>
-  
-<script lang="ts">
-import { ref, onMounted, defineComponent, type PropType, watch } from 'vue';
-import * as d3 from 'd3';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+
+<script setup lang="ts">
+import { computed, ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import * as d3 from 'd3';
+import { CARD_WIDTH, CARD_HEIGHT, layoutOrganisationHierarchy, routeHierarchyLink, type RelationNode, type RelationLink, type PositionedRelationNode } from '@/utils/organisationHierarchy';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 
-export default defineComponent({
-    name: "RelationsGraph",
-    props: {
-        nodes: {
-            type: Object as PropType<any>,
-            required: true
-        },
-        links: {
-            type: Object as PropType<any>,
-            required: true
+const props = defineProps<{ nodes?: RelationNode[]; links?: RelationLink[]; currentId?: number }>();
+const { t, locale } = useI18n();
+const loading = computed(() => !props.nodes || !props.links);
+const container = ref<HTMLElement>();
+const svgElement = ref<SVGSVGElement>();
+const zoomLevel = ref(1);
+let zoom: ReturnType<typeof d3.zoom>;
+let observer: ResizeObserver;
+let graphBounds = { left: 0, top: 0, width: 0, height: 0 };
+let instanceId = '';
+let previousWidth = 0;
+
+const color = (label: RelationLink['label']) => label === 'BELONGS_TO' ? '#6366f1' : '#0d9488';
+function focusGraph(event: PointerEvent) {
+    if (event.button !== 0 || (event.target as Element).closest('a')) return;
+    svgElement.value?.focus({ preventScroll: true });
+}
+function zoomBy(factor: number) {
+    if (zoom && svgElement.value) d3.select(svgElement.value).call(zoom.scaleBy, factor);
+}
+function fitGraph() {
+    if (!zoom || !container.value || !graphBounds.width) return;
+    const { clientWidth: width, clientHeight: height } = container.value;
+    if (!width || !height) return;
+    const scale = Math.max(0.12, Math.min(1, (width - 72) / graphBounds.width, (height - 110) / graphBounds.height));
+    const x = width / 2 - (graphBounds.left + graphBounds.width / 2) * scale;
+    const y = (height - 50) / 2 - (graphBounds.top + graphBounds.height / 2) * scale;
+    d3.select(svgElement.value).call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(scale));
+}
+function handleKeydown(event: KeyboardEvent) {
+    if (event.target !== svgElement.value || !zoom) return;
+    if (event.key === '+' || event.key === '=') zoomBy(1.25);
+    else if (event.key === '-') zoomBy(0.8);
+    else if (event.key === '0') fitGraph();
+    else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        const k = zoomLevel.value;
+        d3.select(svgElement.value).call(zoom.translateBy,
+            event.key === 'ArrowLeft' ? 60 / k : event.key === 'ArrowRight' ? -60 / k : 0,
+            event.key === 'ArrowUp' ? 60 / k : event.key === 'ArrowDown' ? -60 / k : 0);
+    } else return;
+    event.preventDefault();
+}
+
+function renderGraph() {
+    if (!svgElement.value) return;
+    const svg = d3.select(svgElement.value);
+    svg.selectAll('*').remove();
+    const graph = layoutOrganisationHierarchy(props.nodes ?? [], props.links ?? []);
+    const byId = new Map(graph.nodes.map(node => [node.id, node]));
+    const defs = svg.append('defs');
+    const gridId = `${instanceId}-grid`;
+    const grid = defs.append('pattern').attr('id', gridId)
+        .attr('patternUnits', 'userSpaceOnUse').attr('width', 24).attr('height', 24);
+    grid.append('circle').attr('cx', 12).attr('cy', 12).attr('r', 1).attr('fill', '#cbd5e1');
+    svg.append('rect').attr('width', '100%').attr('height', '100%')
+        .attr('fill', '#f8fafc').attr('pointer-events', 'none').attr('aria-hidden', 'true');
+    svg.append('rect').attr('width', '100%').attr('height', '100%')
+        .attr('fill', `url(#${gridId})`).attr('pointer-events', 'none').attr('aria-hidden', 'true');
+    for (const label of ['BELONGS_TO', 'MEMBER_OF'] as const) {
+        defs.append('marker').attr('id', `${instanceId}-${label}`).attr('viewBox', '0 0 10 10')
+            .attr('refX', 9).attr('refY', 5).attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto')
+            .append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z').attr('fill', color(label));
+    }
+    const viewport = svg.append('g').attr('class', 'graph-viewport');
+    const edgeLayer = viewport.append('g').attr('class', 'graph-edges');
+    const routeXs: number[] = [];
+    graph.links.forEach(link => {
+        const child = byId.get(link.source)!;
+        const parent = byId.get(link.target)!;
+        const parallel = graph.links.filter(edge => edge.source === link.source && edge.target === link.target).length > 1;
+        const offset = parallel ? (link.label === 'BELONGS_TO' ? -65 : 65) : 0;
+        const { path, labelX, labelY, laneX } = routeHierarchyLink(child, parent, graph.nodes, offset);
+        if (laneX !== undefined) routeXs.push(laneX - 100, laneX + 100);
+        const edge = edgeLayer.append('g').datum(link).attr('class', 'graph-edge');
+        edge.append('path').attr('d', path).attr('fill', 'none').attr('stroke', color(link.label))
+            .attr('stroke-width', 2).attr('stroke-dasharray', link.label === 'MEMBER_OF' ? '7 5' : null)
+            .attr('marker-end', `url(#${instanceId}-${link.label})`);
+        edge.append('title').text(`${returnCurrentLocaleContent(child.name)} — ${t(link.label === 'BELONGS_TO' ? 'belongsToLabel' : 'memberOfLabel')} → ${returnCurrentLocaleContent(parent.name)}`);
+        const label = edge.append('g').attr('transform', `translate(${labelX},${labelY})`);
+        const text = label.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+            .attr('fill', color(link.label)).attr('font-size', 12).attr('font-weight', 600)
+            .text(t(link.label === 'BELONGS_TO' ? 'belongsToLabel' : 'memberOfLabel'));
+        const textWidth = text.node()?.getComputedTextLength() ?? 90;
+        label.insert('rect', 'text').attr('x', -textWidth / 2 - 10).attr('y', -13)
+            .attr('width', textWidth + 20).attr('height', 26).attr('rx', 7)
+            .attr('fill', '#fff').attr('stroke', color(link.label)).attr('stroke-opacity', 0.25);
+    });
+    const cards = viewport.append('g').selectAll('g').data(graph.nodes).join('g')
+        .attr('class', 'graph-node')
+        .attr('transform', (node: PositionedRelationNode) => `translate(${node.x - CARD_WIDTH / 2},${node.y})`);
+    let hoveredId: number | undefined;
+    let focusedId: number | undefined;
+    const updateHighlight = () => {
+        const activeId = hoveredId ?? focusedId;
+        const relatedIds = new Set<number>();
+        if (activeId !== undefined) {
+            relatedIds.add(activeId);
+            for (const edge of graph.links) {
+                if (edge.source === activeId) relatedIds.add(edge.target);
+                if (edge.target === activeId) relatedIds.add(edge.source);
+            }
         }
-    },
-    setup(props) {
-        const svgContainer = ref(null);
-        const rendered = ref(false);
-        const i18n = useI18n();
-    
-        onMounted(() => {
-            createForceLayout(svgContainer.value);
+        cards.style('opacity', (node: PositionedRelationNode) => activeId === undefined || relatedIds.has(node.id) ? 1 : 0.2);
+        edgeLayer.selectAll('.graph-edge').style('opacity', (edge: RelationLink) =>
+            activeId === undefined || edge.source === activeId || edge.target === activeId ? 1 : 0.12);
+    };
+    cards
+        .on('mouseenter', (_event: MouseEvent, node: PositionedRelationNode) => {
+            hoveredId = node.id;
+            updateHighlight();
+        })
+        .on('mouseleave', () => {
+            hoveredId = undefined;
+            updateHighlight();
+        })
+        .on('focusin', (_event: FocusEvent, node: PositionedRelationNode) => {
+            focusedId = node.id;
+            updateHighlight();
+        })
+        .on('focusout', () => {
+            focusedId = undefined;
+            updateHighlight();
         });
-
-        watch(() => props.nodes, () => {
-            createForceLayout(svgContainer.value);
-        });
-
-        watch(() => props.links, () => {
-            createForceLayout(svgContainer.value);
-        });
-
-        watch(i18n.locale, () => {
-            d3.select(svgContainer.value).selectAll("*").remove();
-            rendered.value = false;
-            createForceLayout(svgContainer.value);
-        });
-
-        const removeDuplicates = (nodes: any) => {
-            const index: any = [];
-            return nodes.filter(function (item: any) {
-                const k = JSON.stringify(item);
-                return index.indexOf(k) >= 0 ? false : index.push(k);
-            });
-        };
-    
-        function createForceLayout(container: any) {
-            if(!props.nodes || !props.links || rendered.value) {
-                return;
-            }
-            
-            const uniqueNodes = removeDuplicates(props.nodes);
-
-            rendered.value = true;
-
-            d3.select(container).select("svg").remove();
-    
-            const height = 500;
-            const node_width = 85;
-
-            const svg = d3.select(container)
-                .append('svg')
-                .attr('width', "100%")
-                .attr('height', height);
-
-            const width = container.clientWidth;
-    
-            const simulation = d3.forceSimulation(uniqueNodes)
-                .force('link', d3.forceLink(props.links).id((d: any) => d.id).distance(200).strength(1))
-                .force('charge', d3.forceManyBody().strength(-300))
-                .force('center', d3.forceCenter(width / 2, height / 2))
-                .alphaDecay(0.05);
-    
-            const linkColors = props.links.map((d: any) => {
-                if (d.label === "BELONGS_TO") {
-                    return "#ff0000"; // Red color
-                } else if (d.label === "MEMBER_OF") {
-                    return "#00ff00"; // Green color
-                } else {
-                    return "#999";
-                }
-            });
-
-            const link = svg.selectAll('.link')
-                .data(props.links)
-                .enter().append('line')
-                .attr('class', 'link')
-                .attr('stroke-width', '3')
-                .attr('marker-end', (_d: any, i: number) => `url(#arrow-${i})`)
-                .attr('stroke', (_: any, i: number) => linkColors[i]);
-
-                        link.each(function(_: any, i: number) {
-                            const marker = svg.append("marker")
-                                .attr("id", `arrow-${i}`)
-                                .attr("markerUnits", "strokeWidth")
-                                .attr("markerWidth", 12)
-                                .attr("markerHeight", 12)
-                                .attr("viewBox", "0 0 12 12")
-                                .attr("refX", 6)
-                                .attr("refY", 6)
-                                .attr("orient", "auto");
-
-                            marker.append("path")
-                                .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
-                                .style("fill", linkColors[i]);
-                        });
-    
-            const node = svg.selectAll(".node")
-                .data(uniqueNodes)
-                .enter().append("circle")
-                .attr("class", "node")
-                .attr("r", node_width)
-                .attr("fill", "#69b3a2")
-                .attr("stroke", "black")
-                .call(d3.drag()
-                    .on("start", dragStarted)
-                    .on("drag", dragged)
-                    .on("end", dragEnded))
-                .on('click', (_event: any, d: any) => seeOUPage(d.id));
-    
-            const nodeText = svg.selectAll('.node-text')
-                .data(uniqueNodes)
-                .enter().append('text')
-                .attr('class', 'node-text')
-                .text((d: any) => returnCurrentLocaleContent(d.name))
-                .attr('text-anchor', 'middle')
-                .attr('dy', '-0.5em')
-                .attr('width', (d: any) => returnCurrentLocaleContent(d.name)!.length * 1.5)
-                .attr('font-size', '12px')
-                .style('text-wrap', 'stable')
-                .on('click', (_event: any, d: any) => seeOUPage(d.id));
-
-            const legend = svg.append('g')
-                .attr('class', 'legend')
-                .attr('transform', `translate(0, ${500 - 70})`);
-
-            legend.append('rect')
-                .attr('x', 0)
-                .attr('y', 0)
-                .attr('width', 20)
-                .attr('height', 20)
-                .attr("stroke", "black")
-                .attr('fill', '#ff0000');
-
-            legend.append('rect')
-                .attr('x', 0)
-                .attr('y', 30)
-                .attr('width', 20)
-                .attr('height', 20)
-                .attr("stroke", "black")
-                .attr('fill', '#00ff00');
-
-            legend.append('text')
-                .attr('x', 30)
-                .attr('y', 15)
-                .text(i18n.t("belongsToLabel"))
-                .style('font-size', '14px')
-                .attr('alignment-baseline', 'middle');
-
-            legend.append('text')
-                .attr('x', 30)
-                .attr('y', 45)
-                .text(i18n.t("memberOfLabel"))
-                .style('font-size', '14px')
-                .attr('alignment-baseline', 'middle');
-
-            function wrap(text: any) {
-                text.each(function() {
-                    const text = d3.select(this);
-                    const words = returnCurrentLocaleContent(text.data()[0].name)!.split(/\s+/).reverse();
-                    const lineHeight = 20;
-                    const width = parseFloat(text.attr('width'));
-                    const y = parseFloat(text.attr('y'));
-                    const x = text.attr('x');
-                    const anchor = text.attr('text-anchor');
-                
-                    let tspan = text.text(null).append('tspan').attr('x', x).attr('y', y).attr('text-anchor', anchor);
-                    let lineNumber = 0;
-                    let line: string[] = [];
-                    let word = words.pop();
-
-                    while (word) {
-                        line.push(word);
-                        tspan.text(line.join(' '));
-                        if (tspan.node().getComputedTextLength() > width) {
-                            lineNumber += 1;
-                            line.pop();
-                            tspan.text(line.join(' '));
-                            line = [word];
-                            tspan = text.append('tspan').attr('x', x).attr('y', y + lineNumber * lineHeight).attr('anchor', anchor).text(word);
-                        }
-                        word = words.pop();
-                    }
-                });
-            }
-
-            function dragStarted(event: any, d: any) {
-                if (!event.active) simulation.alphaTarget(0.1).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-    
-            function dragged(event: any, d: any) {
-                d.fx = event.x;
-                d.fy = event.y;
-            }
-    
-            function dragEnded(event: any, d: any) {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
-    
-            simulation.on('tick', () => {
-                link.attr('x1', (d: any) => d.source.x)
-                    .attr('y1', (d: any) => d.source.y)
-                    .attr('x2', (d: any) => {
-                        const dx = d.target.x - d.source.x;
-                        const dy = d.target.y - d.source.y;
-                        const length = Math.sqrt(dx * dx + dy * dy);
-                        const offsetX = (dx / length) * (node_width + 10);
-                        return d.target.x - offsetX;
-                    })
-                    .attr('y2', (d: any) => {
-                        const dx = d.target.x - d.source.x;
-                        const dy = d.target.y - d.source.y;
-                        const length = Math.sqrt(dx * dx + dy * dy);
-                        const offsetY = (dy / length) * (node_width + 10);
-                        return d.target.y - offsetY;
-                    });
-    
-                node.attr('cx', (d: any) => d.x)
-                    .attr('cy', (d: any) => d.y);
-
-                nodeText.attr('x', (d: any) => d.x)
-                        .attr('y', (d: any) => d.y - 30)
-                        .call(wrap);
-            });
+    cards.append('rect').attr('width', CARD_WIDTH).attr('height', CARD_HEIGHT).attr('rx', 14)
+        .attr('fill', (node: PositionedRelationNode) => node.id === props.currentId ? '#eef2ff' : '#fff')
+        .attr('stroke', (node: PositionedRelationNode) => node.id === props.currentId ? '#818cf8' : '#cbd5e1')
+        .attr('stroke-width', (node: PositionedRelationNode) => node.id === props.currentId ? 2 : 1);
+    cards.each(function(node: PositionedRelationNode) {
+        const card = d3.select(this);
+        const name = returnCurrentLocaleContent(node.name) || t('organisationUnitLabel');
+        card.append('title').text(name);
+        const link = card.append('foreignObject').attr('width', CARD_WIDTH).attr('height', CARD_HEIGHT)
+            .append('xhtml:a').attr('class', 'graph-card-link')
+            .attr('href', `/${locale.value.toLowerCase()}/organisation-units/${node.id}`)
+            .attr('aria-current', node.id === props.currentId ? 'page' : null);
+        const logo = link.append('xhtml:span').attr('class', 'graph-logo');
+        const hex = node.logoBackgroundHex?.replace(/^#/, '');
+        if (hex && /^[\da-f]{6}$/i.test(hex)) logo.style('background-color', `#${hex}`);
+        logo.append('xhtml:span').attr('class', 'mdi mdi-school-outline').attr('aria-hidden', 'true');
+        if (node.logoServerFilename) {
+            logo.append('xhtml:img').attr('alt', '').attr('loading', 'lazy')
+                .attr('src', `${import.meta.env.VITE_BASE_URL}file/logo/${node.id}?fullSize=false&version=${encodeURIComponent(node.logoServerFilename)}`)
+                .on('error', function() { d3.select(this).remove(); });
         }
+        const copy = link.append('xhtml:span').attr('class', 'graph-card-copy');
+        if (node.id === props.currentId) copy.append('xhtml:span').attr('class', 'graph-current-label').text(t('hierarchyCurrentLabel'));
+        copy.append('xhtml:span').attr('class', 'graph-card-name').text(name);
+        link.append('xhtml:span').attr('class', 'mdi mdi-arrow-top-right graph-card-arrow').attr('aria-hidden', 'true');
+    });
+    if (graph.nodes.length) {
+        const left = Math.min(...graph.nodes.map(node => node.x - CARD_WIDTH / 2), ...routeXs);
+        const right = Math.max(...graph.nodes.map(node => node.x + CARD_WIDTH / 2), ...routeXs);
+        graphBounds = { left, top: 0, width: right - left, height: Math.max(...graph.nodes.map(node => node.y)) + CARD_HEIGHT };
+    } else graphBounds.width = 0;
+    zoom = d3.zoom().scaleExtent([0.12, 3]).filter((event: any) => {
+        if (event.type === 'wheel' && !container.value?.contains(document.activeElement)) return false;
+        return (!event.ctrlKey || event.type === 'wheel') && !event.button;
+    }).on('zoom', (event: any) => {
+        viewport.attr('transform', event.transform.toString());
+        grid.attr('patternTransform', event.transform.toString());
+        zoomLevel.value = event.transform.k;
+    });
+    svg.call(zoom).on('dblclick.zoom', null);
+    fitGraph();
+}
 
-        const seeOUPage = (id: number) => {
-            window.location.href = `/${i18n.locale.value.toLowerCase()}/organisation-units/${id}`;
-        };
-    
-        return {
-            svgContainer, rendered
-        };
-    },
+onMounted(() => {
+    instanceId = `relations-${Math.random().toString(36).slice(2)}`;
+    renderGraph();
+    observer = new ResizeObserver(() => {
+        const width = container.value?.clientWidth ?? 0;
+        if (width > 0 && width !== previousWidth) { previousWidth = width; fitGraph(); }
+    });
+    if (container.value) observer.observe(container.value);
+});
+watch([() => props.nodes, () => props.links, () => props.currentId, locale], async () => {
+    await nextTick();
+    renderGraph();
+}, { deep: true });
+onBeforeUnmount(() => {
+    observer?.disconnect();
+    if (svgElement.value) d3.select(svgElement.value).on('.zoom', null);
 });
 </script>
+
+<style scoped>
+.relations-hierarchy { background: #f8fafc; }
+.hierarchy-footer { padding: 16px 24px; background: #fff; border-top: 1px solid #e2e8f0; }
+.hierarchy-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #475569; }
+.hierarchy-legend > span { display: flex; align-items: center; gap: 7px; }
+.legend-line { width: 24px; border-top: 2px solid #6366f1; }
+.legend-line.membership { border-color: #0d9488; border-top-style: dashed; }
+.graph-canvas {
+    position: relative;
+    height: 580px;
+    background-color: #f8fafc;
+}
+.hierarchy-svg { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.hierarchy-svg:active { cursor: grabbing; }
+.hierarchy-svg:focus-visible { outline: 2px solid #6366f1; outline-offset: -2px; }
+.graph-message { position: absolute; inset: 0; display: grid; place-items: center; color: #64748b; pointer-events: none; }
+.graph-controls { position: absolute; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 4px; padding: 5px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px rgb(15 23 42 / 8%); }
+.graph-controls button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; color: #475569; font-size: 20px; cursor: pointer; }
+.graph-controls button:hover { background: #eef2ff; color: #4f46e5; }
+.graph-controls button:focus-visible { outline: 2px solid #6366f1; }
+.zoom-level { min-width: 42px; text-align: center; font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
+.control-divider { width: 1px; height: 20px; margin: 0 4px; background: #e2e8f0; }
+.canvas-hint { position: absolute; bottom: 32px; right: 24px; font-size: 12px; color: #64748b; pointer-events: none; }
+:deep(.graph-node), :deep(.graph-edge) { transition: opacity 160ms ease; }
+@media (prefers-reduced-motion: reduce) {
+    :deep(.graph-node), :deep(.graph-edge) { transition: none; }
+}
+:deep(.graph-card-link) { display: flex; width: 100%; height: 100%; align-items: center; gap: 12px; padding: 14px; color: inherit; text-decoration: none; box-sizing: border-box; border-radius: 14px; cursor: pointer; }
+:deep(.graph-card-link:hover) { background: rgb(99 102 241 / 5%); }
+:deep(.graph-card-link:focus-visible) { outline: 3px solid #6366f1; outline-offset: -3px; }
+:deep(.graph-logo) { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; overflow: hidden; border-radius: 10px; background: #f1f5f9; color: #64748b; font-size: 25px; }
+:deep(.graph-logo img) { position: absolute; inset: 0; width: 100%; height: 100%; padding: 4px; object-fit: contain; background: inherit; }
+:deep(.graph-card-copy) { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+:deep(.graph-card-name) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; color: #1e293b; font-size: 13px; line-height: 1.45; font-weight: 600; }
+:deep(.graph-current-label) { color: #4f46e5; font-size: 10px; font-weight: 700; }
+:deep(.graph-card-arrow) { margin-left: auto; color: #94a3b8; font-size: 16px; }
+@media (max-width: 600px) {
+    .hierarchy-footer { padding: 16px; }
+    .graph-canvas { height: 500px; }
+    .canvas-hint { display: none; }
+}
+</style>

@@ -1,75 +1,39 @@
 <template>
-    <v-bottom-sheet
+    <entity-details-sheet
+        v-if="item"
         v-model="open"
-        inset
+        :title="names[0] || item.name"
+        :to="'persons/' + item.databaseId"
+        :open-page-label="$t('openPersonPageLabel')"
     >
-        <v-card v-if="item" class="rounded-t-2xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-center pt-2 pb-1">
-                <div class="w-10 h-1 rounded-full bg-slate-300"></div>
-            </div>
-            <v-card-title class="px-4 pt-1 pb-2 flex items-start gap-2">
-                <person-avatar
-                    class="flex-shrink-0"
-                    :person-id="item.databaseId"
-                    :name="names[0]"
-                    :size="48"
-                />
-                <div class="min-w-0 flex-1">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="text-base font-semibold leading-snug text-slate-800">
-                            {{ names[0] }}
-                        </div>
-                        <span v-if="birthdateLabel" class="text-sm text-slate-500 font-medium flex-shrink-0">
-                            {{ birthdateLabel }}
-                        </span>
-                    </div>
-                    <p v-if="names.length > 1" class="mt-1 text-xs text-slate-500">
-                        {{ names.slice(1).join(", ") }}
-                    </p>
+        <template #icon>
+            <person-avatar :person-id="item.databaseId" :name="names[0]" :size="40" />
+        </template>
+        <div class="entity-details-grid">
+            <entity-detail-field v-if="birthdateLabel" :label="item.displayBirthdate ? $t('birthdateLabel') : $t('birthYearLabel')">
+                {{ birthdateLabel }}
+            </entity-detail-field>
+            <entity-detail-field v-if="names.length > 1" :label="$t('otherNamesLabel')">
+                {{ names.join(', ') }}
+            </entity-detail-field>
+            <entity-detail-field v-if="hasEmployment(item)" :label="$t('employmentsLabel')" class="entity-details-full-width">
+                <person-employment-list :item="item" />
+            </entity-detail-field>
+            <entity-detail-field v-for="identifier in identifiers" :key="identifier.type" :label="identifier.label">
+                <div class="flex items-start gap-2">
+                    <identifier-menu :identifier="identifier.value" :type="identifier.type" class="shrink-0" />
+                    <span class="min-w-0">{{ identifier.value }}</span>
                 </div>
-                <v-btn
-                    icon="mdi-close"
-                    variant="text"
-                    size="small"
-                    class="flex-shrink-0"
-                    @click="open = false"
-                />
-            </v-card-title>
-
-            <v-card-text class="px-4 pb-4 overflow-y-auto">
-                <div v-if="hasEmployment(item)" class="mb-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500 mb-1">
-                        {{ $t("organisationUnitLabel") }}
-                    </p>
-                    <person-employment-list :item="item" />
-                </div>
-
-                <div v-if="hasIdentifiers(item)" class="mb-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500 mb-2">
-                        {{ $t("identifiersLabel") }}
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                        <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                        <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                        <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
-                    </div>
-                </div>
-
-                <localized-link :to="'persons/' + item.databaseId" class="block">
-                    <span class="inline-flex w-full items-center justify-center gap-2 font-medium rounded-lg px-4 py-2.5 text-sm bg-slate-800 text-white shadow-md hover:bg-slate-700">
-                        {{ $t("openPersonPageLabel") }}
-                    </span>
-                </localized-link>
-            </v-card-text>
-        </v-card>
-    </v-bottom-sheet>
+            </entity-detail-field>
+        </div>
+    </entity-details-sheet>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
 import type { PersonIndex } from "@/models/PersonModel";
-import LocalizedLink from "../localization/LocalizedLink.vue";
+import EntityDetailsSheet from "../core/EntityDetailsSheet.vue";
+import EntityDetailField from "../core/EntityDetailField.vue";
 import IdentifierMenu from "../core/IdentifierMenu.vue";
 import PersonEmploymentList from "./PersonEmploymentList.vue";
 import PersonAvatar from "./PersonAvatar.vue";
@@ -84,7 +48,7 @@ const emit = defineEmits<{
     "update:modelValue": [value: boolean];
 }>();
 
-const { getBirthdateLabel, hasEmployment, hasIdentifiers } = usePersonItemDisplay();
+const { getBirthdateLabel, hasEmployment } = usePersonItemDisplay();
 
 const open = computed({
     get: () => props.modelValue,
@@ -94,4 +58,10 @@ const open = computed({
 const names = computed(() => props.item ? splitPersonNames(props.item) : []);
 
 const birthdateLabel = computed(() => props.item ? getBirthdateLabel(props.item) : "");
+const identifiers = computed(() => props.item ? [
+    { label: 'ORCID', type: 'orcid', value: props.item.orcid },
+    { label: 'Scopus Author ID', type: 'scopus', value: props.item.scopusAuthorId },
+    { label: 'OpenAlex ID', type: 'openalex', value: props.item.openAlexId },
+    { label: 'Web of Science Researcher ID', type: 'webofscience', value: props.item.webOfScienceResearcherId }
+].filter(identifier => identifier.value) : []);
 </script>

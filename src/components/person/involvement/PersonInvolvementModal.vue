@@ -1,40 +1,37 @@
 <template>
-    <v-row justify="start">
-        <v-dialog v-model="dialog" :persistent="edited" max-width="800px" @click:outside="onClickOutside" @keydown.esc="onClickOutside">
+    <div class="inline-flex shrink-0 items-center">
+        <v-dialog
+            v-model="dialog" :persistent="edited" scrollable max-width="800px"
+            @click:outside="onClickOutside" @keydown.esc="onClickOutside">
             <template #activator="scope">
-                <div v-if="!readOnly" class="edit-pen!">
+                <slot name="activator" v-bind="scope">
                     <v-btn
-                        v-if="!edit"
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small">
-                        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+                        v-if="!readOnly && !edit"
+                        v-bind="scope.props"
+                        variant="outlined" size="small" class="text-none"
+                        prepend-icon="mdi-plus">
+                        {{ $t("addInvolvementLabel") }}
                     </v-btn>
-                    <!-- <v-list-item
-                        v-else v-bind="scope.props" :disabled="readOnly" class="inline-action">
-                        <v-list-item-title>{{ $t("updateInvolvementLabel") }}</v-list-item-title>
-                    </v-list-item> -->
                     <v-btn
-                        v-else icon variant="outlined"
-                        color="primary" v-bind="scope.props"
-                        :disabled="readOnly" size="medium">
-                        <v-icon size="large" icon="mdi-pen" />
-                    </v-btn>
-                </div>
+                        v-else-if="!readOnly"
+                        v-bind="scope.props"
+                        icon="mdi-pencil-outline" variant="text" color="primary" size="small"
+                        :aria-label="$t('updateInvolvementLabel')"
+                        :title="$t('updateInvolvementLabel')" />
+                </slot>
             </template>
             <v-card
                 ref="cardRef"
-                class="bg-slate-100"
                 @pointerdown.capture="onPointerDown"
                 @keydown.capture="onKeyDown"
                 @input.capture="onFieldEvent"
                 @change.capture="onFieldEvent"
             >
-                <v-card-title>
-                    <span class="text-h5">{{ edit ? $t("updateInvolvementLabel") : $t("addInvolvementLabel") }}</span>
+                <v-card-title class="px-6 pt-5 pb-2 whitespace-normal!">
+                    <span class="text-lg font-semibold text-slate-800">{{ edit ? $t("updateInvolvementLabel") : $t("addInvolvementLabel") }}</span>
                 </v-card-title>
-                <v-card-text>
-                    <v-container>
+                <v-card-text class="pt-2">
+                    <div class="py-2">
                         <person-involvement-form
                             ref="formRef" :edit="edit"
                             :preset-involvement="presetInvolvement"
@@ -42,17 +39,17 @@
                             @create="emitCreateToParent"
                             @update="emitUpdateToParent"
                         />
-                    </v-container>
+                    </div>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="border-t border-slate-100 px-6 py-4">
                     <v-spacer />
                     <v-btn
-                        color="blue darken-1"
+                        variant="text"
                         @click="dialog = false">
                         {{ $t("closeLabel") }}
                     </v-btn>
                     <v-btn
-                        color="blue darken-1"
+                        color="primary" variant="flat"
                         :disabled="!formRef?.isFormValid"
                         @click="formRef?.saveInvolvement()">
                         {{ edit ? $t("updateLabel") : $t("saveLabel") }}
@@ -69,7 +66,7 @@
             emphasize-cancel
             @continue="discardChanges"
         />
-    </v-row>
+    </div>
 </template>
 
 <script lang="ts">

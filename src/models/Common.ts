@@ -84,7 +84,14 @@ export interface Notification {
     displayValue: string;
     possibleActions: NotificationAction[];
     creationTimestamp: string;
+    readAt: string | null;
+    details: string | null;
+    sentiment: NotificationSentiment;
 }
+
+export type NotificationSentiment = 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS';
+
+export type NotificationReadStatus = 'UNREAD' | 'READ' | 'ALL';
 
 export interface ResearchAreaResponse {
     id? : number;

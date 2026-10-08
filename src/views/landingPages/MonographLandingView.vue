@@ -149,14 +149,21 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <h2>{{ $t("monographPublicationsLabel") }}</h2>
-                <publication-table-component
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    in-comparator
-                    show-publication-concrete-type
-                    @switch-page="switchPage"
-                />
+                <landing-section-card
+                    :title="$t('monographPublicationsLabel')"
+                    :count="totalPublications"
+                    icon="mdi-file-document-multiple-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <publication-table-component
+                        embedded
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        in-comparator
+                        show-publication-concrete-type
+                        @switch-page="switchPage"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -210,73 +217,89 @@
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchArea">
-                <v-row>
-                    <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <research-areas-update-modal
-                                    :research-areas-hierarchy="researchAreaHierarchy ? [researchAreaHierarchy] : []"
-                                    :read-only="!canEdit || monograph?.isArchived"
-                                    limit-one
-                                    @update="updateResearchAreas"
-                                />
-                                <div><b>{{ $t("researchAreasLabel") }}</b></div>
-                                <research-area-hierarchy
-                                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"
-                                />
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                <landing-research-areas-section
+                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"
+                    :can-edit="canEdit && !monograph?.isArchived"
+                    limit-one
+                    @update="updateResearchAreas"
+                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="documentIndicators" 
-                    :applicable-types="[ApplicableEntityType.MONOGRAPH]" 
-                    :entity-id="monograph?.id" 
-                    :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
-                    show-statistics
-                    :has-attached-files="monograph?.fileItems && monograph?.fileItems.length > 0"
-                    @create="createIndicator"
-                    @updated="fetchIndicators"
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="documentIndicators"
+                        :applicable-types="[ApplicableEntityType.MONOGRAPH]"
+                        :entity-id="monograph?.id"
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :can-edit="canEdit && (isResearcher || isAdmin || isCommission)"
+                        show-statistics
+                        :has-attached-files="monograph?.fileItems && monograph?.fileItems.length > 0"
+                        @create="createIndicator"
+                        @updated="fetchIndicators"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <entity-classification-view
-                    :entity-classifications="documentClassifications"
-                    :entity-id="monograph?.id"
-                    :can-edit="((canClassify && monograph?.documentDate) as boolean)"
-                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.MONOGRAPH]"
-                    @create="createClassification"
-                    @update="fetchClassifications"
-                />
+                <landing-section-card
+                    :title="$t('assessmentsLabel')"
+                    icon="mdi-certificate-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <entity-classification-view
+                        :entity-classifications="documentClassifications"
+                        :entity-id="monograph?.id"
+                        :can-edit="((canClassify && monograph?.documentDate) as boolean)"
+                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                        :applicable-types="[ApplicableEntityType.MONOGRAPH]"
+                        @create="createClassification"
+                        @update="fetchClassifications"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <document-visualizations
-                    :document-id="(monograph?.id as number)"
-                    :display-settings="displayConfiguration.displaySettings.value"
-                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
-                />
+                <landing-section-card
+                    :title="$t('visualizationsLabel')"
+                    icon="mdi-chart-bar"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <document-visualizations
+                        :document-id="(monograph?.id as number)"
+                        :display-settings="displayConfiguration.displaySettings.value"
+                        :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="PublicationType.MONOGRAPH"
-                    :entity-id="monograph?.id"
-                    :restore-blocked-reason="monograph?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
-                    @restored="() => fetchMonograph(false)"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="PublicationType.MONOGRAPH"
+                        :entity-id="monograph?.id"
+                        :restore-blocked-reason="monograph?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                        @restored="() => fetchMonograph(false)"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="PublicationType.MONOGRAPH"
-                    :entity-id="monograph?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="PublicationType.MONOGRAPH"
+                        :entity-id="monograph?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -309,7 +332,6 @@ import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
 import ResearchAreaService from '@/services/ResearchAreaService';
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
-import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
@@ -325,7 +347,6 @@ import MonographUpdateForm from '@/components/publication/update/MonographUpdate
 import StatisticsService from '@/services/StatisticsService';
 import { type DocumentIndicator, StatisticsType, type EntityIndicatorResponse, type EntityClassificationResponse, type DocumentAssessmentClassification } from '@/models/AssessmentModel';
 import EntityIndicatorService from '@/services/assessment/EntityIndicatorService';
-import ResearchAreasUpdateModal from '@/components/core/ResearchAreasUpdateModal.vue';
 import IndicatorsSection from '@/components/assessment/indicators/IndicatorsSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
@@ -355,11 +376,13 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
+import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, ResearchAreaHierarchy, GenericCrudModal, LocalizedLink, PublicationTableComponent, ResearchAreasUpdateModal, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { LandingResearchAreasSection, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, LocalizedLink, PublicationTableComponent, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const currentTab = ref("overview");
 

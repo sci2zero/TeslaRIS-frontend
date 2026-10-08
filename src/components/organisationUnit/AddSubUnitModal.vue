@@ -1,11 +1,17 @@
 <template>
-    <v-row justify="start">
+    <div class="inline-flex shrink-0 items-center">
         <v-dialog v-model="dialog" persistent max-width="800px">
             <template #activator="scope">
-                <v-btn
-                    density="compact" class="bottom-spacer ml-3" v-bind="scope.props">
-                    {{ $t("addSubUnitLabel") }}
-                </v-btn>
+                <slot name="activator" v-bind="scope">
+                    <v-btn
+                        v-bind="scope.props"
+                        variant="outlined"
+                        size="small"
+                        class="text-none"
+                        prepend-icon="mdi-plus">
+                        {{ $t("addSubUnitLabel") }}
+                    </v-btn>
+                </slot>
             </template>
             <v-card>
                 <v-card-title>
@@ -39,7 +45,7 @@
         </v-dialog>
 
         <toast v-model="snackbar" :message="message" />
-    </v-row>
+    </div>
 </template>
 
 <script lang="ts">

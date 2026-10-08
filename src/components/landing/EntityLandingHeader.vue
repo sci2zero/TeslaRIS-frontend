@@ -199,7 +199,7 @@
 
                 <div
                     v-if="$slots.actions"
-                    class="flex flex-col sm:flex-row flex-wrap gap-3 justify-center sm:justify-start w-full"
+                    class="entity-landing-actions flex flex-col sm:flex-row flex-wrap gap-3 justify-center sm:justify-start w-full"
                 >
                     <slot name="actions"></slot>
                 </div>
@@ -367,5 +367,9 @@ const coverPattern = computed(() => {
     .book-first-page__icon {
         font-size: 2.85rem !important;
     }
+}
+
+:deep(.entity-landing-actions .text-center.pa-4:empty) {
+    display: none;
 }
 </style>

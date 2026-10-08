@@ -168,7 +168,7 @@ import Breadcrumbs from './Breadcrumbs.vue';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import ApplicationConfigurationService from '@/services/ApplicationConfigurationService';
 import { type MaintenanceInformation } from '@/models/Common';
-import { localiseDate, localiseTime } from '@/utils/DateUtil';
+import { localiseDate, localiseTime, serverTimeToLocal } from '@/utils/DateUtil';
 
 interface MenuItem {
     title?: ComputedRef<string> | string | undefined;
@@ -293,7 +293,7 @@ onMounted(() => {
             ApplicationConfigurationService.getNextScheduledMaintenance().then(maintenanceInfo => {
                 nextScheduledMaintenance.value = maintenanceInfo.data;
                 if (nextScheduledMaintenance.value) {
-                    const startTimeParts = nextScheduledMaintenance.value.startTime.split("T");
+                    const startTimeParts = serverTimeToLocal(nextScheduledMaintenance.value.startTime).split("T");
                     nextScheduledMaintenance.value.startTime = `${localiseDate(startTimeParts[0])} ${localiseTime(startTimeParts[1])}`
                 }
             });

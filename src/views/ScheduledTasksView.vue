@@ -1,311 +1,329 @@
 <template>
-    <h1 class="mb-6 text-3xl font-bold tracking-tight text-slate-800">
-        {{ $t("scheduleTasksLabel") }}
-    </h1>
-    <v-row class="d-flex flex-row justify-center mt-10">
-        <v-col cols="12" sm="3" md="2">
-            <v-select
-                v-model="selectedScheduledTaskType"
-                :items="scheduledTaskTypes"
-                :label="$t('scheduledTaskTypeLabel')"
-                :readonly="false" />
-        </v-col>
-    </v-row>
-    <v-form v-model="isFormValid" @submit.prevent>
-        <v-row class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col
-                v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment && !qualityAssessmentBackfill"
-                cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedApplicableEntityType"
-                    :items="applicableTypes"
-                    :label="$t('applicableTypeLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    :class="taskClassificationComputation ? 'comfortable' : ''"
-                    return-object
-                    :readonly="false" />
-            </v-col>
-            <v-col v-if="reportGeneration" cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedReportType"
-                    :items="reportTypes"
-                    :label="$t('reportTypeLabel') + '*'"
-                    :class="isSummaryReport() ? 'comfortable' : ''"
-                    :rules="requiredSelectionRules"
-                    :readonly="false" />
-            </v-col>
-            <v-col v-if="taskReindexing" cols="8" md="4">
-                <v-select
-                    v-model="selectedEntityTypes"
-                    :items="entityTypes"
-                    :label="$t('entityTypeLabel') + '*'"
-                    :rules="requiredMultiSelectionRules"
-                    return-object
-                    multiple />
-            </v-col>
-            <v-col v-if="taskReindexing" cols="4" md="2">
-                <v-checkbox
-                    v-model="reharvestCitationIndicators"
-                    class="mt-2"
-                    :label="$t('reharvestCitationIndicatorsLabel')"
-                />
-            </v-col>
-            <v-col v-if="qualityAssessmentBackfill" cols="8" md="4">
-                <v-select
-                    v-model="selectedBackfillTargets"
-                    :items="backfillTargets"
-                    :label="$t('backfillTargetTypeLabel') + '*'"
-                    :rules="requiredMultiSelectionRules"
-                    return-object
-                    multiple
-                />
-            </v-col>
-            <v-col v-if="qualityAssessmentBackfill" cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedQualityProfile"
-                    :items="qualityProfiles"
-                    :label="$t('qualityProfileLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                />
-            </v-col>
-            <v-col v-if="qualityAssessmentBackfill" cols="4" md="2">
-                <v-checkbox
-                    v-model="rewriteExistingAssessments"
-                    class="mt-2"
-                    :label="$t('rewriteExistingAssessmentsLabel')"
-                />
-            </v-col>
-            <v-col v-if="publicReviewEndCheck" cols="10" md="6">
-                <v-select
-                    v-model="selectedThesisTypes"
-                    :items="thesisTypes"
-                    :label="$t('thesisTypeLabel') + '*'"
-                    :rules="requiredMultiSelectionRules"
-                    multiple />
-            </v-col>
-            <v-col v-if="publicReviewEndCheck" cols="3" md="2">
-                <v-text-field
-                    v-model="publicReviewLengthDays"
-                    type="number"
-                    class="mt-3"
-                    :label="$t('publicReviewLengthLabel') + '*'"
-                    :placeholder="$t('publicReviewLengthLabel') + '*'"
-                    :rules="requiredNumericGreaterThanZeroFieldRules"
-                />
-            </v-col>
-            <v-col v-if="publicReviewEndCheck" cols="4" md="2">
-                <v-checkbox
-                    v-model="shortenedReviewPeriod"
-                    class="mt-3"
-                    :label="$t('shortenedReviewPeriodLabel')"
-                />
-            </v-col>
-            <v-col v-if="taskIndicatorLoad" cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedIndicatorSource"
-                    :items="indicatorSources"
-                    :label="$t('sourceLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    return-object
-                    :readonly="false" />
-            </v-col>
-            <!-- <v-col v-if="taskClassificationLoad" cols="2">
-                <v-select
-                    v-model="selectedClassificationSource"
-                    :items="classificationSources"
-                    :label="$t('sourceLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    return-object
-                    :readonly="false">
-                </v-select>
-            </v-col> -->
-            <v-col v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || (reportGeneration && !isSummaryReport())" cols="12" sm="3" md="2">
-                <commission-autocomplete-search 
-                    v-model="selectedCommission" 
-                    :only-load-commissions="taskClassificationLoad" 
-                    :only-classification-commissions="taskClassificationComputation"
-                    :comfortable="taskClassificationComputation || journalPublicationsAssessment || proceedingsPublicationsAssessment"
-                    :required="taskClassificationComputation || taskClassificationLoad || reportGeneration"
-                />
-            </v-col>
-            <v-col v-if="reportGeneration && isSummaryReport()" cols="12" sm="3" md="2">
-                <commission-autocomplete-search 
-                    v-model="selectedCommissions" 
-                    only-load-commissions
-                    required
-                    multiple
-                />
-            </v-col>
-            <v-col v-if="reportGeneration && isScientificProductionReport" cols="12" sm="3" md="2">
-                <v-select
-                    v-model="startYear"
-                    :items="years"
-                    :label="$t('fromLabel') + '*'"
-                    :rules="requiredMultiSelectionRules"
-                />
-            </v-col>
-            <v-col v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedYears"
-                    :items="years"
-                    :label="(reportGeneration ? $t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') : $t('yearsLabel')) + '*'"
-                    :rules="requiredMultiSelectionRules"
-                    :class="(taskClassificationComputation || isSummaryReport()) ? 'comfortable' : ''"
-                    :multiple="!reportGeneration" />
-            </v-col>
-            <v-col v-if="taskClassificationComputation || journalPublicationsAssessment" cols="12" md="3">
-                <journal-autocomplete-search
-                    v-model="selectedJournals"
-                    multiple disable-submission
-                />
-            </v-col>
-            <v-col v-if="proceedingsPublicationsAssessment" cols="12" md="3">
-                <event-autocomplete-search
-                    v-model="selectedEvents"
-                    multiple
-                    disable-submission
-                />
-            </v-col>
-            <v-col v-if="monographPublicationsAssessment" cols="12" md="3">
-                <monograph-autocomplete-search
-                    v-model="selectedMonographs"
-                    multiple
-                    disable-submission
-                />
-            </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment" cols="12" md="3">
-                <person-autocomplete-search
-                    v-model="selectedPersons"
-                    multiple disable-submission
-                />
-            </v-col>
-            <v-col v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || metadataEnrichment || isTopLevelReport()" cols="12" md="3">
-                <organisation-unit-autocomplete-search
-                    v-model="selectedOUs" :multiple="!isTopLevelReport() || metadataEnrichment"
-                    disable-submission :required="isTopLevelReport() || metadataEnrichment"
-                    :comfortable="isSummaryReport()"
-                    :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"
-                />
-            </v-col>
-            <v-col v-if="metadataEnrichment" cols="4" md="2">
-                <v-checkbox
-                    v-model="autoload"
-                    class="mt-2"
-                    :label="$t('automaticLabel')"
-                />
-            </v-col>
-            <v-col v-if="maintenance" cols="12" md="4">
-                <v-text-field
-                    v-model="approximateEndMoment"
-                    :label="$t('approximateEndMomentLabel') + '*'"
-                    :placeholder="$t('approximateEndMomentLabel')"
-                    outlined
-                    :rules="requiredFieldRules" />
-            </v-col>
-        </v-row>
-        <v-row
-            v-if="qualityAssessmentBackfill"
-            class="d-flex flex-row justify-center bg-grey-lighten-5">
-            <v-col cols="12" md="3">
-                <person-autocomplete-search
-                    v-model="selectedPersons"
-                    multiple disable-submission
-                />
-            </v-col>
-            <v-col cols="12" md="3">
-                <organisation-unit-autocomplete-search
-                    v-model="selectedOUs"
-                    multiple
-                    disable-submission
-                />
-            </v-col>
-        </v-row>
-        <v-row 
-            v-if="taskIF5Computation"
-            class="d-flex flex-row justify-center bg-grey-lighten-5">
-            <v-col cols="2" md="2">
-                <v-checkbox
-                    v-model="calculateIF5Rank"
-                    class="mt-2"
-                    :label="$t('calculateIf5RankLabel')"
-                />
-            </v-col>
-            <v-col cols="2" md="2">
-                <v-checkbox
-                    v-model="calculateJCIRank"
-                    class="mt-2"
-                    :label="$t('calculateJciRankLabel')"
-                />
-            </v-col>
-        </v-row>
-        <v-row
-            v-if="taskReindexing && reindexingDocuments"
-            class="d-flex flex-row justify-center mt-5 bg-grey-lighten-5">
-            <v-col cols="2" md="2">
-                <h5>
-                    {{ $t("publicationTypeToIndexMessage") }}
-                </h5>
-            </v-col>
-            <v-col cols="4" md="2">
-                <v-select
-                    v-model="selectedPublicationType"
-                    :items="publicationTypes"
-                    :label="$t('typeOfPublicationLabel')"
-                    clearable
-                    return-object />
-            </v-col>
-        </v-row>
-        <v-row class="d-flex flex-row justify-center mb-5">
-            <v-col
-                v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment"
-                cols="12" sm="3" md="2">
-                <date-picker
-                    v-model="startDate"
-                    :label="$t('assessmentLastModificationDateLabel') + '*'"
-                    color="primary"
-                    required
-                />
-            </v-col>
-            <v-col cols="12" sm="3" md="2">
-                <date-picker
-                    v-model="scheduleDate"
-                    :label="$t('dateLabel') + '*'"
-                    color="primary"
-                    required
-                    in-future
-                />
-            </v-col>
-            <v-col cols="12" sm="3" md="1">
-                <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required />
-            </v-col>
-            <v-col
-                v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck || qualityAssessmentBackfill"
-                cols="12" sm="3" md="2">
-                <v-select
-                    v-model="selectedRecurrenceType"
-                    :items="recurrenceTypes"
-                    :label="$t('recurrenceTypeLabel') + '*'"
-                    :rules="requiredSelectionRules"
-                    return-object />
-            </v-col>
-            <v-col cols="12" sm="3" md="1">
-                <v-btn class="mt-3" :disabled="!isFormValid" @click="scheduleTaskForComputation">
-                    {{ $t("scheduleLabel") }}
-                </v-btn>
-            </v-col>
-        </v-row>
-    </v-form>
+    <div class="mx-auto w-full max-w-5xl px-3 pb-6 sm:px-6">
+        <h1 class="mb-6 text-3xl font-bold tracking-tight text-slate-800">
+            {{ $t("scheduleTasksLabel") }}
+        </h1>
+        <ui-form-section :title="$t('scheduleNewTaskLabel')" icon="mdi-calendar-plus">
+            <v-form v-model="isFormValid" class="space-y-5" @submit.prevent="scheduleTaskForComputation">
+                <div class="max-w-xl">
+                    <ui-input
+                        v-model="selectedScheduledTaskType"
+                        control="select"
+                        :items="scheduledTaskTypes"
+                        :label="$t('scheduledTaskTypeLabel')"
+                    />
+                </div>
+                <div
+                    v-if="!taskUnmanagedDocumentsDeletion"
+                    class="scheduler-fields border-t border-slate-100 pt-5"
+                >
+                    <div
+                        v-if="!taskReindexing && !journalPublicationsAssessment && !proceedingsPublicationsAssessment && !reportGeneration && !taskUnmanagedDocumentsDeletion && !publicReviewEndCheck && !maintenance && !thesesAssessment && !monographPublicationsAssessment && !metadataEnrichment && !qualityAssessmentBackfill" class="min-w-0">
+                        <ui-input
+                            v-model="selectedApplicableEntityType"
+                            control="select"
+                            :items="applicableTypes"
+                            :label="$t('applicableTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object
+                            :readonly="false" />
+                    </div>
+                    <div v-if="reportGeneration" class="min-w-0">
+                        <ui-input
+                            v-model="selectedReportType"
+                            control="select"
+                            :items="reportTypes"
+                            :label="$t('reportTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            :readonly="false" />
+                    </div>
+                    <div v-if="taskReindexing" class="min-w-0 md:col-span-2">
+                        <ui-input
+                            v-model="selectedEntityTypes"
+                            control="select"
+                            :items="entityTypes"
+                            :label="$t('entityTypeLabel') + '*'"
+                            :rules="requiredMultiSelectionRules"
+                            return-object
+                            multiple />
+                        <div class="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                            <ui-checkbox
+                                v-model="reharvestCitationIndicators"
+                                :label="$t('reharvestCitationIndicatorsLabel')"
+                            />
+                            <div class="flex items-center gap-1">
+                                <ui-button
+                                    variant="ghost"
+                                    size="xs"
+                                    @click="selectedEntityTypes = [...entityTypes]"
+                                >
+                                    {{ $t('selectAllLabel') }}
+                                </ui-button>
+                                <ui-button
+                                    variant="ghost"
+                                    size="xs"
+                                    :disabled="selectedEntityTypes.length === 0"
+                                    @click="selectedEntityTypes = []"
+                                >
+                                    {{ $t('deselectAllLabel') }}
+                                </ui-button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="qualityAssessmentBackfill" class="min-w-0">
+                        <ui-input
+                            v-model="selectedBackfillTargets"
+                            control="select"
+                            :items="backfillTargets"
+                            :label="$t('backfillTargetTypeLabel') + '*'"
+                            :rules="requiredMultiSelectionRules"
+                            return-object
+                            multiple
+                        />
+                    </div>
+                    <div v-if="qualityAssessmentBackfill" class="min-w-0">
+                        <ui-input
+                            v-model="selectedQualityProfile"
+                            control="select"
+                            :items="qualityProfiles"
+                            :label="$t('qualityProfileLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                        />
+                    </div>
+                    <div v-if="qualityAssessmentBackfill" class="min-w-0">
+                        <ui-checkbox
+                            v-model="rewriteExistingAssessments"
+                            :label="$t('rewriteExistingAssessmentsLabel')"
+                        />
+                    </div>
+                    <div v-if="publicReviewEndCheck" class="min-w-0">
+                        <ui-input
+                            v-model="selectedThesisTypes"
+                            control="select"
+                            :items="thesisTypes"
+                            :label="$t('thesisTypeLabel') + '*'"
+                            :rules="requiredMultiSelectionRules"
+                            multiple />
+                    </div>
+                    <div v-if="publicReviewEndCheck" class="min-w-0">
+                        <ui-input
+                            v-model="publicReviewLengthDays"
+                            type="number"
+                            :label="$t('publicReviewLengthLabel') + '*'"
+                            :placeholder="$t('publicReviewLengthLabel') + '*'"
+                            :rules="requiredNumericGreaterThanZeroFieldRules"
+                        />
+                    </div>
+                    <div v-if="publicReviewEndCheck" class="min-w-0">
+                        <ui-checkbox
+                            v-model="shortenedReviewPeriod"
+                            :label="$t('shortenedReviewPeriodLabel')"
+                        />
+                    </div>
+                    <div v-if="taskIndicatorLoad" class="min-w-0">
+                        <ui-input
+                            v-model="selectedIndicatorSource"
+                            control="select"
+                            :items="indicatorSources"
+                            :label="$t('sourceLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object
+                            :readonly="false" />
+                    </div>
+                    <div v-if="taskClassificationComputation || taskClassificationLoad || journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || (reportGeneration && !isSummaryReport())" class="min-w-0">
+                        <commission-autocomplete-search
+                            v-model="selectedCommission"
+                            :only-load-commissions="taskClassificationLoad"
+                            :only-classification-commissions="taskClassificationComputation"
+                            :required="taskClassificationComputation || taskClassificationLoad || reportGeneration"
+                        />
+                    </div>
+                    <div v-if="reportGeneration && isSummaryReport()" class="min-w-0">
+                        <commission-autocomplete-search
+                            v-model="selectedCommissions"
+                            only-load-commissions
+                            required
+                            multiple
+                        />
+                    </div>
+                    <div v-if="reportGeneration && isScientificProductionReport" class="min-w-0">
+                        <ui-input
+                            v-model="startYear"
+                            control="select"
+                            :items="years"
+                            :label="$t('fromLabel') + '*'"
+                            :rules="requiredMultiSelectionRules"
+                        />
+                    </div>
+                    <div v-if="taskClassificationComputation || taskIF5Computation || reportGeneration" class="min-w-0">
+                        <ui-input
+                            v-model="selectedYears"
+                            control="select"
+                            :items="years"
+                            :label="(reportGeneration ? $t(isScientificProductionReport ? 'toLabel' : 'reportYearLabel') : $t('yearsLabel')) + '*'"
+                            :rules="requiredMultiSelectionRules"
+                            :multiple="!reportGeneration" />
+                    </div>
+                    <div v-if="taskClassificationComputation || journalPublicationsAssessment" class="min-w-0">
+                        <journal-autocomplete-search
+                            v-model="selectedJournals"
+                            multiple disable-submission
+                        />
+                    </div>
+                    <div v-if="proceedingsPublicationsAssessment" class="min-w-0">
+                        <event-autocomplete-search
+                            v-model="selectedEvents"
+                            multiple
+                            disable-submission
+                        />
+                    </div>
+                    <div v-if="monographPublicationsAssessment" class="min-w-0">
+                        <monograph-autocomplete-search
+                            v-model="selectedMonographs"
+                            multiple
+                            disable-submission
+                        />
+                    </div>
+                    <div v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment" class="min-w-0">
+                        <person-autocomplete-search
+                            v-model="selectedPersons"
+                            multiple disable-submission
+                        />
+                    </div>
+                    <div v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment || metadataEnrichment || isTopLevelReport()" class="min-w-0">
+                        <organisation-unit-autocomplete-search
+                            v-model="selectedOUs" :multiple="!isTopLevelReport() || metadataEnrichment"
+                            disable-submission :required="isTopLevelReport() || metadataEnrichment"
+                            :label="isTopLevelReport() ? 'topLevelInstitutionLabel' : ''"
+                        />
+                    </div>
+                    <div v-if="metadataEnrichment" class="min-w-0">
+                        <ui-checkbox
+                            v-model="autoload"
+                            :label="$t('automaticLabel')"
+                        />
+                    </div>
+                    <div v-if="maintenance" class="min-w-0">
+                        <ui-input
+                            v-model="approximateEndMoment"
+                            :label="$t('approximateEndMomentLabel') + '*'"
+                            :placeholder="$t('approximateEndMomentLabel')"
+                            :rules="requiredFieldRules" />
+                    </div>
+                    <template v-if="qualityAssessmentBackfill">
+                        <div class="min-w-0">
+                            <person-autocomplete-search
+                                v-model="selectedPersons"
+                                multiple disable-submission
+                            />
+                        </div>
+                        <div class="min-w-0">
+                            <organisation-unit-autocomplete-search
+                                v-model="selectedOUs"
+                                multiple
+                                disable-submission
+                            />
+                        </div>
+                    </template>
+                    <template v-if="taskIF5Computation">
+                        <div class="min-w-0">
+                            <ui-checkbox
+                                v-model="calculateIF5Rank"
+                                :label="$t('calculateIf5RankLabel')"
+                            />
+                        </div>
+                        <div class="min-w-0">
+                            <ui-checkbox
+                                v-model="calculateJCIRank"
+                                :label="$t('calculateJciRankLabel')"
+                            />
+                        </div>
+                    </template>
+                    <div v-if="taskReindexing && reindexingDocuments" class="min-w-0">
+                        <p class="mb-2 text-sm text-slate-500">
+                            {{ $t("publicationTypeToIndexMessage") }}
+                        </p>
+                        <ui-input
+                            v-model="selectedPublicationType"
+                            control="select"
+                            :items="publicationTypes"
+                            :label="$t('typeOfPublicationLabel')"
+                            clearable
+                            return-object />
+                    </div>
+                    <div
+                        v-if="journalPublicationsAssessment || proceedingsPublicationsAssessment || thesesAssessment || monographPublicationsAssessment" class="min-w-0">
+                        <date-picker
+                            v-model="startDate"
+                            :label="$t('assessmentLastModificationDateLabel') + '*'"
+                            color="primary"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-5">
+                    <choice-cards
+                        v-model="executionMode"
+                        :options="executionModeOptions"
+                        :aria-label="$t('taskStartLabel')"
+                    />
+                </div>
+                <div
+                    v-if="executionMode === 'scheduled' || taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck || qualityAssessmentBackfill"
+                    class="scheduler-fields scheduler-timing"
+                >
+                    <div v-if="executionMode === 'scheduled'" class="min-w-0">
+                        <date-picker
+                            v-model="scheduleDate"
+                            :label="$t('dateLabel') + '*'"
+                            color="primary"
+                            required
+                            in-future
+                        />
+                    </div>
+                    <div v-if="executionMode === 'scheduled'" class="min-w-0">
+                        <time-picker v-model="scheduledTime" :label="$t('timeLabel')" required />
+                    </div>
+                    <div
+                        v-if="taskReindexing || reportGeneration || taskUnmanagedDocumentsDeletion || publicReviewEndCheck || qualityAssessmentBackfill" class="min-w-0">
+                        <ui-input
+                            v-model="selectedRecurrenceType"
+                            control="select"
+                            :items="recurrenceTypes"
+                            :label="$t('recurrenceTypeLabel') + '*'"
+                            :rules="requiredSelectionRules"
+                            return-object />
+                    </div>
+                </div>
+                <div class="flex justify-end border-t border-slate-100 pt-4">
+                    <ui-button type="submit" :disabled="!isFormValid" class="w-full sm:w-auto">
+                        <v-icon :icon="executionMode === 'now' ? 'mdi-play' : 'mdi-calendar-plus'" size="18" />
+                        {{ $t(executionMode === 'now' ? 'startNowLabel' : 'scheduleLabel') }}
+                    </ui-button>
+                </div>
+            </v-form>
+        </ui-form-section>
 
-    <scheduled-tasks-list
-        class="mt-10! mb-5!"
-        :scheduled-tasks="scheduledTasks"
-        @delete="deleteScheduledLoadTask" />
+        <section class="mt-8 border-t border-slate-200 pt-6" aria-labelledby="scheduled-tasks-heading">
+            <h2 id="scheduled-tasks-heading" class="mb-4 text-lg font-semibold text-slate-800">
+                {{ $t('scheduleTasksLabel') }}
+            </h2>
+            <scheduled-tasks-list
+                :scheduled-tasks="scheduledTasks"
+                @delete="deleteScheduledLoadTask" />
+        </section>
 
-    <toast v-model="snackbar" :message="message" />
+        <toast v-model="snackbar" :message="message" />
+    </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import UiInput from "@/components/ui/input/Input.vue";
+import ChoiceCards from "@/components/ui/choice-cards/ChoiceCards.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
+import UiFormSection from "@/components/ui/form-section/FormSection.vue";
+import { UiButton } from "@/components/ui/button";
 import TimePicker from "@/components/core/TimePicker.vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import TaskManagerService from "@/services/TaskManagerService";
@@ -341,22 +359,20 @@ import { QualityAssessmentTarget } from "@/models/RevisionModel";
 import { getQualityAssessmentTargetsForGivenLocale } from "@/i18n/qualityAssessmentTarget";
 import DataQualityService from "@/services/revision/DataQualityService";
 import { useCrisContextInformation } from "@/composables/useCrisContextInformation";
+import { DateTime } from "luxon";
 
 
 export default defineComponent({
-    name: "IndicatorsLoadView",
-    components: { TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch, EventAutocompleteSearch, MonographAutocompleteSearch },
+    name: "ScheduledTasksView",
+    components: { ChoiceCards, UiInput, UiCheckbox, UiFormSection, UiButton, TimePicker, DatePicker, Toast, CommissionAutocompleteSearch, ScheduledTasksList, JournalAutocompleteSearch, PersonAutocompleteSearch, OrganisationUnitAutocompleteSearch, EventAutocompleteSearch, MonographAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
         const message = ref("");
 
-        const now = new Date();
-        const fiveMinutesLater = new Date(
-            now.getTime() + 5 * 60000 - (now.getTimezoneOffset() * 60000)
-        );
-        const scheduleDate = ref(fiveMinutesLater.toISOString().split('T')[0]);
-        const scheduledTime = ref(fiveMinutesLater.toISOString().split('T')[1].slice(0, 5));
+        const fiveMinutesLater = DateTime.local().plus({ minutes: 5 });
+        const scheduleDate = ref(fiveMinutesLater.toISODate()!);
+        const scheduledTime = ref(fiveMinutesLater.toFormat("HH:mm"));
 
         const scheduledTasks = ref<ScheduledTaskResponse[]>([]);
 
@@ -376,6 +392,19 @@ export default defineComponent({
         } = useValidationUtils();
 
         const i18n = useI18n();
+        const executionMode = ref("scheduled");
+        const executionModeOptions = computed(() => [
+            {
+                value: "scheduled",
+                title: i18n.t("scheduledDateLabel"),
+                description: i18n.t("scheduledDateDescription"),
+            },
+            {
+                value: "now",
+                title: i18n.t("startNowLabel"),
+                description: i18n.t("startNowDescription"),
+            },
+        ]);
 
         const { isAssessmentModuleEnabled, isDigitalLibraryEnabled } = useCrisContextInformation();
 
@@ -494,7 +523,7 @@ export default defineComponent({
             fetchQualityProfiles();
 
             populateSelectionData();
-            
+
             const now = new Date();
             const secondsUntilNextMinute = 60 - now.getSeconds();
             const millisecondsUntilNextMinute = secondsUntilNextMinute * 1000;
@@ -565,11 +594,18 @@ export default defineComponent({
         };
 
         const scheduleTaskForComputation = () => {
-            const timestamp = createTimestamp(scheduleDate.value, scheduledTime.value);
+            if (!isFormValid.value) {
+                return;
+            }
+
+            // Leave a short window for the request: the scheduler rejects past timestamps.
+            const timestamp = executionMode.value === "now"
+                ? new Date(Date.now() + 10_000).toISOString()
+                : createTimestamp(scheduleDate.value, scheduledTime.value);
 
             switch (selectedScheduledTaskType.value) {
                 case ScheduledTaskType.INDICATOR_LOAD:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleIndicatorLoadingTask(
                             timestamp, selectedIndicatorSource.value.value
                         )
@@ -577,16 +613,16 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.IF5_JCI_COMPUTATION:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleIF5AndJCIRankComputationTask(
-                            timestamp, selectedYears.value, 
+                            timestamp, selectedYears.value,
                             calculateIF5Rank.value, calculateJCIRank.value
                         )
                     );
                     break;
 
                 case ScheduledTaskType.CLASSIFICATION_COMPUTATION:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleClassificationComputationTask(
                             timestamp, selectedCommission.value.value, selectedYears.value,
                             selectedJournals.value.map(journal => journal.value)
@@ -595,7 +631,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.REINDEXING:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleDatabaseReindexing(
                             timestamp, selectedEntityTypes.value.map(entityType => entityType.value),
                             selectedRecurrenceType.value.value,
@@ -606,7 +642,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.CLASSIFICATION_LOAD:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleClassificationLoadTask(
                             timestamp, selectedClassificationSource.value.value,
                             selectedCommission.value.value
@@ -615,7 +651,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.JOURNAL_PUBLICATIONS_ASSESSMENT:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.schedulePublicationAssessment(
                             timestamp, (startDate.value as string).split("T")[0],
                             {
@@ -628,9 +664,9 @@ export default defineComponent({
                         )
                     );
                     break;
-                
+
                 case ScheduledTaskType.PROCEEDINGS_PUBLICATIONS_ASSESSMENT:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.schedulePublicationAssessment(
                             timestamp, (startDate.value as string).split("T")[0],
                             {
@@ -645,7 +681,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.REPORT_GENERATION:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleReportGeneration(
                             timestamp, selectedReportType.value,
                             selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ? selectedCommissions.value.map(commission => commission.value) : [selectedCommission.value.value],
@@ -657,7 +693,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.UNMANAGED_DOCUMENTS_DELETION:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleUnmanagedDocumentsDeletion(
                             timestamp, selectedRecurrenceType.value.value
                         )
@@ -665,7 +701,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.PUBLIC_REVIEW_END_DATE_CHECK:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.schedulePublicReviewEndCheck(
                             timestamp, selectedThesisTypes.value.map(type => type.value),
                             publicReviewLengthDays.value, selectedRecurrenceType.value.value
@@ -674,7 +710,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.MAINTENANCE:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         ApplicationConfigurationService.scheduleMaintenence(
                             timestamp, approximateEndMoment.value
                         )
@@ -682,7 +718,7 @@ export default defineComponent({
                     break;
 
                 case ScheduledTaskType.THESES_ASSESSMENT:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.schedulePublicationAssessment(
                             timestamp, (startDate.value as string).split("T")[0],
                             {
@@ -696,7 +732,7 @@ export default defineComponent({
                     );
                     break;
                 case ScheduledTaskType.MONOGRAPH_PUBLICATIONS_ASSESSMENT:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.schedulePublicationAssessment(
                             timestamp, (startDate.value as string).split("T")[0],
                             {
@@ -710,11 +746,11 @@ export default defineComponent({
                     );
                     break;
                 case ScheduledTaskType.METADATA_ENRICHMENT:
-                    scheduleTask(() => 
+                    scheduleTask(() =>
                         TaskManagerService.scheduleMetadataEnrichment(
-                            timestamp, 
-                            (selectedOUs.value as { title: string; value: number; }[]).map(ou => ou.value), 
-                            autoload.value, 
+                            timestamp,
+                            (selectedOUs.value as { title: string; value: number; }[]).map(ou => ou.value),
+                            autoload.value,
                             selectedRecurrenceType.value.value
                         )
                     );
@@ -759,11 +795,11 @@ export default defineComponent({
         };
 
         const isTopLevelReport = () => {
-            if (reportGeneration.value && 
+            if (reportGeneration.value &&
                 (
-                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION || 
-                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED || 
-                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY || 
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION ||
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_COLORED ||
+                    selectedReportType.value === ReportType.TABLE_TOP_LEVEL_INSTITUTION_SUMMARY ||
                     selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION
                 )
             ) {
@@ -781,10 +817,11 @@ export default defineComponent({
             return false;
         };
 
-        const isScientificProductionReport = computed(() => 
+        const isScientificProductionReport = computed(() =>
             selectedReportType.value === ReportType.TABLE_SCIENTIFIC_PRODUCTION);
 
         return {
+            executionMode, executionModeOptions,
             scheduleDate, scheduledTasks, publicReviewLengthDays,
             applicableTypes, selectedApplicableEntityType,
             selectedIndicatorSource, requiredSelectionRules,
@@ -826,3 +863,22 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+.scheduler-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .scheduler-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .scheduler-timing {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+</style>

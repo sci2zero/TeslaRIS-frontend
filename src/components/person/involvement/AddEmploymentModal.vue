@@ -3,7 +3,9 @@
         <template #activator="scope">
             <v-btn
                 v-bind="scope.props"
-                variant="elevated"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-briefcase-plus">
                 {{ $t("addEmployeeLabel") }}
             </v-btn>
@@ -25,8 +27,9 @@
                         </v-row>
                         <v-row>
                             <v-col>
-                                <ui-input control="select"
+                                <ui-input
                                     v-model="selectedEmploymentPosition"
+                                    control="select"
                                     :items="employmentPositions"
                                     :label="$t('employmentPositionLabel') + '*'"
                                     :rules="requiredSelectionRules"

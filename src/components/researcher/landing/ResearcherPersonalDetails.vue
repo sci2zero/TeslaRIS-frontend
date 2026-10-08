@@ -1,347 +1,269 @@
 <template>
-    <div class="edit-pen-container relative">
-        <generic-crud-modal
-            :form-component="PersonUpdateForm"
-            :form-props="{ presetPerson: person }"
-            entity-name="Person"
-            is-update
-            is-section-update
-            primary-color outlined
-            :read-only="!canEdit"
-            @update="emit('update', $event)"
-        />
-        <div class="space-y-6">
-            <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-account-circle mr-2 text-blue-600"></span>
-                    {{ t('personalInfoLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('firstNameLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personName?.firstname }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('surnameLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personName?.lastname }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('birthdateLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ (((isResearcher || isAdmin) && canEdit) || person?.showFullBirthdate) ? formatDate(person?.personalInfo?.localBirthDate) : person?.personalInfo?.localBirthDate?.slice(0, 4) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('placeOfBirthLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personalInfo?.placeOfBirth || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('sexLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ formatSex(person?.personalInfo?.sex) }}
-                        </p>
-                    </div>
+    <div class="space-y-4">
+        <landing-section-card
+            :title="t('personalInfoLabel')"
+            icon="mdi-account-circle"
+            icon-class="bg-blue-50 text-blue-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <template v-if="canEdit" #action>
+                <generic-crud-modal
+                    :form-component="PersonUpdateForm"
+                    :form-props="{ presetPerson: person }"
+                    entity-name="Person"
+                    is-update
+                    is-section-update
+                    primary-color outlined
+                    :read-only="!canEdit"
+                    @update="emit('update', $event)"
+                >
+                    <template #activator="{ props: activatorProps }">
+                        <v-btn
+                            v-bind="activatorProps"
+                            variant="outlined" size="small" class="text-none"
+                            prepend-icon="mdi-pencil-outline">
+                            {{ t("updatePersonLabel") }}
+                        </v-btn>
+                    </template>
+                </generic-crud-modal>
+            </template>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field :label="t('firstNameLabel')" class="min-w-0 break-words">
+                    {{ person?.personName?.firstname }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('surnameLabel')" class="min-w-0 break-words">
+                    {{ person?.personName?.lastname }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('birthdateLabel')" class="min-w-0 break-words">
+                    {{ (((isResearcher || isAdmin) && canEdit) || person?.showFullBirthdate) ? formatDate(person?.personalInfo?.localBirthDate) : person?.personalInfo?.localBirthDate?.slice(0, 4) }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('placeOfBirthLabel')" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.placeOfBirth || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('sexLabel')" class="min-w-0 break-words">
+                    {{ formatSex(person?.personalInfo?.sex) }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            v-if="person?.personalInfo?.postalAddress"
+            :title="t('professionalAddressLabel')"
+            icon="mdi-map-marker"
+            icon-class="bg-red-50 text-red-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field :label="t('streetAndNumberLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.streetAndNumber) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('cityLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.city) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('stateLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.state) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('postalNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.postalAddress.postalNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('countryLabel')" class="min-w-0 break-words">
+                    {{ countryName || '-' }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            v-if="person?.personalInfo?.privatePostalAddress"
+            :title="t('privateAddressLabel')"
+            icon="mdi-map-marker"
+            icon-class="bg-red-50 text-red-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field :label="t('streetAndNumberLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.streetAndNumber) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('cityLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.city) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('stateLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.state) || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('postalNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.privatePostalAddress.postalNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('countryLabel')" class="min-w-0 break-words">
+                    {{ privateCountryName || '-' }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            v-if="person?.personalInfo?.contact"
+            :title="t('professionalContactLabel')"
+            icon="mdi-phone"
+            icon-class="bg-green-50 text-green-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field :label="t('emailLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.contact.contactEmail || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('phoneNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.contact.phoneNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('faxNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.contact.faxNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('mobilePhoneNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.contact.mobilePhoneNumber || '-' }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            v-if="person?.personalInfo?.privateContact"
+            :title="t('privateContactLabel')"
+            icon="mdi-phone"
+            icon-class="bg-green-50 text-green-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field :label="t('emailLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.privateContact.contactEmail || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('phoneNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.privateContact.phoneNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('faxNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.privateContact.faxNumber || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('mobilePhoneNumberLabel')" class="min-w-0 break-words">
+                    {{ person.personalInfo.privateContact.mobilePhoneNumber || '-' }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            v-if="researchArea"
+            :title="t('researchAreaLabel')"
+            icon="mdi-domain"
+            icon-class="bg-purple-50 text-purple-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 gap-4">
+                <landing-detail-field :label="t('researchAreaLabel')" class="min-w-0 break-words">
+                    {{ returnCurrentLocaleContent(researchArea.name) }}
+                </landing-detail-field>
+            </div>
+        </landing-section-card>
+
+        <landing-section-card
+            :title="t('identifiersLabel')"
+            icon="mdi-identifier"
+            icon-class="bg-indigo-50 text-indigo-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <landing-detail-field label="APVNT" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.apvnt || '-' }}
+                </landing-detail-field>
+                <landing-detail-field label="eCRIS-ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field label="enaukaID" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.eNaukaId || '-' }}
+                </landing-detail-field>
+                <landing-detail-field :label="t('nationalScienceIdLabel')" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.nationalScienceId || '-' }}
+                </landing-detail-field>
+                <landing-detail-field v-if="person?.personalInfo?.orcid" label="ORCID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.orcid" :identifier="person?.personalInfo.orcid" type="orcid" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field v-if="person?.personalInfo?.scopusAuthorId" label="Scopus Author ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field v-if="person?.personalInfo?.openAlexId" label="OpenAlex ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field v-if="person?.personalInfo?.webOfScienceResearcherId" label="ResearcherID (WoS)" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field label="Google Scholar ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field label="Authenticus ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <landing-detail-field label="Lattes ID" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes" />
+                    <span v-else>-</span>
+                </landing-detail-field>
+                <div class="md:col-span-2">
+                    <entity-identifiers-list
+                        :entity-identifiers="personIdentifiers"
+                        :can-edit="canEdit"
+                        :entity-id="person?.id"
+                        :containing-entity-type="ApplicableEntityType.PERSON"
+                        :concrete-entity-type="ApplicableEntityType.PERSON"
+                        @updated="fetchIdentifiers"
+                    />
                 </div>
             </div>
+        </landing-section-card>
 
-            <div v-if="person?.personalInfo?.postalAddress" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
-                    {{ t('professionalAddressLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('streetAndNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.streetAndNumber) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('cityLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.city) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.state) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.postalAddress.postalNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ countryName || '-' }}
-                        </p>
-                    </div>
+        <landing-section-card
+            v-if="person?.personalInfo?.uris && person.personalInfo.uris.length > 0"
+            :title="t('websiteLabel')"
+            icon="mdi-web"
+            icon-class="bg-blue-50 text-blue-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="space-y-2">
+                <div v-for="uri in person.personalInfo.uris" :key="uri" class="flex items-start min-w-0">
+                    <span class="mdi mdi-link text-gray-400 mr-2 mt-0.5 shrink-0" />
+                    <a :href="uri" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline break-all">
+                        {{ uri }}
+                    </a>
                 </div>
             </div>
+        </landing-section-card>
 
-            <div v-if="person?.personalInfo?.privatePostalAddress" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-map-marker mr-2 text-red-600"></span>
-                    {{ t('privateAddressLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('streetAndNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.streetAndNumber) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('cityLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.city) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('stateLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.state) || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('postalNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.privatePostalAddress.postalNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('countryLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ privateCountryName || '-' }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="person?.personalInfo?.contact" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-phone mr-2 text-green-600"></span>
-                    {{ t('professionalContactLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('emailLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.contact.contactEmail || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.contact.phoneNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.contact.faxNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.contact.mobilePhoneNumber || '-' }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="person?.personalInfo?.privateContact" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-phone mr-2 text-green-600"></span>
-                    {{ t('privateContactLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('emailLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.privateContact.contactEmail || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('phoneNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.privateContact.phoneNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('faxNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.privateContact.faxNumber || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('mobilePhoneNumberLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person.personalInfo.privateContact.mobilePhoneNumber || '-' }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="researchArea" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-domain mr-2 text-purple-600"></span>
-                    {{ t('researchAreaLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t('researchAreaLabel') }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ returnCurrentLocaleContent(researchArea.name) }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-identifier mr-2 text-indigo-600"></span>
-                    {{ t('identifiersLabel') }}
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">APVNT</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personalInfo?.apvnt || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">eCRIS-ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">enaukaID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personalInfo?.eNaukaId || '-' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">{{ t("nationalScienceIdLabel") }}</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            {{ person?.personalInfo?.nationalScienceId || '-' }}
-                        </p>
-                    </div>
-                    <div v-if="person?.personalInfo?.orcid">
-                        <label class="block text-sm font-medium text-gray-700">ORCID</label>
-                        <identifier-link v-if="person?.personalInfo.orcid" :identifier="person?.personalInfo.orcid" type="orcid"></identifier-link>
-                        <span v-else>-</span>
-                    </div>
-                    <div v-if="person?.personalInfo?.scopusAuthorId">
-                        <label class="block text-sm font-medium text-gray-700">Scopus Author ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div v-if="person?.personalInfo?.openAlexId">
-                        <label class="block text-sm font-medium text-gray-700">OpenAlex ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div v-if="person?.personalInfo?.webOfScienceResearcherId">
-                        <label class="block text-sm font-medium text-gray-700">ResearcherID (WoS)</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Google Scholar ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Authenticus ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Lattes ID</label>
-                        <p class="mt-1 text-sm text-gray-900 break-words">
-                            <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes"></identifier-link>
-                            <span v-else>-</span>
-                        </p>
-                    </div>
-                    <div>
-                        <entity-identifiers-list
-                            :entity-identifiers="personIdentifiers"
-                            :can-edit="canEdit"
-                            :entity-id="person?.id"
-                            :containing-entity-type="ApplicableEntityType.PERSON"
-                            :concrete-entity-type="ApplicableEntityType.PERSON"
-                            @updated="fetchIdentifiers"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="person?.personalInfo?.uris && person.personalInfo.uris.length > 0" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-web mr-2 text-blue-600"></span>
-                    {{ t('websiteLabel') }}
-                </h3>
-                <div class="space-y-2">
-                    <div v-for="uri in person.personalInfo.uris" :key="uri" class="flex items-start min-w-0">
-                        <span class="mdi mdi-link text-gray-400 mr-2 mt-0.5 shrink-0"></span>
-                        <a :href="uri" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm underline break-all">
-                            {{ uri }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="activeEmployments.length > 0" class="bg-gray-50 p-4 sm:p-6 rounded-lg">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <span class="mdi mdi-office-building mr-2 text-orange-600"></span>
-                    {{ t('employmentsLabel') }}
-                </h3>
-                <div class="space-y-3">
-                    <div v-for="employment in activeEmployments.slice(0, 5)" :key="employment.id" class="border-l-4 border-orange-200 pl-4">
-                        <localized-link
-                            v-if="employment.organisationUnitId"
-                            :to="'organisation-units/' + employment.organisationUnitId"
-                            class="font-medium text-gray-900 underline"
-                        >
-                            <div class="font-medium text-gray-900">
-                                <v-icon icon="mdi-domain" size="16" class="mr-1"></v-icon>
-                                {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
-                            </div>
-                        </localized-link>
-                        <div v-else class="font-medium text-gray-900">
+        <landing-section-card
+            v-if="activeEmployments.length > 0"
+            :title="t('employmentsLabel')"
+            icon="mdi-office-building"
+            icon-class="bg-orange-50 text-orange-600"
+            class="min-w-0 [&>header]:flex-wrap"
+            padded>
+            <div class="space-y-3">
+                <div v-for="employment in activeEmployments.slice(0, 5)" :key="employment.id" class="border-l-4 border-orange-200 pl-4">
+                    <localized-link
+                        v-if="employment.organisationUnitId"
+                        :to="'organisation-units/' + employment.organisationUnitId"
+                        class="font-medium text-gray-900 underline"
+                    >
+                        <div class="font-medium text-gray-900">
+                            <v-icon icon="mdi-domain" size="16" class="mr-1" />
                             {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
                         </div>
-                        <div v-if="employment.employmentPosition" class="text-sm text-gray-600">
-                            {{ getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition) }}
-                        </div>
+                    </localized-link>
+                    <div v-else class="font-medium text-gray-900">
+                        {{ employment.organisationUnitName ? returnCurrentLocaleContent(employment.organisationUnitName) : returnCurrentLocaleContent(employment.displayOrganisationUnit) }}
+                    </div>
+                    <div v-if="employment.employmentPosition" class="text-sm text-gray-600">
+                        {{ getEmploymentPositionTitleFromValueAutoLocale(employment.employmentPosition) }}
                     </div>
                 </div>
             </div>
-        </div>
+        </landing-section-card>
     </div>
 </template>
 
@@ -359,6 +281,8 @@ import { Sex } from "@/models/PersonModel";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { useUserRole } from "@/composables/useUserRole";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import LandingDetailField from "@/components/landing/LandingDetailField.vue";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import { ApplicableEntityType } from "@/models/Common";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
@@ -424,28 +348,3 @@ const formatSex = (sex: Sex | null | undefined): string => {
     return getTitleFromValueAutoLocale(sex) || "-";
 };
 </script>
-
-<style scoped>
-.edit-pen-container :deep(.edit-pen) {
-    top: 0;
-    right: 0;
-    position: absolute;
-    z-index: 10;
-    opacity: 0;
-}
-
-.edit-pen-container:hover :deep(.edit-pen) {
-    opacity: 0.3;
-}
-
-.edit-pen-container :deep(.edit-pen:hover) {
-    opacity: 1;
-}
-
-@media (hover: none), (max-width: 768px) {
-    .edit-pen-container :deep(.edit-pen) {
-        opacity: 1;
-    }
-}
-</style>
-

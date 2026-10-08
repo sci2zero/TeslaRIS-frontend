@@ -1,6 +1,7 @@
 <template>
     <responsive-data-table
         v-model="selectedPublications"
+        :container-class="embedded ? 'bg-white' : undefined"
         :items="publications"
         :headers="headers"
         :extra-sort-headers="[yearHeader]"
@@ -10,7 +11,6 @@
         :items-per-page="tableOptions.itemsPerPage"
         :sort-by="tableOptions.sortBy"
         :in-comparator="inComparator"
-        :container-class="embedded ? 'bg-transparent' : undefined"
         draggable-group="publications"
         :has-active-filters="hasActiveTypeFilters"
         filter-header-key="type"
@@ -18,10 +18,10 @@
         @dragged="onDropCallback"
     >
         <template v-if="$slots['top-left']" #top-left>
-            <slot name="top-left"></slot>
+            <slot name="top-left" />
         </template>
         <template #actions>
-            <slot name="actions"></slot>
+            <slot name="actions" />
         </template>
         <template #selection-menu>
             <v-list-item
@@ -136,17 +136,17 @@
             </v-list-item>
         </template>
         <template v-if="$slots['type-filter-menu']" #filter="{ column }">
-            <slot name="type-filter-menu" :column="column"></slot>
+            <slot name="type-filter-menu" :column="column" />
         </template>
         <template #[`header.`+titleColumn]="{ isSorted, column, toggleSort, getSortIcon }">
             <div class="flex items-center gap-2 sm:gap-8 md:gap-12 lg:gap-16">
                 <div class="group flex items-center gap-2" @click.stop="toggleSort(column)">
                     <span>{{ column.title }}</span>
-                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)"></v-icon>
+                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
                 </div>
                 <div class="group flex items-center gap-2 px-2 py-4" @click.stop="toggleSort(yearHeader)">
                     <span>{{ yearHeader.title }}</span>
-                    <v-icon :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)"></v-icon>
+                    <v-icon :class="[isSorted(yearHeader) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(yearHeader)" />
                 </div>
             </div>
         </template>

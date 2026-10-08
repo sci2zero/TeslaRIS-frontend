@@ -287,3 +287,34 @@ h3 {
         letter-spacing: 0;
     }
 }
+
+/* Shared entity browsing surfaces. */
+.entity-list-layout {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 2.5rem 1.5rem;
+}
+.entity-list-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.entity-list-header h1 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: #1e293b; letter-spacing: -0.025em; }
+.entity-list-header__icon { display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 0.75rem; background: #eef2ff; color: #5e35b1; }
+.entity-list-content { min-width: 0; padding: 1rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.04); }
+.entity-filter-panel { width: max-content; min-width: 17rem; max-width: min(28rem, calc(100vw - 2rem)); max-height: min(36rem, 75vh); overflow: auto; padding: 1rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 8px 24px rgb(15 23 42 / 0.1); }
+.entity-filter-panel__title { margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #f1f5f9; font-size: 0.875rem; font-weight: 600; color: #334155; }
+.entity-filter-panel .v-label { white-space: normal; }
+.entity-list-layout .v-btn { text-transform: none; letter-spacing: normal; }
+.entity-list-layout .action-menu-trigger { border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: none; color: #475569 !important; }
+@media (max-width: 640px) {
+    .entity-list-layout { padding: 1.5rem 1rem; }
+    .entity-list-content { padding: 0.75rem; }
+}
+
+.funding-landing .funding-info-card { border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 0.04); }
+.funding-landing .info-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2rem; }
+.funding-landing .info-item { min-width: 0; overflow-wrap: anywhere; }
+.funding-landing .info-item > div:first-child { color: #64748b; font-size: 0.75rem; font-weight: 500; }
+.funding-landing .info-item .response { color: #334155; font-size: 0.875rem; }
+@media (max-width: 640px) { .funding-landing .info-columns { grid-template-columns: minmax(0, 1fr); } }
+
+.entity-data-table .v-data-table__th { background: #f8fafc; color: #475569; font-size: 0.8125rem; font-weight: 600; letter-spacing: normal; text-transform: none; border-bottom: 1px solid #e2e8f0; }
+.entity-data-table .modern-table-container { border-color: #e2e8f0; box-shadow: 0 1px 2px rgb(15 23 42 / 0.04); }

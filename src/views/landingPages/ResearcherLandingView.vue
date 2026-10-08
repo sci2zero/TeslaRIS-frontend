@@ -127,16 +127,16 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="openModal(personOtherNameModalRef)"
                     >
-                        <span class="mdi mdi-account-multiple-outline"></span>
+                        <span class="mdi mdi-account-multiple-outline" />
                         {{ $t("viewAllPersonNamesLabel") }}
                     </UiButton>
 
                     <v-menu v-if="canEdit" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                                <span class="mdi mdi-dots-horizontal"></span>
+                                <span class="mdi mdi-dots-horizontal" />
                                 {{ $t("moreActionsLabel") }}
-                                <span class="mdi mdi-chevron-down"></span>
+                                <span class="mdi mdi-chevron-down" />
                             </UiButton>
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -246,28 +246,10 @@
                         </template>
 
                         <div class="space-y-4 px-4 py-4">
-                            <div class="flex flex-col sm:flex-row sm:items-end gap-3">
-                                <search-bar-component
-                                    class="w-full min-w-0 max-w-none!"
-                                    :transparent="false"
-                                    size="small"
-                                    @search="clearSortAndPerformPublicationSearch($event)"
-                                />
-                                <ui-input control="select"
-                                    v-model="selectedPublicationTypes"
-                                    :items="publicationTypes"
-                                    :label="$t('typeOfPublicationLabel')"
-                                    return-object
-                                    hide-details
-                                    density="comfortable"
-                                    class="w-full sm:max-w-xs sm:min-w-56 shrink-0"
-                                    multiple
-                                ></ui-input>
-                            </div>
-
                             <publication-table-component
                                 ref="publicationsRef"
                                 embedded
+                                :has-active-type-filters="selectedPublicationTypes.length > 0"
                                 :publications="publications"
                                 :total-publications="totalPublications"
                                 enable-export
@@ -281,6 +263,17 @@
                                     }"
                                 :allow-researcher-unbinding="canEdit && isResearcher"
                                 @switch-page="switchPage">
+                                <template #top-left>
+                                    <search-bar-component
+                                        class="w-full min-w-0 max-w-none!"
+                                        :transparent="false"
+                                        size="small"
+                                        @search="clearSortAndPerformPublicationSearch($event)"
+                                    />
+                                </template>
+                                <template #type-filter-menu>
+                                    <publication-type-filter v-model="selectedPublicationTypes" :items="publicationTypes || []" />
+                                </template>
                             </publication-table-component>
                         </div>
                     </landing-section-card>
@@ -288,50 +281,60 @@
             </v-tabs-window-item>
 
             <v-tabs-window-item value="projects">
-                <project-table-component
-                    ref="projectsRef"
-                    :projects="projects"
-                    :total-projects="totalProjects"
-                    :has-active-status-filters="selectedProjectStatuses.length > 0"
-                    :allow-unbinding="canEdit && (isResearcher || isInstitutionalEditor)"
-                    @switch-page="switchProjectsPage">
-                    <template #top-left>
-                        <search-bar-component
-                            :transparent="false"
-                            size="small"
-                            @search="clearSortAndPerformProjectSearch($event)"
-                        />
-                    </template>
-                    <template #actions>
-                        <v-menu>
-                            <template #activator="{ props: optionsProps }">
-                                <v-btn
-                                    v-bind="optionsProps"
-                                    color="white"
-                                    prepend-icon="mdi-dots-vertical"
-                                >
-                                    {{ $t("optionsLabel") }}
-                                </v-btn>
-                            </template>
-                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
-                                <ui-checkbox
-                                    v-model="returnOnlyActiveProjects"
-                                    :label="$t('showOnlyActiveLabel')"
-                                    hide-details
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('projectsLabel')"
+                        :count="totalProjects"
+                        icon="mdi-briefcase-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <template #action>
+                            <v-menu>
+                                <template #activator="{ props: optionsProps }">
+                                    <v-btn
+                                        v-bind="optionsProps"
+                                        color="white"
+                                        prepend-icon="mdi-dots-vertical"
+                                    >
+                                        {{ $t("optionsLabel") }}
+                                    </v-btn>
+                                </template>
+                                <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                                    <ui-checkbox
+                                        v-model="returnOnlyActiveProjects"
+                                        :label="$t('showOnlyActiveLabel')"
+                                        hide-details
+                                    />
+                                </div>
+                            </v-menu>
+                            <v-btn
+                                v-if="canEdit"
+                                color="primary" density="compact"
+                                @click="addProject">
+                                {{ $t("createNewProjectLabel") }}
+                            </v-btn>
+                        </template>
+                        <project-table-component
+                            ref="projectsRef"
+                            embedded
+                            :projects="projects"
+                            :total-projects="totalProjects"
+                            :has-active-status-filters="selectedProjectStatuses.length > 0"
+                            :allow-unbinding="canEdit && (isResearcher || isInstitutionalEditor)"
+                            @switch-page="switchProjectsPage">
+                            <template #top-left>
+                                <search-bar-component
+                                    :transparent="false"
+                                    size="small"
+                                    @search="clearSortAndPerformProjectSearch($event)"
                                 />
-                            </div>
-                        </v-menu>
-                        <v-btn
-                            v-if="canEdit"
-                            color="primary" density="compact"
-                            @click="addProject">
-                            {{ $t("createNewProjectLabel") }}
-                        </v-btn>
-                    </template>
-                    <template #status-filter-menu>
-                        <project-status-filter v-model="selectedProjectStatuses" />
-                    </template>
-                </project-table-component>
+                            </template>
+                            <template #status-filter-menu>
+                                <project-status-filter v-model="selectedProjectStatuses" />
+                            </template>
+                        </project-table-component>
+                    </landing-section-card>
+                </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <researcher-additional-info-tab
@@ -356,56 +359,93 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <div class="mt-4 min-w-0">
-                    <indicators-section 
-                        :indicators="personIndicators" 
-                        :applicable-types="[ApplicableEntityType.PERSON]" 
-                        :entity-id="person?.id"
-                        :entity-type="ApplicableEntityType.PERSON" 
-                        :can-edit="false"
-                        show-statistics
-                        @updated="fetchIndicators"
-                    />
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('indicatorListLabel')"
+                        icon="mdi-chart-box-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <div class="min-w-0">
+                            <indicators-section
+                                :indicators="personIndicators"
+                                :applicable-types="[ApplicableEntityType.PERSON]"
+                                :entity-id="person?.id"
+                                :entity-type="ApplicableEntityType.PERSON"
+                                :can-edit="false"
+                                show-statistics
+                                @updated="fetchIndicators"
+                            />
+                        </div>
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <div class="mt-4 overflow-x-auto">
-                    <person-assessments-view
-                        :assessments="personAssessments"
-                        :is-loading="assessmentsLoading"
-                        @fetch="fetchAssessment">
-                    </person-assessments-view>
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('assessmentsLabel')"
+                        icon="mdi-certificate-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <person-assessments-view
+                            :assessments="personAssessments"
+                            :is-loading="assessmentsLoading"
+                            @fetch="fetchAssessment" />
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <div class="mt-4 min-w-0 overflow-x-auto">
-                    <person-visualizations
-                        :person-id="(person.id as number)"
-                        :display-settings="displaySettings.displaySettings.value"
-                        :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
-                        :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
-                        :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
-                        :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
-                    />
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('visualizationsLabel')"
+                        icon="mdi-chart-bar"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <div class="min-w-0 overflow-x-auto">
+                            <person-visualizations
+                                :person-id="(person.id as number)"
+                                :display-settings="displaySettings.displaySettings.value"
+                                :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                                :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                                :display-citations-tab="displaySettings.shouldDisplayCitationsTab()"
+                                :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                            />
+                        </div>
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <div class="mt-5 overflow-x-auto">
-                    <revision-history-table-component
-                        :entity-type="EntityType.PERSON"
-                        :entity-id="person?.id"
-                        @restored="fetchPerson"
-                        @show-assessment-details="showAssessmentDetails"
-                    />
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('revisionHistoryLabel')"
+                        icon="mdi-history"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <div class="overflow-x-auto">
+                            <revision-history-table-component
+                                :entity-type="EntityType.PERSON"
+                                :entity-id="person?.id"
+                                @restored="fetchPerson"
+                                @show-assessment-details="showAssessmentDetails"
+                            />
+                        </div>
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <div class="mt-5 overflow-x-auto">
-                    <data-quality-tabs-component
-                        ref="dataQualityTabsRef"
-                        :entity-type="EntityType.PERSON"
-                        :entity-id="person?.id"
-                    />
+                <div class="mt-4">
+                    <landing-section-card
+                        :title="$t('dataQualityLabel')"
+                        icon="mdi-shield-check-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <div class="overflow-x-auto">
+                            <data-quality-tabs-component
+                                ref="dataQualityTabsRef"
+                                :entity-type="EntityType.PERSON"
+                                :entity-id="person?.id"
+                            />
+                        </div>
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
         </template>
@@ -415,8 +455,7 @@
                 ref="dialogRef"
                 :title="$t('areYouSureLabel')"
                 :message="dialogMessage"
-                @continue="performMigrationToUnmanaged">
-            </persistent-question-dialog>
+                @continue="performMigrationToUnmanaged" />
 
             <toast v-model="snackbar" :message="snackbarMessage" />
         </template>
@@ -434,6 +473,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { PersonResponse, ExpertiseOrSkillResponse, PersonalInfo, PersonName } from '@/models/PersonModel';
 import { watch } from 'vue';
+import PublicationTypeFilter from '@/components/publication/PublicationTypeFilter.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import ProjectTableComponent from '@/components/project/ProjectTableComponent.vue';
 import ProjectStatusFilter from '@/components/project/ProjectStatusFilter.vue';
@@ -492,12 +532,11 @@ import { UiButton } from '@/components/ui/button';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import ResearcherAdditionalInfoTab from '@/components/researcher/landing/ResearcherAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
-import UiInput from '@/components/ui/input/Input.vue';
 import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter, UiInput, UiCheckbox },
+    components: { PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter, UiCheckbox },
     setup() {
         const currentTab = ref("additionalInfo");
 

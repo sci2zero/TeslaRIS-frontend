@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-menu
             v-model="menu"
-            :close-on-content-click="true"
+            :close-on-content-click="false"
             location="bottom"
         >
             <template #activator="{ props }">
@@ -10,20 +10,21 @@
                     v-bind="props"
                     :color="iconColor"
                     variant="text"
-                    icon="mdi-translate"
+                    icon="mdi-bell-outline"
+                    :aria-label="$t('notificationPanelTitle')"
                 >
                     <v-badge
                         style="z-index: 5;"
                         :content="notificationCountStore.notificationCount"
                         :model-value="notificationCountStore.notificationCount > 0">
                         <v-icon left :style="{ color: iconColor }">
-                            mdi-bell
+                            mdi-bell-outline
                         </v-icon>
                     </v-badge>
                 </v-btn>
             </template>
 
-            <notification-list />
+            <notification-list compact />
         </v-menu>
     </div>
 </template>
@@ -97,4 +98,3 @@ label {
     display: inline-block;
 }
 </style>
-  

@@ -1,85 +1,139 @@
 <template>
-    <table-toolbar
+    <landing-section-card
         :title="$t('teamLabel')"
-        :selected-count="selectedMembers.length"
-        :can-act="canRemoveMembers"
-    >
-        <template #action-items>
-            <v-list-item
-                class="action-menu-item"
-                @click="displayPersistentDialog = true"
-            >
-                <template #prepend>
-                    <v-icon color="error" size="18">
-                        mdi-delete
-                    </v-icon>
-                </template>
-                <v-list-item-title class="text-body-2">
-                    {{ $t("removeLabel") }}
-                </v-list-item-title>
-            </v-list-item>
-        </template>
-        <template #actions>
+        :count="persons.length"
+        icon="mdi-account-group-outline"
+        icon-class="bg-indigo-50 text-indigo-600"
+        padded>
+        <template v-if="canEdit || canUnbind" #action>
             <v-btn
                 v-if="canEdit"
-                color="primary"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-account-plus"
                 @click="addDialog = true">
                 {{ $t("addTeamMemberLabel") }}
             </v-btn>
             <v-btn
                 v-if="canUnbind"
-                color="primary"
                 variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-link-variant-off"
                 @click="displayUnbindDialog = true">
                 {{ isResearcher ? $t("removeFromProjectLabel") : $t("removeInstitutionFromProjectLabel") }}
             </v-btn>
         </template>
-    </table-toolbar>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table
+        <responsive-data-table
             v-model="selectedMembers"
-            :items="sortedMembers"
+            :items="pagedMembers"
             :headers="headers"
-            item-value="id"
+            :items-length="persons.length"
             :show-select="canRemoveMembers"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')">
-            <template #item="row">
+            :page="tableOptions.page"
+            :items-per-page="tableOptions.itemsPerPage"
+            :sort-by="tableOptions.sortBy"
+            container-class="bg-white"
+            item-key="id"
+            @update:options="updateTableOptions">
+            <template v-if="canRemoveMembers" #selection-menu>
+                <v-list-item
+                    class="action-menu-item"
+                    @click="displayPersistentDialog = true">
+                    <template #prepend>
+                        <v-icon color="error" size="18">
+                            mdi-delete
+                        </v-icon>
+                    </template>
+                    <v-list-item-title class="text-body-2">
+                        {{ $t("removeLabel") }}
+                    </v-list-item-title>
+                </v-list-item>
+            </template>
+            <template #compact-item="{ item }">
+                <entity-list-card
+                    :to="item.personId > 0 ? 'persons/' + item.personId : undefined"
+                    @preview="openGlance(item)">
+                    <div class="flex items-start gap-3">
+                        <v-checkbox
+                            v-if="canRemoveMembers"
+                            v-model="selectedMembers"
+                            :value="item"
+                            :aria-label="memberName(item)"
+                            density="compact"
+                            hide-details />
+                        <entity-row-identity
+                            :title="memberName(item)"
+                            :to="item.personId > 0 ? 'persons/' + item.personId : undefined">
+                            <template #icon>
+                                <person-avatar :person-id="item.personId" :name="memberName(item)" :size="40" />
+                            </template>
+                            <p class="mt-1 text-sm text-slate-600 break-words">
+                                {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(item.contributionType)) }}
+                            </p>
+                            <p class="mt-1 text-xs text-slate-500 break-words">
+                                {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(item.investigationRole)) }}
+                            </p>
+                        </entity-row-identity>
+                    </div>
+                </entity-list-card>
+            </template>
+            <template #row="{ item }">
                 <tr>
                     <td v-if="canRemoveMembers">
                         <v-checkbox
                             v-model="selectedMembers"
-                            :value="row.item"
+                            :value="item"
+                            :aria-label="memberName(item)"
                             class="table-checkbox"
-                            hide-details
-                        />
+                            hide-details />
                     </td>
                     <td>
-                        <localized-link v-if="row.item.personId" :to="'persons/' + row.item.personId">
-                            {{ memberName(row.item) }}
-                        </localized-link>
-                        <span v-else>
-                            {{ memberName(row.item) }}
-                        </span>
+                        <entity-row-identity
+                            :title="memberName(item)"
+                            :to="item.personId > 0 ? 'persons/' + item.personId : undefined"
+                            class="py-2">
+                            <template #icon>
+                                <person-avatar :person-id="item.personId" :name="memberName(item)" :size="40" />
+                            </template>
+                        </entity-row-identity>
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(item.contributionType)) }}
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(row.item.investigationRole)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(item.investigationRole)) }}
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(returnCurrentLocaleContent(row.item.otherRoleDescription)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(returnCurrentLocaleContent(item.otherRoleDescription)) }}
                     </td>
                 </tr>
             </template>
-        </v-data-table>
-    </div>
+        </responsive-data-table>
+    </landing-section-card>
+
+    <entity-details-sheet
+        v-if="glancedMember"
+        v-model="glanceOpen"
+        :title="memberName(glancedMember)"
+        :to="glancedMember.personId > 0 ? 'persons/' + glancedMember.personId : undefined"
+        :open-page-label="$t('openPersonPageLabel')">
+        <template #icon>
+            <person-avatar :person-id="glancedMember.personId" :name="memberName(glancedMember)" :size="40" />
+        </template>
+        <div class="entity-details-grid">
+            <entity-detail-field :label="$t('contributionTypeLabel')">
+                {{ displayTextOrPlaceholder(getPersonProjectContributionTypeTitleFromValueAutoLocale(glancedMember.contributionType)) }}
+            </entity-detail-field>
+            <entity-detail-field :label="$t('investigationRoleLabel')">
+                {{ displayTextOrPlaceholder(getPersonProjectInvestigationRoleTitleFromValueAutoLocale(glancedMember.investigationRole)) }}
+            </entity-detail-field>
+            <entity-detail-field :label="$t('otherRoleDescriptionLabel')" class="entity-details-full-width">
+                {{ displayTextOrPlaceholder(returnCurrentLocaleContent(glancedMember.otherRoleDescription)) }}
+            </entity-detail-field>
+        </div>
+    </entity-details-sheet>
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -131,11 +185,17 @@ import type { ErrorResponse } from "@/models/Common";
 import type { PersonProjectContribution } from "@/models/ProjectModel";
 import { useI18n } from "vue-i18n";
 import ProjectService from "@/services/project/ProjectService";
-import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import PersonProjectContributionForm from "@/components/project/PersonProjectContributionForm.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
-import TableToolbar from "@/components/core/TableToolbar.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import { useLocalTable } from "@/composables/useLocalTable";
+import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
+import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";
+import EntityListCard from "@/components/core/EntityListCard.vue";
+import EntityDetailsSheet from "@/components/core/EntityDetailsSheet.vue";
+import EntityDetailField from "@/components/core/EntityDetailField.vue";
+import PersonAvatar from "@/components/person/PersonAvatar.vue";
 import { getPersonProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/personProjectContributionType";
 import { getPersonProjectInvestigationRoleTitleFromValueAutoLocale } from "@/i18n/personProjectInvestigationRole";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
@@ -161,6 +221,18 @@ const canRemoveMembers = computed(() => props.canEdit && isAdmin.value);
 const canUnbind = computed(() => props.canEdit && (isResearcher.value || isInstitutionalEditor.value));
 
 const selectedMembers = ref<PersonProjectContribution[]>([]);
+const glanceOpen = ref(false);
+const glancedMember = ref<PersonProjectContribution | null>(null);
+const openGlance = (member: PersonProjectContribution) => {
+    glancedMember.value = member;
+    glanceOpen.value = true;
+};
+
+const { tableOptions, pagedItems: pagedMembers, updateTableOptions } = useLocalTable(
+    computed(() => props.persons), i18n.locale,
+    (member) => memberName(member),
+    (a, b) => a.orderNumber - b.orderNumber
+);
 
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);
@@ -182,12 +254,11 @@ const headers = computed(() => [
     { title: i18n.t("otherRoleDescriptionLabel"), align: "start", sortable: false, key: "otherRoleDescription" }
 ]);
 
-const sortedMembers = computed(() =>
-    [...props.persons].sort((a, b) => a.orderNumber - b.orderNumber)
-);
-
 watch(() => props.persons, () => {
     selectedMembers.value = [];
+    tableOptions.value.page = 1;
+    glancedMember.value = null;
+    glanceOpen.value = false;
 });
 
 const memberName = (member: PersonProjectContribution) => {

@@ -464,53 +464,81 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="documentIndicators" 
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
-                    :entity-id="thesis?.id" 
-                    :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit && !thesis?.isOnPublicReview && (isResearcher || isAdmin || isCommission)"
-                    show-statistics
-                    :has-attached-files="(thesis?.fileItems && thesis?.fileItems.length > 0) || (thesis?.preliminaryFiles && thesis?.preliminaryFiles.length > 0)"
-                    @create="createIndicator"
-                    @updated="fetchIndicators"
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="documentIndicators"
+                        :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                        :entity-id="thesis?.id"
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :can-edit="canEdit && !thesis?.isOnPublicReview && (isResearcher || isAdmin || isCommission)"
+                        show-statistics
+                        :has-attached-files="(thesis?.fileItems && thesis?.fileItems.length > 0) || (thesis?.preliminaryFiles && thesis?.preliminaryFiles.length > 0)"
+                        @create="createIndicator"
+                        @updated="fetchIndicators"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="assessments">
-                <entity-classification-view
-                    :entity-classifications="documentClassifications"
-                    :entity-id="thesis?.id"
-                    :can-edit="canClassify && !thesis?.isOnPublicReview && !!thesis?.documentDate?.year"
-                    :containing-entity-type="ApplicableEntityType.DOCUMENT"
-                    :applicable-types="[ApplicableEntityType.THESIS]"
-                    @create="createClassification"
-                    @update="fetchClassifications"
-                />
+                <landing-section-card
+                    :title="$t('assessmentsLabel')"
+                    icon="mdi-certificate-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <entity-classification-view
+                        :entity-classifications="documentClassifications"
+                        :entity-id="thesis?.id"
+                        :can-edit="canClassify && !thesis?.isOnPublicReview && !!thesis?.documentDate?.year"
+                        :containing-entity-type="ApplicableEntityType.DOCUMENT"
+                        :applicable-types="[ApplicableEntityType.THESIS]"
+                        @create="createClassification"
+                        @update="fetchClassifications"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <document-visualizations
-                    :document-id="(thesis?.id as number)"
-                    :display-settings="displayConfiguration.displaySettings.value"
-                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
-                />
+                <landing-section-card
+                    :title="$t('visualizationsLabel')"
+                    icon="mdi-chart-bar"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <document-visualizations
+                        :document-id="(thesis?.id as number)"
+                        :display-settings="displayConfiguration.displaySettings.value"
+                        :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="PublicationType.THESIS"
-                    :entity-id="thesis?.id"
-                    :restore-blocked-reason="restoreBlockedReason"
-                    @restored="fetchThesis"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="PublicationType.THESIS"
+                        :entity-id="thesis?.id"
+                        :restore-blocked-reason="restoreBlockedReason"
+                        @restored="fetchThesis"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="PublicationType.THESIS"
-                    :entity-id="thesis?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="PublicationType.THESIS"
+                        :entity-id="thesis?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -594,6 +622,7 @@ import { UiButton } from '@/components/ui/button';
 import RoCrateService from '@/services/export/RoCrateService';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import ThesisUpdateForm from '@/components/publication/update/ThesisUpdateForm.vue';
@@ -609,7 +638,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton, EntityLandingHeader, LandingMetaItem, LandingOverviewTab, RichTitleRenderer, LocalizedLink, IdentifierLink },
+    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton, EntityLandingHeader, LandingMetaItem, LandingOverviewTab, RichTitleRenderer, LocalizedLink, IdentifierLink },
     setup() {
         const currentTab = ref("overview");
 

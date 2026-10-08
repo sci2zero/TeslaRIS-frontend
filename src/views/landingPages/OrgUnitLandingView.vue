@@ -56,9 +56,6 @@
                     <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
                         {{ organisationUnit.location.address }}
                     </landing-meta-item>
-                    <landing-meta-item v-if="organisationUnit?.ror" label="ROR" abbrev="ROR" tone="emerald">
-                        <identifier-link :identifier="organisationUnit.ror" type="ror" compact />
-                    </landing-meta-item>
                     <landing-meta-item v-if="organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="indigo">
                         <identifier-link :identifier="organisationUnit.contact.contactEmail" type="email" compact />
                     </landing-meta-item>
@@ -166,16 +163,16 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="navigateToPublicTheses"
                     >
-                        <span class="mdi mdi-eye-outline"></span>
+                        <span class="mdi mdi-eye-outline" />
                         {{ $t("routeLabel.publicDissertationsReport") }}
                     </UiButton>
 
                     <v-menu v-if="hasMoreInstitutionActions" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                                <span class="mdi mdi-dots-horizontal"></span>
+                                <span class="mdi mdi-dots-horizontal" />
                                 {{ $t("moreActionsLabel") }}
-                                <span class="mdi mdi-chevron-down"></span>
+                                <span class="mdi mdi-chevron-down" />
                             </UiButton>
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -268,7 +265,7 @@
                 {{ $t("relationsLabel") }}
             </v-tab>
             <v-tab value="researchAreas">
-                {{ $t("researchAreasLabel") }}
+                {{ $t("additionalInfoLabel") }}
             </v-tab>
             <v-tab v-if="ouIndicators && ouIndicators.length > 0" value="indicators">
                 {{ $t("indicatorListLabel") }}
@@ -291,167 +288,241 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="organisationUnit?.description"
                     is-general-description
                     description-tab="researchAreas"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <!-- Publication Table -->
-                <search-bar-component
-                    class="mt-5"
-                    @search="clearSortAndPerformPublicationSearch($event)"
-                />
-                <span class="flex justify-between items-center">
-                    <div class="flex items-center gap-4 mt-5">
-                        <v-select
-                            v-model="selectedPublicationTypes"
-                            :items="publicationTypes"
-                            :label="$t('typeOfPublicationLabel')"
-                            return-object
-                            class="publication-type-select"
-                            multiple
-                        />
-                        <v-checkbox
-                            v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
-                            v-model="returnOnlyNonArchived"
-                            :label="$t('showNonArchivedLabel')"
-                            class="mt-2"
-                        />
-                    </div>
-                    <div
+                <landing-section-card
+                    :title="$t('scientificResultsListLabel')"
+                    :count="totalPublications"
+                    icon="mdi-file-document-multiple-outline"
+                    icon-class="bg-indigo-50 text-indigo-600">
+                    <template
                         v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
-                        class="flex items-center gap-2 mt-5">
-                        <add-publication-menu compact />
-                        <v-btn
-                            v-if="isInstitutionalEditor && canEdit"
-                            color="primary" density="compact"
-                            @click="performNavigation('importer')">
-                            {{ $t("importerLabel") }}
-                        </v-btn>
+                        #action>
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+                            <add-publication-menu outlined />
+                            <v-btn
+                                v-if="isInstitutionalEditor && canEdit"
+                                variant="outlined"
+                                size="small"
+                                class="text-none"
+                                prepend-icon="mdi-database-import"
+                                @click="performNavigation('importer')">
+                                {{ $t("importerLabel") }}
+                            </v-btn>
+                        </div>
+                    </template>
+
+                    <div class="space-y-4 px-4 py-4">
+                        <publication-table-component
+                            ref="publicationsRef"
+                            embedded
+                            :publications="publications"
+                            :total-publications="totalPublications"
+                            :has-active-type-filters="selectedPublicationTypes.length > 0"
+                            enable-export
+                            :allow-comparison="isInstitutionalEditor && canEdit"
+                            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
+                            :endpoint-token-parameters="[`${organisationUnit?.id}`, `${returnOnlyNonArchived}`, publicationSearchParams]"
+                            :endpoint-body-parameters="
+                                {
+                                    allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
+                                    institutionId: organisationUnit.id,
+                                    commissionId: null
+                                }"
+                            :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
+                            @switch-page="switchPublicationsPage">
+                            <template #top-left>
+                                <search-bar-component
+                                    class="w-full min-w-0 max-w-none!"
+                                    :transparent="false"
+                                    size="small"
+                                    @search="clearSortAndPerformPublicationSearch($event)"
+                                />
+                            </template>
+                            <template #actions>
+                                <v-menu v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary" :close-on-content-click="false" location="bottom end">
+                                    <template #activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            variant="outlined"
+                                            size="small"
+                                            prepend-icon="mdi-tune"
+                                            class="text-none">
+                                            {{ $t('optionsLabel') }}
+                                        </v-btn>
+                                    </template>
+                                    <div class="entity-filter-panel">
+                                        <v-checkbox
+                                            v-model="returnOnlyNonArchived" :label="$t('showNonArchivedLabel')" density="compact" hide-details
+                                            color="primary" />
+                                    </div>
+                                </v-menu>
+                            </template>
+
+                            <template #type-filter-menu>
+                                <publication-type-filter v-model="selectedPublicationTypes" :items="publicationTypes || []" />
+                            </template>
+                        </publication-table-component>
                     </div>
-                </span>
-                <publication-table-component
-                    ref="publicationsRef"
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    enable-export
-                    :allow-comparison="isInstitutionalEditor && canEdit"
-                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_OUTPUTS"
-                    :endpoint-token-parameters="[`${organisationUnit?.id}`, `${returnOnlyNonArchived}`, publicationSearchParams]"
-                    :endpoint-body-parameters="
-                        {
-                            allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
-                            institutionId: organisationUnit.id,
-                            commissionId: null
-                        }"
-                    :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
-                    @switch-page="switchPublicationsPage" />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="employees">
-                <!-- Employees -->
-                <search-bar-component
-                    class="mt-5"
-                    @search="clearSortAndPerformPersonSearch($event)"
-                />
-                <person-table-component
-                    ref="employeesRef"
-                    :persons="employees"
-                    :total-persons="totalEmployees"
-                    :employment-institution-id="organisationUnit?.id"
-                    enable-export
-                    allow-comparison
-                    :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
-                    :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
-                    @switch-page="switchEmployeesPage"
-                    @delete="fetchEmployees(true); fetchEmployees(false);" />
-
-                <div v-if="totalAlumni > 0">
-                    <h1>{{ $t("alumniLabel") }}</h1>
-                    <person-table-component
-                        ref="alumniRef"
-                        :persons="alumni"
-                        :total-persons="totalAlumni"
-                        is-alumni-table
-                        enable-export
-                        :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
-                        :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
-                        @switch-page="switchAlumniPage" />
+                <div class="space-y-5">
+                    <landing-section-card
+                        :title="$t('employeesLabel')"
+                        :count="totalEmployees"
+                        icon="mdi-account-group-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <template v-if="organisationUnit.id > 0 && (isAdmin || isInstitutionalEditor)" #action>
+                            <add-employment-modal
+                                :institution-id="organisationUnit.id"
+                                @update="employeesRef?.notifyUserAndRefreshTable($event)" />
+                        </template>
+                        <person-table-component
+                            ref="employeesRef"
+                            embedded
+                            hide-add-employment
+                            :persons="employees"
+                            :total-persons="totalEmployees"
+                            :employment-institution-id="organisationUnit?.id"
+                            enable-export
+                            allow-comparison
+                            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
+                            :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'false']"
+                            @switch-page="switchEmployeesPage"
+                            @delete="fetchEmployees(true); fetchEmployees(false);">
+                            <template #top-left>
+                                <search-bar-component
+                                    class="w-full min-w-0 max-w-none!"
+                                    size="small" :transparent="false"
+                                    @search="clearSortAndPerformPersonSearch($event)"
+                                />
+                            </template>
+                        </person-table-component>
+                    </landing-section-card>
+                    <landing-section-card
+                        v-if="totalAlumni > 0"
+                        :title="$t('alumniLabel')"
+                        :count="totalAlumni"
+                        icon="mdi-school-outline"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded>
+                        <person-table-component
+                            ref="alumniRef"
+                            embedded
+                            :persons="alumni"
+                            :total-persons="totalAlumni"
+                            is-alumni-table
+                            enable-export
+                            :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_EMPLOYEES"
+                            :endpoint-token-parameters="[`${organisationUnit?.id}`, personSearchParams, 'true']"
+                            @switch-page="switchAlumniPage" />
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="projects">
-                <project-table-component
-                    ref="projectsRef"
-                    hide-bulk-actions
-                    :projects="projects"
-                    :total-projects="totalProjects"
-                    :has-active-status-filters="selectedProjectStatuses.length > 0"
-                    :allow-unbinding="canEdit && isInstitutionalEditor"
-                    @switch-page="switchProjectsPage">
-                    <template #top-left>
-                        <search-bar-component
-                            :transparent="false"
-                            size="small"
-                            @search="clearSortAndPerformProjectSearch($event)"
-                        />
-                    </template>
-                    <template #actions>
-                        <v-menu>
+                <landing-section-card
+                    :title="$t('projectsLabel')"
+                    :count="totalProjects"
+                    icon="mdi-briefcase-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <template #action>
+                        <v-menu :close-on-content-click="false" location="bottom end">
                             <template #activator="{ props: optionsProps }">
                                 <v-btn
                                     v-bind="optionsProps"
-                                    color="white"
-                                    prepend-icon="mdi-dots-vertical"
-                                >
+                                    variant="outlined"
+                                    size="small"
+                                    class="text-none"
+                                    prepend-icon="mdi-tune">
                                     {{ $t("optionsLabel") }}
                                 </v-btn>
                             </template>
-                            <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
+                            <div class="entity-filter-panel">
                                 <v-checkbox
                                     v-model="returnOnlyActiveProjects"
                                     :label="$t('showOnlyActiveLabel')"
-                                    hide-details
-                                />
+                                    density="compact"
+                                    color="primary"
+                                    hide-details />
                             </div>
                         </v-menu>
                     </template>
-                    <template #status-filter-menu>
-                        <project-status-filter v-model="selectedProjectStatuses" />
-                    </template>
-                </project-table-component>
+                    <project-table-component
+                        ref="projectsRef"
+                        embedded
+                        hide-bulk-actions
+                        :projects="projects"
+                        :total-projects="totalProjects"
+                        :has-active-status-filters="selectedProjectStatuses.length > 0"
+                        :allow-unbinding="canEdit && isInstitutionalEditor"
+                        @switch-page="switchProjectsPage">
+                        <template #top-left>
+                            <search-bar-component
+                                class="w-full min-w-0 max-w-none!"
+                                :transparent="false"
+                                size="small"
+                                @search="clearSortAndPerformProjectSearch($event)"
+                            />
+                        </template>
+                        <template #status-filter-menu>
+                            <project-status-filter v-model="selectedProjectStatuses" />
+                        </template>
+                    </project-table-component>
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="relations">
-                <!-- Relations -->
-                <v-row>
-                    <v-col cols="12">
-                        <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                            <v-card-text class="edit-pen-container">
-                                <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations" />
-
-                                <h2>{{ $t("relationsLabel") }}</h2>
-                                <relations-graph ref="graphRef" :nodes="relationChain?.nodes" :links="relationChain?.links" />
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
-                <div class="mt-5">
-                    <h1>{{ $t("subUnitsLabel") }}</h1>
-                    <v-row>
-                        <v-col>
-                            <organisation-unit-table-component
-                                :organisation-units="subUnits"
-                                :total-o-us="totalSubUnits"
-                                allow-comparison
-                                enable-export
-                                :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
-                                :endpoint-token-parameters="['*', String(organisationUnit.id)]"
-                                :top-level-institution-id="organisationUnit.id"
-                                @switch-page="switchSubUnitsPage" />
-                        </v-col>
-                    </v-row>
-                </div>
+                <landing-section-card
+                    :title="$t('hierarchyTitle')"
+                    icon="mdi-file-tree-outline"
+                    icon-class="bg-indigo-50 text-indigo-600">
+                    <template v-if="canEdit && isAdmin" #action>
+                        <organisation-unit-relation-update-modal :relations="relations" :source-o-u="organisationUnit" :read-only="!canEdit || !isAdmin" @update="updateRelations">
+                            <template #activator="{ props: activatorProps }">
+                                <v-btn
+                                    v-bind="activatorProps"
+                                    variant="outlined"
+                                    size="small"
+                                    class="text-none"
+                                    prepend-icon="mdi-pencil-outline"
+                                    :title="$t('updateOURelationLabel')">
+                                    {{ $t('editActionLabel') }}
+                                </v-btn>
+                            </template>
+                        </organisation-unit-relation-update-modal>
+                    </template>
+                    <relations-graph
+                        :nodes="relationChain?.nodes"
+                        :links="relationChain?.links"
+                        :current-id="organisationUnit?.id" />
+                </landing-section-card>
+                <landing-section-card
+                    class="mt-5" :title="$t('subUnitsLabel')" :count="totalSubUnits" icon="mdi-office-building-outline"
+                    padded>
+                    <template v-if="organisationUnit.id > 0 && (isAdmin || isInstitutionalEditor)" #action>
+                        <add-sub-unit-modal
+                            :institution-id="organisationUnit.id"
+                            @update="subUnitAdded" />
+                    </template>
+                    <organisation-unit-table-component
+                        embedded
+                        :organisation-units="subUnits"
+                        :total-o-us="totalSubUnits"
+                        allow-comparison
+                        enable-export
+                        :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
+                        :endpoint-token-parameters="['*', String(organisationUnit.id)]"
+                        :top-level-institution-id="organisationUnit.id"
+                        @switch-page="switchSubUnitsPage" />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
                 <landing-additional-info-tab
@@ -466,25 +537,6 @@
                 >
                     <template #details>
                         <landing-detail-field v-if="organisationUnit?.numberOfEmployees" :label="$t('numberOfEmployeesLabel')" :value="organisationUnit.numberOfEmployees" />
-                        <landing-detail-field label="Scopus AFID">
-                            <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" compact />
-                            <span v-else>{{ $t("notYetSetMessage") }}</span>
-                        </landing-detail-field>
-                        <landing-detail-field label="Open Alex ID">
-                            <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" compact />
-                            <span v-else>{{ $t("notYetSetMessage") }}</span>
-                        </landing-detail-field>
-                        <landing-detail-field label="Ringgold ID" :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
-                        <landing-detail-field label="FundRef" :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
-                        <landing-detail-field label="ISNI" :value="organisationUnit?.isni || $t('notYetSetMessage')" />
-                        <landing-detail-field label="FCT ID" :value="organisationUnit?.fctId || $t('notYetSetMessage')" />
-                        <landing-detail-field label="GRID" :value="organisationUnit?.grid || $t('notYetSetMessage')" />
-                        <landing-detail-field label="Wikidata ID">
-                            <identifier-link v-if="organisationUnit?.wikidata" :identifier="organisationUnit.wikidata" type="wikidata" compact />
-                            <span v-else>{{ $t("notYetSetMessage") }}</span>
-                        </landing-detail-field>
-                        <landing-detail-field :label="$t('nationalIdLabel')" :value="organisationUnit?.nationalId || $t('notYetSetMessage')" />
-                        <landing-detail-field :label="$t('taxNumberLabel')" :value="organisationUnit?.taxNumber || $t('notYetSetMessage')" />
                         <landing-detail-field v-if="isAdmin && organisationUnit?.clientInstitutionCris" :label="$t('clientInstitutionCrisLabel')" :value="$t('clientInstitutionCrisLabel')" />
                         <landing-detail-field v-if="isAdmin && organisationUnit?.clientInstitutionDl" :label="$t('clientInstitutionDlLabel')" :value="$t('clientInstitutionDlLabel')" />
                         <landing-detail-field v-if="isAdmin && organisationUnit?.legalEntity" :label="$t('legalEntityLabel')" :value="$t('legalEntityLabel')" />
@@ -493,7 +545,6 @@
                         <landing-detail-field v-if="organisationUnit?.dateEstablished" :label="$t('dateEstablishedLabel')" :value="localiseDate(organisationUnit?.dateEstablished)" />
                         <landing-detail-field v-if="organisationUnit?.dateDissolved" :label="$t('dateDissolvedLabel')" :value="localiseDate(organisationUnit?.dateDissolved)" />
                         <landing-detail-field v-if="organisationUnit?.active" :label="$t('activeLabel')" :value="$t('activeLabel')" />
-                        <landing-detail-field v-if="!organisationUnit?.ror" label="Research Organisation Registry ID" :value="$t('notYetSetMessage')" />
                         <landing-detail-field v-if="!organisationUnit?.location?.address" :label="$t('addressLabel')" :value="$t('notYetSetMessage')" />
                         <landing-detail-field v-if="!organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" :value="$t('notYetSetMessage')" />
                         <landing-detail-field v-if="loginStore.userLoggedIn" :label="$t('phoneNumberLabel')" :value="organisationUnit?.contact?.phoneNumber || $t('notYetSetMessage')" />
@@ -509,6 +560,31 @@
                             icon-class="bg-indigo-50 text-indigo-600"
                             padded
                         >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <landing-detail-field label="ROR">
+                                    <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field label="Scopus AFID">
+                                    <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field label="OpenAlex ID">
+                                    <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field label="Ringgold ID" :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
+                                <landing-detail-field label="FundRef" :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
+                                <landing-detail-field label="ISNI" :value="organisationUnit?.isni || $t('notYetSetMessage')" />
+                                <landing-detail-field label="FCT ID" :value="organisationUnit?.fctId || $t('notYetSetMessage')" />
+                                <landing-detail-field label="GRID" :value="organisationUnit?.grid || $t('notYetSetMessage')" />
+                                <landing-detail-field label="Wikidata ID">
+                                    <identifier-link v-if="organisationUnit?.wikidata" :identifier="organisationUnit.wikidata" type="wikidata" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field :label="$t('nationalIdLabel')" :value="organisationUnit?.nationalId || $t('notYetSetMessage')" />
+                                <landing-detail-field :label="$t('taxNumberLabel')" :value="organisationUnit?.taxNumber || $t('notYetSetMessage')" />
+                            </div>
                             <entity-identifiers-list
                                 :entity-identifiers="organisationUnitIdentifiers"
                                 :can-edit="canEdit"
@@ -543,54 +619,82 @@
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="ouIndicators" 
-                    :applicable-types="[ApplicableEntityType.ORGANISATION_UNIT]" 
-                    :entity-id="organisationUnit?.id"
-                    :entity-type="ApplicableEntityType.PERSON" 
-                    :can-edit="false"
-                    show-statistics
-                    @updated="fetchIndicators"
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="ouIndicators"
+                        :applicable-types="[ApplicableEntityType.ORGANISATION_UNIT]"
+                        :entity-id="organisationUnit?.id"
+                        :entity-type="ApplicableEntityType.PERSON"
+                        :can-edit="false"
+                        show-statistics
+                        @updated="fetchIndicators"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <organisation-unit-visualizations
-                    :organisation-unit-id="(organisationUnit.id as number)"
-                    :display-settings="displaySettings.displaySettings.value"
-                    :digital-library-display-settings="displaySettingsDL.displaySettings.value"
-                    :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
-                    :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
-                    :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
-                    :is-digital-library-client="organisationUnit?.clientInstitutionDl"
-                />
+                <landing-section-card
+                    :title="$t('visualizationsLabel')"
+                    icon="mdi-chart-bar"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <organisation-unit-visualizations
+                        :organisation-unit-id="(organisationUnit.id as number)"
+                        :display-settings="displaySettings.displaySettings.value"
+                        :digital-library-display-settings="displaySettingsDL.displaySettings.value"
+                        :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
+                        :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"
+                        :display-statistics-tab="displaySettings.shouldDisplayStatisticsTab()"
+                        :is-digital-library-client="organisationUnit?.clientInstitutionDl"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="leaderboards">
-                <organisation-unit-leaderboards
-                    :organisation-unit-id="organisationUnit?.id"
-                    :display-settings="displaySettings.displaySettings.value"
-                    :digital-library-display-settings="displaySettingsDL.displaySettings.value"
-                    :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
-                    :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
-                    :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
-                    :is-digital-library-client="organisationUnit?.clientInstitutionDl"
-                />
+                <landing-section-card
+                    :title="$t('leaderboardsLabel')"
+                    icon="mdi-podium"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <organisation-unit-leaderboards
+                        :organisation-unit-id="organisationUnit?.id"
+                        :display-settings="displaySettings.displaySettings.value"
+                        :digital-library-display-settings="displaySettingsDL.displaySettings.value"
+                        :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"
+                        :display-citations-tab="displaySettings.shouldDisplayCitationLeaderboards()"
+                        :display-points-tab="displaySettings.shouldDisplayAssessmentPointsLeaderboards()"
+                        :is-digital-library-client="organisationUnit?.clientInstitutionDl"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="EntityType.ORGANISATION_UNIT"
-                    :entity-id="organisationUnit?.id"
-                    @restored="() => fetchOU(false)"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="EntityType.ORGANISATION_UNIT"
+                        :entity-id="organisationUnit?.id"
+                        @restored="() => fetchOU(false)"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="EntityType.ORGANISATION_UNIT"
-                    :entity-id="organisationUnit?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="EntityType.ORGANISATION_UNIT"
+                        :entity-id="organisationUnit?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -613,10 +717,13 @@
 import { computed, onMounted, watch, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import PublicationTypeFilter from '@/components/publication/PublicationTypeFilter.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
 import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import OpenLayersMap from '../../components/core/OpenLayersMap.vue';
 import RelationsGraph from '../../components/core/RelationsGraph.vue';
+import AddSubUnitModal from '@/components/organisationUnit/AddSubUnitModal.vue';
+import AddEmploymentModal from '@/components/person/involvement/AddEmploymentModal.vue';
 import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import type { OrganisationUnitIndex, OrganisationUnitRelationRequest, OrganisationUnitRelationResponse, OrganisationUnitRequest, OrganisationUnitResponse } from '@/models/OrganisationUnitModel';
@@ -692,7 +799,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton, ProjectTableComponent, ProjectStatusFilter },
+    components: { PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, AddSubUnitModal, AddEmploymentModal, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const currentTab = ref("overview");
 
@@ -724,7 +831,7 @@ export default defineComponent({
 
         const snackbar = ref(false);
         const snackbarMessage = ref("");
-        
+
         const router = useRouter();
         const currentRoute = useRoute();
 
@@ -735,9 +842,8 @@ export default defineComponent({
             "employees",
         );
 
-        const graphRef = ref<typeof RelationsGraph>();
         const relationChain = ref();
-        
+
         const publications = ref<DocumentPublicationIndex[]>([]);
         const totalPublications = ref<number>(0);
 
@@ -786,14 +892,14 @@ export default defineComponent({
         const i18n = useI18n();
 
         const relations = ref<OrganisationUnitRelationResponse[]>([]);
-        
+
         const subUnits = ref<OrganisationUnitIndex[]>([]);
         const totalSubUnits = ref<number>(0);
 
         const ouIndicators = ref<EntityIndicatorResponse[]>();
 
         const loginStore = useLoginStore();
-        
+
         const {
             isAdmin, isInstitutionalEditor,
             isInstitutionalLibrarian, isHeadOfLibrary,
@@ -809,7 +915,7 @@ export default defineComponent({
             || (isInstitutionalEditor.value && canEdit.value)
             || isAdmin.value
         );
-        
+
         const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
         const returnOnlyNonArchived = ref(false);
@@ -844,7 +950,7 @@ export default defineComponent({
             }
 
             StatisticsService.registerOUView(parseInt(currentRoute.params.id as string));
-            
+
             fetchOU(true);
             fetchIdentifiers();
             fetchIndicators();
@@ -881,7 +987,7 @@ export default defineComponent({
                     organisationUnit.value = response.data;
 
                     document.title = returnCurrentLocaleContent(organisationUnit.value.name) as string;
-                    
+
                     if(uponStartup) {
                         const operations =
                             [fetchEmployees(false), fetchEmployees(true), fetchProjects()];
@@ -912,11 +1018,8 @@ export default defineComponent({
         };
 
         const fetchRelations = () => {
-            OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
+            return OrganisationUnitService.readOURelationsGraph(parseInt(currentRoute.params.id as string)).then((response) => {
                 relationChain.value = response.data;
-                if(graphRef.value) {
-                    graphRef.value.rendered = false;
-                }
             });
         };
 
@@ -1125,6 +1228,13 @@ export default defineComponent({
             await fetchAndSetRelations();
         };
 
+        const subUnitAdded = (success: boolean) => {
+            snackbarMessage.value = i18n.t(success ? "savedMessage" : "genericErrorMessage");
+            snackbar.value = true;
+            fetchSubUnits();
+            fetchAndSetRelations();
+        };
+
         const fetchAndSetRelations = async () => {
             await fetchRelations();
             const sourceOUId = parseInt(currentRoute.params.id as string);
@@ -1244,11 +1354,11 @@ export default defineComponent({
 
         const outputConfigurationUpdated = (shouldShowOutputs: boolean) => {
             showOutputs.value = shouldShowOutputs;
-            
+
             if (shouldShowOutputs) {
                 clearSortAndPerformPublicationSearch(publicationSearchParams.value);
             }
-            
+
             updateSuccess();
         }
 
@@ -1274,8 +1384,10 @@ export default defineComponent({
             });
         };
 
+
+
         watch([selectedPublicationTypes, returnOnlyNonArchived], () => {
-            fetchPublications();
+            clearSortAndPerformPublicationSearch(publicationSearchParams.value);
         });
 
         const openMetadataEnrichmentDialog = () => {
@@ -1305,8 +1417,8 @@ export default defineComponent({
             returnCurrentLocaleContent, canEdit, switchAlumniPage,
             updateKeywords, updateBasicInfo, navigateToPublicTheses,
             snackbar, snackbarMessage, relations, totalAlumni,
-            updateRelations, graphRef, updateResearchAreas,
-            subUnits, totalSubUnits, switchSubUnitsPage,
+            updateRelations, updateResearchAreas,
+            subUnits, totalSubUnits, switchSubUnitsPage, subUnitAdded,
             OrganisationUnitUpdateForm, fetchEmployees,
             ouIndicators, StatisticsType, loginStore,
             ExportableEndpointType, updateSuccess,
@@ -1345,29 +1457,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    .edit-pen-container {
-        position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 0px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
-    .publication-type-select {
-        min-width: 500px;
-        max-width: 500px;
+    :deep(.checkbox-item .v-label--clickable) {
+        width: 100%;
     }
 
     :deep(.org-unit-header-logo) {

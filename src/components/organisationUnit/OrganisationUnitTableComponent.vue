@@ -1,111 +1,4 @@
 <template>
-    <!-- Action Menu for Selected Items -->
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
-            <div v-if="selectedOUs.length > 0" class="action-menu-container">
-                <v-menu offset-y>
-                    <template #activator="{ props }">
-                        <v-btn
-                            v-bind="props"
-                            color="white"
-                            height="48"
-                            variant="elevated"
-                            prepend-icon="mdi-dots-vertical"
-                            class="action-menu-trigger"
-                        >
-                            {{ $t("actions") }} <template v-if="selectedOUs.length > 0">
-                                ({{ selectedOUs.length }})
-                            </template>
-                        </v-btn>
-                    </template>
-                    
-                    <v-list class="action-menu-list" density="compact">
-                        <!-- Delete Action -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison)"
-                            :disabled="selectedOUs.length <= 0"
-                            class="action-menu-item"
-                            @click="startDeletionProcess"
-                        >
-                            <template #prepend>
-                                <v-icon color="error" size="18">
-                                    mdi-delete
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("deleteLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Compare Employees -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison)"
-                            :disabled="selectedOUs.length !== 2"
-                            class="action-menu-item"
-                            @click="startEmploymentComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-account-group
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("compareEmployeesLabel") }}
-                                <span class="selection-indicator">({{ selectedOUs.length }}/2)</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Compare Metadata -->
-                        <v-list-item
-                            v-if="(isAdmin || allowComparison)"
-                            :disabled="selectedOUs.length !== 2"
-                            class="action-menu-item"
-                            @click="startMetadataComparison"
-                        >
-                            <template #prepend>
-                                <v-icon color="info" size="18">
-                                    mdi-database-search
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("compareMetadataLabel") }}
-                                <span class="selection-indicator">({{ selectedOUs.length }}/2)</span>
-                            </v-list-item-title>
-                        </v-list-item>
-                        
-                        <!-- Export Action -->
-                        <v-list-item
-                            v-if="enableExport"
-                            class="action-menu-item"
-                            @click="openExportModal"
-                        >
-                            <template #prepend>
-                                <v-icon color="success" size="18">
-                                    mdi-download
-                                </v-icon>
-                            </template>
-                            <v-list-item-title class="text-body-2">
-                                {{ $t("exportLabel") }}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </div>
-            <div :class="[selectedOUs.length > 0 ? 'w-64' : 'w-96']">
-                <slot name="top-left" />
-            </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <add-sub-unit-modal 
-                v-if="topLevelInstitutionId > 0 && (isAdmin || isInstitutionalEditor)"
-                class="mr-3!"
-                :institution-id="topLevelInstitutionId"
-                @update="notifyUserAndRefreshTable" />
-            <slot name="actions" />
-        </div>
-    </div>
-
-    
     <!-- Table Export Modal -->
     <table-export-modal
         v-if="enableExport"
@@ -118,109 +11,213 @@
         :endpoint-type="endpointType"
         :endpoint-token-parameters="endpointTokenParameters"
         :hide-activation-button="true" />
-    
-    <div ref="tableWrapper" class="modern-table-container">
-        <v-data-table-server
-            v-model="selectedOUs"
-            :sort-by="tableOptions.sortBy"
-            :items="organisationUnits"
-            :headers="headers"
-            item-value="row"
-            :items-length="totalOUs"
-            :show-select="isAdmin || enableExport"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')"
-            :page="tableOptions.page"
-            @update:options="refreshTable">
-            <template #item="row">
-                <tr>
-                    <td v-if="isAdmin || enableExport" class="px-2!">
-                        <v-checkbox
-                            v-model="selectedOUs"
-                            :value="row.item"
-                            class="table-checkbox"
-                            hide-details
-                        />
-                    </td>
-                    <td>
-                        <div class="flex items-center gap-2">
-                            <localized-link :to="'organisation-units/' + row.item.databaseId" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors">
-                                <v-icon color="primary" size="20">
-                                    mdi-office-building
-                                </v-icon>
-                            </localized-link>
-                            <div>
-                                <localized-link :to="'organisation-units/' + row.item.databaseId" class="text-gray-800! hover:text-blue-900! font-semibold text-base">
-                                    <template v-if="$i18n.locale.startsWith('sr')">
-                                        {{ row.item.nameSr }}
-                                    </template>
-                                    <template v-else>
-                                        {{ row.item.nameOther }}
-                                    </template>
-                                </localized-link>
-                                <div v-if="row.item.superOUId" class="text-gray-500 font-normal text-xs flex items-center gap-1 mt-1">
-                                    <v-icon size="14" color="grey">
-                                        mdi-arrow-up-circle
-                                    </v-icon>
-                                    <localized-link :to="'organisation-units/' + row.item.superOUId">
-                                        <template v-if="$i18n.locale.startsWith('sr')">
-                                            {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
-                                        </template>
-                                        <template v-else>
-                                            {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
-                                        </template>
+
+    <responsive-data-table
+        v-model="selectedOUs"
+        :container-class="embedded ? 'bg-white' : undefined"
+        :sort-by="tableOptions.sortBy"
+        :items="organisationUnits"
+        :headers="headers"
+        :items-length="totalOUs"
+        :show-select="isAdmin || enableExport"
+        :items-per-page="tableOptions.itemsPerPage"
+        :page="tableOptions.page"
+        :force-cards="cards"
+        item-key="databaseId"
+        @update:options="refreshTable">
+        <template v-if="$slots['top-left']" #top-left>
+            <slot name="top-left" />
+        </template>
+        <template #actions>
+            <slot name="actions" />
+        </template>
+        <template #selection-menu>
+            <!-- Delete Action -->
+            <v-list-item
+                v-if="(isAdmin || allowComparison)"
+                :disabled="selectedOUs.length <= 0"
+                class="action-menu-item"
+                @click="startDeletionProcess"
+            >
+                <template #prepend>
+                    <v-icon color="error" size="18">
+                        mdi-delete
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("deleteLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+
+            <!-- Compare Employees -->
+            <v-list-item
+                v-if="(isAdmin || allowComparison)"
+                :disabled="selectedOUs.length !== 2"
+                class="action-menu-item"
+                @click="startEmploymentComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-account-group
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("compareEmployeesLabel") }}
+                    <span class="selection-indicator">({{ selectedOUs.length }}/2)</span>
+                </v-list-item-title>
+            </v-list-item>
+
+            <!-- Compare Metadata -->
+            <v-list-item
+                v-if="(isAdmin || allowComparison)"
+                :disabled="selectedOUs.length !== 2"
+                class="action-menu-item"
+                @click="startMetadataComparison"
+            >
+                <template #prepend>
+                    <v-icon color="info" size="18">
+                        mdi-database-search
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("compareMetadataLabel") }}
+                    <span class="selection-indicator">({{ selectedOUs.length }}/2)</span>
+                </v-list-item-title>
+            </v-list-item>
+
+            <!-- Export Action -->
+            <v-list-item
+                v-if="enableExport"
+                class="action-menu-item"
+                @click="openExportModal"
+            >
+                <template #prepend>
+                    <v-icon color="success" size="18">
+                        mdi-download
+                    </v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                    {{ $t("exportLabel") }}
+                </v-list-item-title>
+            </v-list-item>
+        </template>
+        <template #compact-item="{ item }">
+            <entity-list-card
+                :to="'organisation-units/' + item.databaseId"
+                class="h-full bg-white"
+                @preview="openGlance(item)"
+            >
+                <div class="flex items-start gap-3">
+                    <v-checkbox
+                        v-if="isAdmin || enableExport" v-model="selectedOUs" :value="item" hide-details
+                        density="compact" :aria-label="$i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther" />
+                    <entity-row-identity
+                        :title="$i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther"
+                        :to="'organisation-units/' + item.databaseId">
+                        <template #icon>
+                            <organisation-unit-avatar :organisation-unit-id="item.databaseId" />
+                        </template>
+                        <template v-if="hasAdditionalInfo(item)" #default>
+                            <div class="mt-2 space-y-2">
+                                <p v-if="item.superOUId" class="text-xs text-slate-500">
+                                    <localized-link :to="'organisation-units/' + item.superOUId">
+                                        {{ $i18n.locale.startsWith('sr') ? item.superOUNameSr : item.superOUNameOther }}
+                                    </localized-link>
+                                </p>
+                                <p v-if="researchAreasFor(item)" class="text-sm text-slate-500 whitespace-pre-line break-words">
+                                    {{ researchAreasFor(item) }}
+                                </p>
+                                <div v-if="keywordsFor(item).length" class="flex flex-wrap gap-1">
+                                    <localized-link
+                                        v-for="keyword in keywordsFor(item)"
+                                        :key="keyword"
+                                        :to="`advanced-search?searchQuery=${encodeURIComponent(keyword)}&tab=organisationUnits`"
+                                        class="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                                        {{ keyword }}
                                     </localized-link>
                                 </div>
                             </div>
-                        </div>
-                    </td>
-                    <!-- <td>
-                    <div v-if="row.item.superOUId" class="flex items-center gap-2">
+                        </template>
+                    </entity-row-identity>
+                </div>
+            </entity-list-card>
+        </template>
+        <template #row="{ item }">
+            <tr>
+                <td v-if="isAdmin || enableExport" class="px-2!">
+                    <v-checkbox
+                        v-model="selectedOUs"
+                        :value="item"
+                        class="table-checkbox"
+                        hide-details
+                    />
+                </td>
+                <td>
+                    <entity-row-identity
+                        :title="$i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther"
+                        :to="'organisation-units/' + item.databaseId"
+                        class="py-2">
+                        <template #icon>
+                            <localized-link :to="'organisation-units/' + item.databaseId">
+                                <organisation-unit-avatar :organisation-unit-id="item.databaseId" />
+                            </localized-link>
+                        </template>
+                        <template v-if="item.superOUId" #default>
+                            <div class="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                                <v-icon size="14" color="grey" icon="mdi-arrow-up-circle" />
+                                <localized-link :to="'organisation-units/' + item.superOUId">
+                                    {{ displayTextOrPlaceholder($i18n.locale.startsWith('sr') ? item.superOUNameSr : item.superOUNameOther) }}
+                                </localized-link>
+                            </div>
+                        </template>
+                    </entity-row-identity>
+                </td>
+                <!-- <td>
+                    <div v-if="item.superOUId" class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                             <v-icon color="grey" size="16">mdi-office-building</v-icon>
                         </div>
                         <div>
-                            <localized-link :to="'organisation-units/' + row.item.superOUId" class="text-gray-600! hover:text-gray-800! font-medium text-sm">
+                            <localized-link :to="'organisation-units/' + item.superOUId" class="text-gray-600! hover:text-gray-800! font-medium text-sm">
                                 <template v-if="$i18n.locale.startsWith('sr')">
-                                    {{ displayTextOrPlaceholder(row.item.superOUNameSr) }}
+                                    {{ displayTextOrPlaceholder(item.superOUNameSr) }}
                                 </template>
                                 <template v-else>
-                                    {{ displayTextOrPlaceholder(row.item.superOUNameOther) }}
+                                    {{ displayTextOrPlaceholder(item.superOUNameOther) }}
                                 </template>
                             </localized-link>
                         </div>
                     </div>
                 </td> -->
-                    <td>
-                        <div v-if="$i18n.locale.startsWith('sr') ? row.item.keywordsSr : row.item.keywordsOther" class="flex flex-wrap gap-1">
-                            <localized-link 
-                                v-for="(keyword, index) in ($i18n.locale.startsWith('sr') ? row.item.keywordsSr : row.item.keywordsOther).split('\n')" 
-                                :key="index"
-                                :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`"
-                                class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full hover:bg-blue-200 transition-colors"
-                            >
-                                {{ displayTextOrPlaceholder(keyword) }}
-                            </localized-link>
-                        </div>
-                    </td>
-                    <td>
-                        <div v-if="$i18n.locale.startsWith('sr') ? row.item.researchAreasSr : row.item.researchAreasOther" class="flex flex-wrap gap-1">
-                            <span 
-                                v-for="(area, index) in ($i18n.locale.startsWith('sr') ? row.item.researchAreasSr : row.item.researchAreasOther).split('\n')" 
-                                :key="index"
-                                class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
-                            >
-                                {{ displayTextOrPlaceholder(area) }}
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-        </v-data-table-server>
-    </div>
-    
+                <td>
+                    <div v-if="$i18n.locale.startsWith('sr') ? item.keywordsSr : item.keywordsOther" class="flex flex-wrap gap-1">
+                        <localized-link
+                            v-for="(keyword, index) in ($i18n.locale.startsWith('sr') ? item.keywordsSr : item.keywordsOther).split('\n')"
+                            :key="index"
+                            :to="`advanced-search?searchQuery=${keyword}&tab=organisationUnits`"
+                            class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full hover:bg-blue-200 transition-colors"
+                        >
+                            {{ displayTextOrPlaceholder(keyword) }}
+                        </localized-link>
+                    </div>
+                </td>
+                <td>
+                    <div v-if="$i18n.locale.startsWith('sr') ? item.researchAreasSr : item.researchAreasOther" class="flex flex-wrap gap-1">
+                        <span
+                            v-for="(area, index) in ($i18n.locale.startsWith('sr') ? item.researchAreasSr : item.researchAreasOther).split('\n')"
+                            :key="index"
+                            class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                        >
+                            {{ displayTextOrPlaceholder(area) }}
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </template>
+    </responsive-data-table>
+
+    <organisation-unit-quick-glance v-model="glanceOpen" :item="glancedOU" />
+
     <div class="notificationContainer">
         <v-slide-y-transition group>
             <v-alert
@@ -247,6 +244,11 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type {OrganisationUnitIndex} from '@/models/OrganisationUnitModel';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
+import ResponsiveDataTable from '@/components/core/ResponsiveDataTable.vue';
+import EntityListCard from '@/components/core/EntityListCard.vue';
+import EntityRowIdentity from '@/components/core/EntityRowIdentity.vue';
+import OrganisationUnitQuickGlance from './OrganisationUnitQuickGlance.vue';
+import OrganisationUnitAvatar from './OrganisationUnitAvatar.vue';
 import LocalizedLink from '../localization/LocalizedLink.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { useRouter } from 'vue-router';
@@ -254,18 +256,19 @@ import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType, ExportEntity } from '@/models/Common';
 import TableExportModal from '../core/TableExportModal.vue';
 import { isEqual } from 'lodash';
-import AddSubUnitModal from './AddSubUnitModal.vue';
 import PersistentQuestionDialog from '../core/comparators/PersistentQuestionDialog.vue';
 
 
 export default defineComponent({
     name: "OrganisationUnitTableComponent",
-    components: { LocalizedLink, TableExportModal, AddSubUnitModal, PersistentQuestionDialog },
+    components: { EntityListCard, EntityRowIdentity, OrganisationUnitQuickGlance, OrganisationUnitAvatar, ResponsiveDataTable, LocalizedLink, TableExportModal, PersistentQuestionDialog },
     props: {
+        embedded: { type: Boolean, default: false },
+        cards: { type: Boolean, default: false },
         organisationUnits: {
             type: Array<OrganisationUnitIndex>,
             required: true
-        }, 
+        },
         totalOUs: {
             type: Number,
             required: true
@@ -294,9 +297,22 @@ export default defineComponent({
     emits: ["switchPage"],
     setup(props, {emit}) {
         const selectedOUs = ref<OrganisationUnitIndex[]>([]);
+        const glanceOpen = ref(false);
+        const glancedOU = ref<OrganisationUnitIndex | null>(null);
+        const openGlance = (item: OrganisationUnitIndex) => {
+            glancedOU.value = item;
+            glanceOpen.value = true;
+        };
 
         const i18n = useI18n();
         const router = useRouter();
+        const researchAreasFor = (item: OrganisationUnitIndex) =>
+            ((i18n.locale.value.startsWith('sr') ? item.researchAreasSr : item.researchAreasOther) || '').trim();
+        const keywordsFor = (item: OrganisationUnitIndex) =>
+            ((i18n.locale.value.startsWith('sr') ? item.keywordsSr : item.keywordsOther) || '')
+                .split('\n').map(keyword => keyword.trim()).filter(Boolean);
+        const hasAdditionalInfo = (item: OrganisationUnitIndex) =>
+            Boolean(item.superOUId || researchAreasFor(item) || keywordsFor(item).length);
 
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -304,7 +320,7 @@ export default defineComponent({
         const keywordsLabel = computed(() => i18n.t("keywordsLabel"));
         const researchAreasLabel = computed(() => i18n.t("researchAreasLabel"));
 
-        const { isAdmin, isInstitutionalEditor, isUserLoggedIn } = useUserRole();
+        const { isAdmin, isUserLoggedIn } = useUserRole();
 
         const nameColumn = computed(() => i18n.t("nameColumn"));
         const keywordsColumn = computed(() => i18n.t("keywordsColumn"));
@@ -432,16 +448,6 @@ export default defineComponent({
             tableOptions.value.page = page;
         };
 
-        const notifyUserAndRefreshTable = (success: boolean) => {
-            if (success) {
-                addNotification(i18n.t("savedMessage"));
-            } else {
-                addNotification(i18n.t("genericErrorMessage"));
-            }
-
-            refreshTable(tableOptions.value);
-        };
-
         const exportModal = ref<any>(null);
         const openExportModal = () => {
             if (exportModal.value) {
@@ -455,13 +461,14 @@ export default defineComponent({
         };
 
         return {
+            glanceOpen, glancedOU, openGlance, researchAreasFor, keywordsFor, hasAdditionalInfo,
             selectedOUs, headers, notifications,
             refreshTable, isAdmin, deleteSelection,
             tableOptions, displayTextOrPlaceholder,
             startEmploymentComparison, setSortAndPageOption,
             startMetadataComparison, ExportEntity,
-            isUserLoggedIn, isInstitutionalEditor,
-            notifyUserAndRefreshTable, openExportModal, exportModal,
+            isUserLoggedIn,
+            openExportModal, exportModal,
             displayPersistentDialog, startDeletionProcess
         };
     }
@@ -682,7 +689,7 @@ export default defineComponent({
         .organisation-name-section {
             gap: 8px;
         }
-        
+
         .modern-avatar {
             width: 32px !important;
             height: 32px !important;
@@ -695,4 +702,3 @@ export default defineComponent({
     }
 
 </style>
-

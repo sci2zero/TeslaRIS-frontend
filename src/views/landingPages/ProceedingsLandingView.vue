@@ -162,17 +162,24 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <h2>{{ $t("proceedingsPublicationsLabel") }}</h2>
-                <publication-table-component
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    show-publication-concrete-type
-                    enable-export
-                    :allow-comparison="isInstitutionalEditor"
-                    :endpoint-type="ExportableEndpointType.PROCEEDINGS_PUBLICATIONS"
-                    :endpoint-token-parameters="[`${proceedings?.id}`]"
-                    @switch-page="switchPage"
-                />
+                <landing-section-card
+                    :title="$t('proceedingsPublicationsLabel')"
+                    :count="totalPublications"
+                    icon="mdi-file-document-multiple-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <publication-table-component
+                        embedded
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        show-publication-concrete-type
+                        enable-export
+                        :allow-comparison="isInstitutionalEditor"
+                        :endpoint-type="ExportableEndpointType.PROCEEDINGS_PUBLICATIONS"
+                        :endpoint-token-parameters="[`${proceedings?.id}`]"
+                        @switch-page="switchPage"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
                 <person-document-contribution-tabs
@@ -218,42 +225,64 @@
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="documentIndicators" 
-                    :applicable-types="[ApplicableEntityType.DOCUMENT]" 
-                    :entity-id="proceedings?.id" 
-                    :entity-type="ApplicableEntityType.DOCUMENT" 
-                    :can-edit="canEdit && (isAdmin || isCommission)"
-                    show-statistics
-                    :has-attached-files="proceedings?.fileItems && proceedings?.fileItems.length > 0"
-                    @create="createIndicator"
-                    @updated="fetchIndicators"
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="documentIndicators"
+                        :applicable-types="[ApplicableEntityType.DOCUMENT]"
+                        :entity-id="proceedings?.id"
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :can-edit="canEdit && (isAdmin || isCommission)"
+                        show-statistics
+                        :has-attached-files="proceedings?.fileItems && proceedings?.fileItems.length > 0"
+                        @create="createIndicator"
+                        @updated="fetchIndicators"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="visualizations">
-                <document-visualizations
-                    :document-id="(proceedings?.id as number)"
-                    :display-settings="displayConfiguration.displaySettings.value"
-                    :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
-                />
+                <landing-section-card
+                    :title="$t('visualizationsLabel')"
+                    icon="mdi-chart-bar"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <document-visualizations
+                        :document-id="(proceedings?.id as number)"
+                        :display-settings="displayConfiguration.displaySettings.value"
+                        :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="PublicationType.PROCEEDINGS"
-                    :entity-id="proceedings?.id"
-                    :restore-blocked-reason="proceedings?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
-                    @restored="() => fetchProceedings(false)"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="PublicationType.PROCEEDINGS"
+                        :entity-id="proceedings?.id"
+                        :restore-blocked-reason="proceedings?.isArchived ? $t('restoreArchivedDocumentMessage') : undefined"
+                        @restored="() => fetchProceedings(false)"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="PublicationType.PROCEEDINGS"
-                    :entity-id="proceedings?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="PublicationType.PROCEEDINGS"
+                        :entity-id="proceedings?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -322,11 +351,12 @@ import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfo
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const currentTab = ref("overview");
 
