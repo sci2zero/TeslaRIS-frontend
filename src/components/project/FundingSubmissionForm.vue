@@ -65,7 +65,7 @@
                 <!-- Grant Agreement ID -->
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field
+                        <ui-input
                             v-model="grantAgreementId"
                             :label="$t('grantAgreementIdLabel')"
                             :placeholder="$t('grantAgreementIdLabel')"
@@ -76,8 +76,9 @@
                 <!-- Funding Types -->
                 <v-row>
                     <v-col cols="12">
-                        <v-select
+                        <ui-input
                             v-model="selectedFundingTypes"
+                            control="select"
                             :items="fundingTypes"
                             :label="$t('fundingTypesLabel') + '*'"
                             :rules="requiredSelectionRules"
@@ -90,14 +91,14 @@
                 <!-- Start Date / End Date -->
                 <v-row>
                     <v-col cols="12" sm="6">
-                        <v-text-field
+                        <ui-input
                             v-model="dateFrom"
                             :label="$t('dateFromLabel')"
                             type="date"
                         />
                     </v-col>
                     <v-col cols="12" sm="6">
-                        <v-text-field
+                        <ui-input
                             v-model="dateTo"
                             :label="$t('dateToLabel')"
                             type="date"
@@ -154,14 +155,14 @@
                     <!-- Submitted On / Awarded On -->
                     <v-row>
                         <v-col cols="12" sm="6">
-                            <v-text-field
+                            <ui-input
                                 v-model="dateSubmitted"
                                 :label="$t('dateSubmittedLabel')"
                                 type="date"
                             />
                         </v-col>
                         <v-col cols="12" sm="6">
-                            <v-text-field
+                            <ui-input
                                 v-model="dateAwarded"
                                 :label="$t('dateAwardedLabel')"
                                 type="date"
@@ -172,23 +173,23 @@
                     <!-- Boolean flags -->
                     <v-row>
                         <v-col cols="12" sm="6" md="3">
-                            <v-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
+                            <ui-checkbox v-model="competitive" :label="$t('competitiveLabel')" />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-checkbox v-model="renewable" :label="$t('renewableLabel')" />
+                            <ui-checkbox v-model="renewable" :label="$t('renewableLabel')" />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-checkbox v-model="internalInvestment" :label="$t('internalInvestmentLabel')" />
+                            <ui-checkbox v-model="internalInvestment" :label="$t('internalInvestmentLabel')" />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
+                            <ui-checkbox v-model="oaMandated" :label="$t('oaMandatedLabel')" />
                         </v-col>
                     </v-row>
 
                     <!-- OA Mandate URL -->
                     <v-row v-if="oaMandated">
                         <v-col cols="12">
-                            <v-text-field
+                            <ui-input
                                 v-model="oaMandateUrl"
                                 :label="$t('oaMandateUrlLabel')"
                                 :placeholder="$t('oaMandateUrlLabel')"
@@ -210,6 +211,8 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import {ref, computed, nextTick, type PropType} from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

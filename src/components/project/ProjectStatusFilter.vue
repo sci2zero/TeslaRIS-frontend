@@ -10,7 +10,7 @@
                 :key="status.value"
                 class="checkbox-item"
             >
-                <v-checkbox
+                <ui-checkbox
                     :model-value="modelValue.includes(status.value)"
                     :label="status.title"
                     density="compact"
@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { computed } from "vue";
 import { getProjectStatusesForGivenLocale } from "@/i18n/projectStatus";
 import type { ProjectStatus } from "@/models/ProjectModel";

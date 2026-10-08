@@ -35,18 +35,18 @@
                             </v-btn>
                         </template>
                         <div class="entity-filter-panel">
-                            <v-checkbox
+                            <ui-checkbox
                                 v-model="returnOnlyActiveProjects"
                                 :label="$t('showOnlyActiveLabel')"
                                 hide-details
                             />
-                            <v-checkbox
+                            <ui-checkbox
                                 v-if="!returnOnlyMyProjects"
                                 v-model="returnOnlyWithoutContributions"
                                 :label="$t('showOnlyWithoutContributions')"
                                 hide-details
                             />
-                            <v-checkbox
+                            <ui-checkbox
                                 v-if="canFilterOwnProjects"
                                 v-model="returnOnlyMyProjects"
                                 :label="isResearcher ? $t('showOnlyMyProjectsLabel') : $t('showEntitiesForMyInstitutionLabel')"
@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { computed, onMounted, ref, watch } from 'vue';
 import EntityListLayout from '@/components/landing/EntityListLayout.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';

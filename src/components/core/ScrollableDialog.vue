@@ -15,7 +15,7 @@
 
         <div
             ref="panelRef"
-            class="flex max-h-[calc(100dvh-3rem)] min-h-0 w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm"
+            class="flex max-h-[calc(100dvh-3rem)] min-h-0 w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-100 text-slate-800 shadow-sm"
             v-bind="attrs"
         >
             <div v-if="$slots.header" class="shrink-0 border-b border-slate-200">

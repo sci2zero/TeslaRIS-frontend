@@ -59,29 +59,30 @@
 
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="submissionDate" type="date" :label="$t('submissionDateLabel')" />
+                <ui-input v-model="submissionDate" type="date" :label="$t('submissionDateLabel')" />
             </v-col>
             <v-col cols="6">
-                <v-text-field v-model="decisionDate" type="date" :label="$t('dateOfDecisionLabel')" />
-            </v-col>
-        </v-row>
-
-        <v-row>
-            <v-col cols="6">
-                <v-text-field v-model="reviewDateFrom" type="date" :label="$t('reviewStartedLabel')" />
-            </v-col>
-            <v-col cols="6">
-                <v-text-field v-model="reviewDateTo" type="date" :label="$t('reviewEndedLabel')" />
+                <ui-input v-model="decisionDate" type="date" :label="$t('dateOfDecisionLabel')" />
             </v-col>
         </v-row>
 
         <v-row>
             <v-col cols="6">
-                <v-text-field v-model="revisedProposalOrNextRoundDeadlineDate" type="date" :label="$t('deadlineForRequestedChangesLabel')" />
+                <ui-input v-model="reviewDateFrom" type="date" :label="$t('reviewStartedLabel')" />
             </v-col>
             <v-col cols="6">
-                <v-select
+                <ui-input v-model="reviewDateTo" type="date" :label="$t('reviewEndedLabel')" />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col cols="6">
+                <ui-input v-model="revisedProposalOrNextRoundDeadlineDate" type="date" :label="$t('deadlineForRequestedChangesLabel')" />
+            </v-col>
+            <v-col cols="6">
+                <ui-input
                     v-model="result"
+                    control="select"
                     :label="$t('resultLabel')"
                     :items="resultOptions"
                     item-title="title"
@@ -122,6 +123,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import UiInput from '@/components/ui/input/Input.vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';

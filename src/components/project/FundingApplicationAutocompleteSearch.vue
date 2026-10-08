@@ -1,8 +1,9 @@
 <template>
     <div class="flex items-start gap-2">
-        <v-autocomplete
+        <ui-input
             v-model="selectedFundingApplication"
             class="min-w-0 flex-1"
+            control="autocomplete"
             :label="(label ? $t(label) : $t('fundingApplicationLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : fundingApplications"
             :custom-filter="(() => true)"
@@ -16,7 +17,7 @@
         <generic-crud-modal
             v-if="!disableSubmission"
             ref="modalRef"
-            class="w-fit shrink-0 self-center"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
             :form-component="FundingApplicationSubmissionForm"
             :form-props="{ presetFundingCallId: presetFundingCallId, presetProjectId: presetProjectId }"
             entity-name="FundingApplication"
@@ -36,6 +37,7 @@ import type { FundingApplication, FundingApplicationIndex } from "@/models/Fundi
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 
 // Loaded asynchronously because FundingApplicationSubmissionForm uses this
 // component for its "revised application" field - a static import would be circular.

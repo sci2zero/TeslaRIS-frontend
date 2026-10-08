@@ -135,8 +135,9 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-select
+                            <ui-input
                                 v-model="selectedRelationType"
+                                control="select"
                                 :items="relationTypes"
                                 :label="$t('relationTypeLabel') + '*'"
                                 :rules="requiredSelectionRules"
@@ -169,6 +170,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AxiosError } from "axios";

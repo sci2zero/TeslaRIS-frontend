@@ -1,7 +1,8 @@
 <template>
     <div class="flex items-start gap-2">
-        <v-autocomplete
+        <ui-input
             v-model="selectedFundingCall"
+            control="autocomplete"
             class="min-w-0 flex-1"
             :label="(label ? $t(label) : $t('fundingCallLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : fundingCalls"
@@ -16,7 +17,7 @@
         <generic-crud-modal
             v-if="!disableSubmission"
             ref="modalRef"
-            class="w-fit shrink-0 self-center"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
             :form-component="FundingCallSubmissionForm"
             :form-props="{
                 presetFundingProgramId: presetFundingProgramId,
@@ -43,6 +44,7 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 import FundingCallSubmissionForm from "@/components/project/FundingCallSubmissionForm.vue";
 
 const props = withDefaults(defineProps<{

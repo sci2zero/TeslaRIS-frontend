@@ -38,7 +38,7 @@
                             </v-btn>
                         </template>
                         <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
-                            <v-checkbox
+                            <ui-checkbox
                                 v-model="returnOnlyActiveFundingPrograms"
                                 :label="$t('showOnlyActiveLabel')"
                                 hide-details
@@ -61,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { onMounted, ref, watch } from 'vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import FundingProgramService from '@/services/project/FundingProgramService';

@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col cols="7">
-            <v-text-field
+            <ui-input
                 v-model="amountInput"
                 :label="resolvedAmountLabel"
                 :placeholder="resolvedAmountLabel"
@@ -12,8 +12,9 @@
             />
         </v-col>
         <v-col cols="3">
-            <v-select
+            <ui-input
                 v-model="selectedCurrency"
+                control="select"
                 :items="currencies"
                 :item-title="currencyLabel"
                 item-value="currencyId"
@@ -27,6 +28,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from "vue";
+import UiInput from "@/components/ui/input/Input.vue";
 import { useI18n } from "vue-i18n";
 import type { Currency, MonetaryAmount } from "@/models/Common";
 import CurrencyService from "@/services/CurrencyService";

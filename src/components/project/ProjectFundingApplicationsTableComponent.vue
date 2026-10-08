@@ -130,26 +130,27 @@
         :fields="glanceFields(glancedRecord)"
         icon="mdi-file-document-edit-outline" />
 
-    <v-dialog v-model="addDialog" persistent max-width="900">
-        <v-card>
-            <v-card-title>
-                <span class="text-h5">{{ $t("addFundingApplicationLabel") }}</span>
-            </v-card-title>
-            <v-card-text>
-                <funding-application-autocomplete-search
-                    :preset-project-id="projectId"
-                    @selected="linkExistingApplication($event)"
-                    @create="onApplicationCreated"
-                />
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer />
+    <scrollable-dialog v-model="addDialog" persistent max-width="900">
+        <template #header>
+            <h2 class="px-5 py-4 text-xl font-bold text-slate-800">
+                {{ $t("addFundingApplicationLabel") }}
+            </h2>
+        </template>
+        <div class="p-5">
+            <funding-application-autocomplete-search
+                :preset-project-id="projectId"
+                @selected="linkExistingApplication($event)"
+                @create="onApplicationCreated"
+            />
+        </div>
+        <template #footer>
+            <div class="flex justify-end px-5 py-3">
                 <v-btn color="blue darken-1" @click="addDialog = false">
                     {{ $t("closeLabel") }}
                 </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+            </div>
+        </template>
+    </scrollable-dialog>
 
     <toast v-model="snackbar" :message="snackbarMessage" />
 </template>
@@ -164,6 +165,7 @@ import type { ErrorResponse } from "@/models/Common";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingApplicationAutocompleteSearch from "@/components/project/FundingApplicationAutocompleteSearch.vue";
 import Toast from "@/components/core/Toast.vue";
+import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
 import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";

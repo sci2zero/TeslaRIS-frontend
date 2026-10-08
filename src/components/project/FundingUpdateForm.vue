@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="doi"
                     label="DOI"
                     placeholder="DOI"
@@ -10,7 +10,7 @@
                 />
             </v-col>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="grantAgreementId"
                     :label="$t('grantAgreementIdLabel')"
                     :placeholder="$t('grantAgreementIdLabel')"
@@ -20,8 +20,9 @@
 
         <v-row>
             <v-col>
-                <v-select
+                <ui-input
                     v-model="selectedFundingTypes"
+                    control="select"
                     :label="$t('fundingTypesLabel')"
                     :items="fundingTypeOptions"
                     item-title="title"
@@ -118,13 +119,13 @@
 
         <v-row>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
                 />
             </v-col>
             <v-col v-if="oaMandated" cols="6">
-                <v-text-field
+                <ui-input
                     v-model="oaMandateUrl"
                     :label="$t('oaMandateUrlLabel')"
                     :placeholder="$t('oaMandateUrlLabel')"
@@ -134,13 +135,13 @@
 
         <v-row>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="competitive"
                     :label="$t('competitiveLabel')"
                 />
             </v-col>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="renewable"
                     :label="$t('renewableLabel')"
                 />
@@ -149,7 +150,7 @@
 
         <v-row>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="internalInvestment"
                     :label="$t('internalInvestmentLabel')"
                 />
@@ -165,6 +166,8 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';

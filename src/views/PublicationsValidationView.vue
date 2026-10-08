@@ -1,63 +1,68 @@
 <template>
-    <v-container>
-        <h1 class="mb-10 text-3xl font-bold tracking-tight text-slate-800">
-            {{ $t("routeLabel.publicationsValidation") }}
-        </h1>
-
-        <div class="d-flex flex-row justify-center">
-            <organisation-unit-autocomplete-search
-                v-if="!hasInstitution"
-                ref="ouAutocompleteRef"
-                v-model:model-value="selectedOrganisationUnit"
-                class="entity-select"
-                disable-submission
-                required
-            />
-        </div>
-
-        <div
-            v-if="hasInstitution || (selectedOrganisationUnit && selectedOrganisationUnit.value > 0)"
-            class="mt-15">
-            <v-select
-                v-model="selectedPublicationTypes"
-                :items="publicationTypes"
-                :label="$t('typeOfPublicationLabel')"
-                return-object
-                class="entity-select mt-3"
-                multiple
-            />
-
-            <span class="d-flex align-center">
-                <v-checkbox
-                    v-model="nonValidMetadata"
-                    :label="$t('showNonValidatedMetadataLabel')"
-                    class="ml-4 mt-3"
+    <entity-list-layout :title="$t('routeLabel.publicationsValidation')" icon="mdi-check-decagram-outline">
+        <publication-table-component
+            ref="tableRef"
+            :publications="publications"
+            :total-publications="totalPublications"
+            :allow-comparison="isInstitutionalEditor"
+            :has-active-type-filters="selectedPublicationTypes.length > 0"
+            embedded
+            validation-view
+            allow-selection
+            @switch-page="switchPage"
+        >
+            <template #top-left>
+                <div class="flex items-start gap-2">
+                    <organisation-unit-autocomplete-search
+                        v-if="!hasInstitution"
+                        v-model:model-value="selectedOrganisationUnit"
+                        class="min-w-0 flex-1"
+                        disable-submission
+                        required
+                    />
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                variant="outlined"
+                                prepend-icon="mdi-tune"
+                                height="44"
+                                class="action-menu-trigger shrink-0"
+                                :class="{ 'mt-[1.31rem]': !hasInstitution }"
+                            >
+                                {{ $t("optionsLabel") }}
+                            </v-btn>
+                        </template>
+                        <div class="entity-filter-panel">
+                            <ui-checkbox
+                                v-model="nonValidMetadata"
+                                :label="$t('showNonValidatedMetadataLabel')"
+                            />
+                            <ui-checkbox
+                                v-if="isDigitalRepositoryEnabled"
+                                v-model="nonValidFiles"
+                                :label="$t('showNonValidatedFilesLabel')"
+                            />
+                        </div>
+                    </v-menu>
+                </div>
+            </template>
+            <template #type-filter-menu>
+                <publication-type-filter
+                    v-model="selectedPublicationTypes"
+                    :items="publicationTypes"
                 />
-
-                <v-checkbox
-                    v-if="isDigitalRepositoryEnabled"
-                    v-model="nonValidFiles"
-                    :label="$t('showNonValidatedFilesLabel')"
-                    class="ml-4 mt-3"
-                />
-            </span>
-
-            <publication-table-component
-                ref="tableRef"
-                :publications="publications"
-                :total-publications="totalPublications"
-                :allow-comparison="isInstitutionalEditor"
-                validation-view
-                allow-selection
-                @switch-page="switchPage"
-            />
-        </div>
-    </v-container>
+            </template>
+        </publication-table-component>
+    </entity-list-layout>
 </template>
 
 <script lang="ts">
 import { defineComponent, watch } from 'vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
+import PublicationTypeFilter from '@/components/publication/PublicationTypeFilter.vue';
+import EntityListLayout from '@/components/landing/EntityListLayout.vue';
+import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 import { ref } from 'vue';
 import { type DocumentPublicationIndex, PublicationType } from '@/models/PublicationModel';
 import { useI18n } from 'vue-i18n';
@@ -73,7 +78,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "PublicationsValidationView",
-    components: { PublicationTableComponent, OrganisationUnitAutocompleteSearch },
+    components: { PublicationTableComponent, OrganisationUnitAutocompleteSearch, PublicationTypeFilter, EntityListLayout, UiCheckbox },
     setup() {
         const loading = ref(false);
 
@@ -87,9 +92,9 @@ export default defineComponent({
         const direction = ref("");
 
         const i18n = useI18n();
-        const tableRef = ref<typeof PublicationTableComponent>();
+        const tableRef = ref<InstanceType<typeof PublicationTableComponent>>();
         
-        const publicationTypes = computed(() => getPublicationTypesForGivenLocale()?.filter(type => type.value !== PublicationType.PROCEEDINGS));
+        const publicationTypes = computed(() => (getPublicationTypesForGivenLocale() ?? []).filter(type => type.value !== PublicationType.PROCEEDINGS));
         const selectedPublicationTypes = ref<{ title: string, value: PublicationType }[]>([]);
         const nonValidMetadata = ref(true);
         const nonValidFiles = ref(true);
@@ -120,17 +125,22 @@ export default defineComponent({
             selectedPublicationTypes,
             nonValidMetadata,
             nonValidFiles,
+            selectedOrganisationUnit,
             loggedInUser
         ], () => {
-            search(searchParams.value);
+            clearSortAndPerformSearch(searchParams.value);
         });
 
         const search = (tokenParams: string) => {
             if (!loggedInUser.value ||
                 (!hasInstitution.value && selectedOrganisationUnit.value.value <= 0)) {
+                publications.value = [];
+                totalPublications.value = 0;
+                loading.value = false;
                 return;
             }
 
+            loading.value = true;
             const publicationTypes = selectedPublicationTypes.value.map(publicationType => publicationType.value);
 
             searchParams.value = tokenParams;
@@ -192,11 +202,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-
-.entity-select {
-    max-width: 700px;
-}
-
-</style>
