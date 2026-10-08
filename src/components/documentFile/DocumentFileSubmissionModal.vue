@@ -7,48 +7,48 @@
                         icon variant="outlined"
                         color="primary" v-bind="scope.props" class="bottom-spacer ml-2!"
                         :disabled="readOnly" size="medium">
-                        <v-icon size="x-large" icon="mdi-upload"></v-icon>
+                        <v-icon size="x-large" icon="mdi-upload" />
                     </v-btn>
                 </div>
                 <v-btn
                     v-else icon variant="outlined"
                     color="primary" v-bind="scope.props" class="inline-edit-btn"
                     :disabled="readOnly" size="medium">
-                    <v-icon size="x-large" icon="mdi-pen"></v-icon>
+                    <v-icon size="x-large" icon="mdi-pen" />
                 </v-btn>
             </slot>
         </template>
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ edit ? $t("updateLabel") : (isProof ? $t("addProofLabel") : $t("addDocumentFileLabel")) }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container>
-                        <document-file-submission-form
-                            ref="submissionFormRef"
-                            :edit="edit"
-                            :preset-document-file="presetDocumentFile"
-                            :is-proof="isProof"
-                            :always-open-access="alwaysOpenAccess"
-                            :allow-licence-selection="allowLicenceSelection"
-                            :disable-resource-type-selection="disableResourceTypeSelection"
-                            :allowed-resource-types="allowedResourceTypes"
-                            :can-be-archived="canBeArchived"
-                            @create="emitCreateToParent"
-                            @update="emitUpdateToParent"
-                        />
-                    </v-container>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn color="blue darken-1" @click="dialog = false">
-                        {{ $t("closeLabel") }}
-                    </v-btn>
-                    <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" @click="submissionFormRef?.addDocumentFile(true)">
-                        {{ $t("saveLabel") }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ edit ? $t("updateLabel") : (isProof ? $t("addProofLabel") : $t("addDocumentFileLabel")) }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-container>
+                    <document-file-submission-form
+                        ref="submissionFormRef"
+                        :edit="edit"
+                        :preset-document-file="presetDocumentFile"
+                        :is-proof="isProof"
+                        :always-open-access="alwaysOpenAccess"
+                        :allow-licence-selection="allowLicenceSelection"
+                        :disable-resource-type-selection="disableResourceTypeSelection"
+                        :allowed-resource-types="allowedResourceTypes"
+                        :can-be-archived="canBeArchived"
+                        @create="emitCreateToParent"
+                        @update="emitUpdateToParent"
+                    />
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer />
+                <v-btn color="blue darken-1" @click="dialog = false">
+                    {{ $t("closeLabel") }}
+                </v-btn>
+                <v-btn color="blue darken-1" :disabled="!submissionFormRef?.isFormValid" @click="submissionFormRef?.addDocumentFile(true)">
+                    {{ $t("saveLabel") }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
     </v-dialog>
 </template>
 

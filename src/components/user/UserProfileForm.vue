@@ -32,7 +32,7 @@
                 variant="outline"
                 @click="navigateToResearcherPage()"
             >
-                <span class="mdi mdi-account-edit-outline" aria-hidden="true"></span>
+                <span class="mdi mdi-account-edit-outline" aria-hidden="true" />
                 {{ $t("updateResearcherLabel") }}
             </UiButton>
 
@@ -129,7 +129,7 @@
                     class="mdi"
                     :class="changePassword ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                     aria-hidden="true"
-                ></span>
+                />
                 {{ $t("changePasswordLabel") }}
             </UiButton>
             <v-menu location="bottom start">
@@ -140,7 +140,7 @@
                         type="button"
                     >
                         {{ $t("advancedOptionsLabel") }}
-                        <span class="mdi mdi-chevron-down" aria-hidden="true"></span>
+                        <span class="mdi mdi-chevron-down" aria-hidden="true" />
                     </UiButton>
                 </template>
                 <v-list density="compact" class="min-w-64 rounded-lg border border-slate-200 py-2">

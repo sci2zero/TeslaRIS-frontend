@@ -22,7 +22,7 @@
                                                 ? 'brightness-0 opacity-90'
                                                 : 'brightness-0 invert opacity-90'
                                     ]"
-                                />
+                                >
                                 <h3 class="footer-title text-3xl font-bold mb-3">
                                     {{ localizedTitle }}
                                 </h3>

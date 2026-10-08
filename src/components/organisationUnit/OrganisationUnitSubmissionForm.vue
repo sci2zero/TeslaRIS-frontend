@@ -121,7 +121,9 @@
                 </div>
 
                 <div class="flex flex-col gap-4">
-                    <p class="text-sm font-semibold text-slate-800">{{ $t('addressLabel') }}</p>
+                    <p class="text-sm font-semibold text-slate-800">
+                        {{ $t('addressLabel') }}
+                    </p>
                     <ui-input
                         v-model="selectedCountry"
                         control="select"

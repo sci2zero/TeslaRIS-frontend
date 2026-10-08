@@ -32,7 +32,7 @@
             </v-chip>
         </td>
         <td>
-            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi"></identifier-menu>
+            <identifier-menu v-if="item.doi" :identifier="item.doi" type="doi" />
         </td>
         <td v-if="showDocumentDownload">
             <v-menu
@@ -87,8 +87,8 @@
             />
         </td>
         <td v-if="isCommission">
-            <v-icon v-if="item.assessedBy?.includes(loggedInCommissionId as number)" icon="mdi-check"></v-icon>
-            <v-icon v-else icon="mdi-close"></v-icon>
+            <v-icon v-if="item.assessedBy?.includes(loggedInCommissionId as number)" icon="mdi-check" />
+            <v-icon v-else icon="mdi-close" />
         </td>
     </tr>
 </template>

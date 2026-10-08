@@ -12,7 +12,7 @@
         <span
             class="mdi mdi-open-in-new shrink-0 text-[0.75em] text-slate-400 group-hover:text-blue-700"
             aria-hidden="true"
-        ></span>
+        />
     </a>
 </template>
 

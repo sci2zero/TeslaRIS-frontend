@@ -102,11 +102,11 @@
                         ref="researchAreaModalRef"
                         hide-activator
                         :form-component="AssessmentResearchAreaForm"
-                        :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchSubAreas }"
+                        :form-props="{ personId: person?.id, presetResearchArea: researchArea, researchAreasHierarchy: researchAreasHierarchy }"
                         entity-name="ResearchArea"
                         is-update
                         :read-only="!canEdit"
-                        @update="fetchAssessmentResearchArea"
+                        @update="updateResearchAreas"
                     />
                     <generic-crud-modal
                         v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
@@ -625,6 +625,14 @@ export default defineComponent({
         const researchArea = ref<AssessmentResearchArea>();
         const researchSubAreas = ref<ResearchArea[]>([]);
 
+        // The person owns the areas, the assessment sub-areas are its copy. The copy is only there
+        // when the person has an assessment research area at all, so the person comes first.
+        const researchAreasHierarchy = computed<ResearchArea[]>(() =>
+            person.value?.personalInfo?.researchAreas?.length
+                ? person.value.personalInfo.researchAreas
+                : researchSubAreas.value
+        );
+
         const personAssessments = ref<ResearcherAssessmentResponse[]>([]);
 
         const assessmentsLoading = ref(false);
@@ -768,10 +776,52 @@ export default defineComponent({
             });
         };
 
+        /**
+         * The assessment research area only exists while the assessment module is on. With it off
+         * the person's own research areas are the only ones there are, and those arrive with the
+         * person, so there is nothing to ask the assessment side for.
+         */
         const fetchAssessmentResearchArea = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                researchArea.value = undefined;
+                researchSubAreas.value = [];
+                return;
+            }
+
             AssessmentResearchAreaService.readPersonAssessmentResearchArea(parseInt(currentRoute.params.id as string)).then(response => {
                 researchArea.value = response.data;
                 researchSubAreas.value = response.data.researchSubAreas;
+            });
+        };
+
+        // The toggle is fetched asynchronously and defaults to on, so its real value can land after
+        // the first read above has already gone out.
+        watch(isAssessmentModuleEnabled, fetchAssessmentResearchArea);
+
+        /**
+         * The research areas themselves belong to the person, so they go through the ordinary
+         * personal info update; the assessment copy follows from there on the server side.
+         */
+        const updateResearchAreas = (payload?: { researchAreaIds: number[] }) => {
+            if (!payload || !person.value) {
+                fetchAssessmentResearchArea();
+                return;
+            }
+
+            // streetAndNumber is added to the personal info for display only, it is not part of the
+            // payload the server expects back.
+            const { streetAndNumber, ...personalInfoToSend } = person.value.personalInfo as PersonalInfo & { streetAndNumber?: unknown };
+
+            PersonService.updatePersonalInfo(person.value.id as number, {
+                ...personalInfoToSend,
+                researchAreasId: payload.researchAreaIds
+            }).then(() => {
+                fetchPerson();
+                fetchAssessmentResearchArea();
+                updateSuccess();
+            }).catch((error) => {
+                snackbarMessage.value = getErrorMessageForErrorKey(error.response.data.message);
+                snackbar.value = true;
             });
         };
 
@@ -1052,10 +1102,11 @@ export default defineComponent({
             canReviewDataQuality,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
+            researchAreasHierarchy,
             returnCurrentLocaleContent, canEdit, employments, education, memberships,
             addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof,
             updateKeywords, updateBiography, updateNames, selectPrimaryName, getTitleFromValueAutoLocale,
-            snackbar, snackbarMessage, updatePersonalInfo, addInvolvement, fetchPerson, localiseDate,
+            snackbar, snackbarMessage, updatePersonalInfo, updateResearchAreas, addInvolvement, fetchPerson, localiseDate,
             currentTab, migrateToUnmanaged, performMigrationToUnmanaged, isAdmin,
             dialogRef, dialogMessage, personIndicators, StatisticsType, AssessmentResearchAreaForm,
             fetchAssessmentResearchArea, personAssessments, fetchAssessment, assessmentsLoading,

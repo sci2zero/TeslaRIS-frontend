@@ -55,8 +55,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedInvolvementType"
+                            control="select"
                             hide-details="auto"
                             :items="involvementTypes"
                             :rules="requiredSelectionRules"
@@ -161,8 +162,9 @@
                 </div>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedDegreeType"
+                            control="select"
                             hide-details="auto"
                             :items="degreeTypes"
                             :label="$t('degreeTypeLabel')"
@@ -172,8 +174,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedEducationStatus"
+                            control="select"
                             hide-details="auto"
                             :items="educationStatuses"
                             :label="$t('educationStatusLabel')"
@@ -225,8 +228,9 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedMembershipType"
+                            control="select"
                             hide-details="auto"
                             :items="membershipTypes"
                             :label="$t('membershipTypeLabel')"
@@ -241,8 +245,9 @@
             <v-col>
                 <v-row v-if="!useHierarchy">
                     <v-col>
-                        <ui-input control="select"
+                        <ui-input
                             v-model="selectedEmploymentPosition"
+                            control="select"
                             :items="employmentPositions"
                             :label="$t('employmentPositionLabel')"
                             return-object

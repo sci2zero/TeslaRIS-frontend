@@ -117,12 +117,12 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="geneticMaterial?.description"
                     :contributions="geneticMaterial?.contributions"
                     :contribution-types="['AUTHOR']"
                     :for-document-id="geneticMaterial?.id"
                     :document-type="PublicationType.GENETIC_MATERIAL"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

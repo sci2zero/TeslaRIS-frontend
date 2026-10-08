@@ -5,7 +5,7 @@
             :class="toneClass"
         >
             <span v-if="abbrev" class="text-white text-xs font-bold">{{ abbrev }}</span>
-            <span v-else class="mdi text-white text-sm" :class="icon"></span>
+            <span v-else class="mdi text-white text-sm" :class="icon" />
         </div>
         <div class="flex flex-col min-w-0 text-left">
             <span class="text-xs text-slate-500 font-medium uppercase tracking-wide">{{ label }}</span>

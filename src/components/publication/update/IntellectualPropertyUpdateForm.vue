@@ -49,8 +49,9 @@
 
         <v-row>
             <v-col cols="10">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedIntellectualPropertyType"
+                    control="select"
                     :label="$t('intellectualPropertyTypeLabel') + '*'"
                     :items="intellectualPropertyTypes"
                     :rules="requiredSelectionRules"
@@ -61,8 +62,9 @@
 
         <v-row>
             <v-col cols="10">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedIntellectualPropertyApplicationStatusType"
+                    control="select"
                     :label="$t('intellectualPropertyApplicationStatusLabel')"
                     :items="intellectualPropertyApplicationStatuses"
                     return-object

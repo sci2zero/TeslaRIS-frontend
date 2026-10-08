@@ -25,24 +25,27 @@
                 :label="$t('nameAbbreviationLabel')"
             />
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <ui-input control="select"
+                <ui-input
                     v-model="status"
+                    control="select"
                     :label="$t('statusLabel') + '*'"
                     :items="projectStatusOptions"
                     item-title="title"
                     item-value="value"
                     :rules="requiredSelectionValueRules"
                 />
-                <ui-input control="select"
+                <ui-input
                     v-model="collaborationType"
+                    control="select"
                     :label="$t('collaborationTypeLabel') + '*'"
                     :items="projectCollaborationTypeOptions"
                     item-title="title"
                     item-value="value"
                     :rules="requiredSelectionValueRules"
                 />
-                <ui-input control="select"
+                <ui-input
                     v-model="researchType"
+                    control="select"
                     :label="$t('researchTypeLabel') + '*'"
                     :items="projectResearchTypeOptions"
                     item-title="title"

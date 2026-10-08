@@ -10,9 +10,9 @@
             <entity-landing-header
                 :loading="!proceedings"
                 :subtitle="returnCurrentLocaleContent(proceedings?.subTitle)"
-            :entity-label="$t('proceedingsLabel')"
-            :year="proceedings?.documentDate?.year"
-            icon="mdi-newspaper-variant-multiple"
+                :entity-label="$t('proceedingsLabel')"
+                :year="proceedings?.documentDate?.year"
+                icon="mdi-newspaper-variant-multiple"
                 :can-edit="canEdit && !proceedings?.isArchived"
                 :edit-label="$t('updateProceedingsLabel')"
                 :entity-type="PublicationType.PROCEEDINGS"
@@ -153,11 +153,11 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="proceedings?.description"
                     :contributions="proceedings?.contributions"
                     :contribution-types="['EDITOR']"
                     :contributors-label="$t('editorsLabel')"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>

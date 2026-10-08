@@ -20,7 +20,7 @@
                             :disabled="disabled"
                             color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
                             size="small">
-                            <v-icon size="x-large" icon="mdi-file-edit-outline"></v-icon>
+                            <v-icon size="x-large" icon="mdi-file-edit-outline" />
                         </v-btn>
                     </div>
                     <UiButton
@@ -32,7 +32,7 @@
                         :aria-label="$t('createNew' + entityName + 'Label')"
                         v-bind="scope.props"
                     >
-                        <span class="mdi mdi-pencil-plus-outline text-xl" aria-hidden="true"></span>
+                        <span class="mdi mdi-pencil-plus-outline text-xl" aria-hidden="true" />
                     </UiButton>
                     <v-btn
                         v-if="!isSectionUpdate && !readOnly && !isSubmission"
@@ -56,7 +56,7 @@
                         :aria-label="$t('closeLabel')"
                         @click="dialog = false"
                     >
-                        <span class="mdi mdi-close text-lg" aria-hidden="true"></span>
+                        <span class="mdi mdi-close text-lg" aria-hidden="true" />
                     </UiButton>
                 </div>
             </template>

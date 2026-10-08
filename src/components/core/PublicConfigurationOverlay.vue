@@ -9,7 +9,7 @@
                 :src="publicConfigurationStore.logoDisplayUrl"
                 alt=""
                 class="config-gate-logo"
-            />
+            >
 
             <template v-if="publicConfigurationStore.loading">
                 <p class="config-gate-title">

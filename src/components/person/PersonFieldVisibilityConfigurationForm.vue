@@ -60,8 +60,8 @@ import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
 export default defineComponent({
-    components: { UiCheckbox },
     name: "PersonFieldVisibilityConfigurationForm",
+    components: { UiCheckbox },
     props: {
         personId: {
             type: Number,

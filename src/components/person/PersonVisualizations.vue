@@ -13,7 +13,7 @@
             :min="minYear"
             :max="min([maxYear, toYear])"
             @update:model-value="handleYearChange"
-        ></v-text-field>
+        />
         <v-text-field
             v-model="toYear"
             type="number"
@@ -25,7 +25,7 @@
             :min="max([minYear, fromYear])"
             :max="maxYear"
             @update:model-value="handleYearChange"
-        ></v-text-field>
+        />
     </div>
     <div
         v-else-if="initialDatesSet && currentTab === 'statistics'"

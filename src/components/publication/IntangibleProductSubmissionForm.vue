@@ -27,8 +27,9 @@
                 :label="$t('yearOfPublicationLabel') + '*'"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedIntangibleProductType"
+                control="select"
                 :label="$t('intangibleProductTypeLabel') + '*'"
                 :items="intangibleProductTypes"
                 :rules="requiredSelectionRules"

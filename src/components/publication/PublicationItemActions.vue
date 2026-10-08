@@ -18,8 +18,7 @@
             :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
             :disabled="!item.year || item.year < 0"
             @classified="$emit('classified', item)"
-            @update="$emit('refresh')">
-        </entity-classification-modal-content>
+            @update="$emit('refresh')" />
         <v-btn
             v-if="validationView"
             size="small"

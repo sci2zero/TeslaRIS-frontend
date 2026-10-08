@@ -13,7 +13,7 @@
             :has-existing-logo="hasExistingLogo"
             :has-existing-background="hasExistingBackground"
             @update="updateBrandingInfo"
-        ></branding-information-form>
+        />
         <div class="mt-6">
             <v-btn color="blue darken-1" :disabled="!formRef?.isFormValid" class="submission-action" @click="formRef?.submit()">
                 {{ $t("saveLabel") }}

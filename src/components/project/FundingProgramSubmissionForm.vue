@@ -21,8 +21,9 @@
                 label="funderLabel"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedFundingTypes"
+                control="select"
                 :items="fundingTypes"
                 :label="$t('fundingTypesLabel') + '*'"
                 :rules="requiredMultiSelectionRules"

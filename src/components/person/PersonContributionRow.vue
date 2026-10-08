@@ -44,7 +44,7 @@
         <div
             v-if="$slots.badges"
             class="ml-auto flex flex-wrap items-center justify-end gap-1.5">
-            <slot name="badges"></slot>
+            <slot name="badges" />
         </div>
     </div>
 </template>

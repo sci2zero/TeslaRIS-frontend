@@ -15,8 +15,7 @@
         <span
             class="mdi text-4xl leading-none shrink-0"
             :class="hasError ? 'mdi-alert-circle text-red-500' : 'mdi-alert text-amber-500'"
-            aria-hidden="true">
-        </span>
+            aria-hidden="true" />
 
         <div class="min-w-0 flex items-center gap-2">
             <div>
@@ -29,12 +28,11 @@
                     <span>{{ qualityScore.toFixed(1) }}%</span>
                     
                 </span>
-                
             </div>
             <span
                 v-if="hasAnyRemarks"
                 class="text-sm font-medium text-slate-400 self-center">
-                <span class="mdi mdi-chevron-right"></span>
+                <span class="mdi mdi-chevron-right" />
             </span>
         </div>
     </button>

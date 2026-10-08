@@ -15,8 +15,9 @@
                 v-model="nameAbbreviation"
                 :label="$t('nameAbbreviationLabel')"
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedFundingTypes"
+                control="select"
                 :items="fundingTypeOptions"
                 item-title="title"
                 item-value="value"

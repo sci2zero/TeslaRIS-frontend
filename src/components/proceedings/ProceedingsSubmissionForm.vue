@@ -74,8 +74,9 @@
                     is-area
                 />
                 <uri-input ref="urisRef" v-model="uris" />
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguages"
+                    control="select"
                     :label="$t('languageLabel')"
                     :items="languageList"
                     multiple

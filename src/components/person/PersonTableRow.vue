@@ -52,10 +52,10 @@
         <td class="py-4">
             <div v-if="hasIdentifiers(item)" class="identifiers-cell">
                 <div class="flex flex-wrap gap-2">
-                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid"></identifier-menu>
-                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus"></identifier-menu>
-                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex"></identifier-menu>
-                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience"></identifier-menu>
+                    <identifier-menu v-if="item.orcid" :identifier="item.orcid" type="orcid" />
+                    <identifier-menu v-if="item.scopusAuthorId" :identifier="item.scopusAuthorId" type="scopus" />
+                    <identifier-menu v-if="item.openAlexId" :identifier="item.openAlexId" type="openalex" />
+                    <identifier-menu v-if="item.webOfScienceResearcherId" :identifier="item.webOfScienceResearcherId" type="webofscience" />
                 </div>
             </div>
             <div v-else class="no-identifiers">

@@ -41,8 +41,9 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedMaterialProductType"
+                    control="select"
                     :label="$t('materialProductTypeLabel') + '*'"
                     :items="materialProductTypes"
                     :rules="requiredSelectionRules"

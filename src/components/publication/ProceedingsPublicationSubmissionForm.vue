@@ -10,7 +10,9 @@
             />
             <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" required />
             <div v-if="selectedEvent && selectedEvent.value != -1 && myPublications.length > 0">
-                <p class="text-sm font-semibold text-slate-700">{{ $t("recentPublicationsLabel") }}</p>
+                <p class="text-sm font-semibold text-slate-700">
+                    {{ $t("recentPublicationsLabel") }}
+                </p>
                 <p
                     v-for="(publication) in myPublications"
                     :key="publication.id"

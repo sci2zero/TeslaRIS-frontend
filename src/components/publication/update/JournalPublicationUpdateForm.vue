@@ -70,8 +70,9 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedpublicationType"
+                    control="select"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel')"
                     return-object
@@ -87,7 +88,7 @@
                     v-model="numberOfPages" type="number"
                     :min="0" :label="$t('numberOfPagesLabel')"
                     :rules="optionalNumericZeroOrGreaterFieldRules"
-                    />
+                />
             </v-col>
         </v-row>
         <v-row>

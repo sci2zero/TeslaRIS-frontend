@@ -32,7 +32,7 @@
                 class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                 @click="openCitationDialog"
             >
-                <span class="mdi mdi-format-quote-close"></span>
+                <span class="mdi mdi-format-quote-close" />
                 {{ $t("citePublicationLabel") }}
             </UiButton>
 
@@ -44,9 +44,9 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         v-bind="menuProps"
                     >
-                        <span class="mdi mdi-dots-horizontal"></span>
+                        <span class="mdi mdi-dots-horizontal" />
                         {{ $t("moreActionsLabel") }}
-                        <span class="mdi mdi-chevron-down"></span>
+                        <span class="mdi mdi-chevron-down" />
                     </UiButton>
                 </template>
                 <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">

@@ -1,9 +1,9 @@
 <template>
     <div class="flex items-start gap-2">
         <ui-input
+            v-model="selectedDocumentPublication"
             class="min-w-0 flex-1"
             control="autocomplete"
-            v-model="selectedDocumentPublication"
             :label="label ? $t(label) : $t('documentLabel')"
             :items="readonly ? [] : documentPublications"
             :custom-filter="((): boolean => true)"

@@ -7,10 +7,10 @@
         <template #header>
             <entity-landing-header
                 :loading="!otherEvent"
-            :entity-label="$t('otherEventLabel')"
-            :badge="otherEvent?.type ? getOtherEventTypeTitleFromValueAutoLocale(otherEvent.type) : ''"
-            :year="!otherEvent?.serialEvent && otherEvent?.dateFrom ? otherEvent.dateFrom.substring(0, 4) : ''"
-            icon="mdi-presentation"
+                :entity-label="$t('otherEventLabel')"
+                :badge="otherEvent?.type ? getOtherEventTypeTitleFromValueAutoLocale(otherEvent.type) : ''"
+                :year="!otherEvent?.serialEvent && otherEvent?.dateFrom ? otherEvent.dateFrom.substring(0, 4) : ''"
+                icon="mdi-presentation"
                 :can-edit="canEdit"
                 :edit-label="$t('updateLabel')"
                 :entity-type="EntityType.OTHER_EVENT"

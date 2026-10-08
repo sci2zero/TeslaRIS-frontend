@@ -19,7 +19,7 @@
                 :accept="accept"
                 :disabled="disabled"
                 @change="onChange"
-            />
+            >
 
             <img
                 v-if="displayPreview"
@@ -27,7 +27,7 @@
                 alt=""
                 class="rounded-lg"
                 :class="previewWide ? 'max-h-36 w-full object-cover' : 'max-h-24 w-auto object-contain'"
-            />
+            >
             <div
                 v-else
                 class="flex size-10 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm"
@@ -48,7 +48,9 @@
             </p>
 
             <div class="flex flex-wrap items-center justify-center gap-2">
-                <ui-button type="button" variant="outline" size="sm" :disabled="disabled" @click="openPicker">
+                <ui-button
+                    type="button" variant="outline" size="sm" :disabled="disabled"
+                    @click="openPicker">
                     {{ $t("chooseFileLabel") }}
                 </ui-button>
                 <ui-button

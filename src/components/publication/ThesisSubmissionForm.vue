@@ -8,8 +8,9 @@
                 :document-type="PublicationType.THESIS"
                 @metadata-fetched="popuateMetadata"
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedThesisType"
+                control="select"
                 :label="$t('thesisTypeLabel') + '*'"
                 :items="thesisTypes"
                 :rules="requiredSelectionRules"
@@ -105,14 +106,16 @@
                     />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input control="select"
+                    <ui-input
                         v-model="selectedLanguage"
+                        control="select"
                         :label="$t('languageLabel')"
                         :items="languageList"
                     />
-                    <ui-input control="select"
+                    <ui-input
                         v-if="languagesWithMoreWritingSystems.includes(selectedLanguage as number)"
                         v-model="selectedWritingLanguage"
+                        control="select"
                         :label="$t('writingLanguageLabel')"
                         :items="languageTagsList"
                         return-object

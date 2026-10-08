@@ -5,8 +5,9 @@
             :title="$t('publisherLabel')"
         >
             <multilingual-text-input ref="nameRef" v-model="name" :rules="requiredFieldRules" :label="$t('nameLabel') + '*'" />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedCountry"
+                control="select"
                 hide-details="auto"
                 :items="countries"
                 :label="$t('countryLabel')"

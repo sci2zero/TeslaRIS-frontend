@@ -92,6 +92,15 @@
             </template>
         </form-section>
 
+        <form-section :title="$t('researchAreasLabel')">
+            <research-areas-selection
+                ref="researchAreasSelectionRef"
+                :research-areas-hierarchy="undefined"
+                submit-on-click
+                @update="saveResearchAreas"
+            />
+        </form-section>
+
         <p class="text-sm text-slate-500">
             {{ $t("requiredFieldsMessage") }}
         </p>
@@ -122,11 +131,12 @@ import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import UiInput from '@/components/ui/input/Input.vue';
 import FormSection from '@/components/ui/form-section/FormSection.vue';
 import { UiButton } from '@/components/ui/button';
+import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 
 
 export default defineComponent({
     name: "PersonSubmissionForm",
-    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput, FormSection, UiButton },
+    components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput, FormSection, UiButton, ResearchAreasSelection },
     props: {
         inModal: {
             type: Boolean,
@@ -214,6 +224,13 @@ export default defineComponent({
 
         const deduplicationTableRef = ref<typeof PersonDeduplicationTable>();
 
+        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
+        const researchAreaIds = ref<number[]>([]);
+
+        const saveResearchAreas = (researchAreas: number[]) => {
+            researchAreaIds.value = researchAreas;
+        };
+
         const submit = (stayOnPage: boolean) => {
             const newPerson: BasicPerson = {
                 personName: {
@@ -241,7 +258,8 @@ export default defineComponent({
                 localBirthDate: birthdate.value,
                 organisationUnitId: selectedOrganisationUnit.value.value > 0 ? selectedOrganisationUnit.value.value : undefined,
                 employmentPosition: selectedEmploymentPosition.value.value,
-                displayTitle: displayTitle.value
+                displayTitle: displayTitle.value,
+                researchAreasId: researchAreaIds.value
             };
 
             PersonService.createPerson(newPerson).then((response) => {
@@ -272,6 +290,8 @@ export default defineComponent({
                     ouAutocompleteRef.value?.clearInput();
                     selectedEmploymentPosition.value = selectionPlaceholder;
                     deduplicationTableRef.value?.resetTable();
+                    researchAreaIds.value = [];
+                    researchAreasSelectionRef.value?.resetForm();
                     message.value = i18n.t("savedMessage");
                     snackbar.value = true;
                 } else {
@@ -297,7 +317,7 @@ export default defineComponent({
             loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
             personWebOfScienceIdValidationRules, webOfScienceId, returnToParent, scholarIdValidationRules,
             personAuthenticusIdValidationRules, lattesIdValidationRules, nationalScienceId, scholarId,
-            authenticusId, lattesId
+            authenticusId, lattesId, researchAreasSelectionRef, saveResearchAreas
         };
     }
 });

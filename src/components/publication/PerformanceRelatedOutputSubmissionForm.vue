@@ -27,8 +27,9 @@
                 :label="$t('yearOfPublicationLabel') + '*'"
                 required
             />
-            <ui-input control="select"
+            <ui-input
                 v-model="selectedPerformanceRelatedOutputType"
+                control="select"
                 :label="$t('performanceRelatedOutputTypeLabel') + '*'"
                 :items="performanceRelatedOutputTypes"
                 :rules="requiredSelectionRules"
@@ -90,8 +91,9 @@
                     v-model="otherActors"
                     :label="$t('otherActorsLabel')"
                 />
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedLanguageTags"
+                    control="select"
                     :items="allLanguageTags"
                     :label="$t('languageLabel')"
                     return-object

@@ -12,8 +12,7 @@
                     icon="mdi-web"
                     variant="text"
                     :color="iconColor"
-                >
-                </v-btn>
+                />
             </template>
 
             <v-card min-width="150">

@@ -26,208 +26,224 @@
                 flat
                 class="contribution-panel-wrap"
             >
-            <v-expansion-panel
-                :value="input._uid"
-                eager
-                class="contribution-panel"
-            >
-                <v-expansion-panel-title class="contribution-panel-title">
-                    <div class="contribution-summary">
-                        <v-icon
-                            v-if="!limitOne && inputs.length > 1"
-                            class="contribution-drag-handle"
-                            icon="mdi-drag-vertical"
-                            @click.stop
-                        />
-                        <span class="contribution-index">{{ index + 1 }}</span>
-                        <div class="contribution-summary-text">
-                            <div class="contribution-name">
-                                {{ getContributorDisplayName(input) }}
+                <v-expansion-panel
+                    :value="input._uid"
+                    eager
+                    class="contribution-panel"
+                >
+                    <v-expansion-panel-title class="contribution-panel-title">
+                        <div class="contribution-summary">
+                            <v-icon
+                                v-if="!limitOne && inputs.length > 1"
+                                class="contribution-drag-handle"
+                                icon="mdi-drag-vertical"
+                                @click.stop
+                            />
+                            <span class="contribution-index">{{ index + 1 }}</span>
+                            <div class="contribution-summary-text">
+                                <div class="contribution-name">
+                                    {{ getContributorDisplayName(input) }}
+                                </div>
+                                <div class="contribution-chips">
+                                    <v-chip
+                                        v-if="!basic && input.contributionType?.title"
+                                        size="x-small"
+                                        variant="tonal"
+                                        color="primary"
+                                    >
+                                        {{ input.contributionType.title }}
+                                    </v-chip>
+                                    <v-chip
+                                        v-if="!basic && input.isMainContributor"
+                                        size="x-small"
+                                        variant="tonal"
+                                        color="indigo"
+                                    >
+                                        {{ $t("mainContributorLabel") }}
+                                    </v-chip>
+                                    <v-chip
+                                        v-if="!basic && input.isCorrespondingContributor"
+                                        size="x-small"
+                                        variant="tonal"
+                                        color="teal"
+                                    >
+                                        {{ $t("correspondingContributorLabel") }}
+                                    </v-chip>
+                                    <v-chip
+                                        v-if="!basic && input.isBoardPresident"
+                                        size="x-small"
+                                        variant="tonal"
+                                        color="deep-purple"
+                                    >
+                                        {{ $t("boardPresidentLabel") }}
+                                    </v-chip>
+                                    <v-chip
+                                        v-if="!basic && input.isAlsoABoardMember"
+                                        size="x-small"
+                                        variant="tonal"
+                                    >
+                                        {{ $t("isAlsoABoardMemberLabel") }}
+                                    </v-chip>
+                                </div>
                             </div>
-                            <div class="contribution-chips">
-                                <v-chip
-                                    v-if="!basic && input.contributionType?.title"
-                                    size="x-small"
-                                    variant="tonal"
-                                    color="primary"
-                                >
-                                    {{ input.contributionType.title }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="!basic && input.isMainContributor"
-                                    size="x-small"
-                                    variant="tonal"
-                                    color="indigo"
-                                >
-                                    {{ $t("mainContributorLabel") }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="!basic && input.isCorrespondingContributor"
-                                    size="x-small"
-                                    variant="tonal"
-                                    color="teal"
-                                >
-                                    {{ $t("correspondingContributorLabel") }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="!basic && input.isBoardPresident"
-                                    size="x-small"
-                                    variant="tonal"
-                                    color="deep-purple"
-                                >
-                                    {{ $t("boardPresidentLabel") }}
-                                </v-chip>
-                                <v-chip
-                                    v-if="!basic && input.isAlsoABoardMember"
-                                    size="x-small"
-                                    variant="tonal"
-                                >
-                                    {{ $t("isAlsoABoardMemberLabel") }}
-                                </v-chip>
-                            </div>
+                            <v-tooltip
+                                v-if="canRemoveContributor"
+                                location="top"
+                                :text="$t('deleteLabel')"
+                            >
+                                <template #activator="{ props: tooltipProps }">
+                                    <v-icon
+                                        v-bind="tooltipProps"
+                                        class="contribution-delete"
+                                        color="error"
+                                        @click.stop.prevent="removeInput(index)"
+                                        @mousedown.stop
+                                    >
+                                        mdi-delete-outline
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
                         </div>
-                        <v-tooltip
-                            v-if="canRemoveContributor"
-                            location="top"
-                            :text="$t('deleteLabel')"
-                        >
-                            <template #activator="{ props: tooltipProps }">
-                                <v-icon
-                                    v-bind="tooltipProps"
-                                    class="contribution-delete"
-                                    color="error"
-                                    @click.stop.prevent="removeInput(index)"
-                                    @mousedown.stop
-                                >
-                                    mdi-delete-outline
-                                </v-icon>
-                            </template>
-                        </v-tooltip>
-                    </div>
-                </v-expansion-panel-title>
-                <v-expansion-panel-text eager>
-                    <div class="contribution-editor">
-                        <person-contribution-base
-                            :ref="(el) => (baseContributionRef[index] = el)"
-                            :basic="basic"
-                            :required="required"
-                            :preset-contribution-value="input.contribution"
-                            :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
-                            :is-update="isUpdate"
-                            :lock-search-field="lockSearchField"
-                            show-top-suggestions
-                            :suggestion-display-check="checkWhetherCurrentUserShouldBeDisplayed"
-                            @set-input="input.contribution = $event; sendContentToParent();"
-                        />
-
-                        <section v-if="!basic" class="editor-section">
-                            <h3 class="editor-section-title">
-                                {{ $t("contributorRoleSectionLabel") }}
-                            </h3>
-                            <ui-input
-                                v-model="input.contributionType"
-                                control="select"
-                                :items="contributionTypes"
-                                :label="$t('contributionTypeLabel')"
-                                return-object
-                                @update:model-value="sendContentToParent"
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text eager>
+                        <div class="contribution-editor">
+                            <person-contribution-base
+                                :ref="(el) => (baseContributionRef[index] = el)"
+                                :basic="basic"
+                                :required="required"
+                                :preset-contribution-value="input.contribution"
+                                :allow-external-associate="allowExternalAssociate && !boardMembersAllowed"
+                                :is-update="isUpdate"
+                                :lock-search-field="lockSearchField"
+                                show-top-suggestions
+                                :suggestion-display-check="checkWhetherCurrentUserShouldBeDisplayed"
+                                @set-input="input.contribution = $event; sendContentToParent();"
                             />
 
-                            <div v-if="hasRoleOptions(input)" class="role-options">
-                                <v-checkbox
-                                    v-if="canBeMainContributor(input)"
-                                    v-model="input.isMainContributor"
-                                    class="role-option"
-                                    color="primary"
-                                    hide-details
+                            <section v-if="!basic" class="editor-section">
+                                <h3 class="editor-section-title">
+                                    {{ $t("contributorRoleSectionLabel") }}
+                                </h3>
+                                <ui-input
+                                    v-model="input.contributionType"
+                                    control="select"
+                                    :items="contributionTypes"
+                                    :label="$t('contributionTypeLabel')"
+                                    return-object
                                     @update:model-value="sendContentToParent"
-                                >
-                                    <template #label>
-                                        <div>
-                                            <div class="role-option-title">{{ $t("mainContributorLabel") }}</div>
-                                            <div class="role-option-hint">{{ $t("mainContributorHint") }}</div>
-                                        </div>
-                                    </template>
-                                </v-checkbox>
-                                <v-checkbox
-                                    v-if="input.contributionType && input.contributionType.value === 'AUTHOR'"
-                                    v-model="input.isCorrespondingContributor"
-                                    class="role-option"
-                                    color="primary"
-                                    hide-details
-                                    @update:model-value="sendContentToParent"
-                                >
-                                    <template #label>
-                                        <div>
-                                            <div class="role-option-title">{{ $t("correspondingContributorLabel") }}</div>
-                                            <div class="role-option-hint">{{ $t("correspondingContributorHint") }}</div>
-                                        </div>
-                                    </template>
-                                </v-checkbox>
-                                <v-checkbox
-                                    v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)"
-                                    v-model="input.isBoardPresident"
-                                    class="role-option"
-                                    color="primary"
-                                    hide-details
-                                    @update:model-value="sendContentToParent"
-                                >
-                                    <template #label>
-                                        <div>
-                                            <div class="role-option-title">{{ $t("boardPresidentLabel") }}</div>
-                                            <div class="role-option-hint">{{ $t("boardPresidentHint") }}</div>
-                                        </div>
-                                    </template>
-                                </v-checkbox>
-                                <v-checkbox
-                                    v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)"
-                                    v-model="input.isAlsoABoardMember"
-                                    class="role-option"
-                                    color="primary"
-                                    hide-details
-                                    @update:model-value="sendContentToParent"
-                                >
-                                    <template #label>
-                                        <div>
-                                            <div class="role-option-title">{{ $t("isAlsoABoardMemberLabel") }}</div>
-                                            <div class="role-option-hint">{{ $t("isAlsoABoardMemberHint") }}</div>
-                                        </div>
-                                    </template>
-                                </v-checkbox>
-                            </div>
+                                />
 
-                            <div
-                                v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')"
-                                class="title-options"
-                            >
-                                <h4 class="editor-subsection-title">
-                                    {{ $t("contributorTitlesSectionLabel") }}
-                                </h4>
-                                <v-row>
-                                    <v-col cols="12" md="6">
-                                        <ui-input
-                                            v-model="input.employmentTitle"
-                                            control="select"
-                                            :items="employmentTitles"
-                                            :label="$t('employmentPositionLabel')"
-                                            @update:model-value="sendContentToParent"
-                                        />
-                                    </v-col>
-                                    <v-col cols="12" md="6">
-                                        <ui-input
-                                            v-model="input.personalTitle"
-                                            control="select"
-                                            :items="personalTitles"
-                                            :label="$t('academicTitleLabel')"
-                                            @update:model-value="sendContentToParent"
-                                        />
-                                    </v-col>
-                                </v-row>
-                            </div>
-                        </section>
-                    </div>
-                </v-expansion-panel-text>
-            </v-expansion-panel>
+                                <div v-if="hasRoleOptions(input)" class="role-options">
+                                    <v-checkbox
+                                        v-if="canBeMainContributor(input)"
+                                        v-model="input.isMainContributor"
+                                        class="role-option"
+                                        color="primary"
+                                        hide-details
+                                        @update:model-value="sendContentToParent"
+                                    >
+                                        <template #label>
+                                            <div>
+                                                <div class="role-option-title">
+                                                    {{ $t("mainContributorLabel") }}
+                                                </div>
+                                                <div class="role-option-hint">
+                                                    {{ $t("mainContributorHint") }}
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </v-checkbox>
+                                    <v-checkbox
+                                        v-if="input.contributionType && input.contributionType.value === 'AUTHOR'"
+                                        v-model="input.isCorrespondingContributor"
+                                        class="role-option"
+                                        color="primary"
+                                        hide-details
+                                        @update:model-value="sendContentToParent"
+                                    >
+                                        <template #label>
+                                            <div>
+                                                <div class="role-option-title">
+                                                    {{ $t("correspondingContributorLabel") }}
+                                                </div>
+                                                <div class="role-option-hint">
+                                                    {{ $t("correspondingContributorHint") }}
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </v-checkbox>
+                                    <v-checkbox
+                                        v-if="input.contributionType && input.contributionType.value === 'BOARD_MEMBER' && shouldDiplayBoardPresidentBox(input)"
+                                        v-model="input.isBoardPresident"
+                                        class="role-option"
+                                        color="primary"
+                                        hide-details
+                                        @update:model-value="sendContentToParent"
+                                    >
+                                        <template #label>
+                                            <div>
+                                                <div class="role-option-title">
+                                                    {{ $t("boardPresidentLabel") }}
+                                                </div>
+                                                <div class="role-option-hint">
+                                                    {{ $t("boardPresidentHint") }}
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </v-checkbox>
+                                    <v-checkbox
+                                        v-if="input.contributionType && boardMembersAllowed && input.contributionType.value === 'ADVISOR' && shouldDisplayAlsoBoardMemberBox(input)"
+                                        v-model="input.isAlsoABoardMember"
+                                        class="role-option"
+                                        color="primary"
+                                        hide-details
+                                        @update:model-value="sendContentToParent"
+                                    >
+                                        <template #label>
+                                            <div>
+                                                <div class="role-option-title">
+                                                    {{ $t("isAlsoABoardMemberLabel") }}
+                                                </div>
+                                                <div class="role-option-hint">
+                                                    {{ $t("isAlsoABoardMemberHint") }}
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </v-checkbox>
+                                </div>
+
+                                <div
+                                    v-if="input.contributionType && (input.contributionType.value === 'BOARD_MEMBER' || input.contributionType.value === 'ADVISOR')"
+                                    class="title-options"
+                                >
+                                    <h4 class="editor-subsection-title">
+                                        {{ $t("contributorTitlesSectionLabel") }}
+                                    </h4>
+                                    <v-row>
+                                        <v-col cols="12" md="6">
+                                            <ui-input
+                                                v-model="input.employmentTitle"
+                                                control="select"
+                                                :items="employmentTitles"
+                                                :label="$t('employmentPositionLabel')"
+                                                @update:model-value="sendContentToParent"
+                                            />
+                                        </v-col>
+                                        <v-col cols="12" md="6">
+                                            <ui-input
+                                                v-model="input.personalTitle"
+                                                control="select"
+                                                :items="personalTitles"
+                                                :label="$t('academicTitleLabel')"
+                                                @update:model-value="sendContentToParent"
+                                            />
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                            </section>
+                        </div>
+                    </v-expansion-panel-text>
+                </v-expansion-panel>
             </v-expansion-panels>
         </draggable>
 

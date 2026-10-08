@@ -5,7 +5,7 @@
                 v-for="index in 5"
                 :key="index"
                 class="h-20 rounded-lg bg-slate-100 animate-pulse"
-            ></div>
+            />
         </div>
 
         <p
@@ -40,7 +40,7 @@
                             class="mdi text-base"
                             :class="copiedKey === style.key ? 'mdi-check' : 'mdi-content-copy'"
                             aria-hidden="true"
-                        ></span>
+                        />
                     </UiButton>
                 </div>
 

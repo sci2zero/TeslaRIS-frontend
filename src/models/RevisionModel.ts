@@ -73,6 +73,7 @@ export interface DataQualityRuleResult {
     key: string;
     target: string;
     dimension: QualityDimension;
+    metric: string;
     severity: IssueSeverity;
     blocking: boolean;
     points: number;
@@ -178,6 +179,7 @@ export interface DataQualityRemark {
     targetWeight: number;
     severity: IssueSeverity;
     dimension: QualityDimension;
+    metric: string;
     blocking: boolean;
     points: number;
     usedForFairCompliance: boolean;

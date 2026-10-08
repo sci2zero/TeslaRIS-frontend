@@ -26,67 +26,67 @@
                 {{ $t("commissionLabel") }}: {{ returnCurrentLocaleContent(assessment.commissionDescription) }}
             </h3>
             <div v-if="Object.keys(assessment.publicationsPerCategory).length > 0" class="overflow-x-auto">
-            <v-table>
-                <thead>
-                    <tr>
-                        <th class="text-left">
-                            {{ $t("markLabel") }}
-                        </th>
-                        <th class="text-left">
-                            {{ loginStore.userLoggedIn ? $t("scientificResultsWithPointsLabel") : $t("scientificResultsListLabel") }}
-                        </th>
-                        <th v-if="loginStore.userLoggedIn" class="text-left">
-                            {{ $t("numberOfPublicationsLabel") }}
-                        </th>
-                        <th v-if="loginStore.userLoggedIn" class="text-left">
-                            {{ $t("totalPointsLabel") }}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="(publications, category) in assessment.publicationsPerCategory"
-                        :key="category"
-                    >
-                        <td class="narrow">
-                            {{ category }}
-                        </td>
-                        <td>
-                            <ul>
-                                <li v-for="(publication, index) in publications" :key="index" class="mb-1 mt-2 publication-list">
-                                    <localized-link v-if="category.length == 2 || (category.length >= 3 && !category.startsWith('M10') && !category.startsWith('M11'))" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
-                                        {{ publication.a }} 
-                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
-                                    </localized-link>
-                                    <span v-else-if="category === 'M105' || category === 'M112'">
-                                        <strong>{{ $t("participationLabel") }}: </strong>{{ publication.a }} 
-                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
-                                    </span>
-                                    <span v-else>
-                                        <strong>{{ $t("prizeLabel") }}: </strong>{{ publication.a }} 
-                                        <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
-                                    </span>
-                                </li>
-                            </ul>
-                        </td>
-                        <td v-if="loginStore.userLoggedIn">
-                            {{ publications.length }}
-                        </td>
-                        <td v-if="loginStore.userLoggedIn">
-                            {{ formatNumber(calculatePointSum(assessment.commissionId, category)) }}
-                        </td>
-                    </tr>
+                <v-table>
+                    <thead>
+                        <tr>
+                            <th class="text-left">
+                                {{ $t("markLabel") }}
+                            </th>
+                            <th class="text-left">
+                                {{ loginStore.userLoggedIn ? $t("scientificResultsWithPointsLabel") : $t("scientificResultsListLabel") }}
+                            </th>
+                            <th v-if="loginStore.userLoggedIn" class="text-left">
+                                {{ $t("numberOfPublicationsLabel") }}
+                            </th>
+                            <th v-if="loginStore.userLoggedIn" class="text-left">
+                                {{ $t("totalPointsLabel") }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="(publications, category) in assessment.publicationsPerCategory"
+                            :key="category"
+                        >
+                            <td class="narrow">
+                                {{ category }}
+                            </td>
+                            <td>
+                                <ul>
+                                    <li v-for="(publication, index) in publications" :key="index" class="mb-1 mt-2 publication-list">
+                                        <localized-link v-if="category.length == 2 || (category.length >= 3 && !category.startsWith('M10') && !category.startsWith('M11'))" :to="getDocumentLandingPageBasePathBasedOnAssessment(category) + publication.c">
+                                            {{ publication.a }} 
+                                            <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                        </localized-link>
+                                        <span v-else-if="category === 'M105' || category === 'M112'">
+                                            <strong>{{ $t("participationLabel") }}: </strong>{{ publication.a }} 
+                                            <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                        </span>
+                                        <span v-else>
+                                            <strong>{{ $t("prizeLabel") }}: </strong>{{ publication.a }} 
+                                            <b v-if="loginStore.userLoggedIn">→ {{ formatNumber(publication.b) }}</b>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td v-if="loginStore.userLoggedIn">
+                                {{ publications.length }}
+                            </td>
+                            <td v-if="loginStore.userLoggedIn">
+                                {{ formatNumber(calculatePointSum(assessment.commissionId, category)) }}
+                            </td>
+                        </tr>
                 
-                    <tr v-if="loginStore.userLoggedIn" class="totals-row">
-                        <td class="narrow">
-                            <strong>{{ $t("totalLabel") }}</strong>
-                        </td>
-                        <td />
-                        <td><strong>{{ totalPublicationsCount }}</strong></td>
-                        <td><strong>{{ formatNumber(totalPoints) }}</strong></td>
-                    </tr>
-                </tbody>
-            </v-table>
+                        <tr v-if="loginStore.userLoggedIn" class="totals-row">
+                            <td class="narrow">
+                                <strong>{{ $t("totalLabel") }}</strong>
+                            </td>
+                            <td />
+                            <td><strong>{{ totalPublicationsCount }}</strong></td>
+                            <td><strong>{{ formatNumber(totalPoints) }}</strong></td>
+                        </tr>
+                    </tbody>
+                </v-table>
             </div>
             <p v-else class="mt-3">
                 {{ $t("noAssessedPublicationsMessage") }}

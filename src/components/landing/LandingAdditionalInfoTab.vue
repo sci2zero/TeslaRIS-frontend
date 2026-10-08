@@ -8,7 +8,7 @@
             padded
         >
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <slot name="details"></slot>
+                <slot name="details" />
             </div>
         </landing-section-card>
 
@@ -30,7 +30,7 @@
             />
         </landing-section-card>
 
-        <slot name="before-keywords"></slot>
+        <slot name="before-keywords" />
 
         <keyword-list
             v-if="keywords !== undefined"
@@ -40,7 +40,7 @@
             @update="$emit('update-keywords', $event)"
         />
 
-        <slot name="after-keywords"></slot>
+        <slot name="after-keywords" />
 
         <description-section
             v-if="description !== undefined"
@@ -57,7 +57,7 @@
             @update="$emit('update-remark', $event)"
         />
 
-        <slot></slot>
+        <slot />
     </div>
 </template>
 

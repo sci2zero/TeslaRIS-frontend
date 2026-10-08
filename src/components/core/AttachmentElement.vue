@@ -6,7 +6,7 @@
             :class="fileVisual.tileClass"
             :aria-label="$t('downloadLabel')"
             @click="download">
-            <span class="mdi text-2xl leading-none" :class="fileVisual.icon" aria-hidden="true"></span>
+            <span class="mdi text-2xl leading-none" :class="fileVisual.icon" aria-hidden="true" />
             <span class="text-[10px] font-bold uppercase leading-none tracking-wide">
                 {{ fileVisual.extension }}
             </span>
@@ -52,7 +52,7 @@
                     size="small"
                     class="shrink-0 text-slate-500"
                     :aria-label="$t('moreActionsLabel')">
-                    <v-icon icon="mdi-dots-horizontal"></v-icon>
+                    <v-icon icon="mdi-dots-horizontal" />
                 </v-btn>
             </template>
             <v-list class="min-w-48 rounded-lg border border-slate-200 py-1" density="compact">

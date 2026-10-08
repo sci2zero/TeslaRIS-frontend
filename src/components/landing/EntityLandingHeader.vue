@@ -1,6 +1,6 @@
 <template>
     <div class="relative mb-8">
-        <slot name="modals"></slot>
+        <slot name="modals" />
 
         <v-menu
             v-if="canEdit"
@@ -14,7 +14,7 @@
                     v-bind="menuProps"
                     :aria-label="$t('moreActionsLabel')"
                 >
-                    <span class="mdi mdi-dots-horizontal text-lg"></span>
+                    <span class="mdi mdi-dots-horizontal text-lg" />
                 </UiButton>
             </template>
             <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -41,7 +41,7 @@
                             $slots.visual ? 'bg-slate-50' : 'book-first-page',
                         ]"
                     >
-                        <slot v-if="$slots.visual" name="visual"></slot>
+                        <slot v-if="$slots.visual" name="visual" />
                         <div
                             v-else
                             class="relative flex h-full w-full flex-col items-center px-3 py-4 text-center sm:px-4 sm:py-5 sm:px-5 sm:py-6"
@@ -72,7 +72,9 @@
                                 />
                             </svg>
                             <div class="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center">
-                                <v-icon class="book-first-page__icon text-indigo-400">{{ icon }}</v-icon>
+                                <v-icon class="book-first-page__icon text-indigo-400">
+                                    {{ icon }}
+                                </v-icon>
                                 <p
                                     v-if="entityLabel"
                                     class="mt-2 max-w-full text-[10px] font-semibold uppercase leading-tight tracking-[0.14em] text-slate-600 line-clamp-3 sm:mt-3 sm:text-xs sm:text-sm"
@@ -91,7 +93,7 @@
                                     {{ badge }}
                                 </p>
                                 <template v-if="year">
-                                    <div class="mt-1.5 h-px w-8 bg-indigo-200 sm:mt-2 sm:w-10"></div>
+                                    <div class="mt-1.5 h-px w-8 bg-indigo-200 sm:mt-2 sm:w-10" />
                                     <p class="mt-1 text-xs tabular-nums text-slate-600 sm:text-sm sm:text-base">
                                         {{ year }}
                                     </p>
@@ -116,7 +118,9 @@
                             type="heading"
                             class="bg-transparent"
                         >
-                            <slot name="title">{{ title }}</slot>
+                            <slot name="title">
+                                {{ title }}
+                            </slot>
                         </v-skeleton-loader>
                     </h1>
                     <div
@@ -129,7 +133,7 @@
                             size="sm"
                             @click="$emit('edit')"
                         >
-                            <span class="mdi mdi-pencil-outline text-lg"></span>
+                            <span class="mdi mdi-pencil-outline text-lg" />
                             {{ $t('editActionLabel') }}
                         </UiButton>
                         <v-menu
@@ -142,9 +146,9 @@
                                     size="sm"
                                     v-bind="menuProps"
                                 >
-                                    <span class="mdi mdi-pencil-outline text-lg"></span>
+                                    <span class="mdi mdi-pencil-outline text-lg" />
                                     {{ $t('editActionLabel') }}
-                                    <span class="mdi mdi-chevron-down"></span>
+                                    <span class="mdi mdi-chevron-down" />
                                 </UiButton>
                             </template>
                             <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -175,16 +179,16 @@
                 </p>
 
                 <div v-if="$slots.affiliation" class="mb-6 sm:mb-8">
-                    <slot name="affiliation"></slot>
+                    <slot name="affiliation" />
                 </div>
 
                 <div v-if="$slots.meta" class="mb-6 flex justify-center sm:justify-start">
                     <div class="space-y-3">
-                        <slot name="meta"></slot>
+                        <slot name="meta" />
                     </div>
                 </div>
 
-                <slot name="status"></slot>
+                <slot name="status" />
 
                 <div
                     v-if="entityId && entityType"
@@ -201,9 +205,8 @@
                     v-if="$slots.actions"
                     class="entity-landing-actions flex flex-col sm:flex-row flex-wrap gap-3 justify-center sm:justify-start w-full"
                 >
-                    <slot name="actions"></slot>
+                    <slot name="actions" />
                 </div>
-
             </div>
         </div>
     </div>

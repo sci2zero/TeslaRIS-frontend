@@ -135,7 +135,7 @@
                         v-if="thesis?.isOnPublicReview"
                         class="inline-flex items-center gap-2 bg-amber-50 text-amber-800 text-sm font-medium px-3 py-1.5 rounded-full border border-amber-200 mb-6"
                     >
-                        <span class="mdi mdi-eye-outline"></span>
+                        <span class="mdi mdi-eye-outline" />
                         {{ $t("onPublicReviewLabel", [localiseDate(thesis.publicReviewEnd)]) }}
                     </div>
                 </template>
@@ -185,7 +185,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="openCitationDialog"
                     >
-                        <span class="mdi mdi-format-quote-close"></span>
+                        <span class="mdi mdi-format-quote-close" />
                         {{ $t("citePublicationLabel") }}
                     </UiButton>
 
@@ -196,7 +196,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="changePublicReviewState(true, false)"
                     >
-                        <span class="mdi mdi-eye-outline"></span>
+                        <span class="mdi mdi-eye-outline" />
                         {{ $t("putOnPublicReviewLabel") }}
                     </UiButton>
                     <UiButton
@@ -206,7 +206,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="changePublicReviewState(false, false)"
                     >
-                        <span class="mdi mdi-eye-off-outline"></span>
+                        <span class="mdi mdi-eye-off-outline" />
                         {{ $t("removeFromPublicReviewLabel") }}
                     </UiButton>
                     <UiButton
@@ -216,7 +216,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="changePublicReviewState(true, true)"
                     >
-                        <span class="mdi mdi-play-outline"></span>
+                        <span class="mdi mdi-play-outline" />
                         {{ $t("continuePublicReviewLabel") }}
                     </UiButton>
                     <UiButton
@@ -226,7 +226,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="changeArchiveState(true)"
                     >
-                        <span class="mdi mdi-archive-outline"></span>
+                        <span class="mdi mdi-archive-outline" />
                         {{ $t("archiveLabel") }}
                     </UiButton>
                     <UiButton
@@ -236,7 +236,7 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="changeArchiveState(false)"
                     >
-                        <span class="mdi mdi-archive-arrow-up-outline"></span>
+                        <span class="mdi mdi-archive-arrow-up-outline" />
                         {{ $t("unarchiveLabel") }}
                     </UiButton>
                     <UiButton
@@ -246,16 +246,16 @@
                         class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
                         @click="examineRegistryBookEntry"
                     >
-                        <span class="mdi mdi-book-open-page-variant-outline"></span>
+                        <span class="mdi mdi-book-open-page-variant-outline" />
                         {{ $t("examineRegistryBookEntryLabel") }}
                     </UiButton>
 
                     <v-menu v-if="hasMoreActions" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
-                                <span class="mdi mdi-dots-horizontal"></span>
+                                <span class="mdi mdi-dots-horizontal" />
                                 {{ $t("moreActionsLabel") }}
-                                <span class="mdi mdi-chevron-down"></span>
+                                <span class="mdi mdi-chevron-down" />
                             </UiButton>
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
@@ -404,12 +404,12 @@
             <v-tabs-window-item value="overview">
                 <landing-overview-tab
                     v-show="showOverview"
-                    @has-content="onOverviewContent"
                     :description="thesis?.description"
                     :contributions="thesis?.contributions"
                     :contribution-types="['AUTHOR']"
                     :for-document-id="thesis?.id"
                     :document-type="PublicationType.THESIS"
+                    @has-content="onOverviewContent"
                     @see-all="currentTab = $event"
                 />
             </v-tabs-window-item>
@@ -549,8 +549,7 @@
                 :message="dialogMessage"
                 :show-radio-options="thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview"
                 :radio-options="(thesis?.isOnPublicReviewPause && thesis?.publicReviewEndDates && thesis?.publicReviewEndDates.length > 0 && !continueLastReview) ? [{title: $t('regularLabel'), value: 1}, {title: $t('shortenedLabel'), value: 2}] : []"
-                @continue="commitThesisStatusChange">
-            </persistent-question-dialog>
+                @continue="commitThesisStatusChange" />
 
             <share-buttons
                 v-if="thesis && isResearcher && canEdit"

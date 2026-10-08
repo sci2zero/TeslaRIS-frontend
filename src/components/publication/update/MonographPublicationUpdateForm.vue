@@ -59,8 +59,9 @@
         </v-row>
         <v-row>
             <v-col cols="12">
-                <ui-input control="select"
+                <ui-input
                     v-model="selectedpublicationType"
+                    control="select"
                     :items="publicationTypes"
                     :label="$t('concretePublicationTypeLabel') + '*'"
                     return-object

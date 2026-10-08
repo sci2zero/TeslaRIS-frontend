@@ -1,10 +1,10 @@
 <template>
     <div class="flex items-start gap-2">
         <ui-input
-            class="min-w-0 flex-1"
-            control="autocomplete"
             v-model="selectedEvent"
             v-model:search="searchInput"
+            class="min-w-0 flex-1"
+            control="autocomplete"
             :readonly="readOnly"
             :label="(multiple ? $t('conferenceListLabel') : $t('conferenceLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : events"

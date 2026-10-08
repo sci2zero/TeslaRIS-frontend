@@ -42,6 +42,7 @@ export interface BasicPerson {
     organisationUnitId?: number;
     employmentPosition?: EmploymentPosition;
     displayTitle: MultilingualContent[];
+    researchAreasId?: number[];
   }
 
 export interface PersonName {
@@ -170,6 +171,8 @@ export interface PersonalInfo {
     lattesId?: string;
     uris: string[];
     displayTitle: MultilingualContent[];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
 }
 
 export interface ExpertiseOrSkillResponse {

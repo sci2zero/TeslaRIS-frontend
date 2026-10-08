@@ -4,7 +4,7 @@
             <!-- Total Publications -->
             <div class="flex items-start gap-3 py-3 sm:py-2 sm:px-5 first:sm:pl-1 last:sm:pr-1">
                 <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                    <span class="mdi mdi-file-document text-white text-lg"></span>
+                    <span class="mdi mdi-file-document text-white text-lg" />
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs text-blue-600 font-medium uppercase tracking-wide truncate">
@@ -24,7 +24,7 @@
                         <span
                             v-if="featuredInformation?.publicationCount"
                             class="text-sm text-blue-600 font-medium">
-                            <span class="mdi mdi-trending-up"></span>
+                            <span class="mdi mdi-trending-up" />
                             +{{ featuredInformation.publicationsGain }} {{ $t("thisYearLabel") }}
                         </span>
                     </div>
@@ -34,7 +34,7 @@
             <!-- H-Index -->
             <div v-if="featuredInformation?.hIndex" class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
                 <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                    <span class="mdi mdi-chart-line text-white text-lg"></span>
+                    <span class="mdi mdi-chart-line text-white text-lg" />
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs text-emerald-600 font-medium uppercase tracking-wide truncate">
@@ -63,7 +63,7 @@
             <!-- Citations -->
             <div v-if="featuredInformation?.currentCitationCount" class="flex items-start gap-3 py-3 sm:py-2 sm:px-5">
                 <div class="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center shadow-sm shrink-0">
-                    <span class="mdi mdi-format-quote-close text-white text-lg"></span>
+                    <span class="mdi mdi-format-quote-close text-white text-lg" />
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs text-amber-600 font-medium uppercase tracking-wide truncate">
@@ -84,8 +84,7 @@
                             v-if="featuredInformation?.currentCitationCount"
                             class="text-sm text-amber-600 font-medium">
                             <span
-                                :class="`mdi mdi-trending-${areCitationsTrendingUp ? 'up' : 'down'}`">
-                            </span>
+                                :class="`mdi mdi-trending-${areCitationsTrendingUp ? 'up' : 'down'}`" />
                             {{ areCitationsTrendingUp ? "+" : "-" }}{{ featuredInformation.currentCitationTrend }} {{ $t("thisYearLabel") }}
                         </span>
                     </div>

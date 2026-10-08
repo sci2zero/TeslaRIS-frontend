@@ -7,9 +7,9 @@
         <template #header>
             <entity-landing-header
                 :loading="!course"
-            :entity-label="$t('courseLabel')"
-            :year="course?.academicYear || (!course?.serialEvent && course?.dateFrom ? course.dateFrom.substring(0, 4) : '')"
-            icon="mdi-presentation"
+                :entity-label="$t('courseLabel')"
+                :year="course?.academicYear || (!course?.serialEvent && course?.dateFrom ? course.dateFrom.substring(0, 4) : '')"
+                icon="mdi-presentation"
                 :can-edit="canEdit"
                 :edit-label="$t('updateLabel')"
                 :entity-type="EntityType.COURSE"

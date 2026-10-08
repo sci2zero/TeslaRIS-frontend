@@ -151,6 +151,7 @@
                                 <tr>
                                     <th>{{ $t("constraintLabel") }}</th>
                                     <th>{{ $t("dimensionLabel") }}</th>
+                                    <th>{{ $t("metricLabel") }}</th>
                                     <th>{{ $t("severityLabel") }}</th>
                                     <th>{{ $t("messageLabel") }}</th>
                                     <th>{{ $t("actionLabel") }}</th>
@@ -159,7 +160,8 @@
                             <tbody>
                                 <tr v-for="rule in failedRules" :key="rule.key">
                                     <td>{{ displayTextOrPlaceholder(returnCurrentLocaleContent(rule.title) as string) }}</td>
-                                    <td>{{ rule.dimension }}</td>
+                                    <td>{{ getQualityDimensionTitleFromValueAutoLocale(rule.dimension) }}</td>
+                                    <td>{{ metricTitle(rule.metric) }}</td>
                                     <td>
                                         <v-chip
                                             :color="severityColors[rule.severity]"
@@ -385,6 +387,7 @@ import {
     type DataQualityAssessment,
     type DataQualityProfileSummary,
     type DataQualityRuleResult,
+    type MetricSummary,
     type ProfileRelatedQuality,
     type RelatedQuality,
     type Revision
@@ -399,6 +402,7 @@ import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import DataQualityIssueDetailsModal from "@/components/core/revisions/DataQualityIssueDetailsModal.vue";
 import DataQualityIssuesTable from "@/components/core/revisions/DataQualityIssuesTable.vue";
 import { getIssueSeverityTitleFromValueAutoLocale } from "@/i18n/issueSeverity";
+import { getQualityDimensionTitleFromValueAutoLocale } from "@/i18n/qualityDimension";
 
 
 interface VersionItem {
@@ -457,6 +461,31 @@ export default defineComponent({
             })));
 
         const failedRules = computed(() => selectedAssessment.value?.failedRulesList ?? []);
+
+        // A rule only names its metric by key; the readable title is profile configuration, so it
+        // is fetched apart from the assessment and keyed on the profile on show.
+        const metrics = ref<MetricSummary[]>([]);
+
+        const metricTitle = (key: string | undefined) => {
+            const metric = metrics.value.find(candidate => candidate.key === key);
+
+            return metric
+                ? displayTextOrPlaceholder(returnCurrentLocaleContent(metric.title) as string)
+                : displayTextOrPlaceholder(key as string);
+        };
+
+        const fetchMetrics = () => {
+            if (!selectedProfileName.value) {
+                metrics.value = [];
+                return;
+            }
+
+            DataQualityService.listProfileMetrics(selectedProfileName.value).then(response => {
+                metrics.value = response.data;
+            }).catch(() => {
+                metrics.value = [];
+            });
+        };
 
         const totalRules = computed(() =>
             (selectedAssessment.value?.passedRules ?? 0) + failedRules.value.length);
@@ -659,10 +688,13 @@ export default defineComponent({
 
         watch(selectedVersion, fetchAssessments);
 
+        watch(selectedProfileName, fetchMetrics, { immediate: true });
+
         return {
             currentSubTab, loading, assessments, EntityType,
             selectedVersion, versionItems, selectedAssessment,
-            selectedProfileName, profileNames, failedRules,
+            selectedProfileName, profileNames, failedRules, metricTitle,
+            getQualityDimensionTitleFromValueAutoLocale,
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
             relatedQuality, relatedEntityTypeLabels, openRelatedIssues,
