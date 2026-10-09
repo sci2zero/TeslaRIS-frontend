@@ -1,157 +1,134 @@
 <template>
-    <v-container id="funding-application">
-        <!-- Header -->
-        <v-row justify="center">
-            <v-col cols="12">
-                <v-card class="pa-3" variant="flat" color="blue-lighten-3">
-                    <v-card-title class="text-h5 text-center">
-                        <v-skeleton-loader
-                            :loading="!fundingApplication"
-                            type="heading"
-                            color="blue-lighten-3"
-                            class="text-center"
-                        >
-                            <rich-title-renderer :title="title" />
-                        </v-skeleton-loader>
-                    </v-card-title>
-                    <v-card-subtitle class="text-center">
-                        {{ $t("fundingApplicationLabel") }}
-                    </v-card-subtitle>
-                </v-card>
-            </v-col>
-        </v-row>
+    <landing-page-layout id="funding-application" v-model="currentTab" :loading="!fundingApplication" class="funding-landing">
+        <template #header>
+            <entity-landing-header :loading="!fundingApplication" :entity-label="$t('fundingApplicationLabel')" icon="mdi-cash-check">
+                <template #title>
+                    <rich-title-renderer :title="title" />
+                </template>
+            </entity-landing-header>
+        </template>
+        <template #before-tabs>
+            <!-- Basic Info -->
+            <v-row>
+                <v-col cols="12">
+                    <v-card class="funding-info-card mb-6" variant="outlined">
+                        <v-card-text class="edit-pen-container">
+                            <generic-crud-modal
+                                :form-component="FundingApplicationUpdateForm"
+                                :form-props="{ presetFundingApplication: fundingApplication }"
+                                entity-name="FundingApplication"
+                                is-update
+                                is-section-update
+                                :read-only="!canEdit"
+                                @update="updateBasicInfo"
+                            />
 
-        <!-- Basic Info -->
-        <v-row>
-            <v-col cols="3" class="text-center">
-                <v-icon size="x-large" class="large-funding-application-icon">
-                    mdi-cash-check
-                </v-icon>
-            </v-col>
-            <v-col cols="9">
-                <v-card class="pa-3" variant="flat" color="secondary">
-                    <v-card-text class="edit-pen-container">
-                        <generic-crud-modal
-                            :form-component="FundingApplicationUpdateForm"
-                            :form-props="{ presetFundingApplication: fundingApplication }"
-                            entity-name="FundingApplication"
-                            is-update
-                            is-section-update
-                            :read-only="!canEdit"
-                            @update="updateBasicInfo"
-                        />
-
-                        <div class="mb-5">
-                            <b>{{ $t("basicInfoLabel") }}</b>
-                        </div>
-
-                        <basic-info-loader v-if="!fundingApplication" />
-                        <div v-else class="info-columns">
-                            <div v-if="fundingApplication.requestedAmount" class="info-item">
-                                <div>{{ $t("amountRequestedLabel") }}:</div>
-                                <div class="response">
-                                    {{ formatAmount(fundingApplication.requestedAmount.amount, locale) }} {{ fundingApplication.requestedAmount.currencyCode }}
-                                </div>
+                            <div class="mb-5">
+                                <b>{{ $t("basicInfoLabel") }}</b>
                             </div>
 
-                            <div v-if="fundingApplication.description && fundingApplication.description.length > 0" class="info-item">
-                                <div>{{ $t("descriptionLabel") }}:</div>
-                                <div class="response">
-                                    {{ returnCurrentLocaleContent(fundingApplication.description) }}
+                            <basic-info-loader v-if="!fundingApplication" />
+                            <div v-else class="info-columns">
+                                <div v-if="fundingApplication.requestedAmount" class="info-item">
+                                    <div>{{ $t("amountRequestedLabel") }}:</div>
+                                    <div class="response">
+                                        {{ formatAmount(fundingApplication.requestedAmount.amount, locale) }} {{ fundingApplication.requestedAmount.currencyCode }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="submitterName" class="info-item">
-                                <div>{{ $t("submitterLabel") }}:</div>
-                                <div class="response">
-                                    <localized-link :to="'persons/' + fundingApplication.submitterId">
-                                        {{ submitterName }}
-                                    </localized-link>
+                                <div v-if="fundingApplication.description && fundingApplication.description.length > 0" class="info-item">
+                                    <div>{{ $t("descriptionLabel") }}:</div>
+                                    <div class="response">
+                                        {{ returnCurrentLocaleContent(fundingApplication.description) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.submissionDate" class="info-item">
-                                <div>{{ $t("submissionDateLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(fundingApplication.submissionDate) }}
+                                <div v-if="submitterName" class="info-item">
+                                    <div>{{ $t("submitterLabel") }}:</div>
+                                    <div class="response">
+                                        <localized-link :to="'persons/' + fundingApplication.submitterId">
+                                            {{ submitterName }}
+                                        </localized-link>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.responseSummary && fundingApplication.responseSummary.length > 0" class="info-item">
-                                <div>{{ $t("responseSummaryLabel") }}:</div>
-                                <div class="response">
-                                    {{ returnCurrentLocaleContent(fundingApplication.responseSummary) }}
+                                <div v-if="fundingApplication.submissionDate" class="info-item">
+                                    <div>{{ $t("submissionDateLabel") }}:</div>
+                                    <div class="response">
+                                        {{ localiseDate(fundingApplication.submissionDate) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.reviewDateFrom" class="info-item">
-                                <div>{{ $t("reviewStartedLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(fundingApplication.reviewDateFrom) }}
+                                <div v-if="fundingApplication.responseSummary && fundingApplication.responseSummary.length > 0" class="info-item">
+                                    <div>{{ $t("responseSummaryLabel") }}:</div>
+                                    <div class="response">
+                                        {{ returnCurrentLocaleContent(fundingApplication.responseSummary) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.reviewDateTo" class="info-item">
-                                <div>{{ $t("reviewEndedLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(fundingApplication.reviewDateTo) }}
+                                <div v-if="fundingApplication.reviewDateFrom" class="info-item">
+                                    <div>{{ $t("reviewStartedLabel") }}:</div>
+                                    <div class="response">
+                                        {{ localiseDate(fundingApplication.reviewDateFrom) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.decisionDate" class="info-item">
-                                <div>{{ $t("dateOfDecisionLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(fundingApplication.decisionDate) }}
+                                <div v-if="fundingApplication.reviewDateTo" class="info-item">
+                                    <div>{{ $t("reviewEndedLabel") }}:</div>
+                                    <div class="response">
+                                        {{ localiseDate(fundingApplication.reviewDateTo) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.result" class="info-item">
-                                <div>{{ $t("resultLabel") }}:</div>
-                                <div class="response">
-                                    {{ getFundingApplicationResultTitleFromValueAutoLocale(fundingApplication.result) }}
+                                <div v-if="fundingApplication.decisionDate" class="info-item">
+                                    <div>{{ $t("dateOfDecisionLabel") }}:</div>
+                                    <div class="response">
+                                        {{ localiseDate(fundingApplication.decisionDate) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.revisedProposalOrNextRoundDeadlineDate" class="info-item">
-                                <div>{{ $t("deadlineForRequestedChangesLabel") }}:</div>
-                                <div class="response">
-                                    {{ localiseDate(fundingApplication.revisedProposalOrNextRoundDeadlineDate) }}
+                                <div v-if="fundingApplication.result" class="info-item">
+                                    <div>{{ $t("resultLabel") }}:</div>
+                                    <div class="response">
+                                        {{ getFundingApplicationResultTitleFromValueAutoLocale(fundingApplication.result) }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div v-if="fundingApplication.revisedFundingApplicationId" class="info-item">
-                                <div>{{ $t("revisedFundingApplicationLabel") }}:</div>
-                                <div class="response">
-                                    <localized-link :to="'funding-application/' + fundingApplication.revisedFundingApplicationId">
-                                        {{ revisedFundingApplicationTitle }}
-                                    </localized-link>
+                                <div v-if="fundingApplication.revisedProposalOrNextRoundDeadlineDate" class="info-item">
+                                    <div>{{ $t("deadlineForRequestedChangesLabel") }}:</div>
+                                    <div class="response">
+                                        {{ localiseDate(fundingApplication.revisedProposalOrNextRoundDeadlineDate) }}
+                                    </div>
+                                </div>
+
+                                <div v-if="fundingApplication.revisedFundingApplicationId" class="info-item">
+                                    <div>{{ $t("revisedFundingApplicationLabel") }}:</div>
+                                    <div class="response">
+                                        <localized-link :to="'funding-application/' + fundingApplication.revisedFundingApplicationId">
+                                            {{ revisedFundingApplicationTitle }}
+                                        </localized-link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
 
         <!-- Tabs -->
-        <tab-content-loader v-if="!fundingApplication" layout="sections" />
-        <v-tabs
-            v-show="fundingApplication"
-            v-model="currentTab"
-            color="deep-purple-accent-4"
-            align-tabs="start"
-        >
+        </template>
+        <template #tabs>
             <v-tab value="otherFundingSources">
                 {{ $t("otherFundingSourcesLabel") }}
             </v-tab>
             <v-tab value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
-        </v-tabs>
+        </template>
 
-        <v-tabs-window v-show="fundingApplication" v-model="currentTab">
+        <template #default>
             <v-tabs-window-item value="otherFundingSources">
-                <v-row class="mt-10">
+                <v-row class="mt-1">
                     <v-col cols="12">
                         <funding-part-list
                             :funding-parts="fundingApplication?.otherFundingSources ? fundingApplication.otherFundingSources : []"
@@ -165,7 +142,7 @@
             </v-tabs-window-item>
 
             <v-tabs-window-item value="documents">
-                <v-row class="mt-10">
+                <v-row class="mt-1">
                     <v-col cols="12">
                         <attachment-list
                             :attachments="fundingApplication?.documents ? fundingApplication.documents : []"
@@ -177,18 +154,21 @@
                     </v-col>
                 </v-row>
             </v-tabs-window-item>
-        </v-tabs-window>
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </v-container>
+        </template>
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script setup lang="ts">
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
-import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import FundingApplicationService from "@/services/project/FundingApplicationService";
 import ProjectService from "@/services/project/ProjectService";
@@ -411,31 +391,6 @@ const deleteOtherFundingSource = (fundingPartId: number) => {
 </script>
 
 <style scoped>
-#funding-application .large-funding-application-icon {
-    font-size: 10em;
-}
-
-#funding-application .response {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-#funding-application .info-columns {
-    columns: 2;
-    column-gap: 40px;
-}
-
-#funding-application .info-item {
-    break-inside: avoid;
-}
-
-@media (max-width: 959px) {
-    #funding-application .info-columns {
-        columns: 1;
-    }
-}
-
 .edit-pen-container {
     position: relative;
 }

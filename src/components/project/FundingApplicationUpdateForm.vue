@@ -93,8 +93,9 @@
                     color="primary" />
             </v-col>
             <v-col cols="6">
-                <v-select
+                <ui-input
                     v-model="result"
+                    control="select"
                     :label="$t('resultLabel')"
                     :items="resultOptions"
                     item-title="title"
@@ -130,6 +131,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import {computed, ref, watch} from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';

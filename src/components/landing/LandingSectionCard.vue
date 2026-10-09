@@ -1,6 +1,6 @@
 <template>
     <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <header class="flex items-center gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
+        <header class="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
             <div
                 class="flex size-8 shrink-0 items-center justify-center rounded-lg"
                 :class="iconClass">
@@ -14,7 +14,7 @@
                     ({{ count }})
                 </span>
             </h3>
-            <div v-if="$slots.action" class="shrink-0">
+            <div v-if="$slots.action" class="ml-auto flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
                 <slot name="action" />
             </div>
         </header>
@@ -35,6 +35,7 @@ withDefaults(defineProps<{
     iconClass: "bg-slate-100 text-slate-600",
     count: undefined,
     padded: false,
+    count: undefined,
 });
 
 defineOptions({

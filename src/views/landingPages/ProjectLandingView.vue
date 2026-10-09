@@ -140,67 +140,55 @@
             </v-tabs-window-item>
 
             <v-tabs-window-item value="team">
-                <div class="mt-4">
-                    <project-persons-table-component
-                        v-if="project?.id"
-                        :project-id="project.id"
-                        :persons="project.persons ?? []"
-                        :can-edit="canEdit"
-                        @refresh="fetchProject"
-                    />
-                </div>
+                <project-persons-table-component
+                    v-if="project?.id"
+                    :project-id="project.id"
+                    :persons="project.persons ?? []"
+                    :can-edit="canEdit"
+                    @refresh="fetchProject"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="consortium">
-                <div class="mt-4">
-                    <project-organisations-table-component
-                        v-if="project?.id"
-                        :project-id="project.id"
-                        :organisations="project.organisations ?? []"
-                        :can-edit="canEdit"
-                        @refresh="fetchProject"
-                    />
-                </div>
+                <project-organisations-table-component
+                    v-if="project?.id"
+                    :project-id="project.id"
+                    :organisations="project.organisations ?? []"
+                    :can-edit="canEdit"
+                    @refresh="fetchProject"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="fundings">
-                <div class="mt-4">
-                    <project-fundings-table-component
-                        v-if="project?.id"
-                        :project="project"
-                        :can-edit="canEdit"
-                    />
-                </div>
+                <project-fundings-table-component
+                    v-if="project?.id"
+                    :project="project"
+                    :can-edit="canEdit"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="fundingApplications">
-                <div class="mt-4">
-                    <project-funding-applications-table-component
-                        v-if="project?.id"
-                        :project-id="project.id"
-                        :can-edit="canEdit"
-                    />
-                </div>
+                <project-funding-applications-table-component
+                    v-if="project?.id"
+                    :project-id="project.id"
+                    :can-edit="canEdit"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="documents">
-                <div class="mt-4">
-                    <project-documents-table-component
-                        v-if="project?.id"
-                        :project-id="project.id"
-                        :can-edit="canEdit"
-                    />
-                </div>
+                <project-documents-table-component
+                    v-if="project?.id"
+                    :project-id="project.id"
+                    :can-edit="canEdit"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="events">
-                <div class="mt-4">
-                    <project-events-table-component
-                        v-if="project?.id"
-                        :project-id="project.id"
-                        :can-edit="canEdit"
-                    />
-                </div>
+                <project-events-table-component
+                    v-if="project?.id"
+                    :project-id="project.id"
+                    :can-edit="canEdit"
+                />
             </v-tabs-window-item>
 
             <v-tabs-window-item value="additionalInfo">
@@ -244,22 +232,32 @@
             </v-tabs-window-item>
 
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="EntityType.PROJECT"
-                    :entity-id="project?.id"
-                    @restored="fetchProject"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="EntityType.PROJECT"
+                        :entity-id="project?.id"
+                        @restored="fetchProject"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="EntityType.PROJECT"
-                    :entity-id="project?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="EntityType.PROJECT"
+                        :entity-id="project?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -307,6 +305,7 @@ import LandingMetaItem from "@/components/landing/LandingMetaItem.vue";
 import LandingDetailField from "@/components/landing/LandingDetailField.vue";
 import LandingAdditionalInfoTab from "@/components/landing/LandingAdditionalInfoTab.vue";
 import LandingOverviewTab from "@/components/landing/LandingOverviewTab.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import LandingPageLayout from "@/components/landing/LandingPageLayout.vue";
 import { useLandingOverview } from "@/composables/useLandingOverview";
 

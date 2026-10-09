@@ -6,6 +6,7 @@
                 :src="src"
                 :alt="`CC License - ${license}`"
                 width="90"
+                max-width="90"
                 height="40"
                 class="ml-2 cc-badge"
             />
@@ -62,8 +63,12 @@ export default defineComponent({
         white-space: normal;
     }
 
+    .cc-badge {
+        flex: 0 0 90px;
+    }
+
     .cc-badge img {
-        object-fit: cover !important;
+        object-fit: contain;
     }
 
 </style>

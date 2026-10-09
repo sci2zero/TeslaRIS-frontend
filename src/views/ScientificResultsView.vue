@@ -1,20 +1,5 @@
 <template>
-    <div class="container py-4 px-4 mx-auto">
-        <h1 class="text-2xl font-bold mb-4">
-            {{ $t("scientificResultsListLabel") }}
-        </h1>
-        <!-- <v-tabs
-            v-model="currentTab"
-            align-tabs="center"
-        >
-            <v-tab value="simpleSearch">
-                {{ $t("simpleSearchLabel") }}
-            </v-tab>
-            <v-tab value="advancedSearch">
-                {{ $t("advancedSearchLabel") }}
-            </v-tab>
-        </v-tabs> -->
-
+    <entity-list-layout :title="$t('scientificResultsListLabel')" icon="mdi-file-document-multiple-outline">
         <v-tabs-window v-model="currentTab">
             <v-tabs-window-item value="simpleSearch" />
             <v-tabs-window-item value="advancedSearch">
@@ -27,7 +12,7 @@
                 </v-btn>
                 <query-input-component
                     :search-fields="searchFields"
-                    class="mb-4"
+                    class="mt-2 mb-4"
                     @search="clearSortAndPerformSearch($event)"
                     @reset="resetFiltersAndSearch" />
             </v-tabs-window-item>
@@ -58,149 +43,124 @@
                 }"
             @switch-page="switchPage">
             <template #top-left>
-                <div class="flex items-center gap-1 w-full">
+                <div v-if="currentTab === 'simpleSearch'" class="flex items-center gap-2 w-full">
                     <search-bar-component
-                        v-if="currentTab === 'simpleSearch'"
-                        class="w-full min-w-48 max-w-none!"
+                        class="flex-1 min-w-0"
                         :transparent="false"
                         size="small"
                         @search="clearSortAndPerformSearch($event)"
                     />
                     <v-btn
-                        v-if="currentTab === 'simpleSearch'"
                         variant="text"
                         icon="mdi-tune"
                         class="shrink-0"
+                        :aria-label="$t('advancedSearchLabel')"
+                        :title="$t('advancedSearchLabel')"
                         @click="toggleAdvancedSearch"
                     />
                 </div>
             </template>
             <template #actions>
-                <div class="flex items-center gap-2">
-                    <v-menu>
+                <div class="flex flex-wrap items-center gap-2">
+                    <v-menu
+                        v-if="isUserBoundToOU || isAdmin || isInstitutionalEditor || isCommission || isInstitutionalLibrarian || isHeadOfLibrary"
+                        :close-on-content-click="false"
+                        location="bottom end"
+                    >
                         <template #activator="{ props }">
                             <v-btn
-                                v-if="isUserBoundToOU || isAdmin || isInstitutionalEditor || isCommission || isInstitutionalLibrarian || isHeadOfLibrary"
                                 v-bind="props"
-                                color="white"
-                                prepend-icon="mdi-dots-vertical"
+                                variant="outlined"
+                                prepend-icon="mdi-tune"
                                 class="action-menu-trigger"
                             >
                                 {{ $t("optionsLabel") }}
                             </v-btn>
                         </template>
-                        <div class="p-4 border border-gray-200 bg-white rounded-lg shadow-lg">
-                            <span class="flex align-center flex-row gap-2">
-                                <v-checkbox
-                                    v-if="hasInstitution"
-                                    v-model="returnOnlyInstitutionRelatedEntities"
-                                    :label="$t('showEntitiesForMyInstitutionLabel')"
-                                    class=""
-                                />
-
-                                <v-checkbox
-                                    v-if="isCommission"
-                                    v-model="returnOnlyUnassessedEntities"
-                                    :label="$t('showUnassessedLabel')"
-                                    class=""
-                                />
-
-                                <v-checkbox
-                                    v-if="isAdmin"
-                                    v-model="returnOnlyUnmanagedPublications"
-                                    :label="$t('showOnlyUnmanagedLabel')"
-                                    class=""
-                                />
-
-                                <v-checkbox
-                                    v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
-                                    v-model="returnOnlyNonArchived"
-                                    :label="$t('showNonArchivedLabel')"
-                                    class=""
-                                />
-                            </span>
-
-                            <span class="flex align-center flex-row gap-2">
-                                <v-checkbox
-                                    v-if="isAdmin"
-                                    v-model="showProceedingsOnly"
-                                    :label="$t('showProceedingsOnlyLabel')"
-                                    class=""
-                                />
-
-                                <v-checkbox
-                                    v-if="isAdmin && showProceedingsOnly"
-                                    v-model="emptyProceedingsOnly"
-                                    :label="$t('emptyProceedingsOnlyLabel')"
-                                    class=""
-                                />
-                            </span>
-
-                            <span>
-                                <v-checkbox
-                                    v-if="isAdmin && showProceedingsOnly"
-                                    v-model="noContributionsProceedingsOnly"
-                                    :label="$t('noContributionsProceedingsOnlyLabel')"
-                                    class=""
-                                />
-                            </span>
-
-                            <div class="flex items-center gap-2">
-                                <span v-if="isAdmin || isInstitutionalEditor">
+                        <div class="entity-filter-panel">
+                            <v-checkbox
+                                v-if="hasInstitution"
+                                v-model="returnOnlyInstitutionRelatedEntities"
+                                :label="$t('showEntitiesForMyInstitutionLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-checkbox
+                                v-if="isCommission"
+                                v-model="returnOnlyUnassessedEntities"
+                                :label="$t('showUnassessedLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-checkbox
+                                v-if="isAdmin"
+                                v-model="returnOnlyUnmanagedPublications"
+                                :label="$t('showOnlyUnmanagedLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-checkbox
+                                v-if="isAdmin || isInstitutionalLibrarian || isHeadOfLibrary"
+                                v-model="returnOnlyNonArchived"
+                                :label="$t('showNonArchivedLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-divider v-if="isAdmin" class="my-2" />
+                            <v-checkbox
+                                v-if="isAdmin"
+                                v-model="showProceedingsOnly"
+                                :label="$t('showProceedingsOnlyLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-checkbox
+                                v-if="isAdmin && showProceedingsOnly"
+                                v-model="emptyProceedingsOnly"
+                                :label="$t('emptyProceedingsOnlyLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <v-checkbox
+                                v-if="isAdmin && showProceedingsOnly"
+                                v-model="noContributionsProceedingsOnly"
+                                :label="$t('noContributionsProceedingsOnlyLabel')"
+                                density="compact" hide-details color="primary"
+                            />
+                            <template v-if="isAdmin || isInstitutionalEditor">
+                                <v-divider class="my-2" />
+                                <div class="flex flex-col gap-2">
                                     <v-btn
-                                        color="primary" density="default"
-                                        @click="performNavigation('publicationsValidation')">
+                                        variant="text"
+                                        color="primary"
+                                        class="justify-start"
+                                        @click="performNavigation('publicationsValidation')"
+                                    >
                                         {{ $t('routeLabel.publicationsValidation') }}
                                     </v-btn>
-                                </span>
-                                <span v-if="isAdmin || isInstitutionalEditor">
                                     <v-btn
-                                        color="primary" density="default"
-                                        @click="performNavigation('authorReprints')">
+                                        variant="text"
+                                        color="primary"
+                                        class="justify-start"
+                                        @click="performNavigation('authorReprints')"
+                                    >
                                         {{ $t('routeLabel.authorReprints') }}
                                     </v-btn>
-                                </span>
-                            </div>
+                                </div>
+                            </template>
                         </div>
                     </v-menu>
-                    <span
-                        v-if="canUserAddPublications"
-                        :class="'d-flex align-center ' + (canUserAddPublications ? '' : '')">
-                        <add-publication-menu />
-                    </span>
+                    <add-publication-menu v-if="canUserAddPublications" />
                 </div>
             </template>
             <template #type-filter-menu>
-                <div class="publication-type-filter">
-                    <div class="filter-header">
-                        <span class="filter-title">{{ $t('typeOfPublicationLabel') }}</span>
-                    </div>
-                    <v-divider class="my-2" />
-                    <div class="checkbox-grid">
-                        <div 
-                            v-for="type in publicationTypes"
-                            :key="type.value"
-                            class="checkbox-item"
-                        >
-                            <v-checkbox
-                                :model-value="selectedPublicationTypes.some(t => t.value === type.value)"
-                                :label="type.title"
-                                density="compact"
-                                hide-details
-                                class="w-full"
-                                color="primary"
-                                @update:model-value="togglePublicationType(type, !!$event)"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <publication-type-filter
+                    v-model="selectedPublicationTypes"
+                    :items="publicationTypes"
+                />
             </template>
         </publication-table-component>
-    </div>
+    </entity-list-layout>
 </template>
 
 <script lang="ts">
 import { defineComponent, watch } from 'vue';
+import EntityListLayout from '@/components/landing/EntityListLayout.vue';
+import PublicationTypeFilter from '@/components/publication/PublicationTypeFilter.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -220,7 +180,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
     name: "ScientificResultsListView",
-    components: { SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu, TabContentLoader },
+    components: { EntityListLayout, PublicationTypeFilter, SearchBarComponent, PublicationTableComponent, QueryInputComponent, AddPublicationMenu, TabContentLoader },
     setup() {
         const currentTab = ref("simpleSearch");
         const loading = ref(false);
@@ -377,17 +337,6 @@ export default defineComponent({
             router.push({name: pageName});
         };
 
-        const togglePublicationType = (type: { title: string, value: PublicationType }, isSelected: boolean) => {
-            if (isSelected) {
-                selectedPublicationTypes.value.push(type);
-            } else {
-                const index = selectedPublicationTypes.value.findIndex(t => t.value === type.value);
-                if (index > -1) selectedPublicationTypes.value.splice(index, 1);
-            }
-
-            search(searchParams.value);
-        };
-
         const toggleAdvancedSearch = () => {
             if (currentTab.value === "simpleSearch") {
                 currentTab.value = "advancedSearch";
@@ -407,7 +356,7 @@ export default defineComponent({
             ExportableEndpointType, searchParams, currentTab,
             resetFiltersAndSearch, loggedInUser, loading,
             performNavigation, returnOnlyUnmanagedPublications,
-            togglePublicationType, toggleAdvancedSearch,
+            toggleAdvancedSearch,
             isInstitutionalLibrarian, isHeadOfLibrary,
             returnOnlyNonArchived, showProceedingsOnly,
             emptyProceedingsOnly, noContributionsProceedingsOnly
@@ -415,76 +364,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-
-.publication-type-filter {
-    min-width: 500px;
-    max-width: 700px;
-    padding: 12px;
-    background: #ffffff;
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-}
-
-.filter-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    letter-spacing: 0.01em;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 4px;
-}
-
-.checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 8px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 4px 0;
-}
-
-.checkbox-item {
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-}
-
-.checkbox-item:hover {
-    background-color: #f5f5f5;
-}
-
-.checkbox-grid::-webkit-scrollbar {
-    width: 8px;
-}
-
-.checkbox-grid::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.checkbox-grid::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-.checkbox-grid::-webkit-scrollbar-thumb:hover {
-    background: #a1a1a1;
-}
-
-</style>
-
-<style>
-.checkbox-item .v-label--clickable {
-    width: 100%;
-}
-</style>

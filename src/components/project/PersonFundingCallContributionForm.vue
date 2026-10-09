@@ -28,8 +28,9 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-select
+                <ui-input
                     v-model="input.contributionType"
+                    control="select"
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
@@ -42,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { ref, computed, onMounted } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import { getTypesForGivenLocale, getTitleFromValueAutoLocale } from "@/i18n/fundingCallContributionType";

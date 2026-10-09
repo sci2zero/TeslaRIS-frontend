@@ -30,8 +30,9 @@
         </v-row>
         <v-row>
             <v-col cols="6">
-                <v-select
+                <ui-input
                     v-model="input.contributionType"
+                    control="select"
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     return-object
@@ -40,8 +41,9 @@
                 />
             </v-col>
             <v-col cols="6">
-                <v-select
+                <ui-input
                     v-model="input.investigationRole"
+                    control="select"
                     :items="investigationRoles"
                     :label="$t('investigationRoleLabel')"
                     return-object
@@ -65,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { ref, computed, nextTick, onMounted } from "vue";
 import PersonContributionBase from "../core/PersonContributionBase.vue";
 import MultilingualTextInput from "../core/MultilingualTextInput.vue";

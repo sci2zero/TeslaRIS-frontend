@@ -86,13 +86,20 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <h2>{{ $t("thisJournalPublicationsLabel") }}</h2>
-                <publication-table-component
-                    :publications="publications"
-                    :total-publications="totalPublications"
-                    in-comparator
-                    show-publication-concrete-type
-                    @switch-page="switchPage" />
+                <landing-section-card
+                    :title="$t('thisJournalPublicationsLabel')"
+                    :count="totalPublications"
+                    icon="mdi-file-document-multiple-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <publication-table-component
+                        embedded
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        in-comparator
+                        show-publication-concrete-type
+                        @switch-page="switchPage" />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab :show-remark="false">
@@ -129,52 +136,80 @@
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-publication-series-contribution-tabs
-                    :contribution-list="journal?.contributions ? journal.contributions : []"
-                    :publication-series-id="journal?.id"
-                    :read-only="!canEdit"
-                    shows-board-and-reviewers
-                    :article-collection-series-type="journal?.type"
-                    @update="updateContributions"
-                />
+                <landing-section-card
+                    :title="$t('boardAndReviewersLabel')"
+                    icon="mdi-account-group"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <person-publication-series-contribution-tabs
+                        :contribution-list="journal?.contributions ? journal.contributions : []"
+                        :publication-series-id="journal?.id"
+                        :read-only="!canEdit"
+                        shows-board-and-reviewers
+                        :article-collection-series-type="journal?.type"
+                        @update="updateContributions"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section 
-                    :indicators="journalIndicators" 
-                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]" 
-                    :entity-id="journal?.id"
-                    :entity-type="ApplicableEntityType.PUBLICATION_SERIES" 
-                    :can-edit="false"
-                    show-statistics
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="journalIndicators"
+                        :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]"
+                        :entity-id="journal?.id"
+                        :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        :can-edit="false"
+                        show-statistics
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="classifications">
-                <entity-classification-view
-                    :entity-classifications="journalClassifications"
-                    :entity-id="journal?.id"
-                    :can-edit="canClassify"
-                    :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
-                    :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]"
-                    @create="createJournalClassification"
-                    @update="fetchClassifications"
-                />
+                <landing-section-card
+                    :title="$t('classificationsLabel')"
+                    icon="mdi-certificate-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <entity-classification-view
+                        :entity-classifications="journalClassifications"
+                        :entity-id="journal?.id"
+                        :can-edit="canClassify"
+                        :containing-entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        :applicable-types="[ApplicableEntityType.PUBLICATION_SERIES]"
+                        @create="createJournalClassification"
+                        @update="fetchClassifications"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="EntityType.JOURNAL"
-                    :entity-id="journal?.id"
-                    @restored="() => fetchJournal(false)"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="EntityType.JOURNAL"
+                        :entity-id="journal?.id"
+                        @restored="() => fetchJournal(false)"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="EntityType.JOURNAL"
-                    :entity-id="journal?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="EntityType.JOURNAL"
+                        :entity-id="journal?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -229,10 +264,11 @@ import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfo
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { LandingSectionCard, LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 

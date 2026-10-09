@@ -90,11 +90,14 @@
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="publications">
-                <div class="mt-10">
-                    <h2 class="mb-5">
-                        {{ $t("conferencePublicationsLabel") }}
-                    </h2>
+                <landing-section-card
+                    :title="$t('conferencePublicationsLabel')"
+                    :count="totalPublications"
+                    icon="mdi-file-document-multiple-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
                     <publication-table-component
+                        embedded
                         :publications="publications"
                         :total-publications="totalPublications"
                         enable-export
@@ -102,16 +105,22 @@
                         :endpoint-token-parameters="[`${conference?.id}`]"
                         @switch-page="switchPublicationsPage"
                     />
-                </div>
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="contributions">
-                <person-event-contribution-tabs
-                    :event-id="conference?.id"
-                    :contribution-list="conference?.contributions ? conference.contributions : []"
-                    :read-only="!canEdit"
-                    :event="conference"
-                    @update="updateContributions"
-                />
+                <landing-section-card
+                    :title="$t('participationsLabel')"
+                    icon="mdi-account-group"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <person-event-contribution-tabs
+                        :event-id="conference?.id"
+                        :contribution-list="conference?.contributions ? conference.contributions : []"
+                        :read-only="!canEdit"
+                        :event="conference"
+                        @update="updateContributions"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="additionalInfo">
                 <landing-additional-info-tab
@@ -162,44 +171,66 @@
                 </landing-additional-info-tab>
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
-                <indicators-section
-                    :indicators="eventIndicators"
-                    :applicable-types="[ApplicableEntityType.EVENT]"
-                    :entity-id="conference?.id"
-                    :entity-type="ApplicableEntityType.EVENT"
-                    :can-edit="canClassify"
-                    show-statistics
-                    @create="createIndicator"
-                    @updated="fetchIndicators"
-                />
+                <landing-section-card
+                    :title="$t('indicatorListLabel')"
+                    icon="mdi-chart-box-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <indicators-section
+                        :indicators="eventIndicators"
+                        :applicable-types="[ApplicableEntityType.EVENT]"
+                        :entity-id="conference?.id"
+                        :entity-type="ApplicableEntityType.EVENT"
+                        :can-edit="canClassify"
+                        show-statistics
+                        @create="createIndicator"
+                        @updated="fetchIndicators"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="classifications">
-                <entity-classification-view
-                    :entity-classifications="eventClassifications"
-                    :entity-id="conference?.id"
-                    :can-edit="canClassify"
-                    :containing-entity-type="ApplicableEntityType.EVENT"
-                    :applicable-types="[ApplicableEntityType.CONFERENCE]"
-                    @create="createClassification"
-                    @update="fetchClassifications"
-                />
+                <landing-section-card
+                    :title="$t('classificationsLabel')"
+                    icon="mdi-certificate-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <entity-classification-view
+                        :entity-classifications="eventClassifications"
+                        :entity-id="conference?.id"
+                        :can-edit="canClassify"
+                        :containing-entity-type="ApplicableEntityType.EVENT"
+                        :applicable-types="[ApplicableEntityType.CONFERENCE]"
+                        @create="createClassification"
+                        @update="fetchClassifications"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="revisions">
-                <revision-history-table-component
-                    class="mt-5"
-                    :entity-type="EntityType.CONFERENCE"
-                    :entity-id="conference?.id"
-                    @restored="fetchConference"
-                    @show-assessment-details="showAssessmentDetails"
-                />
+                <landing-section-card
+                    :title="$t('revisionHistoryLabel')"
+                    icon="mdi-history"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <revision-history-table-component
+                        :entity-type="EntityType.CONFERENCE"
+                        :entity-id="conference?.id"
+                        @restored="fetchConference"
+                        @show-assessment-details="showAssessmentDetails"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
             <v-tabs-window-item value="dataQuality">
-                <data-quality-tabs-component
-                    ref="dataQualityTabsRef"
-                    class="mt-5"
-                    :entity-type="EntityType.CONFERENCE"
-                    :entity-id="conference?.id"
-                />
+                <landing-section-card
+                    :title="$t('dataQualityLabel')"
+                    icon="mdi-shield-check-outline"
+                    icon-class="bg-indigo-50 text-indigo-600"
+                    padded>
+                    <data-quality-tabs-component
+                        ref="dataQualityTabsRef"
+                        :entity-type="EntityType.CONFERENCE"
+                        :entity-id="conference?.id"
+                    />
+                </landing-section-card>
             </v-tabs-window-item>
         </template>
 
@@ -254,10 +285,11 @@ import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfo
 import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useLandingOverview } from '@/composables/useLandingOverview';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { LandingSectionCard, LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin, canReviewDataQuality } = useUserRole();
 

@@ -2,6 +2,22 @@ import { type FlexibleDate } from "@/models/Common";
 import { RecurrenceType } from "@/models/LoadModel";
 import { DateTime } from "luxon";
 
+export const localiseRelativeTimestamp = (
+    timestamp: string,
+    translate: (key: string, values: Record<string, string>) => string,
+    now = DateTime.local()
+): string => {
+    const dateTime = DateTime.fromISO(timestamp, { setZone: true }).toLocal();
+    if (!dateTime.isValid) return timestamp;
+
+    const day = dateTime.toISODate();
+    const time = dateTime.toFormat('HH:mm');
+    if (day === now.toISODate()) return translate('timestampTodayAt', { time });
+    if (day === now.minus({ days: 1 }).toISODate()) return translate('timestampYesterdayAt', { time });
+    if (day === now.plus({ days: 1 }).toISODate()) return translate('timestampTomorrowAt', { time });
+    return localiseDate(day ?? undefined);
+};
+
 
 export const localiseDate = (iso8601DateString: string | undefined) => {
     if(!iso8601DateString) {
@@ -217,92 +233,25 @@ export const computeRelativeDate = (dateString: string): string => {
     return date.toISOString();
 };
 
-export const toUtcLocalDateTimeString = (localTimestamp: string): string => {
-    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
+export const toUtcTimestamp = (localTimestamp: string): string => {
 
     const localDateTime = DateTime.fromISO(localTimestamp, { setZone: true });
     if (!localDateTime.isValid) {
         throw new Error(`Invalid datetime string: ${localTimestamp}`);
     }
 
-    const serverDateTime = serverTz === "UTC"
-        ? localDateTime.toUTC()
-        : localDateTime.setZone(serverTz);
-
-    return serverDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
+    return localDateTime.toUTC().toISO({ suppressMilliseconds: true })!;
 };
 
+/** Convert an API timestamp carrying Z or an offset into browser-local display time. */
 export const serverTimeToLocal = (serverTimeString: string): string => {
-    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
-
-    const serverDateTime = DateTime.fromFormat(serverTimeString, "yyyy-MM-dd'T'HH:mm:ss", {
-        zone: serverTz
-    });
-
-    if (!serverDateTime.isValid) {
+    const dateTime = DateTime.fromISO(serverTimeString, { setZone: true });
+    if (!dateTime.isValid) {
         throw new Error(`Invalid server datetime: ${serverTimeString}`);
     }
-
-    const localDateTime = serverDateTime.setZone('local');
-
-    return localDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
+    return dateTime.toLocal().toFormat("yyyy-MM-dd'T'HH:mm:ss");
 };
 
 export const serverTimeToLocalTime = (serverTimeString: string): string => {
-    if (!serverTimeString || typeof serverTimeString !== 'string') {
-        throw new Error(`Invalid server time: ${serverTimeString}`);
-    }
-
-    const cleanedTimeString = serverTimeString.replace(/[^0-9:]/g, "");
-    
-    const serverTz = import.meta.env.VITE_SERVER_TIMEZONE || "UTC";
-
-    const timeFormats = [
-        "HH:mm:ss",  // 14:45:30
-        "H:mm:ss",   // 8:45:30
-        "HH:mm",     // 14:45
-        "H:mm",      // 8:45
-        "HH",        // 14 (just hours)
-        "H"          // 8 (just hours)
-    ];
-
-    let serverDateTime: DateTime | null = null;
-
-    for (const format of timeFormats) {
-        serverDateTime = DateTime.fromFormat(cleanedTimeString, format, {
-            zone: serverTz
-        });
-
-        if (serverDateTime.isValid) {
-            break;
-        }
-    }
-
-    if (!serverDateTime || !serverDateTime.isValid) {
-        const numbers = cleanedTimeString.split(':').filter(Boolean);
-        
-        if (numbers.length === 0) {
-            throw new Error(`Invalid server time: ${serverTimeString}`);
-        }
-
-        const hours = parseInt(numbers[0]) || 0;
-        const minutes = parseInt(numbers[1]) || 0;
-        const seconds = parseInt(numbers[2]) || 0;
-
-        serverDateTime = DateTime.fromObject({
-            hour: Math.min(23, Math.max(0, hours)),
-            minute: Math.min(59, Math.max(0, minutes)),
-            second: Math.min(59, Math.max(0, seconds))
-        }, {
-            zone: serverTz
-        });
-    }
-
-    if (!serverDateTime.isValid) {
-        throw new Error(`Invalid server time: ${serverTimeString}`);
-    }
-
-    const localDateTime = serverDateTime.setZone('local');
-    
-    return localDateTime.toFormat("HH:mm") + "h";
+    return DateTime.fromISO(serverTimeToLocal(serverTimeString)).toFormat("HH:mm") + "h";
 };

@@ -3,7 +3,9 @@
         <template #activator="scope">
             <v-btn
                 v-bind="scope.props"
-                variant="elevated"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-briefcase-plus">
                 {{ $t("addEmployeeLabel") }}
             </v-btn>

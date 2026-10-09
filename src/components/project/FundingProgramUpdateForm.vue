@@ -12,8 +12,9 @@
 
         <v-row>
             <v-col>
-                <v-select
+                <ui-input
                     v-model="selectedFundingTypes"
+                    control="select"
                     :label="$t('fundingTypesLabel')"
                     :items="fundingTypeOptions"
                     item-title="title"
@@ -60,13 +61,13 @@
 
         <v-row>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="oaMandated"
                     :label="$t('oaMandatedLabel')"
                 />
             </v-col>
             <v-col v-if="oaMandated" cols="6">
-                <v-text-field
+                <ui-input
                     v-model="oaMandateUrl"
                     :label="$t('oaMandateUrlLabel')"
                     :placeholder="$t('oaMandateUrlLabel')"
@@ -83,6 +84,8 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
 import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';

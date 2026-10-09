@@ -24,8 +24,9 @@
 
         <v-row>
             <v-col cols="12">
-                <v-select
+                <ui-input
                     v-model="input.relationType"
+                    control="select"
                     :items="relationTypes"
                     :label="$t('relationTypeLabel')"
                     item-title="title"
@@ -84,6 +85,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";

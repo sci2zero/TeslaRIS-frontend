@@ -1,57 +1,86 @@
 <template>
-    <v-data-table-server
+    <responsive-data-table
         :sort-by="tableOptions.sortBy"
         :items="pagedRevisions"
         :headers="headers"
         :items-length="revisions.length"
-        :items-per-page-text="$t('itemsPerPageLabel')"
         :items-per-page-options="[5, 25, 50]"
-        :items-per-page="25"
-        :no-data-text="$t('noDataInTableMessage')"
+        :items-per-page="tableOptions.itemsPerPage"
+        item-key="versionKey"
+        container-class="bg-white"
         :page="tableOptions.page"
         @update:options="refreshTable">
-        <template #item="row">
+        <template #compact-item="{ item }">
+            <entity-list-card @preview="openRevisionGlance(item)">
+                <entity-row-identity
+                    :title="`${$t('versionLabel')} ${versionLabelFor(item)}`"
+                    icon="mdi-history">
+                    <p class="text-xs text-slate-500">
+                        {{ localiseDate(item.timestamp) }}
+                    </p>
+                    <p class="text-sm text-slate-600 break-words">
+                        {{ displayTextOrPlaceholder(item.createdBy) }}
+                    </p>
+                    <p v-if="bestAssessment(item)" class="text-sm" :class="scoreColorClass(bestAssessment(item)?.dataQualityScore)">
+                        {{ $t('qualityScoreLabel') }}: {{ bestAssessment(item)?.dataQualityScore.toFixed(1) }}%
+                    </p>
+                    <v-chip v-if="restorationWarnings(item).length" color="warning" variant="tonal" size="x-small">
+                        {{ $t('restorationWarningsCountLabel', { count: restorationWarnings(item).length }) }}
+                    </v-chip>
+                </entity-row-identity>
+            </entity-list-card>
+        </template>
+        <template #row="{ item }">
             <tr>
                 <td>
                     <v-btn
-                        :icon="isExpanded(row.item) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                        :disabled="!isExpandable(row.item)"
+                        :icon="isExpanded(item) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                        :disabled="!isExpandable(item)"
                         density="compact"
                         variant="text"
-                        @click="toggleRow(row.item)"
+                        @click="toggleRow(item)"
                     />
                 </td>
-                <td>{{ row.item.majorVersion }}.{{ row.item.minorVersion }}</td>
-                <td>{{ localiseDate(row.item.timestamp) }}</td>
                 <td>
-                    {{ displayTextOrPlaceholder(row.item.versionNote ? $t(row.item.versionNote.split(":")[0] + "Message", [row.item.versionNote.split(":").at(-1)]) : row.item.versionNote as string) }}
+                    <entity-row-identity
+                        :title="`${$t('versionLabel')} ${versionLabelFor(item)}`"
+                        icon="mdi-history"
+                        class="py-2" />
+                </td>
+                <td class="text-sm text-slate-600">
+                    {{ localiseDate(item.timestamp) }}
+                </td>
+                <td>
+                    {{ displayTextOrPlaceholder(item.versionNote ? $t(item.versionNote.split(":")[0] + "Message", [item.versionNote.split(":").at(-1)]) : item.versionNote as string) }}
                     <v-chip
-                        v-if="restorationWarnings(row.item).length > 0"
+                        v-if="restorationWarnings(item).length > 0"
                         class="ml-2"
                         color="warning"
                         variant="tonal"
                         size="x-small"
                         prepend-icon="mdi-alert-outline"
-                        @click="toggleRow(row.item)">
-                        {{ $t("restorationWarningsCountLabel", { count: restorationWarnings(row.item).length }) }}
+                        @click="toggleRow(item)">
+                        {{ $t("restorationWarningsCountLabel", { count: restorationWarnings(item).length }) }}
                     </v-chip>
                 </td>
-                <td>{{ displayTextOrPlaceholder(row.item.createdBy as string) }}</td>
+                <td class="text-sm text-slate-600">
+                    {{ displayTextOrPlaceholder(item.createdBy as string) }}
+                </td>
                 <td>
                     <span
-                        v-if="row.item.assessments.length === 0"
+                        v-if="item.assessments.length === 0"
                         class="text-medium-emphasis">
                         {{ $t("noAssessmentsLabel") }}
                     </span>
                     <template v-else>
-                        <span :class="scoreColorClass(bestAssessment(row.item)?.dataQualityScore)">
-                            <strong>{{ bestAssessment(row.item)?.dataQualityScore.toFixed(1) }}%</strong>
+                        <span :class="scoreColorClass(bestAssessment(item)?.dataQualityScore)">
+                            <strong>{{ bestAssessment(item)?.dataQualityScore.toFixed(1) }}%</strong>
                         </span>
                         <span class="text-medium-emphasis">
-                            ({{ bestAssessment(row.item)?.profileName }})
+                            ({{ bestAssessment(item)?.profileName }})
                         </span>
                         <span class="text-medium-emphasis">
-                            &middot; {{ $t("totalAssessmentsLabel", { count: row.item.assessments.length }) }}
+                            &middot; {{ $t("totalAssessmentsLabel", { count: item.assessments.length }) }}
                         </span>
                     </template>
                 </td>
@@ -60,11 +89,11 @@
                         density="compact"
                         variant="text"
                         color="primary"
-                        @click="showDetailedAssessment(row.item)">
+                        @click="showDetailedAssessment(item)">
                         {{ $t("detailedAssessmentLabel") }}
                     </v-btn>
                     <v-tooltip
-                        v-if="!isLatestRevision(row.item)"
+                        v-if="!isLatestRevision(item)"
                         :disabled="!restoreBlockedReason"
                         :text="restoreBlockedReason"
                         location="top">
@@ -76,7 +105,7 @@
                                     color="primary"
                                     :disabled="!!restoreBlockedReason"
                                     :loading="restoreInProgress"
-                                    @click="startRestoreProcess(row.item)">
+                                    @click="startRestoreProcess(item)">
                                     {{ $t("restoreRevisionLabel") }}
                                 </v-btn>
                             </span>
@@ -84,9 +113,9 @@
                     </v-tooltip>
                 </td>
             </tr>
-            <tr v-if="isExpanded(row.item)">
+            <tr v-if="isExpanded(item)">
                 <td :colspan="headers.length" class="assessment-panel">
-                    <template v-if="restorationWarnings(row.item).length > 0">
+                    <template v-if="restorationWarnings(item).length > 0">
                         <div class="panel-title">
                             {{ $t("restorationWarningsLabel") }}
                         </div>
@@ -103,7 +132,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="(warning, warningIndex) in restorationWarnings(row.item)"
+                                    v-for="(warning, warningIndex) in restorationWarnings(item)"
                                     :key="`${warning.fieldPath}-${warningIndex}`">
                                     <td>
                                         <v-chip
@@ -124,10 +153,10 @@
                         </v-table>
                     </template>
 
-                    <div v-if="row.item.assessments.length > 0" class="panel-title">
+                    <div v-if="item.assessments.length > 0" class="panel-title">
                         {{ $t("dataQualityAssessmentLabel") }}
                     </div>
-                    <v-table v-if="row.item.assessments.length > 0" density="compact">
+                    <v-table v-if="item.assessments.length > 0" density="compact">
                         <thead>
                             <tr>
                                 <th>{{ $t("qualityProfileLabel") }}</th>
@@ -138,12 +167,12 @@
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(assessment, assessmentIndex) in sortedAssessments(row.item)"
+                                v-for="(assessment, assessmentIndex) in sortedAssessments(item)"
                                 :key="`${assessment.profileName}-${assessment.profileVersion}`">
                                 <td>
                                     {{ assessment.profileName }} {{ assessment.profileVersion }}
                                     <v-chip
-                                        v-if="assessmentIndex === 0 && sortedAssessments(row.item).length > 1"
+                                        v-if="assessmentIndex === 0 && sortedAssessments(item).length > 1"
                                         class="ml-2"
                                         variant="tonal"
                                         size="x-small"
@@ -171,7 +200,18 @@
                 </td>
             </tr>
         </template>
-    </v-data-table-server>
+    </responsive-data-table>
+
+    <revision-quick-glance
+        v-if="glancedRevision"
+        v-model="revisionGlanceOpen"
+        :revision="glancedRevision"
+        :note="revisionNote(glancedRevision)"
+        :latest="isLatestRevision(glancedRevision)"
+        :restoring="restoreInProgress"
+        :restore-blocked-reason="restoreBlockedReason"
+        @assess="showDetailedAssessment(glancedRevision); revisionGlanceOpen = false"
+        @restore="startRestoreProcess(glancedRevision); revisionGlanceOpen = false" />
 
     <div class="notificationContainer">
         <v-slide-y-transition group>
@@ -199,6 +239,10 @@ import type { PropType } from "vue";
 import { useI18n } from "vue-i18n";
 import { DegradationOutcome, type DataQualityAssessmentSimple, type DegradedReference, type Revision } from "@/models/RevisionModel";
 import RevisionService from "@/services/revision/RevisionService";
+import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
+import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";
+import EntityListCard from "@/components/core/EntityListCard.vue";
+import RevisionQuickGlance from "./RevisionQuickGlance.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
@@ -208,7 +252,7 @@ const RESTORE_BLOCKED_MESSAGES = ["restoreArchivedDocumentMessage", "restoreThes
 
 export default defineComponent({
     name: "RevisionHistoryTableComponent",
-    components: { PersistentQuestionDialog },
+    components: { PersistentQuestionDialog, ResponsiveDataTable, EntityListCard, EntityRowIdentity, RevisionQuickGlance },
     props: {
         entityType: {
             type: String,
@@ -226,6 +270,15 @@ export default defineComponent({
     emits: ["restored", "showAssessmentDetails"],
     setup(props, { emit }) {
         const revisions = ref<Revision[]>([]);
+        const revisionGlanceOpen = ref(false);
+        const glancedRevision = ref<Revision | null>(null);
+        const openRevisionGlance = (revision: Revision) => {
+            glancedRevision.value = revision;
+            revisionGlanceOpen.value = true;
+        };
+        const revisionNote = (revision: Revision) => displayTextOrPlaceholder(revision.versionNote
+            ? i18n.t(revision.versionNote.split(":")[0] + "Message", [revision.versionNote.split(":").at(-1)])
+            : revision.versionNote);
         const expandedRows = ref<Set<string>>(new Set());
         const notifications = ref<Map<string, string>>(new Map());
 
@@ -260,7 +313,8 @@ export default defineComponent({
 
         const pagedRevisions = computed(() => {
             const start = (tableOptions.value.page - 1) * tableOptions.value.itemsPerPage;
-            return revisions.value.slice(start, start + tableOptions.value.itemsPerPage);
+            return revisions.value.slice(start, start + tableOptions.value.itemsPerPage)
+                .map(revision => ({ ...revision, versionKey: `${revision.majorVersion}.${revision.minorVersion}` }));
         });
 
         const getContent = () => {
@@ -411,6 +465,7 @@ export default defineComponent({
 
         return {
             revisions, pagedRevisions, headers, tableOptions,
+            revisionGlanceOpen, glancedRevision, openRevisionGlance, revisionNote,
             refreshTable, isExpanded, toggleRow, scoreColorClass,
             sortedAssessments, bestAssessment, isLatestRevision,
             restorationWarnings, isExpandable, DegradationOutcome,

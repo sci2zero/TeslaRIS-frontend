@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col cols="11">
-            <v-text-field
+            <ui-input
                 ref="doiInputRef"
                 v-model="doi"
                 label="DOI"
@@ -23,9 +23,9 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { VTextField } from 'vuetify/lib/components/index.mjs';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import ProjectMetadataPrepopulationService from '@/services/project/ProjectMetadataPrepopulationService';
 import type { PrepopulatedProjectMetadata } from '@/models/ProjectModel';
@@ -44,7 +44,7 @@ const emit = defineEmits<{
 const i18n = useI18n();
 
 const doi = ref('');
-const doiInputRef = ref<InstanceType<typeof VTextField> | null>(null);
+const doiInputRef = ref<InstanceType<typeof UiInput> | null>(null);
 
 const errorMessage = ref('');
 const isLoading = ref(false);

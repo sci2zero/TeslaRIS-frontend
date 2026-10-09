@@ -1,7 +1,8 @@
 <template>
     <div class="flex items-start gap-2">
-        <v-autocomplete
+        <ui-input
             v-model="selectedFunding"
+            control="autocomplete"
             class="min-w-0 flex-1"
             :label="(label ? $t(label) : $t('fundingLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : fundings"
@@ -15,7 +16,7 @@
         />
         <generic-crud-modal
             ref="modalRef"
-            class="w-fit shrink-0 self-center"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
             :form-component="FundingSubmissionForm"
             :form-props="{ presetFundingCallId: presetFundingCallId, presetProject: presetProject }"
             entity-name="Funding"
@@ -34,6 +35,7 @@ import FundingService from "@/services/project/FundingService";
 import type { Funding, FundingIndex } from "@/models/FundingModel";
 import type { Project } from "@/models/ProjectModel";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 import FundingSubmissionForm from "@/components/project/FundingSubmissionForm.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { useValidationUtils } from "@/utils/ValidationUtils";

@@ -11,7 +11,7 @@
         />
 
         <div
-            v-show="!loading"
+            v-if="!loading"
             ref="tabsShellRef"
             class="landing-tabs-shell"
         >
@@ -51,9 +51,9 @@
         </div>
 
         <v-tabs-window
-            v-show="!loading"
+            v-if="!loading"
             v-model="currentTab"
-            class="min-w-0"
+            class="landing-tab-content min-w-0 mt-5"
         >
             <slot />
         </v-tabs-window>
@@ -176,6 +176,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.landing-tab-content :deep(.entity-data-table > .overflow-x-auto),
+.landing-tab-content :deep(.entity-data-table > .responsive-data-table--compact),
+.landing-tab-content :deep(.v-table:not(.entity-data-table .v-data-table)) {
+    border: 1px solid var(--color-slate-200, #e2e8f0);
+    border-radius: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .landing-tabs-shell {
     position: relative;
 }
@@ -307,4 +316,9 @@ onBeforeUnmount(() => {
         letter-spacing: 0;
     }
 }
+</style>
+
+<style scoped>
+.landing-tab-content :deep(.v-tabs-window-item > .mt-4:first-child),
+.landing-tab-content :deep(.v-tabs-window-item > .mt-5:first-child) { margin-top: 0; }
 </style>

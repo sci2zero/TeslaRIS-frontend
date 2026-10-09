@@ -1,5 +1,5 @@
 <template>
-    <v-row>
+    <v-row class="ma-0">
         <v-col cols="12" sm="6" md="4" lg="3">
             <date-picker
                 v-model="startDate"
@@ -20,7 +20,7 @@
     <v-row
         v-for="assessment in assessments"
         :key="assessment.commissionId"
-        class="d-flex justify-center align-center">
+        class="ma-0 d-flex justify-center align-center">
         <v-col cols="12">
             <h3 class="mt-5 text-base sm:text-lg break-words">
                 {{ $t("commissionLabel") }}: {{ returnCurrentLocaleContent(assessment.commissionDescription) }}
@@ -93,8 +93,8 @@
             </p>
         </v-col>
     </v-row>
-    <v-row v-if="assessments.length === 0">
-        <v-col v-if="isLoading">
+    <v-row v-if="assessments.length === 0 && isLoading" class="ma-0">
+        <v-col cols="12">
             <v-progress-circular
                 color="primary"
                 :size="40"

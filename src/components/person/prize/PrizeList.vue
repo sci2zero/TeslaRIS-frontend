@@ -1,110 +1,80 @@
 <template>
-    <v-card
-        class="pa-3!"
-        variant="flat"
-        color="grey-lighten-5">
-        <v-card-text class="edit-pen-container">
-            <prize-modal
-                :read-only="!canEdit"
-                @create="createPrize"
-            />
-
-            <h3>{{ $t("prizesLabel") }}</h3>
-            <strong v-if="prizes?.length === 0">{{ $t("notYetSetMessage") }}</strong>
-            <br>
-            <draggable 
-                :list="prizes" item-key="id"
-                group="prizes" 
-                :disabled="!inComparator"
-            >
-                <div v-for="(prize, index) in prizes" :key="index" class="py-5!">
-                    <!-- <v-menu
-                        v-if="canEdit"
-                        v-model="menus[index]"
-                        :close-on-content-click="true"
-                        location="bottom"
-                    >
-                        <template #activator="{ props }">
-                            <div class="edit-pen">
-                                <v-btn
-                                    v-bind="props"
-                                    icon="mdi-file-edit-outline"
-                                >
-                                </v-btn>
-                            </div>
-                        </template>
-
-                        <v-list min-width="150">
-                            <prize-modal :read-only="!canEdit" edit :preset-prize="prize" @update="updatePrize"></prize-modal>
-                            <v-list-item @click="deletePrize(prize.id)">
-                                <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu> -->
-
-                    <h4>
-                        <div class="flex flex-row items-start justify-between gap-2">
-                            <div class="min-w-0 break-words">
-                                <strong>{{ returnCurrentLocaleContent(prize.title) }}</strong>
-                                <v-icon v-if="prize.date" icon="mdi-circle-small" />
-                                <strong>{{ localiseDate(prize.date) }}</strong>
-                            </div>
-                            <div v-if="canEdit" class="flex shrink-0 items-center">
-                                <v-btn
-                                    class="ml-2!"
-                                    icon variant="outlined"
-                                    color="primary"
-                                    size="small"
-                                    @click="deletePrize(prize.id)">
-                                    <v-icon size="large" icon="mdi-delete" />
-                                </v-btn>
-                                <prize-modal
-                                    class="ml-2!"
-                                    :read-only="!canEdit"
-                                    edit
-                                    :preset-prize="prize"
-                                    @update="updatePrize"
-                                />
-                            </div>
-                        </div>
-                    </h4>
-                    <p>{{ returnCurrentLocaleContent(prize.description) }}</p>
-                    
-                    <div
-                        v-if="prize.keywords && prize.keywords.length > 0">
-                        <br>
-                        <div class="flex flex-wrap gap-2">
-                            <span
-                                v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
-                                :key="keywordIndex">
-                                <v-chip
-                                    outlined
-                                    size="small">
-                                    {{ keyword }}
-                                </v-chip>
-                            </span>
-                        </div>
-                        <br>
-                        <br>
+    <landing-section-card
+        class="[&>header]:flex-wrap [&>header>h3]:min-w-24"
+        :title="$t('prizesLabel')"
+        :count="prizes?.length ?? 0"
+        icon="mdi-trophy-outline"
+        icon-class="bg-amber-50 text-amber-600">
+        <template v-if="canEdit" #action>
+            <prize-modal :read-only="!canEdit" @create="createPrize" />
+        </template>
+        <p v-if="!prizes?.length" class="px-4 py-5 text-sm text-slate-500">
+            {{ $t("notYetSetMessage") }}
+        </p>
+        <draggable
+            :list="prizes" item-key="id"
+            group="prizes"
+            class="divide-y divide-slate-100"
+            :disabled="!inComparator">
+            <div v-for="(prize, index) in prizes" :key="index" class="px-4 py-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1 break-words">
+                        <h4 class="text-sm font-semibold text-slate-800">
+                            {{ returnCurrentLocaleContent(prize.title) }}
+                        </h4>
+                        <p v-if="prize.date" class="mt-1 text-xs text-slate-500">
+                            {{ localiseDate(prize.date) }}
+                        </p>
                     </div>
-
-                    <attachment-list
-                        :attachments="prize.proofs"
-                        :can-edit="canEdit"
-                        is-proof
-                        @create="addPrizeProof($event, prize)"
-                        @update="updatePrizeProof(prize, $event)"
-                        @delete="deletePrizeProof(prize, $event)"
-                    />
-                    
-                    <v-divider
-                        v-if="index < (prizes ? prizes.length : 1) - 1"
-                        class="mt-10"
-                    />
+                    <prize-modal
+                        v-if="canEdit"
+                        :read-only="!canEdit" edit
+                        :preset-prize="prize"
+                        @update="updatePrize">
+                        <template #activator="{ props: activatorProps }">
+                            <v-menu location="bottom end">
+                                <template #activator="{ props: menuProps }">
+                                    <v-btn
+                                        v-bind="menuProps"
+                                        icon="mdi-dots-horizontal" variant="text" size="small"
+                                        class="shrink-0 text-slate-500"
+                                        :aria-label="$t('moreActionsLabel')" />
+                                </template>
+                                <v-list class="min-w-48 rounded-lg border border-slate-200 py-1" density="compact">
+                                    <v-list-item
+                                        v-bind="activatorProps"
+                                        prepend-icon="mdi-pencil-outline"
+                                        :title="$t('editActionLabel')" />
+                                    <v-list-item
+                                        prepend-icon="mdi-delete-outline"
+                                        :title="$t('deleteLabel')"
+                                        class="text-red-600"
+                                        @click="deletePrize(prize.id)" />
+                                </v-list>
+                            </v-menu>
+                        </template>
+                    </prize-modal>
                 </div>
-            </draggable>
-        </v-card-text>
-    </v-card>
+                <p v-if="returnCurrentLocaleContent(prize.description)" class="mt-2 break-words text-sm text-slate-600">
+                    {{ returnCurrentLocaleContent(prize.description) }}
+                </p>
+                <div v-if="prize.keywords && prize.keywords.length > 0" class="mt-3 flex flex-wrap gap-2">
+                    <v-chip
+                        v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(prize.keywords)?.split('\n')"
+                        :key="keywordIndex" variant="tonal" size="small">
+                        {{ keyword }}
+                    </v-chip>
+                </div>
+                <attachment-list
+                    class="mt-3"
+                    :attachments="prize.proofs"
+                    :can-edit="canEdit" is-proof
+                    @create="addPrizeProof($event, prize)"
+                    @update="updatePrizeProof(prize, $event)"
+                    @delete="deletePrizeProof(prize, $event)" />
+            </div>
+        </draggable>
+    </landing-section-card>
 </template>
 
 <script lang="ts">
@@ -114,6 +84,7 @@ import { defineComponent, type PropType } from 'vue';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { PersonResponse, Prize, PrizeResponse } from '@/models/PersonModel';
 import AttachmentList from '@/components/core/AttachmentList.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import PrizeModal from './PrizeModal.vue';
 import { ref } from 'vue';
 import PrizeService from '@/services/PrizeService';
@@ -123,7 +94,7 @@ import { VueDraggableNext } from 'vue-draggable-next'
 
 export default defineComponent({
     name: "PrizeList",
-    components: { AttachmentList, PrizeModal, draggable: VueDraggableNext },
+    components: { LandingSectionCard, AttachmentList, PrizeModal, draggable: VueDraggableNext },
     props: {
         prizes: {
             type: Object as PropType<PrizeResponse[] | undefined>,
@@ -193,31 +164,3 @@ export default defineComponent({
     }
 });
 </script>
-
-<style scoped>
-    .edit-pen-container {
-        position:relative;
-    }
-
-    .edit-pen-container .edit-pen {
-        top: 20px;
-        right: 0px;
-        position: absolute;
-        z-index: 10;
-        opacity: 0;
-    }
-
-    .edit-pen-container:hover .edit-pen {
-        opacity: 0.3;
-    }
-
-    .edit-pen-container .edit-pen:hover {
-        opacity: 1;
-    }
-
-    @media (hover: none), (max-width: 768px) {
-        .edit-pen-container .edit-pen {
-            opacity: 1;
-        }
-    }
-</style>

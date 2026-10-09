@@ -1,11 +1,8 @@
 <template>
-    <div
-        class="group w-full px-3 py-3 cursor-pointer hover:bg-gray-50"
+    <entity-list-card
+        :to="'persons/' + item.databaseId"
         :class="isSelected ? 'bg-purple-50' : 'bg-white'"
-        role="button"
-        tabindex="0"
-        @click="$emit('open')"
-        @keyup.enter="$emit('open')"
+        @preview="$emit('open')"
     >
         <div class="flex gap-2 items-start">
             <div v-if="showSelect" class="flex-shrink-0" @click.stop>
@@ -16,7 +13,7 @@
                     hide-details
                     density="compact"
                     color="primary"
-                    @update:model-value="$emit('update:selectedPersons', $event)"
+                    @update:model-value="$emit('update:selectedPersons', $event ?? [])"
                 />
             </div>
             <person-avatar
@@ -27,9 +24,9 @@
             />
             <div class="min-w-0 flex-1">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="text-gray-800 font-semibold text-sm leading-snug min-w-0">
+                    <localized-link :to="'persons/' + item.databaseId" class="text-gray-800 font-semibold text-sm leading-snug min-w-0 break-words">
                         {{ primaryName }}
-                    </div>
+                    </localized-link>
                     <span v-if="birthdateLabel" class="text-xs text-gray-600 flex-shrink-0 pt-0.5">
                         {{ birthdateLabel }}
                     </span>
@@ -55,11 +52,13 @@
                 </div>
             </div>
         </div>
-    </div>
+    </entity-list-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
+import EntityListCard from "../core/EntityListCard.vue";
+import LocalizedLink from "../localization/LocalizedLink.vue";
 import type { PersonIndex } from "@/models/PersonModel";
 import IdentifierMenu from "../core/IdentifierMenu.vue";
 import PersonAvatar from "./PersonAvatar.vue";

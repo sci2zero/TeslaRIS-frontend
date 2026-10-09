@@ -43,8 +43,9 @@
 
         <v-row>
             <v-col cols="12">
-                <v-select
+                <ui-input
                     v-model="input.contributionType"
+                    control="select"
                     :items="contributionTypes"
                     :label="$t('contributionTypeLabel')"
                     item-title="title"
@@ -99,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { computed, nextTick, ref } from "vue";
 import DatePicker from "@/components/core/DatePicker.vue";
 import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";

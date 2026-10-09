@@ -1,51 +1,33 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
-        <v-row>
-            <v-col cols="12">
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            v-model="name"
-                            :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.name, languageTags)"
-                            :label="$t('titleLabel') + '*'"
-                            :rules="requiredFieldRules"
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            v-model="description"
-                            :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.description, languageTags)"
-                            :label="$t('abstractLabel')"
-                            is-area
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <multilingual-text-input
-                            v-model="keywords"
-                            :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.keywords, languageTags)"
-                            :label="$t('abstractLabel')"
-                            is-area
-                        />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <ui-checkbox
-                            v-model="favorite"
-                            :label="$t('favoriteLabel')"
-                        />
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
+        <div class="space-y-4">
+            <multilingual-text-input
+                v-model="name"
+                :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.name, languageTags)"
+                :label="$t('titleLabel') + '*'"
+                :rules="requiredFieldRules"
+            />
+            <multilingual-text-input
+                v-model="description"
+                :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.description, languageTags)"
+                :label="$t('abstractLabel')"
+                is-area
+            />
+            <multilingual-text-input
+                v-model="keywords"
+                :initial-value="toMultilingualTextInput(presetExpertiseOrSkill?.keywords, languageTags)"
+                :label="$t('abstractLabel')"
+                is-area
+            />
+            <ui-checkbox
+                v-model="favorite"
+                :label="$t('favoriteLabel')"
+            />
+        </div>
 
         <div>
             <h2
-                class="mt-5!">
+                class="mt-5 mb-3 text-sm font-semibold text-slate-800">
                 {{ $t("researchAreasLabel") }}
             </h2>
             <v-row>
@@ -60,11 +42,11 @@
             </v-row>
         </div>
 
-        <v-row>
-            <p class="required-fields-message">
+        <div class="mt-4">
+            <p class="text-xs text-slate-500">
                 {{ $t("requiredFieldsMessage") }}
             </p>
-        </v-row>
+        </div>
     </v-form>
 </template>
 

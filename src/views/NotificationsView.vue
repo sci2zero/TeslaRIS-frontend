@@ -1,11 +1,13 @@
 <template>
-    <v-container>
-        <h1>{{ $t("notificationsLabel") }}</h1>
+    <div class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10">
+        <h1 class="mb-4">
+            {{ $t("notificationsLabel") }}
+        </h1>
 
         <notification-list @performed-action="notifyUser($event)" />
     
         <toast v-model="snackbar" :message="message" />
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

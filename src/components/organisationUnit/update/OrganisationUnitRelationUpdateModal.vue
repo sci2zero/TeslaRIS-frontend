@@ -1,17 +1,19 @@
 <template>
-    <v-row justify="start">
+    <div class="inline-flex shrink-0 items-center">
         <v-dialog
             v-model="dialog" :persistent="edited" max-width="900px" @click:outside="onClickOutside"
             @keydown.esc="onClickOutside">
             <template #activator="scope">
-                <div v-if="!readOnly" class="edit-pen">
-                    <v-btn
-                        icon variant="outlined"
-                        color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
-                        :disabled="readOnly" size="small">
-                        <v-icon size="x-large" icon="mdi-file-edit-outline" />
-                    </v-btn>
-                </div>
+                <slot v-if="!readOnly" name="activator" v-bind="scope">
+                    <div class="edit-pen">
+                        <v-btn
+                            icon variant="outlined"
+                            color="grey-lighten" v-bind="scope.props" class="bottom-spacer"
+                            :disabled="readOnly" size="small">
+                            <v-icon size="x-large" icon="mdi-file-edit-outline" />
+                        </v-btn>
+                    </div>
+                </slot>
             </template>
             <v-card
                 ref="cardRef"
@@ -48,7 +50,7 @@
             emphasize-cancel
             @continue="discardChanges"
         />
-    </v-row>
+    </div>
 </template>
 
 <script lang="ts">

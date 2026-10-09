@@ -1,7 +1,8 @@
 <template>
     <div class="flex items-start gap-2">
-        <v-autocomplete
+        <ui-input
             v-model="selectedFundingProgram"
+            control="autocomplete"
             class="min-w-0 flex-1"
             :label="(label ? $t(label) : $t('fundingProgramLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : fundingPrograms"
@@ -16,7 +17,7 @@
         <generic-crud-modal
             v-if="!disableSubmission"
             ref="modalRef"
-            class="w-fit shrink-0 self-center"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
             :form-component="FundingProgramSubmissionForm"
             entity-name="FundingProgram"
             is-submission
@@ -27,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { onMounted, ref, watch } from "vue";
 import lodash from "lodash";
 import { useI18n } from "vue-i18n";

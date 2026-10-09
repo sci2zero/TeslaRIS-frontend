@@ -1,127 +1,156 @@
 <template>
-    <table-toolbar
+    <landing-section-card
         :title="$t('fundingApplicationsLabel')"
-        :selected-count="selectedApplications.length"
-        :can-act="canEdit"
-    >
-        <template #top-left>
-            <search-bar-component
-                :transparent="false"
-                size="small"
-                @search="onSearch"
-            />
-        </template>
-        <template #action-items>
-            <v-list-item
-                class="action-menu-item"
-                @click="unlinkSelected"
-            >
-                <template #prepend>
-                    <v-icon color="error" size="18">
-                        mdi-link-off
-                    </v-icon>
-                </template>
-                <v-list-item-title class="text-body-2">
-                    {{ $t("removeLabel") }}
-                </v-list-item-title>
-            </v-list-item>
-        </template>
-        <template #actions>
+        :count="totalApplications"
+        icon="mdi-file-document-edit-outline"
+        icon-class="bg-indigo-50 text-indigo-600"
+        padded>
+        <template v-if="canEdit" #action>
             <v-btn
                 v-if="canEdit"
-                color="primary"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-plus"
                 @click="addDialog = true">
                 {{ $t("addFundingApplicationLabel") }}
             </v-btn>
         </template>
-    </table-toolbar>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table-server
+        <responsive-data-table
             v-model="selectedApplications"
-            :items="fundingApplications"
             :headers="headers"
-            item-value="row"
-            :items-length="totalApplications"
             :show-select="canEdit"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')"
+            container-class="bg-white"
+            item-key="databaseId"
+            :items="fundingApplications"
+            :items-length="totalApplications"
             :page="page + 1"
+            :items-per-page="size"
+            :sort-by="tableSortBy"
             @update:options="refreshTable">
-            <template #item="row">
+            <template #top-left>
+                <search-bar-component
+                    class="w-full min-w-0 max-w-none!"
+                    :transparent="false"
+                    size="small"
+                    @search="onSearch"
+                />
+            </template>
+            <template v-if="canEdit" #selection-menu>
+                <v-list-item
+                    class="action-menu-item"
+                    @click="unlinkSelected"
+                >
+                    <template #prepend>
+                        <v-icon color="error" size="18">
+                            mdi-link-off
+                        </v-icon>
+                    </template>
+                    <v-list-item-title class="text-body-2">
+                        {{ $t("removeLabel") }}
+                    </v-list-item-title>
+                </v-list-item>
+            </template>
+            <template #compact-item="{ item }">
+                <entity-list-card :to="recordLink(item)" @preview="openGlance(item)">
+                    <div class="flex items-start gap-3">
+                        <v-checkbox
+                            v-if="canEdit"
+                            v-model="selectedApplications"
+                            :value="item"
+                            :aria-label="applicationTitle(item)"
+                            density="compact"
+                            hide-details />
+                        <entity-row-identity
+                            :title="applicationTitle(item)"
+                            :to="recordLink(item)"
+                            icon="mdi-file-document-edit-outline">
+                            <p class="mt-1 text-sm text-slate-600 break-words">
+                                {{ displayTextOrPlaceholder(funderName(item)) }}
+                            </p>
+                        </entity-row-identity>
+                    </div>
+                </entity-list-card>
+            </template>
+            <template #row="{ item }">
                 <tr>
                     <td v-if="canEdit">
                         <v-checkbox
                             v-model="selectedApplications"
-                            :value="row.item"
+                            :value="item"
                             class="table-checkbox"
                             hide-details
                         />
                     </td>
                     <td>
-                        <localized-link v-if="isAdmin" :to="'funding-application/' + row.item.databaseId">
-                            {{ applicationTitle(row.item) }}
-                        </localized-link>
-                        <span v-else>
-                            {{ displayTextOrPlaceholder(applicationTitle(row.item)) }}
-                        </span>
+                        <entity-row-identity
+                            :title="applicationTitle(item)"
+                            :to="recordLink(item)"
+                            icon="mdi-file-document-edit-outline"
+                            class="py-2" />
                     </td>
-                    <td>
+                    <td class="text-sm text-slate-600">
                         <localized-link
-                            v-if="row.item.funderId"
-                            :to="'organisation-units/' + row.item.funderId"
+                            v-if="item.funderId"
+                            :to="'organisation-units/' + item.funderId"
                         >
-                            {{ funderName(row.item) }}
+                            {{ funderName(item) }}
                         </localized-link>
                         <span v-else>
-                            {{ displayTextOrPlaceholder(funderName(row.item)) }}
+                            {{ displayTextOrPlaceholder(funderName(item)) }}
                         </span>
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.submissionDate)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(localiseDate(item.submissionDate)) }}
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.decisionDate)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(localiseDate(item.decisionDate)) }}
                     </td>
-                    <td>
+                    <td class="text-sm text-slate-600">
                         <v-chip
-                            v-if="row.item.result"
+                            v-if="item.result"
                             size="small"
-                            :color="getFundingApplicationResultColor(row.item.result)"
+                            :color="getFundingApplicationResultColor(item.result)"
                             variant="flat"
                         >
-                            {{ getFundingApplicationResultTitleFromValueAutoLocale(row.item.result) }}
+                            {{ getFundingApplicationResultTitleFromValueAutoLocale(item.result) }}
                         </v-chip>
                         <span v-else>{{ displayTextOrPlaceholder("") }}</span>
                     </td>
                 </tr>
             </template>
-        </v-data-table-server>
-    </div>
+        </responsive-data-table>
+    </landing-section-card>
 
-    <v-dialog v-model="addDialog" persistent max-width="900">
-        <v-card>
-            <v-card-title>
-                <span class="text-h5">{{ $t("addFundingApplicationLabel") }}</span>
-            </v-card-title>
-            <v-card-text>
-                <funding-application-autocomplete-search
-                    :preset-project-id="projectId"
-                    @selected="linkExistingApplication($event)"
-                    @create="onApplicationCreated"
-                />
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer />
+    <project-relation-glance
+        v-if="glancedRecord"
+        v-model="glanceOpen"
+        :title="applicationTitle(glancedRecord)"
+        :to="recordLink(glancedRecord)"
+        :fields="glanceFields(glancedRecord)"
+        icon="mdi-file-document-edit-outline" />
+
+    <scrollable-dialog v-model="addDialog" persistent max-width="900">
+        <template #header>
+            <h2 class="px-5 py-4 text-xl font-bold text-slate-800">
+                {{ $t("addFundingApplicationLabel") }}
+            </h2>
+        </template>
+        <div class="p-5">
+            <funding-application-autocomplete-search
+                :preset-project-id="projectId"
+                @selected="linkExistingApplication($event)"
+                @create="onApplicationCreated"
+            />
+        </div>
+        <template #footer>
+            <div class="flex justify-end px-5 py-3">
                 <v-btn color="blue darken-1" @click="addDialog = false">
                     {{ $t("closeLabel") }}
                 </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+            </div>
+        </template>
+    </scrollable-dialog>
 
     <toast v-model="snackbar" :message="snackbarMessage" />
 </template>
@@ -136,7 +165,12 @@ import type { ErrorResponse } from "@/models/Common";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import FundingApplicationAutocompleteSearch from "@/components/project/FundingApplicationAutocompleteSearch.vue";
 import Toast from "@/components/core/Toast.vue";
-import TableToolbar from "@/components/core/TableToolbar.vue";
+import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
+import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";
+import EntityListCard from "@/components/core/EntityListCard.vue";
+import ProjectRelationGlance from "./ProjectRelationGlance.vue";
 import SearchBarComponent from "@/components/core/SearchBarComponent.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
@@ -160,6 +194,22 @@ const { isAdmin } = useUserRole();
 const fundingApplications = ref<FundingApplicationIndex[]>([]);
 const totalApplications = ref(0);
 const selectedApplications = ref<FundingApplicationIndex[]>([]);
+
+const glanceOpen = ref(false);
+const glancedRecord = ref<FundingApplicationIndex | null>(null);
+const openGlance = (item: FundingApplicationIndex) => {
+    glancedRecord.value = item;
+    glanceOpen.value = true;
+};
+const recordLink = (item: FundingApplicationIndex) => isAdmin.value ? 'funding-application/' + item.databaseId : undefined;
+const glanceFields = (item: FundingApplicationIndex) => [
+    { label: i18n.t("funderLabel"), value: funderName(item) },
+    { label: i18n.t("submissionDateLabel"), value: localiseDate(item.submissionDate) },
+    { label: i18n.t("dateOfDecisionLabel"), value: localiseDate(item.decisionDate) },
+    { label: i18n.t("resultLabel"), value: item.result ? getFundingApplicationResultTitleFromValueAutoLocale(item.result) : undefined }
+];
+
+const tableSortBy = ref<{ key: string; order: string }[]>([]);
 
 const addDialog = ref(false);
 const snackbar = ref(false);
@@ -225,8 +275,11 @@ const fetchFundingApplications = () => {
 };
 
 const refreshTable = (event: any) => {
-    page.value = event.page - 1;
+    const changed = size.value !== event.itemsPerPage
+        || JSON.stringify(tableSortBy.value) !== JSON.stringify(event.sortBy);
+    page.value = changed ? 0 : event.page - 1;
     size.value = event.itemsPerPage;
+    tableSortBy.value = event.sortBy;
     if (event.sortBy.length > 0) {
         sort.value = sortFieldMappings.value.get(event.sortBy[0].key) ?? "";
         direction.value = event.sortBy[0].order.toUpperCase();

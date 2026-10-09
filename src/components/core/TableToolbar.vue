@@ -3,8 +3,8 @@
         {{ title }}
     </h2>
 
-    <div class="flex justify-between mb-2">
-        <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div class="flex flex-wrap items-center gap-2 min-w-0">
             <div v-if="showActionMenu" class="action-menu-container">
                 <v-menu offset-y>
                     <template #activator="{ props: menuProps }">
@@ -25,11 +25,11 @@
                     </v-list>
                 </v-menu>
             </div>
-            <div v-if="$slots['top-left']" :class="[selectedCount > 0 ? 'w-[19.25rem]' : 'w-[28rem]']">
+            <div v-if="$slots['top-left']" class="w-full min-w-0 sm:w-[28rem]">
                 <slot name="top-left" />
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 min-w-0">
             <slot name="actions" />
         </div>
     </div>

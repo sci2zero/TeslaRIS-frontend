@@ -1,83 +1,95 @@
 <template>
-    <div id="publisher" class="mx-auto max-w-7xl w-full px-4 sm:px-6 py-6 sm:py-10 lg:py-12">
-        <entity-landing-header
-            :loading="!publisher"
-            :entity-label="$t('publisherLabel')"
-            icon="mdi-account-group"
-            :can-edit="canEdit"
-            :edit-label="$t('updatePublisherLabel')"
-            :entity-type="EntityType.PUBLISHER"
-            :entity-id="publisher?.id"
-            @edit="openModal(updateModalRef)"
-        >
-            <template #modals>
-                <generic-crud-modal
-                    v-if="canEdit"
-                    ref="updateModalRef"
-                    hide-activator
-                    :form-component="PublisherUpdateForm"
-                    :form-props="{ presetPublisher: publisher }"
-                    entity-name="Publisher"
-                    is-update
-                    is-section-update
-                    :read-only="!canEdit"
-                    @update="updateBasicInfo"
-                />
-            </template>
-            <template #title>
-                {{ returnCurrentLocaleContent(publisher?.name) }}
-            </template>
-            <template #meta>
-                <landing-meta-item v-if="publisher?.countryName?.length" :label="$t('countryLabel')" icon="mdi-flag-outline" tone="emerald">
-                    {{ returnCurrentLocaleContent(publisher?.countryName) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="publisher?.place && publisher.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
-                    {{ returnCurrentLocaleContent(publisher?.place) }}
-                </landing-meta-item>
-                <landing-meta-item v-if="publisher?.state && publisher.state.length > 0" :label="$t('stateLabel')" icon="mdi-map" tone="slate">
-                    {{ returnCurrentLocaleContent(publisher?.state) }}
-                </landing-meta-item>
-            </template>
-        </entity-landing-header>
-
-        <tab-content-loader
-            v-if="!publisher"
-            :button-header="false"
-            layout="table"
-        />
-        <publication-table-component
-            v-else
-            :publications="publications"
-            :total-publications="totalPublications"
-            @switch-page="switchPage"
-        />
-
-        <template v-if="isAdmin && publisher">
-            <h2 class="mt-8 mb-2">
-                {{ $t("revisionHistoryLabel") }}
-            </h2>
-            <revision-history-table-component
+    <landing-page-layout id="publisher" v-model="currentTab" :loading="!publisher">
+        <template #header>
+            <entity-landing-header
+                :loading="!publisher"
+                :entity-label="$t('publisherLabel')"
+                icon="mdi-account-group"
+                :can-edit="canEdit"
+                :edit-label="$t('updatePublisherLabel')"
                 :entity-type="EntityType.PUBLISHER"
                 :entity-id="publisher?.id"
-                @restored="fetchPublisher"
-                @show-assessment-details="showAssessmentDetails"
-            />
-
-            <h2 class="mt-8 mb-2">
-                {{ $t("dataQualityLabel") }}
-            </h2>
-            <data-quality-tabs-component
-                ref="dataQualityTabsRef"
-                :entity-type="EntityType.PUBLISHER"
-                :entity-id="publisher?.id"
-            />
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="PublisherUpdateForm"
+                        :form-props="{ presetPublisher: publisher }"
+                        entity-name="Publisher"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
+                <template #title>
+                    {{ returnCurrentLocaleContent(publisher?.name) }}
+                </template>
+                <template #meta>
+                    <landing-meta-item v-if="publisher?.countryName?.length" :label="$t('countryLabel')" icon="mdi-flag-outline" tone="emerald">
+                        {{ returnCurrentLocaleContent(publisher?.countryName) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="publisher?.place && publisher.place.length > 0" :label="$t('placeLabel')" icon="mdi-map-marker" tone="amber">
+                        {{ returnCurrentLocaleContent(publisher?.place) }}
+                    </landing-meta-item>
+                    <landing-meta-item v-if="publisher?.state && publisher.state.length > 0" :label="$t('stateLabel')" icon="mdi-map" tone="slate">
+                        {{ returnCurrentLocaleContent(publisher?.state) }}
+                    </landing-meta-item>
+                </template>
+            </entity-landing-header>
         </template>
 
-        <toast v-model="snackbar" :message="snackbarMessage" />
-    </div>
+        <template #tabs>
+            <v-tab value="publications">
+                {{ $t('scientificResultsListLabel') }}
+            </v-tab>
+            <v-tab v-if="isAdmin" value="revisions">
+                {{ $t('revisionHistoryLabel') }}
+            </v-tab>
+            <v-tab v-if="isAdmin" value="dataQuality">
+                {{ $t('dataQualityLabel') }}
+            </v-tab>
+        </template>
+        <template #default>
+            <v-tabs-window-item value="publications">
+                <landing-section-card :title="$t('scientificResultsListLabel')" :count="totalPublications" icon="mdi-file-document-multiple-outline" padded>
+                    <publication-table-component
+                        embedded
+                        :publications="publications"
+                        :total-publications="totalPublications"
+                        @switch-page="switchPage"
+                    />
+                </landing-section-card>
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="revisions">
+                <revision-history-table-component
+                    :entity-type="EntityType.PUBLISHER"
+                    :entity-id="publisher?.id"
+                    @restored="fetchPublisher"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+            <v-tabs-window-item v-if="isAdmin" value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    :entity-type="EntityType.PUBLISHER"
+                    :entity-id="publisher?.id"
+                />
+            </v-tabs-window-item>
+        </template>
+
+        <template #footer>
+            <toast v-model="snackbar" :message="snackbarMessage" />
+        </template>
+    </landing-page-layout>
 </template>
 
 <script lang="ts">
+import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
+import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import type { LanguageTagResponse } from '@/models/Common';
 import { onMounted } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -97,7 +109,6 @@ import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import PublisherUpdateForm from '@/components/publisher/update/PublisherUpdateForm.vue';
 import Toast from '@/components/core/Toast.vue';
 import { useLoginStore } from '@/stores/loginStore';
-import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
 import DataQualityTabsComponent from '@/components/core/revisions/DataQualityTabsComponent.vue';
 import { EntityType } from '@/models/MergeModel';
@@ -108,8 +119,9 @@ import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 
 export default defineComponent({
     name: "PublisherSeriesLandingPage",
-    components: { PublicationTableComponent, GenericCrudModal, Toast, TabContentLoader, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem },
+    components: { LandingPageLayout, LandingSectionCard, PublicationTableComponent, GenericCrudModal, Toast, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem },
     setup() {
+        const currentTab = ref("publications");
         const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -237,7 +249,7 @@ export default defineComponent({
         };
 
         return {
-            publisher, publications, totalPublications, switchPage, canReviewDataQuality, canAssessDataQuality,
+            currentTab, publisher, publications, totalPublications, switchPage, canReviewDataQuality, canAssessDataQuality,
             returnCurrentLocaleContent,
             languageTagMap, canEdit, PublisherUpdateForm,
             updateBasicInfo, snackbar, snackbarMessage,

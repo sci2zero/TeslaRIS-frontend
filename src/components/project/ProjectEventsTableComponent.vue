@@ -1,73 +1,101 @@
 <template>
-    <table-toolbar
+    <landing-section-card
         :title="$t('eventListLabel')"
-        :selected-count="selectedEvents.length"
-        :can-act="canEdit"
-    >
-        <template #action-items>
-            <v-list-item
-                class="action-menu-item"
-                @click="displayPersistentDialog = true"
-            >
-                <template #prepend>
-                    <v-icon color="error" size="18">
-                        mdi-delete
-                    </v-icon>
-                </template>
-                <v-list-item-title class="text-body-2">
-                    {{ $t("removeLabel") }}
-                </v-list-item-title>
-            </v-list-item>
-        </template>
-        <template #actions>
+        :count="events.length"
+        icon="mdi-calendar-outline"
+        icon-class="bg-indigo-50 text-indigo-600"
+        padded>
+        <template v-if="canEdit" #action>
             <v-btn
                 v-if="canEdit"
-                color="primary"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-calendar-plus"
                 @click="addDialog = true">
                 {{ $t("addEventLabel") }}
             </v-btn>
         </template>
-    </table-toolbar>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table
+        <responsive-data-table
             v-model="selectedEvents"
-            :items="events"
             :headers="headers"
-            item-value="id"
             :show-select="canEdit"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')">
-            <template #item="row">
+            container-class="bg-white"
+            item-key="id"
+            :items="pagedItems"
+            :items-length="events.length"
+            :page="tableOptions.page"
+            :items-per-page="tableOptions.itemsPerPage"
+            :sort-by="tableOptions.sortBy"
+            @update:options="updateTableOptions">
+            <template v-if="canEdit" #selection-menu>
+                <v-list-item
+                    class="action-menu-item"
+                    @click="displayPersistentDialog = true"
+                >
+                    <template #prepend>
+                        <v-icon color="error" size="18">
+                            mdi-delete
+                        </v-icon>
+                    </template>
+                    <v-list-item-title class="text-body-2">
+                        {{ $t("removeLabel") }}
+                    </v-list-item-title>
+                </v-list-item>
+            </template>
+            <template #compact-item="{ item }">
+                <entity-list-card :to="recordLink(item)" @preview="openGlance(item)">
+                    <div class="flex items-start gap-3">
+                        <v-checkbox
+                            v-if="canEdit"
+                            v-model="selectedEvents"
+                            :value="item"
+                            :aria-label="eventName(item)"
+                            density="compact"
+                            hide-details />
+                        <entity-row-identity
+                            :title="eventName(item)"
+                            :to="recordLink(item)"
+                            icon="mdi-calendar-outline">
+                            <p class="mt-1 text-sm text-slate-600 break-words">
+                                {{ displayTextOrPlaceholder(getProjectEventTypeTitleFromValueAutoLocale(item.relationType)) }}
+                            </p>
+                        </entity-row-identity>
+                    </div>
+                </entity-list-card>
+            </template>
+            <template #row="{ item }">
                 <tr>
                     <td v-if="canEdit">
                         <v-checkbox
                             v-model="selectedEvents"
-                            :value="row.item"
+                            :value="item"
                             class="table-checkbox"
                             hide-details
                         />
                     </td>
                     <td>
-                        <localized-link
-                            v-if="row.item.eventId && eventLandingPagePath(row.item)"
-                            :to="eventLandingPagePath(row.item) + row.item.eventId">
-                            {{ eventName(row.item) }}
-                        </localized-link>
-                        <span v-else>
-                            {{ eventName(row.item) }}
-                        </span>
+                        <entity-row-identity
+                            :title="eventName(item)"
+                            :to="recordLink(item)"
+                            icon="mdi-calendar-outline"
+                            class="py-2" />
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(getProjectEventTypeTitleFromValueAutoLocale(row.item.relationType)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(getProjectEventTypeTitleFromValueAutoLocale(item.relationType)) }}
                     </td>
                 </tr>
             </template>
-        </v-data-table>
-    </div>
+        </responsive-data-table>
+    </landing-section-card>
+
+    <project-relation-glance
+        v-if="glancedRecord"
+        v-model="glanceOpen"
+        :title="eventName(glancedRecord)"
+        :to="recordLink(glancedRecord)"
+        :fields="glanceFields(glancedRecord)"
+        icon="mdi-calendar-outline" />
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -107,8 +135,9 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-select
+                            <ui-input
                                 v-model="selectedRelationType"
+                                control="select"
                                 :items="relationTypes"
                                 :label="$t('relationTypeLabel') + '*'"
                                 :rules="requiredSelectionRules"
@@ -141,19 +170,24 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AxiosError } from "axios";
 import type { ErrorResponse, MultilingualContent } from "@/models/Common";
 import type { ProjectEvent } from "@/models/ProjectModel";
-import { ProjectEventType } from "@/models/ProjectModel";
+import type { ProjectEventType } from "@/models/ProjectModel";
 import ProjectService from "@/services/project/ProjectService";
-import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import MultilingualTextInput from "@/components/core/MultilingualTextInput.vue";
 import AllEventsAutocompleteSearch from "@/components/event/AllEventsAutocompleteSearch.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
-import TableToolbar from "@/components/core/TableToolbar.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import { useLocalTable } from "@/composables/useLocalTable";
+import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
+import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";
+import EntityListCard from "@/components/core/EntityListCard.vue";
+import ProjectRelationGlance from "./ProjectRelationGlance.vue";
 import {
     getProjectEventTypeTitleFromValueAutoLocale,
     getProjectEventTypesForGivenLocale
@@ -175,6 +209,23 @@ const { requiredFieldRules, requiredSelectionRules } = useValidationUtils();
 
 const events = ref<ProjectEvent[]>([]);
 const selectedEvents = ref<ProjectEvent[]>([]);
+
+const glanceOpen = ref(false);
+const glancedRecord = ref<ProjectEvent | null>(null);
+const openGlance = (item: ProjectEvent) => {
+    glancedRecord.value = item;
+    glanceOpen.value = true;
+};
+const recordLink = (item: ProjectEvent) => item.eventId && eventLandingPagePath(item) ? eventLandingPagePath(item) + item.eventId : undefined;
+const glanceFields = (item: ProjectEvent) => [
+    { label: i18n.t("eventLabel"), value: eventName(item) },
+    { label: i18n.t("relationTypeLabel"), value: getProjectEventTypeTitleFromValueAutoLocale(item.relationType) }
+];
+
+const { tableOptions, pagedItems, updateTableOptions } = useLocalTable(
+    events, i18n.locale,
+    (item) => eventName(item)
+);
 
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);

@@ -1,9 +1,22 @@
 <template>
-    <table-toolbar :selected-count="selectedProjects.length" :can-act="allowBulkActions">
-        <template #top-left>
+    <responsive-data-table
+        v-model="selectedProjects"
+        :container-class="embedded ? 'bg-white' : undefined"
+        :sort-by="tableOptions.sortBy"
+        :items="projects"
+        :headers="headers"
+        :items-length="totalProjects"
+        :show-select="allowBulkActions"
+        :page="tableOptions.page"
+        :items-per-page="tableOptions.itemsPerPage"
+        :has-active-filters="hasActiveStatusFilters"
+        filter-header-key="status"
+        @update:options="refreshTable"
+    >
+        <template v-if="$slots['top-left']" #top-left>
             <slot name="top-left" />
         </template>
-        <template #action-items>
+        <template #selection-menu>
             <v-list-item
                 v-if="allowUnbinding"
                 class="action-menu-item"
@@ -36,96 +49,80 @@
         <template #actions>
             <slot name="actions" />
         </template>
-    </table-toolbar>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table-server
-            v-model="selectedProjects"
-            :sort-by="tableOptions.sortBy"
-            :items="projects"
-            :headers="headers"
-            item-value="row"
-            :items-length="totalProjects"
-            :show-select="allowBulkActions"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')"
-            :page="tableOptions.page"
-            @update:options="refreshTable">
-            <template #[`header.status`]="{ isSorted, column, toggleSort, getSortIcon }">
-                <div class="group flex items-center gap-2" @click="toggleSort(column)">
-                    <span>{{ column.title }}</span>
-                    <v-menu v-if="$slots['status-filter-menu']" :close-on-content-click="false">
-                        <template #activator="{ props }">
-                            <v-icon
-                                v-bind="props"
-                                :title="hasActiveStatusFilters ? $t('filterActiveLabel') : $t('filterLabel')"
-                                :class="hasActiveStatusFilters ? 'ml-1 text-primary cursor-pointer hover:text-primary-darken-1' : 'ml-1 text-gray-400 cursor-pointer hover:text-gray-600'"
-                                icon="mdi-filter"
-                                @click.stop
-                            />
-                        </template>
-                        <div class="p-3 bg-white rounded-lg shadow-lg">
-                            <slot name="status-filter-menu" :column="column" />
-                        </div>
-                    </v-menu>
-                    <v-icon :class="[isSorted(column) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50']" :icon="getSortIcon(column)" />
-                </div>
-            </template>
-            <template #item="row">
-                <tr>
-                    <td v-if="allowBulkActions">
+        <template v-if="$slots['status-filter-menu']" #filter="scope">
+            <slot name="status-filter-menu" v-bind="scope" />
+        </template>
+        <template #compact-item="{ item }">
+            <entity-list-card :to="'project/' + item.databaseId" @preview="openGlance(item)">
+                <div class="flex items-start gap-2">
+                    <div v-if="allowBulkActions" class="shrink-0" @click.stop>
                         <v-checkbox
-                            v-model="selectedProjects"
-                            :value="row.item"
-                            class="table-checkbox"
-                            hide-details
-                        />
-                    </td>
-                    <td v-if="$i18n.locale.startsWith('sr')">
-                        <localized-link :to="'project/' + row.item.databaseId">
-                            {{ row.item.nameSr }}
+                            v-model="selectedProjects" :value="item" hide-details density="compact"
+                            :aria-label="$i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther" />
+                    </div>
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                        <v-icon icon="mdi-folder-outline" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <localized-link :to="'project/' + item.databaseId" class="font-semibold text-sm text-slate-800 break-words">
+                            {{ $i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther }}
                         </localized-link>
-                    </td>
-                    <td v-else>
-                        <localized-link :to="'project/' + row.item.databaseId">
-                            {{ row.item.nameOther }}
-                        </localized-link>
-                    </td>
-                    <td v-if="$i18n.locale.startsWith('sr')">
-                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
-                            {{ row.item.coordinatorNameSr }}
-                        </localized-link>
-                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameSr) }}</span>
-                    </td>
-                    <td v-else>
-                        <localized-link v-if="row.item.coordinatorId" :to="'organisation-units/' + row.item.coordinatorId">
-                            {{ row.item.coordinatorNameOther }}
-                        </localized-link>
-                        <span v-else>{{ displayTextOrPlaceholder(row.item.coordinatorNameOther) }}</span>
-                    </td>
-                    <td>
-                        <v-chip
-                            v-if="row.item.status"
-                            size="small"
-                            :color="getProjectStatusColor(row.item.status)"
-                            variant="flat"
-                        >
-                            {{ getProjectStatusTitleFromValueAutoLocale(row.item.status) }}
-                        </v-chip>
-                        <span v-else>{{ displayTextOrPlaceholder("") }}</span>
-                    </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
-                    </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
-                    </td>
-                </tr>
-            </template>
-        </v-data-table-server>
-    </div>
+                        <project-summary :item="item" class="mt-2" />
+                    </div>
+                </div>
+            </entity-list-card>
+        </template>
+        <template #row="{ item }">
+            <tr>
+                <td v-if="allowBulkActions">
+                    <v-checkbox
+                        v-model="selectedProjects"
+                        :value="item"
+                        class="table-checkbox"
+                        hide-details
+                    />
+                </td>
+                <td>
+                    <entity-row-identity
+                        :title="$i18n.locale.startsWith('sr') ? item.nameSr : item.nameOther"
+                        :to="'project/' + item.databaseId"
+                        icon="mdi-folder-outline"
+                        class="py-2"
+                    />
+                </td>
+                <td v-if="$i18n.locale.startsWith('sr')">
+                    <localized-link v-if="item.coordinatorId" :to="'organisation-units/' + item.coordinatorId">
+                        {{ item.coordinatorNameSr }}
+                    </localized-link>
+                    <span v-else>{{ displayTextOrPlaceholder(item.coordinatorNameSr) }}</span>
+                </td>
+                <td v-else>
+                    <localized-link v-if="item.coordinatorId" :to="'organisation-units/' + item.coordinatorId">
+                        {{ item.coordinatorNameOther }}
+                    </localized-link>
+                    <span v-else>{{ displayTextOrPlaceholder(item.coordinatorNameOther) }}</span>
+                </td>
+                <td>
+                    <v-chip
+                        v-if="item.status"
+                        size="small"
+                        :color="getProjectStatusColor(item.status)"
+                        variant="flat"
+                    >
+                        {{ getProjectStatusTitleFromValueAutoLocale(item.status) }}
+                    </v-chip>
+                    <span v-else>{{ displayTextOrPlaceholder("") }}</span>
+                </td>
+                <td>
+                    {{ displayTextOrPlaceholder(localiseDate(item.dateFrom)) }}
+                </td>
+                <td>
+                    {{ displayTextOrPlaceholder(localiseDate(item.dateTo)) }}
+                </td>
+            </tr>
+        </template>
+    </responsive-data-table>
+    <project-quick-glance v-model="glanceOpen" :item="glancedProject" />
     <div class="notificationContainer">
         <v-slide-y-transition group>
             <v-alert
@@ -159,7 +156,11 @@ import { useI18n } from 'vue-i18n';
 import type { ProjectIndex } from '@/models/ProjectModel';
 import ProjectService from '@/services/project/ProjectService';
 import LocalizedLink from '../localization/LocalizedLink.vue';
-import TableToolbar from '@/components/core/TableToolbar.vue';
+import ResponsiveDataTable from '@/components/core/ResponsiveDataTable.vue';
+import EntityListCard from '@/components/core/EntityListCard.vue';
+import EntityRowIdentity from '@/components/core/EntityRowIdentity.vue';
+import ProjectQuickGlance from './ProjectQuickGlance.vue';
+import ProjectSummary from './ProjectSummary.vue';
 import { displayTextOrPlaceholder } from '@/utils/StringUtil';
 import { localiseDate } from '@/utils/DateUtil';
 import { useUserRole } from '@/composables/useUserRole';
@@ -169,12 +170,14 @@ import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from 
 
 
 const tableProps = withDefaults(defineProps<{
+    embedded?: boolean;
     projects: ProjectIndex[];
     totalProjects: number;
     hasActiveStatusFilters?: boolean;
     hideBulkActions?: boolean;
     allowUnbinding?: boolean;
 }>(), {
+    embedded: false,
     hasActiveStatusFilters: false,
     hideBulkActions: false,
     allowUnbinding: false
@@ -185,6 +188,12 @@ const emit = defineEmits<{
 }>();
 
 const selectedProjects = ref<ProjectIndex[]>([]);
+const glanceOpen = ref(false);
+const glancedProject = ref<ProjectIndex | null>(null);
+const openGlance = (item: ProjectIndex) => {
+    glancedProject.value = item;
+    glanceOpen.value = true;
+};
 
 const i18n = useI18n();
 

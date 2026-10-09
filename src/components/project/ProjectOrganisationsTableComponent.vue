@@ -1,80 +1,114 @@
 <template>
-    <table-toolbar
+    <landing-section-card
         :title="$t('consortiumLabel')"
-        :selected-count="selectedMembers.length"
-        :can-act="canRemoveMembers"
-    >
-        <template #action-items>
-            <v-list-item
-                class="action-menu-item"
-                @click="displayPersistentDialog = true"
-            >
-                <template #prepend>
-                    <v-icon color="error" size="18">
-                        mdi-delete
-                    </v-icon>
-                </template>
-                <v-list-item-title class="text-body-2">
-                    {{ $t("removeLabel") }}
-                </v-list-item-title>
-            </v-list-item>
-        </template>
-        <template #actions>
+        :count="organisations.length"
+        icon="mdi-office-building-outline"
+        icon-class="bg-indigo-50 text-indigo-600"
+        padded>
+        <template v-if="canEdit" #action>
             <v-btn
                 v-if="canEdit"
-                color="primary"
+                variant="outlined"
+                size="small"
+                class="text-none"
                 prepend-icon="mdi-domain-plus"
                 @click="addDialog = true">
                 {{ $t("addInstitutionLabel") }}
             </v-btn>
         </template>
-    </table-toolbar>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <v-data-table
+        <responsive-data-table
             v-model="selectedMembers"
-            v-model:sort-by="sortBy"
-            :items="sortedMembers"
             :headers="headers"
-            item-value="id"
             :show-select="canRemoveMembers"
-            return-object
-            :items-per-page-text="$t('itemsPerPageLabel')"
-            :items-per-page-options="[5, 10, 25, 50]"
-            :no-data-text="$t('noDataInTableMessage')">
-            <template #item="row">
+            container-class="bg-white"
+            item-key="id"
+            :items="pagedItems"
+            :items-length="organisations.length"
+            :page="tableOptions.page"
+            :items-per-page="tableOptions.itemsPerPage"
+            :sort-by="tableOptions.sortBy"
+            @update:options="updateTableOptions">
+            <template v-if="canRemoveMembers" #selection-menu>
+                <v-list-item
+                    class="action-menu-item"
+                    @click="displayPersistentDialog = true"
+                >
+                    <template #prepend>
+                        <v-icon color="error" size="18">
+                            mdi-delete
+                        </v-icon>
+                    </template>
+                    <v-list-item-title class="text-body-2">
+                        {{ $t("removeLabel") }}
+                    </v-list-item-title>
+                </v-list-item>
+            </template>
+            <template #compact-item="{ item }">
+                <entity-list-card :to="recordLink(item)" @preview="openGlance(item)">
+                    <div class="flex items-start gap-3">
+                        <v-checkbox
+                            v-if="canRemoveMembers"
+                            v-model="selectedMembers"
+                            :value="item"
+                            :aria-label="institutionName(item)"
+                            density="compact"
+                            hide-details />
+                        <entity-row-identity
+                            :title="institutionName(item)"
+                            :to="recordLink(item)">
+                            <template #icon>
+                                <organisation-unit-avatar :organisation-unit-id="item.organisationUnitId" />
+                            </template>
+                            <p class="mt-1 text-sm text-slate-600 break-words">
+                                {{ displayTextOrPlaceholder(getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(item.contributionType)) }}
+                            </p>
+                        </entity-row-identity>
+                    </div>
+                </entity-list-card>
+            </template>
+            <template #row="{ item }">
                 <tr>
                     <td v-if="canRemoveMembers">
                         <v-checkbox
                             v-model="selectedMembers"
-                            :value="row.item"
+                            :value="item"
                             class="table-checkbox"
                             hide-details
                         />
                     </td>
                     <td>
-                        <localized-link
-                            v-if="row.item.organisationUnitId"
-                            :to="'organisation-units/' + row.item.organisationUnitId">
-                            {{ institutionName(row.item) }}
-                        </localized-link>
-                        <span v-else>
-                            {{ institutionName(row.item) }}
-                        </span>
+                        <entity-row-identity
+                            :title="institutionName(item)"
+                            :to="recordLink(item)"
+                            class="py-2">
+                            <template #icon>
+                                <organisation-unit-avatar :organisation-unit-id="item.organisationUnitId" />
+                            </template>
+                        </entity-row-identity>
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(row.item.contributionType)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(item.contributionType)) }}
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateFrom)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(localiseDate(item.dateFrom)) }}
                     </td>
-                    <td>
-                        {{ displayTextOrPlaceholder(localiseDate(row.item.dateTo)) }}
+                    <td class="text-sm text-slate-600">
+                        {{ displayTextOrPlaceholder(localiseDate(item.dateTo)) }}
                     </td>
                 </tr>
             </template>
-        </v-data-table>
-    </div>
+        </responsive-data-table>
+    </landing-section-card>
+
+    <project-relation-glance
+        v-if="glancedRecord"
+        v-model="glanceOpen"
+        :title="institutionName(glancedRecord)"
+        :to="recordLink(glancedRecord)"
+        :fields="glanceFields(glancedRecord)"
+        icon="mdi-office-building-outline"
+        organisation
+        :organisation-unit-id="glancedRecord.organisationUnitId" />
 
     <v-dialog v-model="addDialog" persistent max-width="900">
         <v-card>
@@ -119,11 +153,16 @@ import type { AxiosError } from "axios";
 import type { ErrorResponse } from "@/models/Common";
 import type { OrganisationUnitProjectContribution } from "@/models/ProjectModel";
 import ProjectService from "@/services/project/ProjectService";
-import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import OrganisationUnitProjectContributionForm from "@/components/project/OrganisationUnitProjectContributionForm.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import Toast from "@/components/core/Toast.vue";
-import TableToolbar from "@/components/core/TableToolbar.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import OrganisationUnitAvatar from "@/components/organisationUnit/OrganisationUnitAvatar.vue";
+import { useLocalTable } from "@/composables/useLocalTable";
+import ResponsiveDataTable from "@/components/core/ResponsiveDataTable.vue";
+import EntityRowIdentity from "@/components/core/EntityRowIdentity.vue";
+import EntityListCard from "@/components/core/EntityListCard.vue";
+import ProjectRelationGlance from "./ProjectRelationGlance.vue";
 import { getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale } from "@/i18n/organisationUnitProjectContributionType";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
@@ -149,6 +188,26 @@ const canRemoveMembers = computed(() => props.canEdit && isAdmin.value);
 
 const selectedMembers = ref<OrganisationUnitProjectContribution[]>([]);
 
+const glanceOpen = ref(false);
+const glancedRecord = ref<OrganisationUnitProjectContribution | null>(null);
+const openGlance = (item: OrganisationUnitProjectContribution) => {
+    glancedRecord.value = item;
+    glanceOpen.value = true;
+};
+const recordLink = (item: OrganisationUnitProjectContribution) => item.organisationUnitId && item.organisationUnitId > 0 ? 'organisation-units/' + item.organisationUnitId : undefined;
+const glanceFields = (item: OrganisationUnitProjectContribution) => [
+    { label: i18n.t("contributionTypeLabel"), value: getOrganisationUnitProjectContributionTypeTitleFromValueAutoLocale(item.contributionType) },
+    { label: i18n.t("dateFromLabel"), value: localiseDate(item.dateFrom) },
+    { label: i18n.t("dateToLabel"), value: localiseDate(item.dateTo) },
+    { label: i18n.t("descriptionLabel"), value: returnCurrentLocaleContent(item.contributionDescription) }
+];
+
+const { tableOptions, pagedItems, updateTableOptions } = useLocalTable(
+    computed(() => props.organisations), i18n.locale,
+    (item, key) => key === "name" ? institutionName(item) : key === "dateFrom" ? item.dateFrom : item.dateTo,
+    (a, b) => a.orderNumber - b.orderNumber
+);
+
 const addDialog = ref(false);
 const displayPersistentDialog = ref(false);
 const isFormValid = ref<boolean | null>(null);
@@ -158,35 +217,12 @@ const snackbarMessage = ref("");
 const pendingOrganisation = ref<OrganisationUnitProjectContribution | undefined>();
 const formKey = ref(0);
 
-const sortBy = ref<{ key: string, order?: boolean | "asc" | "desc" }[]>([]);
-
-const emptyDateSortValue = (key: string) =>
-    sortBy.value.find(entry => entry.key === key)?.order === "desc" ? "0000-01-01" : "9999-12-31";
-
-const headers = computed(() => {
-    const emptyDateFrom = emptyDateSortValue("dateFrom");
-    const emptyDateTo = emptyDateSortValue("dateTo");
-
-    return [
-        {
-            title: i18n.t("institutionLabel"), align: "start", sortable: true, key: "name",
-            value: (member: OrganisationUnitProjectContribution) => institutionName(member)
-        },
-        { title: i18n.t("contributionTypeLabel"), align: "start", sortable: false, key: "contributionType" },
-        {
-            title: i18n.t("dateFromLabel"), align: "start", sortable: true, key: "dateFrom",
-            value: (member: OrganisationUnitProjectContribution) => member.dateFrom || emptyDateFrom
-        },
-        {
-            title: i18n.t("dateToLabel"), align: "start", sortable: true, key: "dateTo",
-            value: (member: OrganisationUnitProjectContribution) => member.dateTo || emptyDateTo
-        }
-    ];
-});
-
-const sortedMembers = computed(() =>
-    [...props.organisations].sort((a, b) => a.orderNumber - b.orderNumber)
-);
+const headers = computed(() => [
+    { title: i18n.t("institutionLabel"), align: "start", sortable: true, key: "name" },
+    { title: i18n.t("contributionTypeLabel"), align: "start", sortable: false, key: "contributionType" },
+    { title: i18n.t("dateFromLabel"), align: "start", sortable: true, key: "dateFrom" },
+    { title: i18n.t("dateToLabel"), align: "start", sortable: true, key: "dateTo" }
+]);
 
 watch(() => props.organisations, () => {
     selectedMembers.value = [];

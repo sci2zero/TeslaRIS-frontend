@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 space-y-6">
+    <div class="mt-4 space-y-4">
         <researcher-personal-details
             :person="person"
             :employments="employments"
@@ -24,73 +24,61 @@
             @update="emit('update-biography', $event)"
         />
 
-        <v-row>
-            <v-col cols="12" lg="6" class="pb-0">
+        <div class="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
+            <div class="min-w-0 space-y-4">
                 <expertise-or-skill-list
                     :expertise-or-skills="person?.expertisesOrSkills"
-                    :person="person"
-                    :can-edit="canEdit"
-                    @crud="emit('refresh')"
-                />
-
-                <div class="mt-4">
-                    <prize-list
-                        :prizes="person?.prizes"
-                        :person="person"
-                        :can-edit="canEdit"
-                        @crud="emit('refresh')"
-                    />
+                    :person="person" :can-edit="canEdit"
+                    @crud="emit('refresh')" />
+                <prize-list
+                    :prizes="person?.prizes"
+                    :person="person" :can-edit="canEdit"
+                    @crud="emit('refresh')" />
+            </div>
+            <landing-section-card
+                class="min-w-0 [&>header]:flex-wrap [&>header>h3]:min-w-24"
+                :title="$t('involvementsLabel')"
+                :count="employments.length + education.length + memberships.length"
+                icon="mdi-domain"
+                icon-class="bg-indigo-50 text-indigo-600">
+                <template v-if="canEdit" #action>
+                    <person-involvement-modal
+                        :read-only="!canEdit" :researcher-id="person?.id"
+                        @create="emit('add-involvement', $event)" />
+                </template>
+                <p
+                    v-if="employments.length === 0 && education.length === 0 && memberships.length === 0"
+                    class="px-4 py-5 text-sm text-slate-500">
+                    {{ $t("notYetSetMessage") }}
+                </p>
+                <div class="divide-y divide-slate-100">
+                    <section v-if="employments.length > 0">
+                        <h4 class="bg-slate-50/50 px-4 py-2 text-xs font-semibold text-slate-500">
+                            {{ $t("employmentsLabel") }}
+                        </h4>
+                        <involvement-list
+                            :involvements="employments" :person="person" :can-edit="canEdit"
+                            @refresh-involvements="emit('refresh')" />
+                    </section>
+                    <section v-if="education.length > 0">
+                        <h4 class="bg-slate-50/50 px-4 py-2 text-xs font-semibold text-slate-500">
+                            {{ $t("educationLabel") }}
+                        </h4>
+                        <involvement-list
+                            :involvements="education" :person="person" :can-edit="canEdit"
+                            @refresh-involvements="emit('refresh')" />
+                    </section>
+                    <section v-if="memberships.length > 0">
+                        <h4 class="bg-slate-50/50 px-4 py-2 text-xs font-semibold text-slate-500">
+                            {{ $t("membershipsLabel") }}
+                        </h4>
+                        <involvement-list
+                            :involvements="memberships" :person="person" :can-edit="canEdit"
+                            @refresh-involvements="emit('refresh')" />
+                    </section>
                 </div>
-            </v-col>
-
-            <v-col cols="12" lg="6">
-                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
-                    <v-card-text class="edit-pen-container overflow-x-auto">
-                        <person-involvement-modal
-                            :read-only="!canEdit"
-                            :researcher-id="person?.id"
-                            @create="emit('add-involvement', $event)"
-                        />
-
-                        <div><h2>{{ $t("involvementsLabel") }}</h2></div>
-                        <strong v-if="employments.length === 0 && education.length === 0 && memberships.length === 0">
-                            {{ $t("notYetSetMessage") }}
-                        </strong>
-                        <br>
-                        <div v-if="employments.length > 0">
-                            <h3>{{ $t("employmentsLabel") }}</h3>
-                        </div>
-                        <br>
-                        <involvement-list
-                            :involvements="employments"
-                            :person="person"
-                            :can-edit="canEdit"
-                            @refresh-involvements="emit('refresh')"
-                        />
-                        <div v-if="education.length > 0">
-                            <v-divider class="mb-5" /><h3>{{ $t("educationLabel") }}</h3>
-                        </div>
-                        <br>
-                        <involvement-list
-                            :involvements="education"
-                            :person="person"
-                            :can-edit="canEdit"
-                            @refresh-involvements="emit('refresh')"
-                        />
-                        <div v-if="memberships.length > 0">
-                            <v-divider class="mb-5" /><h3>{{ $t("membershipsLabel") }}</h3>
-                        </div>
-                        <br>
-                        <involvement-list
-                            :involvements="memberships"
-                            :person="person"
-                            :can-edit="canEdit"
-                            @refresh-involvements="emit('refresh')"
-                        />
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+            </landing-section-card>
+        </div>
 
         <UiButton
             v-if="isAdmin"
@@ -111,6 +99,7 @@ import type { PersonalInfo, PersonResponse } from "@/models/PersonModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import PersonInvolvementModal from "@/components/person/involvement/PersonInvolvementModal.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import InvolvementList from "@/components/person/involvement/InvolvementList.vue";
 import PrizeList from "@/components/person/prize/PrizeList.vue";
 import ExpertiseOrSkillList from "@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue";
@@ -143,31 +132,3 @@ const emit = defineEmits<{
     (e: "migrate-to-unmanaged"): void;
 }>();
 </script>
-
-<style scoped>
-.edit-pen-container {
-    position: relative;
-}
-
-.edit-pen-container :deep(.edit-pen) {
-    top: 0;
-    right: 0;
-    position: absolute;
-    z-index: 10;
-    opacity: 0;
-}
-
-.edit-pen-container:hover :deep(.edit-pen) {
-    opacity: 0.3;
-}
-
-.edit-pen-container :deep(.edit-pen:hover) {
-    opacity: 1;
-}
-
-@media (hover: none), (max-width: 768px) {
-    .edit-pen-container :deep(.edit-pen) {
-        opacity: 1;
-    }
-}
-</style>

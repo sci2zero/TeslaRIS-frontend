@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="entity-data-table">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
             <div class="flex flex-wrap items-center gap-2 min-w-0 w-full sm:w-auto sm:flex-1">
                 <Teleport to="body" :disabled="!isPhone">
@@ -105,7 +105,7 @@
                 <VueDraggableNext
                     v-else
                     :list="items"
-                    class="divide-y divide-gray-200"
+                    :class="forceCards ? 'grid grid-cols-1 gap-3 p-3 md:grid-cols-2' : 'divide-y divide-gray-200'"
                     :disabled="!inComparator"
                     :group="draggableGroup"
                     handle=".handle"
@@ -137,6 +137,7 @@
                 return-object
                 :items-per-page-text="$t('itemsPerPageLabel')"
                 :items-per-page-options="itemsPerPageOptions"
+                :items-per-page="itemsPerPage"
                 :page="page"
                 :class="tableClass"
                 @update:options="$emit('update:options', $event)"
@@ -223,6 +224,7 @@ const props = withDefaults(defineProps<{
     itemKey?: string;
     hasActiveFilters?: boolean;
     filterHeaderKey?: string;
+    forceCards?: boolean;
     tableClass?: string;
     containerClass?: string;
 }>(), {
@@ -238,6 +240,7 @@ const props = withDefaults(defineProps<{
     itemKey: "id",
     hasActiveFilters: false,
     filterHeaderKey: "",
+    forceCards: false,
     tableClass: "",
     containerClass: "bg-white rounded-xl shadow-sm border border-gray-100"
 });
@@ -260,7 +263,7 @@ const selected = computed({
 const hasFilterSlot = computed(() => Boolean(slots.filter));
 const hasSelectionMenu = computed(() => Boolean(slots["selection-menu"]));
 const hasCompactItem = computed(() => Boolean(slots["compact-item"]));
-const showCompact = computed(() => isCompact.value && hasCompactItem.value);
+const showCompact = computed(() => (props.forceCards || isCompact.value) && hasCompactItem.value);
 
 const headerSlotNames = computed(() => Object.keys(slots).filter((name) => name.startsWith("header.")));
 

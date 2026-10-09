@@ -1,7 +1,8 @@
 <template>
     <div class="flex items-start gap-2">
-        <v-autocomplete
+        <ui-input
             v-model="selectedProject"
+            control="autocomplete"
             class="min-w-0 flex-1"
             :label="(label ? $t(label) : $t('projectLabel')) + (required ? '*' : '')"
             :items="readOnly ? [] : projects"
@@ -27,11 +28,11 @@
                     </v-chip>
                 </v-list-item>
             </template>
-        </v-autocomplete>
+        </ui-input>
         <generic-crud-modal
             v-if="!disableSubmission"
             ref="modalRef"
-            class="w-fit shrink-0 self-center"
+            class="mt-[1.31rem] w-fit shrink-0 self-start"
             :form-component="ProjectSubmissionForm"
             entity-name="Project"
             is-submission
@@ -51,6 +52,7 @@ import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import { getProjectStatusColor, getProjectStatusTitleFromValueAutoLocale } from "@/i18n/projectStatus";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
+import UiInput from "@/components/ui/input/Input.vue";
 
 // Loaded asynchronously because ProjectSubmissionForm uses this component
 // for its related projects section - a static import would be circular.

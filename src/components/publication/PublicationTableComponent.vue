@@ -1,6 +1,7 @@
 <template>
     <responsive-data-table
         v-model="selectedPublications"
+        :container-class="embedded ? 'bg-white' : undefined"
         :items="publications"
         :headers="headers"
         :extra-sort-headers="[yearHeader]"
@@ -10,7 +11,6 @@
         :items-per-page="tableOptions.itemsPerPage"
         :sort-by="tableOptions.sortBy"
         :in-comparator="inComparator"
-        :container-class="embedded ? 'bg-transparent' : undefined"
         draggable-group="publications"
         :has-active-filters="hasActiveTypeFilters"
         filter-header-key="type"

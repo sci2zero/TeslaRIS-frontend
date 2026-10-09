@@ -1,81 +1,72 @@
 <template>
-    <draggable 
+    <draggable
         :list="involvements" item-key="id"
-        :group="dragGroup" 
+        :group="dragGroup"
+        class="divide-y divide-slate-100"
         :disabled="!inComparator"
     >
-        <div v-for="(involvement, index) in sortedInvolvements" :key="index" class="py-5">
-            <!-- <v-menu
-                v-if="canEdit"
-                v-model="menus[index]"
-                :close-on-content-click="true"
-                location="bottom"
-            >
-                <template #activator="{ props }">
-                    <div class="edit-pen">
-                        <v-btn
-                            v-bind="props"
-                            icon="mdi-file-edit-outline"
-                        >
-                        </v-btn>
-                    </div>
-                </template>
-
-                <v-list min-width="150">
-                    <person-involvement-modal
-                        :read-only="!canEdit"
-                        edit
-                        :preset-involvement="involvement"
-                        @update="updateInvolvement">
-                    </person-involvement-modal>
-                    <v-list-item @click="deleteInvolvement(involvement.id)">
-                        <v-list-item-title>{{ $t("deleteLabel") }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu> -->
-            <h4 class="flex flex-wrap items-center gap-x-1 gap-y-1">
-                <localized-link
-                    v-if="involvement.organisationUnitId"
-                    :to="'organisation-units/' + involvement.organisationUnitId">
-                    <strong>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
-                </localized-link>
-                <strong v-else>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</strong>
-                <v-icon icon="mdi-circle-small" />
-                <strong v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</strong>
-                <strong v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }} ({{ getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus) }})</strong>
-                <strong v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ (involvement as Employment).employmentPositionId ? returnCurrentLocaleContent((involvement as Employment).employmentPositionName) : getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</strong>
-                <v-icon icon="mdi-circle-small" />
-                <span v-if="involvement.dateFrom">
-                    {{ `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` }}
-                </span>
-                <span v-else>
-                    {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
-                </span>
-                <div v-if="canEdit" class="inline-flex justify-end shrink-0">
-                    <v-btn
-                        class="mt-1! ml-2!"
-                        icon variant="outlined"
-                        color="primary"
-                        size="small"
-                        @click="deleteInvolvement(involvement.id)">
-                        <v-icon size="large" icon="mdi-delete" />
-                    </v-btn>
-                    <person-involvement-modal
-                        class="mt-1! ml-2!"
-                        :read-only="!canEdit"
-                        edit
-                        :preset-involvement="involvement"
-                        :researcher-id="person?.id"
-                        @update="updateInvolvement"
-                    />
+        <div v-for="(involvement, index) in sortedInvolvements" :key="index" class="px-4 py-4">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1 break-words">
+                    <h4 class="text-sm font-semibold text-slate-800">
+                        <localized-link
+                            v-if="involvement.organisationUnitId"
+                            :to="'organisation-units/' + involvement.organisationUnitId"
+                            class="no-underline hover:underline">
+                            {{ returnCurrentLocaleContent(involvement.organisationUnitName) }}
+                        </localized-link>
+                        <span v-else>{{ returnCurrentLocaleContent(involvement.organisationUnitName) }}</span>
+                    </h4>
+                    <p class="mt-1 text-sm text-slate-600">
+                        <span v-if="involvement.involvementType === 'MEMBER_OF'">{{ returnCurrentLocaleContent((involvement as Membership).role) }}</span>
+                        <span v-if="involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT'">{{ returnCurrentLocaleContent((involvement as Education).title) }} <span v-if="getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus)">({{ getEducationStatusTitleFromValueAutoLocale((involvement as Education).educationStatus as EducationStatus) }})</span></span>
+                        <span v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">{{ (involvement as Employment).employmentPositionId ? returnCurrentLocaleContent((involvement as Employment).employmentPositionName) : getEmploymentPositionTitleFromValueAutoLocale((involvement as Employment).employmentPosition as EmploymentPosition) }} ({{ getInvolvementTypeTitleFromValueAutoLocale(involvement.involvementType) }})</span>
+                    </p>
+                    <p class="mt-1 text-xs text-slate-500">
+                        <span v-if="involvement.dateFrom">
+                            {{ `${localiseDate(involvement.dateFrom)} - ${involvement.dateTo ? localiseDate(involvement.dateTo) : $t("presentLabel")}` }}
+                        </span>
+                        <span v-else>
+                            {{ involvement.dateTo ? `${$t("unknownDateMessage")} - ${localiseDate(involvement.dateTo)}` : $t("currentLabel") }}
+                        </span>
+                    </p>
                 </div>
-            </h4>
-            <p v-if="involvement.involvementType === 'MEMBER_OF'">
+                <person-involvement-modal
+                    v-if="canEdit"
+                    :read-only="!canEdit" edit
+                    :preset-involvement="involvement"
+                    :researcher-id="person?.id"
+                    @update="updateInvolvement">
+                    <template #activator="{ props: activatorProps }">
+                        <v-menu location="bottom end">
+                            <template #activator="{ props: menuProps }">
+                                <v-btn
+                                    v-bind="menuProps"
+                                    icon="mdi-dots-horizontal" variant="text" size="small"
+                                    class="shrink-0 text-slate-500"
+                                    :aria-label="$t('moreActionsLabel')" />
+                            </template>
+                            <v-list class="min-w-48 rounded-lg border border-slate-200 py-1" density="compact">
+                                <v-list-item
+                                    v-bind="activatorProps"
+                                    prepend-icon="mdi-pencil-outline"
+                                    :title="$t('editActionLabel')" />
+                                <v-list-item
+                                    prepend-icon="mdi-delete-outline"
+                                    :title="$t('deleteLabel')"
+                                    class="text-red-600"
+                                    @click="deleteInvolvement(involvement.id)" />
+                            </v-list>
+                        </v-menu>
+                    </template>
+                </person-involvement-modal>
+            </div>
+            <p v-if="involvement.involvementType === 'MEMBER_OF'" class="mt-2 break-words text-sm text-slate-600">
                 {{ returnCurrentLocaleContent((involvement as Membership).contributionDescription) }}
             </p>
             <div
                 v-if="(involvement.involvementType === 'STUDIED_AT' || involvement.involvementType === 'POSTDOC_AT' || involvement.involvementType === 'COMPLETED_COURSE_AT') && (involvement as Education).thesisTitle && (involvement as Education).thesisTitle!.length > 0"
-                class="mt-2">
+                class="mt-2 space-y-1 break-words text-sm text-slate-600">
                 <p v-if="(involvement as Education).thesisTitle">
                     {{ $t("thesisTitleLabel") }}: {{ returnCurrentLocaleContent((involvement as Education).thesisTitle) }}
                 </p>
@@ -97,22 +88,22 @@
                     {{ returnCurrentLocaleContent((involvement as Education).degreeCode) }} {{ returnCurrentLocaleContent((involvement as Education).degreeClassification) }}
                 </p>
             </div>
-            <p v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'">
+            <p v-if="involvement.involvementType === 'EMPLOYED_AT' || involvement.involvementType === 'HIRED_BY' || involvement.involvementType === 'CANDIDATE'" class="mt-2 break-words text-sm text-slate-600">
                 {{ returnCurrentLocaleContent((involvement as Employment).role) }}
             </p>
 
-            <p class="mt-2 mb-3">
+            <p v-if="returnCurrentLocaleContent(involvement.description)" class="mt-2 break-words text-sm text-slate-600">
                 {{ returnCurrentLocaleContent(involvement.description) }}
             </p>
 
             <div
                 v-if="involvement.keywords?.length"
-                class="mt-2 mb-2">
+                class="mt-3 flex flex-wrap gap-2">
                 <span
                     v-for="(keyword, keywordIndex) in returnCurrentLocaleContent(involvement.keywords)?.split('\n')"
                     :key="keywordIndex">
                     <v-chip
-                        outlined
+                        variant="tonal"
                         size="small">
                         {{ keyword }}
                     </v-chip>
@@ -120,6 +111,7 @@
             </div>
 
             <attachment-list
+                class="mt-3"
                 :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
                 @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)" />
         </div>

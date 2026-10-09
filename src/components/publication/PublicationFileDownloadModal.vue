@@ -12,9 +12,10 @@
                     v-else
                     min-width="70"
                     density="compact"
+                    :prepend-icon="buttonLabel ? 'mdi-download' : undefined"
                     :disabled="!containsFiles"
                     v-bind="scope.props">
-                    ...
+                    {{ buttonLabel || '...' }}
                 </v-btn>
             </template>
             
@@ -69,6 +70,7 @@ export default defineComponent({
     name: "PublicationFileDownloadModal",
     components: { AttachmentSection },
     props: {
+        buttonLabel: { type: String, default: '' },
         documentId: {
             type: Number,
             required: true

@@ -1,33 +1,32 @@
 <template>
-    <v-row class="d-flex flex-row justify-center">
-        <v-col cols="12" md="6">
-            <v-data-table 
-                :items="scheduledTasks"
-                :headers="headers"
-                :no-data-text="$t('noDataInTableMessage')"
-                :items-per-page-text="$t('itemsPerPageLabel')"
-            >
-                <template #item="row">
-                    <tr>
-                        <td>{{ row.item.taskId }}</td>
-                        <td>{{ `${localiseDate(serverTimeToLocal(row.item.executionTime).split("T")[0])} ${$t("inLabel")} ${serverTimeToLocal(row.item.executionTime).split("T")[1]}` }}</td>
-                        <td>{{ getRecurrenceTypeTitleFromValueAutoLocale(row.item.recurrenceType) }}</td>
-                        <td>
-                            <v-btn v-if="!isDateTimeInPast(serverTimeToLocal(row.item.executionTime))" @click="deleteScheduledLoadTask(row.item.taskId)">
-                                {{ $t("cancelLabel") }}
-                            </v-btn>
-                            <p v-else>
-                                {{ $t("inProgressLabel") }}
-                            </p>
-                        </td>
-                    </tr>
-                </template>
-            </v-data-table>
-        </v-col>
-    </v-row>
+    <div class="min-w-0 overflow-x-auto">
+        <v-data-table
+            :items="scheduledTasks"
+            :headers="headers"
+            :no-data-text="$t('noDataInTableMessage')"
+            :items-per-page-text="$t('itemsPerPageLabel')"
+        >
+            <template #item="row">
+                <tr>
+                    <td>{{ row.item.taskId }}</td>
+                    <td>{{ `${localiseDate(serverTimeToLocal(row.item.executionTime).split("T")[0])} ${$t("inLabel")} ${serverTimeToLocal(row.item.executionTime).split("T")[1]}` }}</td>
+                    <td>{{ getRecurrenceTypeTitleFromValueAutoLocale(row.item.recurrenceType) }}</td>
+                    <td>
+                        <ui-button v-if="!isDateTimeInPast(serverTimeToLocal(row.item.executionTime))" variant="outline" size="sm" @click="deleteScheduledLoadTask(row.item.taskId)">
+                            {{ $t("cancelLabel") }}
+                        </ui-button>
+                        <p v-else>
+                            {{ $t("inProgressLabel") }}
+                        </p>
+                    </td>
+                </tr>
+            </template>
+        </v-data-table>
+    </div>
 </template>
 
 <script lang="ts">
+import { UiButton } from "@/components/ui/button";
 import { computed, defineComponent } from "vue";
 import { type ScheduledTaskResponse } from "@/models/Common";
 import { useI18n } from "vue-i18n";
@@ -37,6 +36,7 @@ import { getRecurrenceTypeTitleFromValueAutoLocale } from "@/i18n/recurrenceType
 
 export default defineComponent({
     name: "ScheduledTasksList",
+    components: { UiButton },
     props: {
         scheduledTasks: {
             type: Array<ScheduledTaskResponse>,

@@ -1,6 +1,6 @@
 <template>
     <button
-        v-if="isAdmin && remarksPresent"
+        v-if="canReviewDataQuality && totalIssueCount > 0"
         type="button"
         class="w-fit max-w-full inline-flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-5 py-3 text-left"
         :class="[
@@ -127,17 +127,15 @@ export default defineComponent({
     },
     setup(props) {
         const dialog = ref(false);
-        const remarksPresent = ref(false);
 
         const reports = ref<QualityReportResponse[]>([]);
         const selectedTab = ref(0);
 
-        const { isAdmin } = useUserRole();
+        const { canReviewDataQuality } = useUserRole();
 
         const getContent = () => {
-            if (!props.entityId || !isAdmin.value) {
+            if (!props.entityId || !canReviewDataQuality.value) {
                 reports.value = [];
-                remarksPresent.value = false;
                 return;
             }
 
@@ -146,7 +144,6 @@ export default defineComponent({
                 props.entityId
             ).then(response => {
                 reports.value = response.data;
-                remarksPresent.value = reports.value.length > 0;
                 selectedTab.value = 0;
             });
         };
@@ -187,17 +184,17 @@ export default defineComponent({
         onMounted(() => getContent());
 
         watch(
-            () => [props.entityId, props.entityType],
+            () => [props.entityId, props.entityType, canReviewDataQuality.value],
             getContent
         );
 
         return {
-            dialog, remarksPresent,
+            dialog,
             reports, selectedTab,
             returnCurrentLocaleContent,
             openSummary, hasAnyRemarks,
             totalIssueCount, qualityScore, hasError,
-            isAdmin
+            canReviewDataQuality
         };
     }
 });

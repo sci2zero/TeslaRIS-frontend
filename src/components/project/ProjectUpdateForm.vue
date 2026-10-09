@@ -2,7 +2,7 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="doi"
                     label="DOI"
                     placeholder="DOI"
@@ -10,7 +10,7 @@
                 />
             </v-col>
             <v-col cols="6">
-                <v-text-field
+                <ui-input
                     v-model="raid"
                     :label="$t('raidLabel')"
                     :placeholder="$t('raidLabel')"
@@ -20,8 +20,9 @@
 
         <v-row>
             <v-col cols="4">
-                <v-select
+                <ui-input
                     v-model="status"
+                    control="select"
                     :label="$t('statusLabel')"
                     :items="projectStatusOptions"
                     item-title="title"
@@ -29,8 +30,9 @@
                 />
             </v-col>
             <v-col cols="4">
-                <v-select
+                <ui-input
                     v-model="collaborationType"
+                    control="select"
                     :label="$t('collaborationTypeLabel')"
                     :items="projectCollaborationTypeOptions"
                     item-title="title"
@@ -38,8 +40,9 @@
                 />
             </v-col>
             <v-col cols="4">
-                <v-select
+                <ui-input
                     v-model="researchType"
+                    control="select"
                     :label="$t('researchTypeLabel')"
                     :items="projectResearchTypeOptions"
                     item-title="title"
@@ -73,7 +76,7 @@
 
         <v-row>
             <v-col>
-                <v-text-field
+                <ui-input
                     v-model="nationalId"
                     :label="$t('nationalIdLabel')"
                     :placeholder="$t('nationalIdLabel')"
@@ -84,7 +87,7 @@
 
         <v-row>
             <v-col cols="6">
-                <v-checkbox
+                <ui-checkbox
                     v-model="notFunded"
                     :label="$t('noCostsLabel')"
                 />
@@ -111,6 +114,8 @@
 </template>
 
 <script setup lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
+import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
 import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';

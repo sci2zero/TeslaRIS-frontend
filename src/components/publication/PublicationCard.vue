@@ -1,11 +1,8 @@
 <template>
-    <div
-        class="group w-full px-3 py-3 cursor-pointer hover:bg-gray-50"
+    <entity-list-card
+        :to="getDocumentLandingPageBasePath(item.type) + item.databaseId"
         :class="isSelected ? 'bg-purple-50' : 'bg-white'"
-        role="button"
-        tabindex="0"
-        @click="$emit('open')"
-        @keyup.enter="$emit('open')"
+        @preview="$emit('open')"
     >
         <div class="flex gap-2 items-start">
             <div v-if="showSelect" class="flex-shrink-0" @click.stop>
@@ -15,14 +12,14 @@
                     class="table-checkbox"
                     hide-details
                     density="compact"
-                    @update:model-value="$emit('update:selectedPublications', $event)"
+                    @update:model-value="$emit('update:selectedPublications', $event ?? [])"
                 />
             </div>
             <div class="min-w-0 flex-1">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="text-gray-800 font-semibold text-sm leading-snug min-w-0">
+                    <localized-link :to="getDocumentLandingPageBasePath(item.type) + item.databaseId" class="text-gray-800 font-semibold text-sm leading-snug min-w-0 break-words">
                         <rich-title-renderer :title="getItemTitle(item)" />
-                    </div>
+                    </localized-link>
                     <span v-if="item.year && item.year > 0" class="text-xs text-gray-600 flex-shrink-0 pt-0.5">
                         {{ item.year }}
                     </span>
@@ -42,11 +39,14 @@
                 </p>
             </div>
         </div>
-    </div>
+    </entity-list-card>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
+import EntityListCard from "../core/EntityListCard.vue";
+import LocalizedLink from "../localization/LocalizedLink.vue";
+import { getDocumentLandingPageBasePath } from "@/utils/PathResolutionUtil";
 import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import RichTitleRenderer from "../core/RichTitleRenderer.vue";
 import { getPublicationTypeIcon, getPublicationTypeLabel, splitAuthorNames, usePublicationItemDisplay } from "@/composables/usePublicationItemDisplay";

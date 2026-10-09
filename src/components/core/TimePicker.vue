@@ -1,13 +1,12 @@
 <template>
     <v-menu v-model="isTimeMenuOpen" :close-on-content-click="false">
         <template #activator="{ props }">
-            <v-text-field
+            <ui-input
                 :label="label"
                 :model-value="formattedTime"
                 :rules="applyRules()"
                 readonly
                 v-bind="props"
-                variant="solo"
                 hide-details
             />
         </template>
@@ -26,13 +25,14 @@
 </template>
 
 <script lang="ts">
+import UiInput from "@/components/ui/input/Input.vue";
 import { useValidationUtils } from "@/utils/ValidationUtils";
 import { defineComponent, ref, computed, watch, type PropType, onMounted } from "vue";
 import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 export default defineComponent({
     name: "TimePicker",
-    components: {VTimePicker},
+    components: { VTimePicker, UiInput },
     props: {
         label: {
             type: String,
