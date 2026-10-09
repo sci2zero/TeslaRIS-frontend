@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
 import type { CitationResponse } from "@/models/PublicationModel";
 import Toast from "../core/Toast.vue";
 import { UiButton } from "@/components/ui/button";
@@ -74,8 +73,6 @@ defineOptions({
 const props = defineProps<{
     citation?: CitationResponse;
 }>();
-
-const { t } = useI18n();
 
 const snackbar = ref(false);
 const copiedKey = ref<keyof CitationResponse | null>(null);

@@ -36,7 +36,7 @@ defineOptions({
     inheritAttrs: false,
 });
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     modelValue: false,
     label: undefined,
     disabled: false,

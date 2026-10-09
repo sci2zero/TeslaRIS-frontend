@@ -64,6 +64,7 @@ defineOptions({
 });
 
 const props = withDefaults(defineProps<Props>(), {
+    modelValue: undefined,
     label: undefined,
     placeholder: undefined,
     control: "text",

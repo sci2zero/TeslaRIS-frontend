@@ -115,6 +115,8 @@ const props = withDefaults(defineProps<{
     contributorsLabel: "",
     contributorsTab: "contributions",
     descriptionTab: "additionalInfo",
+    forDocumentId: undefined,
+    documentType: undefined,
 });
 
 const emit = defineEmits<{

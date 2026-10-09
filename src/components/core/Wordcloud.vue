@@ -33,7 +33,6 @@ const MIN_WORDCLOUD_WORDS = 20;
 export default defineComponent({
     name: "WordCloud",
     components: { Vue3WordCloud },
-    emits: ["visible"],
     props: {
         wordcloudFrequencies: {
             type: Array<[string, number]>,
@@ -52,6 +51,7 @@ export default defineComponent({
             required: true
         }
     },
+    emits: ["visible"],
     setup(props, { emit }) {
         const localWordcloudFrequencies = ref<[string, number][]>([]);
         const isReady = ref(false);

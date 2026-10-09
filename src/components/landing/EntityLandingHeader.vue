@@ -249,6 +249,8 @@ const props = withDefaults(defineProps<{
     canEdit: false,
     loading: false,
     editLabel: "",
+    entityType: undefined,
+    entityId: undefined,
     visualShape: "rounded",
 });
 

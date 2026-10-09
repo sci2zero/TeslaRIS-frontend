@@ -143,11 +143,6 @@
                 />
             </v-col>
         </v-row>
-        <!-- <v-row>
-            <v-col cols="12">
-                <event-autocomplete-search v-model="selectedEvent"></event-autocomplete-search>
-            </v-col>
-        </v-row> -->
         <v-row>
             <v-col cols="4">
                 <ui-input
@@ -216,7 +211,6 @@ import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
 import BookSeriesAutocompleteSearch from '@/components/bookSeries/BookSeriesAutocompleteSearch.vue';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
 import { watch } from 'vue';
 import EventService from '@/services/EventService';
 import JournalService from '@/services/JournalService';
@@ -234,7 +228,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 
 export default defineComponent({
     name: "MonographUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, EventAutocompleteSearch, Toast, PublisherAutocompleteSearch, DocumentCommonFields, FlexibleDatePicker, UiInput },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, BookSeriesAutocompleteSearch, Toast, PublisherAutocompleteSearch, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetMonograph: {
             type: Object as PropType<Monograph | undefined>,

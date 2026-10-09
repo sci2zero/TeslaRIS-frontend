@@ -159,6 +159,10 @@ export const getLandingPageBasePath = (entityType: string): string => {
             return "book-series/";
         case "PUBLISHER":
             return "publishers/";
+        case "PROJECT":
+            return "project/";
+        case "FUNDING":
+            return "funding/";
     }
 
     return "";

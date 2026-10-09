@@ -82,6 +82,10 @@ withDefaults(defineProps<{
     concreteEntityType?: ApplicableEntityType;
     documentIdentifiers?: EntityIdentifierResponse[];
 }>(), {
+    keywords: () => [],
+    description: () => [],
+    remark: () => [],
+    document: undefined,
     canEdit: false,
     isGeneralDescription: false,
     showRemark: true,

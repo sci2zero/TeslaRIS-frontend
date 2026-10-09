@@ -40,10 +40,10 @@
                 :close-on-content-click="true"
                 location="bottom"
             >
-                <template #activator="{ props }">
+                <template #activator="{ props: menuProps }">
                     <div class="edit-pen">
                         <v-btn
-                            v-bind="props"
+                            v-bind="menuProps"
                             compact>
                             ...
                         </v-btn>

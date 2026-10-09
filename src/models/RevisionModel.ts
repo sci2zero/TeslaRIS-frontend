@@ -276,7 +276,9 @@ export enum QualityAssessmentTarget {
     DOCUMENT = "DOCUMENT",
     JOURNAL = "JOURNAL",
     BOOK_SERIES = "BOOK_SERIES",
-    PUBLISHER = "PUBLISHER"
+    PUBLISHER = "PUBLISHER",
+    PROJECT = "PROJECT",
+    FUNDING = "FUNDING"
 }
 
 export enum RepositoryEntityType {

@@ -3,7 +3,7 @@
         id="project"
         v-model="currentTab"
         :loading="!project"
-        :tab-number="8"
+        :tab-number="10"
     >
         <template #header>
             <entity-landing-header
@@ -93,7 +93,7 @@
         </template>
 
         <template #tabs>
-            <v-tab v-if="showOverviewTab" value="overview">
+            <v-tab v-show="showOverviewTab" value="overview">
                 {{ $t("overviewLabel") }}
             </v-tab>
             <v-tab value="team">
@@ -117,8 +117,11 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="canReviewDataQuality" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </template>
 
@@ -246,6 +249,16 @@
                     :entity-type="EntityType.PROJECT"
                     :entity-id="project?.id"
                     @restored="fetchProject"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.PROJECT"
+                    :entity-id="project?.id"
                 />
             </v-tabs-window-item>
         </template>
@@ -257,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
@@ -282,6 +295,8 @@ import ProjectOrganisationsTableComponent from "@/components/project/ProjectOrga
 import ProjectDocumentsTableComponent from "@/components/project/ProjectDocumentsTableComponent.vue";
 import ProjectEventsTableComponent from "@/components/project/ProjectEventsTableComponent.vue";
 import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
+import DataQualityTabsComponent from "@/components/core/revisions/DataQualityTabsComponent.vue";
+import DataQualityService from "@/services/revision/DataQualityService";
 import Toast from "@/components/core/Toast.vue";
 import { EntityType } from "@/models/MergeModel";
 import { useUserRole } from "@/composables/useUserRole";
@@ -312,6 +327,9 @@ const icon = ref("mdi-folder-star");
 const canEdit = ref(false);
 const loginStore = useLoginStore();
 const { canReviewDataQuality } = useUserRole();
+
+const canAssessDataQuality = ref(false);
+const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
 
 const snackbar = ref(false);
 const snackbarMessage = ref("");
@@ -370,6 +388,7 @@ const fetchProject = async () => {
 
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
+            checkIfUserCanAssessDataQuality();
         }
     } catch (error) {
         console.error("Error fetching project:", error);
@@ -381,6 +400,23 @@ const checkIfUserCanEdit = () => {
     ProjectService.canEdit(parseInt(route.params.id as string)).then((response) => {
         canEdit.value = response.data;
     }).catch(() => canEdit.value = false);
+};
+
+// The probe 404s until the project has been assessed at least once, so a failure means
+// "nothing to show" rather than "not allowed".
+const checkIfUserCanAssessDataQuality = () => {
+    DataQualityService.canAssessDataQuality(
+        EntityType.PROJECT, parseInt(route.params.id as string)
+    ).then((response) => {
+        canAssessDataQuality.value = response.data;
+    }).catch(() => canAssessDataQuality.value = false);
+};
+
+const showAssessmentDetails = (version: { majorVersion: number, minorVersion: number }) => {
+    currentTab.value = "dataQuality";
+
+    nextTick(() => dataQualityTabsRef.value?.selectVersion(
+        version.majorVersion, version.minorVersion));
 };
 
 const searchKeyword = (keyword: string) => {

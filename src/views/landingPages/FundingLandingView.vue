@@ -219,6 +219,14 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div v-if="funding?.id" class="my-3 info-columns">
+                            <data-quality-remarks-dialog
+                                :entity-type="EntityType.FUNDING"
+                                :entity-id="funding.id"
+                                prominent
+                            />
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -241,8 +249,11 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab v-show="canReviewDataQuality" value="revisions">
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="revisions">
                 {{ $t("revisionHistoryLabel") }}
+            </v-tab>
+            <v-tab v-show="canReviewDataQuality && canAssessDataQuality" value="dataQuality">
+                {{ $t("dataQualityLabel") }}
             </v-tab>
         </v-tabs>
 
@@ -300,6 +311,16 @@
                     :entity-type="EntityType.FUNDING"
                     :entity-id="funding?.id"
                     @restored="fetchFunding"
+                    @show-assessment-details="showAssessmentDetails"
+                />
+            </v-tabs-window-item>
+
+            <v-tabs-window-item value="dataQuality">
+                <data-quality-tabs-component
+                    ref="dataQualityTabsRef"
+                    class="mt-5"
+                    :entity-type="EntityType.FUNDING"
+                    :entity-id="funding?.id"
                 />
             </v-tabs-window-item>
         </v-tabs-window>
@@ -308,7 +329,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
@@ -320,6 +341,9 @@ import type { Funding, FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
 import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
+import DataQualityTabsComponent from "@/components/core/revisions/DataQualityTabsComponent.vue";
+import DataQualityRemarksDialog from "@/components/core/revisions/DataQualityRemarksDialog.vue";
+import DataQualityService from "@/services/revision/DataQualityService";
 import Toast from "@/components/core/Toast.vue";
 import { EntityType } from "@/models/MergeModel";
 import type { MultilingualContent } from "@/models/Common";
@@ -368,6 +392,9 @@ const canEdit = ref(false);
 const loginStore = useLoginStore();
 const { isAdmin, canReviewDataQuality } = useUserRole();
 
+const canAssessDataQuality = ref(false);
+const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
+
 const uploadStore = useUploadStore();
 
 const title = computed(() => {
@@ -403,6 +430,7 @@ const fetchFunding = async () => {
 
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
+            checkIfUserCanAssessDataQuality();
         }
     } catch (error) {
         console.error("Error fetching funding:", error);
@@ -463,6 +491,23 @@ const checkIfUserCanEdit = () => {
     FundingService.canEdit(parseInt(route.params.id as string)).then((response) => {
         canEdit.value = response.data;
     }).catch(() => canEdit.value = false);
+};
+
+// The probe 404s until the funding has been assessed at least once, so a failure means
+// "nothing to show" rather than "not allowed".
+const checkIfUserCanAssessDataQuality = () => {
+    DataQualityService.canAssessDataQuality(
+        EntityType.FUNDING, parseInt(route.params.id as string)
+    ).then((response) => {
+        canAssessDataQuality.value = response.data;
+    }).catch(() => canAssessDataQuality.value = false);
+};
+
+const showAssessmentDetails = (version: { majorVersion: number, minorVersion: number }) => {
+    currentTab.value = "dataQuality";
+
+    nextTick(() => dataQualityTabsRef.value?.selectVersion(
+        version.majorVersion, version.minorVersion));
 };
 
 const searchKeyword = (keyword: string) => {

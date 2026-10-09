@@ -9,7 +9,9 @@ export const qualityAssessmentTargetSr = [
     { title: "Događaji", value: QualityAssessmentTarget.EVENT },
     { title: "Časopisi", value: QualityAssessmentTarget.JOURNAL },
     { title: "Serije knjiga", value: QualityAssessmentTarget.BOOK_SERIES },
-    { title: "Izdavači", value: QualityAssessmentTarget.PUBLISHER }
+    { title: "Izdavači", value: QualityAssessmentTarget.PUBLISHER },
+    { title: "Projekti", value: QualityAssessmentTarget.PROJECT },
+    { title: "Finansiranja", value: QualityAssessmentTarget.FUNDING }
 ];
 
 export const qualityAssessmentTargetEn = [
@@ -19,7 +21,9 @@ export const qualityAssessmentTargetEn = [
     { title: "Events", value: QualityAssessmentTarget.EVENT },
     { title: "Journals", value: QualityAssessmentTarget.JOURNAL },
     { title: "Book series", value: QualityAssessmentTarget.BOOK_SERIES },
-    { title: "Publishers", value: QualityAssessmentTarget.PUBLISHER }
+    { title: "Publishers", value: QualityAssessmentTarget.PUBLISHER },
+    { title: "Projects", value: QualityAssessmentTarget.PROJECT },
+    { title: "Fundings", value: QualityAssessmentTarget.FUNDING }
 ];
 
 export const getQualityAssessmentTargetTitleFromValueAutoLocale = (value: QualityAssessmentTarget) => {
