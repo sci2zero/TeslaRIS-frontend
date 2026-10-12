@@ -85,7 +85,7 @@
                         <ui-input
                             v-model="selectedQualityProfile"
                             control="select"
-                            :items="qualityProfiles"
+                            :items="qualityProfileItems"
                             :label="$t('qualityProfileLabel') + '*'"
                             :rules="requiredSelectionRules"
                         />
@@ -357,7 +357,7 @@ import ApplicationConfigurationService from "@/services/ApplicationConfiguration
 import MonographAutocompleteSearch from "@/components/publication/MonographAutocompleteSearch.vue";
 import { QualityAssessmentTarget } from "@/models/RevisionModel";
 import { getQualityAssessmentTargetsForGivenLocale } from "@/i18n/qualityAssessmentTarget";
-import DataQualityService from "@/services/revision/DataQualityService";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import { useCrisContextInformation } from "@/composables/useCrisContextInformation";
 import { DateTime } from "luxon";
 
@@ -508,7 +508,10 @@ export default defineComponent({
         const backfillTargets = ref<{ title: string; value: QualityAssessmentTarget; }[]>(getQualityAssessmentTargetsForGivenLocale() as { title: string; value: QualityAssessmentTarget; }[]);
         const selectedBackfillTargets = ref<{ title: string, value: QualityAssessmentTarget }[]>([]);
         const rewriteExistingAssessments = ref(false);
-        const qualityProfiles = ref<string[]>([]);
+        const {
+            profileKeys: qualityProfileKeys,
+            profileItems: qualityProfileItems
+        } = useDataQualityProfiles();
         const selectedQualityProfile = ref<string | undefined>(undefined);
 
         const calculateIF5Rank = ref(true);
@@ -520,8 +523,6 @@ export default defineComponent({
 
         onMounted(() => {
             fetchScheduledTasks();
-            fetchQualityProfiles();
-
             populateSelectionData();
 
             const now = new Date();
@@ -544,17 +545,15 @@ export default defineComponent({
             populateSelectionData();
         });
 
-        const fetchQualityProfiles = () => {
-            DataQualityService.listProfileNames().then(response => {
-                qualityProfiles.value = [
-                    ...new Set(response.data.map(profile => profile.profileName))
-                ];
+        watch(qualityProfileKeys, profileKeyList => {
+            if (profileKeyList.length === 0) {
+                return;
+            }
 
-                if (!selectedQualityProfile.value) {
-                    selectedQualityProfile.value = qualityProfiles.value[0];
-                }
-            });
-        };
+            if (!selectedQualityProfile.value) {
+                selectedQualityProfile.value = profileKeyList[0];
+            }
+        }, { immediate: true });
 
         const fetchScheduledTasks = () => {
             TaskManagerService.listScheduledTasks().then((response) => {
@@ -858,7 +857,7 @@ export default defineComponent({
             isScientificProductionReport, startYear,
             qualityAssessmentBackfill, backfillTargets,
             selectedBackfillTargets, rewriteExistingAssessments,
-            qualityProfiles, selectedQualityProfile
+            qualityProfileItems, selectedQualityProfile
         };
     },
 });

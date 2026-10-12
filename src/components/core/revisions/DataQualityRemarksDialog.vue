@@ -58,7 +58,7 @@
                     v-for="(profile, index) in reports"
                     :key="profile.profileName"
                     :value="index">
-                    {{ profile.profileName }}
+                    {{ profileLabel(profile.profileName) }}
                 </v-tab>
             </v-tabs>
         </template>
@@ -103,6 +103,7 @@ import type { PropType } from "vue";
 import { IssueSeverity, type QualityReportResponse } from "@/models/RevisionModel";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import DataQualityService from "@/services/revision/DataQualityService";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import { useUserRole } from "@/composables/useUserRole";
 import { UiButton } from "@/components/ui/button";
 import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
@@ -130,6 +131,8 @@ export default defineComponent({
 
         const reports = ref<QualityReportResponse[]>([]);
         const selectedTab = ref(0);
+
+        const { profileLabel } = useDataQualityProfiles();
 
         const { canReviewDataQuality } = useUserRole();
 
@@ -190,7 +193,7 @@ export default defineComponent({
 
         return {
             dialog,
-            reports, selectedTab,
+            reports, selectedTab, profileLabel,
             returnCurrentLocaleContent,
             openSummary, hasAnyRemarks,
             totalIssueCount, qualityScore, hasError,

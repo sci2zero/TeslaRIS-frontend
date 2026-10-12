@@ -26,7 +26,7 @@
                             <v-col cols="12" md="3">
                                 <v-select
                                     v-model="selectedProfileName"
-                                    :items="profileNames"
+                                    :items="assessmentProfileItems"
                                     :label="$t('qualityProfileLabel')"
                                     density="compact"
                                     hide-details
@@ -211,7 +211,7 @@
                             <v-col cols="12" md="3">
                                 <v-select
                                     v-model="selectedRelatedProfileName"
-                                    :items="relatedProfileNames"
+                                    :items="relatedProfileItems"
                                     :label="$t('qualityProfileLabel')"
                                     density="compact"
                                     hide-details
@@ -324,7 +324,7 @@
                         <v-col cols="12" md="3">
                             <v-select
                                 v-model="selectedIssueProfileName"
-                                :items="profileNames"
+                                :items="assessmentProfileItems"
                                 :label="$t('qualityProfileLabel')"
                                 density="compact"
                                 hide-details
@@ -385,7 +385,6 @@ import {
     RelatedEntityType,
     SEVERITY_COLORS,
     type DataQualityAssessment,
-    type DataQualityProfileSummary,
     type DataQualityRuleResult,
     type MetricSummary,
     type ProfileRelatedQuality,
@@ -396,6 +395,7 @@ import { EntityType } from "@/models/MergeModel";
 import DataQualityService from "@/services/revision/DataQualityService";
 import RevisionService from "@/services/revision/RevisionService";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
@@ -428,11 +428,12 @@ export default defineComponent({
         const currentSubTab = ref("assessment");
         const loading = ref(false);
 
+        const { profiles, toProfileItems } = useDataQualityProfiles();
+
         const revisions = ref<Revision[]>([]);
         const relatedQuality = ref<ProfileRelatedQuality[]>([]);
         const selectedIssueProfileName = ref<string | undefined>(undefined);
         const issuesTable = ref<InstanceType<typeof DataQualityIssuesTable> | null>(null);
-        const profiles = ref<DataQualityProfileSummary[]>([]);
         const assessments = ref<DataQualityAssessment[]>([]);
         const selectedProfileName = ref<string | undefined>(undefined);
         const selectedRelatedProfileName = ref<string | undefined>(undefined);
@@ -494,15 +495,21 @@ export default defineComponent({
         const downloadFullReport = () => {
         };
 
-        const profileNames = computed(() =>
+        const assessmentProfileKeys = computed(() =>
             assessments.value.map(assessment => assessment.profileName));
+
+        const assessmentProfileItems = computed(() =>
+            toProfileItems(assessmentProfileKeys.value));
 
         const selectedAssessment = computed<DataQualityAssessment | undefined>(() =>
             assessments.value.find(
                 assessment => assessment.profileName === selectedProfileName.value));
 
-        const relatedProfileNames = computed(() =>
+        const relatedProfileKeys = computed(() =>
             relatedQuality.value.map(profile => profile.profileName));
+
+        const relatedProfileItems = computed(() =>
+            toProfileItems(relatedProfileKeys.value));
 
         const latestVersion = computed<VersionItem | undefined>(() => versionItems.value[0]);
 
@@ -539,9 +546,9 @@ export default defineComponent({
             ).then(response => {
                 relatedQuality.value = response.data;
 
-                if (!relatedProfileNames.value.includes(
+                if (!relatedProfileKeys.value.includes(
                     selectedRelatedProfileName.value as string)) {
-                    selectedRelatedProfileName.value = relatedProfileNames.value[0];
+                    selectedRelatedProfileName.value = relatedProfileKeys.value[0];
                 }
             }).catch(() => {
                 relatedQuality.value = [];
@@ -578,18 +585,6 @@ export default defineComponent({
             ruleDetailsAssessmentId.value = selectedAssessment.value.assessmentId;
             ruleDetailsRuleKey.value = rule.key;
             ruleDetailsDialog.value = true;
-        };
-
-        const fetchProfiles = () => {
-            if (!supportsQualityIssues.value) {
-                return;
-            }
-
-            DataQualityService.listProfileNames().then(response => {
-                profiles.value = response.data;
-            }).catch(() => {
-                profiles.value = [];
-            });
         };
 
         const versionLabelFor = (version: VersionItem | undefined) =>
@@ -631,12 +626,14 @@ export default defineComponent({
             ).then(response => {
                 assessments.value = response.data;
 
-                if (!profileNames.value.includes(selectedProfileName.value as string)) {
-                    selectedProfileName.value = profileNames.value[0];
+                if (!assessmentProfileKeys.value.includes(
+                    selectedProfileName.value as string)) {
+                    selectedProfileName.value = assessmentProfileKeys.value[0];
                 }
 
-                if (!profileNames.value.includes(selectedIssueProfileName.value as string)) {
-                    selectedIssueProfileName.value = profileNames.value[0];
+                if (!assessmentProfileKeys.value.includes(
+                    selectedIssueProfileName.value as string)) {
+                    selectedIssueProfileName.value = assessmentProfileKeys.value[0];
                 }
             }).catch(() => {
                 assessments.value = [];
@@ -677,13 +674,11 @@ export default defineComponent({
         onMounted(() => {
             fetchVersions();
             fetchRelatedQuality();
-            fetchProfiles();
         });
 
         watch(() => [props.entityId, props.entityType], () => {
             fetchVersions();
             fetchRelatedQuality();
-            fetchProfiles();
         });
 
         watch(selectedVersion, fetchAssessments);
@@ -693,7 +688,7 @@ export default defineComponent({
         return {
             currentSubTab, loading, assessments, EntityType,
             selectedVersion, versionItems, selectedAssessment,
-            selectedProfileName, profileNames, failedRules, metricTitle,
+            selectedProfileName, assessmentProfileItems, failedRules, metricTitle,
             getQualityDimensionTitleFromValueAutoLocale,
             supportsRelatedQuality, supportsQualityIssues,
             versionLabelFor, scoreColorClass, selectVersion,
@@ -702,7 +697,8 @@ export default defineComponent({
             selectedRelatedProfile, relatedQualityRows, displayTextOrPlaceholder,
             selectedIssueProfileName, issuesTable, initialIssueTarget, issueProfileVersion,
             issueAssessmentDate,
-            selectedRelatedProfileName, relatedProfileNames, latestVersion, downloadFullReport,
+            selectedRelatedProfileName, relatedProfileItems,
+            latestVersion, downloadFullReport,
             returnCurrentLocaleContent, localiseDate, totalRules, severityColors: SEVERITY_COLORS,
             ruleDetailsDialog, ruleDetailsAssessmentId, ruleDetailsRuleKey, showRuleDetails,
             getIssueSeverityTitleFromValueAutoLocale

@@ -105,6 +105,97 @@
                             />
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <multilingual-text-input
+                                ref="nationalIdentifierNameRef"
+                                v-model="nationalIdentifierName"
+                                :label="$t('nationalIdentifierNameLabel')"
+                                :initial-value="toMultilingualTextInput(
+                                    crisContextInformation.nationalIdentifierName, languageTags)"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card>
+
+                <v-card class="pa-4 mt-6" variant="outlined">
+                    <v-card-title class="text-subtitle-1 font-weight-bold px-0">
+                        {{ $t("identifierConfigurationLabel") }}
+                    </v-card-title>
+                    <v-card-subtitle class="px-0 mb-5">
+                        {{ $t("identifierConfigurationDescriptionLabel") }}
+                    </v-card-subtitle>
+
+                    <div
+                        v-for="group in identifierGroups"
+                        :key="group.entityType"
+                        class="mb-6">
+                        <div class="text-lg font-medium font-weight-bold mb-2 ml-2">
+                            {{ $t(group.labelKey) }}
+                        </div>
+
+                        <div class="identifier-matrix">
+                            <v-table density="compact">
+                                <thead>
+                                    <tr>
+                                        <th>{{ $t("identifierLabel") }}</th>
+                                        <th class="text-center">
+                                            {{ $t("hideWhenNotSetLabel") }}
+                                        </th>
+                                        <th class="text-center">
+                                            {{ $t("featuredIdentifierLabel") }}
+                                        </th>
+                                        <th class="text-center">
+                                            {{ $t("canBeUpdatedLabel") }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="identifier in group.identifiers"
+                                        :key="`${group.entityType}-${identifier}`">
+                                        <td>{{ identifier }}</td>
+                                        <td class="text-center">
+                                            <v-checkbox
+                                                :model-value="policyOf(group.entityType, identifier)
+                                                    .hideWhenNotSet"
+                                                hide-details
+                                                density="compact"
+                                                class="d-inline-flex"
+                                                @update:model-value="value => setPolicy(
+                                                    group.entityType, identifier,
+                                                    'hideWhenNotSet', value)"
+                                            />
+                                        </td>
+                                        <td class="text-center">
+                                            <v-checkbox
+                                                :model-value="policyOf(group.entityType, identifier)
+                                                    .featured"
+                                                hide-details
+                                                density="compact"
+                                                class="d-inline-flex"
+                                                @update:model-value="value => setPolicy(
+                                                    group.entityType, identifier,
+                                                    'featured', value)"
+                                            />
+                                        </td>
+                                        <td class="text-center">
+                                            <v-checkbox
+                                                :model-value="policyOf(group.entityType, identifier)
+                                                    .canBeUpdated"
+                                                hide-details
+                                                density="compact"
+                                                class="d-inline-flex"
+                                                @update:model-value="value => setPolicy(
+                                                    group.entityType, identifier,
+                                                    'canBeUpdated', value)"
+                                            />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </div>
+                    </div>
                 </v-card>
 
                 <v-row>
@@ -122,20 +213,35 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Toast from '@/components/core/Toast.vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { useGlobalLoading } from '@/composables/useGlobalLoading';
+import { useLanguageTags } from '@/composables/useLanguageTags';
 import CrisContextInformationService from '@/services/CrisContextInformationService';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
-import type { CrisContextInformation } from '@/models/Common';
+import { ApplicableEntityType, type CrisContextInformation, type IdentifierConfiguration,
+    type IdentifierConfigurationMatrix, type MultilingualContent } from '@/models/Common';
 import { License } from '@/models/DocumentFileModel';
 import { getLicenseTitleFromValueAutoLocale, getLisenseTypesForGivenLocale } from '@/i18n/license';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+
+
+const IDENTIFIER_GROUP_LABELS: { entityType: ApplicableEntityType, labelKey: string }[] = [
+    { entityType: ApplicableEntityType.PERSON, labelKey: "personLabel" },
+    { entityType: ApplicableEntityType.ORGANISATION_UNIT, labelKey: "organisationUnitLabel" },
+    { entityType: ApplicableEntityType.DOCUMENT, labelKey: "documentLabel" }
+];
+
+const DEFAULT_POLICY: IdentifierConfiguration = {
+    hideWhenNotSet: true, featured: false, canBeUpdated: true
+};
 
 
 export default defineComponent({
     name: "CrisContextInformationView",
-    components: { Toast },
+    components: { Toast, MultilingualTextInput },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -143,6 +249,7 @@ export default defineComponent({
         const i18n = useI18n();
         const { showLoader } = useGlobalLoading();
         const { crisContextInformation } = useCrisContextInformation();
+        const { languageTags } = useLanguageTags();
 
         const licenseTypes = getLisenseTypesForGivenLocale();
 
@@ -154,6 +261,8 @@ export default defineComponent({
         const projectNationalIdRegularExpression = ref(".*");
         const organisationUnitNationalIdRegularExpression = ref(".*");
         const documentNationalIdRegularExpression = ref(".*");
+        const nationalIdentifierName = ref<MultilingualContent[]>([]);
+        const identifierConfiguration = ref<IdentifierConfigurationMatrix>({});
         const selectedMetadataLicense = ref({
             title: getLicenseTitleFromValueAutoLocale(License.CC0) as string,
             value: License.CC0
@@ -175,6 +284,27 @@ export default defineComponent({
             }
         ];
 
+        const identifierGroups = computed(() => IDENTIFIER_GROUP_LABELS
+            .filter(group => !!identifierConfiguration.value[group.entityType])
+            .map(group => ({
+                ...group,
+                identifiers: Object.keys(identifierConfiguration.value[group.entityType] ?? {})
+            })));
+
+        const policyOf = (entityType: ApplicableEntityType, identifier: string) =>
+            identifierConfiguration.value[entityType]?.[identifier] ?? DEFAULT_POLICY;
+
+        const setPolicy = (entityType: ApplicableEntityType, identifier: string,
+            field: keyof IdentifierConfiguration, value: boolean | null) => {
+            const perEntityType = identifierConfiguration.value[entityType];
+
+            if (!perEntityType?.[identifier]) {
+                return;
+            }
+
+            perEntityType[identifier] = { ...perEntityType[identifier], [field]: !!value };
+        };
+
         const applyConfiguration = (configuration: CrisContextInformation) => {
             toggleAssessmentModule.value = configuration.toggleAssessmentModule;
             toggleDigitalLibrary.value = configuration.toggleDigitalLibrary;
@@ -190,6 +320,10 @@ export default defineComponent({
                 title: getLicenseTitleFromValueAutoLocale(configuration.metadataLicense) as string,
                 value: configuration.metadataLicense
             };
+            nationalIdentifierName.value = configuration.nationalIdentifierName ?? [];
+            // A copy, so the checkboxes do not move the shared configuration before a save.
+            identifierConfiguration.value = JSON.parse(
+                JSON.stringify(configuration.identifierConfiguration ?? {}));
         };
 
         watch(crisContextInformation, applyConfiguration, { immediate: true });
@@ -206,6 +340,8 @@ export default defineComponent({
                     organisationUnitNationalIdRegularExpression.value,
                 documentNationalIdRegularExpression: documentNationalIdRegularExpression.value,
                 metadataLicense: selectedMetadataLicense.value.value,
+                identifierConfiguration: identifierConfiguration.value,
+                nationalIdentifierName: nationalIdentifierName.value,
                 orcidLoginToggle: crisContextInformation.value.orcidLoginToggle
             };
 
@@ -220,6 +356,8 @@ export default defineComponent({
 
         return {
             isFormValid, snackbar, submit,
+            crisContextInformation, languageTags, toMultilingualTextInput,
+            nationalIdentifierName, identifierGroups, policyOf, setPolicy,
             licenseTypes, selectedMetadataLicense,
             requiredSelectionRules, regularExpressionRules,
             toggleAssessmentModule,
@@ -234,3 +372,9 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+.identifier-matrix {
+    overflow-x: auto;
+}
+</style>

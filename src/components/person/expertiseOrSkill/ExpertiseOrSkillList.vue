@@ -63,9 +63,10 @@
                     </v-chip>
                 </div>
                 <attachment-list
-                    class="mt-3"
+                    v-if="isDigitalRepositoryEnabled"
+                    class="mt-3" is-proof
                     :attachments="expertiseOrSkill.proofs"
-                    :can-edit="canEdit" is-proof
+                    :can-edit="canEdit"
                     @create="addExpertiseOrSkillProof($event, expertiseOrSkill)"
                     @update="updateExpertiseOrSkillProof(expertiseOrSkill, $event)"
                     @delete="deleteExpertiseOrSkillProof(expertiseOrSkill, $event)" />
@@ -86,6 +87,7 @@ import ExpertiseOrSkillModal from './ExpertiseOrSkillModal.vue';
 import { ref } from 'vue';
 import ExpertiseOrSkillService from '@/services/ExpertiseOrSkillService';
 import { VueDraggableNext } from 'vue-draggable-next'
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 export default defineComponent({
@@ -112,6 +114,10 @@ export default defineComponent({
     emits: ["crud"],
     setup(props, {emit}) {
         const menus = ref<boolean[]>([]);
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useCrisContextInformation();
 
         const addExpertiseOrSkillProof = (proof: DocumentFile, expertiseOrSkill: ExpertiseOrSkillResponse) => {
             DocumentFileService.addExpertiseOrSkillProof(proof, expertiseOrSkill.id as number, props.person?.id as number).then((response => {
@@ -154,8 +160,13 @@ export default defineComponent({
             });
         };
 
-        return { addExpertiseOrSkillProof, updateExpertiseOrSkillProof, deleteExpertiseOrSkillProof, menus,
-            returnCurrentLocaleContent, createExpertiseOrSkill, updateExpertiseOrSkill, deleteExpertiseOrSkill };
+        return { 
+            addExpertiseOrSkillProof, updateExpertiseOrSkillProof,
+            deleteExpertiseOrSkillProof, menus,
+            returnCurrentLocaleContent, createExpertiseOrSkill,
+            updateExpertiseOrSkill, deleteExpertiseOrSkill,
+            isDigitalRepositoryEnabled
+        };
     }
 });
 </script>

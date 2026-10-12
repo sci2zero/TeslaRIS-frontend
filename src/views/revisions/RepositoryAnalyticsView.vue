@@ -14,7 +14,7 @@
                 <div class="context-selector mr-8">
                     <v-select
                         v-model="selectedProfileName"
-                        :items="profileNames"
+                        :items="profileItems"
                         :label="$t('qualityProfileLabel')"
                         density="comfortable"
                         variant="outlined"
@@ -103,11 +103,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter, type LocationQueryRaw } from "vue-router";
 import DatePicker from "@/components/core/DatePicker.vue";
-import DataQualityService from "@/services/revision/DataQualityService";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import RepositoryOverviewTab from "@/components/core/revisions/RepositoryOverviewTab.vue";
 import RepositoryTrendsTab from "@/components/core/revisions/RepositoryTrendsTab.vue";
 import RepositoryEntityTypesTab from "@/components/core/revisions/RepositoryEntityTypesTab.vue";
@@ -134,7 +134,7 @@ export default defineComponent({
     },
     setup() {
         const currentTab = ref("overview");
-        const profileNames = ref<string[]>([]);
+        const { profileKeys, profileItems } = useDataQualityProfiles();
         const selectedProfileName = ref<string | undefined>(undefined);
 
         const selectedAssessmentDate = ref<string | undefined>((new Date()).toISOString());
@@ -178,22 +178,22 @@ export default defineComponent({
             openIssueExplorer(query);
         };
 
+        watch(profileKeys, profileKeyList => {
+            if (profileKeyList.length === 0) {
+                return;
+            }
+
+            if (!selectedProfileName.value) {
+                selectedProfileName.value = profileKeyList[0];
+            }
+        }, { immediate: true });
+
         onMounted(() => {
             document.title = i18n.t("routeLabel.repositoryAnalytics");
-
-            DataQualityService.listProfileNames().then(response => {
-                profileNames.value = [
-                    ...new Set(response.data.map(profile => profile.profileName))
-                ];
-
-                if (!selectedProfileName.value) {
-                    selectedProfileName.value = profileNames.value[0];
-                }
-            });
         });
 
         return {
-            currentTab, profileNames, selectedProfileName, selectedAssessmentDate,
+            currentTab, profileItems, selectedProfileName, selectedAssessmentDate,
             openEntityTypeIssues, openDimensionIssues, openConstraintIssues
         };
     }

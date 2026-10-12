@@ -53,7 +53,7 @@
                 </p>
                 <div v-for="assessment in assessments" :key="`${assessment.profileName}-${assessment.profileVersion}`" class="space-y-2 rounded-lg border border-slate-200 p-3">
                     <p class="text-sm font-semibold text-slate-800 break-words">
-                        {{ assessment.profileName }} {{ assessment.profileVersion }}
+                        {{ profileLabel(assessment.profileName) }} {{ assessment.profileVersion }}
                     </p>
                     <p class="text-sm text-slate-700">
                         {{ $t('qualityScoreLabel') }}: {{ assessment.dataQualityScore.toFixed(1) }}%
@@ -91,6 +91,7 @@ import EntityDetailField from "@/components/core/EntityDetailField.vue";
 import { DegradationOutcome, type Revision } from "@/models/RevisionModel";
 import { localiseDate } from "@/utils/DateUtil";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 const props = defineProps<{
     modelValue: boolean;
     revision: Revision;
@@ -100,5 +101,6 @@ const props = defineProps<{
     restoreBlockedReason?: string;
 }>();
 defineEmits<{ "update:modelValue": [value: boolean]; assess: []; restore: [] }>();
+const { profileLabel } = useDataQualityProfiles();
 const assessments = computed(() => [...props.revision.assessments].sort((a, b) => b.dataQualityScore - a.dataQualityScore));
 </script>

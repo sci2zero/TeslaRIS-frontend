@@ -66,9 +66,10 @@
                     </v-chip>
                 </div>
                 <attachment-list
-                    class="mt-3"
+                    v-if="isDigitalRepositoryEnabled"
+                    class="mt-3" is-proof
                     :attachments="prize.proofs"
-                    :can-edit="canEdit" is-proof
+                    :can-edit="canEdit"
                     @create="addPrizeProof($event, prize)"
                     @update="updatePrizeProof(prize, $event)"
                     @delete="deletePrizeProof(prize, $event)" />
@@ -90,6 +91,7 @@ import { ref } from 'vue';
 import PrizeService from '@/services/PrizeService';
 import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 export default defineComponent({
@@ -116,6 +118,10 @@ export default defineComponent({
     emits: ["crud"],
     setup(props, {emit}) {
         const menus = ref<boolean[]>([]);
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useCrisContextInformation();
 
         const addPrizeProof = (proof: DocumentFile, prize: PrizeResponse) => {
             DocumentFileService.addPrizeProof(proof, prize.id as number, props.person?.id as number).then((response => {
@@ -158,9 +164,13 @@ export default defineComponent({
             });
         };
 
-        return { addPrizeProof, updatePrizeProof, deletePrizeProof, menus,
-            returnCurrentLocaleContent, createPrize, updatePrize, deletePrize,
-            localiseDate };
+        return {
+            addPrizeProof, updatePrizeProof,
+            deletePrizeProof, menus,
+            returnCurrentLocaleContent, createPrize,
+            updatePrize, deletePrize, localiseDate,
+            isDigitalRepositoryEnabled
+        };
     }
 });
 </script>

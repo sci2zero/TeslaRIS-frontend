@@ -427,6 +427,15 @@ export interface FlexibleDate {
     text?: string;
 }
 
+export interface IdentifierConfiguration {
+    hideWhenNotSet: boolean;
+    featured: boolean;
+    canBeUpdated: boolean;
+}
+
+export type IdentifierConfigurationMatrix =
+    Partial<Record<ApplicableEntityType, Record<string, IdentifierConfiguration>>>;
+
 export interface CrisContextInformation {
     toggleAssessmentModule: boolean;
     toggleDigitalLibrary: boolean;
@@ -437,6 +446,8 @@ export interface CrisContextInformation {
     organisationUnitNationalIdRegularExpression: string;
     documentNationalIdRegularExpression: string;
     metadataLicense: License;
+    identifierConfiguration: IdentifierConfigurationMatrix;
+    nationalIdentifierName: MultilingualContent[];
     orcidLoginToggle: boolean;
 }
 

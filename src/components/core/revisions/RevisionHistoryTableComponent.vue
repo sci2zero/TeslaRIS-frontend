@@ -77,7 +77,7 @@
                             <strong>{{ bestAssessment(item)?.dataQualityScore.toFixed(1) }}%</strong>
                         </span>
                         <span class="text-medium-emphasis">
-                            ({{ bestAssessment(item)?.profileName }})
+                            ({{ profileLabel(bestAssessment(item)?.profileName) }})
                         </span>
                         <span class="text-medium-emphasis">
                             &middot; {{ $t("totalAssessmentsLabel", { count: item.assessments.length }) }}
@@ -170,7 +170,7 @@
                                 v-for="(assessment, assessmentIndex) in sortedAssessments(item)"
                                 :key="`${assessment.profileName}-${assessment.profileVersion}`">
                                 <td>
-                                    {{ assessment.profileName }} {{ assessment.profileVersion }}
+                                    {{ profileLabel(assessment.profileName) }} {{ assessment.profileVersion }}
                                     <v-chip
                                         v-if="assessmentIndex === 0 && sortedAssessments(item).length > 1"
                                         class="ml-2"
@@ -246,6 +246,7 @@ import RevisionQuickGlance from "./RevisionQuickGlance.vue";
 import PersistentQuestionDialog from "@/components/core/comparators/PersistentQuestionDialog.vue";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { localiseDate } from "@/utils/DateUtil";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 
 const RESTORE_BLOCKED_MESSAGES = ["restoreArchivedDocumentMessage", "restoreThesisOnPublicReviewMessage"];
 
@@ -270,6 +271,8 @@ export default defineComponent({
     emits: ["restored", "showAssessmentDetails"],
     setup(props, { emit }) {
         const revisions = ref<Revision[]>([]);
+
+        const { profileLabel } = useDataQualityProfiles();
         const revisionGlanceOpen = ref(false);
         const glancedRevision = ref<Revision | null>(null);
         const openRevisionGlance = (revision: Revision) => {
@@ -471,7 +474,7 @@ export default defineComponent({
             restorationWarnings, isExpandable, DegradationOutcome,
             showDetailedAssessment, startRestoreProcess, restoreRevision,
             displayPersistentDialog, revisionToRestore, restoreInProgress,
-            notifications, versionLabelFor,
+            notifications, versionLabelFor, profileLabel,
             displayTextOrPlaceholder, localiseDate
         };
     }

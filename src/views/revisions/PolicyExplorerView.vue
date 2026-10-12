@@ -14,10 +14,10 @@
                     </div>
                 </div>
 
-                <div class="context-selector mr-8">
+                <div class="context-selector mr-8 mt-4">
                     <v-select
                         v-model="selectedProfileName"
-                        :items="profileNames"
+                        :items="profileItems"
                         :label="$t('qualityProfileLabel')"
                         density="comfortable"
                         variant="outlined"
@@ -320,6 +320,7 @@ import { useRoute, useRouter, type LocationQuery, type LocationQueryRaw } from "
 import DatePicker from "@/components/core/DatePicker.vue";
 import TabContentLoader from "@/components/core/TabContentLoader.vue";
 import DataQualityService from "@/services/revision/DataQualityService";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import {
     ISSUE_TARGETS,
     IssueSeverity,
@@ -369,7 +370,7 @@ const oneOf = <T extends string>(value: string | undefined, allowed: readonly T[
 
 const parseQuery = (query: LocationQuery): ExplorerState => ({
     profile: single(query.profile),
-    date: single(query.date),
+    date: single(query.date) ?? (new Date()).toISOString(),
     page: Math.max(1, parseInt(single(query.page) ?? "1") || 1),
     filters: {
         dimension: oneOf(single(query.dimension), Object.values(QualityDimension)),
@@ -431,7 +432,7 @@ export default defineComponent({
 
         const initialState = parseQuery(route.query);
 
-        const profileNames = ref<string[]>([]);
+        const { profileKeys, profileItems } = useDataQualityProfiles();
         const selectedProfileName = ref<string | undefined>(initialState.profile);
         const selectedAssessmentDate = ref<string | undefined>(initialState.date);
 
@@ -667,25 +668,25 @@ export default defineComponent({
             }
         });
 
+        watch(profileKeys, profileKeyList => {
+            if (profileKeyList.length === 0) {
+                return;
+            }
+
+            if (!selectedProfileName.value ||
+                !profileKeyList.includes(selectedProfileName.value)) {
+                selectedProfileName.value = profileKeyList[0];
+            } else {
+                fetchPolicy();
+            }
+        }, { immediate: true });
+
         onMounted(() => {
             document.title = i18n.t("routeLabel.policyExplorer");
-
-            DataQualityService.listProfileNames().then(response => {
-                profileNames.value = [
-                    ...new Set(response.data.map(profile => profile.profileName))
-                ];
-
-                if (!selectedProfileName.value ||
-                    !profileNames.value.includes(selectedProfileName.value)) {
-                    selectedProfileName.value = profileNames.value[0];
-                } else {
-                    fetchPolicy();
-                }
-            });
         });
 
         return {
-            profileNames, selectedProfileName, selectedAssessmentDate,
+            profileItems, selectedProfileName, selectedAssessmentDate,
             policy, loading, page, filters,
             dimensionOptions, metricOptions, severityOptions, targetOptions,
             filteredConstraints, pagedConstraints, pageCount, pageStart, pageEnd,

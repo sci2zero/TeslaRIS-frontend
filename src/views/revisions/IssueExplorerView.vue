@@ -11,10 +11,10 @@
                     </div>
                 </div>
 
-                <div class="context-selector mr-8">
+                <div class="context-selector mr-8 mt-4">
                     <v-select
                         v-model="selectedProfileName"
-                        :items="profileNames"
+                        :items="profileItems"
                         :label="$t('qualityProfileLabel')"
                         density="comfortable"
                         variant="outlined"
@@ -47,7 +47,7 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter, type LocationQuery, type LocationQueryRaw } from "vue-router";
 import DatePicker from "@/components/core/DatePicker.vue";
-import DataQualityService from "@/services/revision/DataQualityService";
+import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import DataQualityIssuesTable from "@/components/core/revisions/DataQualityIssuesTable.vue";
 import {
     ISSUE_TARGETS,
@@ -75,7 +75,7 @@ const oneOf = <T extends string>(value: string | undefined, allowed: readonly T[
 // Unknown values are dropped rather than rejected, so a stale link still opens the page.
 const parseQuery = (query: LocationQuery): ExplorerState => ({
     profile: single(query.profile),
-    date: single(query.date),
+    date: single(query.date) ?? (new Date()).toISOString(),
     filters: {
         target: oneOf(single(query.target), ISSUE_TARGETS),
         dimension: oneOf(single(query.dimension), Object.values(QualityDimension)),
@@ -132,7 +132,7 @@ export default defineComponent({
 
         const initialState = parseQuery(route.query);
 
-        const profileNames = ref<string[]>([]);
+        const { profileKeys, profileItems } = useDataQualityProfiles();
         const selectedProfileName = ref<string | undefined>(initialState.profile);
         const selectedAssessmentDate = ref<string | undefined>(initialState.date);
         const initialFilters = initialState.filters;
@@ -176,23 +176,23 @@ export default defineComponent({
 
         watch([selectedProfileName, selectedAssessmentDate], mirrorToUrl);
 
+        watch(profileKeys, profileKeyList => {
+            if (profileKeyList.length === 0) {
+                return;
+            }
+
+            if (!selectedProfileName.value ||
+                !profileKeyList.includes(selectedProfileName.value)) {
+                selectedProfileName.value = profileKeyList[0];
+            }
+        }, { immediate: true });
+
         onMounted(() => {
             document.title = i18n.t("routeLabel.issueExplorer");
-
-            DataQualityService.listProfileNames().then(response => {
-                profileNames.value = [
-                    ...new Set(response.data.map(profile => profile.profileName))
-                ];
-
-                if (!selectedProfileName.value ||
-                    !profileNames.value.includes(selectedProfileName.value)) {
-                    selectedProfileName.value = profileNames.value[0];
-                }
-            });
         });
 
         return {
-            profileNames, selectedProfileName, selectedAssessmentDate, initialFilters,
+            profileItems, selectedProfileName, selectedAssessmentDate, initialFilters,
             issuesTable, onFiltersChanged
         };
     }

@@ -193,11 +193,13 @@ export interface ConstraintSummary {
 export interface DataQualityProfileSummary {
     profileName: string;
     version: string;
+    name: MultilingualContent[];
 }
 
 export interface DataQualityProfile {
     profileName: string;
     version: string;
+    name: MultilingualContent[];
     dataQualityRemarks: Record<string, DataQualityRemark>;
 }
 

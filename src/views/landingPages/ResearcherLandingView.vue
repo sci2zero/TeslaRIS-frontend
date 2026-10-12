@@ -402,7 +402,7 @@
                         padded>
                         <div class="min-w-0 overflow-x-auto">
                             <person-visualizations
-                                :person-id="(person.id as number)"
+                                :person-id="(person?.id as number)"
                                 :display-settings="displaySettings.displaySettings.value"
                                 :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
                                 :display-type-ratios-tab="displaySettings.shouldDisplayTypeTab()"

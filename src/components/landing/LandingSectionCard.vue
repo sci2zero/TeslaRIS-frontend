@@ -35,7 +35,6 @@ withDefaults(defineProps<{
     iconClass: "bg-slate-100 text-slate-600",
     count: undefined,
     padded: false,
-    count: undefined,
 });
 
 defineOptions({

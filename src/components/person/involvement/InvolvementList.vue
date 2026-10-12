@@ -111,8 +111,11 @@
             </div>
 
             <attachment-list
-                class="mt-3"
-                :attachments="involvement.proofs ? involvement.proofs : []" is-proof :can-edit="canEdit" @create="addInvolvementProof($event, involvement)"
+                v-if="isDigitalRepositoryEnabled"
+                class="mt-3" is-proof
+                :attachments="involvement.proofs ? involvement.proofs : []"
+                :can-edit="canEdit"
+                @create="addInvolvementProof($event, involvement)"
                 @delete="deleteInvolvementProof(involvement, $event)" @update="updateInvolvementProof(involvement, $event)" />
         </div>
     </draggable>
@@ -137,6 +140,7 @@ import { localiseDate } from '@/utils/DateUtil';
 import { VueDraggableNext } from 'vue-draggable-next'
 import { getEmploymentPositionTitleFromValueAutoLocale } from '@/i18n/employmentPosition';
 import { getEducationStatusTitleFromValueAutoLocale } from '@/i18n/educationStatus';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 export default defineComponent({
@@ -167,6 +171,10 @@ export default defineComponent({
     emits: ["refreshInvolvements", "dragged"],
     setup(props, { emit }) {
         const menus = ref<boolean[]>([]);
+
+        const {
+            isDigitalRepositoryEnabled
+        } = useCrisContextInformation();
 
         watch(() => props.involvements, () => {
             if(props.involvements) {
@@ -244,7 +252,8 @@ export default defineComponent({
             getInvolvementTypeTitleFromValueAutoLocale, updateInvolvement,
             localiseDate, getEmploymentPositionTitleFromValueAutoLocale,
             EmploymentPosition, sortedInvolvements, EducationStatus,
-            getEducationStatusTitleFromValueAutoLocale
+            getEducationStatusTitleFromValueAutoLocale,
+            isDigitalRepositoryEnabled
         };
     }
 });

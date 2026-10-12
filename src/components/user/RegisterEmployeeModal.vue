@@ -4,13 +4,13 @@
             <template #activator="scope">
                 <v-list-item dark v-bind="scope.props" class="inline-action w-80">
                     <v-list-item-title>
-                        {{ getTitleLabel() }}
+                        {{ getTitleLabel(true) }}
                     </v-list-item-title>
                 </v-list-item>
             </template>
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">{{ getTitleLabel() }}</span>
+                    <span class="text-h5">{{ getTitleLabel(false) }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -221,7 +221,7 @@ export default defineComponent({
             });
         });
 
-        const getTitleLabel = () => {
+        const getTitleLabel = (isButtonLabel: boolean) => {
             switch (props.employeeRole) {
                 case UserRole.INSTITUTIONAL_EDITOR:
                     return i18n.t("addInstitutionEditorLabel");
@@ -232,7 +232,9 @@ export default defineComponent({
                     // anything, it answers for the whole repository.
                     return selectedOrganisationUnit.value.value > 0
                         ? i18n.t("addViceDeanForScienceLabel")
-                        : i18n.t("addResearchInformationManagerLabel");
+                        : (isButtonLabel ? 
+                            `${i18n.t("addViceDeanForScienceLabel")}/${i18n.t("addResearchInformationManagerLabel")}` 
+                                : i18n.t("addResearchInformationManagerLabel"));
                 case UserRole.INSTITUTIONAL_LIBRARIAN:
                     return i18n.t("addInstitutionLibrarianLabel");
                 case UserRole.HEAD_OF_LIBRARY:

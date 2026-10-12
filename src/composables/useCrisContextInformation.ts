@@ -16,6 +16,8 @@ const crisContextInformation = ref<CrisContextInformation>({
     organisationUnitNationalIdRegularExpression: ".*",
     documentNationalIdRegularExpression: ".*",
     metadataLicense: License.CC0,
+    identifierConfiguration: {},
+    nationalIdentifierName: [],
     orcidLoginToggle: false
 });
 const loaded = ref(false);
@@ -47,6 +49,11 @@ export function useCrisContextInformation() {
     const documentNationalIdPattern = computed(() => crisContextInformation.value.documentNationalIdRegularExpression);
     const metadataLicense = computed(() => crisContextInformation.value.metadataLicense);
 
+    const identifierConfiguration = computed(
+        () => crisContextInformation.value.identifierConfiguration ?? {});
+    const nationalIdentifierName = computed(
+        () => crisContextInformation.value.nationalIdentifierName ?? []);
+
     onMounted(fetchCrisContextInformation);
 
     return {
@@ -54,6 +61,7 @@ export function useCrisContextInformation() {
         isAssessmentModuleEnabled, isDigitalLibraryEnabled, isDigitalRepositoryEnabled,
         isRegistrationEnabled, isOrcidLoginEnabled,
         personNationalIdPattern, projectNationalIdPattern,
-        organisationUnitNationalIdPattern, documentNationalIdPattern, metadataLicense
+        organisationUnitNationalIdPattern, documentNationalIdPattern, metadataLicense,
+        identifierConfiguration, nationalIdentifierName
     };
 }
