@@ -32,7 +32,8 @@
         </v-row>
         <v-row>
             <v-col cols="10">
-                <ui-input 
+                <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'doi')" 
                     v-model="doi"
                     label="DOI"
                     :rules="doiValidationRules"
@@ -84,6 +85,7 @@
             </v-col>
             <v-col cols="4">
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'openAlexId')"
                     v-model="openAlexId"
                     label="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules"
@@ -91,6 +93,7 @@
             </v-col>
             <v-col cols="3">
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'webOfScienceId')"
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules"
@@ -149,6 +152,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
@@ -194,6 +199,7 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
         const isFormValid = ref(false);
 
         const publisher = ref<Publisher>();
@@ -372,6 +378,7 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
             isFormValid, doi, snackbar, message,
             title, subtitle, publicationDate,
             selectedPublisher, materialProductNumber,

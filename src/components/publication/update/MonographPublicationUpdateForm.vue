@@ -51,6 +51,7 @@
         <v-row>
             <v-col cols="12">
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'doi')"
                     v-model="doi"
                     label="DOI"
                     :rules="doiValidationRules"
@@ -119,6 +120,7 @@
             </v-col>
             <v-col>
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'openAlexId')"
                     v-model="openAlexId"
                     label="Open Alex ID"
                     :rules="workOpenAlexIdValidationRules"
@@ -126,6 +128,7 @@
             </v-col>
             <v-col>
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'webOfScienceId')"
                     v-model="webOfScienceId"
                     label="Web of Science ID"
                     :rules="documentWebOfScienceIdValidationRules"
@@ -150,6 +153,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { computed, defineComponent, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
@@ -190,6 +195,7 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
         const isFormValid = ref(false);
 
         const monograph = ref<Monograph>();
@@ -354,6 +360,7 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
             isFormValid, snackbar, section, sectionRef,
             title, subtitle, message, doi, scopus,
             selectedMonograph, articleNumber,

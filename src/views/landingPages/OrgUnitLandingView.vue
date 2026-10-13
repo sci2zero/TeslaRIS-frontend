@@ -53,6 +53,9 @@
                     </p>
                 </template>
                 <template #meta>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.ORGANISATION_UNIT"
+                        :source="organisationUnit" />
                     <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
                         {{ organisationUnit.location.address }}
                     </landing-meta-item>
@@ -561,29 +564,60 @@
                             padded
                         >
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <landing-detail-field label="ROR">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'ror', organisationUnit?.ror)"
+                                    label="ROR">
                                     <identifier-link v-if="organisationUnit?.ror" :identifier="organisationUnit.ror" type="ror" compact />
                                     <span v-else>{{ $t("notYetSetMessage") }}</span>
                                 </landing-detail-field>
-                                <landing-detail-field label="Scopus AFID">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'scopusAfid', organisationUnit?.scopusAfid)"
+                                    label="Scopus AFID">
                                     <identifier-link v-if="organisationUnit?.scopusAfid" :identifier="organisationUnit.scopusAfid" type="scopus_affiliation" compact />
                                     <span v-else>{{ $t("notYetSetMessage") }}</span>
                                 </landing-detail-field>
-                                <landing-detail-field label="OpenAlex ID">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'openAlexId', organisationUnit?.openAlexId)"
+                                    label="OpenAlex ID">
                                     <identifier-link v-if="organisationUnit?.openAlexId" :identifier="organisationUnit.openAlexId" type="open_alex" compact />
                                     <span v-else>{{ $t("notYetSetMessage") }}</span>
                                 </landing-detail-field>
-                                <landing-detail-field label="Ringgold ID" :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
-                                <landing-detail-field label="FundRef" :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
-                                <landing-detail-field label="ISNI" :value="organisationUnit?.isni || $t('notYetSetMessage')" />
-                                <landing-detail-field label="FCT ID" :value="organisationUnit?.fctId || $t('notYetSetMessage')" />
-                                <landing-detail-field label="GRID" :value="organisationUnit?.grid || $t('notYetSetMessage')" />
-                                <landing-detail-field label="Wikidata ID">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'ringgold', organisationUnit?.ringgold)"
+                                    label="Ringgold ID"
+                                    :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'fundref', organisationUnit?.fundref)"
+                                    label="FundRef"
+                                    :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'isni', organisationUnit?.isni)"
+                                    label="ISNI"
+                                    :value="organisationUnit?.isni || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'fctId', organisationUnit?.fctId)"
+                                    label="FCT ID"
+                                    :value="organisationUnit?.fctId || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'grid', organisationUnit?.grid)"
+                                    label="GRID"
+                                    :value="organisationUnit?.grid || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'wikidata', organisationUnit?.wikidata)"
+                                    label="Wikidata ID">
                                     <identifier-link v-if="organisationUnit?.wikidata" :identifier="organisationUnit.wikidata" type="wikidata" compact />
                                     <span v-else>{{ $t("notYetSetMessage") }}</span>
                                 </landing-detail-field>
-                                <landing-detail-field :label="$t('nationalIdLabel')" :value="organisationUnit?.nationalId || $t('notYetSetMessage')" />
-                                <landing-detail-field :label="$t('taxNumberLabel')" :value="organisationUnit?.taxNumber || $t('notYetSetMessage')" />
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'nationalId', organisationUnit?.nationalId)"
+                                    :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')">
+                                    <identifier-link v-if="organisationUnit?.nationalId" :identifier="organisationUnit.nationalId" type="national_organisation_unit" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'taxNumber', organisationUnit?.taxNumber)"
+                                    :label="$t('taxNumberLabel')"
+                                    :value="organisationUnit?.taxNumber || $t('notYetSetMessage')" />
                             </div>
                             <entity-identifiers-list
                                 :entity-identifiers="organisationUnitIdentifiers"
@@ -714,6 +748,8 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
 import { computed, onMounted, watch, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -797,10 +833,13 @@ import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import { UiButton } from '@/components/ui/button';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "OrgUnitLanding",
-    components: { PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, AddSubUnitModal, AddEmploymentModal, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton, ProjectTableComponent, ProjectStatusFilter },
+    components: { FeaturedIdentifiers, PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, AddSubUnitModal, AddEmploymentModal, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton, ProjectTableComponent, ProjectStatusFilter },
     setup() {
+        const { isIdentifierShown } = useIdentifierConfiguration();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
         const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -1406,6 +1445,8 @@ export default defineComponent({
         };
 
         return {
+            isIdentifierShown,
+            configuredNationalIdentifierLabel,
             canAssessDataQuality,
             canReviewDataQuality,
             organisationUnit, currentTab, showOverview, showOverviewTab, onOverviewContent, isHeadOfLibrary,

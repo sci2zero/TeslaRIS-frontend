@@ -52,9 +52,9 @@
                     <landing-meta-item v-if="journalPublication?.issue" :label="$t('issueLabel')" icon="mdi-numeric" tone="amber">
                         {{ journalPublication.issue }}
                     </landing-meta-item>
-                    <landing-meta-item v-if="journalPublication?.doi" label="DOI" abbrev="DOI" tone="blue">
-                        <identifier-link :identifier="journalPublication.doi" compact />
-                    </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :source="journalPublication" />
                 </template>
                 <template #actions>
                     <document-action-box
@@ -275,6 +275,8 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
 import { ApplicableEntityType, type LanguageTagResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -330,15 +332,15 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "JournalPublicationLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, IndicatorsSection, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, Toast, LocalizedLink, GenericCrudModal, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, IndicatorsSection, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
+        const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -578,6 +580,7 @@ export default defineComponent({
         };
 
         return {
+            isIdentifierShown,
             journalPublication, canClassify, fetchJournalPublication, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind, actionsRef,

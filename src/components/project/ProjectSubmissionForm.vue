@@ -9,6 +9,7 @@
                 @update:doi="(value: string) => doi = value"
             />
             <ui-input
+                v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'raid')"
                 v-model="raid"
                 :label="$t('raidLabel')"
                 :placeholder="$t('raidLabel')"
@@ -107,9 +108,10 @@
                 />
                 <uri-input ref="urisRef" v-model="uris" />
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'nationalId')"
                     v-model="nationalId"
-                    :label="$t('nationalIdLabel')"
-                    :placeholder="$t('nationalIdLabel')"
+                    :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
+                    :placeholder="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
                     :rules="projectNationalIdValidationRules"
                 />
                 <choice-cards
@@ -145,6 +147,9 @@
 </template>
 
 <script setup lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 import UiInput from '@/components/ui/input/Input.vue';
 import ChoiceCards from '@/components/ui/choice-cards/ChoiceCards.vue';
 import FormSection from '@/components/ui/form-section/FormSection.vue';
@@ -174,6 +179,8 @@ import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchTyp
 import type { AxiosError } from 'axios';
 import type { ErrorResponse, MonetaryAmount, MultilingualContent } from '@/models/Common';
 
+const { canBeUpdated } = useIdentifierConfiguration();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
 const emit = defineEmits(["create"]);
 
 const router = useRouter();

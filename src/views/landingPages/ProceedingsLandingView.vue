@@ -40,6 +40,9 @@
                     </span>
                 </template>
                 <template #meta>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :source="proceedings" />
                     <landing-meta-item v-if="proceedings?.eventId" :label="$t('conferenceLabel')" icon="mdi-calendar-star" tone="violet">
                         <localized-link
                             v-if="(proceedings?.eventName?.length ?? 0) > 0"
@@ -300,6 +303,7 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import { ApplicableEntityType, ExportableEndpointType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -356,7 +360,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "ProceedingsLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, PublicationTableComponent, DocumentActionBox, PublicationBadgeSection, IndicatorsSection, RichTitleRenderer, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const currentTab = ref("overview");
 

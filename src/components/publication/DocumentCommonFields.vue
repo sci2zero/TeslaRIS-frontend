@@ -2,12 +2,14 @@
     <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ui-input
+                v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'handleId')"
                 v-model="localHandleId"
                 label="Handle ID"
                 :rules="handleIdValidationRules"
                 @update:model-value="emitUpdate"
             />
             <ui-input
+                v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'arxivId')"
                 v-model="localArxivId"
                 label="ArXiv ID"
                 :rules="arxivIdValidationRules"
@@ -16,12 +18,14 @@
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <ui-input
+                v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'pubmedId')"
                 v-model="localPubmedId"
                 label="PubMed ID"
                 :rules="pubmedIdValidationRules"
                 @update:model-value="emitUpdate"
             />
             <ui-input
+                v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'ssrnId')"
                 v-model="localSsrnId"
                 label="SSRN ID"
                 :rules="ssrnIdValidationRules"
@@ -29,8 +33,9 @@
             />
         </div>
         <ui-input
+            v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'nationalId')"
             v-model="localNationalId"
-            :label="$t('nationalIdLabel')"
+            :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
             :rules="documentNationalIdValidationRules"
             @update:model-value="emitUpdate"
         />
@@ -84,6 +89,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, type PropType, ref, watch, onMounted, computed } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
@@ -95,6 +102,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "DocumentCommonFields",
     components: { MultilingualTextInput, UiInput, UiCheckbox },
@@ -110,6 +118,8 @@ export default defineComponent({
     },
     emits: ["update:modelValue", "change"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
         const { languageTags } = useLanguageTags();
 
         const {
@@ -277,6 +287,8 @@ export default defineComponent({
         });
 
         return {
+            canBeUpdated, ApplicableEntityType,
+            configuredNationalIdentifierLabel,
             localHandleId, localEdition,
             localArxivId, localPubmedId,
             localSsrnId, localCity,

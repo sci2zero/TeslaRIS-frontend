@@ -75,10 +75,34 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field
+                                v-model="personNationalIdUrl"
+                                :label="$t('personNationalIdUrlLabel')"
+                                placeholder="https://example.org/researchers/{ID}"
+                                :rules="nationalIdUrlValidationRules"
+                                :hint="$t('nationalIdUrlHintLabel')"
+                                persistent-hint
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
                                 v-model="projectNationalIdRegularExpression"
                                 :label="$t('projectNationalIdPatternLabel') + '*'"
                                 :rules="regularExpressionRules"
                                 :hint="$t('regularExpressionHintLabel')"
+                                persistent-hint
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="projectNationalIdUrl"
+                                :label="$t('projectNationalIdUrlLabel')"
+                                placeholder="https://example.org/projects/{ID}"
+                                :rules="nationalIdUrlValidationRules"
+                                :hint="$t('nationalIdUrlHintLabel')"
                                 persistent-hint
                             />
                         </v-col>
@@ -97,10 +121,34 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field
+                                v-model="organisationUnitNationalIdUrl"
+                                :label="$t('organisationUnitNationalIdUrlLabel')"
+                                placeholder="https://example.org/institutions/{ID}"
+                                :rules="nationalIdUrlValidationRules"
+                                :hint="$t('nationalIdUrlHintLabel')"
+                                persistent-hint
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
                                 v-model="documentNationalIdRegularExpression"
                                 :label="$t('documentNationalIdPatternLabel') + '*'"
                                 :rules="regularExpressionRules"
                                 :hint="$t('regularExpressionHintLabel')"
+                                persistent-hint
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="documentNationalIdUrl"
+                                :label="$t('documentNationalIdUrlLabel')"
+                                placeholder="https://example.org/documents/{ID}"
+                                :rules="nationalIdUrlValidationRules"
+                                :hint="$t('nationalIdUrlHintLabel')"
                                 persistent-hint
                             />
                         </v-col>
@@ -226,6 +274,7 @@ import { ApplicableEntityType, type CrisContextInformation, type IdentifierConfi
 import { License } from '@/models/DocumentFileModel';
 import { getLicenseTitleFromValueAutoLocale, getLisenseTypesForGivenLocale } from '@/i18n/license';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
 const IDENTIFIER_GROUP_LABELS: { entityType: ApplicableEntityType, labelKey: string }[] = [
@@ -250,6 +299,7 @@ export default defineComponent({
         const { showLoader } = useGlobalLoading();
         const { crisContextInformation } = useCrisContextInformation();
         const { languageTags } = useLanguageTags();
+        const { nationalIdUrlValidationRules } = useValidationUtils();
 
         const licenseTypes = getLisenseTypesForGivenLocale();
 
@@ -261,6 +311,10 @@ export default defineComponent({
         const projectNationalIdRegularExpression = ref(".*");
         const organisationUnitNationalIdRegularExpression = ref(".*");
         const documentNationalIdRegularExpression = ref(".*");
+        const personNationalIdUrl = ref("");
+        const organisationUnitNationalIdUrl = ref("");
+        const projectNationalIdUrl = ref("");
+        const documentNationalIdUrl = ref("");
         const nationalIdentifierName = ref<MultilingualContent[]>([]);
         const identifierConfiguration = ref<IdentifierConfigurationMatrix>({});
         const selectedMetadataLicense = ref({
@@ -321,6 +375,11 @@ export default defineComponent({
                 value: configuration.metadataLicense
             };
             nationalIdentifierName.value = configuration.nationalIdentifierName ?? [];
+            personNationalIdUrl.value = configuration.personNationalIdUrl ?? "";
+            organisationUnitNationalIdUrl.value =
+                configuration.organisationUnitNationalIdUrl ?? "";
+            projectNationalIdUrl.value = configuration.projectNationalIdUrl ?? "";
+            documentNationalIdUrl.value = configuration.documentNationalIdUrl ?? "";
             // A copy, so the checkboxes do not move the shared configuration before a save.
             identifierConfiguration.value = JSON.parse(
                 JSON.stringify(configuration.identifierConfiguration ?? {}));
@@ -342,6 +401,10 @@ export default defineComponent({
                 metadataLicense: selectedMetadataLicense.value.value,
                 identifierConfiguration: identifierConfiguration.value,
                 nationalIdentifierName: nationalIdentifierName.value,
+                personNationalIdUrl: personNationalIdUrl.value,
+                organisationUnitNationalIdUrl: organisationUnitNationalIdUrl.value,
+                projectNationalIdUrl: projectNationalIdUrl.value,
+                documentNationalIdUrl: documentNationalIdUrl.value,
                 orcidLoginToggle: crisContextInformation.value.orcidLoginToggle
             };
 
@@ -358,6 +421,9 @@ export default defineComponent({
             isFormValid, snackbar, submit,
             crisContextInformation, languageTags, toMultilingualTextInput,
             nationalIdentifierName, identifierGroups, policyOf, setPolicy,
+            personNationalIdUrl, organisationUnitNationalIdUrl, projectNationalIdUrl,
+            documentNationalIdUrl,
+            nationalIdUrlValidationRules,
             licenseTypes, selectedMetadataLicense,
             requiredSelectionRules, regularExpressionRules,
             toggleAssessmentModule,

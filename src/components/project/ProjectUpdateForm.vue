@@ -3,6 +3,7 @@
         <v-row>
             <v-col cols="6">
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'doi')"
                     v-model="doi"
                     label="DOI"
                     placeholder="DOI"
@@ -11,6 +12,7 @@
             </v-col>
             <v-col cols="6">
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'raid')"
                     v-model="raid"
                     :label="$t('raidLabel')"
                     :placeholder="$t('raidLabel')"
@@ -77,9 +79,10 @@
         <v-row>
             <v-col>
                 <ui-input
+                    v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'nationalId')"
                     v-model="nationalId"
-                    :label="$t('nationalIdLabel')"
-                    :placeholder="$t('nationalIdLabel')"
+                    :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
+                    :placeholder="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
                     :rules="projectNationalIdValidationRules"
                 />
             </v-col>
@@ -114,6 +117,9 @@
 </template>
 
 <script setup lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 import UiInput from "@/components/ui/input/Input.vue";
 import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
@@ -127,6 +133,8 @@ import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
 
+const { canBeUpdated } = useIdentifierConfiguration();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
 const props = defineProps<{
     presetProject: Project | undefined;
 }>();

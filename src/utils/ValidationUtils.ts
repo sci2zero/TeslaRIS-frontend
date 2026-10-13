@@ -44,6 +44,7 @@ export const useValidationUtils = () => {
     const invalidAuthenticusIdMessage = computed(() => i18n.t("authenticusIdFormatError"));
     const invalidLattesIdMessage = computed(() => i18n.t("lattesIdFormatError"));
     const invalidRegexMessage = computed(() => i18n.t("invalidRegexMessage"));
+    const invalidNationalIdUrlMessage = computed(() => i18n.t("invalidNationalIdUrlMessage"));
 
     
     const requiredFieldRules = [
@@ -424,6 +425,18 @@ export const useValidationUtils = () => {
         }
     ];
 
+    // The placeholder can sit anywhere in the template, so it is substituted before the URL
+    // itself is validated.
+    const ID_PLACEHOLDER = "{ID}";
+    const nationalIdUrlValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            if (!value.includes(ID_PLACEHOLDER)) return invalidNationalIdUrlMessage.value;
+            if (uriPattern.test(value.split(ID_PLACEHOLDER).join("1"))) return true;
+            return invalidNationalIdUrlMessage.value;
+        }
+    ];
+
     const regexValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -581,6 +594,7 @@ export const useValidationUtils = () => {
         handleIdValidationRules, arxivIdValidationRules, pubmedIdValidationRules,
         ssrnIdValidationRules, gridValidationRules, wikidataValidationRules,
         personNationalIdValidationRules, organisationUnitNationalIdValidationRules,
-        documentNationalIdValidationRules, projectNationalIdValidationRules
+        documentNationalIdValidationRules, projectNationalIdValidationRules,
+        nationalIdUrlValidationRules
     };
 };

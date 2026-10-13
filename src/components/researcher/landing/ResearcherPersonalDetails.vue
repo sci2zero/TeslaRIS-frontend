@@ -38,7 +38,7 @@
                     {{ (((isResearcher || isAdmin) && canEdit) || person?.showFullBirthdate) ? formatDate(person?.personalInfo?.localBirthDate) : person?.personalInfo?.localBirthDate?.slice(0, 4) }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('placeOfBirthLabel')" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.placeOfBirth || '-' }}
+                    {{ person?.personalInfo?.placeOfBirth || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('sexLabel')" class="min-w-0 break-words">
                     {{ formatSex(person?.personalInfo?.sex) }}
@@ -55,19 +55,19 @@
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <landing-detail-field :label="t('streetAndNumberLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.streetAndNumber) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.streetAndNumber) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('cityLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.city) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.city) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('stateLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.state) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.postalAddress.state) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('postalNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.postalAddress.postalNumber || '-' }}
+                    {{ person.personalInfo.postalAddress.postalNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('countryLabel')" class="min-w-0 break-words">
-                    {{ countryName || '-' }}
+                    {{ countryName || t("notYetSetMessage") }}
                 </landing-detail-field>
             </div>
         </landing-section-card>
@@ -81,19 +81,19 @@
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <landing-detail-field :label="t('streetAndNumberLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.streetAndNumber) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.streetAndNumber) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('cityLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.city) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.city) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('stateLabel')" class="min-w-0 break-words">
-                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.state) || '-' }}
+                    {{ returnCurrentLocaleContent(person.personalInfo.privatePostalAddress.state) || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('postalNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.privatePostalAddress.postalNumber || '-' }}
+                    {{ person.personalInfo.privatePostalAddress.postalNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('countryLabel')" class="min-w-0 break-words">
-                    {{ privateCountryName || '-' }}
+                    {{ privateCountryName || t("notYetSetMessage") }}
                 </landing-detail-field>
             </div>
         </landing-section-card>
@@ -107,16 +107,16 @@
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <landing-detail-field :label="t('emailLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.contact.contactEmail || '-' }}
+                    {{ person.personalInfo.contact.contactEmail || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('phoneNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.contact.phoneNumber || '-' }}
+                    {{ person.personalInfo.contact.phoneNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('faxNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.contact.faxNumber || '-' }}
+                    {{ person.personalInfo.contact.faxNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('mobilePhoneNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.contact.mobilePhoneNumber || '-' }}
+                    {{ person.personalInfo.contact.mobilePhoneNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
             </div>
         </landing-section-card>
@@ -130,16 +130,16 @@
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <landing-detail-field :label="t('emailLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.privateContact.contactEmail || '-' }}
+                    {{ person.personalInfo.privateContact.contactEmail || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('phoneNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.privateContact.phoneNumber || '-' }}
+                    {{ person.personalInfo.privateContact.phoneNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('faxNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.privateContact.faxNumber || '-' }}
+                    {{ person.personalInfo.privateContact.faxNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
                 <landing-detail-field :label="t('mobilePhoneNumberLabel')" class="min-w-0 break-words">
-                    {{ person.personalInfo.privateContact.mobilePhoneNumber || '-' }}
+                    {{ person.personalInfo.privateContact.mobilePhoneNumber || t("notYetSetMessage") }}
                 </landing-detail-field>
             </div>
         </landing-section-card>
@@ -165,46 +165,69 @@
             class="min-w-0 [&>header]:flex-wrap"
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <landing-detail-field label="APVNT" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.apvnt || '-' }}
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'apvnt', person?.personalInfo?.apvnt)"
+                    label="APVNT" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.apvnt || t("notYetSetMessage") }}
                 </landing-detail-field>
-                <landing-detail-field label="eCRIS-ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'eCrisId', person?.personalInfo?.eCrisId)"
+                    label="eCRIS-ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field label="enaukaID" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.eNaukaId || '-' }}
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'eNaukaId', person?.personalInfo?.eNaukaId)"
+                    label="enaukaID" class="min-w-0 break-words">
+                    {{ person?.personalInfo?.eNaukaId || t("notYetSetMessage") }}
                 </landing-detail-field>
-                <landing-detail-field :label="t('nationalScienceIdLabel')" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.nationalScienceId || '-' }}
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'nationalScienceId', person?.personalInfo?.nationalScienceId)"
+                    :label="configuredNationalIdentifierLabel || t('nationalScienceIdLabel')" class="min-w-0 break-words">
+                    <identifier-link v-if="person?.personalInfo.nationalScienceId" :identifier="person?.personalInfo.nationalScienceId" type="national_person" />
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field v-if="person?.personalInfo?.orcid" label="ORCID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'orcid', person?.personalInfo?.orcid)"
+                    label="ORCID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.orcid" :identifier="person?.personalInfo.orcid" type="orcid" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field v-if="person?.personalInfo?.scopusAuthorId" label="Scopus Author ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'scopusAuthorId', person?.personalInfo?.scopusAuthorId)"
+                    label="Scopus Author ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.scopusAuthorId" :identifier="person?.personalInfo.scopusAuthorId" type="scopus_author" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field v-if="person?.personalInfo?.openAlexId" label="OpenAlex ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'openAlexId', person?.personalInfo?.openAlexId)"
+                    label="OpenAlex ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.openAlexId" :identifier="person?.personalInfo.openAlexId" type="open_alex" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field v-if="person?.personalInfo?.webOfScienceResearcherId" label="ResearcherID (WoS)" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'webOfScienceResearcherId', person?.personalInfo?.webOfScienceResearcherId)"
+                    label="ResearcherID (WoS)" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.webOfScienceResearcherId" :identifier="person?.personalInfo.webOfScienceResearcherId" type="researcher_id" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field label="Google Scholar ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'scholarId', person?.personalInfo?.scholarId)"
+                    label="Google Scholar ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.scholarId" :identifier="person?.personalInfo.scholarId" type="scholar" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field label="Authenticus ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'authenticusId', person?.personalInfo?.authenticusId)"
+                    label="Authenticus ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.authenticusId" :identifier="person?.personalInfo.authenticusId" type="authenticus" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
-                <landing-detail-field label="Lattes ID" class="min-w-0 break-words">
+                <landing-detail-field
+                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'lattesId', person?.personalInfo?.lattesId)"
+                    label="Lattes ID" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.lattesId" :identifier="person?.personalInfo.lattesId" type="lattes" />
-                    <span v-else>-</span>
+                    <span v-else>{{ t("notYetSetMessage") }}</span>
                 </landing-detail-field>
                 <div class="md:col-span-2">
                     <entity-identifiers-list
@@ -268,6 +291,8 @@
 </template>
 
 <script setup lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PersonUpdateForm from "@/components/person/update/PersonUpdateForm.vue";
@@ -289,6 +314,8 @@ import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import EntityIdentifierService from "@/services/EntityIdentifierService";
 import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
 
+const { isIdentifierShown } = useIdentifierConfiguration();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
 interface Props {
     person: PersonResponse | undefined;
     employments: Employment[];

@@ -73,18 +73,9 @@
                     </p>
                 </template>
                 <template #meta>
-                    <landing-meta-item v-if="person?.personalInfo.orcid" label="ORCID" abbrev="iD" tone="emerald">
-                        <identifier-link :identifier="person.personalInfo.orcid" type="orcid" compact />
-                    </landing-meta-item>
-                    <landing-meta-item v-if="person?.personalInfo.scopusAuthorId" label="Scopus Author ID" abbrev="SC" tone="amber">
-                        <identifier-link :identifier="person.personalInfo.scopusAuthorId" type="scopus_author" compact />
-                    </landing-meta-item>
-                    <landing-meta-item v-if="person?.personalInfo.openAlexId" label="OpenAlex ID" abbrev="OA" tone="slate">
-                        <identifier-link :identifier="person.personalInfo.openAlexId" type="open_alex" compact />
-                    </landing-meta-item>
-                    <landing-meta-item v-if="person?.personalInfo.webOfScienceResearcherId" label="Researcher ID (Web of Science)" abbrev="WoS" tone="blue">
-                        <identifier-link :identifier="person.personalInfo.webOfScienceResearcherId" type="researcher_id" compact />
-                    </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.PERSON"
+                        :source="person?.personalInfo" />
                     <landing-meta-item v-if="person?.personalInfo.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="slate">
                         <identifier-link :identifier="person.personalInfo.contact.contactEmail" type="email" compact />
                     </landing-meta-item>
@@ -463,6 +454,7 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
 import DataQualityService from '@/services/revision/DataQualityService';
@@ -536,7 +528,7 @@ import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 export default defineComponent({
     name: "ResearcherLandingPage",
-    components: { PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter, UiCheckbox },
+    components: { FeaturedIdentifiers, PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, Toast, GenericCrudModal, PersonOtherNameModal, PersistentQuestionDialog, PersonAssessmentsView, AddPublicationMenu, LandingSectionCard, IndicatorsSection, SearchBarComponent, PersonVisualizations, EntityLandingHeader, LandingMetaItem, IdentifierLink, LocalizedLink, PersonProfileImage, ResearcherFeaturedIndicators, RevisionHistoryTableComponent, DataQualityTabsComponent, UiButton, ResearcherAdditionalInfoTab, ProjectTableComponent, ProjectStatusFilter, UiCheckbox },
     setup() {
         const currentTab = ref("additionalInfo");
 

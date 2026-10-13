@@ -120,12 +120,14 @@
                         :rules="scopusIdValidationRules"
                     />
                     <ui-input
+                        v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'openAlexId')"
                         v-model="openAlexId"
                         label="Open Alex ID"
                         placeholder="Open Alex ID"
                         :rules="workOpenAlexIdValidationRules"
                     />
                     <ui-input
+                        v-if="canBeUpdated(ApplicableEntityType.DOCUMENT, 'webOfScienceId')"
                         v-model="webOfScienceId"
                         label="Web of Science ID"
                         placeholder="Web of Science ID"
@@ -144,6 +146,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, nextTick } from 'vue';
 import MultilingualTextInput from '../core/MultilingualTextInput.vue';
 import { ref } from 'vue';
@@ -198,6 +202,7 @@ export default defineComponent({
     },
     emits: ["create"],
     setup(props, {emit}) {
+        const { canBeUpdated } = useIdentifierConfiguration();
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -431,6 +436,7 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
             isFormValid, additionalFields, popuateMetadata,
             snackbar, message, isbnValidationRules, acronym,
             title, titleRef, subtitle, subtitleRef, PublicationType,

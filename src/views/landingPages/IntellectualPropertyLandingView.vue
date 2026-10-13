@@ -57,9 +57,9 @@
                     <landing-meta-item v-if="intellectualProperty?.number" :label="$t('intellectualPropertyNumberLabel')" icon="mdi-identifier" tone="emerald">
                         {{ intellectualProperty.number }}
                     </landing-meta-item>
-                    <landing-meta-item v-if="intellectualProperty?.doi" label="DOI" abbrev="DOI" tone="blue">
-                        <identifier-link :identifier="intellectualProperty.doi" compact />
-                    </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :source="intellectualProperty" />
                 </template>
                 <template #actions>
                     <document-action-box
@@ -270,6 +270,8 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
 import type { LanguageTagResponse, MultilingualContent } from '@/models/Common';
 import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -322,15 +324,15 @@ import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
 import LandingMetaItem from '@/components/landing/LandingMetaItem.vue';
 import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "IntellectualPropertyLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, IdentifierLink },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
+        const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -545,6 +547,7 @@ export default defineComponent({
         };
 
         return {
+            isIdentifierShown,
             intellectualProperty, currentTab, showOverview, showOverviewTab, onOverviewContent, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent, IntellectualPropertyUpdateForm, canClassify,
             languageTagMap, searchKeyword, canEdit, isResearcher,

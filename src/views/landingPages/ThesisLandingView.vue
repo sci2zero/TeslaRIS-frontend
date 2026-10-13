@@ -100,9 +100,9 @@
                     <landing-meta-item v-if="thesis?.topicAcceptanceDate" :label="$t('topicAcceptanceDateLabel')" icon="mdi-file-check-outline" tone="amber">
                         {{ localiseDate(thesis.topicAcceptanceDate) }}
                     </landing-meta-item>
-                    <landing-meta-item v-if="thesis?.doi" label="DOI" abbrev="DOI" tone="blue">
-                        <identifier-link :identifier="thesis.doi" compact />
-                    </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :source="thesis" />
                     <landing-meta-item v-if="thesis?.eisbn" label="eISBN" abbrev="eISBN" tone="indigo">
                         {{ thesis.eisbn }}
                     </landing-meta-item>
@@ -564,6 +564,8 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
 import { ApplicableEntityType, type LanguageTagResponse, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { computed, onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -630,15 +632,15 @@ import LandingOverviewTab from '@/components/landing/LandingOverviewTab.vue';
 import { useLandingOverview } from '@/composables/useLandingOverview';
 import RichTitleRenderer from '@/components/core/RichTitleRenderer.vue';
 import LocalizedLink from '@/components/localization/LocalizedLink.vue';
-import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import { getThesisTitleFromValueAutoLocale } from '@/i18n/thesisType';
 import { localiseDate, localiseFlexibleDate } from '@/utils/DateUtil';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "ThesisLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton, EntityLandingHeader, LandingMetaItem, LandingOverviewTab, RichTitleRenderer, LocalizedLink, IdentifierLink },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, EntityClassificationView, IndicatorsSection, PersistentQuestionDialog, ThesisResearchOutputSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, ThesisAdditionalInfoTab, CitationSelector, PublicationUnbindButton, PublicationBadgeSection, UiButton, EntityLandingHeader, LandingMetaItem, LandingOverviewTab, RichTitleRenderer, LocalizedLink },
     setup() {
+        const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -1186,6 +1188,7 @@ export default defineComponent({
         };
 
         return {
+            isIdentifierShown,
             thesis, publisher, createIndicator, languageTagMap, canAssessDataQuality, isDigitalLibraryEnabled, restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, fetchIndicators,
             languageMap, searchKeyword, canEdit, putOnPublicReview,

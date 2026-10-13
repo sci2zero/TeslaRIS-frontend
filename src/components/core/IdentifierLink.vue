@@ -1,7 +1,7 @@
 <template>
     <a
-        v-if="identifier"
-        :href="`${computeBaseURL()}${identifier}`"
+        v-if="identifier && href"
+        :href="href"
         target="_blank"
         rel="noopener noreferrer"
         class="group inline-flex max-w-full items-baseline gap-1 text-sm font-medium leading-5 text-slate-800 break-all rounded-sm transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
@@ -14,11 +14,20 @@
             aria-hidden="true"
         />
     </a>
+    <span
+        v-else-if="identifier"
+        class="inline-flex max-w-full items-baseline text-sm font-medium leading-5 text-slate-800 break-all"
+    >
+        {{ identifier }}
+    </span>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { crisContextInformationState } from '@/composables/useCrisContextInformation';
 
+
+const ID_PLACEHOLDER = "{ID}";
 
 export default defineComponent({
     name: "IdentifierLink",
@@ -76,7 +85,37 @@ export default defineComponent({
             return "https://doi.org/";
         };
 
-        return { computeBaseURL };
+        const nationalIdUrlTemplate = computed(() => {
+            switch (props.type) {
+                case "national_person":
+                    return crisContextInformationState.value.personNationalIdUrl;
+                case "national_organisation_unit":
+                    return crisContextInformationState.value.organisationUnitNationalIdUrl;
+                case "national_project":
+                    return crisContextInformationState.value.projectNationalIdUrl;
+                case "national_document":
+                    return crisContextInformationState.value.documentNationalIdUrl;
+            }
+
+            return undefined;
+        });
+
+        const isNationalIdentifier = computed(() => props.type.startsWith("national_"));
+
+        // A national identifier has no portal unless this deployment configured one, in which case
+        // the identifier renders as plain text.
+        const href = computed(() => {
+            if (isNationalIdentifier.value) {
+                const template = nationalIdUrlTemplate.value;
+                return template
+                    ? template.split(ID_PLACEHOLDER).join(props.identifier)
+                    : null;
+            }
+
+            return `${computeBaseURL()}${props.identifier}`;
+        });
+
+        return { href };
     }
 });
 </script>

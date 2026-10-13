@@ -36,6 +36,9 @@
                     <rich-title-renderer :title="returnCurrentLocaleContent(monograph?.title)" />
                 </template>
                 <template #meta>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.DOCUMENT"
+                        :source="monograph" />
                     <landing-meta-item v-if="monograph?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
                         {{ localiseFlexibleDate(monograph.documentDate) }}
                     </landing-meta-item>
@@ -317,6 +320,7 @@
 </template>
 
 <script lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import { ApplicableEntityType, type LanguageResponse, type MultilingualContent } from '@/models/Common';
 import { onMounted, nextTick } from 'vue';
 import { defineComponent, ref } from 'vue';
@@ -382,7 +386,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { LandingResearchAreasSection, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, LocalizedLink, PublicationTableComponent, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { FeaturedIdentifiers, LandingResearchAreasSection, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, LocalizedLink, PublicationTableComponent, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const currentTab = ref("overview");
 

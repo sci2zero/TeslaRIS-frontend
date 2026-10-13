@@ -52,26 +52,36 @@ export function useUserRole() {
     
     const loginStore = useLoginStore();
 
-    onMounted(() => {
-        if (loginStore.userLoggedIn) {
-            UserService.getLoggedInUser().then(response => {
-                loggedInUser.value = response.data;
-
-                if (!hasInstitution.value) {
-                    returnOnlyInstitutionRelatedEntities.value = false;
-                }
-            });
-
-            if (isResearcher.value) {
-                PersonService.getPersonId().then(response => {
-                    loggedResearcherId.value = response.data;
-                });
-            }
+    const loadLoggedInUser = () => {
+        if (!loginStore.userLoggedIn) {
+            loggedInUser.value = null;
+            loggedResearcherId.value = -1;
+            return;
         }
-    });
 
+        UserService.getLoggedInUser().then(response => {
+            loggedInUser.value = response.data;
+
+            if (!hasInstitution.value) {
+                returnOnlyInstitutionRelatedEntities.value = false;
+            }
+        });
+
+        if (isResearcher.value) {
+            PersonService.getPersonId().then(response => {
+                loggedResearcherId.value = response.data;
+            });
+        }
+    };
+
+    onMounted(loadLoggedInUser);
+
+    // Logging in does not remount the components already on screen, so everything derived from the
+    // user has to be reloaded here, not only the role.
     watch(() => loginStore.userLoggedIn, () => {
         userRole.value = UserService.provideUserRole();
+        returnOnlyInstitutionRelatedEntities.value = isUserBoundToOU.value as boolean;
+        loadLoggedInUser();
     });
 
     watch(() => loginStore.explicitlyLoggedOut, () => {

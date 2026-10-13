@@ -44,6 +44,7 @@
                 <v-row>
                     <v-col>
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'scopusAfid')"
                             v-model="scopusAfid"
                             label="Scopus AFID"
                             :rules="scopusAfidValidationRules"
@@ -53,6 +54,7 @@
                 <v-row>
                     <v-col>
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'openAlexId')"
                             v-model="openAlexId"
                             label="Open Alex ID"
                             :rules="institutionOpenAlexIdValidationRules"
@@ -62,6 +64,7 @@
                 <v-row>
                     <v-col>
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'ror')"
                             v-model="ror"
                             label="ROR ID"
                             placeholder="Research Organisation Registry ID"
@@ -71,33 +74,34 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12" md="6">
-                        <ui-input v-model="ringgold" label="Ringgold ID" :rules="ringgoldValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'ringgold')" v-model="ringgold" label="Ringgold ID" :rules="ringgoldValidationRules" />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <ui-input v-model="fundref" label="FundRef" :rules="fundrefValidationRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12" md="6">
-                        <ui-input v-model="isni" label="ISNI" :rules="isniValidationRules" />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                        <ui-input v-model="fctId" label="FCT ID" :rules="fctIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'fundref')" v-model="fundref" label="FundRef" :rules="fundrefValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12" md="6">
-                        <ui-input v-model="grid" label="GRID" :rules="gridValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'isni')" v-model="isni" label="ISNI" :rules="isniValidationRules" />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <ui-input v-model="wikidata" label="Wikidata ID" :rules="wikidataValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'fctId')" v-model="fctId" label="FCT ID" :rules="fctIdValidationRules" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" md="6">
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'grid')" v-model="grid" label="GRID" :rules="gridValidationRules" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'wikidata')" v-model="wikidata" label="Wikidata ID" :rules="wikidataValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="12">
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'nationalId')"
                             v-model="nationalId"
-                            :label="$t('nationalIdLabel')"
+                            :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')"
                             :rules="organisationUnitNationalIdValidationRules"
                         />
                     </v-col>
@@ -110,6 +114,7 @@
                 <v-row>
                     <v-col cols="12">
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.ORGANISATION_UNIT, 'taxNumber')"
                             v-model="taxNumber"
                             :label="$t('taxNumberLabel')"
                             :rules="taxNumberValidationRules"
@@ -305,6 +310,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, onMounted, watch, type PropType } from 'vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import { ref } from 'vue';
@@ -329,6 +336,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "OrganisationUnitUpdateForm",
     components: { MultilingualTextInput, OpenLayersMap, UriInput, Toast, DatePicker, UiInput, UiCheckbox },
@@ -344,6 +352,8 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
         const isFormValid = ref(false);
 
         const { languageTags } = useLanguageTags();
@@ -592,6 +602,8 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
+            configuredNationalIdentifierLabel,
             isFormValid, name, mapRef,
             nameAbbreviation, refreshForm,
             email, phoneNumber, scopusAfid,

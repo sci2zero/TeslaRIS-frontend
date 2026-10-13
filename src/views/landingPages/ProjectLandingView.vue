@@ -55,15 +55,9 @@
                     <landing-meta-item v-if="project?.dateTo" :label="$t('dateToLabel')" icon="mdi-calendar-end" tone="amber">
                         {{ localiseDate(project.dateTo) }}
                     </landing-meta-item>
-                    <landing-meta-item v-if="project?.doi" label="DOI" abbrev="DOI" tone="blue">
-                        <identifier-link :identifier="project.doi" type="doi" compact />
-                    </landing-meta-item>
-                    <landing-meta-item v-if="project?.raid" :label="$t('raidLabel')" abbrev="RAiD" tone="indigo">
-                        <identifier-link :identifier="project.raid" type="raid" compact />
-                    </landing-meta-item>
-                    <landing-meta-item v-if="project?.nationalId" :label="$t('nationalIdLabel')" icon="mdi-identifier" tone="violet">
-                        {{ project.nationalId }}
-                    </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.PROJECT"
+                        :source="project" />
                     <landing-meta-item v-if="principleInvestigators.length > 0" :label="$t('principleInvestigatorLabel')" icon="mdi-account" tone="emerald">
                         <div v-for="investigator in principleInvestigators" :key="investigator.id">
                             <localized-link v-if="investigator.personId" :to="'persons/' + investigator.personId" class="underline">
@@ -268,11 +262,11 @@
 </template>
 
 <script setup lang="ts">
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import RichTitleRenderer from "@/components/core/RichTitleRenderer.vue";
-import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
 import ProjectService from "@/services/project/ProjectService";
 import type { OrganisationUnitProjectContribution, PersonProjectContribution, Project } from "@/models/ProjectModel";
@@ -298,7 +292,7 @@ import DataQualityService from "@/services/revision/DataQualityService";
 import Toast from "@/components/core/Toast.vue";
 import { EntityType } from "@/models/MergeModel";
 import { useUserRole } from "@/composables/useUserRole";
-import type { MultilingualContent } from "@/models/Common";
+import type { MultilingualContent, ApplicableEntityType} from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
 import EntityLandingHeader from "@/components/landing/EntityLandingHeader.vue";
 import LandingMetaItem from "@/components/landing/LandingMetaItem.vue";

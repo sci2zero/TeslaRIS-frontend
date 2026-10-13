@@ -147,7 +147,8 @@ const {
     isViceDeanForScience, isHeadOfLibrary,
     isUserBoundToOU, isInstitutionalEditor,
     isInstitutionalLibrarian,
-    isPromotionRegistryAdministrator
+    isPromotionRegistryAdministrator,
+    hasInstitution
 } = useUserRole();
 
 const {
@@ -382,7 +383,7 @@ const menuItems = ref<MenuItem[]>([
     { key: 'events', label: computed(() => i18n.t('eventListLabel')), to: '/events', icon: 'mdi-calendar', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'journals', label: computed(() => i18n.t('journalListLabel')), to: '/journals', icon: 'mdi-book-open-page-variant', condition: computed(() => loginStore.userLoggedIn && isCommission.value) },
     { key: 'prizes', label: computed(() => i18n.t('prizesLabel')), to: '/prizes', icon: 'mdi-seal', condition: computed(() => loginStore.userLoggedIn && (isCommission.value)) },
-    { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && (isViceDeanForScience.value)) },
+    { key: 'assessment-reporting', label: computed(() => i18n.t('reportingLabel')), to: '/assessment/reporting', icon: 'mdi-file-chart', condition: computed(() => loginStore.userLoggedIn && isViceDeanForScience.value && hasInstitution.value) },
     { key: 'repository-analytics', label: computed(() => i18n.t('routeLabel.repositoryAnalytics')), to: '/repository-analytics', icon: 'mdi-home-analytics', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     { key: 'issue-explorer', label: computed(() => i18n.t('routeLabel.issueExplorer')), to: '/issue-explorer', icon: 'mdi-magnify-scan', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },
     { key: 'policy-explorer', label: computed(() => i18n.t('routeLabel.policyExplorer')), to: '/policy-explorer', icon: 'mdi-shield-check-outline', condition: computed(() => isAdmin.value || isInstitutionalEditor.value || isViceDeanForScience.value) },

@@ -61,23 +61,24 @@
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <date-picker v-model="birthdate" :label="$t('birthdateLabel')" color="primary" />
-                    <ui-input v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'orcid')" v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
-                    <ui-input v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eCrisId')" v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eNaukaId')" v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-model="nationalScienceId" :label="$t('nationalScienceIdLabel')" :rules="personNationalIdValidationRules" />
-                    <ui-input v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'nationalScienceId')" v-model="nationalScienceId" :label="configuredNationalIdentifierLabel || $t('nationalScienceIdLabel')" :rules="personNationalIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scholarId')" v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
-                    <ui-input v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'apvnt')" v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scopusAuthorId')" v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'openAlexId')" v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
                     <ui-input
+                        v-if="canBeUpdated(ApplicableEntityType.PERSON, 'webOfScienceResearcherId')"
                         v-model="webOfScienceId"
                         label="ResearcherID (WoS)"
                         placeholder="ResearcherID (WoS)"
@@ -85,8 +86,8 @@
                     />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
-                    <ui-input v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'authenticusId')" v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
+                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'lattesId')" v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
                 </div>
                 <multilingual-text-input v-model="displayTitle" :label="$t('displayTitleLabel')" />
             </template>
@@ -110,6 +111,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, onMounted, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
@@ -134,6 +137,7 @@ import { UiButton } from '@/components/ui/button';
 import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 
 
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "PersonSubmissionForm",
     components: { OrganisationUnitAutocompleteSearch, DatePicker, PersonDeduplicationTable, Toast, MultilingualTextInput, UiInput, FormSection, UiButton, ResearchAreasSelection },
@@ -149,6 +153,8 @@ export default defineComponent({
     },
     emits: ["create", "selected"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 
@@ -308,6 +314,8 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
+            configuredNationalIdentifierLabel,
             isFormValid, additionalFields, snackbar, message, deduplicationTableRef, role,
             firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
             email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,

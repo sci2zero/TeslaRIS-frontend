@@ -29,61 +29,62 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'orcid')" v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eCrisId')" v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eNaukaId')" v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
                         <ui-input
+                            v-if="canBeUpdated(ApplicableEntityType.PERSON, 'nationalScienceId')"
                             v-model="nationalScienceId"
-                            :label="$t('nationalScienceIdLabel')"
+                            :label="configuredNationalIdentifierLabel || $t('nationalScienceIdLabel')"
                             :rules="personNationalIdValidationRules"
                         />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'apvnt')" v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scopusAuthorId')" v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'openAlexId')" v-model="openAlex" label="Open Alex ID" :rules="personOpenAlexIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="webOfScienceId" label="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'webOfScienceResearcherId')" v-model="webOfScienceId" label="ResearcherID (WoS)" :rules="personWebOfScienceIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scholarId')" v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'authenticusId')" v-model="authenticusId" label="Authenticus ID" :rules="personAuthenticusIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
+                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'lattesId')" v-model="lattesId" label="Lattes ID" :rules="lattesIdValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -302,6 +303,8 @@
 </template>
 
 <script lang="ts">
+import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
+import { ApplicableEntityType } from '@/models/Common';
 import { defineComponent, watch, type PropType } from 'vue';
 import { ref } from 'vue';
 import type { Country, MultilingualContent } from '@/models/Common';
@@ -325,6 +328,7 @@ import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue
 import type { ResearchArea } from '@/models/OrganisationUnitModel';
 
 
+import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "PersonUpdateForm",
     components: { MultilingualTextInput, DatePicker, UriInput, Toast, UiInput, ResearchAreasSelection },
@@ -340,6 +344,8 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
+        const { canBeUpdated } = useIdentifierConfiguration();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
         const isFormValid = ref(false);
         const { languageTags } = useLanguageTags();
 
@@ -605,6 +611,8 @@ export default defineComponent({
         };
 
         return {
+            canBeUpdated, ApplicableEntityType,
+            configuredNationalIdentifierLabel,
             isFormValid, email, phoneNumber, birthdate, snackbar,
             orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
             toMultilingualTextInput, languageTags, submit, message,

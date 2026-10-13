@@ -123,6 +123,7 @@ export enum ApplicableEntityType {
     MATERIAL_PRODUCT = "MATERIAL_PRODUCT",
     GENETIC_MATERIAL = "GENETIC_MATERIAL",
     PERFORMANCE_RELATED_OUTPUT = "PERFORMANCE_RELATED_OUTPUT",
+    PROJECT = "PROJECT",
     PRIZE = "PRIZE",
     THESIS = "THESIS",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
@@ -448,6 +449,10 @@ export interface CrisContextInformation {
     metadataLicense: License;
     identifierConfiguration: IdentifierConfigurationMatrix;
     nationalIdentifierName: MultilingualContent[];
+    personNationalIdUrl: string;
+    organisationUnitNationalIdUrl: string;
+    projectNationalIdUrl: string;
+    documentNationalIdUrl: string;
     orcidLoginToggle: boolean;
 }
 
