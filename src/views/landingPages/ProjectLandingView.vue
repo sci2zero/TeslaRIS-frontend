@@ -292,7 +292,7 @@ import DataQualityService from "@/services/revision/DataQualityService";
 import Toast from "@/components/core/Toast.vue";
 import { EntityType } from "@/models/MergeModel";
 import { useUserRole } from "@/composables/useUserRole";
-import type { MultilingualContent, ApplicableEntityType} from "@/models/Common";
+import { type MultilingualContent, ApplicableEntityType} from "@/models/Common";
 import { useLoginStore } from "@/stores/loginStore";
 import EntityLandingHeader from "@/components/landing/EntityLandingHeader.vue";
 import LandingMetaItem from "@/components/landing/LandingMetaItem.vue";
