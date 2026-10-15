@@ -1,6 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
+import { useDownloadStore } from "@/stores/downloadStore";
 import { type ConstraintSummary, type MetricSummary, type DataQualityAssessment, type DataQualityIssueDetails, type DataQualityIssuePage, type DataQualityProfile, type DataQualityProfileSummary, type QualityReportResponse, type ProfileRelatedQuality, type PolicyExplorer } from "@/models/RevisionModel";
 
 
@@ -116,6 +117,47 @@ export class DataQualityService extends BaseService {
 
   async getAssessmentsForVersion(entityType: string, entityId: number, majorVersion: number, minorVersion: number): Promise<AxiosResponse<DataQualityAssessment[]>> {
     return super.sendRequest(axios.get, `data-quality/assessments/${entityType}/${entityId}/${majorVersion}/${minorVersion}`);
+  }
+
+  async downloadFullReport(entityType: string, entityId: number, profileName: string, majorVersion: number, minorVersion: number, language: string): Promise<void> {
+    const downloadStore = useDownloadStore();
+
+    if (downloadStore.isDownloading) {
+      return;
+    }
+
+    const fileName = "full-assessment-report";
+
+    downloadStore.downloadProgressRef?.startDownload(fileName);
+
+    const params = new URLSearchParams({
+      profileName,
+      majorVersion: `${majorVersion}`,
+      minorVersion: `${minorVersion}`,
+      language
+    });
+
+    const response = await axios.get(this.basePath + `data-quality/full-report/${entityType}/${entityId}/download?${params.toString()}`, {
+      responseType: "blob",
+      onDownloadProgress: (progressEvent: any) => {
+        if (progressEvent.total) {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+
+          downloadStore.downloadProgressRef?.updateProgress(percent);
+        }
+      }
+    }).catch(error => {
+      downloadStore.downloadProgressRef?.cancelDownload();
+      throw error;
+    });
+
+    // A response without a content length never reports progress, so the bar is closed explicitly
+    // rather than left spinning.
+    downloadStore.downloadProgressRef?.updateProgress(100);
+
+    this.initialzeDownload(response, fileName, "xlsx");
   }
 }
 

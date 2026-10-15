@@ -66,7 +66,7 @@
                                     variant="outlined"
                                     density="comfortable"
                                     block
-                                    append-icon="mdi-chevron-down"
+                                    prepend-icon="mdi-download"
                                     @click="downloadFullReport">
                                     {{ $t("downloadFullAssessmentReportLabel") }}
                                 </v-btn>
@@ -379,6 +379,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import type { PropType } from "vue";
 import {
     RELATED_ENTITY_TARGETS,
@@ -425,6 +426,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const i18n = useI18n();
         const currentSubTab = ref("assessment");
         const loading = ref(false);
 
@@ -491,8 +493,20 @@ export default defineComponent({
         const totalRules = computed(() =>
             (selectedAssessment.value?.passedRules ?? 0) + failedRules.value.length);
 
-        // TODO: report generation is not implemented yet.
+        // The related quality section is added server side for the entity types that show the
+        // tab, so only the assessment tab's own selection is sent.
         const downloadFullReport = () => {
+            if (!props.entityId || !selectedProfileName.value || !selectedVersion.value) {
+                return;
+            }
+
+            DataQualityService.downloadFullReport(
+                props.entityType,
+                props.entityId,
+                selectedProfileName.value,
+                selectedVersion.value.majorVersion,
+                selectedVersion.value.minorVersion,
+                i18n.locale.value);
         };
 
         const assessmentProfileKeys = computed(() =>
