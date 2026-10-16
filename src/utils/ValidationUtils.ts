@@ -39,7 +39,7 @@ export const useValidationUtils = () => {
     const requiredFutureTimeMessage = computed(() => i18n.t("requiredFutureTimeMessage"));
     const atLeastOneRequiredMessage = computed(() => i18n.t("atLeastOneRequiredMessage"));
     const invalidUDCMessage = computed(() => i18n.t("udcFormatError"));
-    const positiveOrZeroFieldMessage = computed(() => i18n.t("positiveOrZeroFieldMessage"));
+    const positiveFieldMessage = computed(() => i18n.t("positiveFieldMessage"));
     const invalidScholarIdMessage = computed(() => i18n.t("scholarIdFormatError"));
     const invalidAuthenticusIdMessage = computed(() => i18n.t("authenticusIdFormatError"));
     const invalidLattesIdMessage = computed(() => i18n.t("lattesIdFormatError"));
@@ -71,7 +71,7 @@ export const useValidationUtils = () => {
     const optionalNumericZeroOrGreaterFieldRules = [
         (value: number) => {
             if (!value) return true;
-            if (value <= 0) return positiveOrZeroFieldMessage.value;
+            if (value <= 0) return positiveFieldMessage.value;
             return true;
         }
     ];

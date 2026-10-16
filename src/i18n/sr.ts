@@ -956,7 +956,7 @@ export default {
     promotionListLabel: "Promocije",
     createNewPromotionLabel: "Kreiraj novu promociju",
     dateTimeLabel: "Datum i vreme",
-    createNewRegistryBookEntryLabel: "Kreiraj novi zapis u matičnoj knjizi",
+    createNewRegistryBookEntryLabel: "Podaci za promociju doktora nauka",
     updateRegistryBookEntryLabel: "Ažuriraj zapis u matičnoj knjizi",
     countryOfBirthLabel: "Država rođenja",
     municipalityOfBirthLabel: "Opština rođenja",
@@ -1375,7 +1375,7 @@ export default {
     enterOneOfThreeLabel: "Unesite bar jedan od ova tri podatka",
     updateChartDisplayConfigurationLabel: "Prikaz vizuelizacija",
     spanWholeRowLabel: "Raspon na celi red",
-    positiveOrZeroFieldMessage: "Ovo polje ne može biti < 0.",
+    positiveFieldMessage: "Ovo polje ne može biti <= 0.",
     loading: "Učitavanje...",
     citations: "citata",
     footer: {

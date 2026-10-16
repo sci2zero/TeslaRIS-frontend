@@ -955,7 +955,7 @@ export default {
     promotionListLabel: "Promotions",
     createNewPromotionLabel: "Create new promotion",
     dateTimeLabel: "Date and time",
-    createNewRegistryBookEntryLabel: "Create new registry book entry",
+    createNewRegistryBookEntryLabel: "Data for the PhD promotion",
     updateRegistryBookEntryLabel: "Update registry book entry",
     countryOfBirthLabel: "Country of birth",
     municipalityOfBirthLabel: "Municipality of birth",
@@ -1370,7 +1370,7 @@ export default {
     enterOneOfThreeLabel: "Enter at least one of these three",
     updateChartDisplayConfigurationLabel: "Visualizations display",
     spanWholeRowLabel: "Span whole row",
-    positiveOrZeroFieldMessage: "This field can't be < 0.",
+    positiveFieldMessage: "This field can't be <= 0.",
     loading: "Loading...",
     citations: "citations",
     footer: {
