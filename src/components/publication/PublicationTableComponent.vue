@@ -356,22 +356,11 @@ export default defineComponent({
         const exportModal = ref<any>(null);
 
         const {
-            isDigitalRepositoryEnabled
+            isDigitalRepositoryEnabled,
+            isAssessmentModuleEnabled
         } = useCrisContextInformation();
+
         onMounted(() => {
-            if ((props.inClaimer ||
-                isAdmin.value ||
-                isCommission.value ||
-                props.validationView) &&
-                !props.richResultsView
-            ) {
-                headers.value.push({ title: actionLabel.value, align: "start", sortable: false, key: "action"});
-            }
-
-            if (isCommission.value) {
-                headers.value.push({ title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"});
-            }
-
             tableOptions.value.sortBy = [{key: "year", order: "desc"}];
         });
 
@@ -450,6 +439,49 @@ export default defineComponent({
                 headers.value.splice(index, 1);
             }
         }, { immediate: true });
+
+        // The configuration flags and the user's roles are both resolved asynchronously, so these
+        // columns cannot be decided once on mount - they are synced whenever their inputs change.
+        const showActionColumn = computed(() =>
+            (props.inClaimer ||
+                (isAssessmentModuleEnabled.value && (isAdmin.value || isCommission.value)) ||
+                props.validationView) &&
+            !props.richResultsView);
+
+        // Appended in this order whichever of them shows first, so a flag that resolves late
+        // cannot reshuffle the columns.
+        const tailColumnOrder = ["action", "classifiedBy"];
+
+        const syncTailColumn = (shown: boolean, header: any) => {
+            const index = headers.value.findIndex((candidate: any) => candidate.key === header.key);
+
+            if (!shown) {
+                if (index !== -1) {
+                    headers.value.splice(index, 1);
+                }
+
+                return;
+            }
+
+            if (index !== -1) {
+                return;
+            }
+
+            const position = tailColumnOrder.indexOf(header.key);
+            const successor = headers.value.findIndex((candidate: any) =>
+                tailColumnOrder.indexOf(candidate.key) > position);
+
+            headers.value.splice(
+                successor === -1 ? headers.value.length : successor, 0, header);
+        };
+
+        watch(showActionColumn, (shown) => syncTailColumn(shown,
+            { title: actionLabel, align: "start", sortable: false, key: "action"}),
+        { immediate: true });
+
+        watch(isCommission, (shown) => syncTailColumn(shown,
+            { title: assessedByMeLabel, align: "start", sortable: false, key: "classifiedBy"}),
+        { immediate: true });
 
         // const yearHeader = computed(() => headers.value.find((header: any) => header.key === "year") as any);
         const yearHeader = ref({ title: yearOfPublicationLabel, align: "start", sortable: true, key: "year", defaultOrder: "desc" })
@@ -694,10 +726,11 @@ export default defineComponent({
             isCommission, startMetadataComparison,
             startPublicationComparison, setSortAndPageOption, claimPublication,
             declinePublicationClaim, loggedInUser, documentClassified,
-            removeResearchOutputs, ExportEntity,
-            isUserLoggedIn, validateSection,
+            removeResearchOutputs, ExportEntity, isUserLoggedIn, validateSection,
             validateSectionForAll, canPerformUnbinding, openExportModal, exportModal,
-            titleColumn, yearHeader, displayPersistentDialog, startDeletionProcess, showSelect, showClassification, glanceOpen, glancedPublication, openGlance, isDigitalRepositoryEnabled,
+            titleColumn, yearHeader, displayPersistentDialog, startDeletionProcess,
+            showSelect, showClassification, glanceOpen, glancedPublication,
+            openGlance, isDigitalRepositoryEnabled, isAssessmentModuleEnabled
         };
     }
 });

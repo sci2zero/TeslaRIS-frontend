@@ -123,7 +123,7 @@
             <v-tab v-show="(documentIndicators && documentIndicators.length > 0) || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="(documentClassifications && documentClassifications.length > 0) || canClassify" value="assessments">
+            <v-tab v-show="isAssessmentModuleEnabled && ((documentClassifications && documentClassifications.length > 0) || canClassify)" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -421,7 +421,8 @@ export default defineComponent({
         } = useUserRole();
 
         const {
-            isDigitalRepositoryEnabled
+            isDigitalRepositoryEnabled,
+            isAssessmentModuleEnabled
         } = useCrisContextInformation();
 
         const canEdit = ref(false);
@@ -690,19 +691,19 @@ export default defineComponent({
         };
 
         return {
-            monograph, actionsRef, canAssessDataQuality, canReviewDataQuality,
-            returnCurrentLocaleContent,
-            languageMap, updateBasicInfo,
-            searchKeyword, goToURL, canEdit,
-            updateKeywords, updateDescription,
-            snackbar, snackbarMessage, event,
+            monograph, actionsRef, canAssessDataQuality,
+            returnCurrentLocaleContent, canReviewDataQuality,
+            languageMap, updateBasicInfo, searchKeyword, 
+            goToURL, canEdit, updateKeywords, updateDescription,
+            snackbar, snackbarMessage, event, openModal,
             researchAreaHierarchy, updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,
             handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType,
-            currentTab, showOverview, showOverviewTab, onOverviewContent, updateResearchAreas,
+            currentTab, showOverview, showOverviewTab,
+            onOverviewContent, updateResearchAreas,
             ApplicableEntityType, currentRoute,
             createIndicator, fetchIndicators,
             createClassification, fetchClassifications,
@@ -712,11 +713,9 @@ export default defineComponent({
             isAdmin, isCommission, MonographUpdateForm,
             fetchIdentifiers, documentIdentifiers,
             MonographType, localiseFlexibleDate,
-            fetchMonograph,
+            fetchMonograph, isAssessmentModuleEnabled,
             dataQualityTabsRef, showAssessmentDetails,
-            updateModalRef, openModal,
-
-            isDigitalRepositoryEnabled,
+            updateModalRef, isDigitalRepositoryEnabled
         };
 }})
 

@@ -12,13 +12,14 @@
             {{ $t("declineClaimLabel") }}
         </v-btn>
         <entity-classification-modal-content
-            v-if="showClassification"
+            v-if="showClassification && isAssessmentModuleEnabled"
             :entity-id="(item.databaseId as number)"
             :entity-type="ApplicableEntityType.DOCUMENT"
             :applicable-type="getApplicableEntityTypeForDocumentType(item.type)"
             :disabled="!item.year || item.year < 0"
             @classified="$emit('classified', item)"
-            @update="$emit('refresh')" />
+            @update="$emit('refresh')"
+        />
         <v-btn
             v-if="validationView"
             size="small"
@@ -44,6 +45,7 @@ import type { DocumentPublicationIndex } from "@/models/PublicationModel";
 import EntityClassificationModalContent from "../assessment/classifications/EntityClassificationModalContent.vue";
 import { ApplicableEntityType } from "@/models/Common";
 import { getApplicableEntityTypeForDocumentType } from "@/i18n/applicableEntityType";
+import { useCrisContextInformation } from "@/composables/useCrisContextInformation.js";
 
 defineProps<{
     item: DocumentPublicationIndex;
@@ -51,6 +53,8 @@ defineProps<{
     showClassification?: boolean;
     validationView?: boolean;
 }>();
+
+const { isAssessmentModuleEnabled } = useCrisContextInformation();
 
 defineEmits<{
     claim: [documentId: number];

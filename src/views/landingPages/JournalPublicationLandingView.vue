@@ -103,7 +103,7 @@
             <v-tab v-show="(documentIndicators && documentIndicators.length > 0) || canClassify" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
-            <v-tab v-show="(documentClassifications && documentClassifications.length > 0) || canClassify" value="assessments">
+            <v-tab v-show="isAssessmentModuleEnabled && ((documentClassifications && documentClassifications.length > 0) || canClassify)" value="assessments">
                 {{ $t("assessmentsLabel") }}
             </v-tab>
             <v-tab v-show="displayConfiguration.shouldDisplayStatisticsTab()" value="visualizations">
@@ -366,7 +366,8 @@ export default defineComponent({
         } = useUserRole();
 
         const {
-            isDigitalRepositoryEnabled
+            isDigitalRepositoryEnabled,
+            isAssessmentModuleEnabled
         } = useCrisContextInformation();
 
         const canEdit = ref(false);
@@ -581,7 +582,7 @@ export default defineComponent({
 
         return {
             isIdentifierShown,
-            journalPublication, canClassify, fetchJournalPublication, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled,
+            journalPublication, canClassify, fetchJournalPublication, canAssessDataQuality, canReviewDataQuality, isDigitalRepositoryEnabled, isAssessmentModuleEnabled,
             publications, event, totalPublications, isResearcher,
             returnCurrentLocaleContent, handleResearcherUnbind, actionsRef,
             languageTagMap, journal, JournalPublicationUpdateForm,
