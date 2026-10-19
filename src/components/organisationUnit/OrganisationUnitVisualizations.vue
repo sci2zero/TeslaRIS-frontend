@@ -675,7 +675,7 @@ const fetchDigitalLibraryData = () => {
         thesesYearData.value = { categories, series: totalSeries };
     });
 
-    getDigitalLibraryStatistics(props.organisationUnitId, startDate.value, endDate.value);
+    getDigitalLibraryStatistics(props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0]);
 };
 
 const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: number | null = null, to: number | null = null) => {
