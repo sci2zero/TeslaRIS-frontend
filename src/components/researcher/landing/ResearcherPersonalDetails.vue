@@ -166,22 +166,6 @@
             padded>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <landing-detail-field
-                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'apvnt', person?.personalInfo?.apvnt)"
-                    label="APVNT" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.apvnt || t("notYetSetMessage") }}
-                </landing-detail-field>
-                <landing-detail-field
-                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'eCrisId', person?.personalInfo?.eCrisId)"
-                    label="eCRIS-ID" class="min-w-0 break-words">
-                    <identifier-link v-if="person?.personalInfo.eCrisId" :identifier="person?.personalInfo.eCrisId" type="ecris" />
-                    <span v-else>{{ t("notYetSetMessage") }}</span>
-                </landing-detail-field>
-                <landing-detail-field
-                    v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'eNaukaId', person?.personalInfo?.eNaukaId)"
-                    label="enaukaID" class="min-w-0 break-words">
-                    {{ person?.personalInfo?.eNaukaId || t("notYetSetMessage") }}
-                </landing-detail-field>
-                <landing-detail-field
                     v-if="isIdentifierShown(ApplicableEntityType.PERSON, 'nationalScienceId', person?.personalInfo?.nationalScienceId)"
                     :label="configuredNationalIdentifierLabel || t('nationalScienceIdLabel')" class="min-w-0 break-words">
                     <identifier-link v-if="person?.personalInfo.nationalScienceId" :identifier="person?.personalInfo.nationalScienceId" type="national_person" />

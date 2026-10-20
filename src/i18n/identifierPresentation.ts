@@ -20,13 +20,10 @@ const PERSON: Record<string, IdentifierPresentation> = {
     openAlexId: { label: "OpenAlex ID", abbrev: "OA", tone: "slate", linkType: "open_alex" },
     webOfScienceResearcherId: { label: "Researcher ID (Web of Science)", abbrev: "WoS",
         tone: "blue", linkType: "researcher_id" },
-    eCrisId: { label: "eCRIS-ID", abbrev: "eCRIS", tone: "indigo", linkType: "ecris" },
     scholarId: { label: "Google Scholar ID", abbrev: "GS", tone: "violet", linkType: "scholar" },
     authenticusId: { label: "Authenticus ID", abbrev: "AU", tone: "indigo",
         linkType: "authenticus" },
     lattesId: { label: "Lattes ID", abbrev: "LT", tone: "emerald", linkType: "lattes" },
-    apvnt: { label: "APVNT", abbrev: "APV", tone: "slate" },
-    eNaukaId: { label: "enaukaID", abbrev: "eN", tone: "slate" },
     nationalScienceId: { labelKey: "nationalScienceIdLabel", icon: "mdi-identifier",
         tone: "violet", linkType: "national_person" }
 };

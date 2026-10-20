@@ -61,3 +61,19 @@ export const sanitizeUri = (value: string): string => {
         (character) => unsafeUriCharacters[character]
     );
 };
+
+export const ID_PLACEHOLDER = "{ID}";
+
+export const isResolvableUrlTemplate = (urlTemplate?: string | null): boolean =>
+    !!urlTemplate && urlTemplate.includes(ID_PLACEHOLDER);
+
+export const buildIdentifierUrl = (
+    urlTemplate?: string | null,
+    value?: string | null
+): string | null => {
+    if (!isResolvableUrlTemplate(urlTemplate) || !value || value.trim() === "") {
+        return null;
+    }
+
+    return (urlTemplate as string).trim().split(ID_PLACEHOLDER).join(value.trim());
+};

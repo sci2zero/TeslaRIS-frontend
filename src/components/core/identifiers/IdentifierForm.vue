@@ -46,9 +46,12 @@
         <v-row>
             <v-col>
                 <v-text-field
-                    v-model="uriPrefix"
-                    :label="$t('uriPrefixLabel')"
-                    :placeholder="$t('uriPrefixLabel')"
+                    v-model="urlTemplate"
+                    :label="$t('urlTemplateLabel')"
+                    :hint="$t('urlTemplateHintLabel')"
+                    :rules="urlTemplateValidationRules"
+                    placeholder="https://portal.example.org/{ID}"
+                    persistent-hint
                 />
             </v-col>
         </v-row>
@@ -155,13 +158,14 @@ export default defineComponent({
         const description = ref<any>([]);
         const code = ref<string>(props.presetIdentifier ? props.presetIdentifier.code as string : "");
         const regularExpression = ref<string>(props.presetIdentifier ? props.presetIdentifier.regularExpression as string : "");
-        const uriPrefix = ref<string>(props.presetIdentifier ? props.presetIdentifier.uriPrefix as string : "");
+        const urlTemplate = ref<string>(props.presetIdentifier ? props.presetIdentifier.urlTemplate as string : "");
 
         const {
             requiredFieldRules,
             requiredSelectionRules,
             requiredMultiSelectionRules,
-            regexValidationRules
+            regexValidationRules,
+            urlTemplateValidationRules
         } = useValidationUtils();
 
         const submit = () => {
@@ -172,7 +176,7 @@ export default defineComponent({
                 identifierAccessLevel: selectedAccessLevel.value.value,
                 applicableTypes: selectedApplicableTypes.value.map(applicableTypeObject => applicableTypeObject.value),
                 regularExpression: regularExpression.value,
-                uriPrefix: uriPrefix.value
+                urlTemplate: urlTemplate.value
             };
 
             emit("create", identifier);
@@ -186,9 +190,10 @@ export default defineComponent({
             requiredFieldRules, code, submit,
             accessLevels, requiredSelectionRules,
             applicableTypes, selectedApplicableTypes,
-            regularExpression, uriPrefix,
+            regularExpression, urlTemplate,
             requiredMultiSelectionRules,
-            regexValidationRules
+            regexValidationRules,
+            urlTemplateValidationRules
         };
     }
 });

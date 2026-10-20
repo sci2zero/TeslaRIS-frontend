@@ -23,9 +23,6 @@ export interface BasicPerson {
     sex?: Sex;
     localBirthDate: string | null;
     phoneNumber: string;
-    apvnt?: string | null;
-    eCrisId?: string | null;
-    eNaukaId?: string | null;
     orcid?: string | null;
     scopusAuthorId?: string | null;
     organisationUnitId: number;
@@ -129,9 +126,6 @@ interface PersonalInfo {
     sex: Sex;
     postalAddress?: PostalAddress;
     contact: Contact;
-    apvnt?: string;
-    eCrisId?: string;
-    eNaukaId?: string;
     orcid?: string;
     scopusAuthorId?: string;
 }

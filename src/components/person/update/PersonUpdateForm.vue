@@ -34,27 +34,12 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eCrisId')" v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eNaukaId')" v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
                         <ui-input
                             v-if="canBeUpdated(ApplicableEntityType.PERSON, 'nationalScienceId')"
                             v-model="nationalScienceId"
                             :label="configuredNationalIdentifierLabel || $t('nationalScienceIdLabel')"
                             :rules="personNationalIdValidationRules"
                         />
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'apvnt')" v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
                     </v-col>
                 </v-row>
                 <v-row>
@@ -415,9 +400,6 @@ export default defineComponent({
 
         const birthdate = ref(props.presetPerson?.personalInfo.localBirthDate);
         const orcid = ref(props.presetPerson?.personalInfo.orcid);
-        const eCrisId = ref(props.presetPerson?.personalInfo.eCrisId);
-        const eNaukaId = ref(props.presetPerson?.personalInfo.eNaukaId);
-        const apvnt = ref(props.presetPerson?.personalInfo.apvnt);
         const scopus = ref(props.presetPerson?.personalInfo.scopusAuthorId);
         const openAlex = ref(props.presetPerson?.personalInfo.openAlexId);
         const webOfScienceId = ref(props.presetPerson?.personalInfo.webOfScienceResearcherId);
@@ -464,8 +446,7 @@ export default defineComponent({
         const selectedSex = ref({title: props.presetPerson?.personalInfo.sex ? getTitleFromValueAutoLocale(props.presetPerson?.personalInfo.sex as Sex) as string : "", value: props.presetPerson?.personalInfo.sex ? props.presetPerson?.personalInfo.sex as Sex : undefined});
 
         const {
-            apvntValidationRules, eCrisIdValidationRules,
-            eNaukaIdValidationRules, personOpenAlexIdValidationRules,
+            personOpenAlexIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, personNationalIdValidationRules,
             personWebOfScienceIdValidationRules, scholarIdValidationRules,
             personAuthenticusIdValidationRules, lattesIdValidationRules
@@ -475,10 +456,7 @@ export default defineComponent({
             if (props.inModal) {
                 const { duplicateFound } = await checkIdentifiers(
                     [
-                        { value: eNaukaId.value as string, error: "eNaukaIdExistsError" },
                         { value: scopus.value as string, error: "scopusIdExistsError" },
-                        { value: apvnt.value as string, error: "apvntExistsError" },
-                        { value: eCrisId.value as string, error: "eCrisIdExistsError" },
                         { value: orcid.value as string, error: "orcidIdExistsError" },
                         { value: openAlex.value as string, error: "openAlexIdExistsError"},
                         { value: webOfScienceId.value as string, error: "webOfScienceIdExistsError" },
@@ -511,9 +489,6 @@ export default defineComponent({
                 },
                 localBirthDate: birthdate.value || "",
                 sex: selectedSex.value.value as Sex,
-                apvnt: apvnt.value,
-                eCrisId: eCrisId.value,
-                eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 placeOfBirth: placeOfBirth.value,
                 postalAddress: {
@@ -584,9 +559,6 @@ export default defineComponent({
 
             birthdate.value = props.presetPerson?.personalInfo.localBirthDate;
             orcid.value = props.presetPerson?.personalInfo.orcid;
-            eCrisId.value = props.presetPerson?.personalInfo.eCrisId;
-            eNaukaId.value = props.presetPerson?.personalInfo.eNaukaId;
-            apvnt.value = props.presetPerson?.personalInfo.apvnt;
             scopus.value = props.presetPerson?.personalInfo.scopusAuthorId;
             openAlex.value = props.presetPerson?.personalInfo.openAlexId;
             webOfScienceId.value = props.presetPerson?.personalInfo.webOfScienceResearcherId;
@@ -614,10 +586,9 @@ export default defineComponent({
             canBeUpdated, ApplicableEntityType,
             configuredNationalIdentifierLabel,
             isFormValid, email, phoneNumber, birthdate, snackbar,
-            orcid, eCrisId, eNaukaId, apvnt, scopus, sexes, selectedSex,
+            orcid, scopus, sexes, selectedSex,
             toMultilingualTextInput, languageTags, submit, message,
             placeOfBirth, city, streetAndNumber, countries, selectedCountry,
-            apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
             orcidValidationRules, scopusAuthorIdValidationRules, personNationalIdValidationRules, cityRef,
             streetAndNumberRef, refreshForm, uris, urisRef, displayTitle,
             personOpenAlexIdValidationRules, openAlex, webOfScienceId,
