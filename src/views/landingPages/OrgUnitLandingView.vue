@@ -529,6 +529,7 @@
             </v-tabs-window-item>
             <v-tabs-window-item value="researchAreas">
                 <landing-additional-info-tab
+                    :details-title="$t('generalInfoLabel')"
                     :keywords="organisationUnit?.keyword ? organisationUnit.keyword : []"
                     :description="organisationUnit?.description ? organisationUnit.description : []"
                     :can-edit="canEdit"
@@ -547,7 +548,7 @@
                         <landing-detail-field v-if="organisationUnit?.sector" :label="$t('organisationUnitSectorLabel')" :value="getOUSectorFromValueAutoLocale(organisationUnit?.sector)" />
                         <landing-detail-field v-if="organisationUnit?.dateEstablished" :label="$t('dateEstablishedLabel')" :value="localiseDate(organisationUnit?.dateEstablished)" />
                         <landing-detail-field v-if="organisationUnit?.dateDissolved" :label="$t('dateDissolvedLabel')" :value="localiseDate(organisationUnit?.dateDissolved)" />
-                        <landing-detail-field v-if="organisationUnit?.active" :label="$t('activeLabel')" :value="$t('activeLabel')" />
+                        <landing-detail-field v-if="organisationUnit?.active != null" :label="$t('statusLabel')" :value="organisationUnit.active ? $t('activeStatusLabel') : $t('inactiveStatusLabel')" />
                         <landing-detail-field v-if="!organisationUnit?.location?.address" :label="$t('addressLabel')" :value="$t('notYetSetMessage')" />
                         <landing-detail-field v-if="!organisationUnit?.contact?.contactEmail" :label="$t('emailLabel')" :value="$t('notYetSetMessage')" />
                         <landing-detail-field v-if="loginStore.userLoggedIn" :label="$t('phoneNumberLabel')" :value="organisationUnit?.contact?.phoneNumber || $t('notYetSetMessage')" />

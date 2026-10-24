@@ -79,15 +79,6 @@
                 </div>
             </landing-section-card>
         </div>
-
-        <UiButton
-            v-if="isAdmin"
-            variant="outline"
-            size="sm"
-            @click="emit('migrate-to-unmanaged')"
-        >
-            {{ $t("migrateToUnmanagedResearcherLabel") }}
-        </UiButton>
     </div>
 </template>
 
@@ -104,14 +95,12 @@ import InvolvementList from "@/components/person/involvement/InvolvementList.vue
 import PrizeList from "@/components/person/prize/PrizeList.vue";
 import ExpertiseOrSkillList from "@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue";
 import ResearcherPersonalDetails from "@/components/researcher/landing/ResearcherPersonalDetails.vue";
-import { UiButton } from "@/components/ui/button";
 
 interface Props {
     person: PersonResponse | undefined;
     keywords: MultilingualContent[];
     biography: MultilingualContent[];
     canEdit: boolean;
-    isAdmin: boolean;
     employments: Employment[];
     education: Education[];
     memberships: Membership[];
@@ -129,6 +118,5 @@ const emit = defineEmits<{
     (e: "update-biography", biography: MultilingualContent[]): void;
     (e: "refresh"): void;
     (e: "add-involvement", involvement: Education | Membership | Employment): void;
-    (e: "migrate-to-unmanaged"): void;
 }>();
 </script>
