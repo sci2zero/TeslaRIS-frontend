@@ -74,7 +74,7 @@
                         :key="`${profile.profileName}-${remarkIndex}`"
                         class="border border-slate-200 rounded-lg px-4 py-3">
                         <div class="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                            {{ pair.a }}
+                            {{ getIssueSeverityTitleFromValueAutoLocale(pair.a) }}
                         </div>
                         <p class="text-sm text-slate-700 mt-1 leading-relaxed">
                             {{ returnCurrentLocaleContent(pair.b) }}
@@ -107,6 +107,7 @@ import { useDataQualityProfiles } from "@/composables/useDataQualityProfiles";
 import { useUserRole } from "@/composables/useUserRole";
 import { UiButton } from "@/components/ui/button";
 import ScrollableDialog from "@/components/core/ScrollableDialog.vue";
+import { getIssueSeverityTitleFromValueAutoLocale } from "@/i18n/issueSeverity";
 
 
 export default defineComponent({
@@ -192,12 +193,11 @@ export default defineComponent({
         );
 
         return {
-            dialog,
-            reports, selectedTab, profileLabel,
-            returnCurrentLocaleContent,
-            openSummary, hasAnyRemarks,
+            dialog, reports, selectedTab, profileLabel,
+            getIssueSeverityTitleFromValueAutoLocale,
+            returnCurrentLocaleContent, openSummary,
             totalIssueCount, qualityScore, hasError,
-            canReviewDataQuality
+            hasAnyRemarks, canReviewDataQuality
         };
     }
 });
