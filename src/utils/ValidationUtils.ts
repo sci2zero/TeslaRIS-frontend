@@ -1,6 +1,7 @@
 import { useI18n } from 'vue-i18n';
 import { computed, type Ref } from 'vue';
 import { crisContextInformationState } from '@/composables/useCrisContextInformation';
+import { ID_PLACEHOLDER } from '@/utils/StringUtil';
 
 export const useValidationUtils = () => {
     const i18n = useI18n();
@@ -10,9 +11,6 @@ export const useValidationUtils = () => {
     const invalidISBNMessage = computed(() => i18n.t("eisbnFormatError"));
     const invalidEISSNMessage = computed(() => i18n.t("eissnFormatError"));
     const invalidPrintISSNMessage = computed(() => i18n.t("printIssnFormatError"));
-    const invalidApvntMessage = computed(() => i18n.t("apvntFormatError"));
-    const invalidECrisIdMessage = computed(() => i18n.t("eCrisIdFormatError"));
-    const invalidENaukaIdMessage = computed(() => i18n.t("eNaukaIdFormatError"));
     const invalidOrcidIdMessage = computed(() => i18n.t("orcidIdFormatError"));
     const invalidScopusAuthorIdMessage = computed(() => i18n.t("scopusAuthorIdFormatError"));
     const invalidNationalIdMessage = computed(() => i18n.t("nationalIdFormatError"));
@@ -45,6 +43,7 @@ export const useValidationUtils = () => {
     const invalidLattesIdMessage = computed(() => i18n.t("lattesIdFormatError"));
     const invalidRegexMessage = computed(() => i18n.t("invalidRegexMessage"));
     const invalidNationalIdUrlMessage = computed(() => i18n.t("invalidNationalIdUrlMessage"));
+    const invalidUrlTemplateMessage = computed(() => i18n.t("invalidUrlTemplateMessage"));
 
     
     const requiredFieldRules = [
@@ -195,33 +194,6 @@ export const useValidationUtils = () => {
             if (!value || value.trim() === "") return true;
             if (scopusAfidPattern.test(value)) return true;
             return invalidScopusAfidMessage.value;
-        }
-    ];
-
-    const apvntPattern = /^\d+$/i;
-    const apvntValidationRules = [
-        (value: string) => {
-            if (!value || value.trim() === "") return true;
-            if (apvntPattern.test(value)) return true;
-            return invalidApvntMessage.value;
-        }
-    ];
-
-    const eCrisIdPattern = /^\d+$/i;
-    const eCrisIdValidationRules = [
-        (value: string) => {
-            if (!value || value.trim() === "") return true;
-            if (eCrisIdPattern.test(value)) return true;
-            return invalidECrisIdMessage.value;
-        }
-    ];
-
-    const eNaukaIdPattern = /^[A-Z]{2}\d+$/i;
-    const eNaukaIdValidationRules = [
-        (value: string) => {
-            if (!value || value.trim() === "") return true;
-            if (eNaukaIdPattern.test(value)) return true;
-            return invalidENaukaIdMessage.value;
         }
     ];
 
@@ -427,13 +399,21 @@ export const useValidationUtils = () => {
 
     // The placeholder can sit anywhere in the template, so it is substituted before the URL
     // itself is validated.
-    const ID_PLACEHOLDER = "{ID}";
+    const isValidUrlTemplate = (value: string) =>
+        value.includes(ID_PLACEHOLDER) &&
+        uriPattern.test(value.split(ID_PLACEHOLDER).join("1"));
+
     const nationalIdUrlValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
-            if (!value.includes(ID_PLACEHOLDER)) return invalidNationalIdUrlMessage.value;
-            if (uriPattern.test(value.split(ID_PLACEHOLDER).join("1"))) return true;
-            return invalidNationalIdUrlMessage.value;
+            return isValidUrlTemplate(value) ? true : invalidNationalIdUrlMessage.value;
+        }
+    ];
+
+    const urlTemplateValidationRules = [
+        (value: string) => {
+            if (!value || value.trim() === "") return true;
+            return isValidUrlTemplate(value) ? true : invalidUrlTemplateMessage.value;
         }
     ];
 
@@ -578,7 +558,6 @@ export const useValidationUtils = () => {
     return { requiredFieldRules, requiredSelectionRules, doiValidationRules, 
         uriValidationRules, isbnValidationRules, eIssnValidationRules, 
         printIssnValidationRules, scopusAfidValidationRules, confIdValidationRules,
-        apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules,
         orcidValidationRules, scopusAuthorIdValidationRules, scopusIdValidationRules,
         emailFieldRules, nonMandatoryEmailFieldRules, requiredNumericFieldRules,
         dateTodayOrFutureRules, timeTodayOrFutureRules, requiredMultiSelectionRules,
@@ -595,6 +574,6 @@ export const useValidationUtils = () => {
         ssrnIdValidationRules, gridValidationRules, wikidataValidationRules,
         personNationalIdValidationRules, organisationUnitNationalIdValidationRules,
         documentNationalIdValidationRules, projectNationalIdValidationRules,
-        nationalIdUrlValidationRules
+        nationalIdUrlValidationRules, urlTemplateValidationRules
     };
 };

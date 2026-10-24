@@ -64,15 +64,10 @@
                     <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'orcid')" v-model="orcid" label="ORCID" :rules="orcidValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eCrisId')" v-model="eCrisId" label="eCRIS-ID" :rules="eCrisIdValidationRules" />
-                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'eNaukaId')" v-model="eNaukaId" label="enaukaID" :rules="eNaukaIdValidationRules" />
-                </div>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'nationalScienceId')" v-model="nationalScienceId" :label="configuredNationalIdentifierLabel || $t('nationalScienceIdLabel')" :rules="personNationalIdValidationRules" />
                     <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scholarId')" v-model="scholarId" label="Google Scholar ID" :rules="scholarIdValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'apvnt')" v-model="apvnt" label="APVNT" :rules="apvntValidationRules" />
                     <ui-input v-if="canBeUpdated(ApplicableEntityType.PERSON, 'scopusAuthorId')" v-model="scopus" label="Scopus Author ID" :rules="scopusAuthorIdValidationRules" />
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -198,9 +193,6 @@ export default defineComponent({
         const phoneNumber = ref("");
         const birthdate = ref("");
         const orcid = ref("");
-        const eCrisId = ref("");
-        const eNaukaId = ref("");
-        const apvnt = ref("");
         const scopus = ref("");
         const openAlex = ref("");
         const webOfScienceId = ref("");
@@ -212,8 +204,7 @@ export default defineComponent({
 
         const { 
             requiredFieldRules, requiredSelectionRules,
-            apvntValidationRules, eCrisIdValidationRules,
-            eNaukaIdValidationRules, orcidValidationRules,
+            orcidValidationRules,
             scopusAuthorIdValidationRules, personNationalIdValidationRules,
             personOpenAlexIdValidationRules,
             personWebOfScienceIdValidationRules, scholarIdValidationRules,
@@ -249,9 +240,6 @@ export default defineComponent({
                 },
                 contactEmail: email.value,
                 phoneNumber: phoneNumber.value,
-                apvnt: apvnt.value,
-                eCrisId: eCrisId.value,
-                eNaukaId: eNaukaId.value,
                 orcid: orcid.value,
                 scopusAuthorId: scopus.value,
                 openAlexId: openAlex.value,
@@ -281,9 +269,6 @@ export default defineComponent({
                     birthdate.value = "";
                     email.value = "";
                     phoneNumber.value = "";
-                    apvnt.value = "";
-                    eCrisId.value = "";
-                    eNaukaId.value = "";
                     orcid.value = "";
                     scopus.value = "";
                     openAlex.value = "";
@@ -317,10 +302,10 @@ export default defineComponent({
             canBeUpdated, ApplicableEntityType,
             configuredNationalIdentifierLabel,
             isFormValid, additionalFields, snackbar, message, deduplicationTableRef, role,
-            firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef, eNaukaId,
-            email, birthdate, orcid, eCrisId, apvnt,  scopus, employmentPositions, selectedEmploymentPosition,
+            firstName, middleName, lastName, selectedOrganisationUnit, ouAutocompleteRef,
+            email, birthdate, orcid, scopus, employmentPositions, selectedEmploymentPosition,
             sexes, selectedSex, phoneNumber, requiredFieldRules, requiredSelectionRules, submit,
-            apvntValidationRules, eCrisIdValidationRules, eNaukaIdValidationRules, orcidValidationRules,
+            orcidValidationRules,
             scopusAuthorIdValidationRules, personNationalIdValidationRules,
             loggedInUser, displayTitle, openAlex, personOpenAlexIdValidationRules,
             personWebOfScienceIdValidationRules, webOfScienceId, returnToParent, scholarIdValidationRules,

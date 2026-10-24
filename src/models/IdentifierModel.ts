@@ -9,7 +9,7 @@ export interface Identifier {
     identifierAccessLevel: AccessLevel;
     applicableTypes: ApplicableEntityType[];
     regularExpression?: string;
-    uriPrefix?: string;
+    urlTemplate?: string;
 }
 
 export interface IdentifierResponse {
@@ -19,7 +19,7 @@ export interface IdentifierResponse {
     description?: MultilingualContent[];
     applicableEntityTypes: ApplicableEntityType[];
     regularExpression?: string;
-    uriPrefix?: string;
+    urlTemplate?: string;
 }
 
 export interface EntityIdentifier {

@@ -25,9 +25,9 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { crisContextInformationState } from '@/composables/useCrisContextInformation';
+import { buildIdentifierUrl } from '@/utils/StringUtil';
 
 
-const ID_PLACEHOLDER = "{ID}";
 
 export default defineComponent({
     name: "IdentifierLink",
@@ -54,8 +54,6 @@ export default defineComponent({
                     return "https://orcid.org/";
                 case "email":
                     return "mailto:";
-                case "ecris":
-                    return "https://bib.cobiss.net/biblioweb/biblio/sr/scr/cris/";
                 case "scopus_author":
                     return "https://www.scopus.com/authid/detail.uri?authorId=";
                 case "scopus_affiliation":
@@ -106,10 +104,7 @@ export default defineComponent({
         // the identifier renders as plain text.
         const href = computed(() => {
             if (isNationalIdentifier.value) {
-                const template = nationalIdUrlTemplate.value;
-                return template
-                    ? template.split(ID_PLACEHOLDER).join(props.identifier)
-                    : null;
+                return buildIdentifierUrl(nationalIdUrlTemplate.value, props.identifier);
             }
 
             return `${computeBaseURL()}${props.identifier}`;

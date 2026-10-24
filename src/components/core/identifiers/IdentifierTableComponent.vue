@@ -40,7 +40,7 @@
                 <td>{{ returnCurrentLocaleContent(row.item.description) }}</td>
                 <td>{{ row.item.code }}</td>
                 <td>{{ row.item.regularExpression }}</td>
-                <td>{{ row.item.uriPrefix }}</td>
+                <td>{{ row.item.urlTemplate }}</td>
                 <td>
                     <generic-crud-modal
                         :form-component="IdentifierForm"
@@ -116,7 +116,7 @@ export default defineComponent({
         const descriptionLabel = computed(() => i18n.t("descriptionLabel"));
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const regularExpressionLabel = computed(() => i18n.t("regularExpressionLabel"));
-        const uriPrefixLabel = computed(() => i18n.t("uriPrefixLabel"));
+        const urlTemplateLabel = computed(() => i18n.t("urlTemplateLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const tableOptions = ref<any>({
@@ -128,7 +128,7 @@ export default defineComponent({
           { title: descriptionLabel, align: "start", sortable: false, key: "description.content"},
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: regularExpressionLabel, align: "start", sortable: true, key: "regularExpression"},
-          { title: uriPrefixLabel, align: "start", sortable: true, key: "uriPrefix"},
+          { title: urlTemplateLabel, align: "start", sortable: true, key: "urlTemplate"},
           { title: actionLabel},
         ];
 

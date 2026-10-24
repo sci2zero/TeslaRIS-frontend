@@ -67,11 +67,11 @@
                             {{ $t("deleteLabel") }}
                         </v-btn>
                         <v-btn
-                            v-if="identifier.identifierResponse.uriPrefix"
+                            v-if="buildIdentifierUrl(identifier.identifierResponse.urlTemplate, identifier.value)"
                             class="mb-3"
                             density="compact"
                             variant="text"
-                            :href="identifier.identifierResponse.uriPrefix + identifier.value"
+                            :href="buildIdentifierUrl(identifier.identifierResponse.urlTemplate, identifier.value)"
                             target="_blank"
                             rel="noopener noreferrer">
                             {{ $t("visitLinkLabel") }}
@@ -96,6 +96,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import EntityIdentifierForm from '@/components/core/identifiers/EntityIdentifierForm.vue';
 import Toast from '../Toast.vue';
+import { buildIdentifierUrl } from '@/utils/StringUtil';
 
 
 export default defineComponent({
@@ -229,7 +230,8 @@ export default defineComponent({
             ApplicableEntityType,
             updateIdentifier, message,
             deleteIdentifier, snackbar,
-            openedPanel, createIdentifier
+            openedPanel, createIdentifier,
+            buildIdentifierUrl
         };
     }
 });
