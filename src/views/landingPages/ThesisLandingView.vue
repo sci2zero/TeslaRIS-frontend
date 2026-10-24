@@ -189,67 +189,6 @@
                         {{ $t("citePublicationLabel") }}
                     </UiButton>
 
-                    <UiButton
-                        v-if="primaryLibrarianAction === 'putOn'"
-                        variant="outline"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="changePublicReviewState(true, false)"
-                    >
-                        <span class="mdi mdi-eye-outline" />
-                        {{ $t("putOnPublicReviewLabel") }}
-                    </UiButton>
-                    <UiButton
-                        v-else-if="primaryLibrarianAction === 'remove'"
-                        variant="outline"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="changePublicReviewState(false, false)"
-                    >
-                        <span class="mdi mdi-eye-off-outline" />
-                        {{ $t("removeFromPublicReviewLabel") }}
-                    </UiButton>
-                    <UiButton
-                        v-else-if="primaryLibrarianAction === 'continue'"
-                        variant="primary"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="changePublicReviewState(true, true)"
-                    >
-                        <span class="mdi mdi-play-outline" />
-                        {{ $t("continuePublicReviewLabel") }}
-                    </UiButton>
-                    <UiButton
-                        v-else-if="primaryLibrarianAction === 'archive'"
-                        variant="outline"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="changeArchiveState(true)"
-                    >
-                        <span class="mdi mdi-archive-outline" />
-                        {{ $t("archiveLabel") }}
-                    </UiButton>
-                    <UiButton
-                        v-else-if="primaryLibrarianAction === 'unarchive'"
-                        variant="outline"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="changeArchiveState(false)"
-                    >
-                        <span class="mdi mdi-archive-arrow-up-outline" />
-                        {{ $t("unarchiveLabel") }}
-                    </UiButton>
-                    <UiButton
-                        v-else-if="primaryLibrarianAction === 'examine'"
-                        variant="outline"
-                        size="md"
-                        class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!"
-                        @click="examineRegistryBookEntry"
-                    >
-                        <span class="mdi mdi-book-open-page-variant-outline" />
-                        {{ $t("examineRegistryBookEntryLabel") }}
-                    </UiButton>
-
                     <v-menu v-if="hasMoreActions" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
@@ -260,7 +199,7 @@
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
                             <v-list-item
-                                v-if="showPutOnPublicReview && primaryLibrarianAction !== 'putOn'"
+                                v-if="showPutOnPublicReview"
                                 prepend-icon="mdi-eye-outline"
                                 :title="$t('putOnPublicReviewLabel')"
                                 @click="changePublicReviewState(true, false)"
@@ -272,13 +211,13 @@
                                 @click="changePublicReviewState(true, false, true)"
                             />
                             <v-list-item
-                                v-if="showRemoveFromPublicReview && primaryLibrarianAction !== 'remove'"
+                                v-if="showRemoveFromPublicReview"
                                 prepend-icon="mdi-eye-off-outline"
                                 :title="$t('removeFromPublicReviewLabel')"
                                 @click="changePublicReviewState(false, false)"
                             />
                             <v-list-item
-                                v-if="showContinuePublicReview && primaryLibrarianAction !== 'continue'"
+                                v-if="showContinuePublicReview"
                                 prepend-icon="mdi-play-outline"
                                 :title="$t('continuePublicReviewLabel')"
                                 @click="changePublicReviewState(true, true)"
@@ -290,19 +229,19 @@
                                 @click="changePublicReviewState(true, false)"
                             />
                             <v-list-item
-                                v-if="showArchive && primaryLibrarianAction !== 'archive'"
+                                v-if="showArchive"
                                 prepend-icon="mdi-archive-outline"
                                 :title="$t('archiveLabel')"
                                 @click="changeArchiveState(true)"
                             />
                             <v-list-item
-                                v-if="showUnarchive && primaryLibrarianAction !== 'unarchive'"
+                                v-if="showUnarchive"
                                 prepend-icon="mdi-archive-arrow-up-outline"
                                 :title="$t('unarchiveLabel')"
                                 @click="changeArchiveState(false)"
                             />
                             <v-list-item
-                                v-if="showExamineRegistry && primaryLibrarianAction !== 'examine'"
+                                v-if="showExamineRegistry"
                                 prepend-icon="mdi-book-open-page-variant-outline"
                                 :title="$t('examineRegistryBookEntryLabel')"
                                 @click="examineRegistryBookEntry"
@@ -762,25 +701,15 @@ export default defineComponent({
             !thesis.value?.areFilesValid && canEdit.value && canValidate.value
         );
 
-        const primaryLibrarianAction = computed(() => {
-            if (showContinuePublicReview.value) return "continue";
-            if (showRemoveFromPublicReview.value) return "remove";
-            if (showPutOnPublicReview.value) return "putOn";
-            if (showArchive.value) return "archive";
-            if (showUnarchive.value) return "unarchive";
-            if (showExamineRegistry.value) return "examine";
-            return null;
-        });
-
         const hasMoreActions = computed(() =>
             showPutOnPublicReviewShortened.value
             || showRestartPublicReview.value
-            || (showPutOnPublicReview.value && primaryLibrarianAction.value !== "putOn")
-            || (showRemoveFromPublicReview.value && primaryLibrarianAction.value !== "remove")
-            || (showContinuePublicReview.value && primaryLibrarianAction.value !== "continue")
-            || (showArchive.value && primaryLibrarianAction.value !== "archive")
-            || (showUnarchive.value && primaryLibrarianAction.value !== "unarchive")
-            || (showExamineRegistry.value && primaryLibrarianAction.value !== "examine")
+            || showPutOnPublicReview.value
+            || showRemoveFromPublicReview.value
+            || showContinuePublicReview.value
+            || showArchive.value
+            || showUnarchive.value
+            || showExamineRegistry.value
             || canCreateRegistryBookEntry.value
             || canDefineSubstitution.value
             || showRemoveSubstitution.value
@@ -1220,7 +1149,7 @@ export default defineComponent({
             showArchive, showUnarchive, showExamineRegistry,
             canDefineSubstitution, showRemoveSubstitution,
             showValidateMetadata, showValidateFiles,
-            primaryLibrarianAction, hasMoreActions,
+            hasMoreActions,
             openModal, openCitationDialog, openUnbindDialog,
             downloadRoCrate, validateMetadata, validateUploadedFiles,
 

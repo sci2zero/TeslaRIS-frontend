@@ -2,7 +2,7 @@
     <div class="mt-4 space-y-4">
         <landing-section-card
             v-if="$slots.details"
-            :title="$t('basicInfoLabel')"
+            :title="detailsTitle || $t(document ? 'researchResultInfoLabel' : 'basicInfoLabel')"
             icon="mdi-book-open-page-variant-outline"
             icon-class="bg-blue-50 text-blue-600"
             padded
@@ -71,6 +71,7 @@ import type { Document } from "@/models/PublicationModel";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 
 withDefaults(defineProps<{
+    detailsTitle?: string;
     keywords?: MultilingualContent[];
     description?: MultilingualContent[];
     remark?: MultilingualContent[];
@@ -86,6 +87,7 @@ withDefaults(defineProps<{
     description: () => [],
     remark: () => [],
     document: undefined,
+    detailsTitle: "",
     canEdit: false,
     isGeneralDescription: false,
     showRemark: true,

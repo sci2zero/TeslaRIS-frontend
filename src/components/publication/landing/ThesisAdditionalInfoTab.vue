@@ -2,7 +2,7 @@
     <div class="mt-4 space-y-4">
         <landing-section-card
             v-if="hasBibliographicDetails"
-            :title="t('basicInfoLabel')"
+            :title="t('researchResultInfoLabel')"
             icon="mdi-book-open-page-variant-outline"
             icon-class="bg-blue-50 text-blue-600"
             padded

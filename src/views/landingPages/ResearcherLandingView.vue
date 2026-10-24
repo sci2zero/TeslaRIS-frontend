@@ -122,7 +122,7 @@
                         {{ $t("viewAllPersonNamesLabel") }}
                     </UiButton>
 
-                    <v-menu v-if="canEdit" location="bottom">
+                    <v-menu v-if="canEdit || isAdmin" location="bottom">
                         <template #activator="{ props: menuProps }">
                             <UiButton variant="outline" size="md" class="w-full sm:w-auto whitespace-normal! sm:whitespace-nowrap!" v-bind="menuProps">
                                 <span class="mdi mdi-dots-horizontal" />
@@ -132,44 +132,52 @@
                         </template>
                         <v-list class="min-w-64 py-2 rounded-lg border border-slate-200">
                             <v-list-item
+                                v-if="canEdit"
                                 prepend-icon="mdi-flask-outline"
                                 :title="$t('updateResearchAreaLabel')"
                                 @click="openModal(researchAreaModalRef)"
                             />
                             <v-list-item
+                                v-if="canEdit"
                                 prepend-icon="mdi-download"
                                 :title="$t('downloadRoCrateBibliographyLabel')"
                                 @click="downloadRoCrateBibliography"
                             />
                             <v-list-item
-                                v-if="isResearcher"
+                                v-if="canEdit && isResearcher"
                                 prepend-icon="mdi-file-check-outline"
                                 :title="$t('documentClaimLabel')"
                                 @click="performNavigation('documentClaim')"
                             />
                             <v-list-item
-                                v-if="isResearcher"
+                                v-if="canEdit && isResearcher"
                                 prepend-icon="mdi-domain"
                                 :title="$t('massInstitutionAssignmentLabel')"
                                 @click="performNavigation('massInstitutionAssignment')"
                             />
                             <v-list-item
-                                v-if="isResearcher"
+                                v-if="canEdit && isResearcher"
                                 prepend-icon="mdi-import"
                                 :title="$t('importerLabel')"
                                 @click="performNavigation('importer')"
                             />
                             <v-list-item
-                                v-if="isAdmin || isInstitutionalEditor"
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor)"
                                 prepend-icon="mdi-cloud-download-outline"
                                 :title="$t('harvestExternalIndicatorsLabel')"
                                 @click="performIndicatorHarvest"
                             />
                             <v-list-item
-                                v-if="isAdmin || isInstitutionalEditor || isResearcher"
+                                v-if="canEdit && (isAdmin || isInstitutionalEditor || isResearcher)"
                                 prepend-icon="mdi-eye-outline"
                                 :title="$t('updatePersonFieldVisibilityConfigurationLabel')"
                                 @click="openModal(visibilityConfigModalRef)"
+                            />
+                            <v-list-item
+                                v-if="isAdmin"
+                                prepend-icon="mdi-account-arrow-right-outline"
+                                :title="$t('migrateToUnmanagedResearcherLabel')"
+                                @click="migrateToUnmanaged"
                             />
                         </v-list>
                     </v-menu>
@@ -333,7 +341,6 @@
                     :keywords="keywords"
                     :biography="biography"
                     :can-edit="canEdit"
-                    :is-admin="isAdmin"
                     :employments="employments"
                     :education="education"
                     :memberships="memberships"
@@ -346,7 +353,6 @@
                     @update-biography="updateBiography"
                     @refresh="fetchPerson()"
                     @add-involvement="addInvolvement"
-                    @migrate-to-unmanaged="migrateToUnmanaged"
                 />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
