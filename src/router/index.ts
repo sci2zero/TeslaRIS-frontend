@@ -141,6 +141,7 @@ import SubmitProjectView from "@/views/SubmitProjectView.vue";
 import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.vue";
 import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
 import PolicyExplorerView from "@/views/revisions/PolicyExplorerView.vue";
+import DataQualityFixatorView from "@/views/revisions/DataQualityFixatorView.vue";
 
 
 const roles = {
@@ -1602,6 +1603,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "data-quality-fixators",
+                    name: "dataQualityFixators",
+                    component: DataQualityFixatorView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
                     },
                 }
             ]

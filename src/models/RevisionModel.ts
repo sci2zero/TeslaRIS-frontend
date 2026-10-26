@@ -420,3 +420,16 @@ export interface QualityTrend {
     indicators: TrendIndicators;
     trendByEntityType: EntityTypeTrend[];
 }
+
+export interface FixatorSummary {
+    key: string;
+    name: string;
+}
+
+export interface FixatorPipeline {
+    pipelineName: string;
+    version: number | null;
+    matchedRemarkKeys: string[];
+    appliedFixators: string[];
+    createVersionOnEveryStep: boolean;
+}
