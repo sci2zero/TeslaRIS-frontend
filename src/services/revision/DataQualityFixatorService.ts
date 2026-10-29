@@ -2,6 +2,8 @@ import type { AxiosResponse } from "axios";
 import { BaseService } from "../BaseService";
 import axios from "axios";
 import { type FixatorPipeline, type FixatorSummary } from "@/models/RevisionModel";
+import { type RecurrenceType } from "@/models/LoadModel";
+import { toUtcTimestamp } from "@/utils/DateUtil";
 
 
 export class DataQualityFixatorService extends BaseService {
@@ -20,6 +22,10 @@ export class DataQualityFixatorService extends BaseService {
 
   async updatePipeline(pipelineName: string, pipeline: FixatorPipeline): Promise<AxiosResponse<FixatorPipeline>> {
     return super.sendRequest(axios.put, `data-quality-fixator/pipelines/${encodeURIComponent(pipelineName)}`, pipeline);
+  }
+
+  async scheduleFixatorRun(pipelineName: string, timestamp: string, recurrence: RecurrenceType): Promise<AxiosResponse<void>> {
+    return super.sendRequest(axios.post, `data-quality-fixator/pipelines/${encodeURIComponent(pipelineName)}/schedule?timestamp=${toUtcTimestamp(timestamp)}&recurrence=${recurrence}`);
   }
 
   async deletePipeline(pipelineName: string): Promise<AxiosResponse<void>> {

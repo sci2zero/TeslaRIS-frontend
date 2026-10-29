@@ -51,7 +51,7 @@
                     {{ localiseDate(item.timestamp) }}
                 </td>
                 <td>
-                    {{ displayTextOrPlaceholder(item.versionNote ? $t(item.versionNote.split(":")[0] + "Message", [item.versionNote.split(":").at(-1)]) : item.versionNote as string) }}
+                    {{ revisionNote(item) }}
                     <v-chip
                         v-if="restorationWarnings(item).length > 0"
                         class="ml-2"
@@ -279,9 +279,20 @@ export default defineComponent({
             glancedRevision.value = revision;
             revisionGlanceOpen.value = true;
         };
-        const revisionNote = (revision: Revision) => displayTextOrPlaceholder(revision.versionNote
-            ? i18n.t(revision.versionNote.split(":")[0] + "Message", [revision.versionNote.split(":").at(-1)])
-            : revision.versionNote);
+        // A note is a key and an optional argument, thus only the first colon separates them.
+        const revisionNote = (revision: Revision) => {
+            const note = revision.versionNote;
+
+            if (!note) {
+                return displayTextOrPlaceholder(note);
+            }
+
+            const separator = note.indexOf(":");
+            const key = separator < 0 ? note : note.slice(0, separator);
+            const argument = separator < 0 ? "" : note.slice(separator + 1);
+
+            return displayTextOrPlaceholder(i18n.t(key + "Message", [argument]));
+        };
         const expandedRows = ref<Set<string>>(new Set());
         const notifications = ref<Map<string, string>>(new Map());
 

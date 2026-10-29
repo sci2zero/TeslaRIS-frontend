@@ -188,6 +188,9 @@ export interface DataQualityRemark {
 export interface ConstraintSummary {
     key: string;
     title: MultilingualContent[];
+    target: string | null;
+    dimension: QualityDimension | null;
+    metric: string | null;
 }
 
 export interface DataQualityProfileSummary {
@@ -428,6 +431,7 @@ export interface FixatorSummary {
 
 export interface FixatorPipeline {
     pipelineName: string;
+    profileName: string;
     version: number | null;
     matchedRemarkKeys: string[];
     appliedFixators: string[];
