@@ -80,6 +80,7 @@ import BookSeriesMetadataComparatorView from "@/views/comparators/bookSeries/Boo
 import BookSeriesPublicationsComparatorView from "@/views/comparators/bookSeries/BookSeriesPublicationsComparatorView.vue";
 import OrganisationUnitMetadataComparatorView from "@/views/comparators/organisationUnit/OrganisationUnitMetadataComparatorView.vue";
 import CountryListView from "@/views/CountryListView.vue";
+import CurrencyListView from "@/views/CurrencyListView.vue";
 import ResearchAreaListView from "@/views/ResearchAreaListView.vue";
 import DocumentClaimerView from "@/views/DocumentClaimerView.vue";
 import PublisherPublicationsComparator from "@/views/comparators/publisher/PublisherPublicationsComparator.vue";
@@ -1287,6 +1288,15 @@ const router = createRouter({
                     path: "countries",
                     name: "countries",
                     component: CountryListView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "currencies",
+                    name: "currencies",
+                    component: CurrencyListView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],
