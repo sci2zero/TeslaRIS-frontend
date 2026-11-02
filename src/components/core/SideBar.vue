@@ -284,6 +284,7 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'book-series', label: computed(() => i18n.t('bookSeriesListLabel')), to: '/book-series', icon: 'mdi-book-multiple' },
     { key: 'publishers', label: computed(() => i18n.t('publisherListLabel')), to: '/publishers', icon: 'mdi-domain' },
     { key: 'countries', label: computed(() => i18n.t('countryListLabel')), to: '/countries', icon: 'mdi-earth' },
+    { key: 'currencies', label: computed(() => i18n.t('currencyListLabel')), to: '/currencies', icon: 'mdi-cash-multiple' },
     { key: 'research-areas', label: computed(() => i18n.t('researchAreaListLabel')), to: '/research-areas', icon: 'mdi-flask' },
     { key: 'employment-positions', label: computed(() => i18n.t('employmentPositionListLabel')), to: '/employment-positions', icon: 'mdi-account-hard-hat' },
     { key: 'identifiers', label: computed(() => i18n.t('identifierListLabel')), to: '/identifiers', icon: 'mdi-card-account-details-outline' },

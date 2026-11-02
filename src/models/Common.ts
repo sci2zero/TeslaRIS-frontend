@@ -461,8 +461,8 @@ export interface CrisContextInformation {
 }
 
 export interface Currency {
-    currencyId: number;
-    name: MultilingualContent[];
+    currencyId?: number;
+    currencyName: MultilingualContent[];
     code: string;
     symbol: string;
 }
