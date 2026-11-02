@@ -26,7 +26,7 @@ import { useI18n } from "vue-i18n";
 import LandingMetaItem from "@/components/landing/LandingMetaItem.vue";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import { identifierPresentation } from "@/i18n/identifierPresentation";
-import { useCrisContextInformation, useIdentifierConfiguration }
+import { nationalIdentifierNameOf, useCrisContextInformation, useIdentifierConfiguration }
     from "@/composables/useCrisContextInformation";
 import { ApplicableEntityType } from "@/models/Common";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
@@ -51,7 +51,7 @@ const featuredIdentifiers = computed(() => {
         ?? {};
     const presentation = identifierPresentation(props.entityType);
     const configuredNationalName = returnCurrentLocaleContent(
-        crisContextInformation.value.nationalIdentifierName);
+        nationalIdentifierNameOf(props.entityType));
 
     return Object.entries(configured)
         .filter(([identifier, policy]) => policy?.featured && presentation[identifier])

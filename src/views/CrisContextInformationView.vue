@@ -86,6 +86,16 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
+                            <multilingual-text-input
+                                v-model="personNationalIdentifierName"
+                                :label="$t('personNationalIdentifierNameLabel')"
+                                :initial-value="toMultilingualTextInput(
+                                    crisContextInformation.personNationalIdentifierName, languageTags)"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
                             <v-text-field
                                 v-model="projectNationalIdRegularExpression"
                                 :label="$t('projectNationalIdPatternLabel') + '*'"
@@ -109,6 +119,16 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12">
+                            <multilingual-text-input
+                                v-model="projectNationalIdentifierName"
+                                :label="$t('projectNationalIdentifierNameLabel')"
+                                :initial-value="toMultilingualTextInput(
+                                    crisContextInformation.projectNationalIdentifierName, languageTags)"
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
                             <v-text-field
                                 v-model="organisationUnitNationalIdRegularExpression"
                                 :label="$t('organisationUnitNationalIdPatternLabel') + '*'"
@@ -127,6 +147,16 @@
                                 :rules="nationalIdUrlValidationRules"
                                 :hint="$t('nationalIdUrlHintLabel')"
                                 persistent-hint
+                            />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <multilingual-text-input
+                                v-model="organisationUnitNationalIdentifierName"
+                                :label="$t('organisationUnitNationalIdentifierNameLabel')"
+                                :initial-value="toMultilingualTextInput(
+                                    crisContextInformation.organisationUnitNationalIdentifierName, languageTags)"
                             />
                         </v-col>
                     </v-row>
@@ -156,11 +186,10 @@
                     <v-row>
                         <v-col cols="12">
                             <multilingual-text-input
-                                ref="nationalIdentifierNameRef"
-                                v-model="nationalIdentifierName"
-                                :label="$t('nationalIdentifierNameLabel')"
+                                v-model="documentNationalIdentifierName"
+                                :label="$t('documentNationalIdentifierNameLabel')"
                                 :initial-value="toMultilingualTextInput(
-                                    crisContextInformation.nationalIdentifierName, languageTags)"
+                                    crisContextInformation.documentNationalIdentifierName, languageTags)"
                             />
                         </v-col>
                     </v-row>
@@ -315,7 +344,10 @@ export default defineComponent({
         const organisationUnitNationalIdUrl = ref("");
         const projectNationalIdUrl = ref("");
         const documentNationalIdUrl = ref("");
-        const nationalIdentifierName = ref<MultilingualContent[]>([]);
+        const personNationalIdentifierName = ref<MultilingualContent[]>([]);
+        const organisationUnitNationalIdentifierName = ref<MultilingualContent[]>([]);
+        const projectNationalIdentifierName = ref<MultilingualContent[]>([]);
+        const documentNationalIdentifierName = ref<MultilingualContent[]>([]);
         const identifierConfiguration = ref<IdentifierConfigurationMatrix>({});
         const selectedMetadataLicense = ref({
             title: getLicenseTitleFromValueAutoLocale(License.CC0) as string,
@@ -374,7 +406,10 @@ export default defineComponent({
                 title: getLicenseTitleFromValueAutoLocale(configuration.metadataLicense) as string,
                 value: configuration.metadataLicense
             };
-            nationalIdentifierName.value = configuration.nationalIdentifierName ?? [];
+            personNationalIdentifierName.value = configuration.personNationalIdentifierName ?? [];
+            organisationUnitNationalIdentifierName.value = configuration.organisationUnitNationalIdentifierName ?? [];
+            projectNationalIdentifierName.value = configuration.projectNationalIdentifierName ?? [];
+            documentNationalIdentifierName.value = configuration.documentNationalIdentifierName ?? [];
             personNationalIdUrl.value = configuration.personNationalIdUrl ?? "";
             organisationUnitNationalIdUrl.value =
                 configuration.organisationUnitNationalIdUrl ?? "";
@@ -400,7 +435,10 @@ export default defineComponent({
                 documentNationalIdRegularExpression: documentNationalIdRegularExpression.value,
                 metadataLicense: selectedMetadataLicense.value.value,
                 identifierConfiguration: identifierConfiguration.value,
-                nationalIdentifierName: nationalIdentifierName.value,
+                personNationalIdentifierName: personNationalIdentifierName.value,
+                organisationUnitNationalIdentifierName: organisationUnitNationalIdentifierName.value,
+                projectNationalIdentifierName: projectNationalIdentifierName.value,
+                documentNationalIdentifierName: documentNationalIdentifierName.value,
                 personNationalIdUrl: personNationalIdUrl.value,
                 organisationUnitNationalIdUrl: organisationUnitNationalIdUrl.value,
                 projectNationalIdUrl: projectNationalIdUrl.value,
@@ -420,7 +458,8 @@ export default defineComponent({
         return {
             isFormValid, snackbar, submit,
             crisContextInformation, languageTags, toMultilingualTextInput,
-            nationalIdentifierName, identifierGroups, policyOf, setPolicy,
+            personNationalIdentifierName, organisationUnitNationalIdentifierName,
+            projectNationalIdentifierName, documentNationalIdentifierName, identifierGroups, policyOf, setPolicy,
             personNationalIdUrl, organisationUnitNationalIdUrl, projectNationalIdUrl,
             documentNationalIdUrl,
             nationalIdUrlValidationRules,

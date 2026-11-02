@@ -278,6 +278,18 @@
                         @update="updateDescription"
                     />
                 </div>
+
+                <!-- Identifiers -->
+                <div class="mt-5">
+                    <entity-identifiers-list
+                        :entity-identifiers="fundingIdentifiers"
+                        :can-edit="canEdit"
+                        :entity-id="funding?.id"
+                        :containing-entity-type="ApplicableEntityType.FUNDING"
+                        :concrete-entity-type="ApplicableEntityType.FUNDING"
+                        @updated="fetchIdentifiers"
+                    />
+                </div>
             </v-tabs-window-item>
 
             <v-tabs-window-item value="revisions">
@@ -323,7 +335,10 @@ import DataQualityTabsComponent from "@/components/core/revisions/DataQualityTab
 import DataQualityService from "@/services/revision/DataQualityService";
 import Toast from "@/components/core/Toast.vue";
 import { EntityType } from "@/models/MergeModel";
-import type { MultilingualContent } from "@/models/Common";
+import { ApplicableEntityType, type MultilingualContent } from "@/models/Common";
+import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
+import EntityIdentifierService from "@/services/EntityIdentifierService";
+import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
@@ -364,6 +379,7 @@ const fundingCallName = ref<MultilingualContent[]>([]);
 const fundingProgramName = ref<MultilingualContent[]>([]);
 const fundingProgramId = ref<number | undefined>(undefined);
 const fundingApplications = ref<FundingApplicationIndex[]>([]);
+const fundingIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
@@ -394,7 +410,14 @@ const showFundingProgram = computed(() =>
 
 onMounted(() => {
     fetchFunding();
+    fetchIdentifiers();
 });
+
+const fetchIdentifiers = () => {
+    EntityIdentifierService.fetchFundingIdentifiers(parseInt(route.params.id as string)).then(response => {
+        fundingIdentifiers.value = response.data;
+    });
+};
 
 const fetchFunding = async () => {
     try {

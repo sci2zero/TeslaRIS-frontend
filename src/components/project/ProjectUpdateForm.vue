@@ -134,7 +134,7 @@ import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollab
 import { getProjectResearchTypesForGivenLocale } from '@/i18n/projectResearchType';
 
 const { canBeUpdated } = useIdentifierConfiguration();
-const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.PROJECT);
 const props = defineProps<{
     presetProject: Project | undefined;
 }>();

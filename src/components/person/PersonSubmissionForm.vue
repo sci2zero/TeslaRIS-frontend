@@ -149,7 +149,7 @@ export default defineComponent({
     emits: ["create", "selected"],
     setup(props, { emit }) {
         const { canBeUpdated } = useIdentifierConfiguration();
-        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.PERSON);
         const isFormValid = ref(false);
         const additionalFields = ref(false);
 

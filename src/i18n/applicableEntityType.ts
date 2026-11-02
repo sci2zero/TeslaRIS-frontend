@@ -25,6 +25,8 @@ export const applicableEntityTypeSr = [
     { title: "Organizaciona jedinica", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Serija publikacija", value: ApplicableEntityType.PUBLICATION_SERIES },
     { title: "Nagrada", value: ApplicableEntityType.PRIZE },
+    { title: "Projekat", value: ApplicableEntityType.PROJECT },
+    { title: "Finansiranje", value: ApplicableEntityType.FUNDING },
     { title: "Svi", value: ApplicableEntityType.ALL }
 ];
 
@@ -48,6 +50,8 @@ export const applicableEntityTypeEn = [
     { title: "Organisation unit", value: ApplicableEntityType.ORGANISATION_UNIT },
     { title: "Publication series", value: ApplicableEntityType.PUBLICATION_SERIES },
     { title: "Prize", value: ApplicableEntityType.PRIZE },
+    { title: "Project", value: ApplicableEntityType.PROJECT },
+    { title: "Funding", value: ApplicableEntityType.FUNDING },
     { title: "All", value: ApplicableEntityType.ALL }
 ];
 

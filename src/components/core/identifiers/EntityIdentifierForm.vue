@@ -39,7 +39,7 @@ import { ApplicableEntityType } from '@/models/Common';
 import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { DocumentIdentifier, EntityIdentifier, EntityIdentifierResponse, EventIdentifier, IdentifierResponse, OrganisationUnitIdentifier, PersonIdentifier, PublicationSeriesIdentifier } from '@/models/IdentifierModel';
+import type { DocumentIdentifier, EntityIdentifier, EntityIdentifierResponse, EventIdentifier, FundingIdentifier, IdentifierResponse, OrganisationUnitIdentifier, PersonIdentifier, ProjectIdentifier, PublicationSeriesIdentifier } from '@/models/IdentifierModel';
 import IdentifierService from '@/services/IdentifierService';
 import { useI18n } from 'vue-i18n';
 
@@ -125,6 +125,10 @@ export default defineComponent({
                 (entityIdentifier as OrganisationUnitIdentifier).organisationUnitId = props.entityId as number
             } else if (props.entityType === ApplicableEntityType.PUBLICATION_SERIES) {
                 (entityIdentifier as PublicationSeriesIdentifier).publicationSeriesId = props.entityId as number
+            } else if (props.entityType === ApplicableEntityType.PROJECT) {
+                (entityIdentifier as ProjectIdentifier).projectId = props.entityId as number
+            } else if (props.entityType === ApplicableEntityType.FUNDING) {
+                (entityIdentifier as FundingIdentifier).fundingId = props.entityId as number
             }
 
             emit("create", { identifier: entityIdentifier });

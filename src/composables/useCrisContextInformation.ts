@@ -2,7 +2,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CrisContextInformationService from '@/services/CrisContextInformationService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
-import type { ApplicableEntityType, CrisContextInformation } from '@/models/Common';
+import { ApplicableEntityType, type CrisContextInformation, type MultilingualContent } from '@/models/Common';
 import { License } from '@/models/DocumentFileModel';
 
 
@@ -19,7 +19,10 @@ const crisContextInformation = ref<CrisContextInformation>({
     documentNationalIdRegularExpression: ".*",
     metadataLicense: License.CC0,
     identifierConfiguration: {},
-    nationalIdentifierName: [],
+    personNationalIdentifierName: [],
+    organisationUnitNationalIdentifierName: [],
+    projectNationalIdentifierName: [],
+    documentNationalIdentifierName: [],
     personNationalIdUrl: "",
     organisationUnitNationalIdUrl: "",
     projectNationalIdUrl: "",
@@ -57,8 +60,14 @@ export function useCrisContextInformation() {
 
     const identifierConfiguration = computed(
         () => crisContextInformation.value.identifierConfiguration ?? {});
-    const nationalIdentifierName = computed(
-        () => crisContextInformation.value.nationalIdentifierName ?? []);
+    const personNationalIdentifierName = computed(
+        () => crisContextInformation.value.personNationalIdentifierName ?? []);
+    const organisationUnitNationalIdentifierName = computed(
+        () => crisContextInformation.value.organisationUnitNationalIdentifierName ?? []);
+    const projectNationalIdentifierName = computed(
+        () => crisContextInformation.value.projectNationalIdentifierName ?? []);
+    const documentNationalIdentifierName = computed(
+        () => crisContextInformation.value.documentNationalIdentifierName ?? []);
 
     const personNationalIdUrl = computed(
         () => crisContextInformation.value.personNationalIdUrl ?? "");
@@ -77,25 +86,45 @@ export function useCrisContextInformation() {
         isRegistrationEnabled, isOrcidLoginEnabled,
         personNationalIdPattern, projectNationalIdPattern,
         organisationUnitNationalIdPattern, documentNationalIdPattern, metadataLicense,
-        identifierConfiguration, nationalIdentifierName,
+        identifierConfiguration,
+        personNationalIdentifierName, organisationUnitNationalIdentifierName,
+        projectNationalIdentifierName, documentNationalIdentifierName,
         personNationalIdUrl, organisationUnitNationalIdUrl, projectNationalIdUrl,
         documentNationalIdUrl
     };
 }
 
 /**
- * The configured name of the national identifier, or an empty string when this deployment did not
- * configure one, in which case callers keep their own label.
+ * The configured national identifier name of an entity type, or an empty list for a type that has
+ * no national identifier.
  */
-export function useNationalIdentifierLabel() {
+export const nationalIdentifierNameOf = (entityType: ApplicableEntityType): MultilingualContent[] => {
+    switch (entityType) {
+        case ApplicableEntityType.PERSON:
+            return crisContextInformation.value.personNationalIdentifierName ?? [];
+        case ApplicableEntityType.ORGANISATION_UNIT:
+            return crisContextInformation.value.organisationUnitNationalIdentifierName ?? [];
+        case ApplicableEntityType.PROJECT:
+            return crisContextInformation.value.projectNationalIdentifierName ?? [];
+        case ApplicableEntityType.DOCUMENT:
+            return crisContextInformation.value.documentNationalIdentifierName ?? [];
+        default:
+            return [];
+    }
+};
+
+/**
+ * The configured name of the national identifier of an entity type, or an empty string when this
+ * deployment did not configure one, in which case callers keep their own label.
+ */
+export function useNationalIdentifierLabel(entityType: ApplicableEntityType) {
     const { locale } = useI18n();
 
     const configuredNationalIdentifierLabel = computed(() => {
         // Read so that the label recomputes on a language switch.
         const _activeLocale = locale.value;
 
-        return returnCurrentLocaleContent(
-            crisContextInformation.value.nationalIdentifierName) ?? "";
+        return returnCurrentLocaleContent(nationalIdentifierNameOf(entityType)) ?? "";
     });
 
     return { configuredNationalIdentifierLabel };

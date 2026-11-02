@@ -353,7 +353,7 @@ export default defineComponent({
     emits: ["update"],
     setup(props, { emit }) {
         const { canBeUpdated } = useIdentifierConfiguration();
-        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.ORGANISATION_UNIT);
         const isFormValid = ref(false);
 
         const { languageTags } = useLanguageTags();

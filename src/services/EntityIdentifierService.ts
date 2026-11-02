@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { BaseService } from "./BaseService";
 import axios from "axios";
-import type { DocumentIdentifier, EntityIdentifierResponse, EventIdentifier, OrganisationUnitIdentifier, PersonIdentifier, PublicationSeriesIdentifier } from "@/models/IdentifierModel";
+import type { DocumentIdentifier, EntityIdentifierResponse, EventIdentifier, FundingIdentifier, OrganisationUnitIdentifier, PersonIdentifier, ProjectIdentifier, PublicationSeriesIdentifier } from "@/models/IdentifierModel";
 
 
 export class EntityIdentifierService extends BaseService {
@@ -39,6 +39,14 @@ export class EntityIdentifierService extends BaseService {
         return super.sendRequest(axios.get, `publication-series-identifier/${publicationSeriesId}`);
     }
 
+    async fetchProjectIdentifiers(projectId: number): Promise<AxiosResponse<EntityIdentifierResponse[]>> {
+        return super.sendRequest(axios.get, `project-identifier/${projectId}`);
+    }
+
+    async fetchFundingIdentifiers(fundingId: number): Promise<AxiosResponse<EntityIdentifierResponse[]>> {
+        return super.sendRequest(axios.get, `funding-identifier/${fundingId}`);
+    }
+
     async createDocumentIdentifier(body: DocumentIdentifier): Promise<AxiosResponse<EntityIdentifierResponse>> {
         return super.sendRequest(axios.post, `document-identifier/${body.documentId}`, body, EntityIdentifierService.idempotencyKey);
     }
@@ -59,6 +67,14 @@ export class EntityIdentifierService extends BaseService {
         return super.sendRequest(axios.post, `publication-series-identifier`, body, EntityIdentifierService.idempotencyKey);
     }
 
+    async createProjectIdentifier(body: ProjectIdentifier): Promise<AxiosResponse<EntityIdentifierResponse>> {
+        return super.sendRequest(axios.post, `project-identifier/${body.projectId}`, body, EntityIdentifierService.idempotencyKey);
+    }
+
+    async createFundingIdentifier(body: FundingIdentifier): Promise<AxiosResponse<EntityIdentifierResponse>> {
+        return super.sendRequest(axios.post, `funding-identifier/${body.fundingId}`, body, EntityIdentifierService.idempotencyKey);
+    }
+
     async updateDocumentIdentifier(body: DocumentIdentifier, documentIdentifierId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `document-identifier/${body.documentId}/${documentIdentifierId}`, body);
     }
@@ -77,6 +93,14 @@ export class EntityIdentifierService extends BaseService {
 
     async updatePublicationSeriesIdentifier(body: PublicationSeriesIdentifier, publicationSeriesIdentifierId: number): Promise<AxiosResponse<void>> {
         return super.sendRequest(axios.put, `publication-series-identifier/${publicationSeriesIdentifierId}`, body);
+    }
+
+    async updateProjectIdentifier(body: ProjectIdentifier, projectIdentifierId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `project-identifier/${body.projectId}/${projectIdentifierId}`, body);
+    }
+
+    async updateFundingIdentifier(body: FundingIdentifier, fundingIdentifierId: number): Promise<AxiosResponse<void>> {
+        return super.sendRequest(axios.put, `funding-identifier/${body.fundingId}/${fundingIdentifierId}`, body);
     }
 
     async deleteEntityIdentifier(entityIdentifierId: number): Promise<AxiosResponse<void>> {

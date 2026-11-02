@@ -119,7 +119,7 @@ export default defineComponent({
     emits: ["update:modelValue", "change"],
     setup(props, { emit }) {
         const { canBeUpdated } = useIdentifierConfiguration();
-        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.DOCUMENT);
         const { languageTags } = useLanguageTags();
 
         const {

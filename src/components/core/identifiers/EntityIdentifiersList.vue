@@ -184,6 +184,10 @@ export default defineComponent({
                     await EntityIdentifierService.updateOrganisationUnitIdentifier(entityIdentifier.identifier, entityIdentifierId);
                 } else if (props.containingEntityType === ApplicableEntityType.PERSON) {
                     await EntityIdentifierService.updatePersonIdentifier(entityIdentifier.identifier, entityIdentifierId);
+                } else if (props.containingEntityType === ApplicableEntityType.PROJECT) {
+                    await EntityIdentifierService.updateProjectIdentifier(entityIdentifier.identifier, entityIdentifierId);
+                } else if (props.containingEntityType === ApplicableEntityType.FUNDING) {
+                    await EntityIdentifierService.updateFundingIdentifier(entityIdentifier.identifier, entityIdentifierId);
                 }
             } catch (_error) {
                 message.value = i18n.t("identifierInUseMessage");
@@ -205,6 +209,10 @@ export default defineComponent({
                     await EntityIdentifierService.createPersonIdentifier(entityIdentifier.identifier);
                 } else if (props.containingEntityType === ApplicableEntityType.ORGANISATION_UNIT) {
                     await EntityIdentifierService.createOrganisationUnitIdentifier(entityIdentifier.identifier);
+                } else if (props.containingEntityType === ApplicableEntityType.PROJECT) {
+                    await EntityIdentifierService.createProjectIdentifier(entityIdentifier.identifier);
+                } else if (props.containingEntityType === ApplicableEntityType.FUNDING) {
+                    await EntityIdentifierService.createFundingIdentifier(entityIdentifier.identifier);
                 }
             } catch (_error) {
                 message.value = i18n.t("identifierInUseMessage");

@@ -180,7 +180,7 @@ import type { AxiosError } from 'axios';
 import type { ErrorResponse, MonetaryAmount, MultilingualContent } from '@/models/Common';
 
 const { canBeUpdated } = useIdentifierConfiguration();
-const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.PROJECT);
 const emit = defineEmits(["create"]);
 
 const router = useRouter();

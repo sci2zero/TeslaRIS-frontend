@@ -52,3 +52,11 @@ export interface PublicationSeriesIdentifier extends EntityIdentifier {
 export interface OrganisationUnitIdentifier extends EntityIdentifier {
     organisationUnitId: number;
 }
+
+export interface ProjectIdentifier extends EntityIdentifier {
+    projectId: number;
+}
+
+export interface FundingIdentifier extends EntityIdentifier {
+    fundingId: number;
+}

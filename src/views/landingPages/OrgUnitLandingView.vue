@@ -840,7 +840,7 @@ export default defineComponent({
     components: { FeaturedIdentifiers, PublicationTypeFilter, LandingPageLayout, PublicationTableComponent, OpenLayersMap, LandingResearchAreasSection, LandingSectionCard, Toast, RelationsGraph, AddSubUnitModal, AddEmploymentModal, PersonTableComponent, GenericCrudModal, OrganisationUnitRelationUpdateModal, IndicatorsSection, OrganisationUnitTableComponent, IdentifierLink, UriList, OrganisationUnitLogo, AddPublicationMenu, SearchBarComponent, OrganisationUnitVisualizations, OrganisationUnitLeaderboards, LocalizedLink, PersistentQuestionDialog, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab, UiButton, ProjectTableComponent, ProjectStatusFilter },
     setup() {
         const { isIdentifierShown } = useIdentifierConfiguration();
-        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+        const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.ORGANISATION_UNIT);
         const currentTab = ref("overview");
 
         const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();

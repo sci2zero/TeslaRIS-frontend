@@ -221,6 +221,16 @@
                                 {{ uri }}
                             </a>
                         </landing-detail-field>
+                        <div class="md:col-span-2">
+                            <entity-identifiers-list
+                                :entity-identifiers="projectIdentifiers"
+                                :can-edit="canEdit && isAdmin"
+                                :entity-id="project?.id"
+                                :containing-entity-type="ApplicableEntityType.PROJECT"
+                                :concrete-entity-type="ApplicableEntityType.PROJECT"
+                                @updated="fetchIdentifiers"
+                            />
+                        </div>
                     </template>
                 </landing-additional-info-tab>
             </v-tabs-window-item>
@@ -301,6 +311,9 @@ import LandingAdditionalInfoTab from "@/components/landing/LandingAdditionalInfo
 import LandingOverviewTab from "@/components/landing/LandingOverviewTab.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import LandingPageLayout from "@/components/landing/LandingPageLayout.vue";
+import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
+import EntityIdentifierService from "@/services/EntityIdentifierService";
+import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import { useLandingOverview } from "@/composables/useLandingOverview";
 
 const route = useRoute();
@@ -319,7 +332,10 @@ const icon = ref("mdi-folder-star");
 
 const canEdit = ref(false);
 const loginStore = useLoginStore();
-const { canReviewDataQuality } = useUserRole();
+// Identifier editing needs an admin privilege, which a project contributor does not have.
+const { isAdmin, canReviewDataQuality } = useUserRole();
+
+const projectIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
 const canAssessDataQuality = ref(false);
 const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();
@@ -370,7 +386,14 @@ const institutionName = (institution: OrganisationUnitProjectContribution) => {
 
 onMounted(() => {
     fetchProject();
+    fetchIdentifiers();
 });
+
+const fetchIdentifiers = () => {
+    EntityIdentifierService.fetchProjectIdentifiers(parseInt(route.params.id as string)).then(response => {
+        projectIdentifiers.value = response.data;
+    });
+};
 
 const fetchProject = async () => {
     try {

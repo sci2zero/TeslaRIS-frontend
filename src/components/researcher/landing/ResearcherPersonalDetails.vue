@@ -299,7 +299,7 @@ import EntityIdentifierService from "@/services/EntityIdentifierService";
 import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
 
 const { isIdentifierShown } = useIdentifierConfiguration();
-const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel();
+const { configuredNationalIdentifierLabel } = useNationalIdentifierLabel(ApplicableEntityType.PERSON);
 interface Props {
     person: PersonResponse | undefined;
     employments: Employment[];

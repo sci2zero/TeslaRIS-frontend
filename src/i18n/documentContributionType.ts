@@ -24,7 +24,7 @@ export const contributionTypesSr = [
     { title: "Pridruženi urednik", value: DocumentContributionType.ASSOCIATED_EDITOR },
     { title: "Pozvani urednik", value: DocumentContributionType.INVITED_EDITOR },
     { title: "Recenzent", value: DocumentContributionType.REVIEWER },
-    { title: "Savetnik", value: DocumentContributionType.ADVISOR },
+    { title: "Mentor", value: DocumentContributionType.ADVISOR },
     { title: "Član komisije", value: DocumentContributionType.BOARD_MEMBER },
     { title: "Prezenter", value: DocumentContributionType.PRESENTER },
     { title: "Prevodioc", value: DocumentContributionType.TRANSLATOR },

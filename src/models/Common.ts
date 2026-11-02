@@ -124,6 +124,7 @@ export enum ApplicableEntityType {
     GENETIC_MATERIAL = "GENETIC_MATERIAL",
     PERFORMANCE_RELATED_OUTPUT = "PERFORMANCE_RELATED_OUTPUT",
     PROJECT = "PROJECT",
+    FUNDING = "FUNDING",
     PRIZE = "PRIZE",
     THESIS = "THESIS",
     INTANGIBLE_PRODUCT = "INTANGIBLE_PRODUCT",
@@ -448,7 +449,10 @@ export interface CrisContextInformation {
     documentNationalIdRegularExpression: string;
     metadataLicense: License;
     identifierConfiguration: IdentifierConfigurationMatrix;
-    nationalIdentifierName: MultilingualContent[];
+    personNationalIdentifierName: MultilingualContent[];
+    organisationUnitNationalIdentifierName: MultilingualContent[];
+    projectNationalIdentifierName: MultilingualContent[];
+    documentNationalIdentifierName: MultilingualContent[];
     personNationalIdUrl: string;
     organisationUnitNationalIdUrl: string;
     projectNationalIdUrl: string;
