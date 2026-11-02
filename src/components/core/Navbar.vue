@@ -284,6 +284,7 @@ export default defineComponent(
             const commissionProfileLabel = computed(() => i18n.t("commissionProfileLabel"));
             const deduplicateLabel = computed(() => i18n.t("deduplicationPageLabel"));
             const countryListLabel = computed(() => i18n.t("countryListLabel"));
+            const currencyListLabel = computed(() => i18n.t("currencyListLabel"));
             const researchAreaListLabel = computed(() => i18n.t("researchAreaListLabel"));
             const assessmentLabel = computed(() => i18n.t("assessmentLabel"));
             const indicatorPageLabel = computed(() => i18n.t("indicatorListLabel"));
@@ -366,6 +367,7 @@ export default defineComponent(
                 { title: bookSeriesListLabel, type:'icon-link', pathName: 'book-series', condition: computed(() => (isAdmin.value))},
                 { title: publisherListLabel, type:'icon-link', pathName: 'publishers', condition: computed(() => (isAdmin.value))},
                 { title: countryListLabel, type:'icon-link', pathName: "countries", condition: computed(() => (isAdmin.value))},
+                { title: currencyListLabel, type:'icon-link', pathName: "currencies", condition: computed(() => (isAdmin.value))},
                 { title: researchAreaListLabel, type:'icon-link', pathName: "research-areas", condition: computed(() => (isAdmin.value))},
                 { title: deduplicateLabel, type: 'icon-link', pathName: 'deduplication', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: brandingLabel, type:'icon-link', pathName: "branding", condition: computed(() => (isAdmin.value))},
