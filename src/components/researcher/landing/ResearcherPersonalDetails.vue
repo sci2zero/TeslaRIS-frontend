@@ -220,7 +220,7 @@
                         :entity-id="person?.id"
                         :containing-entity-type="ApplicableEntityType.PERSON"
                         :concrete-entity-type="ApplicableEntityType.PERSON"
-                        @updated="fetchIdentifiers"
+                        @updated="emit('identifiers-updated')"
                     />
                 </div>
             </div>
@@ -277,7 +277,7 @@
 <script setup lang="ts">
 import { useIdentifierConfiguration } from '@/composables/useCrisContextInformation';
 import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import PersonUpdateForm from "@/components/person/update/PersonUpdateForm.vue";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
@@ -295,7 +295,6 @@ import LandingDetailField from "@/components/landing/LandingDetailField.vue";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import { ApplicableEntityType } from "@/models/Common";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
-import EntityIdentifierService from "@/services/EntityIdentifierService";
 import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
 
 const { isIdentifierShown } = useIdentifierConfiguration();
@@ -304,6 +303,7 @@ interface Props {
     person: PersonResponse | undefined;
     employments: Employment[];
     canEdit: boolean;
+    personIdentifiers: EntityIdentifierResponse[];
     researchArea?: AssessmentResearchArea;
     countryName?: string;
     privateCountryName?: string;
@@ -312,36 +312,14 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "update", personalInfo: PersonalInfo): void;
+    (e: "identifiers-updated"): void;
 }>();
 
 const { t } = useI18n();
 const { isResearcher, isAdmin } = useUserRole();
-const personIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
 const activeEmployments = computed(() =>
     props.employments.filter(employment => !employment.dateTo)
-);
-
-const fetchIdentifiers = () => {
-    if (!props.person?.id) {
-        return;
-    }
-
-    EntityIdentifierService.fetchPersonIdentifiers(
-        props.person.id
-    ).then(response => {
-        personIdentifiers.value = response.data;
-    });
-};
-
-watch(
-    () => props.person?.id,
-    (id) => {
-        if (id) {
-            fetchIdentifiers();
-        }
-    },
-    { immediate: true }
 );
 
 const formatDate = (dateString: string | null | undefined): string => {

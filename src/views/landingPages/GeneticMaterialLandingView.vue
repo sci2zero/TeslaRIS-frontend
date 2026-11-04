@@ -53,7 +53,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="geneticMaterial" />
+                        :source="geneticMaterial"
+                        :entity-identifiers="documentIdentifiers" />
                 </template>
                 <template #actions>
                     <document-action-box

@@ -4,10 +4,12 @@
             :person="person"
             :employments="employments"
             :can-edit="canEdit"
+            :person-identifiers="personIdentifiers"
             :research-area="researchArea"
             :country-name="countryName"
             :private-country-name="privateCountryName"
             @update="emit('update', $event)"
+            @identifiers-updated="emit('identifiers-updated')"
         />
 
         <keyword-list
@@ -86,6 +88,7 @@
 import type { MultilingualContent } from "@/models/Common";
 import type { AssessmentResearchArea } from "@/models/AssessmentModel";
 import type { Education, Employment, Membership } from "@/models/InvolvementModel";
+import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import type { PersonalInfo, PersonResponse } from "@/models/PersonModel";
 import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
@@ -104,6 +107,7 @@ interface Props {
     employments: Employment[];
     education: Education[];
     memberships: Membership[];
+    personIdentifiers: EntityIdentifierResponse[];
     researchArea?: AssessmentResearchArea;
     countryName?: string;
     privateCountryName?: string;
@@ -117,6 +121,7 @@ const emit = defineEmits<{
     (e: "update-keywords", keywords: MultilingualContent[]): void;
     (e: "update-biography", biography: MultilingualContent[]): void;
     (e: "refresh"): void;
+    (e: "identifiers-updated"): void;
     (e: "add-involvement", involvement: Education | Membership | Employment): void;
 }>();
 </script>

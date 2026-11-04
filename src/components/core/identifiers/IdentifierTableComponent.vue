@@ -41,6 +41,7 @@
                 <td>{{ row.item.code }}</td>
                 <td>{{ row.item.regularExpression }}</td>
                 <td>{{ row.item.urlTemplate }}</td>
+                <td>{{ row.item.featured ? $t("yesLabel") : $t("noLabel") }}</td>
                 <td>
                     <generic-crud-modal
                         :form-component="IdentifierForm"
@@ -117,6 +118,7 @@ export default defineComponent({
         const codeLabel = computed(() => i18n.t("codeLabel"));
         const regularExpressionLabel = computed(() => i18n.t("regularExpressionLabel"));
         const urlTemplateLabel = computed(() => i18n.t("urlTemplateLabel"));
+        const featuredLabel = computed(() => i18n.t("featuredIdentifierLabel"));
         const actionLabel = computed(() => i18n.t("actionLabel"));
 
         const tableOptions = ref<any>({
@@ -129,6 +131,7 @@ export default defineComponent({
           { title: codeLabel, align: "start", sortable: true, key: "code"},
           { title: regularExpressionLabel, align: "start", sortable: true, key: "regularExpression"},
           { title: urlTemplateLabel, align: "start", sortable: true, key: "urlTemplate"},
+          { title: featuredLabel, align: "start", sortable: true, key: "featured"},
           { title: actionLabel},
         ];
 

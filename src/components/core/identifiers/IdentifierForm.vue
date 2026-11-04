@@ -57,6 +57,15 @@
         </v-row>
         <v-row>
             <v-col>
+                <v-checkbox
+                    v-model="featured"
+                    :label="$t('featuredIdentifierLabel')"
+                    hide-details
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
                 <v-select
                     v-model="selectedAccessLevel"
                     :items="accessLevels"
@@ -159,6 +168,7 @@ export default defineComponent({
         const code = ref<string>(props.presetIdentifier ? props.presetIdentifier.code as string : "");
         const regularExpression = ref<string>(props.presetIdentifier ? props.presetIdentifier.regularExpression as string : "");
         const urlTemplate = ref<string>(props.presetIdentifier ? props.presetIdentifier.urlTemplate as string : "");
+        const featured = ref<boolean>(props.presetIdentifier?.featured ?? false);
 
         const {
             requiredFieldRules,
@@ -176,7 +186,8 @@ export default defineComponent({
                 identifierAccessLevel: selectedAccessLevel.value.value,
                 applicableTypes: selectedApplicableTypes.value.map(applicableTypeObject => applicableTypeObject.value),
                 regularExpression: regularExpression.value,
-                urlTemplate: urlTemplate.value
+                urlTemplate: urlTemplate.value,
+                featured: featured.value
             };
 
             emit("create", identifier);
@@ -190,7 +201,7 @@ export default defineComponent({
             requiredFieldRules, code, submit,
             accessLevels, requiredSelectionRules,
             applicableTypes, selectedApplicableTypes,
-            regularExpression, urlTemplate,
+            regularExpression, urlTemplate, featured,
             requiredMultiSelectionRules,
             regexValidationRules,
             urlTemplateValidationRules

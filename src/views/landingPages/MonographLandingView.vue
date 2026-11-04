@@ -38,7 +38,8 @@
                 <template #meta>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="monograph" />
+                        :source="monograph"
+                        :entity-identifiers="documentIdentifiers" />
                     <landing-meta-item v-if="monograph?.documentDate" :label="$t('dateOfPublicationLabel')" icon="mdi-calendar" tone="slate">
                         {{ localiseFlexibleDate(monograph.documentDate) }}
                     </landing-meta-item>

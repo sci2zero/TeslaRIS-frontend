@@ -10,6 +10,7 @@ export interface Identifier {
     applicableTypes: ApplicableEntityType[];
     regularExpression?: string;
     urlTemplate?: string;
+    featured?: boolean;
 }
 
 export interface IdentifierResponse {
@@ -20,6 +21,7 @@ export interface IdentifierResponse {
     applicableEntityTypes: ApplicableEntityType[];
     regularExpression?: string;
     urlTemplate?: string;
+    featured?: boolean;
 }
 
 export interface EntityIdentifier {

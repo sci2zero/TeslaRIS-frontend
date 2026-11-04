@@ -59,7 +59,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="intellectualProperty" />
+                        :source="intellectualProperty"
+                        :entity-identifiers="documentIdentifiers" />
                 </template>
                 <template #actions>
                     <document-action-box

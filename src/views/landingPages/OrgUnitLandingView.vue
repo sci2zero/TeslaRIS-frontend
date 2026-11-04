@@ -55,7 +55,8 @@
                 <template #meta>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.ORGANISATION_UNIT"
-                        :source="organisationUnit" />
+                        :source="organisationUnit"
+                        :entity-identifiers="organisationUnitIdentifiers" />
                     <landing-meta-item v-if="organisationUnit?.location?.address" :label="$t('addressLabel')" icon="mdi-map-marker" tone="slate">
                         {{ organisationUnit.location.address }}
                     </landing-meta-item>

@@ -102,7 +102,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="thesis" />
+                        :source="thesis"
+                        :entity-identifiers="documentIdentifiers" />
                     <landing-meta-item v-if="thesis?.eisbn" label="eISBN" abbrev="eISBN" tone="indigo">
                         {{ thesis.eisbn }}
                     </landing-meta-item>

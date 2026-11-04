@@ -48,7 +48,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="monographPublication" />
+                        :source="monographPublication"
+                        :entity-identifiers="documentIdentifiers" />
                 </template>
                 <template #actions>
                     <document-action-box

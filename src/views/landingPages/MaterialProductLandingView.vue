@@ -53,7 +53,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="materialProduct" />
+                        :source="materialProduct"
+                        :entity-identifiers="documentIdentifiers" />
                 </template>
                 <template #actions>
                     <document-action-box

@@ -42,7 +42,8 @@
                 <template #meta>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.DOCUMENT"
-                        :source="proceedings" />
+                        :source="proceedings"
+                        :entity-identifiers="documentIdentifiers" />
                     <landing-meta-item v-if="proceedings?.eventId" :label="$t('conferenceLabel')" icon="mdi-calendar-star" tone="violet">
                         <localized-link
                             v-if="(proceedings?.eventName?.length ?? 0) > 0"

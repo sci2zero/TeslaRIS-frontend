@@ -46,6 +46,10 @@
                     <landing-meta-item v-if="(conference?.displayOrganizer?.length ?? 0) > 0" :label="$t('organizerLabel')" icon="mdi-account-group" tone="indigo">
                         {{ returnCurrentLocaleContent(conference?.displayOrganizer) }}
                     </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.EVENT"
+                        :source="conference"
+                        :entity-identifiers="eventIdentifiers" />
                 </template>
             </entity-landing-header>
         </template>
@@ -272,6 +276,7 @@ import { useLoginStore } from '@/stores/loginStore';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import RevisionHistoryTableComponent from '@/components/core/revisions/RevisionHistoryTableComponent.vue';
@@ -289,7 +294,7 @@ import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 
 export default defineComponent({
     name: "ConferenceLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, PublicationTableComponent, PersonEventContributionTabs, GenericCrudModal, ProceedingsList, EventsRelationList, UriList, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin, canReviewDataQuality } = useUserRole();
 

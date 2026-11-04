@@ -43,6 +43,10 @@
                     <landing-meta-item v-if="journal?.printISSN" label="Print ISSN" abbrev="ISSN" tone="indigo">
                         {{ journal.printISSN }}
                     </landing-meta-item>
+                    <featured-identifiers
+                        :entity-type="ApplicableEntityType.PUBLICATION_SERIES"
+                        :source="journal"
+                        :entity-identifiers="publicationSeriesIdentifiers" />
                 </template>
             </entity-landing-header>
         </template>
@@ -249,6 +253,7 @@ import EntityClassificationView from '@/components/assessment/classifications/En
 import { useLoginStore } from '@/stores/loginStore';
 import StatisticsService from '@/services/StatisticsService';
 import IdentifierLink from '@/components/core/IdentifierLink.vue';
+import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifiersList from '@/components/core/identifiers/EntityIdentifiersList.vue';
@@ -268,7 +273,7 @@ import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
 
 export default defineComponent({
     name: "JournalLandingPage",
-    components: { LandingSectionCard, LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, PublicationTableComponent, GenericCrudModal, PersonPublicationSeriesContributionTabs, IndicatorsSection, Toast, EntityClassificationView, IdentifierLink, EntityIdentifiersList, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingOverviewTab },
     setup() {
         const { isAdmin, isViceDeanForScience, canReviewDataQuality } = useUserRole();
 

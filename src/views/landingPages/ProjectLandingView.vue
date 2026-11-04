@@ -57,7 +57,8 @@
                     </landing-meta-item>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.PROJECT"
-                        :source="project" />
+                        :source="project"
+                        :entity-identifiers="projectIdentifiers" />
                     <landing-meta-item v-if="principleInvestigators.length > 0" :label="$t('principleInvestigatorLabel')" icon="mdi-account" tone="emerald">
                         <div v-for="investigator in principleInvestigators" :key="investigator.id">
                             <localized-link v-if="investigator.personId" :to="'persons/' + investigator.personId" class="underline">

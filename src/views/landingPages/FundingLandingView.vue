@@ -62,6 +62,12 @@
                                     </div>
                                 </div>
 
+                                <featured-identifiers
+                                    :entity-type="ApplicableEntityType.FUNDING"
+                                    :source="funding"
+                                    :entity-identifiers="fundingIdentifiers"
+                                />
+
                                 <div v-if="funding.fundingTypes && funding.fundingTypes.length > 0" class="info-item">
                                     <div>{{ $t("fundingTypesLabel") }}:</div>
                                     <div class="response">
@@ -340,6 +346,7 @@ import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifie
 import EntityIdentifierService from "@/services/EntityIdentifierService";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
+import FeaturedIdentifiers from "@/components/landing/FeaturedIdentifiers.vue";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";

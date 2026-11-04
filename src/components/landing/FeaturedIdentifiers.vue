@@ -18,6 +18,25 @@
         </template>
         <span v-else>{{ t("notYetSetMessage") }}</span>
     </landing-meta-item>
+    <landing-meta-item
+        v-for="entityIdentifier in featuredEntityIdentifiers"
+        :key="'entity-identifier-' + entityIdentifier.id"
+        :label="entityIdentifier.label"
+        icon="mdi-identifier"
+    >
+        <a
+            v-if="entityIdentifier.url"
+            :href="entityIdentifier.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline break-all"
+        >
+            {{ entityIdentifier.value }}
+        </a>
+        <template v-else>
+            {{ entityIdentifier.value }}
+        </template>
+    </landing-meta-item>
 </template>
 
 <script setup lang="ts">
@@ -30,12 +49,16 @@ import { nationalIdentifierNameOf, useCrisContextInformation, useIdentifierConfi
     from "@/composables/useCrisContextInformation";
 import { ApplicableEntityType } from "@/models/Common";
 import { returnCurrentLocaleContent } from "@/i18n/MultilingualContentUtil";
+import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
+import { buildIdentifierUrl } from "@/utils/StringUtil";
 
 
 const props = defineProps<{
     entityType: ApplicableEntityType;
     // The entity whose fields carry the identifiers, named exactly as the catalogue names them.
     source?: Record<string, any> | null;
+    // Owned by the page, so an edit in its identifier list shows here at once.
+    entityIdentifiers: EntityIdentifierResponse[];
 }>();
 
 const { t, locale } = useI18n();
@@ -67,5 +90,23 @@ const featuredIdentifiers = computed(() => {
         })
         .filter(featured =>
             isIdentifierShown(props.entityType, featured.identifier, featured.value));
+});
+
+// Every set value of an identifier marked as featured, shown after the configured ones.
+const featuredEntityIdentifiers = computed(() => {
+    // Read so that labels recompute on a language switch.
+    const _activeLocale = locale.value;
+
+    return props.entityIdentifiers
+        .filter(entityIdentifier =>
+            entityIdentifier.identifierResponse?.featured && !!entityIdentifier.value)
+        .map(entityIdentifier => ({
+            id: entityIdentifier.id,
+            value: entityIdentifier.value,
+            label: returnCurrentLocaleContent(entityIdentifier.identifierResponse.title) ??
+                entityIdentifier.identifierResponse.code,
+            url: buildIdentifierUrl(entityIdentifier.identifierResponse.urlTemplate,
+                entityIdentifier.value)
+        }));
 });
 </script>

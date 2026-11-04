@@ -75,7 +75,8 @@
                 <template #meta>
                     <featured-identifiers
                         :entity-type="ApplicableEntityType.PERSON"
-                        :source="person?.personalInfo" />
+                        :source="person?.personalInfo"
+                        :entity-identifiers="personIdentifiers" />
                     <landing-meta-item v-if="person?.personalInfo.contact?.contactEmail" :label="$t('emailLabel')" icon="mdi-email" tone="slate">
                         <identifier-link :identifier="person.personalInfo.contact.contactEmail" type="email" compact />
                     </landing-meta-item>
@@ -344,6 +345,7 @@
                     :employments="employments"
                     :education="education"
                     :memberships="memberships"
+                    :person-identifiers="personIdentifiers"
                     :research-area="researchArea"
                     :country-name="personalInfo.country"
                     :private-country-name="personalInfo.countryPrivate"
@@ -352,6 +354,7 @@
                     @update-keywords="updateKeywords"
                     @update-biography="updateBiography"
                     @refresh="fetchPerson()"
+                    @identifiers-updated="fetchIdentifiers"
                     @add-involvement="addInvolvement"
                 />
             </v-tabs-window-item>
@@ -463,6 +466,8 @@
 import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
 import { type MultilingualContent, type Country, ExportableEndpointType, ApplicableEntityType } from '@/models/Common';
 import PersonService from '@/services/PersonService';
+import EntityIdentifierService from '@/services/EntityIdentifierService';
+import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import DataQualityService from '@/services/revision/DataQualityService';
 import CountryService from '@/services/CountryService';
 import { computed, onMounted, nextTick } from 'vue';
@@ -612,6 +617,7 @@ export default defineComponent({
         const activeEmployments = ref<Employment[]>([]);
         const education = ref<Education[]>([]);
         const memberships = ref<Membership[]>([]);
+        const personIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
         const canEdit = ref(false);
         const canAssessDataQuality = ref(false);
@@ -687,6 +693,7 @@ export default defineComponent({
             }
 
             fetchPerson(true);
+            fetchIdentifiers();
             StatisticsService.registerPersonView(parseInt(currentRoute.params.id as string));
             
             fetchIndicators();
@@ -717,6 +724,14 @@ export default defineComponent({
             ).then(response => {
                 personAssessments.value = response.data;
                 assessmentsLoading.value = false;
+            });
+        };
+
+        const fetchIdentifiers = () => {
+            EntityIdentifierService.fetchPersonIdentifiers(
+                parseInt(currentRoute.params.id as string)
+            ).then(response => {
+                personIdentifiers.value = response.data;
             });
         };
 
@@ -1098,6 +1113,7 @@ export default defineComponent({
         return {
             canAssessDataQuality,
             canReviewDataQuality,
+            personIdentifiers, fetchIdentifiers,
             researcherName, person, personalInfo, keywords, loginStore, researchArea,
             biography, publications,  totalPublications, switchPage, searchKeyword, researchSubAreas,
             researchAreasHierarchy,
