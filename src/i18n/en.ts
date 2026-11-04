@@ -1900,6 +1900,7 @@ export default {
     noCostsLabel: "No costs",
     raidLabel: "RAiD",
     principleInvestigatorLabel: "Principle investigator",
+    coPrincipleInvestigatorLabel: "Co-principal investigator",
     institutionCoordinatorLabel: "Institution coordinator",
     teamLabel: "Team",
     investigationRoleLabel: "Investigation role",

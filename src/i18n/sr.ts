@@ -1908,6 +1908,7 @@ export default {
     noCostsLabel: "Nema troškova",
     raidLabel: "RAiD",
     principleInvestigatorLabel: "Glavni istraživač",
+    coPrincipleInvestigatorLabel: "Ko-rukovodilac",
     institutionCoordinatorLabel: "Institucija koordinator",
     teamLabel: "Tim",
     investigationRoleLabel: "Istraživačka uloga",

@@ -365,6 +365,12 @@ const principleInvestigators = computed(() =>
     ) ?? []
 );
 
+const coPrincipleInvestigators = computed(() =>
+    project.value?.persons?.filter(
+        person => person.contributionType === PersonProjectContributionType.CO_PRINCIPLE_INVESTIGATOR
+    ) ?? []
+);
+
 const institutionCoordinators = computed(() =>
     project.value?.organisations?.filter(
         institution => institution.contributionType === OrganisationUnitProjectContributionType.COORDINATOR
