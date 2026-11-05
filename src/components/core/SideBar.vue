@@ -297,7 +297,8 @@ const manageMenu = ref<MenuItem[]>([
     { key: 'scheduled-tasks', label: computed(() => i18n.t('scheduleTasksLabel')), to: '/scheduled-tasks', icon: 'mdi-clock-outline', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
     { key: 'document-backup', label: computed(() => i18n.t('backupLabel')), to: '/document-backup', icon: 'mdi-backup-restore', condition: computed(() => (isAdmin.value)) },
     { key: 'importer', label: computed(() => i18n.t('importerLabel')), to: '/importer', icon: 'mdi-import', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) },
-    { key: 'data-quality-fixators', label: computed(() => i18n.t('routeLabel.dataQualityFixators')), to: '/data-quality-fixators', icon: 'mdi-auto-fix', condition: computed(() => isAdmin.value) }
+    { key: 'data-quality-fixators', label: computed(() => i18n.t('routeLabel.dataQualityFixators')), to: '/data-quality-fixators', icon: 'mdi-auto-fix', condition: computed(() => isAdmin.value) },
+    { key: 'migration-control-panel', label: computed(() => i18n.t('routeLabel.migrationControlPanel')), to: '/migration-control-panel', icon: 'mdi-database-import-outline', condition: computed(() => isAdmin.value) }
 ]);
 
 const assessmentsMenu = ref<MenuItem[]>([

@@ -143,6 +143,7 @@ import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.v
 import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
 import PolicyExplorerView from "@/views/revisions/PolicyExplorerView.vue";
 import DataQualityFixatorView from "@/views/revisions/DataQualityFixatorView.vue";
+import MigrationControlPanelView from "@/views/migration/MigrationControlPanelView.vue";
 
 
 const roles = {
@@ -1619,6 +1620,15 @@ const router = createRouter({
                     path: "data-quality-fixators",
                     name: "dataQualityFixators",
                     component: DataQualityFixatorView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
+                    },
+                },
+                {
+                    path: "migration-control-panel",
+                    name: "migrationControlPanel",
+                    component: MigrationControlPanelView,
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin],

@@ -291,6 +291,7 @@ export default defineComponent(
             const assessmentRulebookPageLabel = computed(() => i18n.t("assessmentRulebookPageLabel"));
             const commissionsLabel = computed(() => i18n.t("commissionListLabel"));
             const scheduleTasksLabel = computed(() => i18n.t("scheduleTasksLabel"));
+            const migrationControlPanelLabel = computed(() => i18n.t("routeLabel.migrationControlPanel"));
             const classificationPageLabel = computed(() => i18n.t("classificationsLabel"));
             const reportingLabel = computed(() => i18n.t("reportingLabel"));
             const mServiceLabel = computed(() => i18n.t("mServiceLabel"));
@@ -376,7 +377,8 @@ export default defineComponent(
                 { title: scheduleTasksLabel, type:'icon-link', pathName: 'scheduled-tasks', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) },
                 { title: backupLabel, type:'icon-link', pathName: 'document-backup', condition: computed(() => (isAdmin.value || isInstitutionalEditor.value)) },
                 { title: importerLabel, type: 'icon-link', pathName: 'importer', condition: computed(() => loginStore.userLoggedIn && (isAdmin.value || isInstitutionalEditor.value)) },
-                { title: publicationsValidationLabel, type:'icon-link', pathName: 'scientific-results/validation', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) }
+                { title: publicationsValidationLabel, type:'icon-link', pathName: 'scientific-results/validation', condition: computed(() => isInstitutionalEditor.value || isAdmin.value) },
+                { title: migrationControlPanelLabel, type:'icon-link', pathName: 'migration-control-panel', condition: computed(() => loginStore.userLoggedIn && isAdmin.value) }
             ]);
 
             const assessmentsMenu = ref<MenuItem[]>([
