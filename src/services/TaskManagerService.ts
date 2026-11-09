@@ -35,6 +35,10 @@ export class TaskSchedulingService extends BaseService {
         return super.sendRequest(axios.get, "scheduled-task/data-quality-fix");
     }
 
+    async listScheduledMigrationTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
+        return super.sendRequest(axios.get, "scheduled-task/migration-sync");
+    }
+
     async listScheduledRegistryBookGenerationTasks(): Promise<AxiosResponse<ScheduledTaskResponse[]>> {
         return super.sendRequest(axios.get, "scheduled-task/registry-book-report-generation");
     }
