@@ -161,7 +161,9 @@ export enum ProjectStatus {
     UNDER_EVALUATION = "UNDER_EVALUATION",
     ONGOING = "ONGOING",
     CANCELLED = "CANCELLED",
-    CONCLUDED = "CONCLUDED"
+    CONCLUDED = "CONCLUDED",
+    CLOSED = "CLOSED",
+    INACTIVE = "INACTIVE"
 }
 
 export enum ProjectCollaborationType {
