@@ -409,6 +409,8 @@ const fetchProject = async () => {
         );
         project.value = response.data;
 
+        document.title = returnCurrentLocaleContent(project.value?.name) as string;
+
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
             checkIfUserCanAssessDataQuality();

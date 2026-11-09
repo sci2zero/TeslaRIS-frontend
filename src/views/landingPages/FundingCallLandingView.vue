@@ -317,6 +317,8 @@ const fetchFundingCall = async () => {
         );
         fundingCall.value = response.data;
 
+        document.title = returnCurrentLocaleContent(fundingCall.value?.name) as string;
+
         funderName.value = [];
         if (fundingCall.value.funderId) {
             fetchFunderName(fundingCall.value.funderId);

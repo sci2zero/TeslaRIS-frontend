@@ -296,6 +296,8 @@ const fetchFundingProgram = async () => {
         );
         fundingProgram.value = response.data;
 
+        document.title = returnCurrentLocaleContent(fundingProgram.value?.name) as string;
+
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
         }

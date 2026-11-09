@@ -441,6 +441,8 @@ const fetchFunding = async () => {
         );
         funding.value = response.data;
 
+        document.title = returnCurrentLocaleContent(funding.value?.name) as string;
+
         fetchLinkedEntityNames();
 
         if (loginStore.userLoggedIn) {

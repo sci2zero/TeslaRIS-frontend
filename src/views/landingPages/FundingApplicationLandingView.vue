@@ -164,7 +164,7 @@
 <script setup lang="ts">
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import EntityLandingHeader from '@/components/landing/EntityLandingHeader.vue';
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import BasicInfoLoader from "@/components/core/BasicInfoLoader.vue";
@@ -219,6 +219,12 @@ const title = computed(() => {
     const projectName = returnCurrentLocaleContent(project.value?.name) ?? "";
     const callName = returnCurrentLocaleContent(fundingCall.value?.name) ?? "";
     return [projectName, callName].filter(part => part).join(" — ");
+});
+
+watch(title, (newTitle) => {
+    if (newTitle) {
+        document.title = newTitle;
+    }
 });
 
 const revisedFundingApplicationTitle = computed(() => {
