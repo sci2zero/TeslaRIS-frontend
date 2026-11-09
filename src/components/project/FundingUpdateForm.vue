@@ -35,6 +35,20 @@
         </v-row>
 
         <v-row>
+            <v-col>
+                <ui-input
+                    v-model="fundingLocationType"
+                    control="select"
+                    :label="$t('fundingLocationTypeLabel')"
+                    :items="fundingLocationTypeOptions"
+                    item-title="title"
+                    item-value="value"
+                    clearable
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col cols="6">
                 <date-picker
                     v-model="dateFrom"
@@ -177,8 +191,9 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import type { MonetaryAmount, MultilingualContent } from '@/models/Common';
-import type {Funding, FundingType} from '@/models/FundingModel';
+import type {Funding, FundingLocationType, FundingType} from '@/models/FundingModel';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
+import { getFundingLocationTypesForGivenLocale } from '@/i18n/fundingLocationType';
 
 const props = defineProps<{
     presetFunding: Funding | undefined;
@@ -218,6 +233,8 @@ const displayProgram = ref<any>([]);
 
 const fundingTypeOptions = computed(() => getFundingTypesForGivenLocale());
 const selectedFundingTypes = ref<FundingType[]>(props.presetFunding?.fundingTypes ?? []);
+const fundingLocationTypeOptions = computed(() => getFundingLocationTypesForGivenLocale());
+const fundingLocationType = ref<FundingLocationType | undefined>(props.presetFunding?.fundingLocationType);
 
 const amount = ref<MonetaryAmount | undefined>(props.presetFunding?.amount);
 
@@ -240,6 +257,7 @@ const refreshForm = () => {
     renewable.value = props.presetFunding?.renewable ?? false;
     internalInvestment.value = props.presetFunding?.internalInvestment ?? false;
     selectedFundingTypes.value = props.presetFunding?.fundingTypes ?? [];
+    fundingLocationType.value = props.presetFunding?.fundingLocationType;
     amountRef.value?.setValue(props.presetFunding?.amount);
 
     displayFunderRef.value?.clearInput();
@@ -264,6 +282,7 @@ const submit = () => {
         doi: doi.value,
         grantAgreementId: grantAgreementId.value,
         fundingTypes: selectedFundingTypes.value,
+        fundingLocationType: fundingLocationType.value,
         dateFrom: dateFrom.value,
         dateTo: dateTo.value,
         dateSubmitted: dateSubmitted.value,

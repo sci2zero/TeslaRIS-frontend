@@ -1830,6 +1830,7 @@ export default {
     decemberLabel: "December",
     grantAgreementIdLabel: "Grant ID",
     fundingTypesLabel: "Funding types",
+    fundingLocationTypeLabel: "Funding location",
     dateAwardedLabel: "Awarded on",
     dateFromLabel: "Start date",
     dateSubmittedLabel: "Submitted on",

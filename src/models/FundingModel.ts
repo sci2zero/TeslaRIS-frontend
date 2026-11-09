@@ -24,6 +24,7 @@ export interface Funding {
     displayProgram: MultilingualContent[];
     displayFunder: MultilingualContent[];
     fundingTypes: FundingType[];
+    fundingLocationType?: FundingLocationType;
     amount?: MonetaryAmount;
     competitive?: boolean;
     renewable?: boolean;
@@ -80,6 +81,12 @@ export enum FundingType {
     INSTITUTIONAL_FUNDING = "INSTITUTIONAL_FUNDING",
     RESOURCE_ALLOCATION = "RESOURCE_ALLOCATION",
     OTHER = "OTHER",
+}
+
+export enum FundingLocationType {
+    NATIONAL = "NATIONAL",
+    ABROAD = "ABROAD",
+    MIXED = "MIXED",
 }
 
 export interface FundingPart {

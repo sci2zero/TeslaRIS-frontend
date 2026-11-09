@@ -1837,6 +1837,7 @@ export default {
     decemberLabel: "Decembar",
     grantAgreementIdLabel: "Grant ID",
     fundingTypesLabel: "Tipovi finansiranja",
+    fundingLocationTypeLabel: "Lokacija finansiranja",
     dateAwardedLabel: "Projekat odobren za finansiranje",
     dateFromLabel: "Datum početka",
     dateSubmittedLabel: "Predlog projekta predat",

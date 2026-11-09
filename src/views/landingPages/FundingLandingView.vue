@@ -75,6 +75,13 @@
                                     </div>
                                 </div>
 
+                                <div v-if="funding.fundingLocationType" class="info-item">
+                                    <div>{{ $t("fundingLocationTypeLabel") }}:</div>
+                                    <div class="response">
+                                        {{ getFundingLocationTypeTitleFromValueAutoLocale(funding.fundingLocationType) }}
+                                    </div>
+                                </div>
+
                                 <div v-if="funding.dateFrom" class="info-item">
                                     <div>{{ $t("dateFromLabel") }}:</div>
                                     <div class="response">
@@ -336,6 +343,7 @@ import FundingService from "@/services/project/FundingService";
 import type { Funding, FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
+import { getFundingLocationTypeTitleFromValueAutoLocale } from "@/i18n/fundingLocationType";
 import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
 import DataQualityTabsComponent from "@/components/core/revisions/DataQualityTabsComponent.vue";
 import DataQualityService from "@/services/revision/DataQualityService";
