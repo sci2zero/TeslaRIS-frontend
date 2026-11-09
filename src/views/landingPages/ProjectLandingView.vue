@@ -31,18 +31,6 @@
                         :read-only="!canEdit"
                         @update="updateBasicInfo"
                     />
-                    <generic-crud-modal
-                        v-if="canEdit"
-                        ref="nameModalRef"
-                        hide-activator
-                        :form-component="AlternateNameForm"
-                        :form-props="{ presetName: project?.name, presetNameAbbreviation: project?.nameAbbreviation }"
-                        entity-name="Name"
-                        is-update
-                        is-section-update
-                        :read-only="!canEdit"
-                        @update="updateName"
-                    />
                 </template>
                 <template #title>
                     <rich-title-renderer :title="title" />
@@ -289,7 +277,6 @@ import { getProjectResearchTypeTitleFromValueAutoLocale } from "@/i18n/projectRe
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
-import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
 import ProjectFundingsTableComponent from "@/components/project/ProjectFundingsTableComponent.vue";
 import ProjectFundingApplicationsTableComponent from "@/components/project/ProjectFundingApplicationsTableComponent.vue";
@@ -345,7 +332,6 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 
 const updateModalRef = ref<{ dialog: boolean } | null>(null);
-const nameModalRef = ref<{ dialog: boolean } | null>(null);
 
 const openModal = (modal: { dialog: boolean } | null) => {
     if (modal) {
@@ -446,12 +432,6 @@ const showAssessmentDetails = (version: { majorVersion: number, minorVersion: nu
 
 const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
-};
-
-const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
-    project.value!.name = nameInformation.name;
-    project.value!.nameAbbreviation = nameInformation.nameAbbreviation;
-    performUpdate(true);
 };
 
 const updateKeywords = (keywords: MultilingualContent[]) => {

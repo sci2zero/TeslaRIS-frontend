@@ -1,21 +1,30 @@
 <template>
     <landing-page-layout id="fundingCall" v-model="currentTab" :loading="!fundingCall" class="funding-landing">
         <template #header>
-            <entity-landing-header :loading="!fundingCall" :entity-label="$t('fundingCallLabel')" :icon="icon">
-                <template #title>
-                    <rich-title-renderer :title="title" />
-                </template>
-                <template #actions>
+            <entity-landing-header
+                :loading="!fundingCall"
+                :entity-label="$t('fundingCallLabel')"
+                :icon="icon"
+                :can-edit="canEdit"
+                :edit-label="$t('updateFundingCallLabel')"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
                     <generic-crud-modal
-
-                        :form-component="AlternateNameForm"
-                        :form-props="{ presetName: fundingCall?.name, presetNameAbbreviation: fundingCall?.nameAbbreviation }"
-                        entity-name="Name"
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="FundingCallUpdateForm"
+                        :form-props="{ presetFundingCall: fundingCall }"
+                        entity-name="FundingCall"
                         is-update
                         is-section-update
                         :read-only="!canEdit"
-                        @update="updateName"
+                        @update="updateFundingCall"
                     />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="title" />
                 </template>
             </entity-landing-header>
         </template>
@@ -24,18 +33,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-card class="funding-info-card mb-6" variant="outlined">
-                        <v-card-text class="edit-pen-container">
-                            <generic-crud-modal
-                                :form-component="FundingCallUpdateForm"
-                                :form-props="{ presetFundingCall: fundingCall }"
-                                entity-name="FundingCall"
-                                is-update
-                                is-section-update
-                                :read-only="!canEdit"
-                                wide
-                                @update="updateFundingCall"
-                            />
-
+                        <v-card-text>
                             <div class="mb-5">
                                 <b>{{ $t("basicInfoLabel") }}</b>
                             </div>
@@ -278,7 +276,6 @@ import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
 import FundingCallUpdateForm from "@/components/project/FundingCallUpdateForm.vue";
-import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 
 const route = useRoute();
@@ -296,6 +293,14 @@ const snackbarMessage = ref("");
 const funderName = ref<MultilingualContent[]>([]);
 
 const canEdit = ref(false);
+
+const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+const openModal = (modal: { dialog: boolean } | null) => {
+    if (modal) {
+        modal.dialog = true;
+    }
+};
 const loginStore = useLoginStore();
 
 const uploadStore = useUploadStore();
@@ -371,12 +376,6 @@ const updateContributors = (contributors: PersonFundingCallContribution[]) => {
 
 const updateResearchAreas = (researchAreaIds: number[]) => {
     fundingCall.value!.researchAreasId = researchAreaIds;
-    performUpdate(true);
-};
-
-const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
-    fundingCall.value!.name = nameInformation.name;
-    fundingCall.value!.nameAbbreviation = nameInformation.nameAbbreviation;
     performUpdate(true);
 };
 

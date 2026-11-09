@@ -2,6 +2,28 @@
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
             <v-col>
+                <multilingual-text-input
+                    ref="nameRef"
+                    v-model="name"
+                    :rules="requiredFieldRules"
+                    :label="$t('nameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetFundingProgram?.name, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameAbbreviationRef"
+                    v-model="nameAbbreviation"
+                    :label="$t('nameAbbreviationLabel')"
+                    :initial-value="toMultilingualTextInput(presetFundingProgram?.nameAbbreviation, languageTags)"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
+            <v-col>
                 <organisation-unit-autocomplete-search
                     v-model="selectedFunder"
                     label="funderLabel"
@@ -87,6 +109,7 @@
 import UiInput from "@/components/ui/input/Input.vue";
 import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
@@ -94,8 +117,9 @@ import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/Or
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import type { FundingProgram, FundingType } from '@/models/FundingModel';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
-import type { MonetaryAmount } from '@/models/Common';
-import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import type { MonetaryAmount, MultilingualContent } from '@/models/Common';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useValidationUtils } from '@/utils/ValidationUtils';
 
 const props = defineProps<{
     presetFundingProgram: FundingProgram | undefined;
@@ -106,11 +130,17 @@ const emit = defineEmits<{
 }>();
 
 const isFormValid = ref(false);
-useLanguageTags();
+const { languageTags } = useLanguageTags();
 
+const { requiredFieldRules } = useValidationUtils();
+
+const nameRef = ref<typeof MultilingualTextInput>();
+const nameAbbreviationRef = ref<typeof MultilingualTextInput>();
 const urisRef = ref<typeof UriInput>();
 const totalAmountRef = ref<typeof MonetaryAmountInput>();
 
+const name = ref<any>([]);
+const nameAbbreviation = ref<any>([]);
 const dateFrom = ref(props.presetFundingProgram?.dateFrom as string);
 const dateTo = ref(props.presetFundingProgram?.dateTo as string);
 const uris = ref<string[]>(props.presetFundingProgram?.uris as string[] ?? []);
@@ -146,12 +176,23 @@ const refreshForm = () => {
         value: props.presetFundingProgram?.funderId as number
     };
 
+    nameRef.value?.clearInput();
+    name.value = props.presetFundingProgram?.name as MultilingualContent[];
+
+    nameAbbreviationRef.value?.clearInput();
+    nameAbbreviation.value = props.presetFundingProgram?.nameAbbreviation as MultilingualContent[];
+
     urisRef.value?.refreshModelValue(props.presetFundingProgram?.uris as string[] ?? []);
     uris.value = props.presetFundingProgram?.uris as string[] ?? [];
+
+    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
 };
 
 const submit = () => {
     const updatedFundingProgram = {
+        name: name.value,
+        nameAbbreviation: nameAbbreviation.value,
         funderId: selectedFunder.value?.value,
         fundingTypes: selectedFundingTypes.value,
         dateFrom: dateFrom.value,

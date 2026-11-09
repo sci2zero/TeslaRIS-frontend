@@ -1,6 +1,28 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameRef"
+                    v-model="name"
+                    :rules="requiredFieldRules"
+                    :label="$t('nameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetFunding?.name, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameAbbreviationRef"
+                    v-model="nameAbbreviation"
+                    :label="$t('nameAbbreviationLabel')"
+                    :initial-value="toMultilingualTextInput(presetFunding?.nameAbbreviation, languageTags)"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col cols="6">
                 <ui-input
                     v-model="doi"
@@ -206,8 +228,10 @@ const emit = defineEmits<{
 const isFormValid = ref(false);
 const { languageTags } = useLanguageTags();
 
-const { doiValidationRules } = useValidationUtils();
+const { requiredFieldRules, doiValidationRules } = useValidationUtils();
 
+const nameRef = ref<typeof MultilingualTextInput>();
+const nameAbbreviationRef = ref<typeof MultilingualTextInput>();
 const displayFunderRef = ref<typeof MultilingualTextInput>();
 const displayCallRef = ref<typeof MultilingualTextInput>();
 const displayProgramRef = ref<typeof MultilingualTextInput>();
@@ -227,6 +251,8 @@ const competitive = ref<boolean>(props.presetFunding?.competitive ?? false);
 const renewable = ref<boolean>(props.presetFunding?.renewable ?? false);
 const internalInvestment = ref<boolean>(props.presetFunding?.internalInvestment ?? false);
 
+const name = ref<any>([]);
+const nameAbbreviation = ref<any>([]);
 const displayFunder = ref<any>([]);
 const displayCall = ref<any>([]);
 const displayProgram = ref<any>([]);
@@ -260,6 +286,12 @@ const refreshForm = () => {
     fundingLocationType.value = props.presetFunding?.fundingLocationType;
     amountRef.value?.setValue(props.presetFunding?.amount);
 
+    nameRef.value?.clearInput();
+    name.value = props.presetFunding?.name as MultilingualContent[];
+
+    nameAbbreviationRef.value?.clearInput();
+    nameAbbreviation.value = props.presetFunding?.nameAbbreviation as MultilingualContent[];
+
     displayFunderRef.value?.clearInput();
     displayFunder.value = props.presetFunding?.displayFunder as MultilingualContent[];
 
@@ -272,6 +304,8 @@ const refreshForm = () => {
     urisRef.value?.refreshModelValue(props.presetFunding?.uris as string[] ?? []);
     uris.value = props.presetFunding?.uris as string[] ?? [];
 
+    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
     displayFunderRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayFunder.value, languageTags.value));
     displayCallRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayCall.value, languageTags.value));
     displayProgramRef.value?.forceRefreshModelValue(toMultilingualTextInput(displayProgram.value, languageTags.value));
@@ -279,6 +313,8 @@ const refreshForm = () => {
 
 const submit = () => {
     const updatedFunding = {
+        name: name.value,
+        nameAbbreviation: nameAbbreviation.value,
         doi: doi.value,
         grantAgreementId: grantAgreementId.value,
         fundingTypes: selectedFundingTypes.value,

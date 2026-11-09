@@ -1,7 +1,28 @@
 <template>
     <landing-page-layout id="funding-application" v-model="currentTab" :loading="!fundingApplication" class="funding-landing">
         <template #header>
-            <entity-landing-header :loading="!fundingApplication" :entity-label="$t('fundingApplicationLabel')" icon="mdi-cash-check">
+            <entity-landing-header
+                :loading="!fundingApplication"
+                :entity-label="$t('fundingApplicationLabel')"
+                icon="mdi-cash-check"
+                :can-edit="canEdit"
+                :edit-label="$t('updateFundingApplicationLabel')"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
+                    <generic-crud-modal
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="FundingApplicationUpdateForm"
+                        :form-props="{ presetFundingApplication: fundingApplication }"
+                        entity-name="FundingApplication"
+                        is-update
+                        is-section-update
+                        :read-only="!canEdit"
+                        @update="updateBasicInfo"
+                    />
+                </template>
                 <template #title>
                     <rich-title-renderer :title="title" />
                 </template>
@@ -12,17 +33,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-card class="funding-info-card mb-6" variant="outlined">
-                        <v-card-text class="edit-pen-container">
-                            <generic-crud-modal
-                                :form-component="FundingApplicationUpdateForm"
-                                :form-props="{ presetFundingApplication: fundingApplication }"
-                                entity-name="FundingApplication"
-                                is-update
-                                is-section-update
-                                :read-only="!canEdit"
-                                @update="updateBasicInfo"
-                            />
-
+                        <v-card-text>
                             <div class="mb-5">
                                 <b>{{ $t("basicInfoLabel") }}</b>
                             </div>
@@ -211,6 +222,14 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 
 const canEdit = ref(false);
+
+const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+const openModal = (modal: { dialog: boolean } | null) => {
+    if (modal) {
+        modal.dialog = true;
+    }
+};
 const loginStore = useLoginStore();
 
 const uploadStore = useUploadStore();
@@ -395,9 +414,3 @@ const deleteOtherFundingSource = (fundingPartId: number) => {
 };
 
 </script>
-
-<style scoped>
-.edit-pen-container {
-    position: relative;
-}
-</style>
