@@ -939,7 +939,7 @@ export default {
     operationLabel: "Operacija",
     archiveLabel: "Arhiviraj",
     unarchiveLabel: "Ukloni iz arhive",
-    missingDataToArchiveMessage: "Potrebno je da postavite minimum naslov i datum odbrane kako bi mogli da arhivirate završni rad.",
+    missingDataToArchiveMessage: "Završni rad je moguće arhivirati samo ako ima naslov, datum dokumenta i datum odbrane i nije na javnom uvidu (niti mu je javni uvid pauziran). Ukoliko je javni uvid završen, zvanični fajl rada i izveštaj komisije moraju biti dostupni u otvorenom pristupu.",
     archiveWarningMessage: "Arhivirana publikacija će biti javno dostupna prilikom izvoza podataka. Dalje izmene biće onemogućene.",
     unarchiveWarningMessage: "Uklanjanje iz arhive je radnja koja se izvršava samo u izuzentnim situacijama.",
     referenceFormatsLabel: "Formati reference",

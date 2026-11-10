@@ -938,7 +938,7 @@ export default {
     operationLabel: "Operation",
     archiveLabel: "Archive",
     unarchiveLabel: "Unarchive",
-    missingDataToArchiveMessage: "You need to provide at least the title and defense date in order to archive the final paper.",
+    missingDataToArchiveMessage: "The final paper can be archived only when it has a title, document date and defence date and is not on public review (or paused). If the public review has been completed, the official thesis file and the commission report must both be available in open access.",
     archiveWarningMessage: "An archived publication will be publicly available when exporting data. Further modifications will be disabled.",
     unarchiveWarningMessage: "Unarchiving is an action that is performed only in exceptional situations.",
     referenceFormatsLabel: "Reference formats",
