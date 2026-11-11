@@ -50,7 +50,7 @@
                         :key="card.key"
                         cols="12"
                         md="6">
-                        <v-card variant="flat" rounded="lg" class="dq-card h-100">
+                        <v-card variant="flat" rounded="lg" class="dq-card">
                             <v-card-item>
                                 <template #prepend>
                                     <v-avatar
@@ -136,7 +136,8 @@
 
                                     <v-autocomplete
                                         v-model="card.form.matchedRemarkKeys"
-                                        :items="remarkOptionsFor(card)"
+                                        :items="remarkOptionsFor(
+                                            card, card.form.matchedRemarkKeys)"
                                         :label="$t('matchedRemarksLabel')"
                                         :no-data-text="$t('noMatchingConstraintsMessage')"
                                         class="mt-4"
@@ -147,6 +148,34 @@
                                         clearable
                                         auto-select-first
                                     />
+
+                                    <v-autocomplete
+                                        v-model="card.form.explicitlySkippedRemarkKeys"
+                                        :items="remarkOptionsFor(
+                                            card, card.form.explicitlySkippedRemarkKeys)"
+                                        :label="$t('skippedRemarksLabel')"
+                                        :hint="$t('skippedRemarksExplanationMessage')"
+                                        :no-data-text="$t('noMatchingConstraintsMessage')"
+                                        class="mt-4 mb-5"
+                                        persistent-hint
+                                        density="compact"
+                                        multiple
+                                        chips
+                                        closable-chips
+                                        clearable
+                                        auto-select-first
+                                    />
+
+                                    <v-alert
+                                        v-if="overlappingRemarkKeys(card).length > 0"
+                                        type="warning"
+                                        variant="tonal"
+                                        density="compact"
+                                        class="mt-4"
+                                    >
+                                        {{ $t("overlappingRemarksMessage", {
+                                            keys: overlappingRemarkKeys(card).join(", ") }) }}
+                                    </v-alert>
 
                                     <v-select
                                         v-model="card.form.appliedFixators"
@@ -260,6 +289,7 @@
                         :items="recurrenceOptions"
                         :label="$t('recurrenceTypeLabel')"
                         density="compact"
+                        class="mt-5"
                         hide-details
                     />
                 </v-card-text>
@@ -328,6 +358,7 @@ import { getIssueTargetTitleFromValueAutoLocale } from "@/i18n/issueTarget";
 import { getRecurrenceTypesForGivenLocale } from "@/i18n/recurrenceType";
 import { RecurrenceType } from "@/models/LoadModel";
 import { DateTime } from "luxon";
+import type { AxiosError } from "axios";
 import { displayTextOrPlaceholder } from "@/utils/StringUtil";
 import { getErrorMessageForErrorKey } from "@/i18n";
 import { useValidationUtils } from "@/utils/ValidationUtils";
@@ -435,7 +466,7 @@ const metricOptionsFor = (profileName: string) => {
 
 // A selected remark that the card filter rules out stays in the list, otherwise the chip loses
 // its title and the next selection drops it.
-const remarkOptionsFor = (card: PipelineCard) => {
+const remarkOptionsFor = (card: PipelineCard, selectedKeys: string[]) => {
     const filters = card.filters;
     const options = constraintsOf(card.form.profileName)
         .filter(constraint =>
@@ -451,7 +482,7 @@ const remarkOptionsFor = (card: PipelineCard) => {
 
     return [
         ...options,
-        ...card.form.matchedRemarkKeys.filter(key => !known.has(key))
+        ...selectedKeys.filter(key => !known.has(key))
             .map(key => ({ title: key, value: key }))
     ];
 };
@@ -464,6 +495,7 @@ const toCard = (pipeline: FixatorPipeline): PipelineCard => ({
         profileName: pipeline.profileName,
         version: pipeline.version,
         matchedRemarkKeys: [...pipeline.matchedRemarkKeys],
+        explicitlySkippedRemarkKeys: [...(pipeline.explicitlySkippedRemarkKeys ?? [])],
         appliedFixators: [...pipeline.appliedFixators],
         createVersionOnEveryStep: pipeline.createVersionOnEveryStep
     },
@@ -478,8 +510,9 @@ const fetchPipelines = () => {
 
     DataQualityFixatorService.listPipelines().then(response => {
         cards.value = response.data.map(toCard);
-    }).catch(() => {
+    }).catch(error => {
         cards.value = [];
+        notifyFailure(error);
     }).finally(() => {
         loading.value = false;
     });
@@ -488,8 +521,9 @@ const fetchPipelines = () => {
 const fetchFixators = () => {
     DataQualityFixatorService.listFixators().then(response => {
         fixators.value = response.data;
-    }).catch(() => {
+    }).catch(error => {
         fixators.value = [];
+        notifyFailure(error);
     });
 };
 
@@ -506,8 +540,9 @@ const loadProfileData = (profileName: string) => {
         profileName, undefined, undefined, undefined
     ).then(response => {
         constraintsByProfile.value[profileName] = response.data;
-    }).catch(() => {
+    }).catch(error => {
         constraintsByProfile.value[profileName] = [];
+        notifyFailure(error);
     });
 
     DataQualityService.listProfileMetrics(profileName).then(response => {
@@ -520,14 +555,19 @@ const loadProfileData = (profileName: string) => {
 const fetchScheduledTasks = () => {
     TaskManagerService.listScheduledDataQualityFixTasks().then(response => {
         scheduledTasks.value = response.data;
-    }).catch(() => {
+    }).catch(error => {
         scheduledTasks.value = [];
+        notifyFailure(error);
     });
 };
 
 const notify = (text: string) => {
     message.value = text;
     snackbar.value = true;
+};
+
+const notifyFailure = (error: AxiosError<{ message?: string }>) => {
+    notify(getErrorMessageForErrorKey(error.response?.data?.message as string));
 };
 
 const cancelScheduledTask = (taskId: string) => {
@@ -548,6 +588,7 @@ const addPipeline = (profileName: string) => {
             profileName,
             version: null,
             matchedRemarkKeys: [],
+            explicitlySkippedRemarkKeys: [],
             appliedFixators: [],
             createVersionOnEveryStep: false
         },
@@ -558,12 +599,18 @@ const addPipeline = (profileName: string) => {
     });
 };
 
+const overlappingRemarkKeys = (card: PipelineCard) =>
+    card.form.matchedRemarkKeys.filter(
+        key => (card.form.explicitlySkippedRemarkKeys ?? []).includes(key));
+
 // A pipeline that matches no remark key is never run, thus it cannot be saved either.
 const canSave = (card: PipelineCard) =>
-    Boolean(card.form.pipelineName) && card.form.matchedRemarkKeys.length > 0;
+    Boolean(card.form.pipelineName) && card.form.matchedRemarkKeys.length > 0 &&
+    overlappingRemarkKeys(card).length === 0;
 
 const canSchedule = (card: PipelineCard) =>
-    Boolean(card.persistedName) && card.form.matchedRemarkKeys.length > 0;
+    Boolean(card.persistedName) && card.form.matchedRemarkKeys.length > 0 &&
+    overlappingRemarkKeys(card).length === 0;
 
 const save = (card: PipelineCard) => {
     card.saving = true;
@@ -686,9 +733,12 @@ fetchPipelines();
     font-weight: 600;
 }
 
+/* Height is left to the content. A v-card clips its overflow, so a fixed height hides the
+   actions row when the remark chips arrive and the card grows. */
 .dq-card {
     background-color: rgb(var(--v-theme-surface));
     border: 1px solid rgba(var(--v-border-color), 0.12);
+    overflow: visible;
 }
 
 .add-pipeline-card {

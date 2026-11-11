@@ -434,6 +434,7 @@ export interface FixatorPipeline {
     profileName: string;
     version: number | null;
     matchedRemarkKeys: string[];
+    explicitlySkippedRemarkKeys: string[];
     appliedFixators: string[];
     createVersionOnEveryStep: boolean;
 }
