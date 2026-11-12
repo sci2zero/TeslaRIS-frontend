@@ -3,7 +3,7 @@
         <v-col cols="7">
             <ui-input
                 v-model="amountInput"
-                :label="resolvedAmountLabel"
+                :label="resolvedAmountLabel + requiredMark"
                 :placeholder="resolvedAmountLabel"
                 type="number"
                 :min="0"
@@ -18,7 +18,7 @@
                 :items="currencies"
                 :item-title="currencyLabel"
                 item-value="currencyId"
-                :label="$t('currencyLabel')"
+                :label="$t('currencyLabel') + requiredMark"
                 :rules="rules"
                 @update:model-value="emitValue"
             />
@@ -54,6 +54,7 @@ const emit = defineEmits<{
 const i18n = useI18n();
 
 const resolvedAmountLabel = computed(() => props.amountLabel ? props.amountLabel : i18n.t("amountLabel"));
+const requiredMark = computed(() => props.required ? "*" : "");
 
 const currencies = ref<Currency[]>([]);
 const amountInput = ref<number | null>(props.presetAmount?.amount ?? null);

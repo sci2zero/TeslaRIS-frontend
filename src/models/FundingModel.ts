@@ -24,6 +24,7 @@ export interface Funding {
     displayProgram: MultilingualContent[];
     displayFunder: MultilingualContent[];
     fundingTypes: FundingType[];
+    fundingLocationType?: FundingLocationType;
     amount?: MonetaryAmount;
     competitive?: boolean;
     renewable?: boolean;
@@ -69,7 +70,23 @@ export interface FundingProgramIndex {
 export enum FundingType {
     GRANT= "GRANT",
     CALL= "CALL",
+    FUNDING_PROGRAM = "FUNDING_PROGRAM",
+    CONTRACT = "CONTRACT",
+    GIFT = "GIFT",
+    TENDER = "TENDER",
+    INTERNAL_FUNDING = "INTERNAL_FUNDING",
+    AWARD = "AWARD",
+    PROJECT = "PROJECT",
+    EMPLOYMENT = "EMPLOYMENT",
+    INSTITUTIONAL_FUNDING = "INSTITUTIONAL_FUNDING",
+    RESOURCE_ALLOCATION = "RESOURCE_ALLOCATION",
     OTHER = "OTHER",
+}
+
+export enum FundingLocationType {
+    NATIONAL = "NATIONAL",
+    ABROAD = "ABROAD",
+    MIXED = "MIXED",
 }
 
 export interface FundingPart {

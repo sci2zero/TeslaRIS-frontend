@@ -4,6 +4,7 @@ import { transliterateContentToCyrillic } from "@/utils/StringUtil";
 
 export const personProjectContributionTypeSr = [
     { title: "Glavni istraživač", value: PersonProjectContributionType.PRINCIPLE_INVESTIGATOR },
+    { title: "Ko-rukovodilac", value: PersonProjectContributionType.CO_PRINCIPLE_INVESTIGATOR },
     { title: "Član tima", value: PersonProjectContributionType.TEAM_MEMBER },
     { title: "Kontakt osoba", value: PersonProjectContributionType.CONTACT },
     { title: "Doprinos u naturi", value: PersonProjectContributionType.INKIND_CONTRIBUTOR },
@@ -13,6 +14,7 @@ export const personProjectContributionTypeSr = [
 
 export const personProjectContributionTypeEn = [
     { title: "Principle investigator", value: PersonProjectContributionType.PRINCIPLE_INVESTIGATOR },
+    { title: "Co-principle investigator", value: PersonProjectContributionType.CO_PRINCIPLE_INVESTIGATOR },
     { title: "Team member", value: PersonProjectContributionType.TEAM_MEMBER },
     { title: "Contact", value: PersonProjectContributionType.CONTACT },
     { title: "In-kind contributor", value: PersonProjectContributionType.INKIND_CONTRIBUTOR },

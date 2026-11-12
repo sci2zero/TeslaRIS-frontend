@@ -1,21 +1,30 @@
 <template>
     <landing-page-layout id="funding-program" v-model="currentTab" :loading="!fundingProgram" class="funding-landing">
         <template #header>
-            <entity-landing-header :loading="!fundingProgram" :entity-label="$t('fundingProgramLabel')" :icon="icon">
-                <template #title>
-                    <rich-title-renderer :title="title" />
-                </template>
-                <template #actions>
+            <entity-landing-header
+                :loading="!fundingProgram"
+                :entity-label="$t('fundingProgramLabel')"
+                :icon="icon"
+                :can-edit="canEdit"
+                :edit-label="$t('updateFundingProgramLabel')"
+                @edit="openModal(updateModalRef)"
+            >
+                <template #modals>
                     <generic-crud-modal
-
-                        :form-component="AlternateNameForm"
-                        :form-props="{ presetName: fundingProgram?.name, presetNameAbbreviation: fundingProgram?.nameAbbreviation }"
-                        entity-name="Name"
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="FundingProgramUpdateForm"
+                        :form-props="{ presetFundingProgram: fundingProgram }"
+                        entity-name="FundingProgram"
                         is-update
                         is-section-update
                         :read-only="!canEdit"
-                        @update="updateName"
+                        @update="updateBasicInfo"
                     />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="title" />
                 </template>
             </entity-landing-header>
         </template>
@@ -24,17 +33,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-card class="funding-info-card mb-6" variant="outlined">
-                        <v-card-text class="edit-pen-container">
-                            <generic-crud-modal
-                                :form-component="FundingProgramUpdateForm"
-                                :form-props="{ presetFundingProgram: fundingProgram }"
-                                entity-name="FundingProgram"
-                                is-update
-                                is-section-update
-                                :read-only="!canEdit"
-                                @update="updateBasicInfo"
-                            />
-
+                        <v-card-text>
                             <div class="mb-5">
                                 <b>{{ $t("basicInfoLabel") }}</b>
                             </div>
@@ -251,7 +250,6 @@ import DescriptionOrBiographyUpdateForm from "@/components/core/update/Descripti
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
-import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import FundingProgramUpdateForm from "@/components/project/FundingProgramUpdateForm.vue";
 import FundingProgramCallsTableComponent from "@/components/project/FundingProgramCallsTableComponent.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
@@ -269,6 +267,14 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 
 const canEdit = ref(false);
+
+const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+const openModal = (modal: { dialog: boolean } | null) => {
+    if (modal) {
+        modal.dialog = true;
+    }
+};
 const loginStore = useLoginStore();
 
 const uploadStore = useUploadStore();
@@ -296,6 +302,8 @@ const fetchFundingProgram = async () => {
         );
         fundingProgram.value = response.data;
 
+        document.title = returnCurrentLocaleContent(fundingProgram.value?.name) as string;
+
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
         }
@@ -313,12 +321,6 @@ const checkIfUserCanEdit = () => {
 
 const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
-};
-
-const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
-    fundingProgram.value!.name = nameInformation.name;
-    fundingProgram.value!.nameAbbreviation = nameInformation.nameAbbreviation;
-    performUpdate(true);
 };
 
 const updateKeywords = (keywords: MultilingualContent[]) => {

@@ -1,6 +1,28 @@
 <template>
     <v-form v-model="isFormValid" @submit.prevent>
         <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameRef"
+                    v-model="name"
+                    :rules="requiredFieldRules"
+                    :label="$t('nameLabel') + '*'"
+                    :initial-value="toMultilingualTextInput(presetProject?.name, languageTags)"
+                />
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
+                <multilingual-text-input
+                    ref="nameAbbreviationRef"
+                    v-model="nameAbbreviation"
+                    :label="$t('nameAbbreviationLabel')"
+                    :initial-value="toMultilingualTextInput(presetProject?.nameAbbreviation, languageTags)"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row>
             <v-col cols="6">
                 <ui-input
                     v-if="canBeUpdated(ApplicableEntityType.PROJECT, 'doi')"
@@ -123,11 +145,14 @@ import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformat
 import UiInput from "@/components/ui/input/Input.vue";
 import UiCheckbox from "@/components/ui/checkbox/Checkbox.vue";
 import { ref, computed, watch } from 'vue';
+import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
 import UriInput from '@/components/core/UriInput.vue';
 import DatePicker from '@/components/core/DatePicker.vue';
 import MonetaryAmountInput from '@/components/core/MonetaryAmountInput.vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
-import type { MonetaryAmount } from '@/models/Common';
+import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { useLanguageTags } from '@/composables/useLanguageTags';
+import type { MonetaryAmount, MultilingualContent } from '@/models/Common';
 import { ProjectCollaborationType, ProjectResearchType, ProjectStatus, type Project } from '@/models/ProjectModel';
 import { getProjectStatusesForGivenLocale } from '@/i18n/projectStatus';
 import { getProjectCollaborationTypesForGivenLocale } from '@/i18n/projectCollaborationType';
@@ -144,12 +169,17 @@ const emit = defineEmits<{
 }>();
 
 const isFormValid = ref(false);
+const { languageTags } = useLanguageTags();
 
-const { doiValidationRules, projectNationalIdValidationRules } = useValidationUtils();
+const { requiredFieldRules, doiValidationRules, projectNationalIdValidationRules } = useValidationUtils();
 
+const nameRef = ref<typeof MultilingualTextInput>();
+const nameAbbreviationRef = ref<typeof MultilingualTextInput>();
 const urisRef = ref<typeof UriInput>();
 const costsRef = ref<typeof MonetaryAmountInput>();
 
+const name = ref<any>([]);
+const nameAbbreviation = ref<any>([]);
 const doi = ref(props.presetProject?.doi);
 const raid = ref(props.presetProject?.raid);
 const nationalId = ref(props.presetProject?.nationalId);
@@ -186,12 +216,23 @@ const refreshForm = () => {
     researchType.value = props.presetProject?.researchType ?? ProjectResearchType.FUNDAMENTAL;
     costsRef.value?.setValue(props.presetProject?.costs);
 
+    nameRef.value?.clearInput();
+    name.value = props.presetProject?.name as MultilingualContent[];
+
+    nameAbbreviationRef.value?.clearInput();
+    nameAbbreviation.value = props.presetProject?.nameAbbreviation as MultilingualContent[];
+
     urisRef.value?.refreshModelValue(props.presetProject?.uris as string[] ?? []);
     uris.value = props.presetProject?.uris as string[] ?? [];
+
+    nameRef.value?.forceRefreshModelValue(toMultilingualTextInput(name.value, languageTags.value));
+    nameAbbreviationRef.value?.forceRefreshModelValue(toMultilingualTextInput(nameAbbreviation.value, languageTags.value));
 };
 
 const submit = () => {
     const updatedProject = {
+        name: name.value,
+        nameAbbreviation: nameAbbreviation.value,
         doi: doi.value,
         raid: raid.value,
         nationalId: nationalId.value,

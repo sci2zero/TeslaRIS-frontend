@@ -7,7 +7,9 @@ export const projectStatusSr = [
     { title: "U proceni", value: ProjectStatus.UNDER_EVALUATION },
     { title: "U toku", value: ProjectStatus.ONGOING },
     { title: "Otkazan", value: ProjectStatus.CANCELLED },
-    { title: "Završen", value: ProjectStatus.CONCLUDED }
+    { title: "Završen", value: ProjectStatus.CONCLUDED },
+    { title: "Zatvoren", value: ProjectStatus.CLOSED },
+    { title: "Neaktivan", value: ProjectStatus.INACTIVE }
 ];
 
 export const projectStatusEn = [
@@ -15,7 +17,9 @@ export const projectStatusEn = [
     { title: "Under evaluation", value: ProjectStatus.UNDER_EVALUATION },
     { title: "Ongoing", value: ProjectStatus.ONGOING },
     { title: "Cancelled", value: ProjectStatus.CANCELLED },
-    { title: "Concluded", value: ProjectStatus.CONCLUDED }
+    { title: "Concluded", value: ProjectStatus.CONCLUDED },
+    { title: "Closed", value: ProjectStatus.CLOSED },
+    { title: "Inactive", value: ProjectStatus.INACTIVE }
 ];
 
 export const getProjectStatusTitleFromValueAutoLocale = (value: ProjectStatus) => {
@@ -42,7 +46,10 @@ export const getProjectStatusColor = (status: ProjectStatus) => {
         case ProjectStatus.CANCELLED:
             return "error";
         case ProjectStatus.CONCLUDED:
+        case ProjectStatus.CLOSED:
             return "success";
+        case ProjectStatus.INACTIVE:
+            return "warning";
         default:
             return "primary";
     }

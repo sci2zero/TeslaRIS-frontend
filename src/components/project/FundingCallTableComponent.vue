@@ -218,6 +218,26 @@ const getFundingTypeIcon = (type: FundingType) => {
             return "mdi-cash-multiple";
         case FundingType.CALL:
             return "mdi-bullhorn";
+        case FundingType.FUNDING_PROGRAM:
+            return "mdi-bank";
+        case FundingType.CONTRACT:
+            return "mdi-file-sign";
+        case FundingType.GIFT:
+            return "mdi-gift";
+        case FundingType.TENDER:
+            return "mdi-gavel";
+        case FundingType.INTERNAL_FUNDING:
+            return "mdi-domain";
+        case FundingType.AWARD:
+            return "mdi-trophy";
+        case FundingType.PROJECT:
+            return "mdi-folder-open";
+        case FundingType.EMPLOYMENT:
+            return "mdi-briefcase";
+        case FundingType.INSTITUTIONAL_FUNDING:
+            return "mdi-office-building";
+        case FundingType.RESOURCE_ALLOCATION:
+            return "mdi-chart-donut";
         default:
             return "mdi-file-document";
     }
