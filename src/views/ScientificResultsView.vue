@@ -33,7 +33,7 @@
             :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
             :has-active-type-filters="selectedPublicationTypes.length > 0"
             :endpoint-type="currentTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
-            :endpoint-token-parameters="[`${returnOnlyNonArchived}`, searchParams.replaceAll('&tokens=', 'tokens=')]"
+            :endpoint-token-parameters="[`${returnOnlyNonArchived}`, decodeSearchTokens(searchParams).replaceAll('&tokens=', 'tokens=')]"
             :endpoint-body-parameters="
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
@@ -176,6 +176,7 @@ import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import AddPublicationMenu from '@/components/publication/AddPublicationMenu.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { decodeSearchTokens, toTokenQuery } from '@/utils/SearchTokenUtil';
 
 
 export default defineComponent({
@@ -310,7 +311,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams !== "string") {
-                tokenParams = "tokens=" + tokenParams.join("&tokens=");
+                tokenParams = toTokenQuery(tokenParams);
             }
 
             tableRef.value?.setSortAndPageOption([], 1);
@@ -353,7 +354,7 @@ export default defineComponent({
             returnOnlyInstitutionRelatedEntities,
             isCommission, returnOnlyUnassessedEntities,
             publicationTypes, selectedPublicationTypes,
-            ExportableEndpointType, searchParams, currentTab,
+            ExportableEndpointType, searchParams, currentTab, decodeSearchTokens,
             resetFiltersAndSearch, loggedInUser, loading,
             performNavigation, returnOnlyUnmanagedPublications,
             toggleAdvancedSearch,

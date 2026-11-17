@@ -114,6 +114,7 @@ import Wordcloud from '@/components/core/Wordcloud.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { toTokenArray } from '@/utils/SearchTokenUtil';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
@@ -308,7 +309,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams === "string") {
-                tokenParams = tokenParams.replaceAll("tokens=", "").split("&");
+                tokenParams = toTokenArray(tokenParams);
             }
 
             tableRef.value?.setSortAndPageOption([], 1);

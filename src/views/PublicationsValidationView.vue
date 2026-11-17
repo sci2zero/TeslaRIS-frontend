@@ -74,6 +74,7 @@ import { ExportableEndpointType } from '@/models/Common';
 import OrganisationUnitTrustConfigurationService from '@/services/OrganisationUnitTrustConfigurationService';
 import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
+import { toTokenQuery } from '@/utils/SearchTokenUtil';
 
 
 export default defineComponent({
@@ -167,7 +168,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams !== "string") {
-                tokenParams = "tokens=" + tokenParams.join("&tokens=");
+                tokenParams = toTokenQuery(tokenParams);
             }
 
             tableRef.value?.setSortAndPageOption([], 1);
