@@ -27,6 +27,7 @@ const crisContextInformation = ref<CrisContextInformation>({
     organisationUnitNationalIdUrl: "",
     projectNationalIdUrl: "",
     documentNationalIdUrl: "",
+    thesisLibraryInstitutionIds: [],
     orcidLoginToggle: false
 });
 const loaded = ref(false);
@@ -78,6 +79,9 @@ export function useCrisContextInformation() {
     const documentNationalIdUrl = computed(
         () => crisContextInformation.value.documentNationalIdUrl ?? "");
 
+    const thesisLibraryInstitutionIds = computed(
+        () => crisContextInformation.value.thesisLibraryInstitutionIds ?? []);
+
     onMounted(fetchCrisContextInformation);
 
     return {
@@ -90,7 +94,7 @@ export function useCrisContextInformation() {
         personNationalIdentifierName, organisationUnitNationalIdentifierName,
         projectNationalIdentifierName, documentNationalIdentifierName,
         personNationalIdUrl, organisationUnitNationalIdUrl, projectNationalIdUrl,
-        documentNationalIdUrl
+        documentNationalIdUrl, thesisLibraryInstitutionIds
     };
 }
 

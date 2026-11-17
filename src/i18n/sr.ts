@@ -1207,6 +1207,8 @@ export default {
     trustNewDocumentFilesLabel: "Potrebna je validacija novih otpremljenih dokumenata",
     enabledModulesLabel: "Omogućeni moduli",
     enabledModulesDescriptionLabel: "Moduli koji su isključeni sakriveni su u celom sistemu.",
+    thesisLibraryInstitutionsLabel: "Institucije biblioteke teza",
+    thesisLibraryInstitutionsDescriptionLabel: "Institucije koje su unapred izabrane u pretrazi biblioteke teza kada link ne sadrži institucije.",
     crisConfigurationLabel: "Konfiguracija sistema",
     crisConfigurationDescriptionLabel: "Licenca metapodataka i formati nacionalnih identifikatora.",
     metadataLicenseLabel: "Licenca metapodataka",

@@ -1207,6 +1207,8 @@ export default {
     trustNewDocumentFilesLabel: "Validation is needed for new uploaded documents",
     enabledModulesLabel: "Enabled modules",
     enabledModulesDescriptionLabel: "Modules that are switched off are hidden across the system.",
+    thesisLibraryInstitutionsLabel: "Thesis library institutions",
+    thesisLibraryInstitutionsDescriptionLabel: "Institutions preselected in the thesis library search when the link carries no institutions.",
     crisConfigurationLabel: "System configuration",
     crisConfigurationDescriptionLabel: "Metadata licensing and national identifier formats.",
     metadataLicenseLabel: "Metadata license",
