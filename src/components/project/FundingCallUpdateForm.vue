@@ -8,7 +8,7 @@
                     :rules="requiredFieldRules"
                     :label="$t('nameLabel') + '*'"
                     :initial-value="toMultilingualTextInput(presetFundingCall?.name, languageTags)"
-                    is-area />
+                />
             </v-col>
         </v-row>
         <v-row>
@@ -18,7 +18,7 @@
                     v-model="nameAbbreviation"
                     :label="$t('nameAbbreviationLabel')"
                     :initial-value="toMultilingualTextInput(presetFundingCall?.nameAbbreviation, languageTags)"
-                    is-area />
+                />
             </v-col>
         </v-row>
 

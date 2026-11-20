@@ -9,6 +9,9 @@ const oUSectorEn = [
     { title: "Health", value: OrganisationUnitSector.HEALTH },
     { title: "Institution", value: OrganisationUnitSector.INSTITUTION },
     { title: "Government", value: OrganisationUnitSector.GOVERNMENT },
+    { title: "Research institute", value: OrganisationUnitSector.RESEARCH_INSTITUTE },
+    { title: "Small or medium-sized enterprise", value: OrganisationUnitSector.SME },
+    { title: "Private non-profit", value: OrganisationUnitSector.PRIVATE_NON_PROFIT },
     { title: "Other", value: OrganisationUnitSector.OTHER }
 ];
 
@@ -18,6 +21,9 @@ const oUSectorSr = [
     { title: "Zdravstveni", value: OrganisationUnitSector.HEALTH },
     { title: "Institucionalni", value: OrganisationUnitSector.INSTITUTION },
     { title: "Državni", value: OrganisationUnitSector.GOVERNMENT },
+    { title: "Istraživački institut", value: OrganisationUnitSector.RESEARCH_INSTITUTE },
+    { title: "Malo ili srednje preduzeće", value: OrganisationUnitSector.SME },
+    { title: "Privatni neprofitni", value: OrganisationUnitSector.PRIVATE_NON_PROFIT },
     { title: "Ostalo", value: OrganisationUnitSector.OTHER }
 ];
 

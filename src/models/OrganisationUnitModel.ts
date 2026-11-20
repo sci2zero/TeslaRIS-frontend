@@ -70,7 +70,10 @@ export enum OrganisationUnitSector {
     HEALTH = "HEALTH",
     INSTITUTION = "INSTITUTION",
     GOVERNMENT = "GOVERNMENT",
-    OTHER = "OTHER"
+    OTHER = "OTHER",
+    RESEARCH_INSTITUTE = "RESEARCH_INSTITUTE",
+    SME = "SME",
+    PRIVATE_NON_PROFIT = "PRIVATE_NON_PROFIT"
 }
 
 export interface OrganisationUnitResponse {

@@ -88,6 +88,21 @@
                     </v-col>
                 </v-row>
 
+                <!-- Funding Location -->
+                <v-row>
+                    <v-col cols="12">
+                        <ui-input
+                            v-model="fundingLocationType"
+                            control="select"
+                            :items="fundingLocationTypes"
+                            :label="$t('fundingLocationTypeLabel')"
+                            item-title="title"
+                            item-value="value"
+                            clearable
+                        />
+                    </v-col>
+                </v-row>
+
                 <!-- Start Date / End Date -->
                 <v-row>
                     <v-col cols="12" sm="6">
@@ -223,9 +238,10 @@ import { useValidationUtils } from '@/utils/ValidationUtils';
 import { sanitizeUri } from '@/utils/StringUtil';
 import FundingService from '@/services/project/FundingService';
 import { getFundingTypesForGivenLocale } from '@/i18n/fundingType';
+import { getFundingLocationTypesForGivenLocale } from '@/i18n/fundingLocationType';
 import type { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/models/Common';
-import type {Funding, FundingType, PrepopulatedFundingMetadata} from "@/models/FundingModel";
+import type {Funding, FundingLocationType, FundingType, PrepopulatedFundingMetadata} from "@/models/FundingModel";
 import MonetaryAmountInput from "@/components/core/MonetaryAmountInput.vue";
 import type { MonetaryAmount } from "@/models/Common";
 import IDFFundingMetadataPrepopulator from "@/components/project/IDFFundingMetadataPrepopulator.vue";
@@ -287,6 +303,7 @@ const oaMandated = ref(false);
 const oaMandateUrl = ref("");
 const amount = ref<MonetaryAmount | undefined>(undefined);
 const selectedFundingTypes = ref<{ title: string, value: FundingType }[]>([]);
+const fundingLocationType = ref<FundingLocationType>();
 const displayCall = ref<any[]>([]);
 const displayProgram = ref<any[]>([]);
 const displayFunder = ref<any[]>([]);
@@ -295,6 +312,7 @@ const monetaryAmountRef = ref<InstanceType<typeof MonetaryAmountInput>>();
 const funderRef = ref<InstanceType<typeof OrganisationUnitAutocompleteSearch>>();
 
 const fundingTypes = computed(() => getFundingTypesForGivenLocale());
+const fundingLocationTypes = computed(() => getFundingLocationTypesForGivenLocale());
 
 const {
     requiredFieldRules,
@@ -384,6 +402,7 @@ const submitFunding = (stayOnPage: boolean) => {
         doi: doi.value || undefined,
         grantAgreementId: grantAgreementId.value || undefined,
         fundingTypes: selectedFundingTypes.value.map(t => t.value),
+        fundingLocationType: fundingLocationType.value,
         dateFrom: dateFrom.value || undefined,
         dateTo: dateTo.value || undefined,
         dateSubmitted: dateSubmitted.value || undefined,
@@ -437,6 +456,7 @@ const submitFunding = (stayOnPage: boolean) => {
             oaMandated.value = false;
             oaMandateUrl.value = "";
             selectedFundingTypes.value = [];
+            fundingLocationType.value = undefined;
             error.value = false;
             snackbar.value = true;
         } else {

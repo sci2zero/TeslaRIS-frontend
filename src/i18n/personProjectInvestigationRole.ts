@@ -17,6 +17,13 @@ export const personProjectInvestigationRoleSr = [
     { title: "Gostujući naučnik - stipendista", value: PersonProjectInvestigationRole.INVITED_SCIENTIST_FELLOW },
     { title: "Upravljanje naukom i tehnologijom - stipendista", value: PersonProjectInvestigationRole.SCIENCE_AND_TECHNOLOGY_MANAGEMENT_FELLOW },
     { title: "Naučna ekspedicija", value: PersonProjectInvestigationRole.SCIENTIFIC_EXPEDITION },
+    { title: "Komentor", value: PersonProjectInvestigationRole.CO_SUPERVISOR },
+    { title: "Mobilnost u nauci i tehnologiji - stipendista", value: PersonProjectInvestigationRole.SCIENCE_AND_TECHNOLOGY_MOBILITY_FELLOW },
+    { title: "Mobilnost između institucija i preduzeća - stipendista", value: PersonProjectInvestigationRole.INSTITUTION_ENTERPRISE_MOBILITY_FELLOW },
+    { title: "Međunarodna stručna praksa - stipendista", value: PersonProjectInvestigationRole.INTERNATIONAL_INTERNSHIP_FELLOW },
+    { title: "Sabatikal - stipendista", value: PersonProjectInvestigationRole.SABBATICAL_LEAVE_FELLOW },
+    { title: "Subvencija za doktoranda rezidenta", value: PersonProjectInvestigationRole.RESIDENT_PHD_STUDENT_SUBSIDY },
+    { title: "Tehnološko savetovanje - stipendista", value: PersonProjectInvestigationRole.TECHNOLOGICAL_CONSULTANCY_FELLOW },
     { title: "Ostalo", value: PersonProjectInvestigationRole.OTHER }
 ];
 
@@ -35,6 +42,13 @@ export const personProjectInvestigationRoleEn = [
     { title: "Invited scientist fellow", value: PersonProjectInvestigationRole.INVITED_SCIENTIST_FELLOW },
     { title: "Science and technology management fellow", value: PersonProjectInvestigationRole.SCIENCE_AND_TECHNOLOGY_MANAGEMENT_FELLOW },
     { title: "Scientific expedition", value: PersonProjectInvestigationRole.SCIENTIFIC_EXPEDITION },
+    { title: "Co-supervisor", value: PersonProjectInvestigationRole.CO_SUPERVISOR },
+    { title: "Science and technology mobility fellow", value: PersonProjectInvestigationRole.SCIENCE_AND_TECHNOLOGY_MOBILITY_FELLOW },
+    { title: "Institution-enterprise mobility fellow", value: PersonProjectInvestigationRole.INSTITUTION_ENTERPRISE_MOBILITY_FELLOW },
+    { title: "International internship fellow", value: PersonProjectInvestigationRole.INTERNATIONAL_INTERNSHIP_FELLOW },
+    { title: "Sabbatical leave fellow", value: PersonProjectInvestigationRole.SABBATICAL_LEAVE_FELLOW },
+    { title: "Resident PhD student subsidy", value: PersonProjectInvestigationRole.RESIDENT_PHD_STUDENT_SUBSIDY },
+    { title: "Technological consultancy fellow", value: PersonProjectInvestigationRole.TECHNOLOGICAL_CONSULTANCY_FELLOW },
     { title: "Other", value: PersonProjectInvestigationRole.OTHER }
 ];
 
