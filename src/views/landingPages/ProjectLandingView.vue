@@ -233,6 +233,12 @@
                             />
                         </div>
                     </template>
+
+                    <landing-research-areas-section
+                        :research-areas="researchAreas"
+                        :can-edit="canEdit"
+                        @update="updateResearchAreas"
+                    />
                 </landing-additional-info-tab>
             </v-tabs-window-item>
 
@@ -312,6 +318,9 @@ import LandingDetailField from "@/components/landing/LandingDetailField.vue";
 import LandingAdditionalInfoTab from "@/components/landing/LandingAdditionalInfoTab.vue";
 import LandingOverviewTab from "@/components/landing/LandingOverviewTab.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import LandingResearchAreasSection from "@/components/landing/LandingResearchAreasSection.vue";
+import ResearchAreaService from "@/services/ResearchAreaService";
+import type { ResearchArea } from "@/models/OrganisationUnitModel";
 import LandingPageLayout from "@/components/landing/LandingPageLayout.vue";
 import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
 import EntityIdentifierService from "@/services/EntityIdentifierService";
@@ -346,6 +355,7 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 
 const updateModalRef = ref<{ dialog: boolean } | null>(null);
+const researchAreas = ref<ResearchArea[]>([]);
 const nameModalRef = ref<{ dialog: boolean } | null>(null);
 
 const openModal = (modal: { dialog: boolean } | null) => {
@@ -403,6 +413,7 @@ const fetchProject = async () => {
             parseInt(route.params.id as string)
         );
         project.value = response.data;
+        fetchResearchAreas();
 
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();
@@ -412,6 +423,14 @@ const fetchProject = async () => {
         console.error("Error fetching project:", error);
         await router.push({ name: "notFound" });
     }
+};
+
+const fetchResearchAreas = () => {
+    Promise.all((project.value?.researchAreasId ?? []).map(
+        researchAreaId => ResearchAreaService.readResearchAreaHierarchy(researchAreaId)
+    )).then(responses => {
+        researchAreas.value = responses.map(response => response.data);
+    }).catch(() => researchAreas.value = []);
 };
 
 const checkIfUserCanEdit = () => {
@@ -444,6 +463,11 @@ const searchKeyword = (keyword: string) => {
 const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
     project.value!.name = nameInformation.name;
     project.value!.nameAbbreviation = nameInformation.nameAbbreviation;
+    performUpdate(true);
+};
+
+const updateResearchAreas = (researchAreaIds: number[]) => {
+    project.value!.researchAreasId = researchAreaIds;
     performUpdate(true);
 };
 
