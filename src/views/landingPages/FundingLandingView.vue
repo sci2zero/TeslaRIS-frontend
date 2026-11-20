@@ -314,6 +314,7 @@
                     class="mt-5"
                     :entity-type="EntityType.FUNDING"
                     :entity-id="funding?.id"
+                    :record-name="title"
                 />
             </v-tabs-window-item>
         </template>

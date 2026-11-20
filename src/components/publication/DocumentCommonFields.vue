@@ -85,6 +85,17 @@
             return-object
             @update:model-value="emitUpdate"
         />
+        <div v-if="!inComparator" class="mb-5">
+            <h2 class="mt-5!">
+                {{ $t("researchAreasLabel") }}
+            </h2>
+            <research-areas-selection
+                ref="researchAreasSelectionRef"
+                :research-areas-hierarchy="localResearchAreas"
+                submit-on-click
+                @update="saveResearchAreas"
+            />
+        </div>
     </div>
 </template>
 
@@ -100,12 +111,14 @@ import { type CommonFieldsData, PublicationStatus } from '@/models/PublicationMo
 import { getPublicationStatusesForGivenLocale, getPublicationStatusTitleFromValueAutoLocale } from '@/i18n/publicationStatus';
 import UiInput from '@/components/ui/input/Input.vue';
 import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
+import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
+import type { ResearchArea } from '@/models/OrganisationUnitModel';
 
 
 import { useNationalIdentifierLabel } from '@/composables/useCrisContextInformation';
 export default defineComponent({
     name: "DocumentCommonFields",
-    components: { MultilingualTextInput, UiInput, UiCheckbox },
+    components: { MultilingualTextInput, UiInput, UiCheckbox, ResearchAreasSelection },
     props: {
         modelValue: {
             type: Object as PropType<CommonFieldsData>,
@@ -114,6 +127,10 @@ export default defineComponent({
         presetData: {
             type: Object as PropType<CommonFieldsData | undefined>,
             default: undefined
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update:modelValue", "change"],
@@ -145,6 +162,12 @@ export default defineComponent({
         );
         const localPeerReviewed = ref(props.modelValue?.peerReviewed || props.presetData?.peerReviewed || false);
         const localOpenAccess = ref(props.modelValue?.openAccess || props.presetData?.openAccess || false);
+        const localResearchAreaIds = ref<number[]>(
+            props.modelValue?.researchAreasId || props.presetData?.researchAreasId || []
+        );
+        const localResearchAreas = ref<ResearchArea[]>(
+            props.modelValue?.researchAreas || props.presetData?.researchAreas || []
+        );
         
         const getPublicationStatusObject = (status: any): { title: string; value: PublicationStatus } => {
             if (status && typeof status === 'object' && 'value' in status) {
@@ -172,6 +195,7 @@ export default defineComponent({
         const geoSpaceDescriptionRef = ref<typeof MultilingualTextInput>();
         const chronologicalSpaceDescriptionRef = ref<typeof MultilingualTextInput>();
         const editionRef = ref<typeof MultilingualTextInput>();
+        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const publicationStatuses = computed(() => getPublicationStatusesForGivenLocale());
 
@@ -188,10 +212,16 @@ export default defineComponent({
                 peerReviewed: localPeerReviewed.value,
                 openAccess: localOpenAccess.value,
                 publicationStatus: localPublicationStatus.value.value,
-                edition: localEdition.value
+                edition: localEdition.value,
+                researchAreasId: props.inComparator ? undefined : localResearchAreaIds.value
             };
             emit("update:modelValue", data);
             emit("change", data);
+        };
+
+        const saveResearchAreas = (newResearchAreaIds: number[]) => {
+            localResearchAreaIds.value = newResearchAreaIds;
+            emitUpdate();
         };
 
         watch(() => props.presetData, (newPresetData) => {
@@ -213,6 +243,11 @@ export default defineComponent({
                 localChronologicalSpaceDescription.value = newModelValue.chronologicalSpaceDescription || [];
                 localPeerReviewed.value = newModelValue.peerReviewed || false;
                 localOpenAccess.value = newModelValue.openAccess || false;
+                localResearchAreaIds.value = newModelValue.researchAreasId || [];
+
+                if (newModelValue.researchAreas) {
+                    localResearchAreas.value = newModelValue.researchAreas;
+                }
 
                 const status = newModelValue.publicationStatus || PublicationStatus.PUBLISHED;
                 localPublicationStatus.value = { 
@@ -234,6 +269,8 @@ export default defineComponent({
             localChronologicalSpaceDescription.value = data.chronologicalSpaceDescription || [];
             localPeerReviewed.value = data.peerReviewed || false;
             localOpenAccess.value = data.openAccess || false;
+            localResearchAreaIds.value = data.researchAreasId || [];
+            localResearchAreas.value = data.researchAreas || [];
 
             const status = data.publicationStatus || PublicationStatus.PUBLISHED;
             localPublicationStatus.value = { 
@@ -270,6 +307,8 @@ export default defineComponent({
             localChronologicalSpaceDescription.value = [];
             localPeerReviewed.value = false;
             localOpenAccess.value = false;
+            localResearchAreaIds.value = [];
+            localResearchAreas.value = [];
             localPublicationStatus.value = { 
                 title: getPublicationStatusTitleFromValueAutoLocale(PublicationStatus.PUBLISHED) as string, 
                 value: PublicationStatus.PUBLISHED 
@@ -278,6 +317,7 @@ export default defineComponent({
             cityRef.value?.clearInput();
             geoSpaceDescriptionRef.value?.clearInput();
             chronologicalSpaceDescriptionRef.value?.clearInput();
+            researchAreasSelectionRef.value?.resetForm();
         };
 
         onMounted(() => {
@@ -296,6 +336,8 @@ export default defineComponent({
             localChronologicalSpaceDescription,
             localPeerReviewed, localOpenAccess,
             localPublicationStatus,
+            localResearchAreaIds, localResearchAreas,
+            researchAreasSelectionRef, saveResearchAreas,
             publicationStatuses, editionRef,
             geoSpaceDescriptionRef, cityRef,
             chronologicalSpaceDescriptionRef,

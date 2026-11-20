@@ -202,6 +202,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.EXHIBITION"
                         :entity-id="exhibition?.id"
+                        :record-name="returnCurrentLocaleContent(exhibition?.name) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>

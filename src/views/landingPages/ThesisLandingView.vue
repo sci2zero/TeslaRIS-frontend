@@ -393,6 +393,7 @@
                     @update-description="updateDescription"
                     @update-extended-abstract="updateExtendedAbstract"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 />
             </v-tabs-window-item>
@@ -477,6 +478,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.THESIS"
                         :entity-id="thesis?.id"
+                        :record-name="returnCurrentLocaleContent(thesis?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -879,6 +881,11 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            thesis.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
+        };
+
         const updateKeywords = (keywords: MultilingualContent[]) => {
             thesis.value!.keywords = keywords;
             performUpdate(false);
@@ -1123,7 +1130,7 @@ export default defineComponent({
             thesis, publisher, createIndicator, languageTagMap, canAssessDataQuality, isDigitalLibraryEnabled, restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, fetchIndicators,
             languageMap, searchKeyword, canEdit, putOnPublicReview,
-            updateKeywords, updateDescription, examineRegistryBookEntry,
+            updateResearchAreas, updateKeywords, updateDescription, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,
             updateBasicInfo, organisationUnit, updateRemark,
             event, updateExtendedAbstract,

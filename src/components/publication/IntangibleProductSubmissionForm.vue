@@ -110,15 +110,6 @@
                     v-model="productUsers"
                     :label="$t('productUsersLabel')"
                 />
-                <h2 class="mt-5!">
-                    {{ $t("researchAreasLabel") }}
-                </h2>
-                <research-areas-selection
-                    ref="researchAreasSelectionRef"
-                    :research-areas-hierarchy="[]"
-                    submit-on-click
-                    @update="saveResearchAreas"
-                />
                 <document-common-fields
                     ref="commonFieldsRef"
                     v-model="commonFieldsData"
@@ -157,7 +148,6 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getIntangibleProductTypesForGivenLocale } from '@/i18n/intangibleProductType';
-import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
 import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
@@ -168,7 +158,7 @@ import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "SubmitIntangibleProduct",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,
@@ -198,7 +188,6 @@ export default defineComponent({
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
         const usersRef = ref<typeof MultilingualTextInput>();
-        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -216,7 +205,6 @@ export default defineComponent({
         const webOfScienceId = ref("");
         const intangibleProductNumber = ref("");
         const uris = ref<string[]>([]);
-        const researchAreaIds = ref<number[]>([]);
 
         const intangibleProductTypes = getIntangibleProductTypesForGivenLocale();
         const selectedIntangibleProductType = ref<{title: string, value: IntangibleProductType | null}>({ title: "", value: null });
@@ -257,7 +245,6 @@ export default defineComponent({
                 proofs: [],
                 productUsers: productUsers.value,
                 intangibleProductType: selectedIntangibleProductType.value.value as IntangibleProductType,
-                researchAreasId: researchAreaIds.value,
                 ...commonFieldsData.value
             };
 
@@ -282,7 +269,6 @@ export default defineComponent({
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
                     usersRef.value?.clearInput();
-                    researchAreasSelectionRef.value?.resetForm();
                     selectedIntangibleProductType.value = { title: "", value: null };
                     commonFieldsRef.value?.clearInputs();
                     commonFieldsData.value = {};
@@ -337,10 +323,6 @@ export default defineComponent({
             }
         };
 
-        const saveResearchAreas = (newResearchAreaIds: number[]) => {
-            researchAreaIds.value = newResearchAreaIds;
-        };
-
         return {
             canBeUpdated, ApplicableEntityType,
             isFormValid, scopusIdValidationRules,
@@ -356,8 +338,7 @@ export default defineComponent({
             workOpenAlexIdValidationRules, webOfScienceId,
             documentWebOfScienceIdValidationRules, usersRef,
             deduplicationTableRef, requiredSelectionRules,
-            intangibleProductTypes, selectedIntangibleProductType,
-            researchAreasSelectionRef, saveResearchAreas, submit,
+            intangibleProductTypes, selectedIntangibleProductType, submit,
             commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }

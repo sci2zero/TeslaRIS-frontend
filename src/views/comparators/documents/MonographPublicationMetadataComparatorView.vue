@@ -47,6 +47,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="leftMonographPublication?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="leftMonographPublication"
                     :proofs="leftMonographPublication?.proofs"
@@ -109,6 +119,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="rightMonographPublication?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="rightMonographPublication"
                     :proofs="rightMonographPublication?.proofs"
@@ -147,6 +167,7 @@ import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
@@ -155,7 +176,7 @@ import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocume
 
 export default defineComponent({
     name: "MonographPublicationMetadataComparatorView",
-    components: { PersonDocumentContributionList, Toast, MonographPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, MonographPublicationUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

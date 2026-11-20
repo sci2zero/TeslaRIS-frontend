@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { ResearchArea } from "@/models/OrganisationUnitModel";
@@ -40,15 +40,27 @@ export default defineComponent({
     },
     emits: ["update"],
     setup(props, { emit }) {
-        onMounted(async () => {
-            buildInitialSelection();
-        });
+        // The tree is cleared at once but filled by a request, so a build that started earlier
+        // must not add its nodes to a newer one.
+        let buildGeneration = 0;
+        let builtHierarchyKey: string | null = null;
+
+        const hierarchyKey = () =>
+            (props.researchAreasHierarchy ?? []).map(researchArea => researchArea.id).join(",");
 
         const buildInitialSelection = () => {
+            const generation = ++buildGeneration;
+            builtHierarchyKey = hierarchyKey();
+
             selectedResearchAreas.value = [];
+            openNodes.value = [];
             researchAreas.splice(0);
 
             ResearchAreaService.fetchChildResearchAreas(0).then(response => {
+                if (generation !== buildGeneration) {
+                    return;
+                }
+
                 response.data.forEach(researchAreaNode => {
                     researchAreas.push(
                         {
@@ -60,22 +72,31 @@ export default defineComponent({
                 });
 
                 props.researchAreasHierarchy?.forEach(researchArea => {
-                    preSelectEverything(researchArea);
+                    preSelectEverything(researchArea, generation);
                 });
             });
         };
 
-        const preSelectEverything = async (researchArea: ResearchArea) => {
+        const preSelectEverything = async (researchArea: ResearchArea, generation: number) => {
+            if (generation !== buildGeneration) {
+                return;
+            }
+
             if (selectedResearchAreas.value.find(researchAreaId => researchAreaId === researchArea.id)) {
                 return;
             }
 
             selectedResearchAreas.value.push(researchArea.id as number);
             if (researchArea.superResearchArea) {
-                await preSelectEverything(researchArea.superResearchArea);
+                await preSelectEverything(researchArea.superResearchArea, generation);
             }
 
             const childrenResponse = await ResearchAreaService.fetchChildResearchAreas(researchArea.id as number);
+
+            if (generation !== buildGeneration) {
+                return;
+            }
+
             childrenResponse.data.forEach(researchAreaNode => {
                 const node = findNodeById(researchAreas, researchArea.id as number);
                 if (node) {
@@ -217,6 +238,12 @@ export default defineComponent({
         const resetForm = () => {
             buildInitialSelection();
         };
+
+        watch(() => props.researchAreasHierarchy, () => {
+            if (hierarchyKey() !== builtHierarchyKey) {
+                buildInitialSelection();
+            }
+        }, { deep: true, immediate: true });
 
         return {
             researchAreas, openNodes, resetForm,

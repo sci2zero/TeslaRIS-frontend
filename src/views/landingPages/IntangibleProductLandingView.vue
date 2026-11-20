@@ -158,6 +158,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -165,13 +166,6 @@
                         <landing-detail-field v-if="intangibleProduct?.productUsers && intangibleProduct.productUsers.length > 0" :label="$t('productUsersLabel')">
                             {{ returnCurrentLocaleContent(intangibleProduct.productUsers) }}
                         </landing-detail-field>
-                    </template>
-                    <template #after-keywords>
-                        <landing-research-areas-section
-                            :research-areas="intangibleProduct?.researchAreas"
-                            :can-edit="canEdit && !intangibleProduct?.isArchived"
-                            @update="updateResearchAreas"
-                        />
                     </template>
                 </landing-additional-info-tab>
             </v-tabs-window-item>
@@ -249,6 +243,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.INTANGIBLE_PRODUCT"
                         :entity-id="intangibleProduct?.id"
+                        :record-name="returnCurrentLocaleContent(intangibleProduct?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -311,7 +306,6 @@ import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import { getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
-import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
@@ -328,7 +322,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "IntangibleProductLandingPage",
-    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingResearchAreasSection },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");

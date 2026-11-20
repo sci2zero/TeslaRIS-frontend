@@ -233,6 +233,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.CONFERENCE"
                         :entity-id="conference?.id"
+                        :record-name="returnCurrentLocaleContent(conference?.name) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>

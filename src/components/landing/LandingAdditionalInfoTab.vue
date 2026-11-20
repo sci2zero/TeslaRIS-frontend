@@ -57,6 +57,13 @@
             @update="$emit('update-remark', $event)"
         />
 
+        <landing-research-areas-section
+            v-if="document"
+            :research-areas="document.researchAreas"
+            :can-edit="canEdit"
+            @update="$emit('update-research-areas', $event)"
+        />
+
         <slot />
     </div>
 </template>
@@ -66,6 +73,7 @@ import KeywordList from "@/components/core/KeywordList.vue";
 import DescriptionSection from "@/components/core/DescriptionSection.vue";
 import DocumentCommonFieldsDisplay from "@/components/publication/DocumentCommonFieldsDisplay.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import LandingResearchAreasSection from "@/components/landing/LandingResearchAreasSection.vue";
 import { ApplicableEntityType, type MultilingualContent } from "@/models/Common";
 import type { Document } from "@/models/PublicationModel";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
@@ -102,5 +110,6 @@ defineEmits<{
     (e: "update-description", description: MultilingualContent[]): void;
     (e: "update-remark", remark: MultilingualContent[]): void;
     (e: "identifiers-updated"): void;
+    (e: "update-research-areas", researchAreaIds: number[]): void;
 }>();
 </script>

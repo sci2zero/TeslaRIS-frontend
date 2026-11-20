@@ -89,14 +89,6 @@
                 />
                 <uri-input ref="urisRef" v-model="uris" />
                 <ui-input
-                    v-model="selectedResearchArea"
-                    control="select"
-                    :label="$t('researchAreaLabel')"
-                    :placeholder="$t('researchAreaLabel')"
-                    :items="researchAreasSelectable"
-                    return-object
-                />
-                <ui-input
                     v-model="selectedLanguages"
                     control="select"
                     :label="$t('languageLabel')"
@@ -209,9 +201,7 @@ import type { ExternalValidation } from "@/models/Common";
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { getMonographTypesForGivenLocale } from '@/i18n/monographType';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
-import ResearchAreaService from '@/services/ResearchAreaService';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import PersonPublicationContribution from './PersonPublicationContribution.vue';
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
@@ -253,7 +243,6 @@ export default defineComponent({
         const router = useRouter();
         const i18n = useI18n();
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
-        const noDataMessage = computed(() => i18n.t("noDataMessage"));
 
         const languageTags = ref<LanguageTagResponse[]>([]);
         const languageList = ref<{title: string, value: number}[]>([]);
@@ -277,13 +266,6 @@ export default defineComponent({
                     }
                 });
             })
-
-            ResearchAreaService.listAllResearchAreas().then(response => {
-                allResearchAreas.value = response.data;
-                populateSelectionData();
-            });
-
-            selectedResearchArea.value.title = noDataMessage.value;
 
             if (props.inModal) {
                 selectedMonographType.value = {
@@ -319,13 +301,6 @@ export default defineComponent({
             }
         };
 
-        const populateSelectionData = () => {
-            researchAreasSelectable.value = [];
-            allResearchAreas.value.forEach(researchArea => {
-                researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
-            });
-        };
-
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const contributionsRef = ref<typeof PersonPublicationContribution>();
@@ -346,10 +321,6 @@ export default defineComponent({
         const monographTypes = getMonographTypesForGivenLocale();
         const selectedMonographType = ref<{title: string, value: MonographType | null}>({ title: "", value: null });
 
-        const allResearchAreas = ref<ResearchArea[]>([]);
-        const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
-
-        const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
 
         const title = ref<any[]>([]);
@@ -405,10 +376,6 @@ export default defineComponent({
             setPublicationYear(newValue.date);
         });
 
-        watch(i18n.locale, () => {
-            populateSelectionData();
-        });
-
         const submit = (stayOnPage: boolean) => {
             let publicationSeriesId: number | undefined = selectedBookSeries.value?.value !== -1 ? selectedBookSeries.value?.value : selectedJournal.value?.value;
             if (publicationSeriesId === -1) {
@@ -436,7 +403,6 @@ export default defineComponent({
                 monographType: selectedMonographType.value.value as MonographType,
                 number: number.value,
                 volume: volume.value,
-                researchAreaId: selectedResearchArea.value?.value as number,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
@@ -462,7 +428,6 @@ export default defineComponent({
                     openAlexId.value = "";
                     webOfScienceId.value = "";
                     numberOfPages.value = null;
-                    selectedResearchArea.value = { title: "", value: null };
                     selectedMonographType.value = { title: "", value: null };
                     eIsbn.value = "";
                     udc.value = "";
@@ -525,7 +490,7 @@ export default defineComponent({
         return {
             canBeUpdated, ApplicableEntityType,
             isFormValid, additionalFields, PublicationType,
-            snackbar, message, researchAreasSelectable,
+            snackbar, message,
             title, titleRef, subtitle, subtitleRef,
             selectedEvent, doiValidationRules, openAlexId,
             journalAutocompleteRef, selectedJournal, uris, urisRef,
@@ -537,7 +502,7 @@ export default defineComponent({
             bookSeriesAutocompleteRef, selectedBookSeries,
             requiredFieldRules, validatePublicationSeriesSelection, 
             publicationSeriesExternalValidation, submit,
-            selectedResearchArea, toMultilingualTextInput,
+            toMultilingualTextInput,
             languageTags, contributionsRef, contributions,
             isbnValidationRules, scopusIdValidationRules,
             workOpenAlexIdValidationRules, popuateMetadata,

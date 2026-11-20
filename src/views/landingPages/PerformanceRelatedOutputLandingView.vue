@@ -147,6 +147,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -244,6 +245,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.PERFORMANCE_RELATED_OUTPUT"
                         :entity-id="performanceRelatedOutput?.id"
+                        :record-name="returnCurrentLocaleContent(performanceRelatedOutput?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -473,6 +475,11 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            performanceRelatedOutput.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
+        };
+
         const updateKeywords = (keywords: MultilingualContent[]) => {
             performanceRelatedOutput.value!.keywords = keywords;
             performUpdate(false);
@@ -539,7 +546,7 @@ export default defineComponent({
             performanceRelatedOutput, ApplicableEntityType, canAssessDataQuality, canReviewDataQuality,
             returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, canClassify,
             languageTagMap, searchKeyword, canEdit,
-            updateKeywords, updateDescription, StatisticsType,
+            updateResearchAreas, updateKeywords, updateDescription, StatisticsType,
             snackbar, snackbarMessage, updateContributions,
             updateBasicInfo, isResearcher, displayConfiguration,
             handleResearcherUnbind, documentIndicators,

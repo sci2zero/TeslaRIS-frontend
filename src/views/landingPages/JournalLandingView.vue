@@ -212,6 +212,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.JOURNAL"
                         :entity-id="journal?.id"
+                        :record-name="returnCurrentLocaleContent(journal?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>

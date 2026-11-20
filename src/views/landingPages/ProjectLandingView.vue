@@ -261,6 +261,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.PROJECT"
                         :entity-id="project?.id"
+                        :record-name="title"
                     />
                 </landing-section-card>
             </v-tabs-window-item>

@@ -137,6 +137,8 @@ export interface Document {
     authorReprint?: boolean;
     publisherName?: MultilingualContent[];
     eventName?: MultilingualContent[];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
 }
 
 export interface CommonFieldsData {
@@ -152,6 +154,8 @@ export interface CommonFieldsData {
     openAccess?: boolean;
     publicationStatus?: PublicationStatus;
     edition?: MultilingualContent[];
+    researchAreasId?: number[];
+    researchAreas?: ResearchArea[];
 }
 
 export interface JournalPublication extends Document {
@@ -258,7 +262,6 @@ export interface Monograph extends Document {
     number?: string;
     publicationSeriesId?: number;
     languageIds?: number[];
-    researchAreaId?: number;
     publisherId?: number;
     publisherName?: MultilingualContent[];
     udc?: string;
@@ -325,8 +328,6 @@ export interface IntangibleProduct extends Document {
     publisherId?: number;
     intangibleProductType: IntangibleProductType;
     productUsers: MultilingualContent[];
-    researchAreasId: number[];
-    researchAreas?: ResearchArea[];
 }
 
 export interface MaterialProduct extends Document {
@@ -335,8 +336,6 @@ export interface MaterialProduct extends Document {
     numberProduced: number;
     materialProductType: MaterialProductType;
     productUsers: MultilingualContent[];
-    researchAreasId: number[];
-    researchAreas?: ResearchArea[];
 }
 
 export interface GeneticMaterial extends Document {

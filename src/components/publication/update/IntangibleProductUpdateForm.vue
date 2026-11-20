@@ -105,26 +105,11 @@
                     :label="$t('productUsersLabel')" />
             </v-col>
         </v-row>
-        <h2
-            v-if="!inComparator"
-            class="mt-5!">
-            {{ $t("researchAreasLabel") }}
-        </h2>
-        <v-row v-if="!inComparator">
-            <v-col cols="10">
-                <research-areas-selection
-                    ref="researchAreasSelectionRef"
-                    :research-areas-hierarchy="presetResearchAreas"
-                    submit-on-click
-                    @update="saveResearchAreas"
-                />
-            </v-col>
-        </v-row>
-
         <document-common-fields
             ref="commonFieldsRef"
             v-model="commonFieldsData"
             :preset-data="presetCommonFieldsData"
+            :in-comparator="inComparator"
         />
 
         <v-row>
@@ -157,9 +142,7 @@ import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
-import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import { getIntangibleProductTypesForGivenLocale, getIntangibleProductTypeTitleFromValueAutoLocale } from '@/i18n/intangibleProductType';
-import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
@@ -168,7 +151,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 
 export default defineComponent({
     name: "IntangibleProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker, UiInput },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetIntangibleProduct: {
             type: Object as PropType<IntangibleProduct | undefined>,
@@ -220,7 +203,6 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const usersRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
-        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -288,7 +270,6 @@ export default defineComponent({
                 webOfScienceId: webOfScienceId.value,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
-                researchAreasId: researchAreaIds.value,
                 productUsers: productUsers.value,
                 intangibleProductType: selectedIntangibleProductType.value.value,
                 fileItems: [],
@@ -326,9 +307,6 @@ export default defineComponent({
                     value: props.presetIntangibleProduct?.intangibleProductType as IntangibleProductType 
                 };
 
-            presetResearchAreas.value = props.presetIntangibleProduct?.researchAreas as ResearchArea[];
-            researchAreaIds.value = props.presetIntangibleProduct?.researchAreasId as number[];
-            researchAreasSelectionRef.value?.resetForm();
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -342,8 +320,6 @@ export default defineComponent({
             fetchDetails();
         };
 
-        const presetResearchAreas = ref<ResearchArea[]>(props.presetIntangibleProduct?.researchAreas as ResearchArea[]);
-        const researchAreaIds = ref<number[]>(props.presetIntangibleProduct?.researchAreas?.map(researchArea => researchArea.id) as number[]);
 
         const intangibleProductTypes = getIntangibleProductTypesForGivenLocale();
         const selectedIntangibleProductType = ref<{title: string, value: IntangibleProductType}>(
@@ -352,10 +328,6 @@ export default defineComponent({
                 value: props.presetIntangibleProduct?.intangibleProductType as IntangibleProductType 
             }
         );
-
-        const saveResearchAreas = (newResearchAreaIds: number[]) => {
-            researchAreaIds.value = newResearchAreaIds;
-        };
 
         return {
             canBeUpdated, ApplicableEntityType,
@@ -368,9 +340,9 @@ export default defineComponent({
             refreshForm, urisRef, subtitleRef,
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
-            scopus, scopusIdValidationRules, presetResearchAreas,
-            researchAreaIds, intangibleProductTypes, productUsers,
-            selectedIntangibleProductType, saveResearchAreas,
+            scopus, scopusIdValidationRules,
+            intangibleProductTypes, productUsers,
+            selectedIntangibleProductType,
             requiredSelectionRules, commonFieldsRef,
             commonFieldsData, presetCommonFieldsData
         };

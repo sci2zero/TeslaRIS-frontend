@@ -47,6 +47,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="leftGeneticMaterial?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="leftGeneticMaterial"
                     :proofs="leftGeneticMaterial?.proofs"
@@ -111,6 +121,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="rightGeneticMaterial?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="rightGeneticMaterial"
                     :proofs="rightGeneticMaterial?.proofs"
@@ -151,6 +171,7 @@ import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
@@ -158,7 +179,7 @@ import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocume
 
 export default defineComponent({
     name: "GeneticMaterialMetadataComparator",
-    components: { PersonDocumentContributionList, GeneticMaterialUpdateForm, Toast, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, GeneticMaterialUpdateForm, Toast, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

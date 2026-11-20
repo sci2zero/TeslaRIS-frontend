@@ -42,10 +42,10 @@
                                             v-if="landingPagePath"
                                             class="issue-details-value"
                                             :to="landingPagePath">
-                                            {{ recordName }}
+                                            {{ displayedRecordName }}
                                         </localized-link>
                                         <div v-else class="issue-details-value">
-                                            {{ recordName }}
+                                            {{ displayedRecordName }}
                                         </div>
                                     </div>
 
@@ -195,7 +195,7 @@
                                             {{ $t("policyLabel") }}
                                         </div>
                                         <div class="issue-details-value">
-                                            {{ details.policy }}
+                                            {{ policyName }}
                                         </div>
                                     </div>
 
@@ -297,6 +297,10 @@ export default defineComponent({
             type: String,
             default: null
         },
+        recordName: {
+            type: String,
+            default: ""
+        },
         recordNameSr: {
             type: String,
             default: ""
@@ -329,18 +333,34 @@ export default defineComponent({
 
         const i18n = useI18n();
 
-        const recordName = computed(() => {
-            const name = i18n.locale.value.startsWith("sr")
+        const displayedRecordName = computed(() => {
+            const name = props.recordName || (i18n.locale.value.startsWith("sr")
                 ? props.recordNameSr
-                : props.recordNameOther;
+                : props.recordNameOther);
 
             if (name) {
                 return name;
             }
 
-            return details.value
-                ? `${details.value.entityType} #${details.value.entityId}`
-                : "";
+            if (!details.value) {
+                return "";
+            }
+
+            const indexedName = i18n.locale.value.startsWith("sr")
+                ? details.value.entityNameSr
+                : details.value.entityNameOther;
+
+            return indexedName
+                ? indexedName
+                : `${details.value.entityType} #${details.value.entityId}`;
+        });
+
+        const policyName = computed(() => {
+            if (!details.value) {
+                return "";
+            }
+
+            return returnCurrentLocaleContent(details.value.policyName) || details.value.policy;
         });
 
         const landingPagePath = computed(() => {
@@ -407,7 +427,8 @@ export default defineComponent({
         });
 
         return {
-            dialog, loading, details, recordName, landingPagePath, isForeignRecord,
+            dialog, loading, loadFailed, details, displayedRecordName, policyName, landingPagePath,
+            isForeignRecord, fetchDetails,
             returnCurrentLocaleContent, displayTextOrPlaceholder, localiseDate,
             getQualityDimensionTitleFromValueAutoLocale
         };

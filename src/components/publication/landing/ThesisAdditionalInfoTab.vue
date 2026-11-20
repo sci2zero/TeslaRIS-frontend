@@ -163,6 +163,12 @@
             is-remark
             @update="emit('update-remark', $event)"
         />
+
+        <landing-research-areas-section
+            :research-areas="thesis?.researchAreas"
+            :can-edit="canEdit && !thesis?.isOnPublicReview && !thesis?.isArchived"
+            @update="emit('update-research-areas', $event)"
+        />
     </div>
 </template>
 
@@ -181,6 +187,7 @@ import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import DocumentCommonFieldsDisplay from "@/components/publication/DocumentCommonFieldsDisplay.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import LandingDetailField from "@/components/landing/LandingDetailField.vue";
+import LandingResearchAreasSection from "@/components/landing/LandingResearchAreasSection.vue";
 
 interface Props {
     thesis: Thesis | undefined;
@@ -199,6 +206,7 @@ const emit = defineEmits<{
     (e: "update-extended-abstract", extendedAbstract: MultilingualContent[]): void;
     (e: "update-remark", remark: MultilingualContent[]): void;
     (e: "identifiers-updated"): void;
+    (e: "update-research-areas", researchAreaIds: number[]): void;
 }>();
 
 const { t } = useI18n();

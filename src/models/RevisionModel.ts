@@ -252,6 +252,8 @@ export interface DataQualityIssueDetails {
     ruleKey: string;
     entityType: string;
     entityId: number;
+    entityNameSr: string | null;
+    entityNameOther: string | null;
     recordMajorVersion: number;
     recordMinorVersion: number;
     assessmentDate: string;
@@ -267,6 +269,7 @@ export interface DataQualityIssueDetails {
     blocking: boolean;
     policy: string;
     policyVersion: string;
+    policyName: MultilingualContent[];
     dimension: QualityDimension;
     dimensionDefinition: MultilingualContent[];
     metric: string;

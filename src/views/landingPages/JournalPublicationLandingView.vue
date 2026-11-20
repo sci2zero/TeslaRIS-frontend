@@ -162,6 +162,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -257,6 +258,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.JOURNAL_PUBLICATION"
                         :entity-id="journalPublication?.id"
+                        :record-name="returnCurrentLocaleContent(journalPublication?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -503,6 +505,11 @@ export default defineComponent({
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            journalPublication.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
+        };
+
         const updateKeywords = (keywords: MultilingualContent[]) => {
             journalPublication.value!.keywords = keywords;
             performUpdate(false);
@@ -589,7 +596,7 @@ export default defineComponent({
             languageTagMap, journal, JournalPublicationUpdateForm,
             StatisticsType, documentIndicators, currentTab, showOverview, showOverviewTab, onOverviewContent, createIndicator,
             searchKeyword, canEdit, fetchIndicators,
-            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateResearchAreas, updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             ApplicableEntityType, documentClassifications, assessJournalPublication,
             createClassification, fetchClassifications, currentRoute, isAdmin, isCommission,

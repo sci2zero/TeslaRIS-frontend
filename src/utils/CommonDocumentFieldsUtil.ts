@@ -21,7 +21,9 @@ export const extractCommonFields = <T extends Partial<CommonFieldsData>>(
         chronologicalSpaceDescription: document.chronologicalSpaceDescription,
         peerReviewed: document.peerReviewed,
         openAccess: document.openAccess,
-        publicationStatus: document.publicationStatus
+        publicationStatus: document.publicationStatus,
+        researchAreasId: document.researchAreasId,
+        researchAreas: document.researchAreas
     };
 };
 
@@ -63,6 +65,10 @@ export const updateCommonBasicInfo = (document: Ref<Document | undefined>, basic
     document.value!.eventId = basicInfo.eventId;
     document.value!.authorReprint = basicInfo.authorReprint;
     document.value!.edition = basicInfo.edition;
+
+    // The comparator form sends no ids, so get them from the dragged hierarchy.
+    document.value!.researchAreasId = basicInfo.researchAreasId ??
+        (document.value!.researchAreas ?? []).map(researchArea => researchArea.id as number);
 };
 
 export const mergeCommonMetadata = (document1: Document, document2: Document) => {
@@ -118,6 +124,26 @@ export const mergeCommonMetadata = (document1: Document, document2: Document) =>
 
     document1.contributions = document1.contributions?.concat(document2.contributions as PersonDocumentContribution[]);
     document2.contributions = [];
+
+    mergeResearchAreas(document1, document2);
+};
+
+const mergeResearchAreas = (document1: Document, document2: Document) => {
+    const merged = document1.researchAreas ?? [];
+    const seenIds = new Set(merged.map(researchArea => researchArea.id as number));
+
+    (document2.researchAreas ?? []).forEach(researchArea => {
+        if (!seenIds.has(researchArea.id as number)) {
+            seenIds.add(researchArea.id as number);
+            merged.push(researchArea);
+        }
+    });
+
+    document1.researchAreas = merged;
+    document1.researchAreasId = Array.from(seenIds);
+
+    document2.researchAreas = [];
+    document2.researchAreasId = [];
 };
 
 type IdentifierValue = string | undefined;

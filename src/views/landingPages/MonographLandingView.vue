@@ -118,9 +118,6 @@
             <v-tab value="additionalInfo">
                 {{ $t("additionalInfoLabel") }}
             </v-tab>
-            <v-tab value="researchArea">
-                {{ $t("researchAreaLabel") }}
-            </v-tab>
             <v-tab v-show="(documentIndicators && documentIndicators.length > 0) || canEdit" value="indicators">
                 {{ $t("indicatorListLabel") }}
             </v-tab>
@@ -202,6 +199,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -219,14 +217,6 @@
                         </landing-detail-field>
                     </template>
                 </landing-additional-info-tab>
-            </v-tabs-window-item>
-            <v-tabs-window-item value="researchArea">
-                <landing-research-areas-section
-                    :research-areas="researchAreaHierarchy ? [researchAreaHierarchy] : []"
-                    :can-edit="canEdit && !monograph?.isArchived"
-                    limit-one
-                    @update="updateResearchAreas"
-                />
             </v-tabs-window-item>
             <v-tabs-window-item value="indicators">
                 <landing-section-card
@@ -302,6 +292,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.MONOGRAPH"
                         :entity-id="monograph?.id"
+                        :record-name="returnCurrentLocaleContent(monograph?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -335,8 +326,6 @@ import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
 import type { Monograph } from '@/models/PublicationModel';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import PersonDocumentContributionTabs from '@/components/core/PersonDocumentContributionTabs.vue';
-import ResearchAreaService from '@/services/ResearchAreaService';
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
 import { PublicationSeriesType, type PublicationSeries } from '@/models/PublicationSeriesModel';
@@ -382,12 +371,11 @@ import LandingDetailField from '@/components/landing/LandingDetailField.vue';
 import LandingAdditionalInfoTab from '@/components/landing/LandingAdditionalInfoTab.vue';
 import LandingPageLayout from '@/components/landing/LandingPageLayout.vue';
 import LandingSectionCard from '@/components/landing/LandingSectionCard.vue';
-import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 export default defineComponent({
     name: "MonographLandingPage",
-    components: { FeaturedIdentifiers, LandingResearchAreasSection, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, LocalizedLink, PublicationTableComponent, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, Toast, PersonDocumentContributionTabs, GenericCrudModal, LocalizedLink, PublicationTableComponent, IndicatorsSection, EntityClassificationView, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const currentTab = ref("overview");
 
@@ -431,8 +419,6 @@ export default defineComponent({
         const canClassify = ref(false);
 
         const i18n = useI18n();
-
-        const researchAreaHierarchy = ref<ResearchArea>();
 
         const event = ref<Conference>();
         const publicationSeries = ref<PublicationSeries>();
@@ -548,11 +534,6 @@ export default defineComponent({
                 })
             });
 
-            if (monograph.value?.researchAreaId) {
-                ResearchAreaService.readResearchAreaHierarchy(monograph.value?.researchAreaId).then(response => {
-                    researchAreaHierarchy.value = response.data;
-                });
-            }
             actionsRef.value?.fetchCitations();
         };
 
@@ -628,15 +609,13 @@ export default defineComponent({
         };
 
         const updateResearchAreas = (researchAreaIds: number[]) => {
-            monograph.value!.researchAreaId = researchAreaIds[0];
-
+            monograph.value!.researchAreasId = researchAreaIds;
             performUpdate(true);
         };
 
         const updateBasicInfo = (basicInfo: Monograph) => {
             monograph.value!.number = basicInfo.number;
             monograph.value!.volume = basicInfo.volume;
-            monograph.value!.researchAreaId = basicInfo.researchAreaId;
             monograph.value!.languageIds = basicInfo.languageIds;
             monograph.value!.publicationSeriesId = basicInfo.publicationSeriesId;
             monograph.value!.numberOfPages = basicInfo.numberOfPages;
@@ -697,7 +676,7 @@ export default defineComponent({
             languageMap, updateBasicInfo, searchKeyword, 
             goToURL, canEdit, updateKeywords, updateDescription,
             snackbar, snackbarMessage, event, openModal,
-            researchAreaHierarchy, updateContributions,
+            updateContributions,
             publicationSeries, publicationSeriesType,
             getMonographTypeTitleFromValueAutoLocale,
             switchPage, publications, totalPublications,

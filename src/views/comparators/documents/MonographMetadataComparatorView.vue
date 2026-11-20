@@ -47,6 +47,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="leftMonograph?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="leftMonograph"
                     :proofs="leftMonograph?.proofs"
@@ -111,6 +121,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="rightMonograph?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="rightMonograph"
                     :proofs="rightMonograph?.proofs"
@@ -152,6 +172,7 @@ import MergeService from '@/services/MergeService';
 import ComparisonActions from '@/components/core/comparators/ComparisonActions.vue';
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import Toast from '@/components/core/Toast.vue';
 import { useUserRole } from '@/composables/useUserRole';
@@ -161,7 +182,7 @@ import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocume
 
 export default defineComponent({
     name: "MonographMetadataComparator",
-    components: { PersonDocumentContributionList, Toast, MonographUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection },
+    components: { PersonDocumentContributionList, Toast, MonographUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -211,7 +232,6 @@ export default defineComponent({
                 { fieldName: "number", emptyValue: "" },
                 { fieldName: "monographType", emptyValue: null, setEmpty: false },
                 { fieldName: "publicationSeriesId", emptyValue: null, setEmpty: false },
-                { fieldName: "researchAreaId", emptyValue: null, setEmpty: false },
                 { fieldName: "publisherId", emptyValue: null, setEmpty: false }
             ]);
 
@@ -259,7 +279,6 @@ export default defineComponent({
             leftMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
             leftMonograph.value!.volume = updatedInfo.volume;
             leftMonograph.value!.number = updatedInfo.number;
-            leftMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             leftMonograph.value!.publisherId = updatedInfo.publisherId;
 
             updateCommonBasicInfo(leftMonograph, updatedInfo);
@@ -278,7 +297,6 @@ export default defineComponent({
             rightMonograph.value!.publicationSeriesId = updatedInfo.publicationSeriesId;
             rightMonograph.value!.volume = updatedInfo.volume;
             rightMonograph.value!.number = updatedInfo.number;
-            rightMonograph.value!.researchAreaId = updatedInfo.researchAreaId;
             rightMonograph.value!.publisherId = updatedInfo.publisherId;
 
             updateCommonBasicInfo(rightMonograph, updatedInfo);

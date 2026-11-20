@@ -729,6 +729,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.ORGANISATION_UNIT"
                         :entity-id="organisationUnit?.id"
+                        :record-name="returnCurrentLocaleContent(organisationUnit?.name) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
