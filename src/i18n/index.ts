@@ -86,6 +86,24 @@ function setLocale(newLocale: string) {
     _i18n.global.locale = newLocale;
 }
 
+// Merges extra messages (e.g. from a plugin) using the same rules as setup():
+// sr-cyr is transliterated from sr, then explicit sr-cyr messages win.
+function mergeMessages(messagesByLocale: Record<string, unknown>) {
+    const { "sr-cyr": srCyrMessages, ...rest } = messagesByLocale;
+
+    for (const [locale, messages] of Object.entries(rest)) {
+        _i18n.global.mergeLocaleMessage(locale, messages as never);
+    }
+
+    if (rest.sr) {
+        _i18n.global.mergeLocaleMessage("sr-cyr", transliterateMessages(rest.sr) as never);
+    }
+
+    if (srCyrMessages) {
+        _i18n.global.mergeLocaleMessage("sr-cyr", srCyrMessages as never);
+    }
+}
+
 function translationExists(key: string) {
     const translated = (_i18n.global as Composer).t(key);
     return translated !== key;
@@ -104,5 +122,6 @@ export default {
         return _i18n;
     },
     setup,
-    setLocale
+    setLocale,
+    mergeMessages
 };

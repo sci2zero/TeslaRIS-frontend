@@ -4,12 +4,7 @@ import {
 } from "@/models/PublicConfiguration";
 
 export const DEFAULT_LOGO_URL = "/logov1.svg";
-const NOVI_SAD_BACKGROUND_URL = "/NTP_Novi_Sad_zgrada_6.jpeg";
-const LIBRARY_HERO_BACKGROUND_URL = "/images/library-hero.png";
-
-export const DEFAULT_BACKGROUND_URL = import.meta.env.VITE_PLUGIN_PROFILE === "portugal"
-    ? LIBRARY_HERO_BACKGROUND_URL
-    : NOVI_SAD_BACKGROUND_URL;
+export const DEFAULT_BACKGROUND_URL = "/NTP_Novi_Sad_zgrada_6.jpeg";
 
 
 export const defaultPublicConfiguration: PublicConfiguration = {
