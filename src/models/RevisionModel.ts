@@ -441,3 +441,23 @@ export interface FixatorPipeline {
     appliedFixators: string[];
     createVersionOnEveryStep: boolean;
 }
+
+export enum PolicyUploadMode {
+    NEW_VERSION = "NEW_VERSION",
+    OVERWRITE_CURRENT = "OVERWRITE_CURRENT"
+}
+
+export interface PolicyFileSummary {
+    profileName: string;
+    name: MultilingualContent[];
+    versions: string[];
+    latestVersion: string;
+}
+
+export interface PolicyUploadResult {
+    profileName: string;
+    version: string;
+    mode: PolicyUploadMode;
+    versionCreated: boolean;
+    warnings: string[];
+}
