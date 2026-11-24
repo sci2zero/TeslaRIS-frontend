@@ -62,7 +62,7 @@
                     />
                 </v-col>
             </v-row>
-            <v-row class="d-flex flex-row text-center mt-10">
+            <v-row v-if="areDownloadsAvailable" class="d-flex flex-row text-center mt-10">
                 <v-col
                     v-if="displaySettings?.downloadCountTotal.display"
                     cols="12" :md="displaySettings?.downloadCountTotal.spanWholeRow ? 12 : 6"
@@ -99,7 +99,7 @@
                 </v-col>
             </v-row>
             <v-row
-                v-if="displaySettings?.downloadCountByCountry.display"
+                v-if="areDownloadsAvailable && displaySettings?.downloadCountByCountry.display"
                 class="mt-10 d-flex justify-center">
                 <v-col
                     cols="12"
@@ -121,7 +121,7 @@
 <script setup lang="ts">
 import { StatisticsType } from '@/models/AssessmentModel';
 import DocumentVisualizationService from '@/services/visualization/DocumentVisualizationService';
-import { onMounted, type PropType, ref, watch } from 'vue';
+import { computed, onMounted, type PropType, ref, watch } from 'vue';
 import { type CountryStatisticsData } from '../charts/WorldMapChart.vue';
 import SimpleBarChart, { type BarSeries } from '../charts/SimpleBarChart.vue';
 import { localiseDate } from '@/utils/DateUtil';
@@ -130,6 +130,7 @@ import WorldMapChart from '../charts/WorldMapChart.vue';
 import DisplayCard from '../charts/DisplayCard.vue';
 import DatePicker from '../core/DatePicker.vue';
 import type { DocumentChartDisplaySettings } from '@/models/ChartDisplayConfigurationModel';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 const props = defineProps({
@@ -144,6 +145,10 @@ const props = defineProps({
     displayStatisticsTab: {
         type: Boolean,
         required: true
+    },
+    isThesis: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -161,7 +166,23 @@ const initialDatesSet = ref(false);
 const startDate = ref<string>("");
 const endDate = ref<string>("");
 
+const {
+    loaded,
+    fetchCrisContextInformation,
+    isDigitalLibraryEnabled,
+    isDigitalRepositoryEnabled
+ } = useCrisContextInformation();
+
+// A thesis file belongs to the digital library, so its downloads need no repository.
+const areDownloadsAvailable = computed(() => isDigitalRepositoryEnabled.value ||
+    (props.isThesis && isDigitalLibraryEnabled.value));
+
+// The module toggles arrive from the server, so the first fetch waits for them.
 onMounted(async () => {
+    if (!loaded.value) {
+        await fetchCrisContextInformation();
+    }
+
     endDate.value = (new Date()).toISOString().split("T")[0];
 
     const currentDate = new Date();
@@ -218,11 +239,13 @@ const getDocumentStatistics = (documentId: number, startDate: string, endDate: s
         viewsByCountry.value = response.data;
     });
 
-    DocumentVisualizationService.getDocumentStatisticsByCountry(
-        documentId, StatisticsType.DOWNLOAD, startDate, endDate
-    ).then(response => {
-        downloadsByCountry.value = response.data;
-    });
+    if (areDownloadsAvailable.value) {
+        DocumentVisualizationService.getDocumentStatisticsByCountry(
+            documentId, StatisticsType.DOWNLOAD, startDate, endDate
+        ).then(response => {
+            downloadsByCountry.value = response.data;
+        });
+    }
 
     DocumentVisualizationService.getMonthlyStatisticsForDocument(
         documentId, StatisticsType.VIEW, startDate, endDate
@@ -239,20 +262,22 @@ const getDocumentStatistics = (documentId: number, startDate: string, endDate: s
         };
     });
 
-    DocumentVisualizationService.getMonthlyStatisticsForDocument(
-        documentId, StatisticsType.DOWNLOAD, startDate, endDate
-    ).then(response => {
-        const categories: string[] = [];
-        const series: number[] = [];
+    if (areDownloadsAvailable.value) {
+        DocumentVisualizationService.getMonthlyStatisticsForDocument(
+            documentId, StatisticsType.DOWNLOAD, startDate, endDate
+        ).then(response => {
+            const categories: string[] = [];
+            const series: number[] = [];
 
-        setCategoriesAndSeries(response.data, categories, series);
+            setCategoriesAndSeries(response.data, categories, series);
 
-        downloadsMonthly.value = {
-            categories: categories, series: [
-                {name: i18n.t("viewsLabel"), data: series}
-            ]
-        };
-    });
+            downloadsMonthly.value = {
+                categories: categories, series: [
+                    {name: i18n.t("downloadsLabel"), data: series}
+                ]
+            };
+        });
+    }
 };
 
 const setCategoriesAndSeries = (data: Record<string, number>, categories: string[], series: number[]) => {

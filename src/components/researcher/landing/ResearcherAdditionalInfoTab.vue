@@ -32,6 +32,10 @@
                     :expertise-or-skills="person?.expertisesOrSkills"
                     :person="person" :can-edit="canEdit"
                     @crud="emit('refresh')" />
+                <language-knowledge-list
+                    :language-knowledges="person?.languageKnowledges"
+                    :person="person" :can-edit="canEdit"
+                    @crud="emit('refresh')" />
                 <prize-list
                     :prizes="person?.prizes"
                     :person="person" :can-edit="canEdit"
@@ -97,6 +101,7 @@ import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
 import InvolvementList from "@/components/person/involvement/InvolvementList.vue";
 import PrizeList from "@/components/person/prize/PrizeList.vue";
 import ExpertiseOrSkillList from "@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue";
+import LanguageKnowledgeList from "@/components/person/languageKnowledge/LanguageKnowledgeList.vue";
 import ResearcherPersonalDetails from "@/components/researcher/landing/ResearcherPersonalDetails.vue";
 
 interface Props {

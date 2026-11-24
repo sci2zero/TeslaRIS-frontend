@@ -8,10 +8,13 @@ import { License } from '@/models/DocumentFileModel';
 
 // Module level so every consumer shares one copy. Each mounting component still
 // refetches, so a change made by an admin is picked up without a page reload.
-const crisContextInformation = ref<CrisContextInformation>({
-    toggleAssessmentModule: true,
-    toggleDigitalLibrary: true,
-    toggleDigitalRepository: true,
+const CRIS_CONTEXT_INFORMATION_STORAGE_KEY = "crisContextInformation";
+
+// Every module is off until the server says otherwise, so a disabled module never shows.
+const defaultCrisContextInformation = (): CrisContextInformation => ({
+    toggleAssessmentModule: false,
+    toggleDigitalLibrary: false,
+    toggleDigitalRepository: false,
     toggleRegistration: false,
     personNationalIdRegularExpression: ".*",
     projectNationalIdRegularExpression: ".*",
@@ -30,20 +33,72 @@ const crisContextInformation = ref<CrisContextInformation>({
     thesisLibraryInstitutionIds: [],
     orcidLoginToggle: false
 });
+
+const crisContextInformation = ref<CrisContextInformation>(defaultCrisContextInformation());
 const loaded = ref(false);
+let inFlightFetch: Promise<void> | null = null;
 
 // Read-only accessor for code that needs the configuration but must not trigger
 // a fetch of its own, such as the shared validation rules.
 export const crisContextInformationState = crisContextInformation;
 
-export const fetchCrisContextInformation = async () => {
+const persistCrisContextInformation = (configuration: CrisContextInformation) => {
     try {
-        const response = await CrisContextInformationService.fetchConfigurationForSystem();
-        crisContextInformation.value = response.data;
-        loaded.value = true;
-    } catch (error) {
-        console.error("Failed to fetch CRIS context information:", error);
+        localStorage.setItem(
+            CRIS_CONTEXT_INFORMATION_STORAGE_KEY, JSON.stringify(configuration));
+    } catch {
+        // A browser which refuses storage only loses the head start of the cache.
     }
+};
+
+/**
+ * The configuration of the last visit, so the first render shows the real modules. It returns
+ * false when no cache exists, and then the caller must wait for the server.
+ */
+export const hydrateCrisContextInformationFromCache = (): boolean => {
+    try {
+        const cached = localStorage.getItem(CRIS_CONTEXT_INFORMATION_STORAGE_KEY);
+
+        if (!cached) {
+            return false;
+        }
+
+        const parsed = JSON.parse(cached);
+
+        if (!parsed || typeof parsed !== "object") {
+            return false;
+        }
+
+        crisContextInformation.value = { ...defaultCrisContextInformation(), ...parsed };
+        loaded.value = true;
+
+        return true;
+    } catch {
+        localStorage.removeItem(CRIS_CONTEXT_INFORMATION_STORAGE_KEY);
+        return false;
+    }
+};
+
+// Concurrent callers share one request, because every consumer asks on mount.
+export const fetchCrisContextInformation = async () => {
+    if (inFlightFetch) {
+        return inFlightFetch;
+    }
+
+    inFlightFetch = (async () => {
+        try {
+            const response = await CrisContextInformationService.fetchConfigurationForSystem();
+            crisContextInformation.value = response.data;
+            loaded.value = true;
+            persistCrisContextInformation(response.data);
+        } catch (error) {
+            console.error("Failed to fetch CRIS context information:", error);
+        } finally {
+            inFlightFetch = null;
+        }
+    })();
+
+    return inFlightFetch;
 };
 
 export function useCrisContextInformation() {

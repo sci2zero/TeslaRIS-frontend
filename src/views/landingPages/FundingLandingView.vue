@@ -48,13 +48,6 @@
 
                             <basic-info-loader v-if="!funding" />
                             <div v-else class="info-columns">
-                                <div v-if="funding.doi" class="info-item">
-                                    <div>DOI:</div>
-                                    <div class="response">
-                                        <identifier-link :identifier="funding.doi" type="doi" />
-                                    </div>
-                                </div>
-
                                 <div v-if="funding.grantAgreementId" class="info-item">
                                     <div>{{ $t("grantAgreementIdLabel") }}:</div>
                                     <div class="response">
@@ -287,14 +280,29 @@
 
                 <!-- Identifiers -->
                 <div class="mt-5">
-                    <entity-identifiers-list
-                        :entity-identifiers="fundingIdentifiers"
-                        :can-edit="canEdit"
-                        :entity-id="funding?.id"
-                        :containing-entity-type="ApplicableEntityType.FUNDING"
-                        :concrete-entity-type="ApplicableEntityType.FUNDING"
-                        @updated="fetchIdentifiers"
-                    />
+                    <landing-section-card
+                        :title="$t('identifiersLabel')"
+                        icon="mdi-identifier"
+                        icon-class="bg-indigo-50 text-indigo-600"
+                        padded
+                    >
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <landing-detail-field
+                                v-if="isIdentifierShown(ApplicableEntityType.FUNDING, 'doi', funding?.doi)"
+                                label="DOI">
+                                <identifier-link v-if="funding?.doi" :identifier="funding.doi" type="doi" compact />
+                                <span v-else>{{ $t("notYetSetMessage") }}</span>
+                            </landing-detail-field>
+                        </div>
+                        <entity-identifiers-list
+                            :entity-identifiers="fundingIdentifiers"
+                            :can-edit="canEdit"
+                            :entity-id="funding?.id"
+                            :containing-entity-type="ApplicableEntityType.FUNDING"
+                            :concrete-entity-type="ApplicableEntityType.FUNDING"
+                            @updated="fetchIdentifiers"
+                        />
+                    </landing-section-card>
                 </div>
             </v-tabs-window-item>
 
@@ -348,6 +356,9 @@ import EntityIdentifierService from "@/services/EntityIdentifierService";
 import type { EntityIdentifierResponse } from "@/models/IdentifierModel";
 import IdentifierLink from "@/components/core/IdentifierLink.vue";
 import FeaturedIdentifiers from "@/components/landing/FeaturedIdentifiers.vue";
+import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import LandingDetailField from "@/components/landing/LandingDetailField.vue";
+import { useIdentifierConfiguration } from "@/composables/useCrisContextInformation";
 import AttachmentList from "@/components/core/AttachmentList.vue";
 import { useLoginStore } from "@/stores/loginStore";
 import { useUploadStore } from "@/stores/uploadStore";
@@ -392,6 +403,7 @@ const fundingIdentifiers = ref<EntityIdentifierResponse[]>([]);
 const canEdit = ref(false);
 const loginStore = useLoginStore();
 const { isAdmin, canReviewDataQuality } = useUserRole();
+const { isIdentifierShown } = useIdentifierConfiguration();
 
 const canAssessDataQuality = ref(false);
 const dataQualityTabsRef = ref<typeof DataQualityTabsComponent>();

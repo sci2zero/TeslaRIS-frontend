@@ -312,7 +312,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled || isDigitalLibraryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -450,6 +450,7 @@
                         :document-id="(thesis?.id as number)"
                         :display-settings="displayConfiguration.displaySettings.value"
                         :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                        is-thesis
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -848,6 +849,11 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                documentClassifications.value = [];
+                return;
+            }
+
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
             });

@@ -306,7 +306,7 @@
                     icon="mdi-file-document-multiple-outline"
                     icon-class="bg-indigo-50 text-indigo-600">
                     <template
-                        v-if="canEdit || (isLibrarianUser && userInstitutionid === organisationUnit.id)"
+                        v-if="canEdit || (isLibrarianUser && userInstitutionid === (organisationUnit?.id as number))"
                         #action>
                         <div class="flex flex-wrap items-center justify-end gap-2">
                             <add-publication-menu outlined />
@@ -336,7 +336,7 @@
                             :endpoint-body-parameters="
                                 {
                                     allowedTypes: selectedPublicationTypes?.map(publicationType => publicationType.value),
-                                    institutionId: organisationUnit.id,
+                                    institutionId: (organisationUnit?.id as number),
                                     commissionId: null
                                 }"
                             :allow-researcher-unbinding="canEdit && isInstitutionalEditor"
@@ -384,9 +384,9 @@
                         icon="mdi-account-group-outline"
                         icon-class="bg-indigo-50 text-indigo-600"
                         padded>
-                        <template v-if="organisationUnit.id > 0 && (isAdmin || isInstitutionalEditor)" #action>
+                        <template v-if="(organisationUnit?.id as number) > 0 && (isAdmin || isInstitutionalEditor)" #action>
                             <add-employment-modal
-                                :institution-id="organisationUnit.id"
+                                :institution-id="(organisationUnit?.id as number)"
                                 @update="employeesRef?.notifyUserAndRefreshTable($event)" />
                         </template>
                         <person-table-component
@@ -511,9 +511,9 @@
                 <landing-section-card
                     class="mt-5" :title="$t('subUnitsLabel')" :count="totalSubUnits" icon="mdi-office-building-outline"
                     padded>
-                    <template v-if="organisationUnit.id > 0 && (isAdmin || isInstitutionalEditor)" #action>
+                    <template v-if="(organisationUnit?.id as number) > 0 && (isAdmin || isInstitutionalEditor)" #action>
                         <add-sub-unit-modal
-                            :institution-id="organisationUnit.id"
+                            :institution-id="(organisationUnit?.id as number)"
                             @update="subUnitAdded" />
                     </template>
                     <organisation-unit-table-component
@@ -523,8 +523,8 @@
                         allow-comparison
                         enable-export
                         :endpoint-type="ExportableEndpointType.ORGANISATION_UNIT_SEARCH"
-                        :endpoint-token-parameters="['*', String(organisationUnit.id)]"
-                        :top-level-institution-id="organisationUnit.id"
+                        :endpoint-token-parameters="['*', String((organisationUnit?.id as number))]"
+                        :top-level-institution-id="(organisationUnit?.id as number)"
                         @switch-page="switchSubUnitsPage" />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -590,12 +590,16 @@
                                     :value="organisationUnit?.ringgold || $t('notYetSetMessage')" />
                                 <landing-detail-field
                                     v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'fundref', organisationUnit?.fundref)"
-                                    label="FundRef"
-                                    :value="organisationUnit?.fundref || $t('notYetSetMessage')" />
+                                    label="FundRef">
+                                    <identifier-link v-if="organisationUnit?.fundref" :identifier="organisationUnit.fundref" type="fundref" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
                                 <landing-detail-field
                                     v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'isni', organisationUnit?.isni)"
-                                    label="ISNI"
-                                    :value="organisationUnit?.isni || $t('notYetSetMessage')" />
+                                    label="ISNI">
+                                    <identifier-link v-if="organisationUnit?.isni" :identifier="organisationUnit.isni" type="isni" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
                                 <landing-detail-field
                                     v-if="isIdentifierShown(ApplicableEntityType.ORGANISATION_UNIT, 'fctId', organisationUnit?.fctId)"
                                     label="FCT ID"
@@ -678,7 +682,7 @@
                     icon-class="bg-indigo-50 text-indigo-600"
                     padded>
                     <organisation-unit-visualizations
-                        :organisation-unit-id="(organisationUnit.id as number)"
+                        :organisation-unit-id="(organisationUnit?.id as number)"
                         :display-settings="displaySettings.displaySettings.value"
                         :digital-library-display-settings="displaySettingsDL.displaySettings.value"
                         :display-publications-tab="displaySettings.shouldDisplayPublicationTab()"
@@ -695,7 +699,7 @@
                     icon-class="bg-indigo-50 text-indigo-600"
                     padded>
                     <organisation-unit-leaderboards
-                        :organisation-unit-id="organisationUnit?.id"
+                        :organisation-unit-id="(organisationUnit?.id as number)"
                         :display-settings="displaySettings.displaySettings.value"
                         :digital-library-display-settings="displaySettingsDL.displaySettings.value"
                         :display-publications-tab="displaySettings.shouldDisplayPublicationLeaderboards()"

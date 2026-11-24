@@ -222,7 +222,34 @@
                                 {{ uri }}
                             </a>
                         </landing-detail-field>
-                        <div class="md:col-span-2">
+                    </template>
+                    <template #before-keywords>
+                        <landing-section-card
+                            :title="$t('identifiersLabel')"
+                            icon="mdi-identifier"
+                            icon-class="bg-indigo-50 text-indigo-600"
+                            padded
+                        >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'doi', project?.doi)"
+                                    label="DOI">
+                                    <identifier-link v-if="project?.doi" :identifier="project.doi" type="doi" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'raid', project?.raid)"
+                                    :label="$t('raidLabel')">
+                                    <identifier-link v-if="project?.raid" :identifier="project.raid" type="raid" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'nationalId', project?.nationalId)"
+                                    :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')">
+                                    <identifier-link v-if="project?.nationalId" :identifier="project.nationalId" type="national_project" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                            </div>
                             <entity-identifiers-list
                                 :entity-identifiers="projectIdentifiers"
                                 :can-edit="canEdit && isAdmin"
@@ -231,7 +258,7 @@
                                 :concrete-entity-type="ApplicableEntityType.PROJECT"
                                 @updated="fetchIdentifiers"
                             />
-                        </div>
+                        </landing-section-card>
                     </template>
                 </landing-additional-info-tab>
             </v-tabs-window-item>
@@ -275,6 +302,9 @@
 
 <script setup lang="ts">
 import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
+import { useIdentifierConfiguration, useNationalIdentifierLabel }
+    from "@/composables/useCrisContextInformation";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
@@ -322,6 +352,10 @@ const route = useRoute();
 const router = useRouter();
 const i18n = useI18n();
 const { locale } = useI18n();
+
+const { isIdentifierShown } = useIdentifierConfiguration();
+const { configuredNationalIdentifierLabel } =
+    useNationalIdentifierLabel(ApplicableEntityType.PROJECT);
 
 const project = ref<Project>();
 const currentTab = ref("overview");

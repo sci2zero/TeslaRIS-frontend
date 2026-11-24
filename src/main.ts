@@ -12,6 +12,10 @@ import { createHead } from "@vueuse/head";
 import { initializeLanguageDetector } from "./utils/LanguageDetector";
 import { usePublicConfigurationStore } from "./stores/publicConfigurationStore";
 import { registerProfilePlugins } from "./plugin-system/profiles";
+import {
+    fetchCrisContextInformation,
+    hydrateCrisContextInformationFromCache
+} from "./composables/useCrisContextInformation";
 
 
 async function bootstrap() {
@@ -26,6 +30,11 @@ async function bootstrap() {
 
     const publicConfigurationStore = usePublicConfigurationStore(pinia);
     publicConfigurationStore.hydrateFromCacheOrDefault();
+
+    // The module toggles decide what the first render shows, so they come before the mount.
+    if (!hydrateCrisContextInformationFromCache()) {
+        await fetchCrisContextInformation();
+    }
 
     createApp(App)
         .use(router)

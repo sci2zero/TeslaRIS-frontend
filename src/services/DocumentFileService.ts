@@ -109,6 +109,26 @@ export class DocumentFileService extends BaseService {
         return super.sendRequest(axios.delete, `expertise-or-skill/${personId}/${expertiseOrSkillId}/${proofId}`);
     }
 
+    async addLanguageKnowledgeProof(proof: any, languageKnowledgeId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
+        proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        return super.sendMultipartFormDataRequest(axios.patch, `language-knowledge/${personId}/${languageKnowledgeId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async updateLanguageKnowledgeProof(proof: any, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
+        if (typeof proof.accessRights === "number") {
+            proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
+        }
+        if (typeof proof.resourceType === "number") {
+            proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
+        }
+        return super.sendMultipartFormDataRequest(axios.patch, `language-knowledge/${personId}`, proof, DocumentFileService.idempotencyKey);
+    }
+
+    async deleteLanguageKnowledgeProof(proofId: number, languageKnowledgeId: number, personId: number): Promise<void> {
+        return super.sendRequest(axios.delete, `language-knowledge/${personId}/${languageKnowledgeId}/${proofId}`);
+    }
+
     async addPrizeProof(proof: any, prizeId: number, personId: number): Promise<AxiosResponse<DocumentFileResponse>> {
         proof.accessRights = getNameFromOrdinal(AccessRights, proof.accessRights);
         proof.resourceType = getNameFromOrdinal(ResourceType, proof.resourceType);
