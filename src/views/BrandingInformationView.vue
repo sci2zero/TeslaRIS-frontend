@@ -48,13 +48,13 @@ export default defineComponent({
 
         const publicConfigurationStore = usePublicConfigurationStore();
         const logoUrl = computed(() =>
-            publicConfigurationStore.hasCustomLogo ? publicConfigurationStore.logoDisplayUrl : ""
+            publicConfigurationStore.hasUploadedLogo ? publicConfigurationStore.logoDisplayUrl : ""
         );
         const backgroundUrl = computed(() =>
-            publicConfigurationStore.hasCustomBackground ? publicConfigurationStore.backgroundDisplayUrl : ""
+            publicConfigurationStore.hasUploadedBackground ? publicConfigurationStore.backgroundDisplayUrl : ""
         );
-        const hasExistingLogo = computed(() => publicConfigurationStore.hasCustomLogo);
-        const hasExistingBackground = computed(() => publicConfigurationStore.hasCustomBackground);
+        const hasExistingLogo = computed(() => publicConfigurationStore.hasUploadedLogo);
+        const hasExistingBackground = computed(() => publicConfigurationStore.hasUploadedBackground);
 
         onMounted(() => {
             document.title = i18n.t("updateBrandingInformationLabel");

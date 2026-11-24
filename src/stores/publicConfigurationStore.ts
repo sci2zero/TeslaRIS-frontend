@@ -11,6 +11,14 @@ import {
     PUBLIC_CONFIGURATION_STORAGE_KEY,
     type PublicConfiguration
 } from "@/models/PublicConfiguration";
+import { getConfig } from "@/plugin-system/registry";
+
+// Plugin-provided branding sits between the backend-uploaded assets and the core defaults.
+function pluginBrandingUrl(key: "logoUrl" | "backgroundUrl"): string | null {
+    const branding = getConfig().branding as Record<string, unknown> | undefined;
+    const url = branding?.[key];
+    return typeof url === "string" && url ? url : null;
+}
 
 function readCachedConfiguration(): PublicConfiguration | null {
     try {
@@ -54,12 +62,20 @@ export const usePublicConfigurationStore = defineStore("publicConfiguration", {
     getters: {
         title: (state) => state.config?.branding.title ?? [],
         description: (state) => state.config?.branding.description ?? [],
-        hasCustomLogo: (state) => !!state.config?.branding.logoUrl,
+        // "Uploaded" = set through the admin branding form; "custom" also includes plugin defaults.
+        hasUploadedLogo: (state) => !!state.config?.branding.logoUrl,
+        hasUploadedBackground: (state) => !!state.config?.branding.backgroundUrl,
+        hasCustomLogo: (state) => !!state.config?.branding.logoUrl || !!pluginBrandingUrl("logoUrl"),
         logoDisplayUrl: (state) =>
-            resolvePublicAssetUrl(state.config?.branding.logoUrl) ?? DEFAULT_LOGO_URL,
+            resolvePublicAssetUrl(state.config?.branding.logoUrl)
+            ?? pluginBrandingUrl("logoUrl")
+            ?? DEFAULT_LOGO_URL,
         backgroundDisplayUrl: (state) =>
-            resolvePublicAssetUrl(state.config?.branding.backgroundUrl) ?? DEFAULT_BACKGROUND_URL,
-        hasCustomBackground: (state) => !!state.config?.branding.backgroundUrl
+            resolvePublicAssetUrl(state.config?.branding.backgroundUrl)
+            ?? pluginBrandingUrl("backgroundUrl")
+            ?? DEFAULT_BACKGROUND_URL,
+        hasCustomBackground: (state) =>
+            !!state.config?.branding.backgroundUrl || !!pluginBrandingUrl("backgroundUrl")
     },
     actions: {
         hydrateFromCacheOrDefault() {

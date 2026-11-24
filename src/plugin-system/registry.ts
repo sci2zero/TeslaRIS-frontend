@@ -36,9 +36,7 @@ export function registerPlugin(plugin: FrontendPlugin) {
     }
 
     if (plugin.i18n) {
-        for (const [locale, messages] of Object.entries(plugin.i18n)) {
-            i18n.vueI18n.global.mergeLocaleMessage(locale, messages as never);
-        }
+        i18n.mergeMessages(plugin.i18n);
     }
 
     if (plugin.config) {
