@@ -372,6 +372,7 @@
         v-model="ruleDetailsDialog"
         :assessment-id="ruleDetailsAssessmentId"
         :rule-key="ruleDetailsRuleKey"
+        :record-name="recordName"
         :current-entity-type="entityType"
         :current-entity-id="entityId"
     />
@@ -423,6 +424,10 @@ export default defineComponent({
         entityId: {
             type: Object as PropType<number | undefined>,
             required: true
+        },
+        recordName: {
+            type: String,
+            default: ""
         }
     },
     setup(props) {

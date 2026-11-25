@@ -443,6 +443,7 @@
                                 ref="dataQualityTabsRef"
                                 :entity-type="EntityType.PERSON"
                                 :entity-id="person?.id"
+                                :record-name="researcherName"
                             />
                         </div>
                     </landing-section-card>

@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, type PropType, ref, watch } from "vue";
 import OrganisationUnitAutocompleteSearch from "../organisationUnit/OrganisationUnitAutocompleteSearch.vue";
 import PersonAutocompleteSearch from "../person/PersonAutocompleteSearch.vue";
 import DatePicker from "../core/DatePicker.vue";
@@ -87,10 +87,21 @@ import { ThesisType } from "@/models/PublicationModel";
 export default defineComponent({
   name: "ThesisFilters",
   components: { OrganisationUnitAutocompleteSearch, PersonAutocompleteSearch, DatePicker },
-  setup() {
+  props: {
+    presetOUs: {
+        type: Array as PropType<{title: string, value: number}[]>,
+        default: () => []
+    }
+  },
+  setup(props) {
     const isExpanded = ref(false);
 
-    const selectedOUs = ref<{title: string, value: number}[]>([]);
+    const selectedOUs = ref<{title: string, value: number}[]>([...props.presetOUs]);
+
+    watch(() => props.presetOUs, () => {
+        selectedOUs.value = [...props.presetOUs];
+    }, { deep: true });
+
     const selectedAuthors = ref<{title: string, value: number}[]>([]);
     const selectedAdvisors = ref<{title: string, value: number}[]>([]);
     const selectedBoardMembers = ref<{title: string, value: number}[]>([]);

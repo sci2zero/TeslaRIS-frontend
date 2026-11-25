@@ -60,7 +60,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryByYear.display"
@@ -87,7 +87,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="personSettings.publicationCategoryRatio.display"
@@ -207,7 +207,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryByYear.display"
@@ -234,7 +234,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="ouSettings.publicationCategoryRatio.display"
@@ -336,7 +336,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointPersonLeaderboard.display"
@@ -348,7 +348,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isAssessmentModuleEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointSubUnitLeaderboard.display"
@@ -356,6 +356,54 @@
                             />
                             <v-checkbox
                                 v-model="ouSettings.assessmentPointSubUnitLeaderboard.spanWholeRow"
+                                :label="$t('spanWholeRowLabel')"
+                            />
+                        </div>
+                    </v-col>
+                    <v-col cols="6">
+                        <div class="d-flex flex-row justify-start">
+                            <v-checkbox
+                                v-model="ouSettings.citationCountDocumentLeaderboard.display"
+                                :label="$t('documentCitationCountLeaderboardLabel')"
+                            />
+                            <v-checkbox
+                                v-model="ouSettings.citationCountDocumentLeaderboard.spanWholeRow"
+                                :label="$t('spanWholeRowLabel')"
+                            />
+                        </div>
+                    </v-col>
+                    <v-col cols="6">
+                        <div class="d-flex flex-row justify-start">
+                            <v-checkbox
+                                v-model="ouSettings.viewCountPersonLeaderboard.display"
+                                :label="$t('personViewCountsLeaderboardLabel')"
+                            />
+                            <v-checkbox
+                                v-model="ouSettings.viewCountPersonLeaderboard.spanWholeRow"
+                                :label="$t('spanWholeRowLabel')"
+                            />
+                        </div>
+                    </v-col>
+                    <v-col cols="6">
+                        <div class="d-flex flex-row justify-start">
+                            <v-checkbox
+                                v-model="ouSettings.viewCountDocumentLeaderboard.display"
+                                :label="$t('documentViewCountsLeaderboardLabel')"
+                            />
+                            <v-checkbox
+                                v-model="ouSettings.viewCountDocumentLeaderboard.spanWholeRow"
+                                :label="$t('spanWholeRowLabel')"
+                            />
+                        </div>
+                    </v-col>
+                    <v-col v-if="isDigitalRepositoryEnabled" cols="6">
+                        <div class="d-flex flex-row justify-start">
+                            <v-checkbox
+                                v-model="ouSettings.downloadCountDocumentLeaderboard.display"
+                                :label="$t('documentDownloadCountsLeaderboardLabel')"
+                            />
+                            <v-checkbox
+                                v-model="ouSettings.downloadCountDocumentLeaderboard.spanWholeRow"
                                 :label="$t('spanWholeRowLabel')"
                             />
                         </div>
@@ -390,7 +438,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isDigitalRepositoryEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="documentSettings.downloadCountTotal.display"
@@ -402,7 +450,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isDigitalRepositoryEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByMonth.display"
@@ -426,7 +474,7 @@
                             />
                         </div>
                     </v-col>
-                    <v-col cols="6">
+                    <v-col v-if="isDigitalRepositoryEnabled" cols="6">
                         <div class="d-flex flex-row justify-start">
                             <v-checkbox
                                 v-model="documentSettings.downloadCountByCountry.display"
@@ -453,6 +501,7 @@ import ChartDisplayConfigurationService from '@/services/visualization/ChartDisp
 import { getErrorMessageForErrorKey } from '@/i18n';
 import Toast from '../core/Toast.vue';
 import { useI18n } from 'vue-i18n';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation.js';
 
 
 const props = defineProps({
@@ -477,7 +526,19 @@ const personSettings = ref<PersonChartDisplaySettings>();
 const ouSettings = ref<OUChartDisplaySettings>();
 const documentSettings = ref<DocumentChartDisplaySettings>();
 
-onMounted(() => {
+const {
+    loaded,
+    fetchCrisContextInformation,
+    isDigitalRepositoryEnabled,
+    isAssessmentModuleEnabled
+ } = useCrisContextInformation();
+
+// The module toggles arrive from the server, so the form waits for them.
+onMounted(async () => {
+    if (!loaded.value) {
+        await fetchCrisContextInformation();
+    }
+
     ChartDisplayConfigurationService.getFullChartDisplaySettings(
         props.organisationUnitId
     ).then(response => {

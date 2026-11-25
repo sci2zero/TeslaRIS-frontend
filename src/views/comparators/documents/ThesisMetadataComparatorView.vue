@@ -47,6 +47,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="leftThesis?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="leftThesis"
                     :proofs="leftThesis?.proofs"
@@ -115,6 +125,16 @@
                     </v-card-text>
                 </v-card>
 
+                <v-card class="pa-3" variant="flat" color="grey-lighten-5">
+                    <v-card-text class="edit-pen-container">
+                        <div><b>{{ $t("researchAreasLabel") }}</b></div>
+                        <research-area-hierarchy
+                            :research-areas="rightThesis?.researchAreas"
+                            in-comparator
+                        />
+                    </v-card-text>
+                </v-card>
+
                 <attachment-section
                     :document="rightThesis"
                     :proofs="rightThesis?.proofs"
@@ -160,6 +180,7 @@ import ComparisonActions from '@/components/core/comparators/ComparisonActions.v
 import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import { mergeDocumentAttachments } from '@/utils/AttachmentUtil';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
+import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
@@ -167,7 +188,7 @@ import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocume
 
 export default defineComponent({
     name: "ThesisMetadataComparator",
-    components: { PersonDocumentContributionList, ThesisUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, Toast },
+    components: { PersonDocumentContributionList, ThesisUpdateForm, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions, AttachmentSection, Toast, ResearchAreaHierarchy },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");

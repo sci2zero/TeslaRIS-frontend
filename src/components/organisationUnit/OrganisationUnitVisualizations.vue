@@ -78,7 +78,7 @@
         v-model="currentTab"
     >
         <v-tabs-window-item value="publicationCount">
-            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient" class="mt-7">
+            <div v-if="canSeeDigitalLibraryAnalytics" class="mt-7">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -132,7 +132,7 @@
             </v-row>
             <v-row v-for="mCategoryCounts in commissionsYearMCategoryData" :key="mCategoryCounts.commissionName">
                 <v-col
-                    v-if="displaySettings?.publicationCategoryByYear.display"
+                    v-if="isAssessmentModuleEnabled && displaySettings?.publicationCategoryByYear.display"
                     cols="12" :md="displaySettings?.publicationCategoryByYear.spanWholeRow ? 12 : 6">
                     <stacked-bar-chart
                         :data="{categories: mCategoryCounts.categories, series: mCategoryCounts.series}"
@@ -147,7 +147,7 @@
                 :key="mCategoryRatio.commissionName"
                 class="mt-10 d-flex justify-center">
                 <v-col
-                    v-if="displaySettings?.publicationCategoryRatio.display"
+                    v-if="isAssessmentModuleEnabled && displaySettings?.publicationCategoryRatio.display"
                     cols="12" :md="displaySettings?.publicationCategoryRatio.spanWholeRow ? 8 : 6">
                     <pie-chart
                         :data="mCategoryRatio.data"
@@ -160,7 +160,7 @@
             </v-row>
 
             <div
-                v-if="isDigitalLibraryEnabled && displayThesesLibraryAnalytics"
+                v-if="canSeeDigitalLibraryAnalytics && displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
                 <div class="flex flex-col justify-center items-center text-center mt-14">
                     <h2 class="text-3xl font-semibold">
@@ -247,7 +247,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient" class="mt-7">
+            <div v-if="canSeeDigitalLibraryAnalytics" class="mt-7">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -292,7 +292,7 @@
             </v-row>
 
             <div
-                v-if="isDigitalLibraryEnabled && displayThesesLibraryAnalytics"
+                v-if="canSeeDigitalLibraryAnalytics && displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
                 <div class="flex flex-col justify-center items-center text-center mt-14">
                     <h2 class="text-3xl font-semibold">
@@ -451,6 +451,9 @@ const props = defineProps({
 });
 
 const { 
+    loaded,
+    fetchCrisContextInformation,
+    isAssessmentModuleEnabled,
     isDigitalLibraryEnabled
  } = useCrisContextInformation();
 
@@ -544,7 +547,12 @@ watch([startDate, endDate], () => {
     );
 });
 
-onMounted(() => {
+// The module toggles arrive from the server, so the first fetch waits for them.
+onMounted(async () => {
+    if (!loaded.value) {
+        await fetchCrisContextInformation();
+    }
+
     getOrganisationUnitPublicationCounts(props.organisationUnitId);
 
     endDate.value = (new Date()).toISOString().split("T")[0];
@@ -617,6 +625,14 @@ const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
 
 const displayThesesLibraryAnalytics = ref();
 
+const canSeeDigitalLibraryAnalytics = computed(
+    () => isDigitalLibraryEnabled.value && props.isDigitalLibraryClient);
+
+watch(canSeeDigitalLibraryAnalytics, (canSee) => {
+    displayThesesLibraryAnalytics.value =
+        canSee && (isInstitutionalLibrarian.value || isHeadOfLibrary.value);
+}, { immediate: true });
+
 const thesesYearTypeData = ref<{ categories: string[]; series: StackedBarSeries[]; }>();
 const thesesYearData = ref<{ categories: string[]; series: BarSeries[]; }>();
 const thesisTypeRatioData = ref<PieDataItem[]>([]);
@@ -631,6 +647,10 @@ watch([
 );
 
 const fetchDigitalLibraryData = () => {
+    if (!canSeeDigitalLibraryAnalytics.value) {
+        return;
+    }
+
     if (fromYear.value == 0 || toYear.value == 0) {
         return;
     }
@@ -691,10 +711,6 @@ const getOrganisationUnitPublicationCounts = (organisationUnitId: number, from: 
             initialDatesSet.value = true;
             fromYear.value = minYear.value;
             toYear.value = maxYear.value;
-
-            if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-                displayThesesLibraryAnalytics.value = true;
-            }
         }
 
         const typeSeries: any[] = Object.values(PublicationType).map(pubType => ({
@@ -826,6 +842,12 @@ const getDigitalLibraryStatistics = (organisationUnitId: number, startDate: stri
 };
 
 const getMCategoryCounts = (organisationUnitId: number) => {
+    if (!isAssessmentModuleEnabled.value) {
+        commissionMCategoryRatios.value.splice(0);
+        commissionsYearMCategoryData.value.splice(0);
+        return;
+    }
+
     OrganisationUnitVisualizationService.getOrganisationUnitMCategories(organisationUnitId, fromYear.value, toYear.value).then((response) => {
         commissionMCategoryRatios.value.splice(0);
         response.data.forEach(commissionCount => {

@@ -102,6 +102,7 @@ import { getDocumentLandingPageName } from "@/utils/PathResolutionUtil";
 import { usePublicConfigurationStore } from "@/stores/publicConfigurationStore";
 import { getExtensions } from "@/plugin-system/registry";
 import PluginExtensions from "@/plugin-system/PluginExtensions.vue";
+import { toTokenArray } from "@/utils/SearchTokenUtil";
 
 export default defineComponent({
     name: "HomeView",
@@ -167,17 +168,8 @@ export default defineComponent({
         cardsData.value.sort((left, right) => left.order - right.order);
 
         const search = (tokenParams: string) => {
-            let token = tokenParams;
-            let prefix = "&tokens="
-            while (token.includes(prefix)) {
-                token = token.replace(prefix, " ");
-            }
+            const token = toTokenArray(tokenParams).join(" ");
 
-            prefix = "tokens="
-            while (token.includes(prefix)) {
-                token = token.replace(prefix, "");
-            }
-            
             router.push(
                 {
                     name:"advancedSearch",

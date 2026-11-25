@@ -178,7 +178,6 @@ import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
-import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
@@ -235,12 +234,6 @@ export default defineComponent({
                 { fieldName: "materialProductType", emptyValue: null, setEmpty: false }
             ]);
 
-            materialProduct1.researchAreas = materialProduct1.researchAreas?.concat(materialProduct2.researchAreas as ResearchArea[]);
-            materialProduct2.researchAreas = [];
-
-            materialProduct1.researchAreasId = materialProduct1.researchAreasId?.concat(materialProduct2.researchAreasId as number[]);
-            materialProduct2.researchAreasId = [];
-
             return [materialProduct1, materialProduct2];
         };
 
@@ -276,8 +269,6 @@ export default defineComponent({
             leftMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             leftMaterialProduct.value!.productUsers = updatedInfo.productUsers;
             leftMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;
-            leftMaterialProduct.value!.researchAreasId =
-                leftMaterialProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
 
             updateCommonBasicInfo(leftMaterialProduct, updatedInfo);
             
@@ -293,8 +284,6 @@ export default defineComponent({
             rightMaterialProduct.value!.numberProduced = updatedInfo.numberProduced;
             rightMaterialProduct.value!.productUsers = updatedInfo.productUsers;
             rightMaterialProduct.value!.materialProductType = updatedInfo.materialProductType;
-            rightMaterialProduct.value!.researchAreasId =
-                rightMaterialProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
 
             updateCommonBasicInfo(rightMaterialProduct, updatedInfo);
                         

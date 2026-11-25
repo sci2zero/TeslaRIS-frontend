@@ -77,7 +77,7 @@
                             :total-persons="totalPersons"
                             enable-export
                             :endpoint-type="searchTab === 'simpleSearch' ? ExportableEndpointType.PERSON_SEARCH : ExportableEndpointType.PERSON_SEARCH_ADVANCED"
-                            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+                            :endpoint-token-parameters="toTokenArray(searchParams)"
                             @switch-page="switchPage"
                         />
                     </v-window-item>
@@ -101,7 +101,7 @@
                             :total-publications="totalPublications"
                             enable-export
                             :endpoint-type="searchTab === 'simpleSearch' ? ExportableEndpointType.DOCUMENT_SEARCH : ExportableEndpointType.DOCUMENT_ADVANCED_SEARCH"
-                            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+                            :endpoint-token-parameters="toTokenArray(searchParams)"
                             :endpoint-body-parameters="
                                 {
                                     allowedTypes: [],
@@ -137,6 +137,7 @@ import { ExportableEndpointType, type SearchFieldsResponse } from "@/models/Comm
 import QueryInputComponent from "@/components/core/QueryInputComponent.vue";
 import UiInput from "@/components/ui/input/Input.vue";
 import { UiButton } from "@/components/ui/button";
+import { toTokenArray, toTokenQuery } from "@/utils/SearchTokenUtil";
 
 
 export default defineComponent({
@@ -339,7 +340,7 @@ export default defineComponent({
                     {
                         name:"advancedSearch",
                         query: { 
-                            searchQuery: tokenParams.replaceAll("&tokens=", "tokens=").split("tokens=").filter(el => el).join(isSimpleSearch ? " " : "§"),
+                            searchQuery: toTokenArray(tokenParams).join(isSimpleSearch ? " " : "§"),
                             tab: currentTab.value,
                             search: isSimpleSearch ? "simple" : "advanced"
                         }
@@ -368,7 +369,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams !== "string") {
-                tokenParams = "tokens=" + tokenParams.join("&tokens=");
+                tokenParams = toTokenQuery(tokenParams);
             }
 
             parsonTableRef.value?.setSortAndPageOption([], 1);
@@ -424,7 +425,7 @@ export default defineComponent({
             currentTab, persons, organisationUnits,
             publications, totalPersons, totalOUs,
             totalPublications, search, switchPage,
-            searchParams, ExportableEndpointType,
+            searchParams, ExportableEndpointType, toTokenArray,
             clearSortAndPerformSearch, ouTableRef,
             parsonTableRef, docTableRef, searchTab,
             getSearchFieldsForTable, queryInputRef,

@@ -168,6 +168,7 @@
                     class="mt-5"
                     :entity-type="EntityType.COURSE"
                     :entity-id="course?.id"
+                    :record-name="returnCurrentLocaleContent(course?.name) ?? ''"
                 />
             </v-tabs-window-item>
         </template>

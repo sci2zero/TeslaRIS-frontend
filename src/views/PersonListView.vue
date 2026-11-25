@@ -14,7 +14,7 @@
                 enable-export
                 :allow-comparison="isInstitutionalEditor && (returnOnlyInstitutionRelatedEntities as boolean)"
                 :endpoint-type="ExportableEndpointType.PERSON_SEARCH"
-                :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+                :endpoint-token-parameters="toTokenArray(searchParams)"
                 @switch-page="switchPage">
                 <template #top-left>
                     <search-bar-component :transparent="false" size="small" @search="clearSortAndPerformSearch($event)" />
@@ -76,6 +76,7 @@ import { useI18n } from 'vue-i18n';
 import { useUserRole } from '@/composables/useUserRole';
 import { ExportableEndpointType } from '@/models/Common';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import { toTokenArray } from '@/utils/SearchTokenUtil';
 
 
 export default defineComponent({
@@ -167,7 +168,7 @@ export default defineComponent({
             tableRef, clearSortAndPerformSearch,
             isInstitutionalEditor, isUserBoundToOU, hasInstitution,
             returnOnlyInstitutionRelatedEntities,
-            ExportableEndpointType, searchParams,
+            ExportableEndpointType, searchParams, toTokenArray,
             loading, withNoInvolvements,
             withNoContributions
         };

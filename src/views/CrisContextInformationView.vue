@@ -42,6 +42,27 @@
                     </v-row>
                 </v-card>
 
+                <v-card class="pa-4 mb-6" variant="outlined">
+                    <v-card-title class="text-subtitle-1 font-weight-bold px-0">
+                        {{ $t("thesisLibraryInstitutionsLabel") }}
+                    </v-card-title>
+                    <v-card-subtitle class="px-0 pb-2">
+                        {{ $t("thesisLibraryInstitutionsDescriptionLabel") }}
+                    </v-card-subtitle>
+
+                    <v-row>
+                        <v-col cols="12">
+                            <organisation-unit-autocomplete-search
+                                v-model="selectedThesisLibraryOUs"
+                                multiple
+                                disable-submission
+                                only-client-institutions-dl
+                                label="institutionsLabel"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card>
+
                 <v-card class="pa-4" variant="outlined">
                     <v-card-title class="text-subtitle-1 font-weight-bold px-0">
                         {{ $t("crisConfigurationLabel") }}
@@ -294,15 +315,17 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Toast from '@/components/core/Toast.vue';
 import MultilingualTextInput from '@/components/core/MultilingualTextInput.vue';
+import OrganisationUnitAutocompleteSearch from '@/components/organisationUnit/OrganisationUnitAutocompleteSearch.vue';
 import { useGlobalLoading } from '@/composables/useGlobalLoading';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import CrisContextInformationService from '@/services/CrisContextInformationService';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
 import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import { ApplicableEntityType, type CrisContextInformation, type IdentifierConfiguration,
     type IdentifierConfigurationMatrix, type MultilingualContent } from '@/models/Common';
 import { License } from '@/models/DocumentFileModel';
 import { getLicenseTitleFromValueAutoLocale, getLisenseTypesForGivenLocale } from '@/i18n/license';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 
 
@@ -319,7 +342,7 @@ const DEFAULT_POLICY: IdentifierConfiguration = {
 
 export default defineComponent({
     name: "CrisContextInformationView",
-    components: { Toast, MultilingualTextInput },
+    components: { Toast, MultilingualTextInput, OrganisationUnitAutocompleteSearch },
     setup() {
         const isFormValid = ref(false);
         const snackbar = ref(false);
@@ -349,6 +372,7 @@ export default defineComponent({
         const projectNationalIdentifierName = ref<MultilingualContent[]>([]);
         const documentNationalIdentifierName = ref<MultilingualContent[]>([]);
         const identifierConfiguration = ref<IdentifierConfigurationMatrix>({});
+        const selectedThesisLibraryOUs = ref<{title: string, value: number}[]>([]);
         const selectedMetadataLicense = ref({
             title: getLicenseTitleFromValueAutoLocale(License.CC0) as string,
             value: License.CC0
@@ -391,6 +415,30 @@ export default defineComponent({
             perEntityType[identifier] = { ...perEntityType[identifier], [field]: !!value };
         };
 
+        const loadThesisLibraryOUs = (institutionIds: number[]) => {
+            if (institutionIds.length === 0) {
+                selectedThesisLibraryOUs.value = [];
+                return;
+            }
+
+            Promise.allSettled(
+                institutionIds.map(institutionId => OrganisationUnitService.readOU(institutionId))
+            ).then(results => {
+                const fetchedOUs: {title: string, value: number}[] = [];
+
+                results.forEach(result => {
+                    if (result.status === "fulfilled") {
+                        fetchedOUs.push({
+                            title: returnCurrentLocaleContent(result.value.data.name) as string,
+                            value: result.value.data.id
+                        });
+                    }
+                });
+
+                selectedThesisLibraryOUs.value = fetchedOUs;
+            });
+        };
+
         const applyConfiguration = (configuration: CrisContextInformation) => {
             toggleAssessmentModule.value = configuration.toggleAssessmentModule;
             toggleDigitalLibrary.value = configuration.toggleDigitalLibrary;
@@ -415,6 +463,7 @@ export default defineComponent({
                 configuration.organisationUnitNationalIdUrl ?? "";
             projectNationalIdUrl.value = configuration.projectNationalIdUrl ?? "";
             documentNationalIdUrl.value = configuration.documentNationalIdUrl ?? "";
+            loadThesisLibraryOUs(configuration.thesisLibraryInstitutionIds ?? []);
             // A copy, so the checkboxes do not move the shared configuration before a save.
             identifierConfiguration.value = JSON.parse(
                 JSON.stringify(configuration.identifierConfiguration ?? {}));
@@ -443,6 +492,8 @@ export default defineComponent({
                 organisationUnitNationalIdUrl: organisationUnitNationalIdUrl.value,
                 projectNationalIdUrl: projectNationalIdUrl.value,
                 documentNationalIdUrl: documentNationalIdUrl.value,
+                thesisLibraryInstitutionIds: selectedThesisLibraryOUs.value.map(
+                    selection => selection.value),
                 orcidLoginToggle: crisContextInformation.value.orcidLoginToggle
             };
 
@@ -463,6 +514,7 @@ export default defineComponent({
             personNationalIdUrl, organisationUnitNationalIdUrl, projectNationalIdUrl,
             documentNationalIdUrl,
             nationalIdUrlValidationRules,
+            selectedThesisLibraryOUs,
             licenseTypes, selectedMetadataLicense,
             requiredSelectionRules, regularExpressionRules,
             toggleAssessmentModule,

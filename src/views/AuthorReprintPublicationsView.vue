@@ -47,7 +47,7 @@
             enable-export
             :allow-comparison="(isInstitutionalEditor as boolean) && (returnOnlyInstitutionRelatedEntities as boolean)"
             :endpoint-type="ExportableEndpointType.AUTHOR_REPRINT_DOCUMENTS_SEARCH"
-            :endpoint-token-parameters="searchParams.replaceAll('&tokens=', 'tokens=').split('tokens=').filter(token => token)"
+            :endpoint-token-parameters="toTokenArray(searchParams)"
             :endpoint-body-parameters="
                 {
                     allowedTypes: selectedPublicationTypes.map(publicationType => publicationType.value),
@@ -73,6 +73,7 @@ import { getPublicationTypesForGivenLocale, getPublicationTypeTitleFromValueAuto
 import { ExportableEndpointType } from '@/models/Common';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
 import { useRouter } from 'vue-router';
+import { toTokenArray, toTokenQuery } from '@/utils/SearchTokenUtil';
 
 
 export default defineComponent({
@@ -154,7 +155,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams !== "string") {
-                tokenParams = "tokens=" + tokenParams.join("&tokens=");
+                tokenParams = toTokenQuery(tokenParams);
             }
 
             tableRef.value?.setSortAndPageOption([], 1);
@@ -177,7 +178,7 @@ export default defineComponent({
         };
 
         return {
-            search, publications, searchParams,
+            search, publications, searchParams, toTokenArray,
             switchPage, isAdmin, totalPublications,
             tableRef, clearSortAndPerformSearch,
             isUserBoundToOU, isCommission, hasInstitution,

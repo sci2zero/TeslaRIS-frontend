@@ -312,7 +312,7 @@
             <v-tab value="contributions">
                 {{ $t("contributionsLabel") }}
             </v-tab>
-            <v-tab v-show="isDigitalRepositoryEnabled" value="documents">
+            <v-tab v-show="isDigitalRepositoryEnabled || isDigitalLibraryEnabled" value="documents">
                 {{ $t("documentsLabel") }}
             </v-tab>
             <v-tab value="additionalInfo">
@@ -393,6 +393,7 @@
                     @update-description="updateDescription"
                     @update-extended-abstract="updateExtendedAbstract"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 />
             </v-tabs-window-item>
@@ -449,6 +450,7 @@
                         :document-id="(thesis?.id as number)"
                         :display-settings="displayConfiguration.displaySettings.value"
                         :display-statistics-tab="displayConfiguration.shouldDisplayStatisticsTab()"
+                        is-thesis
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -477,6 +479,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.THESIS"
                         :entity-id="thesis?.id"
+                        :record-name="returnCurrentLocaleContent(thesis?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -846,6 +849,11 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                documentClassifications.value = [];
+                return;
+            }
+
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
             });
@@ -877,6 +885,11 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
+        };
+
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            thesis.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -1123,7 +1136,7 @@ export default defineComponent({
             thesis, publisher, createIndicator, languageTagMap, canAssessDataQuality, isDigitalLibraryEnabled, restoreBlockedReason,
             returnCurrentLocaleContent, currentTab, showOverview, showOverviewTab, onOverviewContent, fetchIndicators,
             languageMap, searchKeyword, canEdit, putOnPublicReview,
-            updateKeywords, updateDescription, examineRegistryBookEntry,
+            updateResearchAreas, updateKeywords, updateDescription, examineRegistryBookEntry,
             snackbar, snackbarMessage, updateContributions, registryBookEntryId,
             updateBasicInfo, organisationUnit, updateRemark,
             event, updateExtendedAbstract,

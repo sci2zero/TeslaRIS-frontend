@@ -136,7 +136,7 @@
             </v-row>
             <v-row v-for="mCategoryCounts in commissionsYearMCategoryData" :key="mCategoryCounts.commissionName">
                 <v-col
-                    v-if="displaySettings?.publicationCategoryByYear.display"
+                    v-if="isAssessmentModuleEnabled && displaySettings?.publicationCategoryByYear.display"
                     cols="12" :md="displaySettings?.publicationCategoryByYear.spanWholeRow ? 12 : 6">
                     <stacked-bar-chart
                         :data="{categories: mCategoryCounts.categories, series: mCategoryCounts.series}"
@@ -151,7 +151,7 @@
                 :key="mCategoryRatio.commissionName"
                 class="mt-10 d-flex justify-center">
                 <v-col
-                    v-if="displaySettings?.publicationCategoryRatio.display"
+                    v-if="isAssessmentModuleEnabled && displaySettings?.publicationCategoryRatio.display"
                     cols="12" :md="displaySettings?.publicationCategoryRatio.spanWholeRow ? 12 : 6">
                     <pie-chart
                         :data="mCategoryRatio.data"
@@ -268,6 +268,7 @@ import lodash from "lodash";
 import PersonCollaborationNetwork from '@/components/person/PersonCollaborationNetwork.vue';
 import { useRoute } from 'vue-router';
 import PersonVisualizationPublications from './PersonVisualizationPublications.vue';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 import { getTitleFromValueAutoLocale } from '@/i18n/documentContributionType';
 
 
@@ -313,6 +314,8 @@ const commissionsYearMCategoryData = ref<{commissionName: string, categories: st
 
 const i18n = useI18n();
 const currentTab = ref("publicationCount");
+
+const { isAssessmentModuleEnabled } = useCrisContextInformation();
 
 const initialDatesSet = ref(false);
 const watchDates = ref(false);
@@ -584,6 +587,12 @@ const getPersonStatistics = (personId: number, startDate: string, endDate: strin
 };
 
 const getMCategoryCounts = (personId: number) => {
+    if (!isAssessmentModuleEnabled.value) {
+        commissionMCategoryRatios.value.splice(0);
+        commissionsYearMCategoryData.value.splice(0);
+        return;
+    }
+
     PersonVisualizationService.getPersonMCategories(personId, fromYear.value, toYear.value).then((response) => {
         commissionMCategoryRatios.value.splice(0);
         response.data.forEach(commissionCount => {

@@ -173,7 +173,6 @@ import { ComparisonSide, EntityType } from '@/models/MergeModel';
 import AttachmentSection from '@/components/core/AttachmentSection.vue';
 import Toast from '@/components/core/Toast.vue';
 import { bulkTransferFields } from '@/utils/FieldTransferUtil';
-import { type ResearchArea } from '@/models/OrganisationUnitModel';
 import ResearchAreaHierarchy from '@/components/core/ResearchAreaHierarchy.vue';
 import { mergeCommonMetadata, updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
 
@@ -227,12 +226,6 @@ export default defineComponent({
                 { fieldName: "intangibleProductType", emptyValue: null, setEmpty: false }
             ]);
 
-            intangibleProduct1.researchAreas = intangibleProduct1.researchAreas?.concat(intangibleProduct2.researchAreas as ResearchArea[]);
-            intangibleProduct2.researchAreas = [];
-
-            intangibleProduct1.researchAreasId = intangibleProduct1.researchAreasId?.concat(intangibleProduct2.researchAreasId as number[]);
-            intangibleProduct2.researchAreasId = [];
-
             return [intangibleProduct1, intangibleProduct2];
         };
 
@@ -267,8 +260,6 @@ export default defineComponent({
             leftIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
             leftIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             leftIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
-            leftIntangibleProduct.value!.researchAreasId =
-                leftIntangibleProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
 
             updateCommonBasicInfo(leftIntangibleProduct, updatedInfo);
             
@@ -283,8 +274,6 @@ export default defineComponent({
             rightIntangibleProduct.value!.publisherId = updatedInfo.publisherId;
             rightIntangibleProduct.value!.productUsers = updatedInfo.productUsers;
             rightIntangibleProduct.value!.intangibleProductType = updatedInfo.intangibleProductType;
-            rightIntangibleProduct.value!.researchAreasId =
-                rightIntangibleProduct.value?.researchAreas?.map(researchArea => researchArea.id) as number[];
 
             updateCommonBasicInfo(rightIntangibleProduct, updatedInfo);
                         

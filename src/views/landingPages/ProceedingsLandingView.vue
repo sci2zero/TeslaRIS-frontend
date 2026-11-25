@@ -218,6 +218,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -285,6 +286,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.PROCEEDINGS"
                         :entity-id="proceedings?.id"
+                        :record-name="returnCurrentLocaleContent(proceedings?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -566,6 +568,11 @@ export default defineComponent({
             performUpdate(true);
         };
 
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            proceedings.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
+        };
+
         const updateKeywords = (keywords: MultilingualContent[]) => {
             proceedings.value!.keywords = keywords;
             performUpdate(false);
@@ -644,7 +651,7 @@ export default defineComponent({
             returnCurrentLocaleContent, localiseFlexibleDate, fetchIdentifiers,
             languageMap, publicationSeriesType, displayConfiguration,
             searchKeyword, goToURL, canEdit, documentIdentifiers,
-            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateResearchAreas, updateKeywords, updateDescription, snackbar, snackbarMessage,
             publicationSeries, updateBasicInfo, updateContributions,
             ProceedingsUpdateForm, handleResearcherUnbind, isResearcher,
             documentIndicators, StatisticsType, currentRoute, updateRemark,

@@ -188,6 +188,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.BOOK_SERIES"
                         :entity-id="bookSeries?.id"
+                        :record-name="returnCurrentLocaleContent(bookSeries?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>

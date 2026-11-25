@@ -119,26 +119,11 @@
                 />
             </v-col>
         </v-row>
-        <h2
-            v-if="!inComparator"
-            class="mt-5!">
-            {{ $t("researchAreasLabel") }}
-        </h2>
-        <v-row v-if="!inComparator">
-            <v-col cols="10">
-                <research-areas-selection
-                    ref="researchAreasSelectionRef"
-                    :research-areas-hierarchy="presetResearchAreas"
-                    submit-on-click
-                    @update="saveResearchAreas"
-                />
-            </v-col>
-        </v-row>
-
         <document-common-fields
             ref="commonFieldsRef"
             v-model="commonFieldsData"
             :preset-data="presetCommonFieldsData"
+            :in-comparator="inComparator"
         />
 
         <v-row>
@@ -172,8 +157,6 @@ import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
 import { useIdentifierCheck } from '@/composables/useIdentifierCheck';
 import { getMaterialProductTypesForGivenLocale, getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
-import { type ResearchArea } from '@/models/OrganisationUnitModel';
-import ResearchAreasSelection from '@/components/core/ResearchAreasSelection.vue';
 import DocumentCommonFields from '../DocumentCommonFields.vue';
 import { getCommonIdentifiers, updateDocumentCommonFields } from '@/utils/CommonDocumentFieldsUtil';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
@@ -182,7 +165,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 
 export default defineComponent({
     name: "MaterialProductUpdateForm",
-    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker, UiInput },
+    components: { MultilingualTextInput, UriInput, PublisherAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetMaterialProduct: {
             type: Object as PropType<MaterialProduct | undefined>,
@@ -237,7 +220,6 @@ export default defineComponent({
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const usersRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
-        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: returnCurrentLocaleContent(publisher.value?.name) as string, value: publisher.value?.id as number};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -254,8 +236,6 @@ export default defineComponent({
         const scopus = ref(props.presetMaterialProduct?.scopusId);
         const numberProduced = ref(props.presetMaterialProduct?.numberProduced);
 
-        const presetResearchAreas = ref<ResearchArea[]>(props.presetMaterialProduct?.researchAreas as ResearchArea[]);
-        const researchAreaIds = ref<number[]>(props.presetMaterialProduct?.researchAreas?.map(researchArea => researchArea.id) as number[]);
 
         const materialProductTypes = getMaterialProductTypesForGivenLocale();
         const selectedMaterialProductType = ref<{title: string, value: MaterialProductType}>(
@@ -317,7 +297,6 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 numberProduced: numberProduced.value as number,
-                researchAreasId: researchAreaIds.value,
                 productUsers: productUsers.value,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
@@ -357,9 +336,6 @@ export default defineComponent({
                     value: props.presetMaterialProduct?.materialProductType as MaterialProductType 
                 };
 
-            presetResearchAreas.value = props.presetMaterialProduct?.researchAreas as ResearchArea[];
-            researchAreaIds.value = props.presetMaterialProduct?.researchAreasId as number[];
-            researchAreasSelectionRef.value?.resetForm();
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -373,10 +349,6 @@ export default defineComponent({
             fetchDetails();
         };
 
-        const saveResearchAreas = (newResearchAreaIds: number[]) => {
-            researchAreaIds.value = newResearchAreaIds;
-        };
-
         return {
             canBeUpdated, ApplicableEntityType,
             isFormValid, doi, snackbar, message,
@@ -384,13 +356,12 @@ export default defineComponent({
             selectedPublisher, materialProductNumber,
             uris, requiredFieldRules, titleRef, usersRef,
             submit, toMultilingualTextInput, requiredSelectionRules,
-            languageTags, doiValidationRules, saveResearchAreas,
+            languageTags, doiValidationRules,
             refreshForm, urisRef, subtitleRef, productUsers,
             openAlexId, workOpenAlexIdValidationRules,
             webOfScienceId, documentWebOfScienceIdValidationRules,
             scopus, scopusIdValidationRules, numberProduced,
             materialProductTypes, selectedMaterialProductType,
-            researchAreasSelectionRef, presetResearchAreas,
             commonFieldsRef, commonFieldsData, presetCommonFieldsData
         };
     }

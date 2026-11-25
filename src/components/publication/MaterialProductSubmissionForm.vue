@@ -119,15 +119,6 @@
                     v-model="productUsers"
                     :label="$t('productUsersLabel')"
                 />
-                <h2 class="mt-5!">
-                    {{ $t("researchAreasLabel") }}
-                </h2>
-                <research-areas-selection
-                    ref="researchAreasSelectionRef"
-                    :research-areas-hierarchy="[]"
-                    submit-on-click
-                    @update="saveResearchAreas"
-                />
                 <document-common-fields
                     ref="commonFieldsRef"
                     v-model="commonFieldsData"
@@ -166,7 +157,6 @@ import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getMaterialProductTypesForGivenLocale } from '@/i18n/materialProductType';
-import ResearchAreasSelection from '../core/ResearchAreasSelection.vue';
 import DocumentCommonFields from './DocumentCommonFields.vue';
 import FlexibleDatePicker from '../core/FlexibleDatePicker.vue';
 
@@ -177,7 +167,7 @@ import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "SubmitMaterialProduct",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, ResearchAreasSelection, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, PublisherAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,
@@ -207,7 +197,6 @@ export default defineComponent({
         const publisherAutocompleteRef = ref<typeof PublisherAutocompleteSearch>();
         const deduplicationTableRef = ref<typeof PublicationDeduplicationTable>();
         const usersRef = ref<typeof MultilingualTextInput>();
-        const researchAreasSelectionRef = ref<typeof ResearchAreasSelection>();
 
         const searchPlaceholder = {title: "", value: -1};
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
@@ -226,7 +215,6 @@ export default defineComponent({
         const materialProductNumber = ref("");
         const uris = ref<string[]>([]);
         const numberProduced = ref();
-        const researchAreaIds = ref<number[]>([]);
 
         const materialProductTypes = getMaterialProductTypesForGivenLocale();
         const selectedMaterialProductType = ref<{title: string, value: MaterialProductType | null}>({ title: "", value: null });
@@ -268,7 +256,6 @@ export default defineComponent({
                 authorReprint: selectedPublisher.value.value === -2,
                 fileItems: [],
                 proofs: [],
-                researchAreasId: researchAreaIds.value,
                 ...commonFieldsData.value
             };
 
@@ -294,7 +281,6 @@ export default defineComponent({
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
                     usersRef.value?.clearInput();
-                    researchAreasSelectionRef.value?.resetForm();
                     selectedMaterialProductType.value = { title: "", value: null };
                     commonFieldsRef.value?.clearInputs();
                     commonFieldsData.value = {};
@@ -349,10 +335,6 @@ export default defineComponent({
             }
         };
 
-        const saveResearchAreas = (newResearchAreaIds: number[]) => {
-            researchAreaIds.value = newResearchAreaIds;
-        };
-
         return {
             canBeUpdated, ApplicableEntityType,
             isFormValid, scopusIdValidationRules,
@@ -370,7 +352,6 @@ export default defineComponent({
             deduplicationTableRef, numberProduced,
             materialProductTypes, selectedMaterialProductType,
             requiredSelectionRules, usersRef, submit,
-            researchAreasSelectionRef, saveResearchAreas,
             commonFieldsRef, commonFieldsData,
             presetCommonFieldsData
         };

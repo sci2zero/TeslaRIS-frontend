@@ -78,6 +78,10 @@ export default defineComponent({
                     return "https://authenticus.pt/author/";
                 case "wikidata":
                     return "https://www.wikidata.org/wiki/";
+                case "fundref":
+                    return "https://api.crossref.org/funders/";
+                case "isni":
+                    return "https://isni.org/isni/";
             }
 
             return "https://doi.org/";

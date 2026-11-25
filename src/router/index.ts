@@ -143,6 +143,7 @@ import RepositoryAnalyticsView from "@/views/revisions/RepositoryAnalyticsView.v
 import IssueExplorerView from "@/views/revisions/IssueExplorerView.vue";
 import PolicyExplorerView from "@/views/revisions/PolicyExplorerView.vue";
 import DataQualityFixatorView from "@/views/revisions/DataQualityFixatorView.vue";
+import PolicyManagementView from "@/views/revisions/PolicyManagementView.vue";
 import MigrationControlPanelView from "@/views/migration/MigrationControlPanelView.vue";
 
 
@@ -1614,6 +1615,15 @@ const router = createRouter({
                     meta: {
                         authenticated: true,
                         authorities: [roles.admin, roles.institutionalEditor, roles.viceDeanForScience],
+                    },
+                },
+                {
+                    path: "policy-management",
+                    name: "policyManagement",
+                    component: PolicyManagementView,
+                    meta: {
+                        authenticated: true,
+                        authorities: [roles.admin],
                     },
                 },
                 {

@@ -1,4 +1,4 @@
-import type { ApproveStatus, MultilingualContent } from "./Common";
+import type { ApproveStatus, LanguageResponse, MultilingualContent } from "./Common";
 import type { DocumentFileResponse } from "./DocumentFileModel";
 import type { ResearchArea } from "./OrganisationUnitModel";
 
@@ -142,6 +142,7 @@ export interface PersonResponse {
     educationIds: number[];
     membershipIds: number[];
     expertisesOrSkills: ExpertiseOrSkillResponse[];
+    languageKnowledges: LanguageKnowledgeResponse[];
     prizes: PrizeResponse[];
     imageServerFilename?: string;
     showFullBirthdate: boolean;
@@ -178,6 +179,36 @@ export interface ExpertiseOrSkillResponse {
     researchAreasId: number[];
     researchAreas: ResearchArea[];
     proofs: DocumentFileResponse[];
+}
+
+export type LanguageLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+
+export interface LanguageKnowledge {
+    id?: number;
+    languageId: number;
+    motherTongue: boolean;
+    reading?: LanguageLevel;
+    writing?: LanguageLevel;
+    speaking?: LanguageLevel;
+    listening?: LanguageLevel;
+    academicReview?: LanguageLevel;
+    academicWriting?: LanguageLevel;
+    overall?: LanguageLevel;
+}
+
+export interface LanguageKnowledgeResponse {
+    id: number;
+    name: MultilingualContent[];
+    language?: LanguageResponse;
+    motherTongue?: boolean;
+    reading?: LanguageLevel;
+    writing?: LanguageLevel;
+    speaking?: LanguageLevel;
+    listening?: LanguageLevel;
+    academicReview?: LanguageLevel;
+    academicWriting?: LanguageLevel;
+    overall?: LanguageLevel;
+    proofs?: DocumentFileResponse[];
 }
 
 export interface ExpertiseOrSkill {

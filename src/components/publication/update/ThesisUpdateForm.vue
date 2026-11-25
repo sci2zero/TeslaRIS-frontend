@@ -282,6 +282,7 @@
             ref="commonFieldsRef"
             v-model="commonFieldsData"
             :preset-data="presetCommonFieldsData"
+            :in-comparator="inComparator"
         />
 
         <v-row>
@@ -339,6 +340,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],

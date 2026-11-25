@@ -77,6 +77,7 @@
                     ref="dataQualityTabsRef"
                     :entity-type="EntityType.PUBLISHER"
                     :entity-id="publisher?.id"
+                    :record-name="returnCurrentLocaleContent(publisher?.name) ?? ''"
                 />
             </v-tabs-window-item>
         </template>

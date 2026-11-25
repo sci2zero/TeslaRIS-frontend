@@ -154,6 +154,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -246,6 +247,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.MONOGRAPH_PUBLICATION"
                         :entity-id="monographPublication?.id"
+                        :record-name="returnCurrentLocaleContent(monographPublication?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -457,6 +459,11 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                documentClassifications.value = [];
+                return;
+            }
+
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
             });
@@ -481,6 +488,11 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
+        };
+
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            monographPublication.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -558,7 +570,7 @@ export default defineComponent({
             returnCurrentLocaleContent, handleResearcherUnbind,
             languageTagMap, MonographPublicationUpdateForm,
             searchKeyword, canEdit, isResearcher,
-            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateResearchAreas, updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, getTitleFromValueAutoLocale,
             documentIndicators, StatisticsType, currentTab, showOverview, showOverviewTab, onOverviewContent, currentRoute,
             ApplicableEntityType, canClassify, documentClassifications,

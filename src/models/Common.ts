@@ -457,6 +457,7 @@ export interface CrisContextInformation {
     organisationUnitNationalIdUrl: string;
     projectNationalIdUrl: string;
     documentNationalIdUrl: string;
+    thesisLibraryInstitutionIds: number[];
     orcidLoginToggle: boolean;
 }
 

@@ -161,6 +161,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -251,6 +252,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.PROCEEDINGS_PUBLICATION"
                         :entity-id="proceedingsPublication?.id"
+                        :record-name="returnCurrentLocaleContent(proceedingsPublication?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -439,6 +441,11 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                documentClassifications.value = [];
+                return;
+            }
+
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
             });
@@ -493,6 +500,11 @@ export default defineComponent({
 
         const searchKeyword = (keyword: string) => {
             router.push({name:"advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" }});
+        };
+
+        const updateResearchAreas = (researchAreaIds: number[]) => {
+            proceedingsPublication.value!.researchAreasId = researchAreaIds;
+            performUpdate(true);
         };
 
         const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -577,7 +589,7 @@ export default defineComponent({
             totalPublications, returnCurrentLocaleContent, isResearcher,
             languageTagMap, ProceedingsPublicationUpdateForm,
             searchKeyword, canEdit, proceedings, getTitleFromValueAutoLocale,
-            updateKeywords, updateDescription, snackbar, snackbarMessage,
+            updateResearchAreas, updateKeywords, updateDescription, snackbar, snackbarMessage,
             updateContributions, updateBasicInfo, handleResearcherUnbind,
             StatisticsType, documentIndicators, currentTab, showOverview, showOverviewTab, onOverviewContent, ApplicableEntityType,
             documentClassifications, assessProceedingsPublication,

@@ -370,7 +370,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const taxNumberPattern = /^[0-9]+$/i;
+    const taxNumberPattern = /^[A-Z]{0,2}[0-9]+$/i;
     const taxNumberValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;
@@ -379,7 +379,7 @@ export const useValidationUtils = () => {
         }
     ];
 
-    const gridPattern = /^grid\\.\\d{4,6}\\.[0-9a-f]{1,2}$/i;
+    const gridPattern = /^grid\.\d{4,6}\.[0-9a-f]{1,2}$/i;
     const gridValidationRules = [
         (value: string) => {
             if (!value || value.trim() === "") return true;

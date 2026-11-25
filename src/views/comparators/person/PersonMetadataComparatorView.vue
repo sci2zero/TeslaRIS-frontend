@@ -47,6 +47,9 @@
                 <expertise-or-skill-list :expertise-or-skills="leftPerson?.expertisesOrSkills" :person="leftPerson" in-comparator />
 
                 <br>
+                <language-knowledge-list :language-knowledges="leftPerson?.languageKnowledges" :person="leftPerson" in-comparator />
+
+                <br>
                 <prize-list :prizes="leftPerson?.prizes" :person="leftPerson" in-comparator />
             </v-col>
 
@@ -104,6 +107,9 @@
                 
                 <br>
                 <expertise-or-skill-list :expertise-or-skills="rightPerson?.expertisesOrSkills" :person="rightPerson" in-comparator />
+
+                <br>
+                <language-knowledge-list :language-knowledges="rightPerson?.languageKnowledges" :person="rightPerson" in-comparator />
             
                 <br>
                 <prize-list :prizes="rightPerson?.prizes" :person="rightPerson" in-comparator />
@@ -133,10 +139,11 @@ import { mergeMultilingualContentField, returnCurrentLocaleContent } from '@/i18
 import PersonUpdateForm from '@/components/person/update/PersonUpdateForm.vue';
 import InvolvementList from '@/components/person/involvement/InvolvementList.vue';
 import PersonService from '@/services/PersonService';
-import type { ExpertiseOrSkillResponse, PersonResponse, PersonalInfo, PrizeResponse } from '@/models/PersonModel';
+import type { ExpertiseOrSkillResponse, LanguageKnowledgeResponse, PersonResponse, PersonalInfo, PrizeResponse } from '@/models/PersonModel';
 import InvolvementService from '@/services/InvolvementService';
 import type { Education, Employment, Membership } from '@/models/InvolvementModel';
 import ExpertiseOrSkillList from '@/components/person/expertiseOrSkill/ExpertiseOrSkillList.vue';
+import LanguageKnowledgeList from '@/components/person/languageKnowledge/LanguageKnowledgeList.vue';
 import PrizeList from '@/components/person/prize/PrizeList.vue';
 import DescriptionOrBiographyUpdateForm from '@/components/core/update/DescriptionOrBiographyUpdateForm.vue';
 import KeywordUpdateForm from '@/components/core/update/KeywordUpdateForm.vue';
@@ -152,7 +159,7 @@ import { bulkTransferFields } from '@/utils/FieldTransferUtil';
 
 export default defineComponent({
     name: "PersonMetadataComparator",
-    components: { PersonUpdateForm, Toast, InvolvementList, ExpertiseOrSkillList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
+    components: { PersonUpdateForm, Toast, InvolvementList, ExpertiseOrSkillList, LanguageKnowledgeList, PrizeList, DescriptionOrBiographyUpdateForm, KeywordUpdateForm, ComparisonActions },
     setup() {
         const snackbar = ref(false);
         const snackbarMessage = ref("");
@@ -311,9 +318,17 @@ export default defineComponent({
             return [person1, person2];
         };
 
+        const skillAndLanguageIds = (person: PersonResponse | undefined) => [
+            ...(person?.expertisesOrSkills?.map(skill => skill.id) ?? []),
+            ...(person?.languageKnowledges?.map(language => language.id) ?? [])
+        ] as number[];
+
         const mergePersonCollectionAttributes = (person1: PersonResponse, person2: PersonResponse) => {
             person1.expertisesOrSkills = person1.expertisesOrSkills.concat(person2.expertisesOrSkills) as ExpertiseOrSkillResponse[];
             person2.expertisesOrSkills = [];
+
+            person1.languageKnowledges = person1.languageKnowledges.concat(person2.languageKnowledges) as LanguageKnowledgeResponse[];
+            person2.languageKnowledges = [];
 
             person1.prizes = person1.prizes.concat(person2.prizes) as PrizeResponse[];
             person2.prizes = [];
@@ -443,9 +458,9 @@ export default defineComponent({
                         MergeService.switchPrizesToOtherPerson(leftPerson.value?.prizes.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
                         MergeService.switchPrizesToOtherPerson(rightPerson.value?.prizes.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number),
 
-                        // Merge skills
-                        MergeService.switchSkillsToOtherPerson(leftPerson.value?.expertisesOrSkills.map(e => e.id) as number[], rightPerson.value?.id as number, leftPerson.value?.id as number),
-                        MergeService.switchSkillsToOtherPerson(rightPerson.value?.expertisesOrSkills.map(e => e.id) as number[], leftPerson.value?.id as number, rightPerson.value?.id as number)
+                        // Merge skills and the languages, which share one table
+                        MergeService.switchSkillsToOtherPerson(skillAndLanguageIds(leftPerson.value), rightPerson.value?.id as number, leftPerson.value?.id as number),
+                        MergeService.switchSkillsToOtherPerson(skillAndLanguageIds(rightPerson.value), leftPerson.value?.id as number, rightPerson.value?.id as number)
                     ]);
 
                     // Personal information

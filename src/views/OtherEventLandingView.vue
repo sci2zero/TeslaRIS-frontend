@@ -155,6 +155,7 @@
                     class="mt-5"
                     :entity-type="EntityType.OTHER_EVENT"
                     :entity-id="otherEvent?.id"
+                    :record-name="returnCurrentLocaleContent(otherEvent?.name) ?? ''"
                 />
             </v-tabs-window-item>
         </template>

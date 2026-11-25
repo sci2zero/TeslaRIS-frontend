@@ -48,17 +48,6 @@
         <v-row>
             <v-col>
                 <ui-input
-                    v-model="selectedResearchArea"
-                    control="select"
-                    :label="$t('researchAreaLabel')"
-                    :items="researchAreasSelectable"
-                    return-object
-                />
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col>
-                <ui-input
                     v-model="selectedLanguages"
                     control="select"
                     :label="$t('languageLabel')"
@@ -182,6 +171,7 @@
             ref="commonFieldsRef"
             v-model="commonFieldsData"
             :preset-data="presetCommonFieldsData"
+            :in-comparator="inComparator"
         />
 
         <v-row>
@@ -208,9 +198,7 @@ import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import LanguageService from '@/services/LanguageService';
 import type { AxiosResponse } from 'axios';
-import ResearchAreaService from '@/services/ResearchAreaService';
 import { getMonographTypesForGivenLocale, getMonographTypeTitleFromValueAutoLocale } from '@/i18n/monographType';
-import type { ResearchArea } from '@/models/OrganisationUnitModel';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
@@ -241,6 +229,10 @@ export default defineComponent({
         inModal: {
             type: Boolean,
             default: true
+        },
+        inComparator: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ["update"],
@@ -255,7 +247,6 @@ export default defineComponent({
         const i18n = useI18n();
 
         const selectOneMessage = computed(() => i18n.t("selectOnePublicationSeriesMessage"));
-        const noDataMessage = computed(() => i18n.t("noDataMessage"));
 
         const selectedLanguages = ref<number[]>(props.presetMonograph?.languageIds as number[]);
 
@@ -270,26 +261,12 @@ export default defineComponent({
                 })
             });
 
-            ResearchAreaService.listAllResearchAreas().then(response => {
-                allResearchAreas.value = response.data;
-                populateSelectionData();
-            });
-
-
             updatePresetCommonFields();
             fetchDetails();
         });
 
         const fetchDetails = () => {
             if (props.presetMonograph) {
-                if (props.presetMonograph.researchAreaId) {
-                    ResearchAreaService.readResearchAreaHierarchy(props.presetMonograph.researchAreaId).then((response) => {
-                        selectedResearchArea.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
-                    });
-                } else {
-                    selectedResearchArea.value.title = noDataMessage.value;
-                }
-
                 if (props.presetMonograph.eventId) {
                     EventService.readConference(props.presetMonograph.eventId).then(response => {
                         selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
@@ -325,13 +302,6 @@ export default defineComponent({
             }
         });
 
-        const populateSelectionData = () => {
-            researchAreasSelectable.value = [];
-            allResearchAreas.value.forEach(researchArea => {
-                researchAreasSelectable.value.push({title: returnCurrentLocaleContent(researchArea.name) as string, value: researchArea.id as number});
-            });
-        };
-
         const titleRef = ref<typeof MultilingualTextInput>();
         const subtitleRef = ref<typeof MultilingualTextInput>();
         const urisRef = ref<typeof UriInput>();
@@ -344,9 +314,6 @@ export default defineComponent({
         const monographTypes = getMonographTypesForGivenLocale();
         const selectedMonographType = ref<{title: string, value: MonographType | null}>({ title: getMonographTypeTitleFromValueAutoLocale(props.presetMonograph?.monographType as MonographType) as string, value: props.presetMonograph?.monographType as MonographType });
 
-        const allResearchAreas = ref<ResearchArea[]>([]);
-        const researchAreasSelectable = ref<{ title: string, value: number }[]>([]);
-        const selectedResearchArea = ref<{ title: string, value: number | null}>({ title: "", value: null });
         const selectedPublisher = ref<{ title: string, value: number }>(searchPlaceholder);
         
         const title = ref<any>([]);
@@ -444,7 +411,6 @@ export default defineComponent({
                 monographType: selectedMonographType.value.value as MonographType,
                 number: number.value,
                 volume: volume.value,
-                researchAreaId: selectedResearchArea.value?.value as number,
                 publisherId: (!selectedPublisher.value || selectedPublisher.value.value < 0) ? undefined : selectedPublisher.value.value,
                 authorReprint: selectedPublisher.value?.value === -2,
                 fileItems: [],
@@ -507,13 +473,12 @@ export default defineComponent({
             toMultilingualTextInput, languageTags,
             number, volume, selectedJournal,
             selectedBookSeries, monographTypes,
-            selectedMonographType, allResearchAreas,
-            researchAreasSelectable, selectedEvent,
+            selectedMonographType, selectedEvent,
             publicationSeriesExternalValidation,
             eIsbn, printIsbn, numberOfPages,
             selectedLanguages, languageList,
             requiredSelectionRules, uris,
-            selectedResearchArea, doiValidationRules,
+            doiValidationRules,
             scopusIdValidationRules, titleRef,
             subtitleRef, refreshForm, urisRef,
             isbnValidationRules, snackbar, message,

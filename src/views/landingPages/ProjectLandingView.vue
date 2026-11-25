@@ -210,7 +210,34 @@
                                 {{ uri }}
                             </a>
                         </landing-detail-field>
-                        <div class="md:col-span-2">
+                    </template>
+                    <template #before-keywords>
+                        <landing-section-card
+                            :title="$t('identifiersLabel')"
+                            icon="mdi-identifier"
+                            icon-class="bg-indigo-50 text-indigo-600"
+                            padded
+                        >
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'doi', project?.doi)"
+                                    label="DOI">
+                                    <identifier-link v-if="project?.doi" :identifier="project.doi" type="doi" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'raid', project?.raid)"
+                                    :label="$t('raidLabel')">
+                                    <identifier-link v-if="project?.raid" :identifier="project.raid" type="raid" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                                <landing-detail-field
+                                    v-if="isIdentifierShown(ApplicableEntityType.PROJECT, 'nationalId', project?.nationalId)"
+                                    :label="configuredNationalIdentifierLabel || $t('nationalIdLabel')">
+                                    <identifier-link v-if="project?.nationalId" :identifier="project.nationalId" type="national_project" compact />
+                                    <span v-else>{{ $t("notYetSetMessage") }}</span>
+                                </landing-detail-field>
+                            </div>
                             <entity-identifiers-list
                                 :entity-identifiers="projectIdentifiers"
                                 :can-edit="canEdit && isAdmin"
@@ -219,8 +246,14 @@
                                 :concrete-entity-type="ApplicableEntityType.PROJECT"
                                 @updated="fetchIdentifiers"
                             />
-                        </div>
+                        </landing-section-card>
                     </template>
+
+                    <landing-research-areas-section
+                        :research-areas="researchAreas"
+                        :can-edit="canEdit"
+                        @update="updateResearchAreas"
+                    />
                 </landing-additional-info-tab>
             </v-tabs-window-item>
 
@@ -249,6 +282,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="EntityType.PROJECT"
                         :entity-id="project?.id"
+                        :record-name="title"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -262,6 +296,9 @@
 
 <script setup lang="ts">
 import FeaturedIdentifiers from '@/components/landing/FeaturedIdentifiers.vue';
+import IdentifierLink from "@/components/core/IdentifierLink.vue";
+import { useIdentifierConfiguration, useNationalIdentifierLabel }
+    from "@/composables/useCrisContextInformation";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
@@ -298,6 +335,9 @@ import LandingDetailField from "@/components/landing/LandingDetailField.vue";
 import LandingAdditionalInfoTab from "@/components/landing/LandingAdditionalInfoTab.vue";
 import LandingOverviewTab from "@/components/landing/LandingOverviewTab.vue";
 import LandingSectionCard from "@/components/landing/LandingSectionCard.vue";
+import LandingResearchAreasSection from "@/components/landing/LandingResearchAreasSection.vue";
+import ResearchAreaService from "@/services/ResearchAreaService";
+import type { ResearchArea } from "@/models/OrganisationUnitModel";
 import LandingPageLayout from "@/components/landing/LandingPageLayout.vue";
 import EntityIdentifiersList from "@/components/core/identifiers/EntityIdentifiersList.vue";
 import EntityIdentifierService from "@/services/EntityIdentifierService";
@@ -308,6 +348,10 @@ const route = useRoute();
 const router = useRouter();
 const i18n = useI18n();
 const { locale } = useI18n();
+
+const { isIdentifierShown } = useIdentifierConfiguration();
+const { configuredNationalIdentifierLabel } =
+    useNationalIdentifierLabel(ApplicableEntityType.PROJECT);
 
 const project = ref<Project>();
 const currentTab = ref("overview");
@@ -332,6 +376,8 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 
 const updateModalRef = ref<{ dialog: boolean } | null>(null);
+const researchAreas = ref<ResearchArea[]>([]);
+const nameModalRef = ref<{ dialog: boolean } | null>(null);
 
 const openModal = (modal: { dialog: boolean } | null) => {
     if (modal) {
@@ -394,6 +440,7 @@ const fetchProject = async () => {
             parseInt(route.params.id as string)
         );
         project.value = response.data;
+        fetchResearchAreas();
 
         document.title = returnCurrentLocaleContent(project.value?.name) as string;
 
@@ -405,6 +452,14 @@ const fetchProject = async () => {
         console.error("Error fetching project:", error);
         await router.push({ name: "notFound" });
     }
+};
+
+const fetchResearchAreas = () => {
+    Promise.all((project.value?.researchAreasId ?? []).map(
+        researchAreaId => ResearchAreaService.readResearchAreaHierarchy(researchAreaId)
+    )).then(responses => {
+        researchAreas.value = responses.map(response => response.data);
+    }).catch(() => researchAreas.value = []);
 };
 
 const checkIfUserCanEdit = () => {
@@ -432,6 +487,17 @@ const showAssessmentDetails = (version: { majorVersion: number, minorVersion: nu
 
 const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
+};
+
+const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
+    project.value!.name = nameInformation.name;
+    project.value!.nameAbbreviation = nameInformation.nameAbbreviation;
+    performUpdate(true);
+};
+
+const updateResearchAreas = (researchAreaIds: number[]) => {
+    project.value!.researchAreasId = researchAreaIds;
+    performUpdate(true);
 };
 
 const updateKeywords = (keywords: MultilingualContent[]) => {

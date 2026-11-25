@@ -156,7 +156,7 @@
             </v-row>
         </v-tabs-window-item>
         <v-tabs-window-item value="statistics">
-            <div v-if="isDigitalLibraryEnabled && isDigitalLibraryClient">
+            <div v-if="canSeeDigitalLibraryAnalytics">
                 <v-checkbox
                     v-model="displayThesesLibraryAnalytics"
                     class="table-checkbox"
@@ -175,14 +175,14 @@
                 </v-col>
                 <v-col
                     v-if="displaySettings?.viewCountDocumentLeaderboard.display"
-                    cols="12" :md="displaySettings?.viewCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
+                    cols="12" :md="(displaySettings?.viewCountDocumentLeaderboard.spanWholeRow || !isDigitalRepositoryEnabled) ? 12 : 6">
                     <leaderboard-table
                         :leaderboard-data="documentViewCountsLeaderboard"
                         :title="$t('documentViewCountsLeaderboardLabel')"
                     />
                 </v-col>
                 <v-col
-                    v-if="displaySettings?.downloadCountDocumentLeaderboard.display"
+                    v-if="displaySettings?.downloadCountDocumentLeaderboard.display && isDigitalRepositoryEnabled"
                     cols="12" :md="displaySettings?.downloadCountDocumentLeaderboard.spanWholeRow ? 12 : 6">
                     <leaderboard-table
                         :leaderboard-data="documentDownloadCountsLeaderboard"
@@ -192,7 +192,7 @@
             </v-row>
 
             <div
-                v-if="displayThesesLibraryAnalytics"
+                v-if="canSeeDigitalLibraryAnalytics && displayThesesLibraryAnalytics"
                 ref="thesisLibraryAnalyticsRef">
                 <div class="flex flex-col justify-center items-center text-center mt-14">
                     <h2 class="text-3xl font-semibold">
@@ -292,8 +292,11 @@ const endDate = ref<string>((new Date()).toISOString());
 const currentTab = ref("publicationCount");
 
 const { 
+    loaded,
+    fetchCrisContextInformation,
     isAssessmentModuleEnabled,
-    isDigitalLibraryEnabled
+    isDigitalLibraryEnabled,
+    isDigitalRepositoryEnabled
  } = useCrisContextInformation();
 
 const {
@@ -322,14 +325,23 @@ const selectedThesisTypes = ref<{ title: string, value: ThesisType }[]>([]);
 
 const displayThesesLibraryAnalytics = ref(false);
 
-onMounted(() => {
-    if (isInstitutionalLibrarian.value || isHeadOfLibrary.value) {
-        displayThesesLibraryAnalytics.value = true;
+const canSeeDigitalLibraryAnalytics = computed(
+    () => isDigitalLibraryEnabled.value && props.isDigitalLibraryClient);
+
+// The module toggles arrive from the server, so the first fetch waits for them.
+onMounted(async () => {
+    if (!loaded.value) {
+        await fetchCrisContextInformation();
     }
 
     fetchLeaderboardData();
     deduceStartTab();
 });
+
+watch(canSeeDigitalLibraryAnalytics, (canSee) => {
+    displayThesesLibraryAnalytics.value =
+        canSee && (isInstitutionalLibrarian.value || isHeadOfLibrary.value);
+}, { immediate: true });
 
 const fetchLeaderboardData = () => {
     fetchPersonLeaderboards();
@@ -357,11 +369,14 @@ const fetchPersonLeaderboards = () => {
     });
 
     personAssessmentPointsLeaderboard.value.splice(0);
-    PersonLeaderboardService.getPersonAssessmentPointsLeaderboard(
-        props.organisationUnitId, fromYear.value, toYear.value
-    ).then((response) => {
-        personAssessmentPointsLeaderboard.value = response.data;
-    });
+
+    if (isAssessmentModuleEnabled.value) {
+        PersonLeaderboardService.getPersonAssessmentPointsLeaderboard(
+            props.organisationUnitId, fromYear.value, toYear.value
+        ).then((response) => {
+            personAssessmentPointsLeaderboard.value = response.data;
+        });
+    }
 
     personViewCountsLeaderboard.value.splice(0);
     PersonLeaderboardService.getPersonViewCountLeaderboard(
@@ -387,11 +402,14 @@ const fetchOrganisationSubUnitsLeaderboards = () => {
     });
 
     subUnitAssessmentPointsLeaderboard.value.splice(0);
-    OrganisationUnitLeaderboardService.getOrganisationUnitAssessmentPointsLeaderboard(
-        props.organisationUnitId, fromYear.value, toYear.value
-    ).then((response) => {
-        subUnitAssessmentPointsLeaderboard.value = response.data;
-    });
+
+    if (isAssessmentModuleEnabled.value) {
+        OrganisationUnitLeaderboardService.getOrganisationUnitAssessmentPointsLeaderboard(
+            props.organisationUnitId, fromYear.value, toYear.value
+        ).then((response) => {
+            subUnitAssessmentPointsLeaderboard.value = response.data;
+        });
+    }
 };
 
 const fetchDocumentLeaderboards = () => {
@@ -410,14 +428,21 @@ const fetchDocumentLeaderboards = () => {
     });
 
     documentDownloadCountsLeaderboard.value.splice(0);
-    DocumentLeaderboardService.getDocumentStatisticCountLeaderboard(
-        props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0], StatisticsType.DOWNLOAD
-    ).then((response) => {
-        documentDownloadCountsLeaderboard.value = response.data;
-    });
+
+    if (isDigitalRepositoryEnabled.value) {
+        DocumentLeaderboardService.getDocumentStatisticCountLeaderboard(
+            props.organisationUnitId, startDate.value.split("T")[0], endDate.value.split("T")[0], StatisticsType.DOWNLOAD
+        ).then((response) => {
+            documentDownloadCountsLeaderboard.value = response.data;
+        });
+    }
 };
 
 const fetchDigitalLibraryLeaderboards = () => {
+    if (!canSeeDigitalLibraryAnalytics.value) {
+        return;
+    }
+
     thesesViewCountsLeaderboard.value.splice(0);
     DigitalLibraryLeaderboardService.getThesisStatisticCountLeaderboard(
         props.organisationUnitId,

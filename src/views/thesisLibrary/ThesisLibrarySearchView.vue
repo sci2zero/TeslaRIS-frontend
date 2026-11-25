@@ -37,6 +37,7 @@
             <filter-bar-component
                 ref="filtersRef"
                 :filter-component="ThesisFilters"
+                :filter-props="{ presetOUs: presetOUs }"
                 :show-reset-button="currentTab === 'simpleSearch'"
                 @apply-filters="search(searchParams)"
                 @reset="search(searchParams)" />
@@ -94,13 +95,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { getThesisTitleFromValueAutoLocale, getThesisTypesForGivenLocale } from '@/i18n/thesisType';
 import { type DocumentPublicationIndex, PublicationType, ThesisType } from '@/models/PublicationModel';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import { type ThesisSearchRequest, type ThesisReportRequest } from '@/models/ThesisLibraryModel';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 import QueryInputComponent from '@/components/core/QueryInputComponent.vue';
 import SearchBarComponent from '@/components/core/SearchBarComponent.vue';
 import PublicationTableComponent from '@/components/publication/PublicationTableComponent.vue';
@@ -110,6 +112,10 @@ import ThesisFilters from '@/components/thesisLibrary/ThesisFilters.vue';
 import { ExportableEndpointType, ExportEntity, type SearchFieldsResponse } from '@/models/Common';
 import Wordcloud from '@/components/core/Wordcloud.vue';
 import TabContentLoader from '@/components/core/TabContentLoader.vue';
+import OrganisationUnitService from '@/services/OrganisationUnitService';
+import { returnCurrentLocaleContent } from '@/i18n/MultilingualContentUtil';
+import { toTokenArray } from '@/utils/SearchTokenUtil';
+import { useCrisContextInformation } from '@/composables/useCrisContextInformation';
 
 
 export default defineComponent({
@@ -123,6 +129,11 @@ export default defineComponent({
         const isFormValid = ref(false);
         const reportRequest = ref<ThesisReportRequest>();
         const i18n = useI18n();
+        const route = useRoute();
+        const router = useRouter();
+
+        const presetOUs = ref<{title: string, value: number}[]>([]);
+        const { thesisLibraryInstitutionIds } = useCrisContextInformation();
 
         const showWordcloud = ref(false);
 
@@ -157,7 +168,90 @@ export default defineComponent({
             });
 
             loading.value = true;
+
+            applyInstitutionIdsFromUrl();
         });
+
+        const applyInstitutionIdsFromUrl = () => {
+            const institutionIdsParam = route.query.institutionIds as string;
+
+            if (!institutionIdsParam) {
+                applyInstitutionIdsFromContext();
+                return;
+            }
+
+            const institutionIds = [...new Set(
+                institutionIdsParam
+                    .split(",")
+                    .map(institutionId => parseInt(institutionId.trim()))
+                    .filter(institutionId => !isNaN(institutionId))
+            )];
+
+            if (institutionIds.length === 0) {
+                applyInstitutionIdsFromContext();
+                return;
+            }
+
+            applyPresetInstitutionIds(institutionIds);
+        };
+
+        const applyInstitutionIdsFromContext = () => {
+            if (thesisLibraryInstitutionIds.value.length > 0) {
+                applyPresetInstitutionIds(thesisLibraryInstitutionIds.value);
+                return;
+            }
+
+            const stopWaitingForContext = watch(thesisLibraryInstitutionIds, institutionIds => {
+                stopWaitingForContext();
+
+                if (institutionIds.length > 0) {
+                    applyPresetInstitutionIds(institutionIds);
+                }
+            });
+        };
+
+        const applyPresetInstitutionIds = (institutionIds: number[]) => {
+            Promise.allSettled(
+                institutionIds.map(institutionId => OrganisationUnitService.readOU(institutionId))
+            ).then(results => {
+                const fetchedOUs: {title: string, value: number}[] = [];
+
+                results.forEach(result => {
+                    if (result.status === "fulfilled") {
+                        fetchedOUs.push({
+                            title: returnCurrentLocaleContent(result.value.data.name) as string,
+                            value: result.value.data.id
+                        });
+                    }
+                });
+
+                if (fetchedOUs.length === 0) {
+                    return;
+                }
+
+                presetOUs.value = fetchedOUs;
+
+                if (filtersRef.value) {
+                    filtersRef.value.isExpanded = true;
+                }
+
+                nextTick(() => {
+                    clearSortAndPerformSearch(["*"]);
+                });
+            });
+        };
+
+        const syncInstitutionIdsWithUrl = (facultyIds: number[]) => {
+            const query = { ...route.query };
+
+            if (facultyIds.length > 0) {
+                query.institutionIds = facultyIds.join(",");
+            } else {
+                delete query.institutionIds;
+            }
+
+            router.replace({ query });
+        };
 
         const search = (tokenParams: string[]) => {
             searchParams.value = tokenParams;
@@ -181,6 +275,7 @@ export default defineComponent({
             }
 
             lastSearchRequest.value = searchRequest;
+            syncInstitutionIdsWithUrl(searchRequest.facultyIds ?? []);
 
             const isSimpleSearch = currentTab.value === "simpleSearch";
             const serviceMethod = isSimpleSearch
@@ -214,7 +309,7 @@ export default defineComponent({
 
         const clearSortAndPerformSearch = (tokenParams: string | string[]) => {
             if (typeof tokenParams === "string") {
-                tokenParams = tokenParams.replaceAll("tokens=", "").split("&");
+                tokenParams = toTokenArray(tokenParams);
             }
 
             tableRef.value?.setSortAndPageOption([], 1);
@@ -253,6 +348,7 @@ export default defineComponent({
             lastSearchRequest, ExportEntity,
             resetFiltersAndSearch,
             sectionTableRef, searchFields,
+            presetOUs,
             wordcloudFrequencies, PublicationType,
             showWordcloud, loading
         };

@@ -159,6 +159,7 @@
                     @update-keywords="updateKeywords"
                     @update-description="updateDescription"
                     @update-remark="updateRemark"
+                    @update-research-areas="updateResearchAreas"
                     @identifiers-updated="fetchIdentifiers"
                 >
                     <template #details>
@@ -166,13 +167,6 @@
                         <landing-detail-field v-if="materialProduct?.productUsers && materialProduct.productUsers.length > 0" :label="$t('productUsersLabel')">
                             {{ returnCurrentLocaleContent(materialProduct.productUsers) }}
                         </landing-detail-field>
-                    </template>
-                    <template #after-keywords>
-                        <landing-research-areas-section
-                            :research-areas="materialProduct?.researchAreas"
-                            :can-edit="canEdit && !materialProduct?.isArchived"
-                            @update="updateResearchAreas"
-                        />
                     </template>
                 </landing-additional-info-tab>
             </v-tabs-window-item>
@@ -250,6 +244,7 @@
                         ref="dataQualityTabsRef"
                         :entity-type="PublicationType.MATERIAL_PRODUCT"
                         :entity-id="materialProduct?.id"
+                        :record-name="returnCurrentLocaleContent(materialProduct?.title) ?? ''"
                     />
                 </landing-section-card>
             </v-tabs-window-item>
@@ -310,7 +305,6 @@ import { type AxiosResponseHeaders } from 'axios';
 import DocumentVisualizations from '@/components/publication/DocumentVisualizations.vue';
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import MaterialProductUpdateForm from '@/components/publication/update/MaterialProductUpdateForm.vue';
-import LandingResearchAreasSection from '@/components/landing/LandingResearchAreasSection.vue';
 import GenericCrudModal from '@/components/core/GenericCrudModal.vue';
 import { getMaterialProductTypeTitleFromValueAutoLocale } from '@/i18n/materialProductType';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
@@ -329,7 +323,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "MaterialProductLandingPage",
-    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, GenericCrudModal, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab, LandingResearchAreasSection },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, LocalizedLink, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, GenericCrudModal, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");
@@ -464,6 +458,11 @@ export default defineComponent({
         };
 
         const fetchClassifications = () => {
+            if (!isAssessmentModuleEnabled.value) {
+                documentClassifications.value = [];
+                return;
+            }
+
             EntityClassificationService.fetchDocumentClassifications(parseInt(currentRoute.params.id as string)).then(response => {
                 documentClassifications.value = response.data;
             });
