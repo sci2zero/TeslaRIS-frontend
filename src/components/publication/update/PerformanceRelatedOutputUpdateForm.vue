@@ -47,6 +47,15 @@
             </v-col>
         </v-row>
         <v-row>
+            <v-col cols="10">
+                <event-autocomplete-search
+                    ref="eventAutocompleteRef"
+                    v-model="selectedEvent"
+                    allow-manual-clearing
+                />
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col>
                 <multilingual-text-input
                     ref="producerRef"
@@ -160,7 +169,7 @@ import { onMounted } from 'vue';
 import { useValidationUtils } from '@/utils/ValidationUtils';
 import type { CommonFieldsData, PerformanceRelatedOutput, PerformanceRelatedOutputType } from '@/models/PublicationModel';
 import UriInput from '@/components/core/UriInput.vue';
-import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
+import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import { watch } from 'vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
@@ -173,11 +182,13 @@ import LanguageService from '@/services/LanguageService';
 import { type AxiosResponse } from 'axios';
 import FlexibleDatePicker from '@/components/core/FlexibleDatePicker.vue';
 import UiInput from '@/components/ui/input/Input.vue';
+import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+import EventService from '@/services/EventService';
 
 
 export default defineComponent({
     name: "PerformanceRelatedOutputUpdateForm",
-    components: { MultilingualTextInput, UriInput, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput },
+    components: { MultilingualTextInput, UriInput, EventAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput },
     props: {
         presetPerformanceRelatedOutput: {
             type: Object as PropType<PerformanceRelatedOutput | undefined>,
@@ -203,6 +214,7 @@ export default defineComponent({
 
         onMounted(() => {
             updatePresetCommonFields();
+            fillEventData();
 
             LanguageService.getAllLanguageTags()
                 .then((response: AxiosResponse<LanguageTagResponse[]>) => {
@@ -215,6 +227,25 @@ export default defineComponent({
                 })
             });
         });
+
+        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
+        const selectedEvent = ref<{ title: string, value: number }>({ title: "", value: -1 });
+
+        const fillEventData = () => {
+            const eventId = props.presetPerformanceRelatedOutput?.eventId;
+
+            if (!eventId) {
+                selectedEvent.value = { title: "", value: -1 };
+                return;
+            }
+
+            EventService.readConference(eventId).then(response => {
+                selectedEvent.value = {
+                    title: returnCurrentLocaleContent(response.data.name) as string,
+                    value: response.data.id as number
+                };
+            });
+        };
 
         const fillLanguageData = () => {
             selectedLanguageTags.value.splice(0);
@@ -314,6 +345,7 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 type: selectedPerformanceRelatedOutputType.value.value as PerformanceRelatedOutputType,
+                eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 fileItems: [],
                 proofs: [],
                 producer: producer.value,
@@ -366,6 +398,7 @@ export default defineComponent({
                 };
 
             fillLanguageData();
+            fillEventData();
 
             titleRef.value?.forceRefreshModelValue(toMultilingualTextInput(title.value, languageTags.value));
             subtitleRef.value?.forceRefreshModelValue(toMultilingualTextInput(subtitle.value, languageTags.value));
@@ -391,7 +424,8 @@ export default defineComponent({
             commonFieldsRef, commonFieldsData, presetCommonFieldsData,
             distributorRef, producerRef, sourceTitleRef, otherActorsRef,
             distributor, producer, sourceTitle, otherActors,
-            allLanguageTags, selectedLanguageTags
+            allLanguageTags, selectedLanguageTags,
+            selectedEvent, eventAutocompleteRef
         };
     }
 });

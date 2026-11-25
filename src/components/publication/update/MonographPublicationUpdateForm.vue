@@ -102,14 +102,14 @@
                 <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
-        <v-row>
+        <!-- <v-row>
             <v-col cols="12">
                 <event-autocomplete-search
                     ref="eventAutocompleteRef"
                     v-model="selectedEvent"
                 />
             </v-col>
-        </v-row>
+        </v-row> -->
         <v-row>
             <v-col>
                 <ui-input
@@ -167,10 +167,9 @@ import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import MonographService from '@/services/DocumentPublicationService';
 import type { Monograph } from '@/models/PublicationModel';
-import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getMonographPublicationTypesForGivenLocale } from '@/i18n/monographPublicationType';
 import MonographAutocompleteSearch from '../MonographAutocompleteSearch.vue';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+import EventService from '@/services/EventService';
 import { watch } from 'vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
@@ -183,7 +182,7 @@ import UiInput from '@/components/ui/input/Input.vue';
 
 export default defineComponent({
     name: "MonographPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, MonographAutocompleteSearch, EventAutocompleteSearch, Toast, DocumentCommonFields, UiInput },
+    components: { MultilingualTextInput, UriInput, MonographAutocompleteSearch, Toast, DocumentCommonFields, UiInput },
     props: {
         presetMonographPublication: {
             type: Object as PropType<MonographPublication | undefined>,
@@ -204,7 +203,6 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const monograph = ref<Monograph>();
-        const event = ref<Conference>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
 
@@ -220,6 +218,12 @@ export default defineComponent({
                 MonographService.readMonograph(props.presetMonographPublication.monographId).then((response) => {
                     monograph.value = response.data;
                     selectedMonograph.value = {title: returnCurrentLocaleContent(monograph.value.title) as string, value: monograph.value.id as number};
+                });
+            }
+
+            if (props.presetMonographPublication?.eventId) {
+                EventService.readConference(props.presetMonographPublication.eventId).then((response) => {
+                    selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
                 });
             }
         };
@@ -238,8 +242,7 @@ export default defineComponent({
         const searchPlaceholderMonograph = {title: returnCurrentLocaleContent(monograph.value?.title) as string, value: monograph.value?.id as number};
         const selectedMonograph = ref<{ title: string, value: number }>(searchPlaceholderMonograph);
 
-        const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
+        const selectedEvent = ref<{ title: string, value: number }>({title: "", value: -1});
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
@@ -312,7 +315,7 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 monographId: selectedMonograph.value.value,
-                eventId: selectedEvent.value.value,
+                eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 monographPublicationType: selectedpublicationType.value.value as MonographPublicationType,
                 fileItems: [],
                 proofs: [],

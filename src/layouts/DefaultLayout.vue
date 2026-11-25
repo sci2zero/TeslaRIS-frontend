@@ -12,7 +12,7 @@
     </v-app>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Navbar from "@/components/core/MainNavbar.vue";
 import Footerbar from "@/components/core/FooterBar.vue";
 import SideBar from "@/components/core/SideBar.vue";

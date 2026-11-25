@@ -106,11 +106,11 @@
                 <uri-input ref="urisRef" v-model="uris" />
             </v-col>
         </v-row>
-        <v-row>
+        <!-- <v-row>
             <v-col cols="10">
                 <event-autocomplete-search ref="eventAutocompleteRef" v-model="selectedEvent" />
             </v-col>
-        </v-row>
+        </v-row> -->
         <v-row>
             <v-col cols="3">
                 <ui-input
@@ -165,11 +165,10 @@ import UriInput from '@/components/core/UriInput.vue';
 import { returnCurrentLocaleContent, toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import JournalService from '@/services/JournalService';
 import type { Journal } from '@/models/JournalModel';
-import type { Conference } from '@/models/EventModel';
 import { getTitleFromValueAutoLocale, getTypesForGivenLocale } from '@/i18n/journalPublicationType';
 import { watch } from 'vue';
 import JournalAutocompleteSearch from '@/components/journal/JournalAutocompleteSearch.vue';
-import EventAutocompleteSearch from '@/components/event/EventAutocompleteSearch.vue';
+import EventService from '@/services/EventService';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import Toast from '@/components/core/Toast.vue';
 import DocumentPublicationService from '@/services/DocumentPublicationService';
@@ -183,7 +182,7 @@ import UiCheckbox from '@/components/ui/checkbox/Checkbox.vue';
 
 export default defineComponent({
     name: "JournalPublicationUpdateForm",
-    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, EventAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput, UiCheckbox },
+    components: { MultilingualTextInput, UriInput, JournalAutocompleteSearch, Toast, DocumentCommonFields, FlexibleDatePicker, UiInput, UiCheckbox },
     props: {
         presetJournalPublication: {
             type: Object as PropType<JournalPublication | undefined>,
@@ -204,7 +203,6 @@ export default defineComponent({
         const isFormValid = ref(false);
 
         const journal = ref<Journal>();
-        const event = ref<Conference>();
 
         const { checkIdentifiers, message, snackbar } = useIdentifierCheck();
 
@@ -226,6 +224,12 @@ export default defineComponent({
                     selectedJournal.value = {title: returnCurrentLocaleContent(journal.value.title) as string, value: journal.value.id as number};
                 });
             }
+
+            if (props.presetJournalPublication?.eventId) {
+                EventService.readConference(props.presetJournalPublication.eventId).then((response) => {
+                    selectedEvent.value = {title: returnCurrentLocaleContent(response.data.name) as string, value: response.data.id as number};
+                });
+            }
         };
 
         watch(() => props.presetJournalPublication, () => {
@@ -242,8 +246,7 @@ export default defineComponent({
         const searchPlaceholderJournal = {title: returnCurrentLocaleContent(journal.value?.title) as string, value: journal.value?.id as number};
         const selectedJournal = ref<{ title: string, value: number }>(searchPlaceholderJournal);
 
-        const searchPlaceholderEvent = {title: returnCurrentLocaleContent(event.value?.name) as string, value: event.value?.id as number};
-        const selectedEvent = ref<{ title: string, value: number }>(searchPlaceholderEvent);
+        const selectedEvent = ref<{ title: string, value: number }>({title: "", value: -1});
 
         const title = ref<any>([]);
         const subtitle = ref<any>([]);
@@ -316,7 +319,7 @@ export default defineComponent({
                 openAlexId: openAlexId.value,
                 webOfScienceId: webOfScienceId.value,
                 journalId: selectedJournal.value.value,
-                eventId: selectedEvent.value.value,
+                eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 journalPublicationType: selectedpublicationType.value.value as JournalPublicationType,
                 fileItems: [],
                 proofs: [],

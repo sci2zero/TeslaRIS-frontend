@@ -163,6 +163,11 @@
                         <landing-detail-field v-if="(performanceRelatedOutput?.otherActors?.length || 0) > 0" :label="$t('otherActorsLabel')">
                             {{ returnCurrentLocaleContent(performanceRelatedOutput?.otherActors) }}
                         </landing-detail-field>
+                        <landing-detail-field v-if="performanceRelatedOutput?.eventId" :label="$t('conferenceLabel')">
+                            <localized-link :to="'events/conference/' + performanceRelatedOutput.eventId" class="underline">
+                                {{ returnCurrentLocaleContent(performanceRelatedOutput?.eventName) }}
+                            </localized-link>
+                        </landing-detail-field>
                         <landing-detail-field v-if="performanceRelatedOutput?.languageTags && performanceRelatedOutput.languageTags.length > 0" :label="$t('languageLabel')">
                             <v-chip v-for="(languageTag, index) in performanceRelatedOutput.languageTags" :key="index" outlined>
                                 {{ languageTag.display }}
@@ -305,6 +310,7 @@ import DocumentVisualizations from '@/components/publication/DocumentVisualizati
 import { useDocumentChartDisplay } from '@/composables/useDocumentChartDisplay';
 import { getPerformanceRelatedOutputTypeTitleFromValueAutoLocale } from '@/i18n/performanceRelatedOutputType';
 import PerformanceRelatedOutputUpdateForm from '@/components/publication/update/PerformanceRelatedOutputUpdateForm.vue';
+import LocalizedLink from '@/components/localization/LocalizedLink.vue';
 import type { EntityIdentifierResponse } from '@/models/IdentifierModel';
 import EntityIdentifierService from '@/services/EntityIdentifierService';
 import { updateCommonBasicInfo } from '@/utils/CommonDocumentFieldsUtil';
@@ -321,7 +327,7 @@ import { useCrisContextInformation } from '@/composables/useCrisContextInformati
 
 export default defineComponent({
     name: "PerformanceRelatedOutputLandingPage",
-    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, GenericCrudModal, Toast, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
+    components: { FeaturedIdentifiers, LandingSectionCard, LandingPageLayout, AttachmentSection, PersonDocumentContributionTabs, GenericCrudModal, Toast, LocalizedLink, EntityClassificationView, IndicatorsSection, RichTitleRenderer, LandingOverviewTab, DocumentActionBox, PublicationBadgeSection, ShareButtons, DocumentVisualizations, RevisionHistoryTableComponent, DataQualityTabsComponent, EntityLandingHeader, LandingMetaItem, LandingDetailField, LandingAdditionalInfoTab },
     setup() {
         const { isIdentifierShown } = useIdentifierConfiguration();
         const currentTab = ref("overview");

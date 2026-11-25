@@ -35,6 +35,11 @@
                 :rules="requiredSelectionRules"
                 return-object
             />
+            <event-autocomplete-search
+                ref="eventAutocompleteRef"
+                v-model="selectedEvent"
+                allow-manual-clearing
+            />
         </form-section>
 
         <form-section
@@ -160,6 +165,7 @@ import Toast from '../core/Toast.vue';
 import { useLanguageTags } from '@/composables/useLanguageTags';
 import { toMultilingualTextInput } from '@/i18n/MultilingualContentUtil';
 import IDFMetadataPrepopulator from '../core/IDFMetadataPrepopulator.vue';
+import EventAutocompleteSearch from '../event/EventAutocompleteSearch.vue';
 import PublicationDeduplicationTable from './PublicationDeduplicationTable.vue';
 import { getPerformanceRelatedOutputTypesForGivenLocale } from '@/i18n/performanceRelatedOutputType';
 import DocumentCommonFields from './DocumentCommonFields.vue';
@@ -173,7 +179,7 @@ import { UiButton } from '@/components/ui/button';
 
 export default defineComponent({
     name: "SubmitPerformanceRelatedOutput",
-    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
+    components: {MultilingualTextInput, UriInput, PersonPublicationContribution, EventAutocompleteSearch, Toast, IDFMetadataPrepopulator, PublicationDeduplicationTable, DocumentCommonFields, FlexibleDatePicker, UiInput, FormSection, UiButton},
     props: {
         inModal: {
             type: Boolean,
@@ -205,6 +211,7 @@ export default defineComponent({
         const distributorRef = ref<typeof MultilingualTextInput>();
         const sourceTitleRef = ref<typeof MultilingualTextInput>();
         const otherActorsRef = ref<typeof MultilingualTextInput>();
+        const eventAutocompleteRef = ref<typeof EventAutocompleteSearch>();
 
         const title = ref<any[]>([]);
         const subtitle = ref([]);
@@ -222,6 +229,8 @@ export default defineComponent({
         const distributor = ref<any[]>([]);
         const sourceTitle = ref<any[]>([]);
         const otherActors = ref<any[]>([]);
+
+        const selectedEvent = ref<{ title: string, value: number }>({ title: "", value: -1 });
 
         const performanceRelatedOutputTypes = getPerformanceRelatedOutputTypesForGivenLocale();
         const selectedPerformanceRelatedOutputType = ref<{title: string, value: PerformanceRelatedOutputType | null}>({ title: "", value: null });
@@ -274,6 +283,7 @@ export default defineComponent({
                 scopusId: scopus.value,
                 webOfScienceId: webOfScienceId.value,
                 type: selectedPerformanceRelatedOutputType.value.value as PerformanceRelatedOutputType,
+                eventId: selectedEvent.value?.value > 0 ? selectedEvent.value?.value : undefined,
                 fileItems: [],
                 proofs: [],
                 languageTagIds: selectedLanguageTags.value.map(languageTag => languageTag.value),
@@ -304,6 +314,7 @@ export default defineComponent({
                     contributionsRef.value?.clearInput();
                     deduplicationTableRef.value?.resetTable();
                     selectedPerformanceRelatedOutputType.value = { title: "", value: null };
+                    eventAutocompleteRef.value?.clearInput();
                     commonFieldsRef.value?.clearInputs();
                     commonFieldsData.value = {};
 
@@ -376,7 +387,7 @@ export default defineComponent({
             commonFieldsRef, commonFieldsData, otherActors,
             presetCommonFieldsData, producerRef, distributorRef,
             sourceTitleRef, otherActorsRef, selectedLanguageTags,
-            allLanguageTags
+            allLanguageTags, selectedEvent, eventAutocompleteRef
         };
     }
 });
