@@ -31,18 +31,6 @@
                         :read-only="!canEdit"
                         @update="updateBasicInfo"
                     />
-                    <generic-crud-modal
-                        v-if="canEdit"
-                        ref="nameModalRef"
-                        hide-activator
-                        :form-component="AlternateNameForm"
-                        :form-props="{ presetName: project?.name, presetNameAbbreviation: project?.nameAbbreviation }"
-                        entity-name="Name"
-                        is-update
-                        is-section-update
-                        :read-only="!canEdit"
-                        @update="updateName"
-                    />
                 </template>
                 <template #title>
                     <rich-title-renderer :title="title" />
@@ -326,7 +314,6 @@ import { getProjectResearchTypeTitleFromValueAutoLocale } from "@/i18n/projectRe
 import { formatAmount } from "@/utils/MonetaryUtil";
 import { localiseDate } from "@/utils/DateUtil";
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
-import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import ProjectUpdateForm from "@/components/project/ProjectUpdateForm.vue";
 import ProjectFundingsTableComponent from "@/components/project/ProjectFundingsTableComponent.vue";
 import ProjectFundingApplicationsTableComponent from "@/components/project/ProjectFundingApplicationsTableComponent.vue";
@@ -410,6 +397,12 @@ const principleInvestigators = computed(() =>
     ) ?? []
 );
 
+const coPrincipleInvestigators = computed(() =>
+    project.value?.persons?.filter(
+        person => person.contributionType === PersonProjectContributionType.CO_PRINCIPLE_INVESTIGATOR
+    ) ?? []
+);
+
 const institutionCoordinators = computed(() =>
     project.value?.organisations?.filter(
         institution => institution.contributionType === OrganisationUnitProjectContributionType.COORDINATOR
@@ -448,6 +441,8 @@ const fetchProject = async () => {
         );
         project.value = response.data;
         fetchResearchAreas();
+
+        document.title = returnCurrentLocaleContent(project.value?.name) as string;
 
         if (loginStore.userLoggedIn) {
             checkIfUserCanEdit();

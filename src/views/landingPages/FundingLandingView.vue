@@ -5,23 +5,28 @@
                 :loading="!funding"
                 :entity-label="$t('fundingLabel')"
                 :icon="icon"
+                :can-edit="canEdit"
+                :edit-label="$t('updateFundingLabel')"
                 :entity-type="EntityType.FUNDING"
                 :entity-id="funding?.id"
+                @edit="openModal(updateModalRef)"
             >
-                <template #title>
-                    <rich-title-renderer :title="title" />
-                </template>
-                <template #actions>
+                <template #modals>
                     <generic-crud-modal
-
-                        :form-component="AlternateNameForm"
-                        :form-props="{ presetName: funding?.name, presetNameAbbreviation: funding?.nameAbbreviation }"
-                        entity-name="Name"
+                        v-if="canEdit"
+                        ref="updateModalRef"
+                        hide-activator
+                        :form-component="FundingUpdateForm"
+                        :form-props="{ presetFunding: funding }"
+                        entity-name="Funding"
                         is-update
                         is-section-update
                         :read-only="!canEdit"
-                        @update="updateName"
+                        @update="updateBasicInfo"
                     />
+                </template>
+                <template #title>
+                    <rich-title-renderer :title="title" />
                 </template>
             </entity-landing-header>
         </template>
@@ -30,17 +35,7 @@
             <v-row>
                 <v-col cols="12">
                     <v-card class="funding-info-card mb-6" variant="outlined">
-                        <v-card-text class="edit-pen-container">
-                            <generic-crud-modal
-                                :form-component="FundingUpdateForm"
-                                :form-props="{ presetFunding: funding }"
-                                entity-name="Funding"
-                                is-update
-                                is-section-update
-                                :read-only="!canEdit"
-                                @update="updateBasicInfo"
-                            />
-
+                        <v-card-text>
                             <!-- Basic Info -->
                             <div class="mb-5">
                                 <b>{{ $t("basicInfoLabel") }}</b>
@@ -65,6 +60,13 @@
                                     <div>{{ $t("fundingTypesLabel") }}:</div>
                                     <div class="response">
                                         {{ funding.fundingTypes.map((t : FundingType) => getFundingTypeTitleFromValueAutoLocale(t)).join(", ") }}
+                                    </div>
+                                </div>
+
+                                <div v-if="funding.fundingLocationType" class="info-item">
+                                    <div>{{ $t("fundingLocationTypeLabel") }}:</div>
+                                    <div class="response">
+                                        {{ getFundingLocationTypeTitleFromValueAutoLocale(funding.fundingLocationType) }}
                                     </div>
                                 </div>
 
@@ -345,6 +347,7 @@ import FundingService from "@/services/project/FundingService";
 import type { Funding, FundingPart } from "@/models/FundingModel";
 import type { FundingType } from "@/models/FundingModel";
 import { getFundingTypeTitleFromValueAutoLocale } from "@/i18n/fundingType";
+import { getFundingLocationTypeTitleFromValueAutoLocale } from "@/i18n/fundingLocationType";
 import RevisionHistoryTableComponent from "@/components/core/revisions/RevisionHistoryTableComponent.vue";
 import DataQualityTabsComponent from "@/components/core/revisions/DataQualityTabsComponent.vue";
 import DataQualityService from "@/services/revision/DataQualityService";
@@ -370,7 +373,6 @@ import { formatAmount } from "@/utils/MonetaryUtil";
 import FundingPartService from "@/services/project/FundingPartService";
 import { localiseDate } from '@/utils/DateUtil';
 import GenericCrudModal from "@/components/core/GenericCrudModal.vue";
-import AlternateNameForm from "@/components/project/AlternateNameForm.vue";
 import FundingUpdateForm from "@/components/project/FundingUpdateForm.vue";
 import LocalizedLink from "@/components/localization/LocalizedLink.vue";
 import ProjectService from "@/services/project/ProjectService";
@@ -401,6 +403,14 @@ const fundingApplications = ref<FundingApplicationIndex[]>([]);
 const fundingIdentifiers = ref<EntityIdentifierResponse[]>([]);
 
 const canEdit = ref(false);
+
+const updateModalRef = ref<{ dialog: boolean } | null>(null);
+
+const openModal = (modal: { dialog: boolean } | null) => {
+    if (modal) {
+        modal.dialog = true;
+    }
+};
 const loginStore = useLoginStore();
 const { isAdmin, canReviewDataQuality } = useUserRole();
 const { isIdentifierShown } = useIdentifierConfiguration();
@@ -445,6 +455,8 @@ const fetchFunding = async () => {
             parseInt(route.params.id as string)
         );
         funding.value = response.data;
+
+        document.title = returnCurrentLocaleContent(funding.value?.name) as string;
 
         fetchLinkedEntityNames();
 
@@ -530,12 +542,6 @@ const showAssessmentDetails = (version: { majorVersion: number, minorVersion: nu
 
 const searchKeyword = (keyword: string) => {
     router.push({ name: "advancedSearch", query: { searchQuery: keyword.trim(), tab: "publications", search: "simple" } });
-};
-
-const updateName = (nameInformation: {name: MultilingualContent[], nameAbbreviation: MultilingualContent[]}) => {
-    funding.value!.name = nameInformation.name;
-    funding.value!.nameAbbreviation = nameInformation.nameAbbreviation;
-    performUpdate(true);
 };
 
 const updateKeywords = (keywords: MultilingualContent[]) => {
@@ -638,9 +644,3 @@ const deleteFundingPart = (fundingPartId: number) => {
 };
 
 </script>
-
-<style scoped>
-.edit-pen-container {
-    position: relative;
-}
-</style>
